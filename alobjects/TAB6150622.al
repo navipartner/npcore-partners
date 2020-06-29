@@ -31,183 +31,190 @@ table 6150622 "POS Sales Line"
 
     fields
     {
-        field(1;"POS Entry No.";Integer)
+        field(1; "POS Entry No."; Integer)
         {
             Caption = 'POS Entry No.';
             TableRelation = "POS Entry";
         }
-        field(3;"POS Store Code";Code[10])
+        field(3; "POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';
             TableRelation = "POS Store";
         }
-        field(4;"POS Unit No.";Code[10])
+        field(4; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
             TableRelation = "POS Unit";
         }
-        field(5;"Document No.";Code[20])
+        field(5; "Document No."; Code[20])
         {
             Caption = 'Document No.';
         }
-        field(6;"Line No.";Integer)
+        field(6; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(7;"POS Period Register No.";Integer)
+        field(7; "POS Period Register No."; Integer)
         {
             Caption = 'POS Period Register No.';
             Description = 'NPR5.36';
             TableRelation = "POS Period Register";
         }
-        field(10;Type;Option)
+        field(10; Type; Option)
         {
             Caption = 'Type';
             OptionCaption = 'Comment,G/L Account,Item,Customer,Voucher,Payout,Rounding';
             OptionMembers = Comment,"G/L Account",Item,Customer,Voucher,Payout,Rounding;
         }
-        field(11;"No.";Code[20])
+        field(11; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type=CONST(Comment)) "Standard Text"
-                            ELSE IF (Type=CONST("G/L Account")) "G/L Account"
-                            ELSE IF (Type=CONST(Customer)) Customer
-                            ELSE IF (Type=CONST(Voucher)) "G/L Account"
-                            ELSE IF (Type=CONST(Payout)) "G/L Account"
-                            ELSE IF (Type=CONST(Item)) Item
-                            ELSE IF (Type=CONST(Rounding)) "G/L Account";
+            TableRelation = IF (Type = CONST(Comment)) "Standard Text"
+            ELSE
+            IF (Type = CONST("G/L Account")) "G/L Account"
+            ELSE
+            IF (Type = CONST(Customer)) Customer
+            ELSE
+            IF (Type = CONST(Voucher)) "G/L Account"
+            ELSE
+            IF (Type = CONST(Payout)) "G/L Account"
+            ELSE
+            IF (Type = CONST(Item)) Item
+            ELSE
+            IF (Type = CONST(Rounding)) "G/L Account";
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(12;"Location Code";Code[10])
+        field(12; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             TableRelation = Location;
         }
-        field(13;"Posting Group";Code[10])
+        field(13; "Posting Group"; Code[10])
         {
             Caption = 'Posting Group';
-            TableRelation = IF (Type=CONST(Item)) "Inventory Posting Group"
-                            ELSE IF (Type=CONST(Customer)) "Customer Posting Group";
+            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group"
+            ELSE
+            IF (Type = CONST(Customer)) "Customer Posting Group";
         }
-        field(14;Description;Text[80])
+        field(14; Description; Text[80])
         {
             Caption = 'Description';
         }
-        field(15;Quantity;Decimal)
+        field(15; Quantity; Decimal)
         {
             Caption = 'Quantity';
         }
-        field(20;"Customer No.";Code[20])
+        field(20; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
             TableRelation = Customer;
         }
-        field(22;"Unit Price";Decimal)
+        field(22; "Unit Price"; Decimal)
         {
             Caption = 'Unit Price';
         }
-        field(23;"Unit Cost (LCY)";Decimal)
+        field(23; "Unit Cost (LCY)"; Decimal)
         {
             Caption = 'Unit Cost (LCY)';
         }
-        field(25;"VAT %";Decimal)
+        field(25; "VAT %"; Decimal)
         {
             Caption = 'VAT %';
         }
-        field(26;"Line Discount %";Decimal)
+        field(26; "Line Discount %"; Decimal)
         {
             Caption = 'Line Discount %';
         }
-        field(27;"Line Discount Amount Excl. VAT";Decimal)
+        field(27; "Line Discount Amount Excl. VAT"; Decimal)
         {
             Caption = 'Line Discount Amount Excl. VAT';
         }
-        field(28;"Line Discount Amount Incl. VAT";Decimal)
+        field(28; "Line Discount Amount Incl. VAT"; Decimal)
         {
             Caption = 'Line Discount Amount';
         }
-        field(29;"Amount Excl. VAT";Decimal)
+        field(29; "Amount Excl. VAT"; Decimal)
         {
             Caption = 'Amount Excl. VAT';
         }
-        field(30;"Amount Incl. VAT";Decimal)
+        field(30; "Amount Incl. VAT"; Decimal)
         {
             Caption = 'Amount Incl. VAT';
         }
-        field(31;"Line Dsc. Amt. Excl. VAT (LCY)";Decimal)
+        field(31; "Line Dsc. Amt. Excl. VAT (LCY)"; Decimal)
         {
             Caption = 'Line Dsc. Amt. Excl. VAT (LCY)';
         }
-        field(32;"Line Dsc. Amt. Incl. VAT (LCY)";Decimal)
+        field(32; "Line Dsc. Amt. Incl. VAT (LCY)"; Decimal)
         {
             Caption = 'Line Dsc. Amt. Incl. VAT (LCY)';
         }
-        field(35;"Amount Excl. VAT (LCY)";Decimal)
+        field(35; "Amount Excl. VAT (LCY)"; Decimal)
         {
             Caption = 'Amount Excl. VAT (LCY)';
             Description = 'NPR5.36';
         }
-        field(36;"Amount Incl. VAT (LCY)";Decimal)
+        field(36; "Amount Incl. VAT (LCY)"; Decimal)
         {
             Caption = 'Amount Incl. VAT (LCY)';
             Description = 'NPR5.36';
         }
-        field(38;"Appl.-to Item Entry";Integer)
+        field(38; "Appl.-to Item Entry"; Integer)
         {
             Caption = 'Appl.-to Item Entry';
         }
-        field(39;"Item Entry No.";Integer)
+        field(39; "Item Entry No."; Integer)
         {
             Caption = 'Item Entry No.';
             TableRelation = "Item Ledger Entry";
         }
-        field(40;"Shortcut Dimension 1 Code";Code[20])
+        field(40; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
-        field(41;"Shortcut Dimension 2 Code";Code[20])
+        field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
-        field(43;"Salesperson Code";Code[10])
+        field(43; "Salesperson Code"; Code[10])
         {
             Caption = 'Salesperson Code';
             TableRelation = "Salesperson/Purchaser";
         }
-        field(50;"Withhold Item";Boolean)
+        field(50; "Withhold Item"; Boolean)
         {
             Caption = 'Withhold Item';
             Description = 'NPR5.36';
         }
-        field(51;"Move to Location";Code[10])
+        field(51; "Move to Location"; Code[10])
         {
             Caption = 'Move to Location';
             Description = 'NPR5.36';
             TableRelation = Location;
         }
-        field(70;"Currency Code";Code[10])
+        field(70; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
             Description = 'NPR5.36';
             TableRelation = Currency;
         }
-        field(74;"Gen. Bus. Posting Group";Code[10])
+        field(74; "Gen. Bus. Posting Group"; Code[10])
         {
             Caption = 'Gen. Bus. Posting Group';
             TableRelation = "Gen. Business Posting Group";
         }
-        field(75;"Gen. Prod. Posting Group";Code[10])
+        field(75; "Gen. Prod. Posting Group"; Code[10])
         {
             Caption = 'Gen. Prod. Posting Group';
             TableRelation = "Gen. Product Posting Group";
         }
-        field(77;"VAT Calculation Type";Option)
+        field(77; "VAT Calculation Type"; Option)
         {
             Caption = 'VAT Calculation Type';
             Description = 'NPR5.36';
@@ -215,55 +222,55 @@ table 6150622 "POS Sales Line"
             OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
             OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
-        field(84;"Gen. Posting Type";Option)
+        field(84; "Gen. Posting Type"; Option)
         {
             Caption = 'Gen. Posting Type';
             OptionCaption = ' ,Purchase,Sale';
             OptionMembers = " ",Purchase,Sale;
         }
-        field(85;"Tax Area Code";Code[20])
+        field(85; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
             TableRelation = "Tax Area";
         }
-        field(86;"Tax Liable";Boolean)
+        field(86; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
         }
-        field(87;"Tax Group Code";Code[10])
+        field(87; "Tax Group Code"; Code[10])
         {
             Caption = 'Tax Group Code';
             TableRelation = "Tax Group";
         }
-        field(88;"Use Tax";Boolean)
+        field(88; "Use Tax"; Boolean)
         {
             Caption = 'Use Tax';
         }
-        field(89;"VAT Bus. Posting Group";Code[10])
+        field(89; "VAT Bus. Posting Group"; Code[10])
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
         }
-        field(90;"VAT Prod. Posting Group";Code[10])
+        field(90; "VAT Prod. Posting Group"; Code[10])
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";
         }
-        field(99;"VAT Base Amount";Decimal)
+        field(99; "VAT Base Amount"; Decimal)
         {
             Caption = 'VAT Base Amount';
         }
-        field(100;"Unit Cost";Decimal)
+        field(100; "Unit Cost"; Decimal)
         {
             Caption = 'Unit Cost';
         }
-        field(103;"Line Amount";Decimal)
+        field(103; "Line Amount"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
         }
-        field(104;"VAT Difference";Decimal)
+        field(104; "VAT Difference"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
@@ -271,57 +278,57 @@ table 6150622 "POS Sales Line"
             Description = 'NPR5.36';
             Editable = false;
         }
-        field(106;"VAT Identifier";Code[10])
+        field(106; "VAT Identifier"; Code[10])
         {
             Caption = 'VAT Identifier';
             Description = 'NPR5.36';
             Editable = false;
         }
-        field(140;"Sales Document Type";Integer)
+        field(140; "Sales Document Type"; Integer)
         {
             Caption = 'Sales Document Type';
             Description = 'NPR5.36';
         }
-        field(141;"Sales Document No.";Code[20])
+        field(141; "Sales Document No."; Code[20])
         {
             Caption = 'Sales Document No.';
             Description = 'NPR5.36';
         }
-        field(142;"Sales Document Line No.";Integer)
+        field(142; "Sales Document Line No."; Integer)
         {
             Caption = 'Sales Document Line No.';
             Description = 'NPR5.36';
         }
-        field(143;"Applies-to Doc. Type";Option)
+        field(143; "Applies-to Doc. Type"; Option)
         {
             Caption = 'Applies-to Doc. Type';
             OptionCaption = ' ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund';
             OptionMembers = " ",Payment,Invoice,"Credit Memo","Finance Charge Memo",Reminder,Refund;
         }
-        field(144;"Applies-to Doc. No.";Code[20])
+        field(144; "Applies-to Doc. No."; Code[20])
         {
             Caption = 'Applies-to Doc. No.';
         }
-        field(160;"Orig. POS Sale ID";Integer)
+        field(160; "Orig. POS Sale ID"; Integer)
         {
             Caption = 'Orig. POS Sale ID';
             Description = 'NPR5.32';
         }
-        field(161;"Orig. POS Line No.";Integer)
+        field(161; "Orig. POS Line No."; Integer)
         {
             Caption = 'Orig. POS Line No.';
             Description = 'NPR5.32';
         }
-        field(170;"Retail ID";Guid)
+        field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
             Description = 'NPR5.50';
         }
-        field(200;"Bin Code";Code[20])
+        field(200; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
             Description = 'NPR5.32.10';
-            TableRelation = Bin.Code WHERE ("Location Code"=FIELD("Location Code"));
+            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
 
             trigger OnLookup()
             var
@@ -336,17 +343,17 @@ table 6150622 "POS Sales Line"
             begin
             end;
         }
-        field(201;"Qty. per Unit of Measure";Decimal)
+        field(201; "Qty. per Unit of Measure"; Decimal)
         {
             Caption = 'Qty. per Unit of Measure';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             Description = 'NPR5.32.10';
             Editable = false;
             InitValue = 1;
         }
-        field(202;"Cross-Reference No.";Code[20])
+        field(202; "Cross-Reference No."; Code[20])
         {
-            AccessByPermission = TableData "Item Cross Reference"=R;
+            AccessByPermission = TableData "Item Cross Reference" = R;
             Caption = 'Cross-Reference No.';
             Description = 'NPR5.32.10';
 
@@ -356,68 +363,68 @@ table 6150622 "POS Sales Line"
             begin
             end;
         }
-        field(203;"Originally Ordered No.";Code[20])
+        field(203; "Originally Ordered No."; Code[20])
         {
-            AccessByPermission = TableData "Item Substitution"=R;
+            AccessByPermission = TableData "Item Substitution" = R;
             Caption = 'Originally Ordered No.';
             Description = 'NPR5.32.10';
-            TableRelation = IF (Type=CONST(Item)) Item;
+            TableRelation = IF (Type = CONST(Item)) Item;
         }
-        field(204;"Originally Ordered Var. Code";Code[10])
+        field(204; "Originally Ordered Var. Code"; Code[10])
         {
-            AccessByPermission = TableData "Item Substitution"=R;
+            AccessByPermission = TableData "Item Substitution" = R;
             Caption = 'Originally Ordered Var. Code';
             Description = 'NPR5.32.10';
-            TableRelation = IF (Type=CONST(Item)) "Item Variant".Code WHERE ("Item No."=FIELD("Originally Ordered No."));
+            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("Originally Ordered No."));
         }
-        field(205;"Out-of-Stock Substitution";Boolean)
+        field(205; "Out-of-Stock Substitution"; Boolean)
         {
             Caption = 'Out-of-Stock Substitution';
             Description = 'NPR5.32.10';
             Editable = false;
         }
-        field(206;"Purchasing Code";Code[10])
+        field(206; "Purchasing Code"; Code[10])
         {
-            AccessByPermission = TableData "Drop Shpt. Post. Buffer"=R;
+            AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Purchasing Code';
             Description = 'NPR5.32.10';
             TableRelation = Purchasing;
         }
-        field(207;"Product Group Code";Code[10])
+        field(207; "Product Group Code"; Code[10])
         {
             Caption = 'Product Group Code';
             Description = 'NPR5.32.10';
-            TableRelation = "Product Group".Code WHERE ("Item Category Code"=FIELD("Item Category Code"));
+            TableRelation = "Product Group".Code WHERE("Item Category Code" = FIELD("Item Category Code"));
         }
-        field(208;"Planned Delivery Date";Date)
+        field(208; "Planned Delivery Date"; Date)
         {
-            AccessByPermission = TableData "Order Promising Line"=R;
+            AccessByPermission = TableData "Order Promising Line" = R;
             Caption = 'Planned Delivery Date';
             Description = 'NPR5.32.10';
         }
-        field(210;"Reason Code";Code[10])
+        field(210; "Reason Code"; Code[10])
         {
             Caption = 'Reason Code';
             Description = 'NPR5.36';
             TableRelation = "Reason Code";
         }
-        field(400;"Discount Type";Option)
+        field(400; "Discount Type"; Option)
         {
             Caption = 'Discount Type';
             OptionCaption = ' ,Campaign,Mix,Quantity,Manual,BOM List,Photo work,Rounding,Combination,Customer';
             OptionMembers = " ",Campaign,Mix,Quantity,Manual,"BOM List","Photo work",Rounding,Combination,Customer;
         }
-        field(401;"Discount Code";Code[30])
+        field(401; "Discount Code"; Code[30])
         {
             Caption = 'Discount Code';
         }
-        field(405;"Discount Authorised by";Code[20])
+        field(405; "Discount Authorised by"; Code[20])
         {
             Caption = 'Discount Authorised by';
             Description = 'NPR5.39';
             TableRelation = "Salesperson/Purchaser";
         }
-        field(480;"Dimension Set ID";Integer)
+        field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
             Editable = false;
@@ -430,84 +437,85 @@ table 6150622 "POS Sales Line"
                 //+NPR5.38 [294747]
             end;
         }
-        field(500;"Exclude from Posting";Boolean)
+        field(500; "Exclude from Posting"; Boolean)
         {
             Caption = 'Exclude from Posting';
             Description = 'NPR5.51';
         }
-        field(600;"Entry Date";Date)
+        field(600; "Entry Date"; Date)
         {
-            CalcFormula = Lookup("POS Entry"."Entry Date" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            CalcFormula = Lookup ("POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Entry Date';
             Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(610;"Starting Time";Time)
+        field(610; "Starting Time"; Time)
         {
-            CalcFormula = Lookup("POS Entry"."Starting Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            CalcFormula = Lookup ("POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Starting Time';
             Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(620;"Ending Time";Time)
+        field(620; "Ending Time"; Time)
         {
-            CalcFormula = Lookup("POS Entry"."Ending Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            CalcFormula = Lookup ("POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Ending Time';
             Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(700;"NPRE Seating Code";Code[10])
+        field(700; "NPRE Seating Code"; Code[10])
         {
             Caption = 'Seating Code';
             Description = 'NPR5.53';
             TableRelation = "NPRE Seating";
         }
-        field(5402;"Variant Code";Code[10])
+        field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type=CONST(Item)) "Item Variant".Code WHERE ("Item No."=FIELD("No."));
+            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
-        field(5407;"Unit of Measure Code";Code[10])
+        field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type=CONST(Item)) "Item Unit of Measure".Code WHERE ("Item No."=FIELD("No."))
-                            ELSE "Unit of Measure";
+            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
+            ELSE
+            "Unit of Measure";
         }
-        field(5415;"Quantity (Base)";Decimal)
+        field(5415; "Quantity (Base)"; Decimal)
         {
             Caption = 'Quantity (Base)';
         }
-        field(5709;"Item Category Code";Code[20])
+        field(5709; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
             TableRelation = "Item Category";
         }
-        field(5710;Nonstock;Boolean)
+        field(5710; Nonstock; Boolean)
         {
             Caption = 'Nonstock';
         }
-        field(5909;"BOM Item No.";Code[20])
+        field(5909; "BOM Item No."; Code[20])
         {
             Caption = 'BOM Item No.';
             TableRelation = Item;
         }
-        field(6015;"Retail Serial No.";Code[30])
+        field(6015; "Retail Serial No."; Code[30])
         {
             Caption = 'Retail Serial No.';
         }
-        field(6500;"Serial No.";Code[20])
+        field(6500; "Serial No."; Code[20])
         {
             Caption = 'Serial No.';
         }
-        field(6501;"Lot No.";Code[20])
+        field(6501; "Lot No."; Code[20])
         {
             Caption = 'Lot No.';
             Description = 'NPR5.32.10';
         }
-        field(6608;"Return Reason Code";Code[10])
+        field(6608; "Return Reason Code"; Code[10])
         {
             Caption = 'Return Reason Code';
             TableRelation = "Return Reason";
@@ -516,10 +524,10 @@ table 6150622 "POS Sales Line"
 
     keys
     {
-        key(Key1;"POS Entry No.","Line No.")
+        key(Key1; "POS Entry No.", "Line No.")
         {
         }
-        key(Key2;"Document No.","Line No.")
+        key(Key2; "Document No.", "Line No.")
         {
         }
     }
@@ -539,17 +547,17 @@ table 6150622 "POS Sales Line"
         // DimMgt.ShowDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2 - %3',TABLECAPTION,"POS Entry No.","Line No."));
         //+NPR5.38 [294717]
 
-        POSEntry.Get ("POS Entry No.");
+        POSEntry.Get("POS Entry No.");
         if ((POSEntry."Post Entry Status" = POSEntry."Post Entry Status"::Posted) and (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted)) then begin
-          DimMgt.ShowDimensionSet("Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.", "Line No."));
+            DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."));
         end else begin
-          //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2 %3',TABLECAPTION,"POS Entry No.", "Line No."));  //NPR5.54 [397063]-revoked
-          //-NPR5.54 [397063]
-          "Dimension Set ID" :=
-            DimMgt.EditDimensionSet2(
-              "Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.","Line No."),"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code");
-          //+NPR5.54 [397063]
-          Modify ();
+            //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2 %3',TABLECAPTION,"POS Entry No.", "Line No."));  //NPR5.54 [397063]-revoked
+            //-NPR5.54 [397063]
+            "Dimension Set ID" :=
+              DimMgt.EditDimensionSet(
+                "Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+            //+NPR5.54 [397063]
+            Modify();
         end;
         //+NPR5.42 [314834]
     end;
@@ -562,18 +570,18 @@ table 6150622 "POS Sales Line"
         GeneralLedgerSetup.Get;
         POSEntry.Get("POS Entry No.");
         if POSEntry."Currency Factor" > 0 then
-          POSEntry."Currency Factor" := 1;
-        "Line Dsc. Amt. Excl. VAT (LCY)" := Round("Line Discount Amount Excl. VAT" / POSEntry."Currency Factor",GeneralLedgerSetup."Amount Rounding Precision");
-        "Line Dsc. Amt. Incl. VAT (LCY)" := Round("Line Discount Amount Incl. VAT" / POSEntry."Currency Factor",GeneralLedgerSetup."Amount Rounding Precision");
-        "Amount Excl. VAT (LCY)" := Round("Amount Excl. VAT" / POSEntry."Currency Factor",GeneralLedgerSetup."Amount Rounding Precision");
-        "Amount Incl. VAT (LCY)" := Round("Amount Incl. VAT"/ POSEntry."Currency Factor",GeneralLedgerSetup."Amount Rounding Precision");
+            POSEntry."Currency Factor" := 1;
+        "Line Dsc. Amt. Excl. VAT (LCY)" := Round("Line Discount Amount Excl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
+        "Line Dsc. Amt. Incl. VAT (LCY)" := Round("Line Discount Amount Incl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
+        "Amount Excl. VAT (LCY)" := Round("Amount Excl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
+        "Amount Incl. VAT (LCY)" := Round("Amount Incl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
     end;
 
     procedure CalculateDiscountPerc()
     begin
         //-NPR5.37 [293227]
         if "Amount Excl. VAT" <> 0 then
-          "Line Discount %" := ("Line Discount Amount Excl. VAT" / "Amount Excl. VAT") * 100;
+            "Line Discount %" := ("Line Discount Amount Excl. VAT" / "Amount Excl. VAT") * 100;
         //+NPR5.37 [293227]
     end;
 }

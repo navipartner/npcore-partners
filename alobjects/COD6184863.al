@@ -147,13 +147,13 @@ codeunit 6184863 "Request Management"
         FTPWebResponse := FTPWebRequest.GetResponse();
     end;
 
-    procedure BlobLenght(var TempBlob: Record TempBlob) Lenght: BigInteger
+    procedure BlobLenght(var TempBlob: Codeunit "Temp Blob") Lenght: BigInteger
     var
         Bytes: Integer;
         InStr: InStream;
         Red: Text;
     begin
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
 
         repeat
             Bytes := InStr.Read(Red);
@@ -161,7 +161,7 @@ codeunit 6184863 "Request Management"
         until Bytes = 0;
     end;
 
-    procedure StreamToHttpRequest(var HttpWebRequest: DotNet npNetHttpWebRequest; var TempBlob: Record TempBlob; ContentLenght: BigInteger)
+    procedure StreamToHttpRequest(var HttpWebRequest: DotNet npNetHttpWebRequest; var TempBlob: Codeunit "Temp Blob"; ContentLenght: BigInteger)
     var
         InStr: InStream;
         Stream: DotNet npNetStream;
@@ -169,7 +169,7 @@ codeunit 6184863 "Request Management"
         HashBytes: DotNet npNetArray;
     begin
         MemoryStream := MemoryStream.MemoryStream();
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
         CopyStream(MemoryStream, InStr);
 
         HashBytes := MemoryStream.ToArray();
@@ -180,7 +180,7 @@ codeunit 6184863 "Request Management"
         Stream.Close();
     end;
 
-    procedure StreamToFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest; var TempBlob: Record TempBlob; ContentLenght: BigInteger)
+    procedure StreamToFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest; var TempBlob: Codeunit "Temp Blob"; ContentLenght: BigInteger)
     var
         InStr: InStream;
         Stream: DotNet npNetStream;
@@ -188,7 +188,7 @@ codeunit 6184863 "Request Management"
         HashBytes: DotNet npNetArray;
     begin
         MemoryStream := MemoryStream.MemoryStream();
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
         CopyStream(MemoryStream, InStr);
 
         HashBytes := MemoryStream.ToArray();

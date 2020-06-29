@@ -54,35 +54,35 @@ codeunit 6184860 "Dropbox API Mgt."
         DropBoxOverview: Record "DropBox Overview";
     begin
         with TempStorageOperationtypes do begin
-          Init;
-          "Storage Type" := StorageType();
-          Description := UploadDescriptionCaption;
-          "Operation Code" := UploadCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := UploadDescriptionCaption;
+            "Operation Code" := UploadCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := DownloadDescriptionCaption;
-          "Operation Code" := DownloadCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := DownloadDescriptionCaption;
+            "Operation Code" := DownloadCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := DeleteDescriptionCaption;
-          "Operation Code" := DeleteCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := DeleteDescriptionCaption;
+            "Operation Code" := DeleteCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := ListDescriptionCaption;
-          "Operation Code" := ListCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := ListDescriptionCaption;
+            "Operation Code" := ListCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := StrSubstNo(OverviewDescriptionCaption, DropBoxOverview.TableCaption);
-          "Operation Code" := OverviewCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := StrSubstNo(OverviewDescriptionCaption, DropBoxOverview.TableCaption);
+            "Operation Code" := OverviewCaption;
+            Insert;
         end;
     end;
 
@@ -92,65 +92,65 @@ codeunit 6184860 "Dropbox API Mgt."
         DropBoxOverview: Page "DropBox Overview";
     begin
         with TempStorageOperationParameter do begin
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := ListCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := RefreshCaption;
-          Description := StrSubstNo(ListParamDescriptionCaption, DropBoxOverview.Caption);
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := ListCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := RefreshCaption;
+            Description := StrSubstNo(ListParamDescriptionCaption, DropBoxOverview.Caption);
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := UploadFromCaption;
-          Description := UploadFromDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := UploadFromCaption;
+            Description := UploadFromDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 200;
-          "Parameter Name" := UploadLocationCaption;
-          Description := LocationOnStorageDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := UploadLocationCaption;
+            Description := LocationOnStorageDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 300;
-          "Parameter Name" := UploadAllCaption;
-          Description := UploadAllDescCaption;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 300;
+            "Parameter Name" := UploadAllCaption;
+            Description := UploadAllDescCaption;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DownloadCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := DownloadFileCaption;
-          Description := FileDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := DownloadFileCaption;
+            Description := FileDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DownloadCaption;
-          "Parameter Key" := 200;
-          "Parameter Name" := DataExchTypeCaption;
-          Description := DataExchTypeDescCaption;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := DataExchTypeCaption;
+            Description := DataExchTypeDescCaption;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DeleteCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := DeleteFileCaption;
-          Description := FileDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DeleteCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := DeleteFileCaption;
+            Description := FileDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
         end;
     end;
 
@@ -160,19 +160,19 @@ codeunit 6184860 "Dropbox API Mgt."
         DropBoxAPISetup: Record "DropBox API Setup";
     begin
         if StorageSetup."Storage Type" <> StorageType() then
-          exit;
+            exit;
 
         if PAGE.RunModal(PAGE::"DropBox Setup", DropBoxAPISetup) <> ACTION::LookupOK then
-          exit;
+            exit;
 
-        StorageSetup."Storage ID" :=  DropBoxAPISetup."Account Code";
+        StorageSetup."Storage ID" := DropBoxAPISetup."Account Code";
         StorageSetup.Description := DropBoxAPISetup.Description;
     end;
 
-    procedure ListFolderFilesContinueDropBox(AccountCode: Code[10];var Cursor: Text;var Paths: DotNet npNetXmlDocument;File: Boolean;Silent: Boolean)
+    procedure ListFolderFilesContinueDropBox(AccountCode: Code[10]; var Cursor: Text; var Paths: DotNet npNetXmlDocument; File: Boolean; Silent: Boolean)
     var
         DropBoxSetup: Record "DropBox API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Arguments: Text;
         CustomResponse: Text;
@@ -195,41 +195,41 @@ codeunit 6184860 "Dropbox API Mgt."
         HttpWebRequest.ContentType('application/json');
         HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         if File then
-          PropertyValue := 'file'
+            PropertyValue := 'file'
         else
-          PropertyValue := 'folder';
+            PropertyValue := 'folder';
 
         RequestManagement.ReplaceSubstringAnyLength(Response, CustomResponse, '".tag"', '"tag"');
         RequestManagement.GetXMLFromJsonArray(Response, NewPaths, 'entries', 'path_display', 'tag', PropertyValue);
 
         if File then
-          foreach Path in NewPaths.SelectNodes('/root/*') do
-            InsertDropBoxOverview(AccountCode, Path.InnerText);
+            foreach Path in NewPaths.SelectNodes('/root/*') do
+                InsertDropBoxOverview(AccountCode, Path.InnerText);
 
         HasMore := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'has_more');
         RequestManagement.AppendXML(NewPaths, '', Paths);
 
         if HasMore > '' then
-          if Convert.ToBoolean(HasMore) then begin
-            Cursor := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'cursor');
+            if Convert.ToBoolean(HasMore) then begin
+                Cursor := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'cursor');
 
-            ListFolderFilesContinueDropBox(AccountCode, Cursor, Paths, File, Silent);
-          end;
+                ListFolderFilesContinueDropBox(AccountCode, Cursor, Paths, File, Silent);
+            end;
     end;
 
-    procedure ListFolderFilesDropBox(AccountCode: Code[10];DirectoryPath: Text;var Cursor: Text;var Paths: DotNet npNetXmlDocument;FullRefresh: Boolean;File: Boolean;Silent: Boolean): Boolean
+    procedure ListFolderFilesDropBox(AccountCode: Code[10]; DirectoryPath: Text; var Cursor: Text; var Paths: DotNet npNetXmlDocument; FullRefresh: Boolean; File: Boolean; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "DropBox API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Response: Text;
         CustomResponse: Text;
@@ -243,14 +243,14 @@ codeunit 6184860 "Dropbox API Mgt."
     begin
         DropBoxSetup.Get(AccountCode);
         if FullRefresh then
-          RemoveDropBoxOverview(AccountCode, '');
+            RemoveDropBoxOverview(AccountCode, '');
 
-        RequestManagement.JsonAdd(Arguments, 'path' , DirectoryPath, false);
-        RequestManagement.JsonAdd(Arguments, 'recursive' , true, false);
-        RequestManagement.JsonAdd(Arguments, 'include_deleted' , false, false);
-        RequestManagement.JsonAdd(Arguments, 'include_has_explicit_shared_members' , false, false);
-        RequestManagement.JsonAdd(Arguments, 'include_mounted_folders' , true, false);
-        RequestManagement.JsonAdd(Arguments, 'include_non_downloadable_files' , true, false);
+        RequestManagement.JsonAdd(Arguments, 'path', DirectoryPath, false);
+        RequestManagement.JsonAdd(Arguments, 'recursive', true, false);
+        RequestManagement.JsonAdd(Arguments, 'include_deleted', false, false);
+        RequestManagement.JsonAdd(Arguments, 'include_has_explicit_shared_members', false, false);
+        RequestManagement.JsonAdd(Arguments, 'include_mounted_folders', true, false);
+        RequestManagement.JsonAdd(Arguments, 'include_non_downloadable_files', true, false);
 
         HttpWebRequest := HttpWebRequest.Create('https://api.dropboxapi.com/2/files/list_folder');
         HttpWebRequest.Timeout := DropBoxSetup.Timeout;
@@ -258,42 +258,42 @@ codeunit 6184860 "Dropbox API Mgt."
         HttpWebRequest.ContentType('application/json');
         HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         if File then
-          PropertyValue := 'file'
+            PropertyValue := 'file'
         else
-          PropertyValue := 'folder';
+            PropertyValue := 'folder';
 
         RequestManagement.ReplaceSubstringAnyLength(Response, CustomResponse, '".tag"', '"tag"');
         RequestManagement.GetXMLFromJsonArray(CustomResponse, Paths, 'entries', 'path_display', 'tag', PropertyValue);
 
         if File then
-          foreach Path in Paths.SelectNodes('/root/*') do
-            InsertDropBoxOverview(AccountCode, Path.InnerText);
+            foreach Path in Paths.SelectNodes('/root/*') do
+                InsertDropBoxOverview(AccountCode, Path.InnerText);
 
         HasMore := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'has_more');
 
         if HasMore > '' then
-          if Convert.ToBoolean(HasMore) then begin
-            Cursor := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'cursor');
+            if Convert.ToBoolean(HasMore) then begin
+                Cursor := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'cursor');
 
-            ListFolderFilesContinueDropBox(AccountCode, Cursor, Paths, File, Silent);
-          end;
+                ListFolderFilesContinueDropBox(AccountCode, Cursor, Paths, File, Silent);
+            end;
 
         exit(Paths.FirstChild.ChildNodes.Count() > 0);
     end;
 
-    procedure FindOnDropbox(var Paths: DotNet npNetXmlDocument;AccountCode: Code[10];SearchText: Text;Silent: Boolean): Boolean
+    procedure FindOnDropbox(var Paths: DotNet npNetXmlDocument; AccountCode: Code[10]; SearchText: Text; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "DropBox API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Arguments: Text;
         Response: Text;
@@ -313,20 +313,20 @@ codeunit 6184860 "Dropbox API Mgt."
         HttpWebRequest.UserAgent := 'api-explorer-client';
         HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         RequestManagement.GetXMLFromJsonArray(Response, Paths, 'matches', '$..path_display', '', '');
 
         exit(Paths.FirstChild.ChildNodes.Count() > 0);
     end;
 
-    procedure UploadToDropbox(var TempBlob: Record TempBlob;AccountCode: Code[10];FileName: Text;Replace: Boolean;Silent: Boolean): Boolean
+    procedure UploadToDropbox(var TempBlob: Codeunit "Temp Blob"; AccountCode: Code[10]; FileName: Text; Replace: Boolean; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "DropBox API Setup";
         RequestManagement: Codeunit "Request Management";
@@ -342,17 +342,17 @@ codeunit 6184860 "Dropbox API Mgt."
 
         //avoid non suggestive error
         if CopyStr(FileName, 1, 1) <> '/' then
-          FileName := '/' + FileName;
+            FileName := '/' + FileName;
 
         if Replace then
-          Mode := Mode::overwrite;
+            Mode := Mode::overwrite;
 
         with RequestManagement do begin
-          JsonAdd(Arguments, 'path', FileName, false);
-          JsonAdd(Arguments, 'mode', Format(Mode), false);
-          JsonAdd(Arguments, 'autorename', true, false);
-          JsonAdd(Arguments, 'mute', false, false);
-          JsonAdd(Arguments, 'strict_conflict', false, false);
+            JsonAdd(Arguments, 'path', FileName, false);
+            JsonAdd(Arguments, 'mode', Format(Mode), false);
+            JsonAdd(Arguments, 'autorename', true, false);
+            JsonAdd(Arguments, 'mute', false, false);
+            JsonAdd(Arguments, 'strict_conflict', false, false);
         end;
 
         HttpWebRequest := HttpWebRequest.Create('https://content.dropboxapi.com/2/files/upload');
@@ -367,14 +367,14 @@ codeunit 6184860 "Dropbox API Mgt."
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength);
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         InsertDropBoxOverview(AccountCode, FileName);
 
         exit(true);
     end;
 
-    procedure DownloadFromDropbox(var TempBlob: Record TempBlob;AccountCode: Code[10];FileName: Text;Silent: Boolean): Boolean
+    procedure DownloadFromDropbox(var TempBlob: Codeunit "Temp Blob"; AccountCode: Code[10]; FileName: Text; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "DropBox API Setup";
         RequestManagement: Codeunit "Request Management";
@@ -389,7 +389,7 @@ codeunit 6184860 "Dropbox API Mgt."
 
         //avoid non suggestive error
         if CopyStr(FileName, 1, 1) <> '/' then
-          FileName := '/' + FileName;
+            FileName := '/' + FileName;
 
         RequestManagement.JsonAdd(Arguments, 'path', FileName, false);
 
@@ -401,20 +401,20 @@ codeunit 6184860 "Dropbox API Mgt."
         HttpWebRequest.Headers.Add('Dropbox-API-Arg', Arguments);
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(Response));
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         MemoryStream.CopyTo(OutStr);
 
-        exit(TempBlob.Blob.HasValue);
+        exit(TempBlob.HasValue);
     end;
 
-    procedure DeleteFromDropbox(AccountCode: Code[10];FileName: Text;Silent: Boolean): Boolean
+    procedure DeleteFromDropbox(AccountCode: Code[10]; FileName: Text; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "DropBox API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Arguments: Text;
         Response: Text;
@@ -425,7 +425,7 @@ codeunit 6184860 "Dropbox API Mgt."
 
         //avoid non suggestive error
         if CopyStr(FileName, 1, 1) <> '/' then
-          FileName := '/' + FileName;
+            FileName := '/' + FileName;
 
         RequestManagement.JsonAdd(Arguments, 'path', FileName, false);
 
@@ -435,23 +435,23 @@ codeunit 6184860 "Dropbox API Mgt."
         HttpWebRequest.ContentType := 'application/json';
         HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         RemoveDropBoxOverview(AccountCode, FileName);
 
         exit(true);
     end;
 
-    procedure CopyFileOnDropbox(AccountCode: Code[10];FileFrom: Text;FileTo: Text;Silent: Boolean): Boolean
+    procedure CopyFileOnDropbox(AccountCode: Code[10]; FileFrom: Text; FileTo: Text; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "DropBox API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Arguments: Text;
         Response: Text;
@@ -462,17 +462,17 @@ codeunit 6184860 "Dropbox API Mgt."
 
         //avoid non suggestive error
         if CopyStr(FileFrom, 1, 1) <> '/' then
-          FileFrom := '/' + FileFrom;
+            FileFrom := '/' + FileFrom;
 
         if CopyStr(FileTo, 1, 1) <> '/' then
-          FileTo := '/' + FileTo;
+            FileTo := '/' + FileTo;
 
         with RequestManagement do begin
-          JsonAdd(Arguments, 'from_path', FileFrom, false);
-          JsonAdd(Arguments, 'to_path', FileTo, false);
-          JsonAdd(Arguments, 'allow_shared_folder', false, false);
-          JsonAdd(Arguments, 'autorename', false, false);
-          JsonAdd(Arguments, 'allow_ownership_transfer', false, false);
+            JsonAdd(Arguments, 'from_path', FileFrom, false);
+            JsonAdd(Arguments, 'to_path', FileTo, false);
+            JsonAdd(Arguments, 'allow_shared_folder', false, false);
+            JsonAdd(Arguments, 'autorename', false, false);
+            JsonAdd(Arguments, 'allow_ownership_transfer', false, false);
         end;
 
         HttpWebRequest := HttpWebRequest.Create('https://api.dropboxapi.com/2/files/copy_v2');
@@ -481,20 +481,20 @@ codeunit 6184860 "Dropbox API Mgt."
         HttpWebRequest.ContentType := 'application/json';
         HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         InsertDropBoxOverview(AccountCode, FileTo);
 
         exit(true);
     end;
 
-    local procedure InsertDropBoxOverview(Account: Code[10];Path: Text)
+    local procedure InsertDropBoxOverview(Account: Code[10]; Path: Text)
     var
         DropBoxOverview: Record "DropBox Overview";
         FileManagement: Codeunit "File Management";
@@ -505,10 +505,10 @@ codeunit 6184860 "Dropbox API Mgt."
 
         DropBoxOverview.SetRecFilter;
         if DropBoxOverview.IsEmpty and (DropBoxOverview."File Name" > '') then
-          DropBoxOverview.Insert;
+            DropBoxOverview.Insert;
     end;
 
-    local procedure RemoveDropBoxOverview(Account: Code[10];Path: Text)
+    local procedure RemoveDropBoxOverview(Account: Code[10]; Path: Text)
     var
         DropBoxOverview: Record "DropBox Overview";
         FileManagement: Codeunit "File Management";
@@ -516,8 +516,8 @@ codeunit 6184860 "Dropbox API Mgt."
         DropBoxOverview.SetRange("Account Code", Account);
 
         if Path > '' then begin
-          DropBoxOverview.SetRange("File Name", ConvertStr(FileManagement.GetDirectoryName(Path), '\', '/'));
-          DropBoxOverview.SetRange(Name, FileManagement.GetFileName(Path));
+            DropBoxOverview.SetRange("File Name", ConvertStr(FileManagement.GetDirectoryName(Path), '\', '/'));
+            DropBoxOverview.SetRange(Name, FileManagement.GetFileName(Path));
         end;
 
         DropBoxOverview.DeleteAll;

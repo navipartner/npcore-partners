@@ -135,7 +135,7 @@ codeunit 6151403 "Magento Webservice"
 
         Filename := TemporaryPath + 'customerstatement-' + CustomerNo + '.pdf';
 
-        REPORT.SaveAsPdf (ReportSelections."Report ID", Filename, Customer);
+        REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, Customer);
 
         PdfCustomerStatement := GetBase64(Filename);
         if Erase(Filename) then;
@@ -172,7 +172,7 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GeneratePdfQuote(DocumentNo: Code[20];CustomerNo: Code[20]) PdfQuote: Text
+    procedure GeneratePdfQuote(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfQuote: Text
     var
         SalesHeader: Record "Sales Header";
         ReportSelections: Record "Report Selections";
@@ -180,21 +180,21 @@ codeunit 6151403 "Magento Webservice"
     begin
 
         //-MAG2.25 [388058]
-        ReportSelections.SetRange (Usage, ReportSelections.Usage::"S.Quote");
-        ReportSelections.SetFilter ("Report ID", '<>%1', 0);
-        ReportSelections.FindFirst ();
+        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Quote");
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
+        ReportSelections.FindFirst();
 
-        SalesHeader.Get (SalesHeader."Document Type"::Quote, DocumentNo);
-        SalesHeader.TestField ("Bill-to Customer No.", CustomerNo);
+        SalesHeader.Get(SalesHeader."Document Type"::Quote, DocumentNo);
+        SalesHeader.TestField("Bill-to Customer No.", CustomerNo);
         SalesHeader.SetRecFilter;
 
         Filename := TemporaryPath + 'quote-' + DocumentNo + '.pdf';
-        REPORT.SaveAsPdf (ReportSelections."Report ID",Filename, SalesHeader);
+        REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, SalesHeader);
 
-        PdfQuote := GetBase64 (Filename);
+        PdfQuote := GetBase64(Filename);
         if (Erase(Filename)) then;
 
-        exit (PdfQuote);
+        exit(PdfQuote);
         //+MAG2.25 [388058]
     end;
 
@@ -240,11 +240,11 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GetQuotes(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    procedure GetQuotes(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.25 [388058]
-        documents.SetQuoteFilter (CustomerNo, '', StartDate, EndDate, false);
+        documents.SetQuoteFilter(CustomerNo, '', StartDate, EndDate, false);
         //+MAG2.25 [388058]
     end;
 
@@ -293,11 +293,11 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure ListQuotes(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    procedure ListQuotes(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.25 [388058]
-        documents.SetQuoteFilter (CustomerNo, '', StartDate, EndDate, true);
+        documents.SetQuoteFilter(CustomerNo, '', StartDate, EndDate, true);
         //+MAG2.25 [388058]
     end;
 
@@ -346,11 +346,11 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GetQuote(CustomerNo: Code[20];DocumentNumber: Code[20];var documents: XMLport "Magento Document Export")
+    procedure GetQuote(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.25 [388058]
-        documents.SetQuoteFilter (CustomerNo, DocumentNumber, 0D, DMY2Date (31, 12, 9999), false);
+        documents.SetQuoteFilter(CustomerNo, DocumentNumber, 0D, DMY2Date(31, 12, 9999), false);
         //+MAG2.25 [388058]
     end;
 
@@ -384,20 +384,20 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GetCustomerAndContactNo(OrderNo: Code[20];var CustomerNo: Code[20];var ContactNo: Code[20]): Boolean
+    procedure GetCustomerAndContactNo(OrderNo: Code[20]; var CustomerNo: Code[20]; var ContactNo: Code[20]): Boolean
     var
         SalesHeader: Record "Sales Header";
     begin
         //-MAG2.25 [396445]
         if (OrderNo = '') then
-          exit (false);
+            exit(false);
 
-        SalesHeader.SetRange("Document Type",SalesHeader."Document Type"::Order);
-        SalesHeader.SetFilter("External Order No.",OrderNo);
-        if (not SalesHeader.FindFirst ()) then
-          exit (false);
+        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetFilter("External Order No.", OrderNo);
+        if (not SalesHeader.FindFirst()) then
+            exit(false);
 
-        CustomerNo :=  SalesHeader."Sell-to Customer No.";
+        CustomerNo := SalesHeader."Sell-to Customer No.";
         ContactNo := SalesHeader."Sell-to Contact No.";
         exit(true);
         //+MAG2.25 [396445]
@@ -578,7 +578,7 @@ codeunit 6151403 "Magento Webservice"
 
     local procedure GetBase64(Filename: Text) Value: Text
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         BinaryReader: DotNet npNetBinaryReader;
         MemoryStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;

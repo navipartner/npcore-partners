@@ -32,7 +32,7 @@ codeunit 6060136 "MM Member Notification"
         HandleBatchNotifications(Today);
 
         //-#367935 [367935]
-        SponsorshipTicketMgmt.NotifyRecipients ();
+        SponsorshipTicketMgmt.NotifyRecipients();
         //+#367935 [367935]
     end;
 
@@ -48,7 +48,7 @@ codeunit 6060136 "MM Member Notification"
     begin
 
         //-MM1.42 [378212]
-        SelectLatestVersion ();
+        SelectLatestVersion();
         //+MM1.42 [378212]
 
         MembershipNotification.SetCurrentKey("Notification Status", "Date To Notify");
@@ -65,7 +65,7 @@ codeunit 6060136 "MM Member Notification"
 
                 //-MM1.38 [355234]
                 Commit();
-                //+MM1.38 [355234]
+            //+MM1.38 [355234]
 
             until (MembershipNotification.Next() = 0);
         end;
@@ -276,41 +276,49 @@ codeunit 6060136 "MM Member Notification"
                         MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
                     //+MM1.36 [328141]
 
-              //-MM1.42 [382728]
-              //CASE Member."Notification Method" OF
-              //  Member."Notification Method"::EMAIL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
-              //  Member."Notification Method"::NONE :  MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
-              //  Member."Notification Method"::MANUAL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
-              //  Member."Notification Method"::SMS : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
-              //  ELSE ERROR (NOT_IMPLEMENTED, Member.FIELDCAPTION (Member."Notification Method"), Member."Notification Method");
-              //END;
+                    //-MM1.42 [382728]
+                    //CASE Member."Notification Method" OF
+                    //  Member."Notification Method"::EMAIL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
+                    //  Member."Notification Method"::NONE :  MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
+                    //  Member."Notification Method"::MANUAL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
+                    //  Member."Notification Method"::SMS : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
+                    //  ELSE ERROR (NOT_IMPLEMENTED, Member.FIELDCAPTION (Member."Notification Method"), Member."Notification Method");
+                    //END;
 
-              //-MM1.43 [390938]
-              // WITH MembershipNotification DO
-              //   CASE "Notification Trigger" OF
-              //    "Notification Trigger"::WELCOME       : MembershipManagement.GetCommunicationMethod_Welcome ("Member Entry No.", "Membership Entry No.", Method, Address);
-              //    "Notification Trigger"::RENEWAL       : MembershipManagement.GetCommunicationMethod_Renew ("Member Entry No.", "Membership Entry No.", Method, Address);
-              //    "Notification Trigger"::WALLET_CREATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
-              //  END;
-              with MemberNotificationEntry do
-                case "Notification Trigger" of
-                  "Notification Trigger"::WELCOME       : MembershipManagement.GetCommunicationMethod_Welcome ("Member Entry No.", "Membership Entry No.", Method, Address);
-                  "Notification Trigger"::RENEWAL       : MembershipManagement.GetCommunicationMethod_Renew ("Member Entry No.", "Membership Entry No.", Method, Address);
-                  "Notification Trigger"::WALLET_CREATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
-                  "Notification Trigger"::WALLET_UPDATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
-                end;
-              //+MM1.43 [390938]
+                    //-MM1.43 [390938]
+                    // WITH MembershipNotification DO
+                    //   CASE "Notification Trigger" OF
+                    //    "Notification Trigger"::WELCOME       : MembershipManagement.GetCommunicationMethod_Welcome ("Member Entry No.", "Membership Entry No.", Method, Address);
+                    //    "Notification Trigger"::RENEWAL       : MembershipManagement.GetCommunicationMethod_Renew ("Member Entry No.", "Membership Entry No.", Method, Address);
+                    //    "Notification Trigger"::WALLET_CREATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
+                    //  END;
+                    with MemberNotificationEntry do
+                        case "Notification Trigger" of
+                            "Notification Trigger"::WELCOME:
+                                MembershipManagement.GetCommunicationMethod_Welcome("Member Entry No.", "Membership Entry No.", Method, Address);
+                            "Notification Trigger"::RENEWAL:
+                                MembershipManagement.GetCommunicationMethod_Renew("Member Entry No.", "Membership Entry No.", Method, Address);
+                            "Notification Trigger"::WALLET_CREATE:
+                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address);
+                            "Notification Trigger"::WALLET_UPDATE:
+                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address);
+                        end;
+                    //+MM1.43 [390938]
 
-              with MemberNotificationEntry do
-                case Method of
-                  'SMS'     : "Notification Method" := "Notification Method"::SMS;
-                  'W-SMS'   : "Notification Method" := "Notification Method"::SMS;
-                  'EMAIL'   : "Notification Method" := "Notification Method"::EMAIL;
-                  'W-EMAIL' : "Notification Method" := "Notification Method"::EMAIL;
-                else
-                  "Notification Method" := "Notification Method"::NONE;
-                end;
-              //+MM1.42 [382728]
+                    with MemberNotificationEntry do
+                        case Method of
+                            'SMS':
+                                "Notification Method" := "Notification Method"::SMS;
+                            'W-SMS':
+                                "Notification Method" := "Notification Method"::SMS;
+                            'EMAIL':
+                                "Notification Method" := "Notification Method"::EMAIL;
+                            'W-EMAIL':
+                                "Notification Method" := "Notification Method"::EMAIL;
+                            else
+                                "Notification Method" := "Notification Method"::NONE;
+                        end;
+                    //+MM1.42 [382728]
 
                     //-MM1.36 [328141]
                     if (MembershipNotification."Notification Method Source" = MembershipNotification."Notification Method Source"::EXTERNAL) then
@@ -327,7 +335,7 @@ codeunit 6060136 "MM Member Notification"
 
                     if (MemberNotificationEntry.Insert()) then;
                 end;
-          until ((MembershipRole.Next () = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
+            until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
         end;
     end;
 
@@ -577,10 +585,10 @@ codeunit 6060136 "MM Member Notification"
                 MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
                 MembershipEntry.SetFilter(Blocked, '=%1', false);
                 // NEW,REGRET,RENEW,UPGRADE,EXTEND,CANCEL,AUTORENEW,FOREIGN
-            //-MM1.41 [368691]
-            //MembershipEntry.SETFILTER (Context, '%1..%2 ', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND);
-            MembershipEntry.SetFilter (Context, '%1..%2|%3', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND, MembershipEntry.Context::AUTORENEW);
-            //+MM1.41 [368691]
+                //-MM1.41 [368691]
+                //MembershipEntry.SETFILTER (Context, '%1..%2 ', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND);
+                MembershipEntry.SetFilter(Context, '%1..%2|%3', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND, MembershipEntry.Context::AUTORENEW);
+                //+MM1.41 [368691]
                 if (MembershipEntry.FindLast()) then
                     if (MembershipEntry."Valid Until Date" > Today) then
                         AddMembershipRenewalNotificationWorker(MembershipEntry, MembershipSetup, CommunitySetup);
@@ -819,10 +827,10 @@ codeunit 6060136 "MM Member Notification"
             StartPos := StrPos(NewLine, StartSeparator);
             EndPos := StrPos(NewLine, EndSeparator);
 
-          Evaluate (FieldNumber, CopyStr (NewLine,StartPos + SeparatorLength,EndPos - StartPos - SeparatorLength));
-          if (RecRef.FieldExist(FieldNumber)) then begin
+            Evaluate(FieldNumber, CopyStr(NewLine, StartPos + SeparatorLength, EndPos - StartPos - SeparatorLength));
+            if (RecRef.FieldExist(FieldNumber)) then begin
 
-            FieldRef := RecRef.Field(FieldNumber);
+                FieldRef := RecRef.Field(FieldNumber);
                 if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
                     FieldRef.CalcField;
 
@@ -840,7 +848,7 @@ codeunit 6060136 "MM Member Notification"
                     NewLine := InsStr(NewLine, DelChr(Format(FieldRef.Value, 0, 9), '<=>', '"'), StartPos);
                 end;
             end else
-            case FieldNumber of
+                case FieldNumber of
                     -100: // thumbnail
                         begin
                             FieldRef := RecRef.Field(MemberNotificationEntry.FieldNo("Member Entry No."));
@@ -852,7 +860,7 @@ codeunit 6060136 "MM Member Notification"
                             NewLine := InsStr(NewLine, B64Image, StartPos);
                         end;
                     else
-                Error(BAD_REFERENCE, FieldNumber, Line);
+                        Error(BAD_REFERENCE, FieldNumber, Line);
                 end;
             Line := NewLine;
         end;
@@ -1027,7 +1035,7 @@ codeunit 6060136 "MM Member Notification"
         // I want posting to be done before sending out the notification
 
         //-MM1.42 [378212]
-        SelectLatestVersion ();
+        SelectLatestVersion();
         //+MM1.42 [378212]
 
         MembershipNotification.Reset();
@@ -1043,7 +1051,7 @@ codeunit 6060136 "MM Member Notification"
         end;
 
         //-#367935 [367935]
-        SponsorshipTicketMgmt.NotifyRecipients ();
+        SponsorshipTicketMgmt.NotifyRecipients();
         //+#367935 [367935]
     end;
 
@@ -1241,7 +1249,7 @@ codeunit 6060136 "MM Member Notification"
 
     procedure ToBase64(StringToEncode: Text) B64String: Text
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         BinaryReader: DotNet npNetBinaryReader;
         MemoryStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;
@@ -1250,10 +1258,10 @@ codeunit 6060136 "MM Member Notification"
     begin
 
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(Outstr);
+        TempBlob.CreateOutStream(Outstr);
         Outstr.WriteText(StringToEncode);
 
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
         MemoryStream := InStr;
         BinaryReader := BinaryReader.BinaryReader(InStr);
 

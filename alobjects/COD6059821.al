@@ -10,7 +10,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
 
     var
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
-        ResponseTempBlob: Record TempBlob;
+        ResponseTempBlob: Codeunit "Temp Blob";
         HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
         ResponseInStream: InStream;
         HttpStatusCode: DotNet npNetHttpStatusCode;
@@ -148,7 +148,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
     var
         TransactionalEmailSetup: Record "Transactional Email Setup";
         TransactionalEmailVariable: Record "Smart Email Variable";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         EmailLog: Record "Transactional Email Log";
         NpXmlTemplate: Record "NpXml Template";
         StringBuilder: DotNet npNetStringBuilder;
@@ -204,11 +204,8 @@ codeunit 6059821 "CampaignMonitor Mgt."
         //+NPR5.44 [310042]
         JTextWriter.WriteEndObject;
 
-        TempBlob.Init;
-        TempBlob.Insert;
-        TempBlob.Blob.CreateOutStream(OStream, TEXTENCODING::UTF8);
+        TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
         OStream.WriteText(StringBuilder.ToString);
-        TempBlob.Modify;
         HttpWebRequestMgt.AddBodyBlob(TempBlob);
 
         if not ExecuteWebServiceRequest then begin
@@ -237,7 +234,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
     procedure SendClasicMail(Recipient: Text; Cc: Text; Bcc: Text; Subject: Text; BodyHtml: Text; BodyText: Text; From: Text; ReplyTo: Text; TrackOpen: Boolean; TrackClick: Boolean; Group: Text; AddRecipientsToListID: Text; var Attachment: Record "E-mail Attachment"; Silent: Boolean): Text
     var
         TransactionalEmailSetup: Record "Transactional Email Setup";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         EmailLog: Record "Transactional Email Log";
         StringBuilder: DotNet npNetStringBuilder;
         StringWriter: DotNet npNetStringWriter;
@@ -284,11 +281,8 @@ codeunit 6059821 "CampaignMonitor Mgt."
             WriteNameValuePair(JTextWriter, 'AddRecipientsToListID', AddRecipientsToListID);
         JTextWriter.WriteEndObject;
 
-        TempBlob.Init;
-        TempBlob.Insert;
-        TempBlob.Blob.CreateOutStream(OStream, TEXTENCODING::UTF8);
+        TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
         OStream.WriteText(StringBuilder.ToString);
-        TempBlob.Modify;
         HttpWebRequestMgt.AddBodyBlob(TempBlob);
 
         if not ExecuteWebServiceRequest then begin
@@ -334,8 +328,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
     local procedure ExecuteWebServiceRequest()
     begin
         Clear(ResponseTempBlob);
-        ResponseTempBlob.Init;
-        ResponseTempBlob.Blob.CreateInStream(ResponseInStream);
+        ResponseTempBlob.CreateInStream(ResponseInStream);
 
         if not GuiAllowed then
             HttpWebRequestMgt.DisableUI;

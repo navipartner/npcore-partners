@@ -16,11 +16,11 @@ codeunit 6014619 "Tax Free Last Voucher Print"
 
     var
         VoucherEntryNo: Integer;
-        PrintBlob: Record TempBlob temporary;
+        PrintBlob: Codeunit "Temp Blob";
         PrintType: Integer;
         Stored: Boolean;
 
-    procedure SetVoucher(VoucherEntryNoIn: Integer;var PrintBlobIn: Record TempBlob temporary;PrintTypeIn: Integer)
+    procedure SetVoucher(VoucherEntryNoIn: Integer; var PrintBlobIn: Codeunit "Temp Blob"; PrintTypeIn: Integer)
     begin
         VoucherEntryNo := VoucherEntryNoIn;
         PrintBlob := PrintBlobIn;
@@ -28,7 +28,7 @@ codeunit 6014619 "Tax Free Last Voucher Print"
         Stored := true;
     end;
 
-    procedure GetVoucher(var VoucherEntryNoOut: Integer;var PrintBlobOut: Record TempBlob temporary;var PrintTypeOut: Integer): Boolean
+    procedure GetVoucher(var VoucherEntryNoOut: Integer; var PrintBlobOut: Codeunit "Temp Blob"; var PrintTypeOut: Integer): Boolean
     begin
         VoucherEntryNoOut := VoucherEntryNo;
         PrintBlobOut := PrintBlob;

@@ -11,13 +11,13 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     end;
 
     [Scope('Personalization')]
-    procedure WebServiceApi(LoyaltyEndpointClient: Record "MM NPR Remote Endpoint Setup";SoapAction: Text;var ReasonText: Text;var XmlDocIn: DotNet npNetXmlDocument;var XmlDocOut: DotNet npNetXmlDocument): Boolean
+    procedure WebServiceApi(LoyaltyEndpointClient: Record "MM NPR Remote Endpoint Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: DotNet npNetXmlDocument; var XmlDocOut: DotNet npNetXmlDocument): Boolean
     var
         NPRMembership: Codeunit "MM NPR Membership";
     begin
 
         //-MM1.40 [357360]
-        exit (NPRMembership.WebServiceApi (LoyaltyEndpointClient, SoapAction, ReasonText, XmlDocIn, XmlDocOut));
+        exit(NPRMembership.WebServiceApi(LoyaltyEndpointClient, SoapAction, ReasonText, XmlDocIn, XmlDocOut));
 
         //
         // ReasonText := '';
@@ -64,7 +64,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     [Scope('Personalization')]
     procedure ToBase64(StringToEncode: Text) B64String: Text
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         BinaryReader: DotNet npNetBinaryReader;
         MemoryStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;
@@ -73,10 +73,10 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     begin
 
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(Outstr);
+        TempBlob.CreateOutStream(Outstr);
         Outstr.WriteText(StringToEncode);
 
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
         MemoryStream := InStr;
         BinaryReader := BinaryReader.BinaryReader(InStr);
 
@@ -91,7 +91,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     procedure XmlSafe(InText: Text): Text
     begin
 
-        exit (DelChr (InText, '<=>', DelChr (InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));
+        exit(DelChr(InText, '<=>', DelChr(InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));
     end;
 }
 

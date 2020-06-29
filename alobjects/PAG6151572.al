@@ -16,49 +16,49 @@ page 6151572 "AF Test Services"
             group("Spire Barcode")
             {
                 Caption = 'Spire Barcode';
-                field(Value;Value)
+                field(Value; Value)
                 {
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field("Show Checksum";"Show Checksum")
+                field("Show Checksum"; "Show Checksum")
                 {
                 }
-                field("Barcode Height";"Barcode Height")
+                field("Barcode Height"; "Barcode Height")
                 {
                 }
-                field("Barcode Size";"Barcode Size")
+                field("Barcode Size"; "Barcode Size")
                 {
                 }
-                field("Include Text";"Include Text")
+                field("Include Text"; "Include Text")
                 {
                 }
-                field(Border;Border)
+                field(Border; Border)
                 {
                 }
-                field("Reverse Colors";"Reverse Colors")
+                field("Reverse Colors"; "Reverse Colors")
                 {
                 }
-                field("Image Type";"Image Type")
+                field("Image Type"; "Image Type")
                 {
                 }
-                field(Image;Image)
+                field(Image; Image)
                 {
                 }
             }
             group("MSG Service")
             {
                 Caption = 'MSG Service';
-                field(MSGSender;MSGSender)
+                field(MSGSender; MSGSender)
                 {
                     Caption = 'Sender';
                 }
-                field(MSGPhoneNumber;MSGPhoneNumber)
+                field(MSGPhoneNumber; MSGPhoneNumber)
                 {
                     Caption = 'Phone Number';
                 }
-                field(MSGInvoiceNo;MSGInvoiceNo)
+                field(MSGInvoiceNo; MSGInvoiceNo)
                 {
                     Caption = 'Invoice No.';
                     TableRelation = "Sales Invoice Header";
@@ -118,14 +118,14 @@ page 6151572 "AF Test Services"
                         AFSetup: Record "AF Setup";
                     begin
                         if (MSGPhoneNumber <> '') and (MSGSender <> '') and (MSGInvoiceNo <> '') then begin
-                          SalesInvoiceHeader.Get(MSGInvoiceNo);
-                        //-NPR5.40 [307195]
-                          AFSetup.Get;
-                          AFSetup.TestField("Msg Service - Report ID");
-                          SMSBody := AFAPIMsgService.CreateSMSBody(SalesInvoiceHeader.RecordId,AFSetup."Msg Service - Report ID",'');
-                        //+NPR5.40 [307195]
-                          SMSManagement.SendSMS(MSGPhoneNumber,MSGSender,SMSBody);
-                          Message(SMSSentTxt);
+                            SalesInvoiceHeader.Get(MSGInvoiceNo);
+                            //-NPR5.40 [307195]
+                            AFSetup.Get;
+                            AFSetup.TestField("Msg Service - Report ID");
+                            SMSBody := AFAPIMsgService.CreateSMSBody(SalesInvoiceHeader.RecordId, AFSetup."Msg Service - Report ID", '');
+                            //+NPR5.40 [307195]
+                            SMSManagement.SendSMS(MSGPhoneNumber, MSGSender, SMSBody);
+                            Message(SMSSentTxt);
                         end;
                     end;
                 }
@@ -135,7 +135,7 @@ page 6151572 "AF Test Services"
 
     var
         AFAPISpireBarcode: Codeunit "AF API - Spire Barcode";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         MSGSender: Text;
         MSGPhoneNumber: Text;
         MSGInvoiceNo: Code[20];

@@ -26,7 +26,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.Delete", DeleteCode);
     end;
 
-    procedure InitNpXmlTemplateSetup(var TempBlob: Record TempBlob temporary)
+    procedure InitNpXmlTemplateSetup(var TempBlob: Codeunit "Temp Blob")
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         XmlDoc: DotNet npNetXmlDocument;
@@ -108,8 +108,8 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //AddNpXmlTemplate(XmlDoc,NodePath,'UPD_ITEM_DISC_GROUP','DEL_ITEM_DISC_GROUP');
         //+MAG2.09 [295656]
 
-        Clear(TempBlob.Blob);
-        TempBlob.Blob.CreateOutStream(OutStream);
+        Clear(TempBlob);
+        TempBlob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
     end;
 
@@ -117,7 +117,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
     begin
     end;
 
-    local procedure SetupTemplate(var TempBlob: Record TempBlob temporary; TemplateCode: Code[20]; Enabled: Boolean)
+    local procedure SetupTemplate(var TempBlob: Codeunit "Temp Blob"; TemplateCode: Code[20]; Enabled: Boolean)
     var
         MagentoSetup: Record "Magento Setup";
         NcSetup: Record "Nc Setup";
@@ -133,8 +133,8 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
 
         //-MAG2.22 [359285]
         MagentoSetupMgt.UpdateVersionNo(MagentoSetup);
-        if NpXmlTemplate.Get(TemplateCode) and (CopyStr(NpXmlTemplate."Template Version",1,StrLen(MagentoSetupMgt.MagentoVersionId())) = MagentoSetupMgt.MagentoVersionId()) then
-          NpXmlTemplate.Delete(true);
+        if NpXmlTemplate.Get(TemplateCode) and (CopyStr(NpXmlTemplate."Template Version", 1, StrLen(MagentoSetupMgt.MagentoVersionId())) = MagentoSetupMgt.MagentoVersionId()) then
+            NpXmlTemplate.Delete(true);
         //+MAG2.22 [359285]
 
         if not Enabled then begin
@@ -196,7 +196,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //+MAG2.09 [295656]
     end;
 
-    procedure SetupTemplateAttribute(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateAttribute(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -206,7 +206,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateAttributeSet(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateAttributeSet(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -216,7 +216,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateCreditVoucher(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateCreditVoucher(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -226,7 +226,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateCustomer(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateCustomer(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -236,7 +236,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateDisplayConfig(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateDisplayConfig(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -246,7 +246,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateGiftVoucher(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateGiftVoucher(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -256,7 +256,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateItem(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateItem(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -266,7 +266,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateItemStore(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateItemStore(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -278,7 +278,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //+MAG1.21
     end;
 
-    procedure SetupTemplateItemGroup(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateItemGroup(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -288,7 +288,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateItemInventory(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateItemInventory(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         NpXmlTemplate: Record "NpXml Template";
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
@@ -305,7 +305,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         NpXmlTemplate.Modify;
     end;
 
-    procedure SetupTemplateBrand(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateBrand(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -315,7 +315,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateOrderStatus(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateOrderStatus(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -325,7 +325,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplatePicture(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplatePicture(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -335,7 +335,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateSalesLineDiscount(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateSalesLineDiscount(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -345,7 +345,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateSalesPrice(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateSalesPrice(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -355,7 +355,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
 
-    procedure SetupTemplateTicket(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateTicket(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -366,7 +366,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //+MAG2.02
     end;
 
-    procedure SetupTemplateMember(var TempBlob: Record TempBlob; Enabled: Boolean)
+    procedure SetupTemplateMember(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
@@ -377,15 +377,15 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //+MAG2.02
     end;
 
-    procedure SetupTemplateCollectStore(var TempBlob: Record TempBlob;Enabled: Boolean)
+    procedure SetupTemplateCollectStore(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         NodePath: Text;
     begin
         //-MAG2.22 [352201]
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CollectStore" + '/';
-        SetupTemplate(TempBlob,MagentoGenericSetupMgt.GetValueText(TempBlob,NodePath + "ElementName.Update"),Enabled);
-        SetupTemplate(TempBlob,MagentoGenericSetupMgt.GetValueText(TempBlob,NodePath + "ElementName.Delete"),Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
         //+MAG2.22 [352201]
     end;
 
@@ -393,7 +393,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
     begin
     end;
 
-    procedure AddItemDiscGroupCodeElement(var TempBlob: Record TempBlob)
+    procedure AddItemDiscGroupCodeElement(var TempBlob: Codeunit "Temp Blob")
     var
         Item: Record Item;
         NpXmlElement: Record "NpXml Element";
@@ -459,7 +459,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //+MAG2.09 [295656]
     end;
 
-    procedure SetItemElementEnabled(var TempBlob: Record TempBlob; NodePath: Text; CommentFilter: Text; Enabled: Boolean)
+    procedure SetItemElementEnabled(var TempBlob: Codeunit "Temp Blob"; NodePath: Text; CommentFilter: Text; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         TemplateCode: Code[20];
@@ -476,7 +476,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         NpXmlTemplateMgt.SetNpXmlElementActive(TemplateCode, NodePath, CommentFilter, Enabled);
     end;
 
-    procedure SetItemStoreElementEnabled(var TempBlob: Record TempBlob; ElementName: Text; Enabled: Boolean)
+    procedure SetItemStoreElementEnabled(var TempBlob: Codeunit "Temp Blob"; ElementName: Text; Enabled: Boolean)
     var
         NpXmlElement: Record "NpXml Element";
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
@@ -511,7 +511,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //+MAG2.09 [295656]
     end;
 
-    procedure SetItemFilterValue(var TempBlob: Record TempBlob; ParentNodePath: Text; ParentCommentFilter: Text; NodePath: Text; CommentFilter: Text; FilterFieldNo: Integer; FilterValue: Text)
+    procedure SetItemFilterValue(var TempBlob: Codeunit "Temp Blob"; ParentNodePath: Text; ParentCommentFilter: Text; NodePath: Text; CommentFilter: Text; FilterFieldNo: Integer; FilterValue: Text)
     var
         NpXmlElement: Record "NpXml Element";
         NpXmlElement2: Record "NpXml Element";
@@ -527,7 +527,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
             NpXmlTemplateMgt.SetNpXmlFilterValue(NpXmlElement2."Xml Template Code", NpXmlElement2."Line No.", FilterFieldNo, FilterValue);
     end;
 
-    procedure SetSalesPriceEnabled(var TempBlob: Record TempBlob; NodePath: Text; CommentFilter: Text; Enabled: Boolean)
+    procedure SetSalesPriceEnabled(var TempBlob: Codeunit "Temp Blob"; NodePath: Text; CommentFilter: Text; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         TemplateCode: Code[20];

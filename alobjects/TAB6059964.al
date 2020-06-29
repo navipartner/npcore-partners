@@ -10,72 +10,66 @@ table 6059964 "MPOS QR Code"
 
     fields
     {
-        field(1;"User ID";Code[50])
+        field(1; "User ID"; Code[50])
         {
             Caption = 'User ID';
             NotBlank = true;
             TableRelation = User."User Name";
             ValidateTableRelation = false;
-
-            trigger OnLookup()
-            var
-                UserMgt: Codeunit "User Management";
-            begin
-                UserMgt.LookupUserID("User ID");
-            end;
+            DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                //UserMgt.ValidateUserID("User ID");
+                UserSelection.ValidateUserName("User ID");
             end;
         }
-        field(10;Password;Text[30])
+        field(10; Password; Text[30])
         {
             Caption = 'Password';
             ExtendedDatatype = Masked;
         }
-        field(11;Url;Text[250])
+        field(11; Url; Text[250])
         {
             Caption = 'Url';
         }
-        field(12;"Client Type";Option)
+        field(12; "Client Type"; Option)
         {
             Caption = 'Client Type';
             OptionCaption = 'Standard,Transcendence';
             OptionMembers = Standard,Transcendence;
         }
-        field(13;Company;Text[30])
+        field(13; Company; Text[30])
         {
             Caption = 'Company';
             TableRelation = Company;
             ValidateTableRelation = false;
         }
-        field(14;"Payment Gateway";Option)
+        field(14; "Payment Gateway"; Option)
         {
             Caption = 'Payment Gateway';
             OptionCaption = 'None,Nets,Adyen';
             OptionMembers = "None",Nets,Adyen;
         }
-        field(15;Tenant;Text[30])
+        field(15; Tenant; Text[30])
         {
             Caption = 'Tenant';
         }
-        field(16;"E-mail";Text[30])
+        field(16; "E-mail"; Text[30])
         {
             Caption = 'E-mail';
         }
-        field(17;"Webservice Url";Text[250])
+        field(17; "Webservice Url"; Text[250])
         {
             Caption = 'Webservice Url';
         }
-        field(20;"QR code";BLOB)
+        field(20; "QR code"; BLOB)
         {
             Caption = 'QR code';
             SubType = Bitmap;
         }
-        field(21;"Cash Register Id";Code[10])
+        field(21; "Cash Register Id"; Code[10])
         {
             Caption = 'Cash Register Id';
             TableRelation = Register."Register No.";
@@ -85,7 +79,7 @@ table 6059964 "MPOS QR Code"
 
     keys
     {
-        key(Key1;"User ID",Company,"Cash Register Id")
+        key(Key1; "User ID", Company, "Cash Register Id")
         {
         }
     }
@@ -106,13 +100,13 @@ table 6059964 "MPOS QR Code"
         MPOSQRCode.TestField("User ID");
 
         if MPOSQRCode.Url = '' then
-          MPOSQRCode.Url := StringReplace(GetUrl(CLIENTTYPE::Windows));
+            MPOSQRCode.Url := StringReplace(GetUrl(CLIENTTYPE::Windows));
         if MPOSQRCode.Tenant = '' then
-          MPOSQRCode.Tenant := TenantId;
+            MPOSQRCode.Tenant := TenantId;
         if MPOSQRCode.Company = '' then
-          MPOSQRCode.Company := CompanyName;
+            MPOSQRCode.Company := CompanyName;
         if MPOSQRCode."Webservice Url" = '' then
-          MPOSQRCode."Webservice Url" := GetUrl(CLIENTTYPE::SOAP);
+            MPOSQRCode."Webservice Url" := GetUrl(CLIENTTYPE::SOAP);
         MPOSQRCode.Modify(true);
     end;
 
@@ -124,29 +118,26 @@ table 6059964 "MPOS QR Code"
     begin
         Old := 'dynamicsnav://';
         Pos := StrPos(String, Old);
-        while Pos <> 0 do
-        begin
-          String := DelStr(String, Pos, StrLen(Old));
-          String := InsStr(String, New, Pos);
-          Pos := StrPos(String, Old);
+        while Pos <> 0 do begin
+            String := DelStr(String, Pos, StrLen(Old));
+            String := InsStr(String, New, Pos);
+            Pos := StrPos(String, Old);
         end;
 
         Old := '//';
         Pos := StrPos(String, Old);
-        while Pos <> 0 do
-        begin
-          String := DelStr(String, Pos, StrLen(Old));
-          String := InsStr(String, New, Pos);
-          Pos := StrPos(String, Old);
+        while Pos <> 0 do begin
+            String := DelStr(String, Pos, StrLen(Old));
+            String := InsStr(String, New, Pos);
+            Pos := StrPos(String, Old);
         end;
 
         Old := ':';
         Pos := StrPos(String, Old);
-        while Pos <> 0 do
-        begin
-          String := DelStr(String, Pos, StrLen(Old) + 4);
-          String := InsStr(String, New, Pos);
-          Pos := StrPos(String, Old);
+        while Pos <> 0 do begin
+            String := DelStr(String, Pos, StrLen(Old) + 4);
+            String := InsStr(String, New, Pos);
+            Pos := StrPos(String, Old);
         end;
 
         exit(String);
@@ -154,42 +145,52 @@ table 6059964 "MPOS QR Code"
 
     procedure CreateQRCode(var MPOSQRCode: Record "MPOS QR Code")
     var
-        TmpQR: Record TempBlob temporary;
+        TmpQR: Codeunit "Temp Blob";
         JsonString: Text;
         ClientType: Text[1];
         PaymentType: Text[10];
+        RecRef: RecordRef;
     begin
         MPOSQRCode.TestField("User ID");
         MPOSQRCode.TestField(Url);
 
         case MPOSQRCode."Client Type" of
-          "Client Type"::Standard : ClientType := 'S';
-          "Client Type"::Transcendence : ClientType := 'T';
+            "Client Type"::Standard:
+                ClientType := 'S';
+            "Client Type"::Transcendence:
+                ClientType := 'T';
         end;
 
         case MPOSQRCode."Payment Gateway" of
-          "Payment Gateway"::Adyen : PaymentType := 'Adyen';
-          "Payment Gateway"::Nets : PaymentType := 'Nets';
-          "Payment Gateway"::None : PaymentType := '';
+            "Payment Gateway"::Adyen:
+                PaymentType := 'Adyen';
+            "Payment Gateway"::Nets:
+                PaymentType := 'Nets';
+            "Payment Gateway"::None:
+                PaymentType := '';
         end;
 
-        JsonString := '{ "A":"'+MPOSQRCode.Url+
-                      '","B":"'+MPOSQRCode."User ID"+
-                      '","C":"'+MPOSQRCode.Password+
-                      '","D":"'+MPOSQRCode.Tenant+
-                      '","E":"'+ClientType+
-                      '","F":"'+MPOSQRCode.Company+
-                      '","G":"'+PaymentType+
-                      '","H":"'+MPOSQRCode."Webservice Url"+
-                      '","I":"'+MPOSQRCode."Cash Register Id"+
+        JsonString := '{ "A":"' + MPOSQRCode.Url +
+                      '","B":"' + MPOSQRCode."User ID" +
+                      '","C":"' + MPOSQRCode.Password +
+                      '","D":"' + MPOSQRCode.Tenant +
+                      '","E":"' + ClientType +
+                      '","F":"' + MPOSQRCode.Company +
+                      '","G":"' + PaymentType +
+                      '","H":"' + MPOSQRCode."Webservice Url" +
+                      '","I":"' + MPOSQRCode."Cash Register Id" +
                       '"}';
 
-        GenerateBarcode(JsonString,TmpQR);
-        MPOSQRCode."QR code" := TmpQR.Blob;
-        MPOSQRCode.Modify;
+        GenerateBarcode(JsonString, TmpQR);
+
+        RecRef.GetTable(MPOSQRCode);
+        TmpQR.ToRecordRef(RecRef, MPOSQRCode.FieldNo("QR code"));
+        RecRef.SetTable(MPOSQRCode);
+
+        MPOSQRCode.Modify();
     end;
 
-    procedure GenerateBarcode(BarCode: Text;var TempBlob: Record TempBlob)
+    procedure GenerateBarcode(BarCode: Text; var TempBlob: Codeunit "Temp Blob")
     var
         MemoryStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
@@ -207,10 +208,10 @@ table 6059964 "MPOS QR Code"
         BarCodeSettings.ApplyKey('3YOZI-9N0S5-RD239-JN9R0-WCGL8');
         Image := BarCodeGenerator.GenerateImage();
         MemoryStream := MemoryStream.MemoryStream;
-        Image.Save(MemoryStream,ImageFormat.Png);
+        Image.Save(MemoryStream, ImageFormat.Png);
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStream);
-        CopyStream(OutStream,MemoryStream);
+        TempBlob.CreateOutStream(OutStream);
+        CopyStream(OutStream, MemoryStream);
     end;
 }
 

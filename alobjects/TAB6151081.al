@@ -8,67 +8,67 @@ table 6151081 "ExRv Voucher"
 
     fields
     {
-        field(1;"Voucher Type";Code[20])
+        field(1; "Voucher Type"; Code[20])
         {
             Caption = 'Voucher Type';
             NotBlank = true;
             TableRelation = "ExRv Voucher Type";
         }
-        field(5;"No.";Code[20])
+        field(5; "No."; Code[20])
         {
             Caption = 'No.';
             NotBlank = true;
         }
-        field(10;"Issued at";DateTime)
+        field(10; "Issued at"; DateTime)
         {
             Caption = 'Issued at';
         }
-        field(15;Amount;Decimal)
+        field(15; Amount; Decimal)
         {
             Caption = 'Amount';
-            DecimalPlaces = 2:5;
+            DecimalPlaces = 2 : 5;
         }
-        field(20;"Posting Date";Date)
+        field(20; "Posting Date"; Date)
         {
             Caption = 'Posting Date';
         }
-        field(25;Posted;Boolean)
+        field(25; Posted; Boolean)
         {
             Caption = 'Posted';
         }
-        field(30;"Source Type";Option)
+        field(30; "Source Type"; Option)
         {
             Caption = 'Source Table No.';
             OptionCaption = 'Gift Voucher';
             OptionMembers = "Gift Voucher";
         }
-        field(35;"Source No.";Code[20])
+        field(35; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type"=CONST("Gift Voucher")) "Gift Voucher"."No.";
+            TableRelation = IF ("Source Type" = CONST("Gift Voucher")) "Gift Voucher"."No.";
         }
-        field(40;"Reference No.";Code[20])
+        field(40; "Reference No."; Code[20])
         {
             Caption = 'Reference No.';
         }
-        field(45;"Online Reference No.";Code[20])
+        field(45; "Online Reference No."; Code[20])
         {
             Caption = 'Online Reference No.';
         }
-        field(100;Open;Boolean)
+        field(100; Open; Boolean)
         {
             Caption = 'Open';
         }
-        field(105;"Remaining Amount";Decimal)
+        field(105; "Remaining Amount"; Decimal)
         {
             Caption = 'Remaining Amount';
-            DecimalPlaces = 2:5;
+            DecimalPlaces = 2 : 5;
         }
-        field(110;"Closed at";Date)
+        field(110; "Closed at"; Date)
         {
             Caption = 'Closed at';
         }
-        field(480;"Dimension Set ID";Integer)
+        field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
             Editable = false;
@@ -79,33 +79,33 @@ table 6151081 "ExRv Voucher"
                 ShowDocDim;
             end;
         }
-        field(485;"Shortcut Dimension 1 Code";Code[20])
+        field(485; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1,"Shortcut Dimension 1 Code");
+                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
-        field(490;"Shortcut Dimension 2 Code";Code[20])
+        field(490; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2,"Shortcut Dimension 2 Code");
+                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
     }
 
     keys
     {
-        key(Key1;"Voucher Type","No.")
+        key(Key1; "Voucher Type", "No.")
         {
         }
     }
@@ -126,25 +126,25 @@ table 6151081 "ExRv Voucher"
     begin
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
-          DimMgt.EditDimensionSet2(
-            "Dimension Set ID",StrSubstNo('%1 %2',TableCaption,"No."),
-            "Shortcut Dimension 1 Code","Shortcut Dimension 2 Code");
+          DimMgt.EditDimensionSet(
+            "Dimension Set ID", StrSubstNo('%1 %2', TableCaption, "No."),
+            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         if OldDimSetID <> "Dimension Set ID" then
-          Modify;
+            Modify;
     end;
 
-    local procedure ValidateShortcutDimCode(FieldNumber: Integer;var ShortcutDimCode: Code[20])
+    local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimMgt: Codeunit DimensionManagement;
         OldDimSetID: Integer;
     begin
         OldDimSetID := "Dimension Set ID";
-        DimMgt.ValidateShortcutDimValues(FieldNumber,ShortcutDimCode,"Dimension Set ID");
+        DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
         if "No." <> '' then
-          Modify;
+            Modify;
 
         if OldDimSetID <> "Dimension Set ID" then
-          Modify;
+            Modify;
     end;
 }
 

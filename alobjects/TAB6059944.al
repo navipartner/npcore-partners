@@ -6,31 +6,31 @@ table 6059944 "NaviDocs Entry Attachment"
 
     fields
     {
-        field(1;"NaviDocs Entry No.";BigInteger)
+        field(1; "NaviDocs Entry No."; BigInteger)
         {
             Caption = 'NaviDocs Entry No.';
         }
-        field(2;"Line No.";Integer)
+        field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(10;Data;BLOB)
+        field(10; Data; BLOB)
         {
             Caption = 'Data';
         }
-        field(20;"File Extension";Text[10])
+        field(20; "File Extension"; Text[10])
         {
             Caption = 'File Extension';
         }
-        field(30;"Data Type";Code[20])
+        field(30; "Data Type"; Code[20])
         {
             Caption = 'Data Type';
         }
-        field(40;Description;Text[30])
+        field(40; Description; Text[30])
         {
             Caption = 'Description';
         }
-        field(50;"Internal Type";Option)
+        field(50; "Internal Type"; Option)
         {
             Caption = 'Internal Type';
             OptionCaption = ' ,Report Parameters';
@@ -40,7 +40,7 @@ table 6059944 "NaviDocs Entry Attachment"
 
     keys
     {
-        key(Key1;"NaviDocs Entry No.","Line No.")
+        key(Key1; "NaviDocs Entry No.", "Line No.")
         {
         }
     }
@@ -61,37 +61,37 @@ table 6059944 "NaviDocs Entry Attachment"
         Path: Text;
         Content: Text;
         IsHandled: Boolean;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
     begin
-        OnShowOutput(Rec,IsHandled);
+        OnShowOutput(Rec, IsHandled);
         if IsHandled then
-          exit;
+            exit;
 
         CalcFields(Data);
         if not Data.HasValue then begin
-          Message(NoDataText);
-          exit;
+            Message(NoDataText);
+            exit;
         end;
-        TempBlob.Blob := Data;
-        FileMgt.BLOBExport(TempBlob,StrSubstNo(FilenamePattern,"NaviDocs Entry No.","File Extension"),true);
+        TempBlob.FromRecord(Rec, FieldNo(Data));
+        FileMgt.BLOBExport(TempBlob, StrSubstNo(FilenamePattern, "NaviDocs Entry No.", "File Extension"), true);
         exit;
-        Data.CreateInStream(InStr,TEXTENCODING::UTF8);
+        Data.CreateInStream(InStr, TEXTENCODING::UTF8);
         if IsWebClient() then begin
-          StreamReader := StreamReader.StreamReader(InStr);
-          Content := StreamReader.ReadToEnd();
-          Message(Content);
+            StreamReader := StreamReader.StreamReader(InStr);
+            Content := StreamReader.ReadToEnd();
+            Message(Content);
         end else begin
-          Path := TemporaryPath + StrSubstNo(FilenamePattern,"NaviDocs Entry No.","File Extension");
-          StreamReader := StreamReader.StreamReader(InStr);
-          DownloadFromStream(InStr,'Export',FileMgt.Magicpath,'.xml',Path);
-          SyncMgt.RunProcess('notepad.exe',Path,false);
-          Sleep(100);
-          FileMgt.DeleteClientFile(Path);
+            Path := TemporaryPath + StrSubstNo(FilenamePattern, "NaviDocs Entry No.", "File Extension");
+            StreamReader := StreamReader.StreamReader(InStr);
+            DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.xml', Path);
+            SyncMgt.RunProcess('notepad.exe', Path, false);
+            Sleep(100);
+            FileMgt.DeleteClientFile(Path);
         end;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnShowOutput(var NaviDocsEntryAttachment: Record "NaviDocs Entry Attachment";var IsHandled: Boolean)
+    local procedure OnShowOutput(var NaviDocsEntryAttachment: Record "NaviDocs Entry Attachment"; var IsHandled: Boolean)
     begin
     end;
 
@@ -99,8 +99,8 @@ table 6059944 "NaviDocs Entry Attachment"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId,SessionId) then
-          exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
+        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;
 

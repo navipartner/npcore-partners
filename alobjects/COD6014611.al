@@ -54,27 +54,27 @@ codeunit 6014611 "Tax Free PTF PI"
         TaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
 
         if not TaxFreeUnit."Handler Parameters".HasValue then
-          Error(Error_MissingParameters, TaxFreeUnit."Handler ID", TaxFreeUnit."POS Unit No.");
+            Error(Error_MissingParameters, TaxFreeUnit."Handler ID", TaxFreeUnit."POS Unit No.");
 
         AddParameters(tmpHandlerParameters);
         tmpHandlerParameters.DeserializeParameterBLOB(TaxFreeUnit);
 
         if tmpHandlerParameters.TryGetParameterValue('Merchant ID', Variant) then
-          MerchantID := Variant;
+            MerchantID := Variant;
 
         if tmpHandlerParameters.TryGetParameterValue('VAT Number', Variant) then
-          VATNumber := Variant;
+            VATNumber := Variant;
 
         if tmpHandlerParameters.TryGetParameterValue('Country Code', Variant) then
-          CountryCode := Variant;
+            CountryCode := Variant;
 
         if tmpHandlerParameters.TryGetParameterValue('Minimum Amount Limit', Variant) then
-          MinimumAmountLimit := Variant;
+            MinimumAmountLimit := Variant;
 
         POSUnitNo := TaxFreeUnit."POS Unit No.";
 
         if (StrLen(MerchantID) = 0) or (StrLen(VATNumber) = 0) or (CountryCode = 0) then
-          Error(Error_MissingParameters, TaxFreeUnit."Handler ID", TaxFreeUnit."POS Unit No.");
+            Error(Error_MissingParameters, TaxFreeUnit."Handler ID", TaxFreeUnit."POS Unit No.");
     end;
 
     local procedure AddParameters(var tmpHandlerParameters: Record "Tax Free Handler Parameters")
@@ -89,7 +89,7 @@ codeunit 6014611 "Tax Free PTF PI"
     begin
     end;
 
-    local procedure VoucherIssue(var TaxFreeRequest: Record "Tax Free Request";var RecRef: RecordRef)
+    local procedure VoucherIssue(var TaxFreeRequest: Record "Tax Free Request"; var RecRef: RecordRef)
     var
         VoucherNo: Text;
         VoucherBarcode: Text;
@@ -112,7 +112,7 @@ codeunit 6014611 "Tax Free PTF PI"
         CreateVoucher(TaxFreeRequest, RecRef);
     end;
 
-    local procedure VoucherVoid(var TaxFreeRequest: Record "Tax Free Request";ExternalVoucherNo: Text)
+    local procedure VoucherVoid(var TaxFreeRequest: Record "Tax Free Request"; ExternalVoucherNo: Text)
     var
         ErrorText: Text;
         ErrorNo: Text;
@@ -121,10 +121,10 @@ codeunit 6014611 "Tax Free PTF PI"
         VoidVoucherRequest(TaxFreeRequest, ExternalVoucherNo);
         HandleResponse(TaxFreeRequest, 'VoidVoucherResult', XMLDoc);
 
-        ErrorNo := GetFirstNodeContent(XMLDoc,'error',false);
+        ErrorNo := GetFirstNodeContent(XMLDoc, 'error', false);
         if UpperCase(ErrorNo) <> '0' then begin
-          ErrorText := GetFirstNodeContent(XMLDoc,'error_text',false);
-          Error(ErrorText);
+            ErrorText := GetFirstNodeContent(XMLDoc, 'error_text', false);
+            Error(ErrorText);
         end;
     end;
 
@@ -136,12 +136,14 @@ codeunit 6014611 "Tax Free PTF PI"
         Buffer: Text;
     begin
         case TaxFreeRequest."Print Type" of
-          TaxFreeRequest."Print Type"::PDF : PrintPDF(TaxFreeRequest);
-          TaxFreeRequest."Print Type"::Thermal : PrintThermalReceipt(TaxFreeRequest);
+            TaxFreeRequest."Print Type"::PDF:
+                PrintPDF(TaxFreeRequest);
+            TaxFreeRequest."Print Type"::Thermal:
+                PrintThermalReceipt(TaxFreeRequest);
         end;
     end;
 
-    local procedure IsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request";MaskedCardNo: Text) Valid: Boolean
+    local procedure IsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request"; MaskedCardNo: Text) Valid: Boolean
     var
         ResponseMessage: Text;
         Value: Text;
@@ -155,12 +157,12 @@ codeunit 6014611 "Tax Free PTF PI"
         BRTSearchRequest(TaxFreeRequest, IIN);
         HandleResponse(TaxFreeRequest, 'PerformBRTSearchResult', XMLDoc);
 
-        if TryGetFirstNodeContent(XMLDoc,'VATRefundEligible',false,Eligible) then
-          Valid := (UpperCase(Eligible) = 'TRUE')
+        if TryGetFirstNodeContent(XMLDoc, 'VATRefundEligible', false, Eligible) then
+            Valid := (UpperCase(Eligible) = 'TRUE')
         else begin
-          if TryGetFirstNodeContent(XMLDoc,'error',false,ErrorNo) then
-            TaxFreeRequest."Error Code" := ErrorNo;
-          Error( GetFirstNodeContent(XMLDoc,'error_text',false));
+            if TryGetFirstNodeContent(XMLDoc, 'error', false, ErrorNo) then
+                TaxFreeRequest."Error Code" := ErrorNo;
+            Error(GetFirstNodeContent(XMLDoc, 'error_text', false));
         end;
     end;
 
@@ -168,7 +170,7 @@ codeunit 6014611 "Tax Free PTF PI"
     begin
     end;
 
-    local procedure InsertInvoice(var TaxFreeRequest: Record "Tax Free Request";var RecRef: RecordRef): Boolean
+    local procedure InsertInvoice(var TaxFreeRequest: Record "Tax Free Request"; var RecRef: RecordRef): Boolean
     var
         ResponseMessage: Text;
         ErrorNo: Text;
@@ -177,14 +179,14 @@ codeunit 6014611 "Tax Free PTF PI"
         InsertInvoiceRequest(TaxFreeRequest, RecRef);
         HandleResponse(TaxFreeRequest, 'InsertInvoiceResult', XMLDoc);
 
-        ErrorNo := GetFirstNodeContent(XMLDoc,'error',false);
+        ErrorNo := GetFirstNodeContent(XMLDoc, 'error', false);
         if not (UpperCase(ErrorNo) = '0') then begin //0 = Success
-          TaxFreeRequest."Error Code" := ErrorNo;
-          Error( GetFirstNodeContent(XMLDoc,'error_text',false));
+            TaxFreeRequest."Error Code" := ErrorNo;
+            Error(GetFirstNodeContent(XMLDoc, 'error_text', false));
         end;
     end;
 
-    local procedure CreateVoucher(var TaxFreeRequest: Record "Tax Free Request";var RecRef: RecordRef)
+    local procedure CreateVoucher(var TaxFreeRequest: Record "Tax Free Request"; var RecRef: RecordRef)
     var
         ResponseMessage: Text;
         ErrorNo: Text;
@@ -192,7 +194,7 @@ codeunit 6014611 "Tax Free PTF PI"
         VoucherBarcode: Text;
         VoucherTotalAmount: Text;
         VoucherRefundAmount: Text;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;
         XMLDoc: DotNet npNetXmlDocument;
         Decimal: Decimal;
@@ -201,38 +203,38 @@ codeunit 6014611 "Tax Free PTF PI"
         CreateVoucherRequest(TaxFreeRequest, RecRef);
         HandleResponse(TaxFreeRequest, 'CreateVoucherResult', XMLDoc);
 
-        if TryGetFirstNodeContent(XMLDoc,'voucher_number',false, VoucherNo) then;
+        if TryGetFirstNodeContent(XMLDoc, 'voucher_number', false, VoucherNo) then;
 
-        if not TryGetFirstNodeContent(XMLDoc,'voucher_lines',true,PrintXML) then //Thermal print data
-          if TryGetFirstNodeContent(XMLDoc,'VoucherForm',true,PrintXML) then //PDF print data
-            TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
+        if not TryGetFirstNodeContent(XMLDoc, 'voucher_lines', true, PrintXML) then //Thermal print data
+            if TryGetFirstNodeContent(XMLDoc, 'VoucherForm', true, PrintXML) then //PDF print data
+                TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
 
-        if not GetBarcodeFromPrintXML(PrintXML,VoucherBarcode) then
-          if TryGetFirstNodeContent(XMLDoc,'Barcode',true, VoucherBarcode) then;
+        if not GetBarcodeFromPrintXML(PrintXML, VoucherBarcode) then
+            if TryGetFirstNodeContent(XMLDoc, 'Barcode', true, VoucherBarcode) then;
 
-        if TryGetFirstNodeContent(XMLDoc,'price_incl_vat',false,VoucherTotalAmount) then;
+        if TryGetFirstNodeContent(XMLDoc, 'price_incl_vat', false, VoucherTotalAmount) then;
 
-        if TryGetFirstNodeContent(XMLDoc,'refund_amount',false,VoucherRefundAmount) then;
+        if TryGetFirstNodeContent(XMLDoc, 'refund_amount', false, VoucherRefundAmount) then;
 
         if (StrLen(VoucherNo) > 0) and (StrLen(VoucherBarcode) > 0) and (StrLen(PrintXML) > 0) and (StrLen(VoucherTotalAmount) > 0) and (StrLen(VoucherRefundAmount) > 0) then begin
-          TaxFreeRequest."External Voucher No." := VoucherNo;
-          TaxFreeRequest."External Voucher Barcode" := VoucherBarcode;
-          Evaluate(TaxFreeRequest."Total Amount Incl. VAT", VoucherTotalAmount, 9);
-          Evaluate(TaxFreeRequest."Refund Amount", VoucherRefundAmount, 9);
-          //-NPR5.41 [312751]
-          //TaxFreeRequest.Print.CREATEOUTSTREAM(OutStream);
-          TaxFreeRequest.Print.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-          //+NPR5.41 [312751]
-          OutStream.Write(PrintXML);
+            TaxFreeRequest."External Voucher No." := VoucherNo;
+            TaxFreeRequest."External Voucher Barcode" := VoucherBarcode;
+            Evaluate(TaxFreeRequest."Total Amount Incl. VAT", VoucherTotalAmount, 9);
+            Evaluate(TaxFreeRequest."Refund Amount", VoucherRefundAmount, 9);
+            //-NPR5.41 [312751]
+            //TaxFreeRequest.Print.CREATEOUTSTREAM(OutStream);
+            TaxFreeRequest.Print.CreateOutStream(OutStream, TEXTENCODING::UTF8);
+            //+NPR5.41 [312751]
+            OutStream.Write(PrintXML);
         end else begin
-          if TryGetFirstNodeContent(XMLDoc,'error',false,ErrorNo) then
-            TaxFreeRequest."Error Code" := ErrorNo;
+            if TryGetFirstNodeContent(XMLDoc, 'error', false, ErrorNo) then
+                TaxFreeRequest."Error Code" := ErrorNo;
 
-          Error( GetFirstNodeContent(XMLDoc,'error_text',false));
+            Error(GetFirstNodeContent(XMLDoc, 'error_text', false));
         end;
     end;
 
-    local procedure GetCDataXML(XMLDoc: DotNet npNetXmlDocument;CDATATagName: Text)
+    local procedure GetCDataXML(XMLDoc: DotNet npNetXmlDocument; CDATATagName: Text)
     var
         XMLNode: DotNet npNetXmlNode;
         XMLNodeList: DotNet npNetXmlNodeList;
@@ -244,7 +246,7 @@ codeunit 6014611 "Tax Free PTF PI"
         XMLDoc.LoadXml(HtmlDecoder.HtmlDecode(XMLNode.InnerXml));
     end;
 
-    local procedure GetFirstNodeContent(XMLDoc: DotNet npNetXmlDocument;ElementName: Text;XMLInContent: Boolean): Text
+    local procedure GetFirstNodeContent(XMLDoc: DotNet npNetXmlDocument; ElementName: Text; XMLInContent: Boolean): Text
     var
         XMLNode: DotNet npNetXmlNode;
         XMLNodeList: DotNet npNetXmlNodeList;
@@ -252,13 +254,13 @@ codeunit 6014611 "Tax Free PTF PI"
         XMLNodeList := XMLDoc.GetElementsByTagName(ElementName);
         XMLNode := XMLNodeList.ItemOf(0);
         if XMLInContent then
-          exit(XMLNode.OuterXml)
+            exit(XMLNode.OuterXml)
         else
-          exit(XMLNode.InnerText);
+            exit(XMLNode.InnerText);
     end;
 
     [TryFunction]
-    local procedure GetBarcodeFromPrintXML(PrintXML: Text;var Barcode: Text)
+    local procedure GetBarcodeFromPrintXML(PrintXML: Text; var Barcode: Text)
     var
         XMLNode: DotNet npNetXmlNode;
         PrintLines: DotNet npNetXmlNodeList;
@@ -270,23 +272,23 @@ codeunit 6014611 "Tax Free PTF PI"
         XMLDoc.LoadXml(PrintXML);
         PrintLines := XMLDoc.GetElementsByTagName('print_line');
         if PrintLines.Count < 1 then
-          Error(Error_PrintData);
+            Error(Error_PrintData);
 
         i := 0;
         Barcode := '';
         repeat
-          XMLNode := PrintLines.ItemOf(i);
-          Line    := XMLNode.InnerText;
-          if CopyStr(Line,1,2) = '11' then
-            Barcode := CopyStr(Line,3);
-          i += 1;
+            XMLNode := PrintLines.ItemOf(i);
+            Line := XMLNode.InnerText;
+            if CopyStr(Line, 1, 2) = '11' then
+                Barcode := CopyStr(Line, 3);
+            i += 1;
         until (i >= (PrintLines.Count - 1)) or (Barcode <> '');
 
         if Barcode = '' then
-          Error(Error_PrintData);
+            Error(Error_PrintData);
     end;
 
-    local procedure GetSaleInfo(RecRef: RecordRef;Parameter: Text): Text
+    local procedure GetSaleInfo(RecRef: RecordRef; Parameter: Text): Text
     var
         AuditRoll: Record "Audit Roll";
         SalePOS: Record "Sale POS";
@@ -295,42 +297,55 @@ codeunit 6014611 "Tax Free PTF PI"
         DateTime: DateTime;
     begin
         case RecRef.Number of
-          DATABASE::"Audit Roll"   : RecRef.SetTable(AuditRoll);
-          DATABASE::"Sale POS"     : RecRef.SetTable(SalePOS);
-          DATABASE::"Sales Header" : RecRef.SetTable(SalesHeader);
+            DATABASE::"Audit Roll":
+                RecRef.SetTable(AuditRoll);
+            DATABASE::"Sale POS":
+                RecRef.SetTable(SalePOS);
+            DATABASE::"Sales Header":
+                RecRef.SetTable(SalesHeader);
         end;
 
         case Parameter of
-          'operator_id'            :
-            case RecRef.Number of
-              DATABASE::"Audit Roll" : exit(ReplaceSpecialChars(AuditRoll."Salesperson Code"))
-            end;
-          'transaction_type'       : exit('1');
-          'transaction_date'       :
-            case RecRef.Number of
-              DATABASE::"Audit Roll" : exit(Format(AuditRoll."Sale Date",0,9));
-            end;
-          'transaction_time'       :
-            case RecRef.Number of
-              DATABASE::"Audit Roll" : exit(Format(AuditRoll."Closing Time"));
-            end;
-          'invoice_number',
-          'barcode_data'           :
-            case RecRef.Number of
-              DATABASE::"Audit Roll" : exit(ReplaceSpecialChars(AuditRoll."Sales Ticket No."))
-            end;
-          'number_of_items'        :
-            case RecRef.Number of
-              DATABASE::"Audit Roll" : begin
-                                         AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
-                                         AuditRoll.SetRange(Type,AuditRoll.Type::Item);
-                                         exit(Format(AuditRoll.Count));
-                                       end;
-            end;
-          'invoice_line_items'     : exit(GetSaleItemInfo(RecRef));
-          'transaction_totals'     : exit(GetSaleTotals(RecRef));
-          'payment_method_details' : exit(GetSalePaymentInfo(RecRef));
-          'iso_country_of_origin'  : exit('');
+            'operator_id':
+                case RecRef.Number of
+                    DATABASE::"Audit Roll":
+                        exit(ReplaceSpecialChars(AuditRoll."Salesperson Code"))
+                end;
+            'transaction_type':
+                exit('1');
+            'transaction_date':
+                case RecRef.Number of
+                    DATABASE::"Audit Roll":
+                        exit(Format(AuditRoll."Sale Date", 0, 9));
+                end;
+            'transaction_time':
+                case RecRef.Number of
+                    DATABASE::"Audit Roll":
+                        exit(Format(AuditRoll."Closing Time"));
+                end;
+            'invoice_number',
+          'barcode_data':
+                case RecRef.Number of
+                    DATABASE::"Audit Roll":
+                        exit(ReplaceSpecialChars(AuditRoll."Sales Ticket No."))
+                end;
+            'number_of_items':
+                case RecRef.Number of
+                    DATABASE::"Audit Roll":
+                        begin
+                            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+                            AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+                            exit(Format(AuditRoll.Count));
+                        end;
+                end;
+            'invoice_line_items':
+                exit(GetSaleItemInfo(RecRef));
+            'transaction_totals':
+                exit(GetSaleTotals(RecRef));
+            'payment_method_details':
+                exit(GetSalePaymentInfo(RecRef));
+            'iso_country_of_origin':
+                exit('');
         end;
     end;
 
@@ -352,47 +367,48 @@ codeunit 6014611 "Tax Free PTF PI"
         ItemXML: Text;
     begin
         case RecRef.Number of
-          DATABASE::"Audit Roll"   :
-            begin
-              RecRef.SetTable(AuditRoll);
-              AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
-              AuditRoll.SetRange(Type,AuditRoll.Type::Item);
-              AuditRoll.SetFilter(Quantity,'>0');
-              if AuditRoll.FindSet then repeat
+            DATABASE::"Audit Roll":
+                begin
+                    RecRef.SetTable(AuditRoll);
+                    AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+                    AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+                    AuditRoll.SetFilter(Quantity, '>0');
+                    if AuditRoll.FindSet then
+                        repeat
 
-                ItemNo           += 1;
+                            ItemNo += 1;
 
-                ItemDesc         := ReplaceSpecialChars(AuditRoll.Description);
-                ItemVATRate      := Format(AuditRoll."VAT %",0,'<Precision,2:2><Standard Format,2>');
-                ItemGrossAmount  := Format(AuditRoll."Amount Including VAT",0,'<Precision,2:2><Standard Format,2>');
-                ItemNetAmount    := Format(AuditRoll.Amount,0,'<Precision,2:2><Standard Format,2>');
-                ItemVATAmount    := Format(AuditRoll."Amount Including VAT" - AuditRoll.Amount,0,'<Precision,2:2><Standard Format,2>');
-                ItemUnitPrice    := Format(AuditRoll."Unit Price",0,'<Precision,2:2><Standard Format,2>');
-                ItemDepartmentID := ReplaceSpecialChars(AuditRoll."No.");
-                ItemQuantity     := Format(Round(AuditRoll.Quantity,1,'>')); //Round up - They only accept integer quantity
+                            ItemDesc := ReplaceSpecialChars(AuditRoll.Description);
+                            ItemVATRate := Format(AuditRoll."VAT %", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemGrossAmount := Format(AuditRoll."Amount Including VAT", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemNetAmount := Format(AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>');
+                            ItemVATAmount := Format(AuditRoll."Amount Including VAT" - AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>');
+                            ItemUnitPrice := Format(AuditRoll."Unit Price", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemDepartmentID := ReplaceSpecialChars(AuditRoll."No.");
+                            ItemQuantity := Format(Round(AuditRoll.Quantity, 1, '>')); //Round up - They only accept integer quantity
 
-                ItemXML += '<line_item>' +
-                           '  <item_number>'+Format(ItemNo)+'</item_number>' +
-                           '  <item_description>'+ItemDesc+'</item_description>' +
-                           '  <item_vat_rate>'+ItemVATRate+'</item_vat_rate>' +
-                           '  <item_net_amount>'+ItemNetAmount+'</item_net_amount>' +
-                           '  <item_gross_amount>'+ItemGrossAmount+'</item_gross_amount>' +
-                           '  <item_vat_amount>'+ItemVATAmount+'</item_vat_amount>' +
-                           '  <individual_item_value>'+ItemUnitPrice+'</individual_item_value>' +
-                           '  <department_id>'+ItemDepartmentID+'</department_id>'+
-                           '  <item_quantity>'+ItemQuantity+'</item_quantity>' +
-                           '</line_item>';
+                            ItemXML += '<line_item>' +
+                                       '  <item_number>' + Format(ItemNo) + '</item_number>' +
+                                       '  <item_description>' + ItemDesc + '</item_description>' +
+                                       '  <item_vat_rate>' + ItemVATRate + '</item_vat_rate>' +
+                                       '  <item_net_amount>' + ItemNetAmount + '</item_net_amount>' +
+                                       '  <item_gross_amount>' + ItemGrossAmount + '</item_gross_amount>' +
+                                       '  <item_vat_amount>' + ItemVATAmount + '</item_vat_amount>' +
+                                       '  <individual_item_value>' + ItemUnitPrice + '</individual_item_value>' +
+                                       '  <department_id>' + ItemDepartmentID + '</department_id>' +
+                                       '  <item_quantity>' + ItemQuantity + '</item_quantity>' +
+                                       '</line_item>';
 
-              until AuditRoll.Next = 0;
-            end;
-          DATABASE::"Sale POS"     :
-            begin
-              RecRef.SetTable(SalePOS);
-            end;
-          DATABASE::"Sales Header" :
-            begin
-              RecRef.SetTable(SalesHeader);
-            end;
+                        until AuditRoll.Next = 0;
+                end;
+            DATABASE::"Sale POS":
+                begin
+                    RecRef.SetTable(SalePOS);
+                end;
+            DATABASE::"Sales Header":
+                begin
+                    RecRef.SetTable(SalesHeader);
+                end;
         end;
 
         exit(ItemXML);
@@ -414,40 +430,48 @@ codeunit 6014611 "Tax Free PTF PI"
         //See page 51 of doc. for payment methods
 
         case RecRef.Number of
-          DATABASE::"Audit Roll"   :
-            begin
-              RecRef.SetTable(AuditRoll);
-              AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
+            DATABASE::"Audit Roll":
+                begin
+                    RecRef.SetTable(AuditRoll);
+                    AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
 
-              if AuditRoll.FindSet then repeat
-                if PaymentTypePOS.Get(AuditRoll."No.") then begin
-                  case PaymentTypePOS."Processing Type" of
-                    PaymentTypePOS."Processing Type"::Cash                     : PaymentMethod := '1';
-                    PaymentTypePOS."Processing Type"::"Foreign Currency"       : PaymentMethod := '2';
+                    if AuditRoll.FindSet then
+                        repeat
+                            if PaymentTypePOS.Get(AuditRoll."No.") then begin
+                                case PaymentTypePOS."Processing Type" of
+                                    PaymentTypePOS."Processing Type"::Cash:
+                                        PaymentMethod := '1';
+                                    PaymentTypePOS."Processing Type"::"Foreign Currency":
+                                        PaymentMethod := '2';
 
-                    PaymentTypePOS."Processing Type"::"Other Credit Cards",
-                    PaymentTypePOS."Processing Type"::"Terminal Card"          : PaymentMethod := '4';
+                                    PaymentTypePOS."Processing Type"::"Other Credit Cards",
+                                  PaymentTypePOS."Processing Type"::"Terminal Card":
+                                        PaymentMethod := '4';
 
-                    PaymentTypePOS."Processing Type"::"Credit Voucher",
-                    PaymentTypePOS."Processing Type"::"Gift Voucher",
-                    PaymentTypePOS."Processing Type"::"Foreign Gift Voucher",
-                    PaymentTypePOS."Processing Type"::"Foreign Credit Voucher" : PaymentMethod := '6';
+                                    PaymentTypePOS."Processing Type"::"Credit Voucher",
+                                  PaymentTypePOS."Processing Type"::"Gift Voucher",
+                                  PaymentTypePOS."Processing Type"::"Foreign Gift Voucher",
+                                  PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
+                                        PaymentMethod := '6';
 
-                    PaymentTypePOS."Processing Type"::"Manual Card"            : PaymentMethod := '11';
-                  else
-                    PaymentMethod := '13';
-                  end;
-                  PaymentAmount := Format(AuditRoll."Amount Including VAT",0,'<Precision,2:2><Standard Format,2>');
+                                    PaymentTypePOS."Processing Type"::"Manual Card":
+                                        PaymentMethod := '11';
+                                    else
+                                        PaymentMethod := '13';
+                                end;
+                                PaymentAmount := Format(AuditRoll."Amount Including VAT", 0, '<Precision,2:2><Standard Format,2>');
 
-                  PaymentsXML += '<payment_method_detail>' +
-                                  '<payment_method>' + PaymentMethod + '</payment_method>' +
-                                  '<amount>' + PaymentAmount + '</amount>' +
-                                '</payment_method_detail>';
+                                PaymentsXML += '<payment_method_detail>' +
+                                                '<payment_method>' + PaymentMethod + '</payment_method>' +
+                                                '<amount>' + PaymentAmount + '</amount>' +
+                                              '</payment_method_detail>';
+                            end;
+                        until AuditRoll.Next = 0;
                 end;
-              until AuditRoll.Next = 0;
-            end;
-          DATABASE::"Sale POS"     : RecRef.SetTable(SalePOS);
-          DATABASE::"Sales Header" : RecRef.SetTable(SalesHeader);
+            DATABASE::"Sale POS":
+                RecRef.SetTable(SalePOS);
+            DATABASE::"Sales Header":
+                RecRef.SetTable(SalesHeader);
         end;
 
         exit(PaymentsXML);
@@ -465,31 +489,34 @@ codeunit 6014611 "Tax Free PTF PI"
         TotalsXML: Text;
     begin
         case RecRef.Number of
-          DATABASE::"Audit Roll"   :
-            begin
-              RecRef.SetTable(AuditRoll);
-              AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
-              AuditRoll.SetRange(Type,AuditRoll.Type::Item);
-              AuditRoll.SetFilter(Quantity,'>0');
-              if AuditRoll.FindSet then repeat
-                TotalGrossAmount += AuditRoll."Amount Including VAT";
-                TotalNetAmount   += AuditRoll.Amount;
-                TotalVATAmount   += (AuditRoll."Amount Including VAT" - AuditRoll.Amount);
-              until AuditRoll.Next = 0;
+            DATABASE::"Audit Roll":
+                begin
+                    RecRef.SetTable(AuditRoll);
+                    AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+                    AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+                    AuditRoll.SetFilter(Quantity, '>0');
+                    if AuditRoll.FindSet then
+                        repeat
+                            TotalGrossAmount += AuditRoll."Amount Including VAT";
+                            TotalNetAmount += AuditRoll.Amount;
+                            TotalVATAmount += (AuditRoll."Amount Including VAT" - AuditRoll.Amount);
+                        until AuditRoll.Next = 0;
 
-              TotalsXML := '<transaction_net_amount>' + Format(TotalNetAmount,0,'<Precision,2:2><Standard Format,2>') + '</transaction_net_amount>' +
-                           '<transaction_gross_amount>' + Format(TotalGrossAmount,0,'<Precision,2:2><Standard Format,2>') + '</transaction_gross_amount>' +
-                           '<transaction_vat_amount>' + Format(TotalVATAmount,0,'<Precision,2:2><Standard Format,2>') + '</transaction_vat_amount>';
-            end;
-          DATABASE::"Sale POS"     : RecRef.SetTable(SalePOS);
-          DATABASE::"Sales Header" : RecRef.SetTable(SalesHeader);
+                    TotalsXML := '<transaction_net_amount>' + Format(TotalNetAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_net_amount>' +
+                                 '<transaction_gross_amount>' + Format(TotalGrossAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_gross_amount>' +
+                                 '<transaction_vat_amount>' + Format(TotalVATAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_vat_amount>';
+                end;
+            DATABASE::"Sale POS":
+                RecRef.SetTable(SalePOS);
+            DATABASE::"Sales Header":
+                RecRef.SetTable(SalesHeader);
         end;
 
         exit(TotalsXML);
     end;
 
     [TryFunction]
-    local procedure TryGetFirstNodeContent(XMLDoc: DotNet npNetXmlDocument;ElementName: Text;XMLInContent: Boolean;var Value: Text)
+    local procedure TryGetFirstNodeContent(XMLDoc: DotNet npNetXmlDocument; ElementName: Text; XMLInContent: Boolean; var Value: Text)
     begin
         Value := GetFirstNodeContent(XMLDoc, ElementName, XMLInContent);
     end;
@@ -520,7 +547,7 @@ codeunit 6014611 "Tax Free PTF PI"
         AuditRoll.SetFilter("VAT %", '>0');
         AuditRoll.CalcSums("Amount Including VAT");
 
-        exit ( AuditRoll."Amount Including VAT" >= MinimumAmountLimit );
+        exit(AuditRoll."Amount Including VAT" >= MinimumAmountLimit);
     end;
 
     local procedure IsActiveSaleEligible(SalesTicketNo: Text): Boolean
@@ -534,7 +561,7 @@ codeunit 6014611 "Tax Free PTF PI"
         SaleLinePOS.SetFilter("VAT %", '>0');
         SaleLinePOS.CalcSums("Amount Including VAT");
 
-        exit ( SaleLinePOS."Amount Including VAT" >= MinimumAmountLimit );
+        exit(SaleLinePOS."Amount Including VAT" >= MinimumAmountLimit);
     end;
 
     local procedure "// Print functions"()
@@ -561,7 +588,7 @@ codeunit 6014611 "Tax Free PTF PI"
         OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"Report - Tax Free Receipt");
 
         if Output = '' then
-          Error(Error_MissingPrintSetup);
+            Error(Error_MissingPrintSetup);
 
         //-NPR5.41 [312751]
         //TaxFreeRequest.Print.CREATEINSTREAM(InStream);
@@ -575,68 +602,92 @@ codeunit 6014611 "Tax Free PTF PI"
         XMLDoc.Load(MemoryStream);
         PrintLines := XMLDoc.GetElementsByTagName('print_line'); //Thermal Receipt Data
         if PrintLines.Count < 1 then
-          Error(Error_PrintData);
+            Error(Error_PrintData);
 
-        Printer.SetThreeColumnDistribution(0.33,0.33,0.33);
+        Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
         Printer.SetAutoLineBreak(false);
 
         for i := 0 to (PrintLines.Count - 1) do begin
-          XMLNode := PrintLines.ItemOf(i);
-          Line := XMLNode.InnerText;
+            XMLNode := PrintLines.ItemOf(i);
+            Line := XMLNode.InnerText;
 
-          case CopyStr(Line,1,2) of
-            '01' : PrintThermalLine(Printer,'m','Control',false,'LEFT',true,false); //Tax free logo bitmap
-            '02' : PrintThermalLine(Printer,CopyStr(Line,3),'B21',true,'LEFT',true,false);
-            '03' : PrintThermalLine(Printer,CopyStr(Line,3),'B21',false,'LEFT',true,true);
-            '04' : PrintThermalLine(Printer,CopyStr(Line,3),'A11',false,'LEFT',true,true);
-            '05' : PrintThermalLine(Printer,CopyStr(Line,3),'A11',false,'LEFT',true,false);
-            '06' : PrintThermalLine(Printer,CopyStr(Line,3),'A11',true,'LEFT',true,false);
-            '07' : PrintThermalLine(Printer,CopyStr(Line,3),'A11',false,'LEFT',true,false); //Wide font?
-            '08' : PrintThermalLine(Printer,CopyStr(Line,3),'A11',false,'RIGHT',true,false);
-            '09' : PrintThermalLine(Printer,CopyStr(Line,3),'A11',false,'CENTER',true,false);
-            '10' : PrintThermalLine(Printer,CopyStr(Line,3),'B21',true,'CENTER',true,false);
-            '11' : if StrLen(CopyStr(Line,3)) < 30 then
-                      PrintThermalLine(Printer,CopyStr(Line,3),'BARCODE6',false,'LEFT',true,false) //Barcode type: Interleaved 2-of-5
+            case CopyStr(Line, 1, 2) of
+                '01':
+                    PrintThermalLine(Printer, 'm', 'Control', false, 'LEFT', true, false); //Tax free logo bitmap
+                '02':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'B21', true, 'LEFT', true, false);
+                '03':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'B21', false, 'LEFT', true, true);
+                '04':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', true, true);
+                '05':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', true, false);
+                '06':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', true, 'LEFT', true, false);
+                '07':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', true, false); //Wide font?
+                '08':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'RIGHT', true, false);
+                '09':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'CENTER', true, false);
+                '10':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'B21', true, 'CENTER', true, false);
+                '11':
+                    if StrLen(CopyStr(Line, 3)) < 30 then
+                        PrintThermalLine(Printer, CopyStr(Line, 3), 'BARCODE6', false, 'LEFT', true, false) //Barcode type: Interleaved 2-of-5
                     else
-                      PrintThermalLine(Printer,CopyStr(Line,3),'A11',false,'LEFT',true,false);
-            '12' : PrintThermalLine(Printer,' ','A11',false,'LEFT',true,false);
-            '13' : PrintThermalLine(Printer,'P','Control',false,'LEFT',true,false);
-            '14' : PrintThermalLine(Printer,CopyStr(Line,3),'A11',false,'LEFT',false,false);
-            '50' : ; //Load another voucher
-            '51' : PrintThermalLine(Printer,'COPY','A11',false,'LEFT',true,false); //Print Copy?
-            '61' : ; //remaining print is base64 encoded
-            '70' : begin //Store logo bitmap
-                      PrintThermalLine(Printer,'h','Control',false,'LEFT',true,false);
-                      PrintThermalLine(Printer,'G','Control',false,'LEFT',true,false);
+                        PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', true, false);
+                '12':
+                    PrintThermalLine(Printer, ' ', 'A11', false, 'LEFT', true, false);
+                '13':
+                    PrintThermalLine(Printer, 'P', 'Control', false, 'LEFT', true, false);
+                '14':
+                    PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', false, false);
+                '50':
+                    ; //Load another voucher
+                '51':
+                    PrintThermalLine(Printer, 'COPY', 'A11', false, 'LEFT', true, false); //Print Copy?
+                '61':
+                    ; //remaining print is base64 encoded
+                '70':
+                    begin //Store logo bitmap
+                        PrintThermalLine(Printer, 'h', 'Control', false, 'LEFT', true, false);
+                        PrintThermalLine(Printer, 'G', 'Control', false, 'LEFT', true, false);
                     end;
-            '71' : ; //Store signature bitmap
-            '72' : ; //Customer signature?
-            '73' : ; //Country specific digital signature
-          end;
+                '71':
+                    ; //Store signature bitmap
+                '72':
+                    ; //Customer signature?
+                '73':
+                    ; //Country specific digital signature
+            end;
         end;
 
         Printer.ProcessBufferForCodeunit(CODEUNIT::"Report - Tax Free Receipt", ''); //Use the object output selection of old object so no new setup is needed.
     end;
 
-    local procedure PrintThermalLine(var Printer: Codeunit "RP Line Print Mgt.";Value: Text;Font: Text;Bold: Boolean;Alignment: Text;CR: Boolean;Underline: Boolean)
+    local procedure PrintThermalLine(var Printer: Codeunit "RP Line Print Mgt."; Value: Text; Font: Text; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
     begin
-        if Font in ['A11','B21','Control'] then begin
-          Printer.SetFont(Font);
-          Printer.SetBold(Bold);
-          Printer.SetUnderLine(Underline);
+        if Font in ['A11', 'B21', 'Control'] then begin
+            Printer.SetFont(Font);
+            Printer.SetBold(Bold);
+            Printer.SetUnderLine(Underline);
 
-          case Alignment of
-            'LEFT'   : Printer.AddTextField(1,0,Value);
-            'CENTER' : Printer.AddTextField(2,1,Value);
-            'RIGHT'  : Printer.AddTextField(3,2,Value);
-          end;
+            case Alignment of
+                'LEFT':
+                    Printer.AddTextField(1, 0, Value);
+                'CENTER':
+                    Printer.AddTextField(2, 1, Value);
+                'RIGHT':
+                    Printer.AddTextField(3, 2, Value);
+            end;
         end;
 
         if Font = 'BARCODE6' then
-          Printer.AddBarcode(Font,Value,2);
+            Printer.AddBarcode(Font, Value, 2);
 
         if CR then
-          Printer.NewLine;
+            Printer.NewLine;
     end;
 
     local procedure PrintPDF(var TaxFreeRequest: Record "Tax Free Request")
@@ -659,7 +710,7 @@ codeunit 6014611 "Tax Free PTF PI"
         OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"Report - Tax Free Receipt");
 
         if Output = '' then
-          Error(Error_MissingPrintSetup);
+            Error(Error_MissingPrintSetup);
 
         TaxFreeRequest.Print.CreateInStream(InStream);
         MemoryStream := MemoryStream.MemoryStream();
@@ -671,16 +722,19 @@ codeunit 6014611 "Tax Free PTF PI"
 
         PrintLines := XMLDoc.GetElementsByTagName('FormData'); //Base64 pdf data
         if PrintLines.Count <> 1 then
-          Error(Error_PrintData);
+            Error(Error_PrintData);
 
         XMLNode := PrintLines.ItemOf(0);
         base64 := XMLNode.InnerText;
         MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(base64));
 
         case OutputType of
-          ObjectOutputSelection."Output Type"::"Google Print" : PrintMethodMgt.PrintViaGoogleCloud(Output, MemoryStream, 'application/pdf', 1, CODEUNIT::"Report - Tax Free Receipt");
-          ObjectOutputSelection."Output Type"::"E-mail"       : PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
-          ObjectOutputSelection."Output Type"::"Printer Name" : PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
+            ObjectOutputSelection."Output Type"::"Google Print":
+                PrintMethodMgt.PrintViaGoogleCloud(Output, MemoryStream, 'application/pdf', 1, CODEUNIT::"Report - Tax Free Receipt");
+            ObjectOutputSelection."Output Type"::"E-mail":
+                PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
+            ObjectOutputSelection."Output Type"::"Printer Name":
+                PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
         end;
     end;
 
@@ -688,7 +742,7 @@ codeunit 6014611 "Tax Free PTF PI"
     begin
     end;
 
-    local procedure BRTSearchRequest(var TaxFreeRequest: Record "Tax Free Request";IIN: Text)
+    local procedure BRTSearchRequest(var TaxFreeRequest: Record "Tax Free Request"; IIN: Text)
     var
         RequestBody: Text;
     begin
@@ -715,7 +769,7 @@ codeunit 6014611 "Tax Free PTF PI"
                 '<operator_id>' + ReplaceSpecialChars(TaxFreeRequest."Salesperson Code") + '</operator_id>' +
               '</operator_info>' +
         //+NPR5.45 [316333]
-              '<card_number>' + IIN +'</card_number>' +
+              '<card_number>' + IIN + '</card_number>' +
         //-NPR5.45 [316333]
         //      '<respond_in_language></respond_in_language>' +
               '<respond_in_language>' + Format(CountryCode) + '</respond_in_language>' +
@@ -725,10 +779,10 @@ codeunit 6014611 "Tax Free PTF PI"
         '</v2:PerformBRTSearch>';
 
         RequestBody := WrapSOAPEnvelope(RequestBody);
-        InvokeService(RequestBody,TaxFreeRequest);
+        InvokeService(RequestBody, TaxFreeRequest);
     end;
 
-    local procedure InsertInvoiceRequest(var TaxFreeRequest: Record "Tax Free Request";var RecRef: RecordRef)
+    local procedure InsertInvoiceRequest(var TaxFreeRequest: Record "Tax Free Request"; var RecRef: RecordRef)
     var
         RequestBody: Text;
     begin
@@ -750,25 +804,25 @@ codeunit 6014611 "Tax Free PTF PI"
         '        <training_mode>0</training_mode>' +
         '      </terminal>' +
         '      <operator_info>' +
-        '        <operator_id>' + GetSaleInfo(RecRef,'operator_id') + '</operator_id>' +
+        '        <operator_id>' + GetSaleInfo(RecRef, 'operator_id') + '</operator_id>' +
         '      </operator_info>' +
         '      <transaction_header>' +
-        '        <transaction_type>' + GetSaleInfo(RecRef,'transaction_type') +'</transaction_type>' +
-        '        <transaction_date>' + GetSaleInfo(RecRef,'transaction_date') + '</transaction_date>' +
-        '        <transaction_time>' + GetSaleInfo(RecRef,'transaction_time') + '</transaction_time>' +
-        '        <invoice_number>' + GetSaleInfo(RecRef,'invoice_number') + '</invoice_number>' +
-        '        <barcode_data>' + GetSaleInfo(RecRef,'barcode_data') +'</barcode_data>' +
-        '        <number_of_items>' + GetSaleInfo(RecRef,'number_of_items') + '</number_of_items>' +
+        '        <transaction_type>' + GetSaleInfo(RecRef, 'transaction_type') + '</transaction_type>' +
+        '        <transaction_date>' + GetSaleInfo(RecRef, 'transaction_date') + '</transaction_date>' +
+        '        <transaction_time>' + GetSaleInfo(RecRef, 'transaction_time') + '</transaction_time>' +
+        '        <invoice_number>' + GetSaleInfo(RecRef, 'invoice_number') + '</invoice_number>' +
+        '        <barcode_data>' + GetSaleInfo(RecRef, 'barcode_data') + '</barcode_data>' +
+        '        <number_of_items>' + GetSaleInfo(RecRef, 'number_of_items') + '</number_of_items>' +
         '      </transaction_header>' +
         '      <original_invoice />' +
         '      <invoice_line_items>' +
-                 GetSaleInfo(RecRef,'invoice_line_items') +
+                 GetSaleInfo(RecRef, 'invoice_line_items') +
         '      </invoice_line_items>' +
         '      <transaction_totals>' +
-                 GetSaleInfo(RecRef,'transaction_totals') +
+                 GetSaleInfo(RecRef, 'transaction_totals') +
         '      </transaction_totals>' +
         '      <payment_method_details>' +
-                   GetSaleInfo(RecRef,'payment_method_details') +
+                   GetSaleInfo(RecRef, 'payment_method_details') +
         '      </payment_method_details>' +
         '      <customer_data>' +
         '      </customer_data>' +
@@ -780,10 +834,10 @@ codeunit 6014611 "Tax Free PTF PI"
         '</v2:InsertInvoice>';
 
         RequestBody := WrapSOAPEnvelope(RequestBody);
-        InvokeService(RequestBody,TaxFreeRequest);
+        InvokeService(RequestBody, TaxFreeRequest);
     end;
 
-    local procedure CreateVoucherRequest(var TaxFreeRequest: Record "Tax Free Request";var RecRef: RecordRef)
+    local procedure CreateVoucherRequest(var TaxFreeRequest: Record "Tax Free Request"; var RecRef: RecordRef)
     var
         RequestBody: Text;
     begin
@@ -804,12 +858,12 @@ codeunit 6014611 "Tax Free PTF PI"
         '        <merchant_country_code>' + Format(CountryCode) + '</merchant_country_code>' +
         '      </terminal>' +
         '      <operator_info>' +
-        '        <operator_id>' + GetSaleInfo(RecRef,'operator_id') +'</operator_id>' +
+        '        <operator_id>' + GetSaleInfo(RecRef, 'operator_id') + '</operator_id>' +
         '      </operator_info>' +
         '      <number_of_invoices>1</number_of_invoices>' +
         '      <voucher_info>' +
         '        <barcodes>' +
-        '          <barcode_data>' + GetSaleInfo(RecRef,'barcode_data') + '</barcode_data>' +
+        '          <barcode_data>' + GetSaleInfo(RecRef, 'barcode_data') + '</barcode_data>' +
         '        </barcodes>' +
         '        <voucher_formula>' +
         '        </voucher_formula>' +
@@ -822,10 +876,10 @@ codeunit 6014611 "Tax Free PTF PI"
         '</v2:CreateVoucher>';
 
         RequestBody := WrapSOAPEnvelope(RequestBody);
-        InvokeService(RequestBody,TaxFreeRequest);
+        InvokeService(RequestBody, TaxFreeRequest);
     end;
 
-    local procedure VoidVoucherRequest(var TaxFreeRequest: Record "Tax Free Request";VoucherNo: Text)
+    local procedure VoidVoucherRequest(var TaxFreeRequest: Record "Tax Free Request"; VoucherNo: Text)
     var
         RequestBody: Text;
     begin
@@ -854,7 +908,7 @@ codeunit 6014611 "Tax Free PTF PI"
         '</v2:VoidVoucher>';
 
         RequestBody := WrapSOAPEnvelope(RequestBody);
-        InvokeService(RequestBody,TaxFreeRequest);
+        InvokeService(RequestBody, TaxFreeRequest);
     end;
 
     local procedure WrapSOAPEnvelope(RequestBody: Text): Text
@@ -866,7 +920,7 @@ codeunit 6014611 "Tax Free PTF PI"
              '</soap:Envelope>');
     end;
 
-    local procedure InvokeService(RequestMessage: Text;var TaxFreeRequest: Record "Tax Free Request")
+    local procedure InvokeService(RequestMessage: Text; var TaxFreeRequest: Record "Tax Free Request")
     var
         BaseAddress: Text;
         HttpClient: DotNet npNetHttpClient;
@@ -888,14 +942,14 @@ codeunit 6014611 "Tax Free PTF PI"
         HttpClient.DefaultRequestHeaders.Clear();
 
         if TaxFreeRequest.Mode = TaxFreeRequest.Mode::PROD then
-          HttpClient.BaseAddress := Uri.Uri(ServicePROD)
+            HttpClient.BaseAddress := Uri.Uri(ServicePROD)
         else
-          HttpClient.BaseAddress := Uri.Uri(ServiceTEST);
+            HttpClient.BaseAddress := Uri.Uri(ServiceTEST);
 
         if TaxFreeRequest."Timeout (ms)" > 0 then
-          HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 0, TaxFreeRequest."Timeout (ms)")
+            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 0, TaxFreeRequest."Timeout (ms)")
         else
-          HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 10);
+            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 10);
 
         StringContent := StringContent.StringContent(RequestMessage, Encoding.UTF8, 'application/soap+xml');
         HttpResponseMessage := HttpClient.PostAsync('', StringContent).Result();
@@ -905,7 +959,7 @@ codeunit 6014611 "Tax Free PTF PI"
         OutStream.Write(Result);
     end;
 
-    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request";ResponseTagName: Text;var XMLDoc: DotNet npNetXmlDocument)
+    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request"; ResponseTagName: Text; var XMLDoc: DotNet npNetXmlDocument)
     var
         InStream: InStream;
         MemoryStream: DotNet npNetMemoryStream;
@@ -931,44 +985,44 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandlerParameters', '', false, false)]
-    local procedure OnLookupHandlerParameter(TaxFreeUnit: Record "Tax Free POS Unit";var Handled: Boolean;var tmpHandlerParameters: Record "Tax Free Handler Parameters" temporary)
+    local procedure OnLookupHandlerParameter(TaxFreeUnit: Record "Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "Tax Free Handler Parameters" temporary)
     begin
         if not TaxFreeUnit.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         AddParameters(tmpHandlerParameters);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnSetUnitParameters', '', false, false)]
-    local procedure OnSetUnitParameters(TaxFreeUnit: Record "Tax Free POS Unit";var Handled: Boolean)
+    local procedure OnSetUnitParameters(TaxFreeUnit: Record "Tax Free POS Unit"; var Handled: Boolean)
     var
         TaxFreeMgt: Codeunit "Tax Free Handler Mgt.";
     begin
-        if not TaxFreeUnit.IsThisHandler(HandlerID)then
-          exit;
+        if not TaxFreeUnit.IsThisHandler(HandlerID) then
+            exit;
 
         Handled := true;
         TaxFreeMgt.SetGenericHandlerParameters(TaxFreeUnit); //Use the built-in support for storing parameters in the unit BLOB instead of externally.
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitAutoConfigure', '', false, false)]
-    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "Tax Free Request";Silent: Boolean;var Handled: Boolean)
+    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "Tax Free Request"; Silent: Boolean; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         Error(Error_NotSupported, HandlerID);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitTestConnection', '', false, false)]
-    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "Tax Free Request";var Handled: Boolean)
+    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "Tax Free Request"; var Handled: Boolean)
     var
         Valid: Boolean;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
 
@@ -977,23 +1031,23 @@ codeunit 6014611 "Tax Free PTF PI"
         Valid := IsValidTerminalIIN(TaxFreeRequest, '498692XXXXXXXXXX');
 
         if not Valid then
-          Error(Error_WrongIINDecision);
+            Error(Error_WrongIINDecision);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherIssueFromPOSSale', '', false, false)]
-    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "Tax Free Request";SalesReceiptNo: Code[20];var Handled: Boolean;var SkipRecordHandling: Boolean)
+    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "Tax Free Request"; SalesReceiptNo: Code[20]; var Handled: Boolean; var SkipRecordHandling: Boolean)
     var
         AuditRoll: Record "Audit Roll";
         RecRef: RecordRef;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
 
         if not IsStoredSaleEligible(SalesReceiptNo) then
-          Error(Error_Ineligible);
+            Error(Error_Ineligible);
 
         AuditRoll.SetRange("Sales Ticket No.", SalesReceiptNo);
         AuditRoll.FindSet;
@@ -1003,10 +1057,10 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherVoid', '', false, false)]
-    local procedure OnVoucherVoid(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";var Handled: Boolean)
+    local procedure OnVoucherVoid(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1014,49 +1068,49 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherReissue', '', false, false)]
-    local procedure OnVoucherReissue(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";var Handled: Boolean)
+    local procedure OnVoucherReissue(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         Error(Error_NotSupported, HandlerID);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherLookup', '', false, false)]
-    local procedure OnVoucherLookup(var TaxFreeRequest: Record "Tax Free Request";VoucherNo: Text;var Handled: Boolean)
+    local procedure OnVoucherLookup(var TaxFreeRequest: Record "Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         Error(Error_NotSupported, TaxFreeRequest."Handler ID");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherPrint', '', false, false)]
-    local procedure OnVoucherPrint(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";IsRecentVoucher: Boolean;var Handled: Boolean)
+    local procedure OnVoucherPrint(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; IsRecentVoucher: Boolean; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
 
         if not IsRecentVoucher then
-          if not TaxFreeVoucher.Print.HasValue then
-            Error(Error_MissingPrint);
+            if not TaxFreeVoucher.Print.HasValue then
+                Error(Error_MissingPrint);
 
         ClearLastError;
         if not TryPrintVoucher(TaxFreeRequest) then
-          Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
+            Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherConsolidate', '', false, false)]
-    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "Tax Free Request";var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;var Handled: Boolean)
+    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "Tax Free Request"; var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary; var Handled: Boolean)
     var
         tmpEligibleServices: Record "Tax Free GB I2 Service" temporary;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1064,10 +1118,10 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsValidTerminalIIN', '', false, false)]
-    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request";MaskedCardNo: Text;var IsForeignIIN: Boolean;var Handled: Boolean)
+    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1075,12 +1129,12 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsActiveSaleEligible', '', false, false)]
-    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "Tax Free Request";SalesTicketNo: Code[20];var Eligible: Boolean;var Handled: Boolean)
+    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     var
         tmpEligibleServices: Record "Tax Free GB I2 Service" temporary;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1088,12 +1142,12 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsStoredSaleEligible', '', false, false)]
-    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "Tax Free Request";SalesTicketNo: Code[20];var Eligible: Boolean;var Handled: Boolean)
+    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     var
         tmpEligibleServices: Record "Tax Free GB I2 Service" temporary;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);

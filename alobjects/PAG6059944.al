@@ -22,11 +22,11 @@ page 6059944 "SMS Send Message"
                 {
                     ShowCaption = false;
                     Visible = Mode < 2;
-                    field(PhoneNo;PhoneNo)
+                    field(PhoneNo; PhoneNo)
                     {
                         Caption = 'Phone No';
                     }
-                    field(SenderText;SenderText)
+                    field(SenderText; SenderText)
                     {
                         Caption = 'Sender';
                     }
@@ -35,7 +35,7 @@ page 6059944 "SMS Send Message"
                 {
                     Caption = 'Merge Template with';
                     Visible = ShowRecordSelection;
-                    field(RecordInfo;RecordInfo)
+                    field(RecordInfo; RecordInfo)
                     {
                         Caption = 'Record';
                         Visible = ShowRecordSelection;
@@ -43,15 +43,15 @@ page 6059944 "SMS Send Message"
                         trigger OnLookup(var Text: Text): Boolean
                         begin
                             if SelectedRecordRef.Number <> 0 then
-                              SelectedRecordRef.Close;
-                            if SelectRecord(Rec,SelectedRecordRef) then begin
-                              Text := Format(SelectedRecordRef.RecordId);
-                            //-NPR5.30 [263182]
-                              SMSMessageText := SMSManagement.MakeMessage(Rec,SelectedRecordRef);
-                            //+NPR5.30 [263182]
-                              exit(true);
+                                SelectedRecordRef.Close;
+                            if SelectRecord(Rec, SelectedRecordRef) then begin
+                                Text := Format(SelectedRecordRef.RecordId);
+                                //-NPR5.30 [263182]
+                                SMSMessageText := SMSManagement.MakeMessage(Rec, SelectedRecordRef);
+                                //+NPR5.30 [263182]
+                                exit(true);
                             end else
-                              Text := '';
+                                Text := '';
                         end;
                     }
                 }
@@ -60,7 +60,7 @@ page 6059944 "SMS Send Message"
                     Editable = false;
                     ShowCaption = false;
                     Visible = InfoText <> '';
-                    field(InfoText;InfoText)
+                    field(InfoText; InfoText)
                     {
                         ShowCaption = false;
                         Style = Strong;
@@ -70,7 +70,7 @@ page 6059944 "SMS Send Message"
                 group(Message)
                 {
                     Caption = 'Message';
-                    field(SMSMessageText;SMSMessageText)
+                    field(SMSMessageText; SMSMessageText)
                     {
                         MultiLine = true;
                         ShowCaption = false;
@@ -79,7 +79,7 @@ page 6059944 "SMS Send Message"
                 group(Control6150621)
                 {
                     ShowCaption = false;
-                    field(SendingOption;SendingOption)
+                    field(SendingOption; SendingOption)
                     {
                         Caption = 'Sending Option';
 
@@ -89,7 +89,7 @@ page 6059944 "SMS Send Message"
                         begin
                             //-NPR5.38 [301396]
                             if SendingOption = SendingOption::"Through NaviDocs" then
-                              SMSManagement.IsNaviDocsAvailable(true);
+                                SMSManagement.IsNaviDocsAvailable(true);
                             //+NPR5.38 [301396]
                         end;
                     }
@@ -97,7 +97,7 @@ page 6059944 "SMS Send Message"
                     {
                         ShowCaption = false;
                         Visible = SendingOption = 1;
-                        field(DelayUntil;DelayUntil)
+                        field(DelayUntil; DelayUntil)
                         {
                             Caption = 'Delay Until';
                         }
@@ -117,7 +117,7 @@ page 6059944 "SMS Send Message"
         //-NPR5.38 [301396]
         ShowRecordSelection := ("Table No." <> 0) and ShowRecordSelection and (Mode < Mode::Batch);
         //+NPR5.38 [301396]
-        SMSMessageText := SMSManagement.MakeMessage(Rec,SelectedRecordRef);
+        SMSMessageText := SMSManagement.MakeMessage(Rec, SelectedRecordRef);
         //+NPR5.30 [263182]
     end;
 
@@ -150,7 +150,7 @@ page 6059944 "SMS Send Message"
         DelayUntil: DateTime;
         Mode: Option Test,SingleRecord,Batch;
 
-    procedure SetData(ReceiverPhoneNo: Text;RecRef: RecordRef;Sender: Text;DialogMode: Option Test,SingleRecord,Batch;RecordSelectionText: Text)
+    procedure SetData(ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text)
     begin
         //-NPR5.30 [263182]
         PhoneNo := ReceiverPhoneNo;
@@ -163,7 +163,7 @@ page 6059944 "SMS Send Message"
         //+NPR5.38 [301396]
     end;
 
-    procedure GetData(var ReceiverPhoneNo: Text;var RecRef: RecordRef;var SMSBodyText: Text;var Sender: Text;var SendOption: Option;var SendDelayUntil: DateTime)
+    procedure GetData(var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendOption: Option; var SendDelayUntil: DateTime)
     begin
         ReceiverPhoneNo := PhoneNo;
         RecRef := SelectedRecordRef;
@@ -177,9 +177,9 @@ page 6059944 "SMS Send Message"
         //+NPR5.38 [301396]
     end;
 
-    local procedure SelectRecord(Template: Record "SMS Template Header";var RecRef: RecordRef): Boolean
+    local procedure SelectRecord(Template: Record "SMS Template Header"; var RecRef: RecordRef): Boolean
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         PageManagement: Codeunit "Page Management";
         DataTypeManagement: Codeunit "Data Type Management";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
@@ -188,20 +188,20 @@ page 6059944 "SMS Send Message"
     begin
         PageID := PageManagement.GetDefaultLookupPageID(Template."Table No.");
         if PageID <> 0 then begin
-          RecRef.Open(Template."Table No.");
-          if Template."Table Filters".HasValue then begin
-            Template.CalcFields("Table Filters");
-            TempBlob.Init;
-            TempBlob.Blob := Template."Table Filters";
-            RequestPageParametersHelper.ConvertParametersToFilters(RecRef,TempBlob);
-          end;
-          RecVariant := RecRef;
-          if RecRef.IsEmpty then
-            Message(Text001,RecRef.Caption);
-          if PAGE.RunModal(PageID,RecVariant) = ACTION::LookupOK then begin
-            DataTypeManagement.GetRecordRef(RecVariant,RecRef);
-            exit(true);
-          end;
+            RecRef.Open(Template."Table No.");
+            if Template."Table Filters".HasValue then begin
+                Template.CalcFields("Table Filters");
+                Clear(TempBlob);
+                TempBlob.FromRecord(Template, Template.FieldNo("Table Filters"));
+                RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob);
+            end;
+            RecVariant := RecRef;
+            if RecRef.IsEmpty then
+                Message(Text001, RecRef.Caption);
+            if PAGE.RunModal(PageID, RecVariant) = ACTION::LookupOK then begin
+                DataTypeManagement.GetRecordRef(RecVariant, RecRef);
+                exit(true);
+            end;
         end;
     end;
 
@@ -211,10 +211,10 @@ page 6059944 "SMS Send Message"
     begin
         //-NPR5.30 [263182]
         if RecRef.Number = 0 then
-          exit(true);
+            exit(true);
         EmptyRecRef.Open(RecRef.Number);
         if RecRef.RecordId = EmptyRecRef.RecordId then
-          exit(true);
+            exit(true);
         exit(RecRef.IsEmpty);
         //+NPR5.30 [263182]
     end;

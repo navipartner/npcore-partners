@@ -12,70 +12,70 @@ report 6014561 "Gift Voucher A5"
 
     dataset
     {
-        dataitem("Integer";"Integer")
+        dataitem("Integer"; "Integer")
         {
-            dataitem("Gift Voucher";"Gift Voucher")
+            dataitem("Gift Voucher"; "Gift Voucher")
             {
-                column(CopyText;CopyText)
+                column(CopyText; CopyText)
                 {
                 }
-                column(No_GiftVoucher;"Gift Voucher"."No.")
+                column(No_GiftVoucher; "Gift Voucher"."No.")
                 {
                 }
-                column(Amount_GiftVoucher;"Gift Voucher".Amount)
+                column(Amount_GiftVoucher; "Gift Voucher".Amount)
                 {
-                    DecimalPlaces = 2:2;
+                    DecimalPlaces = 2 : 2;
                     IncludeCaption = true;
                 }
-                column(Name_GiftVoucher;"Gift Voucher".Name)
+                column(Name_GiftVoucher; "Gift Voucher".Name)
                 {
                 }
-                column(Address_GiftVoucher;"Gift Voucher".Address)
+                column(Address_GiftVoucher; "Gift Voucher".Address)
                 {
                 }
-                column(IssueDate_GiftVoucher;"Gift Voucher"."Issue Date")
+                column(IssueDate_GiftVoucher; "Gift Voucher"."Issue Date")
                 {
                 }
-                column(RegisterNo_GiftVoucher;"Gift Voucher"."Register No.")
+                column(RegisterNo_GiftVoucher; "Gift Voucher"."Register No.")
                 {
                 }
-                column(SalesTicketNo_GiftVoucher;"Gift Voucher"."Sales Ticket No.")
+                column(SalesTicketNo_GiftVoucher; "Gift Voucher"."Sales Ticket No.")
                 {
                 }
-                column(ZipCodeCityText;ZipCodeCityText)
+                column(ZipCodeCityText; ZipCodeCityText)
                 {
                 }
-                column(DetailsText;DetailsText)
+                column(DetailsText; DetailsText)
                 {
                 }
-                column(Barcode;TempBlob.Blob)
+                column(Barcode; TempBlob.Blob)
                 {
                 }
-                column(SalesPersonText;SalesPersonText)
+                column(SalesPersonText; SalesPersonText)
                 {
                 }
-                dataitem(Register;Register)
+                dataitem(Register; Register)
                 {
-                    DataItemLink = "Register No."=FIELD("Register No.");
-                    column(Name_Register;Register.Name)
+                    DataItemLink = "Register No." = FIELD("Register No.");
+                    column(Name_Register; Register.Name)
                     {
                     }
-                    column(Address_Register;Register.Address)
+                    column(Address_Register; Register.Address)
                     {
                     }
-                    column(Email_Register;Register."E-mail")
+                    column(Email_Register; Register."E-mail")
                     {
                     }
-                    column(WebAddress_Register;Register.Website)
+                    column(WebAddress_Register; Register.Website)
                     {
                     }
-                    column(RegisterPhoneText;RegisterPhoneText)
+                    column(RegisterPhoneText; RegisterPhoneText)
                     {
                     }
-                    column(RegisterPostCodeAndCityText;RegisterPostCodeAndCityText)
+                    column(RegisterPostCodeAndCityText; RegisterPostCodeAndCityText)
                     {
                     }
-                    column(RegisterVatNoText;RegisterVatNoText)
+                    column(RegisterVatNoText; RegisterVatNoText)
                     {
                     }
 
@@ -95,30 +95,30 @@ report 6014561 "Gift Voucher A5"
                     "Gift Voucher".Modify(false);
 
                     if ("Gift Voucher"."No. Printed" > 1) and (RetailSetup."Copy No. on Sales Ticket") then
-                      CopyText := Text1001;
+                        CopyText := Text1001;
 
-                    DetailsText := Format("Issue Date") + ' ' + "Register No." + ' ' + "Sales Ticket No." +' - ' + "No."+' - ' +Format(Time);
+                    DetailsText := Format("Issue Date") + ' ' + "Register No." + ' ' + "Sales Ticket No." + ' - ' + "No." + ' - ' + Format(Time);
 
                     //+NPR5.38
                     ZipCodeCityText := "ZIP Code";
                     if ZipCodeCityText <> '' then
-                      ZipCodeCityText += ', ' + City
+                        ZipCodeCityText += ', ' + City
                     else
-                      ZipCodeCityText += City;
+                        ZipCodeCityText += City;
                     //-NPR5.38
 
                     BarcodeLib.GenerateBarcode("Gift Voucher"."No.", TempBlob);
 
                     if Get("Gift Voucher".Salesperson) then
-                      if RetailSetup."Salesperson on Sales Ticket" then
-                        SalesPersonText := StrSubstNo('%1 %2', "Gift Voucher".FieldCaption(Salesperson), Name);
+                        if RetailSetup."Salesperson on Sales Ticket" then
+                            SalesPersonText := StrSubstNo('%1 %2', "Gift Voucher".FieldCaption(Salesperson), Name);
                 end;
             }
 
             trigger OnAfterGetRecord()
             begin
                 if LoopCounter > 0 then
-                  CurrReport.Break;
+                    CurrReport.Break;
                 LoopCounter += 1;
             end;
 
@@ -166,7 +166,7 @@ report 6014561 "Gift Voucher A5"
         RetailSetup: Record "Retail Setup";
         CopyText: Text;
         Text1001: Label 'COPY';
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         DetailsText: Text;
         SalesPersonText: Text;
         RegisterPhoneText: Text;

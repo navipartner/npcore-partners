@@ -131,7 +131,7 @@ codeunit 6014449 "Table Import Library"
         RegenAutoIncrements: Boolean;
         DeleteAllBeforeImport: Boolean;
         "-- Dialog": Integer;
-        DialogValues: array [3] of Integer;
+        DialogValues: array[3] of Integer;
         ProgressDialog: Dialog;
         TxtProgess: Label 'Importing ##1######\@@2@@@@@@@@@@@@@@@@@\@@3@@@@@@@@@@@@@@@@@';
         IsDialogOpen: Boolean;
@@ -139,7 +139,7 @@ codeunit 6014449 "Table Import Library"
         InputCharsRead: Integer;
         InputCharsInBuffer: Integer;
         ErrImcompatibleTypes: Label 'Error. Incompatible type for table %1, field no. %2.  (%3 vs. %4[%5]) ';
-        TempRecordRefs: array [10] of RecordRef;
+        TempRecordRefs: array[10] of RecordRef;
         ErrTableNotExpected: Label 'Error. Table no. %1 was not expected.';
         UseXmlDataFormat: Boolean;
         Text_UploadCaption: Label 'Choose file:';
@@ -232,89 +232,89 @@ codeunit 6014449 "Table Import Library"
         UpdateBuffer();
 
         while not EOS do begin
-          case ParseMode of
-            ParseMode::Records :
-              begin
-        //-NPR5.50 [351021]
-                if Peek(StrLen(DataItemSeparator)) <> DataItemSeparator then begin
-        //+NPR5.50 [351021]
-                  ParseRecord;
-                  UpdateProgessDialog(3,CurrentRecordNo,CurrentRecordCount);
-                  CurrentRecordNo += 1;
-        //-NPR5.50 [351021]
-        //        IF (CurrentRecordNo > CurrentRecordCount) THEN BEGIN
-                end else begin
-        //+NPR5.50 [351021]
-                  ParseMode := ParseMode::TableInfo;
-                  Read(StrLen(DataItemSeparator));
-                  if UseTempTable then
-                    TempRecordRefs[CurrentTableCount] := CurrentRecRef.Duplicate;
-                  AddImportedDetails();
-                end;
-              end;
-            ParseMode::TableInfo :
-              begin
-                LineStart := Peek(7);
-                case true of
-                  (CopyStr(LineStart,1,5) = 'Table') :
+            case ParseMode of
+                ParseMode::Records:
                     begin
-                      ReadTableNo;
-                      CurrentTableCount += 1;
-                      if CheckTableExists() then begin
-                        CurrentRecRef.Close;
-                        LocalRecRef.Close;
-                        CheckTableExpected(CurrentTableNo);
-                        OpenTable;
-                        UpdateProgessDialog(2,CurrentTableCount,TotalTableCount);
-                        UpdateDialog(1,CurrentTableNo);
-                        AddImportedTable(CurrentTableNo);
-                      end;
+                        //-NPR5.50 [351021]
+                        if Peek(StrLen(DataItemSeparator)) <> DataItemSeparator then begin
+                            //+NPR5.50 [351021]
+                            ParseRecord;
+                            UpdateProgessDialog(3, CurrentRecordNo, CurrentRecordCount);
+                            CurrentRecordNo += 1;
+                            //-NPR5.50 [351021]
+                            //        IF (CurrentRecordNo > CurrentRecordCount) THEN BEGIN
+                        end else begin
+                            //+NPR5.50 [351021]
+                            ParseMode := ParseMode::TableInfo;
+                            Read(StrLen(DataItemSeparator));
+                            if UseTempTable then
+                                TempRecordRefs[CurrentTableCount] := CurrentRecRef.Duplicate;
+                            AddImportedDetails();
+                        end;
                     end;
-                  (LineStart = 'Records') :
+                ParseMode::TableInfo:
                     begin
-                      TempFieldsToImport.Reset;
-                      TempFieldsToImport.DeleteAll;
-                      TempFieldsToSkip.Reset;
-                      TempFieldsToSkip.DeleteAll;
-                      TempAutoIncrementFields.Reset;
-                      TempAutoIncrementFields.DeleteAll;
-                      ReadRecordCount;
-                      ParseMode := ParseMode::Fields;
+                        LineStart := Peek(7);
+                        case true of
+                            (CopyStr(LineStart, 1, 5) = 'Table'):
+                                begin
+                                    ReadTableNo;
+                                    CurrentTableCount += 1;
+                                    if CheckTableExists() then begin
+                                        CurrentRecRef.Close;
+                                        LocalRecRef.Close;
+                                        CheckTableExpected(CurrentTableNo);
+                                        OpenTable;
+                                        UpdateProgessDialog(2, CurrentTableCount, TotalTableCount);
+                                        UpdateDialog(1, CurrentTableNo);
+                                        AddImportedTable(CurrentTableNo);
+                                    end;
+                                end;
+                            (LineStart = 'Records'):
+                                begin
+                                    TempFieldsToImport.Reset;
+                                    TempFieldsToImport.DeleteAll;
+                                    TempFieldsToSkip.Reset;
+                                    TempFieldsToSkip.DeleteAll;
+                                    TempAutoIncrementFields.Reset;
+                                    TempAutoIncrementFields.DeleteAll;
+                                    ReadRecordCount;
+                                    ParseMode := ParseMode::Fields;
+                                end;
+                            else
+                                Error(ErrFormat, 'Table/Record', 'TableInfo');
+                        end;
                     end;
-                  else
-                    Error(ErrFormat, 'Table/Record', 'TableInfo');
-                end;
-              end;
-            ParseMode::FieldTypes :
-              begin
-                ReadFieldTypeDefinitions();
-                FieldCount := TempFieldsToImport.Count;
-                CurrentRecordNo   := 1;
-                ParseMode := ParseMode::Records;
-              end;
-            ParseMode::Fields :
-              begin
-                ReadFieldListDefinition;
-                ParseMode := ParseMode::FieldTypes;
-              end;
-            ParseMode::ImportInfo :
-              begin
-                LineStart := Peek(6);
-                if not (LineStart = 'Tables') then
-                  Error(ErrFormat, 'Tables', 'ImportInfo');
+                ParseMode::FieldTypes:
+                    begin
+                        ReadFieldTypeDefinitions();
+                        FieldCount := TempFieldsToImport.Count;
+                        CurrentRecordNo := 1;
+                        ParseMode := ParseMode::Records;
+                    end;
+                ParseMode::Fields:
+                    begin
+                        ReadFieldListDefinition;
+                        ParseMode := ParseMode::FieldTypes;
+                    end;
+                ParseMode::ImportInfo:
+                    begin
+                        LineStart := Peek(6);
+                        if not (LineStart = 'Tables') then
+                            Error(ErrFormat, 'Tables', 'ImportInfo');
 
-                ReadImportInfo;
-                ParseMode := ParseMode::TableInfo;
-              end;
-        //+NPR5.48 [340086]
-          end;
-          Clear(LastTokenConsumed);
+                        ReadImportInfo;
+                        ParseMode := ParseMode::TableInfo;
+                    end;
+            //+NPR5.48 [340086]
+            end;
+            Clear(LastTokenConsumed);
         end;
 
         AddImportedDetails();
 
         if (CurrentTableNo > 0) and UseTempTable then
-          TempRecordRefs[CurrentTableCount] := CurrentRecRef.Duplicate;
+            TempRecordRefs[CurrentTableCount] := CurrentRecRef.Duplicate;
     end;
 
     procedure ReadImportInfo()
@@ -324,7 +324,7 @@ codeunit 6014449 "Table Import Library"
         //-NPR5.48 [340086]
         //String.Construct(ReadLine);
         //EVALUATE(TotalTableCount,String.SelectStringSep(2,':'));
-        SplitString(ReadUntil(RecordSeparator),':',SplitArray);
+        SplitString(ReadUntil(RecordSeparator), ':', SplitArray);
         Evaluate(TotalTableCount, SplitArray.GetValue(1));
         //+NPR5.48 [340086]
     end;
@@ -341,7 +341,7 @@ codeunit 6014449 "Table Import Library"
     begin
         Skip := not TableExists;
         if not Skip then
-          CurrentRecRef.Init;
+            CurrentRecRef.Init;
 
         //-NPR5.48 [340086]
         //TempFieldsToImport.SETRANGE(TableNo,CurrentTableNo);
@@ -349,84 +349,86 @@ codeunit 6014449 "Table Import Library"
         TempFieldsToImport.FindSet;
         //+NPR5.48 [340086]
 
-        while CopyStr(LastTokenConsumed,(Lookahead + 1) - StrLen(RecordSeparator), StrLen(RecordSeparator)) <> RecordSeparator do begin
-        //-NPR5.48 [340086]
-          IsLastField := FieldsRead + 1 >= FieldCount;
-        //+NPR5.48 [340086]
-
-          if not Skip and not IgnoreField(TempFieldsToImport.TableNo,TempFieldsToImport."No.") then begin
-            FieldRef := CurrentRecRef.Field(TempFieldsToImport."No.");
-
-            CurrentFieldNo := TempFieldsToImport."No.";
-
-        //-NPR5.48 [340086]
-        //    IF FORMAT(FieldRef.TYPE) = 'BLOB' THEN BEGIN
-        //      EvaluateBlob(FieldRef)
-        //    END ELSE BEGIN
-        //      Value    := ReadField;
-
-            FieldType := UpperCase(Format(FieldRef.Type));
-
-            if FieldType = 'BLOB' then begin
-              EvaluateBlob(FieldRef, IsLastField);
-        //-NPR5.48 [342396]
-            end else if FieldType = 'MEDIA' then begin
-              EvaluateMedia(FieldRef, IsLastField);
-            end else if FieldType = 'MEDIASET' then begin
-              EvaluateMediaSet(FieldRef, IsLastField);
-        //+NPR5.48 [342396]
-            end else begin
-              Value := ReadField(IsLastField);
-              if RegenAutoIncrements then
-                if FieldIsInAutoIncrementBuffer(TempFieldsToImport.TableNo, TempFieldsToImport."No.") then
-                  Value := '0';
-        //+NPR5.48 [340086]
-
-              CurrentValue := Value;
-
-              if Format(FieldRef.Type) = 'Text' then
-                Value := CopyStr(Value,1,FieldRef.Length);
-
-              if not UseXmlDataFormat then begin
-                if Format(FieldRef.Type) = 'Date' then
-                  Value := EvaluateDate(FieldRef,Value);
-                if Format(FieldRef.Type) = 'Decimal' then
-                  Value := EvaluateDecimal(FieldRef,Value);
-        //-NPR5.48 [340086]
-        //        IF RaiseErrors THEN
-                if ErrorOnDataMismatch then
-        //+NPR5.48 [340086]
-                  Evaluate(FieldRef,Value)
-                else
-                  if Evaluate(FieldRef,Value) then;
-              end else begin
-        //-NPR5.48 [340086]
-        //        IF RaiseErrors THEN
-                if ErrorOnDataMismatch then
-        //+NPR5.48 [340086]
-                  Evaluate(FieldRef,Value,9)
-                else
-                  if Evaluate(FieldRef,Value,9) then;
-              end;
-            end;
+        while CopyStr(LastTokenConsumed, (Lookahead + 1) - StrLen(RecordSeparator), StrLen(RecordSeparator)) <> RecordSeparator do begin
             //-NPR5.48 [340086]
-            FieldsWritten += 1;
+            IsLastField := FieldsRead + 1 >= FieldCount;
             //+NPR5.48 [340086]
-          end else
-        //-NPR5.48 [340086]
-        //    ReadField();
-            ReadField(IsLastField);
-        //+NPR5.48 [340086]
 
-          TempFieldsToImport.Next;
-          FieldsRead += 1;
+            if not Skip and not IgnoreField(TempFieldsToImport.TableNo, TempFieldsToImport."No.") then begin
+                FieldRef := CurrentRecRef.Field(TempFieldsToImport."No.");
+
+                CurrentFieldNo := TempFieldsToImport."No.";
+
+                //-NPR5.48 [340086]
+                //    IF FORMAT(FieldRef.TYPE) = 'BLOB' THEN BEGIN
+                //      EvaluateBlob(FieldRef)
+                //    END ELSE BEGIN
+                //      Value    := ReadField;
+
+                FieldType := UpperCase(Format(FieldRef.Type));
+
+                if FieldType = 'BLOB' then begin
+                    EvaluateBlob(FieldRef, IsLastField);
+                    //-NPR5.48 [342396]
+                end else
+                    if FieldType = 'MEDIA' then begin
+                        EvaluateMedia(FieldRef, IsLastField);
+                    end else
+                        if FieldType = 'MEDIASET' then begin
+                            EvaluateMediaSet(FieldRef, IsLastField);
+                            //+NPR5.48 [342396]
+                        end else begin
+                            Value := ReadField(IsLastField);
+                            if RegenAutoIncrements then
+                                if FieldIsInAutoIncrementBuffer(TempFieldsToImport.TableNo, TempFieldsToImport."No.") then
+                                    Value := '0';
+                            //+NPR5.48 [340086]
+
+                            CurrentValue := Value;
+
+                            if Format(FieldRef.Type) = 'Text' then
+                                Value := CopyStr(Value, 1, FieldRef.Length);
+
+                            if not UseXmlDataFormat then begin
+                                if Format(FieldRef.Type) = 'Date' then
+                                    Value := EvaluateDate(FieldRef, Value);
+                                if Format(FieldRef.Type) = 'Decimal' then
+                                    Value := EvaluateDecimal(FieldRef, Value);
+                                //-NPR5.48 [340086]
+                                //        IF RaiseErrors THEN
+                                if ErrorOnDataMismatch then
+                                    //+NPR5.48 [340086]
+                                    Evaluate(FieldRef, Value)
+                                else
+                                    if Evaluate(FieldRef, Value) then;
+                            end else begin
+                                //-NPR5.48 [340086]
+                                //        IF RaiseErrors THEN
+                                if ErrorOnDataMismatch then
+                                    //+NPR5.48 [340086]
+                                    Evaluate(FieldRef, Value, 9)
+                                else
+                                    if Evaluate(FieldRef, Value, 9) then;
+                            end;
+                        end;
+                //-NPR5.48 [340086]
+                FieldsWritten += 1;
+                //+NPR5.48 [340086]
+            end else
+                //-NPR5.48 [340086]
+                //    ReadField();
+                ReadField(IsLastField);
+            //+NPR5.48 [340086]
+
+            TempFieldsToImport.Next;
+            FieldsRead += 1;
         end;
 
         //-NPR5.48 [340086]
         // IF NOT Skip AND (CurrentFieldsRead > 1) THEN
         //  StoreRecord;
         if not Skip and (FieldsWritten > 0) then
-          StoreRecord;
+            StoreRecord;
         //+NPR5.48 [340086]
     end;
 
@@ -438,7 +440,7 @@ codeunit 6014449 "Table Import Library"
         // LineVal := ReadLine;
         // String.Construct(LineVal);
         // EVALUATE(CurrentTableNo,String.SelectStringSep(2,':'));
-        SplitString(ReadUntil(RecordSeparator),':',SplitArray);
+        SplitString(ReadUntil(RecordSeparator), ':', SplitArray);
         Evaluate(CurrentTableNo, SplitArray.GetValue(1));
         //+NPR5.48 [340086]
     end;
@@ -450,7 +452,7 @@ codeunit 6014449 "Table Import Library"
         //-NPR5.48 [340086]
         // String.Construct(ReadLine);
         //EVALUATE(CurrentRecordCount,String.SelectStringSep(2,':'));
-        SplitString(ReadUntil(RecordSeparator),':',SplitArray);
+        SplitString(ReadUntil(RecordSeparator), ':', SplitArray);
         Evaluate(CurrentRecordCount, SplitArray.GetValue(1));
         //+NPR5.48 [340086]
     end;
@@ -467,15 +469,15 @@ codeunit 6014449 "Table Import Library"
         //  AddFieldForImport(CurrentTableNo,FieldNo);
         // END;
 
-        SplitString(ReadUntil(RecordSeparator),FieldSeparator,SplitArray);
+        SplitString(ReadUntil(RecordSeparator), FieldSeparator, SplitArray);
         foreach Value in SplitArray do begin
-        //-NPR5.50 [351021]
-        //  IF (FieldStartDelimeter <> '') OR (FieldEndDelimeter <> '') THEN
-        //    Value := COPYSTR(Value, STRLEN(FieldStartDelimeter)+1, STRLEN(Value)-STRLEN(FieldStartDelimeter)-STRLEN(FieldEndDelimeter));
-        //+NPR5.50 [351021]
+            //-NPR5.50 [351021]
+            //  IF (FieldStartDelimeter <> '') OR (FieldEndDelimeter <> '') THEN
+            //    Value := COPYSTR(Value, STRLEN(FieldStartDelimeter)+1, STRLEN(Value)-STRLEN(FieldStartDelimeter)-STRLEN(FieldEndDelimeter));
+            //+NPR5.50 [351021]
 
-          Evaluate(FieldNo, Value);
-          AddFieldForImport(CurrentTableNo, FieldNo);
+            Evaluate(FieldNo, Value);
+            AddFieldForImport(CurrentTableNo, FieldNo);
         end;
         //+NPR5.48 [340086]
     end;
@@ -495,19 +497,19 @@ codeunit 6014449 "Table Import Library"
 
         //CheckTableAutoIncrement(CurrentTableNo);
 
-        SplitString(ReadUntil(RecordSeparator),FieldSeparator,SplitArray);
+        SplitString(ReadUntil(RecordSeparator), FieldSeparator, SplitArray);
 
         if not TableExists then
-          exit;
+            exit;
 
         foreach Value in SplitArray do begin
-        //-NPR5.50 [351021]
-        //  IF (FieldStartDelimeter <> '') OR (FieldEndDelimeter <> '') THEN
-        //    Value := COPYSTR(Value, STRLEN(FieldStartDelimeter)+1, STRLEN(Value)-STRLEN(FieldStartDelimeter)-STRLEN(FieldEndDelimeter));
-        //+NPR5.50 [351021]
+            //-NPR5.50 [351021]
+            //  IF (FieldStartDelimeter <> '') OR (FieldEndDelimeter <> '') THEN
+            //    Value := COPYSTR(Value, STRLEN(FieldStartDelimeter)+1, STRLEN(Value)-STRLEN(FieldStartDelimeter)-STRLEN(FieldEndDelimeter));
+            //+NPR5.50 [351021]
 
-          FieldIndex += 1;
-          CheckFieldDefinition(CurrentTableNo,FieldIndex,Value);
+            FieldIndex += 1;
+            CheckFieldDefinition(CurrentTableNo, FieldIndex, Value);
         end;
 
         CheckTableMetadata(CurrentTableNo);
@@ -515,10 +517,11 @@ codeunit 6014449 "Table Import Library"
 
         TempFieldsToImport.MarkedOnly(true);
 
-        if TempFieldsToImport.FindSet then repeat
-          TempFieldsToSkip := TempFieldsToImport;
-          TempFieldsToSkip.Insert;
-        until TempFieldsToImport.Next = 0;
+        if TempFieldsToImport.FindSet then
+            repeat
+                TempFieldsToSkip := TempFieldsToImport;
+                TempFieldsToSkip.Insert;
+            until TempFieldsToImport.Next = 0;
 
         TempFieldsToImport.MarkedOnly(false);
     end;
@@ -529,7 +532,7 @@ codeunit 6014449 "Table Import Library"
         //Value := ReadUntil(FieldSeparator)
 
         if IsLastField then
-          exit(ReadUntil(RecordSeparator));
+            exit(ReadUntil(RecordSeparator));
         exit(ReadUntil(FieldSeparator));
         //+NPR5.48 [340086]
     end;
@@ -561,40 +564,44 @@ codeunit 6014449 "Table Import Library"
         // END;
 
         while true do begin
-          CharRead := Read(1);
-          SetLastTokenConsumed(CharRead);
+            CharRead := Read(1);
+            SetLastTokenConsumed(CharRead);
 
-          if (CharRead = '') then begin
-            exit //EOS
-          end else if (EscapeNext) then begin
-            EscapeNext := false;
-        //-NPR5.50 [351021]
-        //    AddCharToValueBuffer(CharRead, Value)
-            AddCharToValueBuffer(CharRead, Value, false)
-        //+NPR5.50 [351021]
-          end else if (CharRead = EscapeCharacter) then begin
-            EscapeNext := true
-          end else if (CharRead = CopyStr(ExitString,1,1)) then begin
-            if (StrLen(ExitString) = 1) then
-              exit
-            else if (Peek(1) = CopyStr(ExitString,2,1)) then begin
-              SetLastTokenConsumed(Read(1));
-              exit;
+            if (CharRead = '') then begin
+                exit //EOS
             end else
-        //-NPR5.50 [351021]
-        //      AddCharToValueBuffer(CharRead, Value)
-              AddCharToValueBuffer(CharRead, Value, true)
-        //+NPR5.50 [351021]
-          end else
-        //-NPR5.50 [351021]
-        //    AddCharToValueBuffer(CharRead, Value)
-            AddCharToValueBuffer(CharRead, Value, true)
-        //+NPR5.50 [351021]
+                if (EscapeNext) then begin
+                    EscapeNext := false;
+                    //-NPR5.50 [351021]
+                    //    AddCharToValueBuffer(CharRead, Value)
+                    AddCharToValueBuffer(CharRead, Value, false)
+                    //+NPR5.50 [351021]
+                end else
+                    if (CharRead = EscapeCharacter) then begin
+                        EscapeNext := true
+                    end else
+                        if (CharRead = CopyStr(ExitString, 1, 1)) then begin
+                            if (StrLen(ExitString) = 1) then
+                                exit
+                            else
+                                if (Peek(1) = CopyStr(ExitString, 2, 1)) then begin
+                                    SetLastTokenConsumed(Read(1));
+                                    exit;
+                                end else
+                                    //-NPR5.50 [351021]
+                                    //      AddCharToValueBuffer(CharRead, Value)
+                                    AddCharToValueBuffer(CharRead, Value, true)
+                            //+NPR5.50 [351021]
+                        end else
+                            //-NPR5.50 [351021]
+                            //    AddCharToValueBuffer(CharRead, Value)
+                            AddCharToValueBuffer(CharRead, Value, true)
+            //+NPR5.50 [351021]
         end;
         //+NPR5.48 [340086]
     end;
 
-    local procedure AddCharToValueBuffer(Char: Text[1];var Value: Text;CheckValue: Boolean)
+    local procedure AddCharToValueBuffer(Char: Text[1]; var Value: Text; CheckValue: Boolean)
     begin
         //-NPR5.48 [340086]
         //This is the old approach - not robust against non-escaped delimiter values inside a fields value. Use escaping without delimiters instead.
@@ -605,10 +612,10 @@ codeunit 6014449 "Table Import Library"
         //  Value += Char;
 
         if CheckValue then begin
-          if (not (Char in [FieldEndDelimeter,FieldStartDelimeter])) and (Char[1] > 20) then
-            Value += Char;
+            if (not (Char in [FieldEndDelimeter, FieldStartDelimeter])) and (Char[1] > 20) then
+                Value += Char;
         end else
-          Value += Char;
+            Value += Char;
         //+NPR5.50 [351021]
 
         //+NPR5.48 [340086]
@@ -618,9 +625,9 @@ codeunit 6014449 "Table Import Library"
     begin
         //-NPR5.48 [340086]
         if (StrLen(LastTokenConsumed) = MaxStrLen(LastTokenConsumed)) then
-          LastTokenConsumed := CopyStr(LastTokenConsumed, 2) + Value
+            LastTokenConsumed := CopyStr(LastTokenConsumed, 2) + Value
         else
-          LastTokenConsumed += Value;
+            LastTokenConsumed += Value;
         //+NPR5.48 [340086]
     end;
 
@@ -645,14 +652,14 @@ codeunit 6014449 "Table Import Library"
         //END;
 
         while ((InputCharsRead + CharacterCount) > InputCharsInBuffer) do begin
-          UpdateBuffer;
+            UpdateBuffer;
 
-          if InputCharsInBuffer = PrevBufferLength then
-            exit(CopyStr(InputCharsBuffer,InputCharsRead+1,CharacterCount));
-          PrevBufferLength := InputCharsInBuffer;
+            if InputCharsInBuffer = PrevBufferLength then
+                exit(CopyStr(InputCharsBuffer, InputCharsRead + 1, CharacterCount));
+            PrevBufferLength := InputCharsInBuffer;
         end;
 
-        exit(CopyStr(InputCharsBuffer,InputCharsRead+1,CharacterCount));
+        exit(CopyStr(InputCharsBuffer, InputCharsRead + 1, CharacterCount));
         //+NPR5.48 [340086]
     end;
 
@@ -678,16 +685,16 @@ codeunit 6014449 "Table Import Library"
         // InputCharsRead := 1;
 
         begin
-          if (InputCharsRead >= InputCharsInBuffer) then
-            InputCharsBuffer   := FileReadText(4096)
-          else begin
-            if InputCharsRead > 0 then
-              InputCharsBuffer := CopyStr(InputCharsBuffer,InputCharsRead+1)
-            else
-              InputCharsBuffer := CopyStr(InputCharsBuffer,1);
-            InputCharsBuffer += FileReadText(4096);
-          end;
-          InputCharsInBuffer := StrLen(InputCharsBuffer)
+            if (InputCharsRead >= InputCharsInBuffer) then
+                InputCharsBuffer := FileReadText(4096)
+            else begin
+                if InputCharsRead > 0 then
+                    InputCharsBuffer := CopyStr(InputCharsBuffer, InputCharsRead + 1)
+                else
+                    InputCharsBuffer := CopyStr(InputCharsBuffer, 1);
+                InputCharsBuffer += FileReadText(4096);
+            end;
+            InputCharsInBuffer := StrLen(InputCharsBuffer)
         end;
 
         InputCharsRead := 0;
@@ -705,26 +712,27 @@ codeunit 6014449 "Table Import Library"
         //      UpdateLocalRecord;
 
         if not AutoSave then
-          exit;
-
-        if (not AutoReplace) and (not AutoUpdate) and ErrorOnDataMismatch then begin
-          CurrentRecRef.Insert; //Bulk insert - big perf improvement
-          exit;
-        end else
-          if CurrentRecRef.Insert then
             exit;
 
+        if (not AutoReplace) and (not AutoUpdate) and ErrorOnDataMismatch then begin
+            CurrentRecRef.Insert; //Bulk insert - big perf improvement
+            exit;
+        end else
+            if CurrentRecRef.Insert then
+                exit;
+
         if AutoReplace then begin
-          if ErrorOnDataMismatch then
-            CurrentRecRef.Modify
-          else
-            if CurrentRecRef.Modify then;
-        end else if AutoUpdate then
-          UpdateLocalRecord();
+            if ErrorOnDataMismatch then
+                CurrentRecRef.Modify
+            else
+                if CurrentRecRef.Modify then;
+        end else
+            if AutoUpdate then
+                UpdateLocalRecord();
         //+NPR5.48 [340086]
     end;
 
-    local procedure AddFieldForImport(TableNo: Integer;FieldNo: Integer)
+    local procedure AddFieldForImport(TableNo: Integer; FieldNo: Integer)
     var
         "Fields": Record "Field";
     begin
@@ -737,33 +745,33 @@ codeunit 6014449 "Table Import Library"
         // ELSE
         //  IF Fields.FINDFIRST THEN;
         if ErrorOnMissingFields then
-          Fields.Get(TableNo, FieldNo)
+            Fields.Get(TableNo, FieldNo)
         else
-          if Fields.Get(TableNo, FieldNo) then;
+            if Fields.Get(TableNo, FieldNo) then;
         //+NPR5.48 [340086]
 
         TempFieldsToImport.TableNo := TableNo;
-        TempFieldsToImport.Type    := Fields.Type;
-        TempFieldsToImport."No."   := FieldNo;
+        TempFieldsToImport.Type := Fields.Type;
+        TempFieldsToImport."No." := FieldNo;
         TempFieldsToImport.Insert;
     end;
 
     local procedure AddImportedTable(TableNo: Integer)
     begin
         TempImportedObjects."Object Type" := TempImportedObjects."Object Type"::Table;
-        TempImportedObjects."Object ID"   := TableNo;
+        TempImportedObjects."Object ID" := TableNo;
         TempImportedObjects."Object Name" := GetTableName(TableNo);
         TempImportedObjects.Insert;
     end;
 
     local procedure AddImportedDetails()
     begin
-        TempObjectCommentLines."No."   := Format(CurrentTableNo);
-        TempObjectCommentLines.Comment := StrSubstNo('%1 Records imported.',CurrentRecordCount);
+        TempObjectCommentLines."No." := Format(CurrentTableNo);
+        TempObjectCommentLines.Comment := StrSubstNo('%1 Records imported.', CurrentRecordCount);
         if TempObjectCommentLines.Insert then;
     end;
 
-    local procedure CheckFieldDefinition(TableNo: Integer;FieldIndex: Integer;TypeText: Text[50])
+    local procedure CheckFieldDefinition(TableNo: Integer; FieldIndex: Integer; TypeText: Text[50])
     var
         "Fields": Record "Field";
         LocalFieldType: Text[30];
@@ -777,55 +785,55 @@ codeunit 6014449 "Table Import Library"
         //TempFieldsToImport.SETRANGE(TableNo, TableNo);
         //+NPR5.48 [340086]
         TempFieldsToImport.FindFirst;
-        TempFieldsToImport.Next(FieldIndex-1);
+        TempFieldsToImport.Next(FieldIndex - 1);
 
         //-NPR5.48 [340086]
         if not FieldExists(TableNo, TempFieldsToImport."No.") then
-          exit;
+            exit;
         //+NPR5.48 [340086]
 
-        LocalFieldType    := GetFieldType(TableNo,TempFieldsToImport."No.");
-        LocalFieldLength  := GetFieldLength(TableNo,TempFieldsToImport."No.");
-        LocalFieldEnabled := GetFieldEnabled(TableNo,TempFieldsToImport."No.");
+        LocalFieldType := GetFieldType(TableNo, TempFieldsToImport."No.");
+        LocalFieldLength := GetFieldLength(TableNo, TempFieldsToImport."No.");
+        LocalFieldEnabled := GetFieldEnabled(TableNo, TempFieldsToImport."No.");
 
         String.Construct(TypeText);
-        ImportFieldType := String.SelectStringSep(1,':');
+        ImportFieldType := String.SelectStringSep(1, ':');
         if String.CountOccurences(':') = 1 then
-          Evaluate(ImportFieldLength,DelChr(String.SelectStringSep(2,':'),'=','[]'))
+            Evaluate(ImportFieldLength, DelChr(String.SelectStringSep(2, ':'), '=', '[]'))
         else
-          ImportFieldLength := 0;
+            ImportFieldLength := 0;
 
         case true of
-          ImportFieldType  <> LocalFieldType   :
-            begin
-              TempFieldsToImport.Mark(true);
-        //-NPR5.48 [340086]
-        //      IF RaiseErrors THEN
-              if ErrorOnDataMismatch then
-        //+NPR5.48 [340086]
-                Error(ErrImcompatibleTypes,TableNo,TempFieldsToImport."No.",
-                      TypeText,LocalFieldType,LocalFieldLength);
-            end;
-          (ImportFieldLength > LocalFieldLength) and
-          (LocalFieldType <> 'Text') :
-            begin
-              TempFieldsToImport.Mark(true);
-        //-NPR5.48 [340086]
-        //      IF RaiseErrors THEN
-              if ErrorOnDataMismatch then
-        //+NPR5.48 [340086]
-                Error(ErrImcompatibleTypes,TableNo,TempFieldsToImport."No.",
-                      TypeText,LocalFieldType,LocalFieldLength);
-            end;
-          not LocalFieldEnabled :
-            begin
-              TempFieldsToImport.Mark(true);
-        //-NPR5.48 [340086]
-        //      IF RaiseErrors THEN
-              if ErrorOnDataMismatch then
-        //+NPR5.48 [340086]
-                Error(ErrImcompatibleTypes,TempFieldsToImport."No.",TableNo);
-            end;
+            ImportFieldType <> LocalFieldType:
+                begin
+                    TempFieldsToImport.Mark(true);
+                    //-NPR5.48 [340086]
+                    //      IF RaiseErrors THEN
+                    if ErrorOnDataMismatch then
+                        //+NPR5.48 [340086]
+                        Error(ErrImcompatibleTypes, TableNo, TempFieldsToImport."No.",
+                      TypeText, LocalFieldType, LocalFieldLength);
+                end;
+            (ImportFieldLength > LocalFieldLength) and
+            (LocalFieldType <> 'Text'):
+                begin
+                    TempFieldsToImport.Mark(true);
+                    //-NPR5.48 [340086]
+                    //      IF RaiseErrors THEN
+                    if ErrorOnDataMismatch then
+                        //+NPR5.48 [340086]
+                        Error(ErrImcompatibleTypes, TableNo, TempFieldsToImport."No.",
+                      TypeText, LocalFieldType, LocalFieldLength);
+                end;
+            not LocalFieldEnabled:
+                begin
+                    TempFieldsToImport.Mark(true);
+                    //-NPR5.48 [340086]
+                    //      IF RaiseErrors THEN
+                    if ErrorOnDataMismatch then
+                        //+NPR5.48 [340086]
+                        Error(ErrImcompatibleTypes, TempFieldsToImport."No.", TableNo);
+                end;
         end;
     end;
 
@@ -844,21 +852,22 @@ codeunit 6014449 "Table Import Library"
         LoadMetadataXml(TableNo, XmlDoc);
         //-NPR5.51 [362054]
 
-        if TempFieldsToImport.FindSet then repeat
-          if TempFieldsToImport.Type in [TempFieldsToImport.Type::Integer, TempFieldsToImport.Type::BigInteger] then
-            if TryFieldAutoIncrementCheck(TempFieldsToImport."No.", XmlDoc, IsAutoIncrement) then
-              if IsAutoIncrement then begin
-                TempAutoIncrementFields := TempFieldsToImport;
-                TempAutoIncrementFields.Insert;
-              end;
+        if TempFieldsToImport.FindSet then
+            repeat
+                if TempFieldsToImport.Type in [TempFieldsToImport.Type::Integer, TempFieldsToImport.Type::BigInteger] then
+                    if TryFieldAutoIncrementCheck(TempFieldsToImport."No.", XmlDoc, IsAutoIncrement) then
+                        if IsAutoIncrement then begin
+                            TempAutoIncrementFields := TempFieldsToImport;
+                            TempAutoIncrementFields.Insert;
+                        end;
 
-          if FieldIsObsolete(TempFieldsToImport.TableNo, TempFieldsToImport."No.") then
-            TempFieldsToImport.Mark(true);
-        until TempFieldsToImport.Next = 0;
+                if FieldIsObsolete(TempFieldsToImport.TableNo, TempFieldsToImport."No.") then
+                    TempFieldsToImport.Mark(true);
+            until TempFieldsToImport.Next = 0;
     end;
 
     [TryFunction]
-    local procedure TryFieldObsoleteCheck(FieldNo: Integer;var XmlDoc: DotNet npNetXmlDocument;var IsObsolete: Boolean)
+    local procedure TryFieldObsoleteCheck(FieldNo: Integer; var XmlDoc: DotNet npNetXmlDocument; var IsObsolete: Boolean)
     begin
         //-NPR5.48 [340086]
         IsObsolete := (XmlDoc.DocumentElement.SelectNodes(StrSubstNo('//*[local-name()=''Field''][@ID=''%1'' and @ObsoleteState=''Removed'']', FieldNo)).Count = 1)
@@ -866,14 +875,14 @@ codeunit 6014449 "Table Import Library"
     end;
 
     [TryFunction]
-    local procedure TryFieldAutoIncrementCheck(FieldNo: Integer;var XmlDoc: DotNet npNetXmlDocument;var IsAutoIncrement: Boolean)
+    local procedure TryFieldAutoIncrementCheck(FieldNo: Integer; var XmlDoc: DotNet npNetXmlDocument; var IsAutoIncrement: Boolean)
     begin
         //-NPR5.42 [313693]
         IsAutoIncrement := (XmlDoc.DocumentElement.SelectNodes(StrSubstNo('//*[local-name()=''Field''][@ID=''%1'' and @AutoIncrement=''1'']', FieldNo)).Count = 1)
         //+NPR5.42 [313693]
     end;
 
-    local procedure FieldIsObsolete(TableNo: Integer;FieldNo: Integer): Boolean
+    local procedure FieldIsObsolete(TableNo: Integer; FieldNo: Integer): Boolean
     var
         FieldRecRef: RecordRef;
         FieldRef: FieldRef;
@@ -881,7 +890,7 @@ codeunit 6014449 "Table Import Library"
         //-NPR5.48 [340086]
         FieldRecRef.Open(DATABASE::Field);
         if not FieldRecRef.FieldExist(25) then
-          exit(false);
+            exit(false);
 
         FieldRef := FieldRecRef.Field(1);
         FieldRef.SetRange(TableNo);
@@ -896,7 +905,7 @@ codeunit 6014449 "Table Import Library"
         //+NPR5.48 [340086]
     end;
 
-    local procedure FieldIsInAutoIncrementBuffer(TableNo: Integer;FieldNo: Integer): Boolean
+    local procedure FieldIsInAutoIncrementBuffer(TableNo: Integer; FieldNo: Integer): Boolean
     begin
         //-NPR5.48 [340086]
         exit(TempAutoIncrementFields.Get(TableNo, FieldNo));
@@ -904,7 +913,7 @@ codeunit 6014449 "Table Import Library"
     end;
 
     [TryFunction]
-    local procedure LoadXmlInStream(var InStream: InStream;var XmlDoc: DotNet npNetXmlDocument)
+    local procedure LoadXmlInStream(var InStream: InStream; var XmlDoc: DotNet npNetXmlDocument)
     begin
         //-NPR5.42 [313693]
         XmlDoc := XmlDoc.XmlDocument;
@@ -912,7 +921,7 @@ codeunit 6014449 "Table Import Library"
         //+NPR5.42 [313693]
     end;
 
-    local procedure LoadMetadataXml(TableNo: Integer;var XmlDoc: DotNet npNetXmlDocument)
+    local procedure LoadMetadataXml(TableNo: Integer; var XmlDoc: DotNet npNetXmlDocument)
     var
         InStream: InStream;
         ObjectMetadata: Record "Object Metadata";
@@ -920,48 +929,49 @@ codeunit 6014449 "Table Import Library"
         FieldRef: FieldRef;
         AllObj: Record AllObj;
         InstalledPackageIDFilter: Text;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
     begin
         //-NPR5.51 [362054]
         ObjectMetadata.SetAutoCalcFields(Metadata);
         if ObjectMetadata.Get(ObjectMetadata."Object Type"::Table, TableNo) then begin
-          if not ObjectMetadata.Metadata.HasValue then
-            Error(ERROR_TABLE_NO, TableNo);
+            if not ObjectMetadata.Metadata.HasValue then
+                Error(ERROR_TABLE_NO, TableNo);
 
-          ObjectMetadata.Metadata.CreateInStream(InStream);
+            ObjectMetadata.Metadata.CreateInStream(InStream);
         end else begin
-          //Check if table is inside an extension in NAV2018+
-          if not (AllObj.Get(AllObj."Object Type"::Table, 2000000150) and AllObj.Get(AllObj."Object Type"::Table, 2000000153)) then //NAV App Object Metadata & NAV App Installed App
-            Error(ERROR_TABLE_NO, TableNo);
+            //Check if table is inside an extension in NAV2018+
+            if not (AllObj.Get(AllObj."Object Type"::Table, 2000000150) and AllObj.Get(AllObj."Object Type"::Table, 2000000153)) then //NAV App Object Metadata & NAV App Installed App
+                Error(ERROR_TABLE_NO, TableNo);
 
-          RecRef.Open(2000000153); //NAV App Installed App
-          if RecRef.FindSet then repeat
-            if InstalledPackageIDFilter <> '' then
-              InstalledPackageIDFilter += '|';
-            InstalledPackageIDFilter += ('''' + Format(RecRef.Field(2).Value) + '''');
-          until RecRef.Next = 0;
-          RecRef.Close();
+            RecRef.Open(2000000153); //NAV App Installed App
+            if RecRef.FindSet then
+                repeat
+                    if InstalledPackageIDFilter <> '' then
+                        InstalledPackageIDFilter += '|';
+                    InstalledPackageIDFilter += ('''' + Format(RecRef.Field(2).Value) + '''');
+                until RecRef.Next = 0;
+            RecRef.Close();
 
-          RecRef.Open(2000000150); //NAV App Object Metadata
-          FieldRef := RecRef.Field(1); //App Package ID
-          FieldRef.SetFilter(InstalledPackageIDFilter);
-          FieldRef := RecRef.Field(2); //Object Type
-          FieldRef.SetFilter('=%1', 1); //Table
-          FieldRef := RecRef.Field(3); //Object ID
-          FieldRef.SetFilter('=%1', TableNo);
+            RecRef.Open(2000000150); //NAV App Object Metadata
+            FieldRef := RecRef.Field(1); //App Package ID
+            FieldRef.SetFilter(InstalledPackageIDFilter);
+            FieldRef := RecRef.Field(2); //Object Type
+            FieldRef.SetFilter('=%1', 1); //Table
+            FieldRef := RecRef.Field(3); //Object ID
+            FieldRef.SetFilter('=%1', TableNo);
 
-          if not RecRef.FindFirst then
-            Error(ERROR_TABLE_NO, TableNo);
+            if not RecRef.FindFirst then
+                Error(ERROR_TABLE_NO, TableNo);
 
-          FieldRef := RecRef.Field(5); //Metadata
-          FieldRef.CalcField;
-          TempBlob.Blob := FieldRef.Value;
-          TempBlob.Blob.CreateInStream(InStream);
+            FieldRef := RecRef.Field(5); //Metadata
+            FieldRef.CalcField;
+            TempBlob.FromFieldRef(FieldRef);
+            TempBlob.CreateInStream(InStream);
         end;
 
-        if LoadXmlInStream(InStream,XmlDoc) then
-          if not IsNull(XmlDoc.DocumentElement) then
-            exit;
+        if LoadXmlInStream(InStream, XmlDoc) then
+            if not IsNull(XmlDoc.DocumentElement) then
+                exit;
 
         Error(ERROR_TABLE_NO, TableNo);
         //-NPR5.51 [362054]
@@ -970,11 +980,11 @@ codeunit 6014449 "Table Import Library"
     local procedure CheckTableExpected(TableID: Integer)
     begin
         if TempExpectedTables.Count > 0 then
-          if not TempExpectedTables.Get(TempExpectedTables."Object Type"::Table,TempExpectedTables."Object ID") then
-            Error(ErrTableNotExpected);
+            if not TempExpectedTables.Get(TempExpectedTables."Object Type"::Table, TempExpectedTables."Object ID") then
+                Error(ErrTableNotExpected);
     end;
 
-    procedure FieldExists(TableNo: Integer;FieldNo: Integer) Exists: Boolean
+    procedure FieldExists(TableNo: Integer; FieldNo: Integer) Exists: Boolean
     var
         "Fields": Record "Field";
     begin
@@ -990,18 +1000,18 @@ codeunit 6014449 "Table Import Library"
         Fields.SetRange("No.", FieldNo);
         Exists := not Fields.IsEmpty;
         if ErrorOnMissingFields and not Exists then
-          Fields.FindFirst;
+            Fields.FindFirst;
         //+NPR5.48 [340086]
     end;
 
-    procedure IgnoreField(TableNo: Integer;FieldNo: Integer): Boolean
+    procedure IgnoreField(TableNo: Integer; FieldNo: Integer): Boolean
     begin
         //-NPR5.48 [340086]
         // TempFieldsToSkip.SETRANGE(TableNo,TableNo);
         // TempFieldsToSkip.SETRANGE("No.",FieldNo);
         // EXIT(TempFieldsToSkip.FINDFIRST);
         if not FieldExists(TableNo, FieldNo) then
-          exit(true);
+            exit(true);
         exit(TempFieldsToSkip.Get(TableNo, FieldNo));
         //+NPR5.48 [340086]
     end;
@@ -1009,13 +1019,13 @@ codeunit 6014449 "Table Import Library"
     local procedure OpenTable()
     begin
         if TableExists then begin
-          CurrentRecRef.Open(CurrentTableNo,UseTempTable);
-          LocalRecRef.Open(CurrentTableNo);
+            CurrentRecRef.Open(CurrentTableNo, UseTempTable);
+            LocalRecRef.Open(CurrentTableNo);
 
-        //-NPR5.48 [342396]
-          if DeleteAllBeforeImport and (not UseTempTable) then
-            CurrentRecRef.DeleteAll;
-        //+NPR5.48 [342396]
+            //-NPR5.48 [342396]
+            if DeleteAllBeforeImport and (not UseTempTable) then
+                CurrentRecRef.DeleteAll;
+            //+NPR5.48 [342396]
         end;
     end;
 
@@ -1032,19 +1042,19 @@ codeunit 6014449 "Table Import Library"
 
         TableMetadataRef.Open(DATABASE::"Table Metadata");
         if TableMetadataRef.FieldExist(13) then begin
-          //NAV2018+
-          FieldRef := TableMetadataRef.Field(1); //ID
-          FieldRef.SetRange(CurrentTableNo);
-          FieldRef := TableMetadataRef.Field(13); //ObsoleteState in NAV2018+
-          FieldRef.SetFilter('<>%1', 2); //Option 2 = Removed
-          TableExists := not TableMetadataRef.IsEmpty;
-          if ErrorOnMissingFields and not TableExists then
-            TableMetadataRef.FindFirst;
+            //NAV2018+
+            FieldRef := TableMetadataRef.Field(1); //ID
+            FieldRef.SetRange(CurrentTableNo);
+            FieldRef := TableMetadataRef.Field(13); //ObsoleteState in NAV2018+
+            FieldRef.SetFilter('<>%1', 2); //Option 2 = Removed
+            TableExists := not TableMetadataRef.IsEmpty;
+            if ErrorOnMissingFields and not TableExists then
+                TableMetadataRef.FindFirst;
         end else begin
-          //NAV2016-17
-          TableExists := TableMetadata.Get(CurrentTableNo);
-          if ErrorOnMissingFields and not TableExists then
-            TableMetadata.Get(CurrentTableNo);
+            //NAV2016-17
+            TableExists := TableMetadata.Get(CurrentTableNo);
+            if ErrorOnMissingFields and not TableExists then
+                TableMetadata.Get(CurrentTableNo);
         end;
 
         exit(TableExists);
@@ -1054,10 +1064,11 @@ codeunit 6014449 "Table Import Library"
     local procedure OpenFileForImport()
     begin
         if IsFileOpen then
-          exit;
+            exit;
 
         case FileMode of
-          FileMode::DotNet : OpenDotNetStreamForImport;
+            FileMode::DotNet:
+                OpenDotNetStreamForImport;
         end;
 
         IsFileOpen := true;
@@ -1074,25 +1085,26 @@ codeunit 6014449 "Table Import Library"
 
         //-NPR5.48 [340086]
         if FileName <> '' then begin
-          DotNetFilePath := FileName;
-          DotNetStream := DotNetStream.StreamReader(DotNetFilePath, DotNetEncoding.GetEncoding(InputEncoding));
-        end else begin
-        //+NPR5.48 [340086]
-          TempServerFileName := FileManagement.ServerTempFileName('.txt');
-          Uploaded := Upload(Text_UploadCaption, '', 'Text Files (*.txt)|*.txt', ClientFileName, TempServerFileName);
-          if Uploaded then begin
-            FileManagement.ValidateFileExtension(TempServerFileName,'.txt');
-            DotNetFilePath := TempServerFileName;
+            DotNetFilePath := FileName;
             DotNetStream := DotNetStream.StreamReader(DotNetFilePath, DotNetEncoding.GetEncoding(InputEncoding));
-          end else
-            Error(Text_ImportCancel);
+        end else begin
+            //+NPR5.48 [340086]
+            TempServerFileName := FileManagement.ServerTempFileName('.txt');
+            Uploaded := Upload(Text_UploadCaption, '', 'Text Files (*.txt)|*.txt', ClientFileName, TempServerFileName);
+            if Uploaded then begin
+                FileManagement.ValidateFileExtension(TempServerFileName, '.txt');
+                DotNetFilePath := TempServerFileName;
+                DotNetStream := DotNetStream.StreamReader(DotNetFilePath, DotNetEncoding.GetEncoding(InputEncoding));
+            end else
+                Error(Text_ImportCancel);
         end;
     end;
 
     local procedure CloseFileForImport()
     begin
         case FileMode of
-          FileMode::DotNet  : CloseDotNetStreamForImport;
+            FileMode::DotNet:
+                CloseDotNetStreamForImport;
         end;
 
         IsFileOpen := false;
@@ -1108,16 +1120,17 @@ codeunit 6014449 "Table Import Library"
         Index: Integer;
     begin
         case FileMode of
-        //-NPR5.48 [340086]
-        //  FileMode::DotNet :
-        //    BEGIN
-        //      Index := 1;
-        //      WHILE (Index <= Count) AND NOT DotNetStream.EndOfStream DO BEGIN
-        //        ReturnText[Index] := DotNetStream.Read;
-        //        Index += 1;
-        //      END;
-        //    END;
-          FileMode::DotNet : exit(FileReadTextDotNet(Count));
+            //-NPR5.48 [340086]
+            //  FileMode::DotNet :
+            //    BEGIN
+            //      Index := 1;
+            //      WHILE (Index <= Count) AND NOT DotNetStream.EndOfStream DO BEGIN
+            //        ReturnText[Index] := DotNetStream.Read;
+            //        Index += 1;
+            //      END;
+            //    END;
+            FileMode::DotNet:
+                exit(FileReadTextDotNet(Count));
         //+NPR5.48 [340086]
         end;
     end;
@@ -1131,21 +1144,21 @@ codeunit 6014449 "Table Import Library"
     begin
         //-NPR5.48 [340086]
         if Count = 0 then begin //Full line
-          if not DotNetStream.EndOfStream then
-            Output := DotNetStream.ReadLine() + NEWLINE; //Readd newline so delimiter detection works
+            if not DotNetStream.EndOfStream then
+                Output := DotNetStream.ReadLine() + NEWLINE; //Readd newline so delimiter detection works
         end else begin
-          if IsNull(DotNetReadArray) then
-            DotNetReadArray := DotNetReadArray.CreateInstance(GetDotNetType(Char), Count);
+            if IsNull(DotNetReadArray) then
+                DotNetReadArray := DotNetReadArray.CreateInstance(GetDotNetType(Char), Count);
 
-          ReadChars := DotNetStream.Read(DotNetReadArray, 0, Count);
-          if ReadChars > 0 then begin
-            if ReadChars <> Count then begin
-              DotNetSubArray := DotNetSubArray.CreateInstance(GetDotNetType(Char), ReadChars);
-              DotNetReadArray.Copy(DotNetReadArray, DotNetSubArray, ReadChars);
-              Output := String.String(DotNetSubArray);
-            end else
-              Output := String.String(DotNetReadArray);
-          end;
+            ReadChars := DotNetStream.Read(DotNetReadArray, 0, Count);
+            if ReadChars > 0 then begin
+                if ReadChars <> Count then begin
+                    DotNetSubArray := DotNetSubArray.CreateInstance(GetDotNetType(Char), ReadChars);
+                    DotNetReadArray.Copy(DotNetReadArray, DotNetSubArray, ReadChars);
+                    Output := String.String(DotNetSubArray);
+                end else
+                    Output := String.String(DotNetReadArray);
+            end;
         end;
         //+NPR5.48 [340086]
     end;
@@ -1153,14 +1166,14 @@ codeunit 6014449 "Table Import Library"
     local procedure EOS(): Boolean
     begin
         case FileMode of
-        //-NPR5.48 [340086]
-        //  FileMode::DotNet  : EndOfFile := DotNetStream.EndOfStream AND (InputCharsRead >= InputCharsInBuffer);
-            FileMode::DotNet  :
-              begin
-                if InputCharsRead < InputCharsInBuffer then
-                  exit(false);
-                exit(DotNetStream.EndOfStream());
-              end;
+            //-NPR5.48 [340086]
+            //  FileMode::DotNet  : EndOfFile := DotNetStream.EndOfStream AND (InputCharsRead >= InputCharsInBuffer);
+            FileMode::DotNet:
+                begin
+                    if InputCharsRead < InputCharsInBuffer then
+                        exit(false);
+                    exit(DotNetStream.EndOfStream());
+                end;
         //+NPR5.48 [340086]
         end;
     end;
@@ -1176,21 +1189,21 @@ codeunit 6014449 "Table Import Library"
         //  ValRead += GetNextCharacter;
 
         if Characters <= 0 then
-          exit('');
+            exit('');
 
         while (CharsRead < Characters) and (InputCharsInBuffer <> 0) do begin
-          CharsToRead := Characters-CharsRead;
-          CharsRemainingInBuffer := InputCharsInBuffer-InputCharsRead;
-          if CharsRemainingInBuffer < CharsToRead then begin
-            Output += CopyStr(InputCharsBuffer, InputCharsRead+1, CharsRemainingInBuffer);
-            CharsRead += CharsRemainingInBuffer;
-            InputCharsRead += CharsRemainingInBuffer;
-            UpdateBuffer();
-          end else begin
-            Output += CopyStr(InputCharsBuffer, InputCharsRead+1, CharsToRead);
-            CharsRead += CharsToRead;
-            InputCharsRead += CharsToRead;
-          end;
+            CharsToRead := Characters - CharsRead;
+            CharsRemainingInBuffer := InputCharsInBuffer - InputCharsRead;
+            if CharsRemainingInBuffer < CharsToRead then begin
+                Output += CopyStr(InputCharsBuffer, InputCharsRead + 1, CharsRemainingInBuffer);
+                CharsRead += CharsRemainingInBuffer;
+                InputCharsRead += CharsRemainingInBuffer;
+                UpdateBuffer();
+            end else begin
+                Output += CopyStr(InputCharsBuffer, InputCharsRead + 1, CharsToRead);
+                CharsRead += CharsToRead;
+                InputCharsRead += CharsToRead;
+            end;
         end;
         //+NPR5.48 [340086]
     end;
@@ -1198,33 +1211,33 @@ codeunit 6014449 "Table Import Library"
     local procedure OpenDialog()
     begin
         if GuiAllowed and ShowStatus then
-          if not IsDialogOpen then begin
-            ProgressDialog.Open(TxtProgess);
-            IsDialogOpen := true;
-          end;
+            if not IsDialogOpen then begin
+                ProgressDialog.Open(TxtProgess);
+                IsDialogOpen := true;
+            end;
     end;
 
-    local procedure UpdateDialog(ValueNo: Integer;Value: Integer)
+    local procedure UpdateDialog(ValueNo: Integer; Value: Integer)
     begin
         if GuiAllowed and ShowStatus then
-          ProgressDialog.Update(ValueNo,Value);
+            ProgressDialog.Update(ValueNo, Value);
     end;
 
-    local procedure UpdateProgessDialog(ValueNo: Integer;Progress: Integer;Total: Integer)
+    local procedure UpdateProgessDialog(ValueNo: Integer; Progress: Integer; Total: Integer)
     begin
         if GuiAllowed and ShowStatus then begin
-          Progress := Round(Progress/Total *10000,1,'>');
-          if Progress <> DialogValues[ValueNo] then begin
-            DialogValues[ValueNo] := Progress;
-            ProgressDialog.Update(ValueNo, DialogValues[ValueNo]);
-          end;
+            Progress := Round(Progress / Total * 10000, 1, '>');
+            if Progress <> DialogValues[ValueNo] then begin
+                DialogValues[ValueNo] := Progress;
+                ProgressDialog.Update(ValueNo, DialogValues[ValueNo]);
+            end;
         end;
     end;
 
     local procedure CloseDialog()
     begin
         if GuiAllowed and ShowStatus then
-          ProgressDialog.Close;
+            ProgressDialog.Close;
 
         IsDialogOpen := false;
     end;
@@ -1243,17 +1256,17 @@ codeunit 6014449 "Table Import Library"
     begin
         //-NPR5.48 [340086]
         if not FieldStartDelimiterSet then
-        //+NPR5.48 [340086]
-          TestAndSet(FieldStartDelimeter, '"');
+            //+NPR5.48 [340086]
+            TestAndSet(FieldStartDelimeter, '"');
         //-NPR5.48 [340086]
         if not FieldEndDelimiterSet then
-        //+NPR5.48 [340086]
-          TestAndSet(FieldEndDelimeter,   '"');
-        TestAndSet(FieldSeparator,      ';');
-        TestAndSet(RecordSeparator,     NEWLINE);
-        TestAndSet(DataItemSeparator,   NEWLINE + NEWLINE);
+            //+NPR5.48 [340086]
+            TestAndSet(FieldEndDelimeter, '"');
+        TestAndSet(FieldSeparator, ';');
+        TestAndSet(RecordSeparator, NEWLINE);
+        TestAndSet(DataItemSeparator, NEWLINE + NEWLINE);
         if (InputEncoding = '') then begin
-          InputEncoding := 'utf-8';
+            InputEncoding := 'utf-8';
         end;
 
         Lookahead := 2;
@@ -1261,12 +1274,12 @@ codeunit 6014449 "Table Import Library"
 
     procedure SetAutoSave(AutoSaveIn: Boolean)
     begin
-        AutoSave    := AutoSaveIn;
+        AutoSave := AutoSaveIn;
     end;
 
     procedure SetAutoUpdate(AutoUpdateIn: Boolean)
     begin
-        AutoUpdate  := AutoUpdateIn;
+        AutoUpdate := AutoUpdateIn;
     end;
 
     procedure SetAutoReplace(AutoReplaceIn: Boolean)
@@ -1276,7 +1289,7 @@ codeunit 6014449 "Table Import Library"
 
     procedure SetFileName(FileNameIn: Text[250])
     begin
-        FileName            := FileNameIn;
+        FileName := FileNameIn;
     end;
 
     procedure SetFieldStartDelimeter(FieldStartDelimeterIn: Text[30])
@@ -1292,28 +1305,28 @@ codeunit 6014449 "Table Import Library"
         //-NPR5.48 [340086]
         FieldEndDelimiterSet := true;
         //+NPR5.48 [340086]
-        FieldEndDelimeter   := ResolveDelimeters(FieldEndDelimeterIn);
+        FieldEndDelimeter := ResolveDelimeters(FieldEndDelimeterIn);
     end;
 
     procedure SetFieldSeparator(FieldSeparatorIn: Text[30])
     begin
-        FieldSeparator      := ResolveDelimeters(FieldSeparatorIn);
+        FieldSeparator := ResolveDelimeters(FieldSeparatorIn);
     end;
 
     procedure SetRecordSeparator(RecordSeparatorIn: Text[30])
     begin
-        RecordSeparator     := ResolveDelimeters(RecordSeparatorIn);
+        RecordSeparator := ResolveDelimeters(RecordSeparatorIn);
     end;
 
     procedure SetDataItemSeparator(DataItemSeparatorIn: Text[30])
     begin
-        DataItemSeparator   := ResolveDelimeters(DataItemSeparatorIn);
+        DataItemSeparator := ResolveDelimeters(DataItemSeparatorIn);
     end;
 
     procedure SetExpectedTable(TableID: Integer)
     begin
         TempExpectedTables."Object Type" := TempExpectedTables."Object Type"::Table;
-        TempExpectedTables."Object ID"   := TableID;
+        TempExpectedTables."Object ID" := TableID;
         TempExpectedTables.Insert;
     end;
 
@@ -1333,7 +1346,7 @@ codeunit 6014449 "Table Import Library"
 
     procedure SetShowStatus(ShowStatusIn: Boolean)
     begin
-        ShowStatus          := ShowStatusIn;
+        ShowStatus := ShowStatusIn;
     end;
 
     procedure SetInFileEncoding(Encoding: Text[50])
@@ -1372,7 +1385,7 @@ codeunit 6014449 "Table Import Library"
         //+NPR5.48 [342396]
     end;
 
-    procedure EvaluateDate(var FieldRef: FieldRef;Value: Text): Text[20]
+    procedure EvaluateDate(var FieldRef: FieldRef; Value: Text): Text[20]
     var
         Day: Integer;
         Month: Integer;
@@ -1380,23 +1393,23 @@ codeunit 6014449 "Table Import Library"
     begin
         if Value = '' then exit('');
 
-        Evaluate(Day,CopyStr(Value,1,2));
-        Evaluate(Month,CopyStr(Value,3,2));
-        Evaluate(Year,CopyStr(Value,5,4));
-        exit(Format(DMY2Date(Day,Month,Year)));
+        Evaluate(Day, CopyStr(Value, 1, 2));
+        Evaluate(Month, CopyStr(Value, 3, 2));
+        Evaluate(Year, CopyStr(Value, 5, 4));
+        exit(Format(DMY2Date(Day, Month, Year)));
     end;
 
-    procedure EvaluateDecimal(var FieldRef: FieldRef;Value: Text): Text
+    procedure EvaluateDecimal(var FieldRef: FieldRef; Value: Text): Text
     var
         CultureInfo: DotNet npNetCultureInfo;
     begin
         CultureInfo := CultureInfo.CurrentCulture;
-        exit(ConvertStr(Value,'.',CultureInfo.NumberFormat().NumberDecimalSeparator));
+        exit(ConvertStr(Value, '.', CultureInfo.NumberFormat().NumberDecimalSeparator));
     end;
 
-    procedure EvaluateBlob(var FieldRef: FieldRef;IsLastField: Boolean): Text
+    procedure EvaluateBlob(var FieldRef: FieldRef; IsLastField: Boolean): Text
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
     begin
         //-NPR5.48 [342396]
         // LengthText := ReadUntil(':');
@@ -1407,7 +1420,7 @@ codeunit 6014449 "Table Import Library"
         //
         // IF ReadLength > 0 THEN BEGIN
         //  BlobValue := Read(ReadLength);
-        //  TempBlob.Blob.CREATEOUTSTREAM(OutStream);
+        //  TempBlob.CREATEOUTSTREAM(OutStream);
         //  MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(BlobValue));
         //  MemoryStream.WriteTo(OutStream);
         //  FieldRef.VALUE := TempBlob.Blob;
@@ -1419,32 +1432,32 @@ codeunit 6014449 "Table Import Library"
         //  ReadUntil(FieldSeparator);
 
         ReadBinary(TempBlob);
-        if TempBlob.Blob.HasValue then
-          FieldRef.Value := TempBlob.Blob;
+        if TempBlob.HasValue then
+            TempBlob.ToFieldRef(FieldRef);
 
         ReadField(IsLastField);
         //+NPR5.48 [342396]
     end;
 
-    local procedure EvaluateMedia(var FieldRef: FieldRef;IsLastField: Boolean)
+    local procedure EvaluateMedia(var FieldRef: FieldRef; IsLastField: Boolean)
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         NullGuid: Guid;
     begin
         //-NPR5.48 [342396]
         FieldRef.Value := NullGuid; //Blank reference to existing media.
 
         ReadBinary(TempBlob);
-        if TempBlob.Blob.HasValue then
-          OnHandleMediaImport(FieldRef, TempBlob);
+        if TempBlob.HasValue then
+            OnHandleMediaImport(FieldRef, TempBlob);
 
         ReadField(IsLastField);
         //+NPR5.48 [342396]
     end;
 
-    local procedure EvaluateMediaSet(var FieldRef: FieldRef;IsLastField: Boolean)
+    local procedure EvaluateMediaSet(var FieldRef: FieldRef; IsLastField: Boolean)
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         NullGuid: Guid;
         MediaInBuffer: Boolean;
     begin
@@ -1453,21 +1466,21 @@ codeunit 6014449 "Table Import Library"
 
         MediaInBuffer := true;
         while (MediaInBuffer) do begin
-          ReadBinary(TempBlob);
-          if TempBlob.Blob.HasValue then
-            OnHandleMediaSetImport(FieldRef, TempBlob);
+            ReadBinary(TempBlob);
+            if TempBlob.HasValue then
+                OnHandleMediaSetImport(FieldRef, TempBlob);
 
-          if Peek(1) = '^' then
-            Read(1)
-          else
-            MediaInBuffer := false;
+            if Peek(1) = '^' then
+                Read(1)
+            else
+                MediaInBuffer := false;
         end;
 
         ReadField(IsLastField);
         //+NPR5.48 [342396]
     end;
 
-    local procedure ReadBinary(var TempBlob: Record TempBlob temporary)
+    local procedure ReadBinary(var TempBlob: Codeunit "Temp Blob")
     var
         Convert: DotNet npNetConvert;
         MemoryStream: DotNet npNetMemoryStream;
@@ -1478,69 +1491,71 @@ codeunit 6014449 "Table Import Library"
     begin
         //-NPR5.48 [342396]
         LengthText := ReadUntil(':');
-        Evaluate(ReadLength,LengthText);
+        Evaluate(ReadLength, LengthText);
 
         if ReadLength > 0 then begin
-          BlobValue := Read(ReadLength);
-          TempBlob.Blob.CreateOutStream(OutStream);
-          MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(BlobValue));
-          MemoryStream.WriteTo(OutStream);
+            BlobValue := Read(ReadLength);
+            TempBlob.CreateOutStream(OutStream);
+            MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(BlobValue));
+            MemoryStream.WriteTo(OutStream);
         end;
         //+NPR5.48 [342396]
     end;
 
-    local procedure GetFieldType(TableNo: Integer;FieldNo: Integer): Text[30]
+    local procedure GetFieldType(TableNo: Integer; FieldNo: Integer): Text[30]
     var
         "Fields": Record "Field";
     begin
-        if Fields.Get(TableNo,FieldNo) then
-          exit(Format(Fields.Type));
+        if Fields.Get(TableNo, FieldNo) then
+            exit(Format(Fields.Type));
     end;
 
-    local procedure GetFieldLength(TableNo: Integer;FieldNo: Integer): Integer
+    local procedure GetFieldLength(TableNo: Integer; FieldNo: Integer): Integer
     var
         "Fields": Record "Field";
     begin
-        if Fields.Get(TableNo,FieldNo) then
-          exit(Fields.Len);
+        if Fields.Get(TableNo, FieldNo) then
+            exit(Fields.Len);
     end;
 
-    procedure GetFieldEnabled(TableNo: Integer;FieldNo: Integer) Enabled: Boolean
+    procedure GetFieldEnabled(TableNo: Integer; FieldNo: Integer) Enabled: Boolean
     var
         "Fields": Record "Field";
     begin
-        if Fields.Get(TableNo,FieldNo) then
-          exit(Fields.Enabled);
+        if Fields.Get(TableNo, FieldNo) then
+            exit(Fields.Enabled);
     end;
 
     procedure GetTableName(TableNo: Integer): Text
     var
         AllObj: Record AllObj;
     begin
-        AllObj.Get(TempImportedObjects."Object Type",TableNo);
+        AllObj.Get(TempImportedObjects."Object Type", TableNo);
         exit(AllObj."Object Name")
     end;
 
     procedure GetLastPosition(): Text
     begin
-        exit(StrSubstNo('Table %1, field %2, record no. %3, value %4\Error : %5',CurrentTableNo, CurrentFieldNo, CurrentRecordNo,CurrentValue,GetLastErrorText));
+        exit(StrSubstNo('Table %1, field %2, record no. %3, value %4\Error : %5', CurrentTableNo, CurrentFieldNo, CurrentRecordNo, CurrentValue, GetLastErrorText));
     end;
 
     procedure GetImportHistory(var TempAllObj: Record AllObj temporary)
     begin
-        if TempImportedObjects.FindSet then repeat
-          TempAllObj.TransferFields(TempImportedObjects);
-          TempAllObj.Insert;
-        until TempImportedObjects.Next = 0;
+        if TempImportedObjects.FindSet then
+            repeat
+                TempAllObj.TransferFields(TempImportedObjects);
+                TempAllObj.Insert;
+            until TempImportedObjects.Next = 0;
     end;
 
     procedure GetImportDetails(var TempCommentLine: Record "Comment Line" temporary)
     begin
         TempCommentLine.DeleteAll;
-        if TempObjectCommentLines.FindSet then repeat
-          TempCommentLine.TransferFields(TempObjectCommentLines);
-          TempCommentLine.Insert;
-        until TempObjectCommentLines.Next = 0;
+        if TempObjectCommentLines.FindSet then
+            repeat
+                TempCommentLine.TransferFields(TempObjectCommentLines);
+                TempCommentLine.Insert;
+            until TempObjectCommentLines.Next = 0;
     end;
 
     procedure UpdateLocalRecord()
@@ -1553,24 +1568,25 @@ codeunit 6014449 "Table Import Library"
         LocalRecRef.Open(CurrentTableNo);
         LocalRecRef.SetPosition(CurrentRecRef.GetPosition);
         if LocalRecRef.Find then;
-        if TempFieldsToImport.FindSet then repeat
-        //-NPR5.48 [340086]
-        //  IF FieldExists(TempFieldsToImport."No.") AND NOT IgnoreField(TempFieldsToImport.TableNo,TempFieldsToImport."No.") THEN BEGIN
-          if (not IgnoreField(TempFieldsToImport.TableNo,TempFieldsToImport."No.")) and (not FieldIsInAutoIncrementBuffer(TempFieldsToImport.TableNo, TempFieldsToImport."No.")) then begin
-        //+NPR5.48 [340086]
-            ExternalFieldRef    := CurrentRecRef.Field(TempFieldsToImport."No.");
-            LocalFieldRef       := LocalRecRef.Field(TempFieldsToImport."No.");
-            LocalFieldRef.Value := ExternalFieldRef.Value;
-          end;
-        until TempFieldsToImport.Next = 0;
+        if TempFieldsToImport.FindSet then
+            repeat
+                //-NPR5.48 [340086]
+                //  IF FieldExists(TempFieldsToImport."No.") AND NOT IgnoreField(TempFieldsToImport.TableNo,TempFieldsToImport."No.") THEN BEGIN
+                if (not IgnoreField(TempFieldsToImport.TableNo, TempFieldsToImport."No.")) and (not FieldIsInAutoIncrementBuffer(TempFieldsToImport.TableNo, TempFieldsToImport."No.")) then begin
+                    //+NPR5.48 [340086]
+                    ExternalFieldRef := CurrentRecRef.Field(TempFieldsToImport."No.");
+                    LocalFieldRef := LocalRecRef.Field(TempFieldsToImport."No.");
+                    LocalFieldRef.Value := ExternalFieldRef.Value;
+                end;
+            until TempFieldsToImport.Next = 0;
 
         //-NPR5.48 [340086]
         //IF RaiseErrors THEN
         if ErrorOnDataMismatch then
-        //+NPR5.48 [340086]
-          LocalRecRef.Modify
+            //+NPR5.48 [340086]
+            LocalRecRef.Modify
         else
-          if LocalRecRef.Modify then;
+            if LocalRecRef.Modify then;
 
         LocalRecRef.Close;
     end;
@@ -1581,18 +1597,18 @@ codeunit 6014449 "Table Import Library"
     begin
         String.Construct(ConvertString);
         String.Replace('<NEWLINE>', NEWLINE);
-        String.Replace('<TAB>',     TAB);
-        String.Replace('<SPACE>',   SPACE);
+        String.Replace('<TAB>', TAB);
+        String.Replace('<SPACE>', SPACE);
         exit(String.Text);
     end;
 
-    local procedure TestAndSet(var ToSetAndTest: Text[30];Value: Text[30])
+    local procedure TestAndSet(var ToSetAndTest: Text[30]; Value: Text[30])
     begin
         if ToSetAndTest = '' then
-          ToSetAndTest := Value;
+            ToSetAndTest := Value;
     end;
 
-    local procedure SplitString(Text: Text;SplitChar: Text[1];var SplitArray: DotNet npNetArray)
+    local procedure SplitString(Text: Text; SplitChar: Text[1]; var SplitArray: DotNet npNetArray)
     var
         String: DotNet npNetString;
         CharArray: DotNet npNetArray;
@@ -1632,7 +1648,7 @@ codeunit 6014449 "Table Import Library"
 
     local procedure NEWLINE(): Text[2]
     begin
-        exit (CR + LF);
+        exit(CR + LF);
     end;
 
     local procedure SPACE(): Text[1]
@@ -1652,12 +1668,12 @@ codeunit 6014449 "Table Import Library"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnHandleMediaImport(var FieldRef: FieldRef;var TempBlob: Record TempBlob)
+    local procedure OnHandleMediaImport(var FieldRef: FieldRef; var TempBlob: Codeunit "Temp Blob")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnHandleMediaSetImport(var FieldRef: FieldRef;var TempBlob: Record TempBlob)
+    local procedure OnHandleMediaSetImport(var FieldRef: FieldRef; var TempBlob: Codeunit "Temp Blob")
     begin
     end;
 }

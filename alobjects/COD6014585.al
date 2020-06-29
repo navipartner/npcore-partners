@@ -27,40 +27,40 @@ codeunit 6014585 "RP Package Handler"
         FileName: Text;
     begin
         if not TemplateHeader.FindSet then
-          exit;
+            exit;
 
         repeat
-          TemplateLine.SetRange("Template Code", TemplateHeader.Code);
-          DataItem.SetRange(Code, TemplateHeader.Code);
-          DataItemLinks.SetRange("Data Item Code", TemplateHeader.Code);
-          DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
-          DataItemConstraintLinks.SetRange("Data Item Code", TemplateHeader.Code);
-          DeviceSettings.SetRange(Template, TemplateHeader.Code);
-          MediaInfo.SetRange(Template, TemplateHeader.Code);
-          TemplateHeader2 := TemplateHeader;
-          TemplateHeader2.SetRecFilter;
+            TemplateLine.SetRange("Template Code", TemplateHeader.Code);
+            DataItem.SetRange(Code, TemplateHeader.Code);
+            DataItemLinks.SetRange("Data Item Code", TemplateHeader.Code);
+            DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
+            DataItemConstraintLinks.SetRange("Data Item Code", TemplateHeader.Code);
+            DeviceSettings.SetRange(Template, TemplateHeader.Code);
+            MediaInfo.SetRange(Template, TemplateHeader.Code);
+            TemplateHeader2 := TemplateHeader;
+            TemplateHeader2.SetRecFilter;
 
-          ManagedPackageBuilder.AddRecord(TemplateHeader2);
-          ManagedPackageBuilder.AddRecord(TemplateLine);
-          ManagedPackageBuilder.AddRecord(DataItem);
-          ManagedPackageBuilder.AddRecord(DataItemLinks);
-          ManagedPackageBuilder.AddRecord(DataItemConstraint);
-          ManagedPackageBuilder.AddRecord(DataItemConstraintLinks);
-          ManagedPackageBuilder.AddRecord(DeviceSettings);
-          ManagedPackageBuilder.AddRecord(MediaInfo);
+            ManagedPackageBuilder.AddRecord(TemplateHeader2);
+            ManagedPackageBuilder.AddRecord(TemplateLine);
+            ManagedPackageBuilder.AddRecord(DataItem);
+            ManagedPackageBuilder.AddRecord(DataItemLinks);
+            ManagedPackageBuilder.AddRecord(DataItemConstraint);
+            ManagedPackageBuilder.AddRecord(DataItemConstraintLinks);
+            ManagedPackageBuilder.AddRecord(DeviceSettings);
+            ManagedPackageBuilder.AddRecord(MediaInfo);
 
-          i += 1;
+            i += 1;
         until TemplateHeader.Next = 0;
 
         if i = 1 then
-          FileName := StrSubstNo('%1, Version %2',TemplateHeader.Code, TemplateHeader.Version)
+            FileName := StrSubstNo('%1, Version %2', TemplateHeader.Code, TemplateHeader.Version)
         else
-          FileName := 'Retail Print Templates';
+            FileName := 'Retail Print Templates';
 
         ManagedPackageBuilder.ExportToFile(FileName, '1.0', 'Templates for the retail print module', DATABASE::"RP Template Header")
     end;
 
-    procedure ExportPackageToBlob(var TemplateHeader: Record "RP Template Header";var TempBlobOut: Record TempBlob temporary)
+    procedure ExportPackageToBlob(var TemplateHeader: Record "RP Template Header"; var TempBlobOut: Codeunit "Temp Blob")
     var
         ManagedPackageBuilder: Codeunit "Managed Package Builder";
         TemplateHeader2: Record "RP Template Header";
@@ -74,28 +74,28 @@ codeunit 6014585 "RP Package Handler"
         //Does not export media info to prevent archive bloat.
 
         if not TemplateHeader.FindSet then
-          exit;
+            exit;
 
         repeat
-          TemplateLine.SetRange("Template Code", TemplateHeader.Code);
-          DataItem.SetRange(Code, TemplateHeader.Code);
-          DataItemLinks.SetRange("Data Item Code", TemplateHeader.Code);
-          DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
-          DataItemConstraintLinks.SetRange("Data Item Code", TemplateHeader.Code);
-          DeviceSettings.SetRange(Template, TemplateHeader.Code);
-          TemplateHeader2 := TemplateHeader;
-          TemplateHeader2.SetRecFilter;
+            TemplateLine.SetRange("Template Code", TemplateHeader.Code);
+            DataItem.SetRange(Code, TemplateHeader.Code);
+            DataItemLinks.SetRange("Data Item Code", TemplateHeader.Code);
+            DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
+            DataItemConstraintLinks.SetRange("Data Item Code", TemplateHeader.Code);
+            DeviceSettings.SetRange(Template, TemplateHeader.Code);
+            TemplateHeader2 := TemplateHeader;
+            TemplateHeader2.SetRecFilter;
 
-          ManagedPackageBuilder.AddRecord(TemplateHeader2);
-          ManagedPackageBuilder.AddRecord(TemplateLine);
-          ManagedPackageBuilder.AddRecord(DataItem);
-          ManagedPackageBuilder.AddRecord(DataItemLinks);
-          ManagedPackageBuilder.AddRecord(DataItemConstraint);
-          ManagedPackageBuilder.AddRecord(DataItemConstraintLinks);
-          ManagedPackageBuilder.AddRecord(DeviceSettings);
+            ManagedPackageBuilder.AddRecord(TemplateHeader2);
+            ManagedPackageBuilder.AddRecord(TemplateLine);
+            ManagedPackageBuilder.AddRecord(DataItem);
+            ManagedPackageBuilder.AddRecord(DataItemLinks);
+            ManagedPackageBuilder.AddRecord(DataItemConstraint);
+            ManagedPackageBuilder.AddRecord(DataItemConstraintLinks);
+            ManagedPackageBuilder.AddRecord(DeviceSettings);
         until TemplateHeader.Next = 0;
 
-        ManagedPackageBuilder.ExportToBlob('RP Template Archive','1.0',StrSubstNo('Archived template: %1',TemplateHeader.Code), DATABASE::"RP Template Header",TempBlobOut);
+        ManagedPackageBuilder.ExportToBlob('RP Template Archive', '1.0', StrSubstNo('Archived template: %1', TemplateHeader.Code), DATABASE::"RP Template Header", TempBlobOut);
     end;
 
     procedure ImportPackageFromFile()
@@ -113,7 +113,7 @@ codeunit 6014585 "RP Package Handler"
         ManagedPackageMgt.ImportFromFile();
     end;
 
-    procedure ImportPackageFromBlob(var TempBlob: Record TempBlob temporary)
+    procedure ImportPackageFromBlob(var TempBlob: Codeunit "Temp Blob")
     var
         ManagedPackageMgt: Codeunit "Managed Package Mgt.";
     begin
@@ -145,7 +145,7 @@ codeunit 6014585 "RP Package Handler"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014628, 'OnLoadPackage', '', false, false)]
-    local procedure OnLoadPackage(var Handled: Boolean;PrimaryPackageTable: Integer;JObject: DotNet JObject;LoadType: Option File,Blob,Download)
+    local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JObject: DotNet JObject; LoadType: Option File,Blob,Download)
     var
         tmpImportWorksheet: Record "RP Import Worksheet" temporary;
         tmpTemplateHeader: Record "RP Template Header" temporary;
@@ -160,40 +160,40 @@ codeunit 6014585 "RP Package Handler"
     begin
         //-NPR5.38 [294095]
         if Handled then
-          exit;
+            exit;
         if LoadType = LoadType::Blob then
-          exit;
+            exit;
         if PrimaryPackageTable <> DATABASE::"RP Template Header" then
-          exit;
+            exit;
 
         Handled := true;
 
         if not ParsePackage(JObject, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo) then
-          exit;
+            exit;
 
         repeat
-          tmpImportWorksheet.Init;
-          tmpImportWorksheet."Entry No." += 1;
-          tmpImportWorksheet.Template := tmpTemplateHeader.Code;
-          tmpImportWorksheet."New Description" := tmpTemplateHeader.Description;
-          tmpImportWorksheet."New Last Modified At" := tmpTemplateHeader."Last Modified At";
-          tmpImportWorksheet."New Version" := tmpTemplateHeader.Version;
-          if TemplateHeader.Get(tmpTemplateHeader.Code) then begin
-            tmpImportWorksheet."Existing Description" := TemplateHeader.Description;
-            tmpImportWorksheet."Existing Last Modified At" := TemplateHeader."Last Modified At";
-            tmpImportWorksheet."Existing Version" := TemplateHeader.Version;
-          end;
-          tmpImportWorksheet.Insert(true);
+            tmpImportWorksheet.Init;
+            tmpImportWorksheet."Entry No." += 1;
+            tmpImportWorksheet.Template := tmpTemplateHeader.Code;
+            tmpImportWorksheet."New Description" := tmpTemplateHeader.Description;
+            tmpImportWorksheet."New Last Modified At" := tmpTemplateHeader."Last Modified At";
+            tmpImportWorksheet."New Version" := tmpTemplateHeader.Version;
+            if TemplateHeader.Get(tmpTemplateHeader.Code) then begin
+                tmpImportWorksheet."Existing Description" := TemplateHeader.Description;
+                tmpImportWorksheet."Existing Last Modified At" := TemplateHeader."Last Modified At";
+                tmpImportWorksheet."Existing Version" := TemplateHeader.Version;
+            end;
+            tmpImportWorksheet.Insert(true);
         until tmpTemplateHeader.Next = 0;
 
         if PAGE.RunModal(PAGE::"RP Import Worksheet", tmpImportWorksheet) <> ACTION::LookupOK then
-          exit;
+            exit;
 
         ImportPackage(tmpImportWorksheet, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo);
         //+NPR5.38 [294095]
     end;
 
-    local procedure ParsePackage(JObject: DotNet JObject;var tmpTemplateHeader: Record "RP Template Header" temporary;var tmpTemplateLine: Record "RP Template Line" temporary;var tmpDataItem: Record "RP Data Items" temporary;var tmpDataItemLinks: Record "RP Data Item Links" temporary;var tmpDataItemConstraint: Record "RP Data Item Constraint" temporary;var tmpDataItemConstraintLinks: Record "RP Data Item Constraint Links" temporary;var tmpDeviceSettings: Record "RP Device Settings" temporary;var tmpMediaInfo: Record "RP Template Media Info" temporary): Boolean
+    local procedure ParsePackage(JObject: DotNet JObject; var tmpTemplateHeader: Record "RP Template Header" temporary; var tmpTemplateLine: Record "RP Template Line" temporary; var tmpDataItem: Record "RP Data Items" temporary; var tmpDataItemLinks: Record "RP Data Item Links" temporary; var tmpDataItemConstraint: Record "RP Data Item Constraint" temporary; var tmpDataItemConstraintLinks: Record "RP Data Item Constraint Links" temporary; var tmpDeviceSettings: Record "RP Device Settings" temporary; var tmpMediaInfo: Record "RP Template Media Info" temporary): Boolean
     var
         i: Integer;
         TotalRecords: Integer;
@@ -208,36 +208,44 @@ codeunit 6014585 "RP Package Handler"
         //-NPR5.38 [294095]
         TotalRecords := JObject.Count;
         for i := 0 to TotalRecords - 1 do begin
-          Evaluate(TableNo, JObject.Item(i).Item('Record').ToString());
+            Evaluate(TableNo, JObject.Item(i).Item('Record').ToString());
 
-          case TableNo of
-            DATABASE::"RP Template Header" : RecRef.GetTable(tmpTemplateHeader);
-            DATABASE::"RP Template Line" : RecRef.GetTable(tmpTemplateLine);
-            DATABASE::"RP Data Items" : RecRef.GetTable(tmpDataItem);
-            DATABASE::"RP Data Item Links" : RecRef.GetTable(tmpDataItemLinks);
-            DATABASE::"RP Data Item Constraint" : RecRef.GetTable(tmpDataItemConstraint);
-            DATABASE::"RP Data Item Constraint Links" : RecRef.GetTable(tmpDataItemConstraintLinks);
-            DATABASE::"RP Device Settings" : RecRef.GetTable(tmpDeviceSettings);
-            DATABASE::"RP Template Media Info" : RecRef.GetTable(tmpMediaInfo);
-            else
-              Error('Unexpected table.');
-          end;
+            case TableNo of
+                DATABASE::"RP Template Header":
+                    RecRef.GetTable(tmpTemplateHeader);
+                DATABASE::"RP Template Line":
+                    RecRef.GetTable(tmpTemplateLine);
+                DATABASE::"RP Data Items":
+                    RecRef.GetTable(tmpDataItem);
+                DATABASE::"RP Data Item Links":
+                    RecRef.GetTable(tmpDataItemLinks);
+                DATABASE::"RP Data Item Constraint":
+                    RecRef.GetTable(tmpDataItemConstraint);
+                DATABASE::"RP Data Item Constraint Links":
+                    RecRef.GetTable(tmpDataItemConstraintLinks);
+                DATABASE::"RP Device Settings":
+                    RecRef.GetTable(tmpDeviceSettings);
+                DATABASE::"RP Template Media Info":
+                    RecRef.GetTable(tmpMediaInfo);
+                else
+                    Error('Unexpected table.');
+            end;
 
-          FieldsJObject := JObject.Item(i).Item('Fields');
-          foreach KeyValuePair in FieldsJObject do
-            if ManagedPackageMgt.FieldRefByID(RecRef,KeyValuePair.Key,FieldRef) then
-              if not ManagedDependencyMgt.TextToFieldRef(KeyValuePair.Value,FieldRef) then
-                Error('Unexpected field data.');
+            FieldsJObject := JObject.Item(i).Item('Fields');
+            foreach KeyValuePair in FieldsJObject do
+                if ManagedPackageMgt.FieldRefByID(RecRef, KeyValuePair.Key, FieldRef) then
+                    if not ManagedDependencyMgt.TextToFieldRef(KeyValuePair.Value, FieldRef) then
+                        Error('Unexpected field data.');
 
-          RecRef.Insert;
-          RecRef.Close;
+            RecRef.Insert;
+            RecRef.Close;
         end;
 
         exit(tmpTemplateHeader.FindSet);
         //+NPR5.38 [294095]
     end;
 
-    local procedure ImportPackage(var tmpImportWorksheet: Record "RP Import Worksheet";var tmpTemplateHeader: Record "RP Template Header" temporary;var tmpTemplateLine: Record "RP Template Line" temporary;var tmpDataItem: Record "RP Data Items" temporary;var tmpDataItemLinks: Record "RP Data Item Links" temporary;var tmpDataItemConstraint: Record "RP Data Item Constraint" temporary;var tmpDataItemConstraintLinks: Record "RP Data Item Constraint Links" temporary;var tmpDeviceSettings: Record "RP Device Settings" temporary;var tmpMediaInfo: Record "RP Template Media Info" temporary)
+    local procedure ImportPackage(var tmpImportWorksheet: Record "RP Import Worksheet"; var tmpTemplateHeader: Record "RP Template Header" temporary; var tmpTemplateLine: Record "RP Template Line" temporary; var tmpDataItem: Record "RP Data Items" temporary; var tmpDataItemLinks: Record "RP Data Item Links" temporary; var tmpDataItemConstraint: Record "RP Data Item Constraint" temporary; var tmpDataItemConstraintLinks: Record "RP Data Item Constraint Links" temporary; var tmpDeviceSettings: Record "RP Device Settings" temporary; var tmpMediaInfo: Record "RP Template Media Info" temporary)
     var
         TemplateHeader: Record "RP Template Header";
         TemplateLine: Record "RP Template Line";
@@ -252,77 +260,85 @@ codeunit 6014585 "RP Package Handler"
     begin
         //-NPR5.38 [294095]
         with tmpImportWorksheet do begin
-          SetFilter(Action, '<>%1', Action::Skip);
-          if FindSet then repeat
-            if Action = Action::Replace then begin
-              DeleteTemplate(Template);
-              ReplaceCounter += 1;
-            end else
-              CreateCounter += 1;
+            SetFilter(Action, '<>%1', Action::Skip);
+            if FindSet then
+                repeat
+                    if Action = Action::Replace then begin
+                        DeleteTemplate(Template);
+                        ReplaceCounter += 1;
+                    end else
+                        CreateCounter += 1;
 
-            tmpTemplateHeader.Get(Template);
-            tmpTemplateLine.SetRange("Template Code", Template);
-            tmpDataItem.SetRange(Code, Template);
-            tmpDataItemLinks.SetRange("Data Item Code", Template);
-            tmpDataItemConstraint.SetRange("Data Item Code", Template);
-            tmpDataItemConstraintLinks.SetRange("Data Item Code", Template);
-            tmpDeviceSettings.SetRange(Template, Template);
-            tmpMediaInfo.SetRange(Template, Template);
+                    tmpTemplateHeader.Get(Template);
+                    tmpTemplateLine.SetRange("Template Code", Template);
+                    tmpDataItem.SetRange(Code, Template);
+                    tmpDataItemLinks.SetRange("Data Item Code", Template);
+                    tmpDataItemConstraint.SetRange("Data Item Code", Template);
+                    tmpDataItemConstraintLinks.SetRange("Data Item Code", Template);
+                    tmpDeviceSettings.SetRange(Template, Template);
+                    tmpMediaInfo.SetRange(Template, Template);
 
-            TemplateHeader.Init;
-            TemplateHeader := tmpTemplateHeader;
-            TemplateHeader.Insert;
+                    TemplateHeader.Init;
+                    TemplateHeader := tmpTemplateHeader;
+                    TemplateHeader.Insert;
 
-            if tmpTemplateLine.FindSet then repeat
-              TemplateLine.Init;
-              TemplateLine := tmpTemplateLine;
-              TemplateLine.Insert;
-            until tmpTemplateLine.Next = 0;
+                    if tmpTemplateLine.FindSet then
+                        repeat
+                            TemplateLine.Init;
+                            TemplateLine := tmpTemplateLine;
+                            TemplateLine.Insert;
+                        until tmpTemplateLine.Next = 0;
 
-            if tmpDataItem.FindSet then repeat
-              DataItem.Init;
-              DataItem := tmpDataItem;
-              DataItem.Insert;
-            until tmpDataItem.Next = 0;
+                    if tmpDataItem.FindSet then
+                        repeat
+                            DataItem.Init;
+                            DataItem := tmpDataItem;
+                            DataItem.Insert;
+                        until tmpDataItem.Next = 0;
 
-            if tmpDataItemLinks.FindSet then repeat
-              DataItemLinks.Init;
-              DataItemLinks := tmpDataItemLinks;
-              DataItemLinks.Insert;
-            until tmpDataItemLinks.Next = 0;
+                    if tmpDataItemLinks.FindSet then
+                        repeat
+                            DataItemLinks.Init;
+                            DataItemLinks := tmpDataItemLinks;
+                            DataItemLinks.Insert;
+                        until tmpDataItemLinks.Next = 0;
 
-            if tmpDataItemConstraint.FindSet then repeat
-              DataItemConstraint.Init;
-              DataItemConstraint := tmpDataItemConstraint;
-              DataItemConstraint.Insert;
-            until tmpDataItemConstraint.Next = 0;
+                    if tmpDataItemConstraint.FindSet then
+                        repeat
+                            DataItemConstraint.Init;
+                            DataItemConstraint := tmpDataItemConstraint;
+                            DataItemConstraint.Insert;
+                        until tmpDataItemConstraint.Next = 0;
 
-            if tmpDataItemConstraintLinks.FindSet then repeat
-              DataItemConstraintLinks.Init;
-              DataItemConstraintLinks := tmpDataItemConstraintLinks;
-              DataItemConstraintLinks.Insert;
-            until tmpDataItemConstraintLinks.Next = 0;
+                    if tmpDataItemConstraintLinks.FindSet then
+                        repeat
+                            DataItemConstraintLinks.Init;
+                            DataItemConstraintLinks := tmpDataItemConstraintLinks;
+                            DataItemConstraintLinks.Insert;
+                        until tmpDataItemConstraintLinks.Next = 0;
 
-            if tmpDeviceSettings.FindSet then repeat
-              DeviceSettings.Init;
-              DeviceSettings := tmpDeviceSettings;
-              DeviceSettings.Insert;
-            until tmpDeviceSettings.Next = 0;
+                    if tmpDeviceSettings.FindSet then
+                        repeat
+                            DeviceSettings.Init;
+                            DeviceSettings := tmpDeviceSettings;
+                            DeviceSettings.Insert;
+                        until tmpDeviceSettings.Next = 0;
 
-            //-NPR5.39 [300666]
-            tmpMediaInfo.SetAutoCalcFields(Picture);
-            //+NPR5.39 [300666]
-            if tmpMediaInfo.FindSet then repeat
-              MediaInfo.Init;
-              MediaInfo := tmpMediaInfo;
-              MediaInfo.Insert;
-            until tmpMediaInfo.Next = 0;
+                    //-NPR5.39 [300666]
+                    tmpMediaInfo.SetAutoCalcFields(Picture);
+                    //+NPR5.39 [300666]
+                    if tmpMediaInfo.FindSet then
+                        repeat
+                            MediaInfo.Init;
+                            MediaInfo := tmpMediaInfo;
+                            MediaInfo.Insert;
+                        until tmpMediaInfo.Next = 0;
 
-          until tmpImportWorksheet.Next = 0;
+                until tmpImportWorksheet.Next = 0;
         end;
 
         if (ReplaceCounter > 0) or (CreateCounter > 0) then
-          Message(ImportedMessage, CreateCounter, ReplaceCounter);
+            Message(ImportedMessage, CreateCounter, ReplaceCounter);
         //+NPR5.38 [294095]
     end;
 
@@ -341,10 +357,10 @@ codeunit 6014585 "RP Package Handler"
         //-NPR5.38 [294095]
         TemplateHeader.Get(Code);
         if not TemplateHeader.Archived then begin
-          if not TemplateArchive.Get(Code, TemplateHeader.Version) then begin
-            TemplateHeader."Version Comments" := 'Auto archiving before import';
-            TemplateHeader.Validate(Archived, true);
-          end;
+            if not TemplateArchive.Get(Code, TemplateHeader.Version) then begin
+                TemplateHeader."Version Comments" := 'Auto archiving before import';
+                TemplateHeader.Validate(Archived, true);
+            end;
         end;
 
         TemplateHeader.SetRange(Code, Code);

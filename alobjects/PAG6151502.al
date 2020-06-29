@@ -42,12 +42,12 @@ page 6151502 "Nc Task List"
                 group(Filters)
                 {
                     Caption = 'Filters';
-                    field("COUNT";Count)
+                    field("COUNT"; Count)
                     {
                         Caption = 'Quantity';
                         Editable = false;
                     }
-                    field(TaskProcessorFilter;TaskProcessorFilter)
+                    field(TaskProcessorFilter; TaskProcessorFilter)
                     {
                         Caption = 'Task Processor';
                         TableRelation = "Nc Task Processor";
@@ -57,7 +57,7 @@ page 6151502 "Nc Task List"
                             SetPresetFilters();
                         end;
                     }
-                    field("Show Exported";ShowProcessed)
+                    field("Show Exported"; ShowProcessed)
                     {
                         Caption = 'Show Processed';
 
@@ -70,13 +70,13 @@ page 6151502 "Nc Task List"
                 group(Control6150657)
                 {
                     ShowCaption = false;
-                    field(Control6150656;'')
+                    field(Control6150656; '')
                     {
                         Caption = 'Response:                                                                                                                                                                                                                                                                               _';
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(ResponseText;ResponseText)
+                    field(ResponseText; ResponseText)
                     {
                         Editable = false;
                         MultiLine = true;
@@ -87,55 +87,55 @@ page 6151502 "Nc Task List"
             repeater(Control6150622)
             {
                 ShowCaption = false;
-                field("Task Processor Code";"Task Processor Code")
+                field("Task Processor Code"; "Task Processor Code")
                 {
                 }
-                field(Processed;Processed)
+                field(Processed; Processed)
                 {
                 }
-                field("Process Error";"Process Error")
+                field("Process Error"; "Process Error")
                 {
                     Editable = false;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
                     Visible = false;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                     Editable = false;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
                     Editable = false;
                 }
-                field("Record Value";"Record Value")
+                field("Record Value"; "Record Value")
                 {
                 }
-                field("Record Position";"Record Position")
+                field("Record Position"; "Record Position")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Log Date";"Log Date")
+                field("Log Date"; "Log Date")
                 {
                     Editable = false;
                 }
-                field("Last Checked1";"Last Processing Started at")
+                field("Last Checked1"; "Last Processing Started at")
                 {
                     Visible = false;
                 }
-                field("Last Processing Completed at";"Last Processing Completed at")
+                field("Last Processing Completed at"; "Last Processing Completed at")
                 {
                 }
-                field("Last Processing Duration";"Last Processing Duration")
+                field("Last Processing Duration"; "Last Processing Duration")
                 {
                     Visible = false;
                 }
-                field("Process Count";"Process Count")
+                field("Process Count"; "Process Count")
                 {
                 }
             }
@@ -197,7 +197,7 @@ page 6151502 "Nc Task List"
                 Caption = 'Fields';
                 Image = List;
                 RunObject = Page "Nc Task Fields";
-                RunPageLink = "Task Entry No."=FIELD("Entry No.");
+                RunPageLink = "Task Entry No." = FIELD("Entry No.");
             }
             action("Show Output")
             {
@@ -237,7 +237,7 @@ page 6151502 "Nc Task List"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "Nc Task Output List";
-                RunPageLink = "Task Entry No."=FIELD("Entry No.");
+                RunPageLink = "Task Entry No." = FIELD("Entry No.");
             }
         }
     }
@@ -269,8 +269,8 @@ page 6151502 "Nc Task List"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId,SessionId) then
-          exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
+        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;
 
@@ -283,16 +283,16 @@ page 6151502 "Nc Task List"
         CurrentEntryNo := "Entry No.";
         FilterGroup(2);
         //-NC2.01 [252048]
-        SetFilter("Task Processor Code",TaskProcessorFilter);
+        SetFilter("Task Processor Code", TaskProcessorFilter);
         //+NC2.01 [252048]
 
         //-NC2.00
         //RESET;
         //+NC2.00
         if ShowProcessed then
-          SetRange(Processed)
-         else
-          SetRange(Processed,false);
+            SetRange(Processed)
+        else
+            SetRange(Processed, false);
 
         //-NC2.00
         // IF ItemNo <> '' THEN BEGIN
@@ -332,9 +332,9 @@ page 6151502 "Nc Task List"
         // END;
         ResponseText := '';
         if not Response.HasValue then
-          exit;
+            exit;
         CalcFields(Response);
-        Response.CreateInStream(InStream,TEXTENCODING::UTF8);
+        Response.CreateInStream(InStream, TEXTENCODING::UTF8);
         StreamReader := StreamReader.StreamReader(InStream);
         ResponseText := StreamReader.ReadToEnd();
         //+NC2.01 [252048]
@@ -352,11 +352,11 @@ page 6151502 "Nc Task List"
         //IF PAGE.RUNMODAL(PAGE::"Task Worker Group",TaskWorkerGroup) = ACTION::LookupOK THEN
         //  TaskMgt.UpdateTasks(TaskWorkerGroup.Code);
         if not TaskProcessor.FindSet then begin
-          SyncMgt.UpdateTaskProcessor(TaskProcessor);
-          Commit;
+            SyncMgt.UpdateTaskProcessor(TaskProcessor);
+            Commit;
         end;
-        if PAGE.RunModal(PAGE::"Nc Task Proces. List",TaskProcessor) <> ACTION::LookupOK then
-          exit;
+        if PAGE.RunModal(PAGE::"Nc Task Proces. List", TaskProcessor) <> ACTION::LookupOK then
+            exit;
 
         TaskMgt.UpdateTasks(TaskProcessor);
         Clear(TaskMgt);
@@ -371,13 +371,13 @@ page 6151502 "Nc Task List"
     begin
         CurrPage.SetSelectionFilter(Task);
         Window.Open(Text003);
-        Window.Update(2,Task.Count);
+        Window.Update(2, Task.Count);
         if Task.FindSet then
-          repeat
-            Counter += 1;
-            Window.Update(1,Counter);
-            SyncMgt.ProcessTask(Task);
-          until Task.Next = 0;
+            repeat
+                Counter += 1;
+                Window.Update(1, Counter);
+                SyncMgt.ProcessTask(Task);
+            until Task.Next = 0;
         Window.Close;
         CurrPage.Update(false);
     end;
@@ -389,16 +389,16 @@ page 6151502 "Nc Task List"
         Window: Dialog;
     begin
         CurrPage.SetSelectionFilter(Task);
-        if Confirm(StrSubstNo(Text002,Task.Count),true) then begin
-          Task.ModifyAll("Process Error",false,true);
-          CurrPage.Update(false);
+        if Confirm(StrSubstNo(Text002, Task.Count), true) then begin
+            Task.ModifyAll("Process Error", false, true);
+            CurrPage.Update(false);
         end;
     end;
 
     local procedure ShowOutput()
     var
         NcTaskOutput: Record "Nc Task Output";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
@@ -407,43 +407,43 @@ page 6151502 "Nc Task List"
     begin
         CalcFields("Data Output");
         if not "Data Output".HasValue then begin
-          //-NC2.17 [335927]
-          NcTaskOutput.SetRange("Task Entry No.","Entry No.");
-          if NcTaskOutput.FindLast and NcTaskOutput.Data.HasValue then begin
-            NcTaskOutput.CalcFields(Data);
-            NcTaskOutput.Data.CreateInStream(InStr,TEXTENCODING::UTF8);
-            Path := TemporaryPath + NcTaskOutput.Name;
-            DownloadFromStream(InStr,'Export',FileMgt.Magicpath,'.' + FileMgt.GetExtension(NcTaskOutput.Name),Path);
-            HyperLink(Path);
+            //-NC2.17 [335927]
+            NcTaskOutput.SetRange("Task Entry No.", "Entry No.");
+            if NcTaskOutput.FindLast and NcTaskOutput.Data.HasValue then begin
+                NcTaskOutput.CalcFields(Data);
+                NcTaskOutput.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
+                Path := TemporaryPath + NcTaskOutput.Name;
+                DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.' + FileMgt.GetExtension(NcTaskOutput.Name), Path);
+                HyperLink(Path);
+                exit;
+            end;
+            //+NC2.17 [335927]
+            Message(Text001);
             exit;
-          end;
-          //+NC2.17 [335927]
-          Message(Text001);
-          exit;
         end;
         //-NC2.01 [252048]
-        "Data Output".CreateInStream(InStr,TEXTENCODING::UTF8);
+        "Data Output".CreateInStream(InStr, TEXTENCODING::UTF8);
         //+NC2.01 [252048]
         if IsWebClient() then begin
-          //-NC2.01 [252048]
-          //"Data Output".CREATEINSTREAM(InStr);
-          //+NC2.01 [252048]
-          StreamReader := StreamReader.StreamReader(InStr);
-          Content := StreamReader.ReadToEnd();
-          Message(Content);
+            //-NC2.01 [252048]
+            //"Data Output".CREATEINSTREAM(InStr);
+            //+NC2.01 [252048]
+            StreamReader := StreamReader.StreamReader(InStr);
+            Content := StreamReader.ReadToEnd();
+            Message(Content);
         end else begin
-          //-NC2.01 [252048]
-          //TempBlob.Blob := "Data Output";
-          //Path := FileMgt.BLOBExport(TempBlob,TEMPORARYPATH + 'Task-' + FORMAT("Entry No.") + '.xml',FALSE);
-          Path := TemporaryPath + 'Task-' + Format("Entry No.") + '.xml';
-          StreamReader := StreamReader.StreamReader(InStr);
-          DownloadFromStream(InStr,'Export',FileMgt.Magicpath,'.xml',Path);
-          //+NC2.01 [252048]
-          SyncMgt.RunProcess('notepad.exe',Path,false);
-          //-#285886 [285886]
-          // SLEEP(100);
-          // FileMgt.DeleteClientFile(Path);
-          //+#285886 [285886]
+            //-NC2.01 [252048]
+            //TempBlob.Blob := "Data Output";
+            //Path := FileMgt.BLOBExport(TempBlob,TEMPORARYPATH + 'Task-' + FORMAT("Entry No.") + '.xml',FALSE);
+            Path := TemporaryPath + 'Task-' + Format("Entry No.") + '.xml';
+            StreamReader := StreamReader.StreamReader(InStr);
+            DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.xml', Path);
+            //+NC2.01 [252048]
+            SyncMgt.RunProcess('notepad.exe', Path, false);
+            //-#285886 [285886]
+            // SLEEP(100);
+            // FileMgt.DeleteClientFile(Path);
+            //+#285886 [285886]
         end;
     end;
 

@@ -16,7 +16,7 @@ codeunit 6151460 "M2 Setup Mgt."
     var
         Text000: Label 'Root Categoery is missing for Website %1';
 
-    local procedure CreateStores(var XmlElement: DotNet npNetXmlElement;MagentoWebsite: Record "Magento Website")
+    local procedure CreateStores(var XmlElement: DotNet npNetXmlElement; MagentoWebsite: Record "Magento Website")
     var
         MagentoStore: Record "Magento Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -27,45 +27,46 @@ codeunit 6151460 "M2 Setup Mgt."
         RootItemGroupNo: Code[20];
     begin
         if IsNull(XmlElement) then
-          exit;
+            exit;
 
-        if NpXmlDomMgt.FindNode(XmlElement,'stores/store',XmlElement2) then
-          repeat
-            RootItemGroupNo := NpXmlDomMgt.GetXmlText(XmlElement,'root_category',MaxStrLen(RootItemGroupNo),true);
-            if not NpXmlDomMgt.FindNode(XmlElement,'root_category',XmlElement3) then
-              Error(Text000,MagentoWebsite.Code);
-            RootItemGroupNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement3,'external_id',true);
-            CreateRootItemGroup(RootItemGroupNo,CopyStr(MagentoWebsite.Name,1,50));
+        if NpXmlDomMgt.FindNode(XmlElement, 'stores/store', XmlElement2) then
+            repeat
+                RootItemGroupNo := NpXmlDomMgt.GetXmlText(XmlElement, 'root_category', MaxStrLen(RootItemGroupNo), true);
+                if not NpXmlDomMgt.FindNode(XmlElement, 'root_category', XmlElement3) then
+                    Error(Text000, MagentoWebsite.Code);
+                RootItemGroupNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement3, 'external_id', true);
+                CreateRootItemGroup(RootItemGroupNo, CopyStr(MagentoWebsite.Name, 1, 50));
 
-            if not MagentoStore.Get(UpperCase(XmlElement2.GetAttribute('code'))) then begin
-              MagentoStore.Init;
-              MagentoStore.Code := UpperCase(XmlElement2.GetAttribute('code'));
-              MagentoStore."Website Code" := MagentoWebsite.Code;
-              MagentoStore.Name := XmlElement2.InnerText;
-              MagentoStore."Root Item Group No." := RootItemGroupNo;
-              MagentoStore.Insert(true);
-            end else if (MagentoStore."Website Code" <> MagentoWebsite.Code) or (MagentoStore.Name <> XmlElement2.InnerText) or (MagentoStore."Root Item Group No." <> RootItemGroupNo) then begin
-              MagentoStore."Website Code" := MagentoWebsite.Code;
-              MagentoStore.Name := XmlElement2.InnerText;
-              MagentoStore."Root Item Group No." := RootItemGroupNo;
-              MagentoStore.Modify(true);
-            end;
-            XmlElement2 := XmlElement2.NextSibling;
-          until IsNull(XmlElement2);
+                if not MagentoStore.Get(UpperCase(XmlElement2.GetAttribute('code'))) then begin
+                    MagentoStore.Init;
+                    MagentoStore.Code := UpperCase(XmlElement2.GetAttribute('code'));
+                    MagentoStore."Website Code" := MagentoWebsite.Code;
+                    MagentoStore.Name := XmlElement2.InnerText;
+                    MagentoStore."Root Item Group No." := RootItemGroupNo;
+                    MagentoStore.Insert(true);
+                end else
+                    if (MagentoStore."Website Code" <> MagentoWebsite.Code) or (MagentoStore.Name <> XmlElement2.InnerText) or (MagentoStore."Root Item Group No." <> RootItemGroupNo) then begin
+                        MagentoStore."Website Code" := MagentoWebsite.Code;
+                        MagentoStore.Name := XmlElement2.InnerText;
+                        MagentoStore."Root Item Group No." := RootItemGroupNo;
+                        MagentoStore.Modify(true);
+                    end;
+                XmlElement2 := XmlElement2.NextSibling;
+            until IsNull(XmlElement2);
     end;
 
-    local procedure CreateRootItemGroup(ItemGroupNo: Code[20];ItemGroupName: Text[50])
+    local procedure CreateRootItemGroup(ItemGroupNo: Code[20]; ItemGroupName: Text[50])
     var
         ItemGroup: Record "Magento Item Group";
     begin
         if ItemGroup.Get(ItemGroupNo) then begin
-          if (ItemGroup.Name <> ItemGroupName) or (not ItemGroup.Root) or (ItemGroup."Root No." <> ItemGroup."No.") then begin
-            ItemGroup.Name := ItemGroupName;
-            ItemGroup.Root := true;
-            ItemGroup."Root No." := ItemGroup."No.";
-            ItemGroup.Modify(true);
-          end;
-          exit;
+            if (ItemGroup.Name <> ItemGroupName) or (not ItemGroup.Root) or (ItemGroup."Root No." <> ItemGroup."No.") then begin
+                ItemGroup.Name := ItemGroupName;
+                ItemGroup.Root := true;
+                ItemGroup."Root No." := ItemGroup."No.";
+                ItemGroup.Modify(true);
+            end;
+            exit;
         end;
 
         ItemGroup.Init;
@@ -82,25 +83,25 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoStore: Record "Magento Store";
         MagentoWebsite: Record "Magento Website";
     begin
-        MagentoWebsite.SetRange("Default Website",true);
+        MagentoWebsite.SetRange("Default Website", true);
         if not MagentoWebsite.FindFirst then
-          exit;
+            exit;
 
-        MagentoStore.SetRange("Website Code",MagentoWebsite.Code);
-        MagentoStore.SetFilter("Root Item Group No.",'<>%1','');
+        MagentoStore.SetRange("Website Code", MagentoWebsite.Code);
+        MagentoStore.SetFilter("Root Item Group No.", '<>%1', '');
         if not MagentoStore.FindFirst then
-          exit;
+            exit;
 
-        ItemGroup.SetFilter("Parent Item Group No.",'=%1','');
-        ItemGroup.SetFilter("Root No.",'=%1','');
-        ItemGroup.SetRange(Root,false);
+        ItemGroup.SetFilter("Parent Item Group No.", '=%1', '');
+        ItemGroup.SetFilter("Root No.", '=%1', '');
+        ItemGroup.SetRange(Root, false);
         if not ItemGroup.FindSet then
-          exit;
+            exit;
 
         repeat
-          ItemGroup."Parent Item Group No." := MagentoStore."Root Item Group No.";
-          ItemGroup."Root No." := MagentoStore."Root Item Group No.";
-          ItemGroup.Modify(true);
+            ItemGroup."Parent Item Group No." := MagentoStore."Root Item Group No.";
+            ItemGroup."Root No." := MagentoStore."Root Item Group No.";
+            ItemGroup.Modify(true);
         until ItemGroup.Next = 0;
     end;
 
@@ -110,7 +111,7 @@ codeunit 6151460 "M2 Setup Mgt."
         NpXmlElement: Record "NpXml Element";
         NpXmlElement2: Record "NpXml Element";
         NpXmlFilter: Record "NpXml Filter";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         M2NpXmlSetupMgt: Codeunit "M2 NpXml Setup Mgt.";
         VariaXElementLineNo: Integer;
@@ -118,80 +119,80 @@ codeunit 6151460 "M2 Setup Mgt."
         SizeDimension: Code[20];
     begin
         if not MagentoSetup.Get then
-          exit;
+            exit;
 
         MagentoGenericSetupMgt.InitGenericMagentoSetup(MagentoSetup);
-        TempBlob.Blob := MagentoSetup."Generic Setup";
+        TempBlob.FromRecord(MagentoSetup, MagentoSetup.FieldNo("Generic Setup"));
 
-        M2NpXmlSetupMgt.SetupTemplateItem(TempBlob,MagentoSetup."Magento Enabled");
-        M2NpXmlSetupMgt.SetupTemplatePicture(TempBlob,MagentoSetup."Magento Enabled");
-        M2NpXmlSetupMgt.SetupTemplateItemInventory(TempBlob,MagentoSetup."Magento Enabled");
-        M2NpXmlSetupMgt.SetupTemplateItemStore(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Multistore Enabled");
-        M2NpXmlSetupMgt.SetupTemplateItemGroup(TempBlob,MagentoSetup."Magento Enabled");
-        M2NpXmlSetupMgt.SetupTemplateOrderStatus(TempBlob,MagentoSetup."Magento Enabled");
-        M2NpXmlSetupMgt.SetupTemplateBrand(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Brands Enabled");
-        M2NpXmlSetupMgt.SetupTemplateGiftVoucher(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Gift Voucher Enabled");
-        M2NpXmlSetupMgt.SetupTemplateCreditVoucher(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Gift Voucher Enabled");
-        M2NpXmlSetupMgt.SetupTemplateAttribute(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Attributes Enabled");
-        M2NpXmlSetupMgt.SetupTemplateAttributeSet(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Attributes Enabled");
-        M2NpXmlSetupMgt.SetupTemplateCustomer(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled");
-        M2NpXmlSetupMgt.SetupTemplateDisplayConfig(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled");
-        M2NpXmlSetupMgt.SetupTemplateSalesPrice(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Sales Prices Enabled");
-        M2NpXmlSetupMgt.SetupTemplateSalesLineDiscount(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Sales Line Discounts Enabled");
-        M2NpXmlSetupMgt.SetupTemplateTicket(TempBlob,true);
-        M2NpXmlSetupMgt.SetupTemplateMember(TempBlob,true);
+        M2NpXmlSetupMgt.SetupTemplateItem(TempBlob, MagentoSetup."Magento Enabled");
+        M2NpXmlSetupMgt.SetupTemplatePicture(TempBlob, MagentoSetup."Magento Enabled");
+        M2NpXmlSetupMgt.SetupTemplateItemInventory(TempBlob, MagentoSetup."Magento Enabled");
+        M2NpXmlSetupMgt.SetupTemplateItemStore(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Multistore Enabled");
+        M2NpXmlSetupMgt.SetupTemplateItemGroup(TempBlob, MagentoSetup."Magento Enabled");
+        M2NpXmlSetupMgt.SetupTemplateOrderStatus(TempBlob, MagentoSetup."Magento Enabled");
+        M2NpXmlSetupMgt.SetupTemplateBrand(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Brands Enabled");
+        M2NpXmlSetupMgt.SetupTemplateGiftVoucher(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Gift Voucher Enabled");
+        M2NpXmlSetupMgt.SetupTemplateCreditVoucher(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Gift Voucher Enabled");
+        M2NpXmlSetupMgt.SetupTemplateAttribute(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Attributes Enabled");
+        M2NpXmlSetupMgt.SetupTemplateAttributeSet(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Attributes Enabled");
+        M2NpXmlSetupMgt.SetupTemplateCustomer(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled");
+        M2NpXmlSetupMgt.SetupTemplateDisplayConfig(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled");
+        M2NpXmlSetupMgt.SetupTemplateSalesPrice(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Sales Prices Enabled");
+        M2NpXmlSetupMgt.SetupTemplateSalesLineDiscount(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Sales Line Discounts Enabled");
+        M2NpXmlSetupMgt.SetupTemplateTicket(TempBlob, true);
+        M2NpXmlSetupMgt.SetupTemplateMember(TempBlob, true);
         //-MAG2.22 [352201]
         M2NpXmlSetupMgt.SetupTemplateCollectStore(TempBlob,
           MagentoSetup."Magento Enabled" and MagentoSetup."Collect in Store Enabled" and (MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"2"));
         //+MAG2.22 [352201]
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/manufacturer','',MagentoSetup."Brands Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/product_external_attributes','',MagentoSetup."Attributes Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/related_products','',MagentoSetup."Product Relations Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/special_price','',MagentoSetup."Special Prices Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/special_price_from','',MagentoSetup."Special Prices Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/special_price_to','',MagentoSetup."Special Prices Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/tier_prices','',MagentoSetup."Tier Prices Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/group_prices','',MagentoSetup."Customer Group Prices Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/custom_options','',MagentoSetup."Custom Options Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/bundled_options','',MagentoSetup."Bundled Products Enabled");
-        M2NpXmlSetupMgt.SetSalesPriceEnabled(TempBlob,'product/unit_codes','',MagentoSetup."Sales Prices Enabled" or MagentoSetup."Sales Line Discounts Enabled");
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/ticket_setup','',MagentoSetup."Tickets Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/manufacturer', '', MagentoSetup."Brands Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/product_external_attributes', '', MagentoSetup."Attributes Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/related_products', '', MagentoSetup."Product Relations Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/special_price', '', MagentoSetup."Special Prices Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/special_price_from', '', MagentoSetup."Special Prices Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/special_price_to', '', MagentoSetup."Special Prices Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/tier_prices', '', MagentoSetup."Tier Prices Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/group_prices', '', MagentoSetup."Customer Group Prices Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/custom_options', '', MagentoSetup."Custom Options Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/bundled_options', '', MagentoSetup."Bundled Products Enabled");
+        M2NpXmlSetupMgt.SetSalesPriceEnabled(TempBlob, 'product/unit_codes', '', MagentoSetup."Sales Prices Enabled" or MagentoSetup."Sales Line Discounts Enabled");
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/ticket_setup', '', MagentoSetup."Tickets Enabled");
         //-MAG2.09 [295656]
-        M2NpXmlSetupMgt.SetItemStoreElementEnabled(TempBlob,'ticket_setup',MagentoSetup."Tickets Enabled");
+        M2NpXmlSetupMgt.SetItemStoreElementEnabled(TempBlob, 'ticket_setup', MagentoSetup."Tickets Enabled");
         M2NpXmlSetupMgt.AddItemDiscGroupCodeElement(TempBlob);
         //+MAG2.09 [295656]
 
-        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer','',MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety);
+        M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer', '', MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety);
         //-MAG2.22 [359285]
         case MagentoSetup."Variant System" of
-          MagentoSetup."Variant System"::Variety:
-            begin
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                '','fixed_variety_1_buffer','',6059970,MagentoSetup."Variant Picture Dimension");
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                '','fixed_variety_2_buffer','',6059973,MagentoSetup."Variant Picture Dimension");
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                '','fixed_variety_3_buffer','',6059976,MagentoSetup."Variant Picture Dimension");
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                '','fixed_variety_4_buffer','',6059979,MagentoSetup."Variant Picture Dimension");
+            MagentoSetup."Variant System"::Variety:
+                begin
+                    M2NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                      '', 'fixed_variety_1_buffer', '', 6059970, MagentoSetup."Variant Picture Dimension");
+                    M2NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                      '', 'fixed_variety_2_buffer', '', 6059973, MagentoSetup."Variant Picture Dimension");
+                    M2NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                      '', 'fixed_variety_3_buffer', '', 6059976, MagentoSetup."Variant Picture Dimension");
+                    M2NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                      '', 'fixed_variety_4_buffer', '', 6059979, MagentoSetup."Variant Picture Dimension");
 
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_1_buffer',
-                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_2_buffer',
-                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_3_buffer',
-                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_4_buffer',
-                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_1_buffer',
-                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 1"]);
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_2_buffer',
-                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 2"]);
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_3_buffer',
-                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 3"]);
-              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_4_buffer',
-                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 4"]);
-            end;
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_1_buffer',
+                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_2_buffer',
+                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_3_buffer',
+                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_4_buffer',
+                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_1_buffer',
+                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 1"]);
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_2_buffer',
+                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 2"]);
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_3_buffer',
+                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 3"]);
+                    M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_4_buffer',
+                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 4"]);
+                end;
         end;
         //+MAG2.22 [359285]
     end;
@@ -213,21 +214,21 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
-          exit;
-        MagentoApiGet(MagentoSetup."Api Url",'payment_methods',XmlDoc);
+            exit;
+        MagentoApiGet(MagentoSetup."Api Url", 'payment_methods', XmlDoc);
 
-        NpXmlDomMgt.FindNodes(XmlDoc,'payment_method',XmlNodeList);
+        NpXmlDomMgt.FindNodes(XmlDoc, 'payment_method', XmlNodeList);
         for i := 0 to XmlNodeList.Count - 1 do begin
-          XmlElement := XmlNodeList.ItemOf(i);
-          PaymentCode := XmlElement.GetAttribute('code');
-          PaymentType := XmlElement.GetAttribute('type');
+            XmlElement := XmlNodeList.ItemOf(i);
+            PaymentCode := XmlElement.GetAttribute('code');
+            PaymentType := XmlElement.GetAttribute('type');
 
-          if not PaymentMapping.Get(PaymentCode,PaymentType) then begin
-            PaymentMapping.Init;
-            PaymentMapping."External Payment Method Code" := PaymentCode;
-            PaymentMapping."External Payment Type" := PaymentType;
-            PaymentMapping.Insert(true);
-          end;
+            if not PaymentMapping.Get(PaymentCode, PaymentType) then begin
+                PaymentMapping.Init;
+                PaymentMapping."External Payment Method Code" := PaymentCode;
+                PaymentMapping."External Payment Type" := PaymentType;
+                PaymentMapping.Insert(true);
+            end;
         end;
     end;
 
@@ -247,18 +248,18 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
-          exit;
-        MagentoApiGet(MagentoSetup."Api Url",'shipping_methods',XmlDoc);
+            exit;
+        MagentoApiGet(MagentoSetup."Api Url", 'shipping_methods', XmlDoc);
 
-        NpXmlDomMgt.FindNodes(XmlDoc,'shipping_method',XmlNodeList);
+        NpXmlDomMgt.FindNodes(XmlDoc, 'shipping_method', XmlNodeList);
         for i := 0 to XmlNodeList.Count - 1 do begin
-          XmlElement := XmlNodeList.ItemOf(i);
-          ShipmentCode := XmlElement.GetAttribute('carrier');
-          if not ShipmentMapping.Get(ShipmentCode) then begin
-            ShipmentMapping.Init;
-            ShipmentMapping."External Shipment Method Code" := ShipmentCode;
-            ShipmentMapping.Insert(true);
-          end;
+            XmlElement := XmlNodeList.ItemOf(i);
+            ShipmentCode := XmlElement.GetAttribute('carrier');
+            if not ShipmentMapping.Get(ShipmentCode) then begin
+                ShipmentMapping.Init;
+                ShipmentMapping."External Shipment Method Code" := ShipmentCode;
+                ShipmentMapping.Insert(true);
+            end;
         end;
     end;
 
@@ -278,10 +279,10 @@ codeunit 6151460 "M2 Setup Mgt."
         //-MAG2.14 [286677]
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
-          exit;
+            exit;
 
         Username := NpXmlMgt.GetAutomaticUsername();
-        Hash := LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(Username + Username + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2','MD5'));
+        Hash := LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(Username + Username + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2', 'MD5'));
 
         Clear(XmlDoc);
         XmlDoc := XmlDoc.XmlDocument;
@@ -294,11 +295,11 @@ codeunit 6151460 "M2 Setup Mgt."
                        '  </initSetup>' +
                        '</root>');
 
-        MagentoApiPost(MagentoSetup."Api Url",'initSetup',XmlDoc);
-        if not NpXmlDomMgt.FindNode(XmlDoc.DocumentElement,'success/message',XmlElement) then
-          Error(NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml));
+        MagentoApiPost(MagentoSetup."Api Url", 'initSetup', XmlDoc);
+        if not NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, 'success/message', XmlElement) then
+            Error(NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml));
 
-        Authentication := NpXmlDomMgt.GetXmlText(XmlElement,'authentication_type',0,true) + ' ' + NpXmlDomMgt.GetXmlText(XmlElement,'access_token',0,true);
+        Authentication := NpXmlDomMgt.GetXmlText(XmlElement, 'authentication_type', 0, true) + ' ' + NpXmlDomMgt.GetXmlText(XmlElement, 'access_token', 0, true);
 
         PrevRec := Format(MagentoSetup);
         MagentoSetup."Api Username Type" := MagentoSetup."Api Username Type"::Custom;
@@ -306,7 +307,7 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetup."Api Password" := '';
         MagentoSetup."Api Authorization" := Authentication;
         if PrevRec <> Format(MagentoSetup) then
-          MagentoSetup.Modify;
+            MagentoSetup.Modify;
         //+MAG2.14 [286677]
     end;
 
@@ -324,25 +325,27 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
-          exit;
-        MagentoApiGet(MagentoSetup."Api Url",'tax_classes',XmlDoc);
+            exit;
+        MagentoApiGet(MagentoSetup."Api Url", 'tax_classes', XmlDoc);
 
-        NpXmlDomMgt.FindNodes(XmlDoc,'tax_class',XmlNodeList);
+        NpXmlDomMgt.FindNodes(XmlDoc, 'tax_class', XmlNodeList);
         for i := 0 to XmlNodeList.Count - 1 do begin
-          XmlElement := XmlNodeList.ItemOf(i);
-          ClassName := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement,'class_name',0,false),1,MaxStrLen(MagentoTaxClass.Name));
-          ClassType := -1;
-          case LowerCase(NpXmlDomMgt.GetXmlText(XmlElement,'class_type',0,false)) of
-            'customer': ClassType := MagentoTaxClass.Type::Customer;
-            'product': ClassType := MagentoTaxClass.Type::Item;
-          end;
-          if (ClassName <> '') and (ClassType >= 0) then
-            if not MagentoTaxClass.Get(ClassName,ClassType) then begin
-              MagentoTaxClass.Init;
-              MagentoTaxClass.Name := ClassName;
-              MagentoTaxClass.Type := ClassType;
-              MagentoTaxClass.Insert(true);
+            XmlElement := XmlNodeList.ItemOf(i);
+            ClassName := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'class_name', 0, false), 1, MaxStrLen(MagentoTaxClass.Name));
+            ClassType := -1;
+            case LowerCase(NpXmlDomMgt.GetXmlText(XmlElement, 'class_type', 0, false)) of
+                'customer':
+                    ClassType := MagentoTaxClass.Type::Customer;
+                'product':
+                    ClassType := MagentoTaxClass.Type::Item;
             end;
+            if (ClassName <> '') and (ClassType >= 0) then
+                if not MagentoTaxClass.Get(ClassName, ClassType) then begin
+                    MagentoTaxClass.Init;
+                    MagentoTaxClass.Name := ClassName;
+                    MagentoTaxClass.Type := ClassType;
+                    MagentoTaxClass.Insert(true);
+                end;
         end;
     end;
 
@@ -359,29 +362,29 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
-          exit;
-        MagentoApiGet(MagentoSetup."Api Url",'websites',XmlDoc);
+            exit;
+        MagentoApiGet(MagentoSetup."Api Url", 'websites', XmlDoc);
 
-        NpXmlDomMgt.FindNodes(XmlDoc,'website',XmlNodeList);
+        NpXmlDomMgt.FindNodes(XmlDoc, 'website', XmlNodeList);
         for i := 0 to XmlNodeList.Count - 1 do begin
-          XmlElement := XmlNodeList.ItemOf(i);
-          if not MagentoWebsite.Get(XmlElement.GetAttribute('code')) then begin
-            MagentoWebsite.Init;
-            MagentoWebsite.Code := UpperCase(XmlElement.GetAttribute('code'));
-            MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(XmlElement,'name',0,false);
-            MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(XmlElement,'is_default',0,false) = '1';
-            MagentoWebsite.Insert(true);
-          end else begin
-            MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(XmlElement,'name',0,false);
-            MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(XmlElement,'is_default',0,false) = '1';
-            MagentoWebsite.Modify(true);
-          end;
+            XmlElement := XmlNodeList.ItemOf(i);
+            if not MagentoWebsite.Get(XmlElement.GetAttribute('code')) then begin
+                MagentoWebsite.Init;
+                MagentoWebsite.Code := UpperCase(XmlElement.GetAttribute('code'));
+                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(XmlElement, 'name', 0, false);
+                MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(XmlElement, 'is_default', 0, false) = '1';
+                MagentoWebsite.Insert(true);
+            end else begin
+                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(XmlElement, 'name', 0, false);
+                MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(XmlElement, 'is_default', 0, false) = '1';
+                MagentoWebsite.Modify(true);
+            end;
 
-          if NpXmlDomMgt.FindNode(XmlElement,'store_groups/store_group',XmlElement2) then
-            repeat
-              CreateStores(XmlElement2,MagentoWebsite);
-              XmlElement2 := XmlElement2.NextSibling;
-            until IsNull(XmlElement2);
+            if NpXmlDomMgt.FindNode(XmlElement, 'store_groups/store_group', XmlElement2) then
+                repeat
+                    CreateStores(XmlElement2, MagentoWebsite);
+                    XmlElement2 := XmlElement2.NextSibling;
+                until IsNull(XmlElement2);
         end;
 
         SetDefaultItemGroupRoots();
@@ -392,25 +395,25 @@ codeunit 6151460 "M2 Setup Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, 6151401, 'OnBeforeModifyEvent', '', true, true)]
-    local procedure OnAfterModifyMagentoSetup(var Rec: Record "Magento Setup";var xRec: Record "Magento Setup";RunTrigger: Boolean)
+    local procedure OnAfterModifyMagentoSetup(var Rec: Record "Magento Setup"; var xRec: Record "Magento Setup"; RunTrigger: Boolean)
     var
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
     begin
         //-MAG2.20 [320423]
         if Rec.IsTemporary then
-          exit;
+            exit;
         if Rec."Magento Version" = xRec."Magento Version" then
-          exit;
+            exit;
 
         case Rec."Magento Version" of
-          Rec."Magento Version"::"1":
-            begin
-              MagentoSetupEventSub.DeleteAll;
-            end;
-          Rec."Magento Version"::"2":
-            begin
-              InitMagentoSetupEvents();
-            end;
+            Rec."Magento Version"::"1":
+                begin
+                    MagentoSetupEventSub.DeleteAll;
+                end;
+            Rec."Magento Version"::"2":
+                begin
+                    InitMagentoSetupEvents();
+                end;
         end;
         //+MAG2.20 [320423]
     end;
@@ -421,24 +424,24 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
         //-MAG2.20 [320423]
         MagentoSetupEventSub.DeleteAll;
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"DragDrop Picture",CODEUNIT::"M2 Picture Mgt.",'UploadM2Picture');
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Magento Picture Url",CODEUNIT::"M2 Picture Mgt.",'GetM2PictureUrl');
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup NpXml Templates",CODEUNIT::"M2 Setup Mgt.",'SetupM2NpXmlTemplates');
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Magento Tax Classes",CODEUNIT::"M2 Setup Mgt.",'SetupM2TaxClasses');
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Magento Api Credentials",CODEUNIT::"M2 Setup Mgt.",'SetupM2Credentials');
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Magento Websites",CODEUNIT::"M2 Setup Mgt.",'SetupM2Websites');
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Payment Method Mapping",CODEUNIT::"M2 Setup Mgt.",'SetupM2PaymentMethodMapping');
-        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Shipment Method Mapping",CODEUNIT::"M2 Setup Mgt.",'SetupM2ShipmentMethodMapping');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"DragDrop Picture", CODEUNIT::"M2 Picture Mgt.", 'UploadM2Picture');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Magento Picture Url", CODEUNIT::"M2 Picture Mgt.", 'GetM2PictureUrl');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup NpXml Templates", CODEUNIT::"M2 Setup Mgt.", 'SetupM2NpXmlTemplates');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Magento Tax Classes", CODEUNIT::"M2 Setup Mgt.", 'SetupM2TaxClasses');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Magento Api Credentials", CODEUNIT::"M2 Setup Mgt.", 'SetupM2Credentials');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Magento Websites", CODEUNIT::"M2 Setup Mgt.", 'SetupM2Websites');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Payment Method Mapping", CODEUNIT::"M2 Setup Mgt.", 'SetupM2PaymentMethodMapping');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Shipment Method Mapping", CODEUNIT::"M2 Setup Mgt.", 'SetupM2ShipmentMethodMapping');
         //+MAG2.20 [320423]
     end;
 
-    local procedure InitMagentoSetupEvent(Type: Integer;CodeunitId: Integer;FunctionName: Text)
+    local procedure InitMagentoSetupEvent(Type: Integer; CodeunitId: Integer; FunctionName: Text)
     var
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
     begin
         //-MAG2.20 [320423]
-        if MagentoSetupEventSub.Get(Type,CodeunitId,FunctionName) then
-          exit;
+        if MagentoSetupEventSub.Get(Type, CodeunitId, FunctionName) then
+            exit;
 
         MagentoSetupEventSub.Init;
         MagentoSetupEventSub.Type := Type;
@@ -456,8 +459,8 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
         //-MAG2.14 [286677]
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Api Credentials",CurrCodeunitId(),'SetupM2Credentials') then
-          exit;
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Api Credentials", CurrCodeunitId(), 'SetupM2Credentials') then
+            exit;
 
         Handled := true;
         SetupMagentoCredentials();
@@ -470,8 +473,8 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup NpXml Templates",CurrCodeunitId(),'SetupM2NpXmlTemplates') then
-          exit;
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup NpXml Templates", CurrCodeunitId(), 'SetupM2NpXmlTemplates') then
+            exit;
 
         Handled := true;
         SetupNpXmlTemplates();
@@ -483,8 +486,8 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Payment Method Mapping",CurrCodeunitId(),'SetupM2PaymentMethodMapping') then
-          exit;
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Payment Method Mapping", CurrCodeunitId(), 'SetupM2PaymentMethodMapping') then
+            exit;
 
         Handled := true;
         SetupPaymentMethodMapping();
@@ -497,8 +500,8 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
         //-MAG2.07 [286943]
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Shipment Method Mapping",CurrCodeunitId(),'SetupM2ShipmentMethodMapping') then
-          exit;
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Shipment Method Mapping", CurrCodeunitId(), 'SetupM2ShipmentMethodMapping') then
+            exit;
 
         Handled := true;
         SetupShipmentMethodMapping();
@@ -511,8 +514,8 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Tax Classes",CurrCodeunitId(),'SetupM2TaxClasses') then
-          exit;
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Tax Classes", CurrCodeunitId(), 'SetupM2TaxClasses') then
+            exit;
 
         Handled := true;
         SetupTaxClasses();
@@ -524,8 +527,8 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Websites",CurrCodeunitId(),'SetupM2Websites') then
-          exit;
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Websites", CurrCodeunitId(), 'SetupM2Websites') then
+            exit;
 
         Handled := true;
         SetupWebsites();
@@ -535,7 +538,7 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
     end;
 
-    procedure MagentoApiGet(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
+    procedure MagentoApiGet(MagentoApiUrl: Text; Method: Text; var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -546,10 +549,10 @@ codeunit 6151460 "M2 Setup Mgt."
         ErrorMessage: Text;
     begin
         if MagentoApiUrl = '' then
-          exit(false);
+            exit(false);
 
         if not IsNull(HttpWebRequest) then
-          Clear(HttpWebRequest);
+            Clear(HttpWebRequest);
         HttpWebRequest := HttpWebRequest.Create(MagentoApiUrl + Method);
         HttpWebRequest.Timeout := 1000 * 60 * 5;
 
@@ -560,14 +563,14 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetup.Get;
         //-MAG2.14 [286677]
         if MagentoSetup."Api Authorization" <> '' then
-          HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization");
+            HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization");
         //+MAG2.14 [286677]
 
         //-MAG2.22 [361164]
-        if not TryGetWebResponse(HttpWebRequest,HttpWebResponse) then begin
-          WebException := GetLastErrorObject;
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          Error(CopyStr(ErrorMessage,1,1000));
+        if not TryGetWebResponse(HttpWebRequest, HttpWebResponse) then begin
+            WebException := GetLastErrorObject;
+            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+            Error(CopyStr(ErrorMessage, 1, 1000));
         end;
         //+MAG2.22 [361164]
         MemoryStream := HttpWebResponse.GetResponseStream;
@@ -583,7 +586,7 @@ codeunit 6151460 "M2 Setup Mgt."
         exit(true);
     end;
 
-    procedure MagentoApiPost(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
+    procedure MagentoApiPost(MagentoApiUrl: Text; Method: Text; var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -595,10 +598,10 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
         //-MAG2.14 [286677]
         if MagentoApiUrl = '' then
-          exit(false);
+            exit(false);
 
         if not IsNull(HttpWebRequest) then
-          Clear(HttpWebRequest);
+            Clear(HttpWebRequest);
         HttpWebRequest := HttpWebRequest.Create(MagentoApiUrl + Method);
         HttpWebRequest.Timeout := 1000 * 60 * 5;
 
@@ -608,18 +611,18 @@ codeunit 6151460 "M2 Setup Mgt."
 
         MagentoSetup.Get;
         if MagentoSetup."Api Authorization" <> '' then
-          HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization");
+            HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization");
         if MagentoSetup."Api Authorization" <> '' then begin
-          HttpWebRequest.ContentType := 'naviconnect/xml';
-          HttpWebRequest.Accept('application/xml');
-          HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization");
+            HttpWebRequest.ContentType := 'naviconnect/xml';
+            HttpWebRequest.Accept('application/xml');
+            HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization");
         end;
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-MAG2.22 [361164]
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          Error(CopyStr(ErrorMessage,1,1000));
-          //+MAG2.22 [361164]
+        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
+            //-MAG2.22 [361164]
+            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+            Error(CopyStr(ErrorMessage, 1, 1000));
+            //+MAG2.22 [361164]
         end;
 
         ResponseText := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
@@ -631,7 +634,7 @@ codeunit 6151460 "M2 Setup Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetWebResponse(HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    local procedure TryGetWebResponse(HttpWebRequest: DotNet npNetHttpWebRequest; var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
         MemoryStream: DotNet npNetMemoryStream;
     begin

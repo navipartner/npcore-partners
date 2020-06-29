@@ -319,7 +319,7 @@ page 6060043 "Item Worksheet Variety Subpage"
         SalesPriceBold: Boolean;
         PurchasePriceText: Text[20];
         PurchasePriceBold: Boolean;
-        AutoFormatManagement: Codeunit AutoFormatManagement;
+        AutoFormatManagement: Codeunit "Auto Format";
         VarietySetup: Record "Variety Setup";
         AltNoEditable: Boolean;
         CrossRefEditable: Boolean;
@@ -386,9 +386,9 @@ page 6060043 "Item Worksheet Variety Subpage"
           SalesPriceText := ''
         else
           if "Sales Price"  = 0 then
-            SalesPriceText := StrSubstNo('( %1 )',Format(ItemWorksheetLine."Sales Price",0,AutoFormatManagement.AutoFormatTranslate(2,'')))
+            SalesPriceText := StrSubstNo('( %1 )',Format(ItemWorksheetLine."Sales Price",0,AutoFormatManagement.ResolveAutoFormat(2,'')))
           else
-            SalesPriceText := StrSubstNo('%1',Format("Sales Price",0,AutoFormatManagement.AutoFormatTranslate(2,'')));
+            SalesPriceText := StrSubstNo('%1',Format("Sales Price",0,AutoFormatManagement.ResolveAutoFormat(2,'')));
         SalesPriceBold :=  "Sales Price" > 0;
     end;
 
@@ -399,9 +399,9 @@ page 6060043 "Item Worksheet Variety Subpage"
           PurchasePriceText := ''
         else
          if "Direct Unit Cost"  = 0 then
-           PurchasePriceText := StrSubstNo('( %1 )',Format(ItemWorksheetLine."Direct Unit Cost",0,AutoFormatManagement.AutoFormatTranslate(2,'')))
+           PurchasePriceText := StrSubstNo('( %1 )',Format(ItemWorksheetLine."Direct Unit Cost",0,AutoFormatManagement.ResolveAutoFormat(2,'')))
          else
-           PurchasePriceText := StrSubstNo('%1',Format("Direct Unit Cost",0,AutoFormatManagement.AutoFormatTranslate(2,'')));
+           PurchasePriceText := StrSubstNo('%1',Format("Direct Unit Cost",0,AutoFormatManagement.ResolveAutoFormat(2,'')));
         PurchasePriceBold :=  "Direct Unit Cost" > 0;
     end;
 
@@ -413,9 +413,9 @@ page 6060043 "Item Worksheet Variety Subpage"
           RecommendedRetailPriceText := ''
         else
           if "Recommended Retail Price"  = 0 then
-            RecommendedRetailPriceText := StrSubstNo('( %1 )',Format(ItemWorksheetLine."Recommended Retail Price",0,AutoFormatManagement.AutoFormatTranslate(2,'')))
+            RecommendedRetailPriceText := StrSubstNo('( %1 )',Format(ItemWorksheetLine."Recommended Retail Price",0,AutoFormatManagement.ResolveAutoFormat(2,'')))
           else
-            RecommendedRetailPriceText := StrSubstNo('%1',Format("Recommended Retail Price",0,AutoFormatManagement.AutoFormatTranslate(2,'')));
+            RecommendedRetailPriceText := StrSubstNo('%1',Format("Recommended Retail Price",0,AutoFormatManagement.ResolveAutoFormat(2,'')));
         RecommendedRetailPriceBold :=  "Recommended Retail Price" > 0;
         //+NPR5.22
     end;

@@ -33,16 +33,16 @@ table 6150613 "NP Retail Setup"
 
     fields
     {
-        field(1;"Primary Key";Code[10])
+        field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
         }
-        field(10;"Source Code";Code[10])
+        field(10; "Source Code"; Code[10])
         {
             Caption = 'Source Code';
             TableRelation = "Source Code";
         }
-        field(150;"Sale Fiscal No. Series";Code[10])
+        field(150; "Sale Fiscal No. Series"; Code[10])
         {
             Caption = 'Sale Fiscal No. Series';
             Description = 'NPR5.39';
@@ -54,37 +54,37 @@ table 6150613 "NP Retail Setup"
             begin
                 //-NPR5.39 [305016]
                 if "Sale Fiscal No. Series" <> '' then begin
-                  NoSeries.Get("Sale Fiscal No. Series");
-                  NoSeries.TestField("Default Nos.",true);
+                    NoSeries.Get("Sale Fiscal No. Series");
+                    NoSeries.TestField("Default Nos.", true);
                 end;
                 //+NPR5.39 [305016]
             end;
         }
-        field(151;"Balancing Fiscal No. Series";Code[10])
+        field(151; "Balancing Fiscal No. Series"; Code[10])
         {
             Caption = 'Balancing Fiscal No. Series';
             Description = 'NPR5.40';
             TableRelation = "No. Series";
         }
-        field(160;"Fill Sale Fiscal No. On";Option)
+        field(160; "Fill Sale Fiscal No. On"; Option)
         {
             Caption = 'Fill Sale Fiscal No. On';
             Description = 'NPR5.40';
             OptionCaption = 'All Sales,Successful Sales';
             OptionMembers = All,Successful;
         }
-        field(200;"Allow Zero Amount Sales";Boolean)
+        field(200; "Allow Zero Amount Sales"; Boolean)
         {
             Caption = 'Allow Zero Amount Sales';
             Description = 'NPR5.42 [312104]';
         }
-        field(210;"Default POS Posting Profile";Code[20])
+        field(210; "Default POS Posting Profile"; Code[20])
         {
             Caption = 'Default POS Posting Profile';
             Description = 'NPR5.52';
             TableRelation = "POS Posting Profile";
         }
-        field(300;"Item Price Codeunit ID";Integer)
+        field(300; "Item Price Codeunit ID"; Integer)
         {
             BlankZero = true;
             Caption = 'Item Price Codeunit ID';
@@ -95,11 +95,11 @@ table 6150613 "NP Retail Setup"
                 EventSubscription: Record "Event Subscription";
             begin
                 //-NPR5.45 [323705]
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
-                  exit;
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                    exit;
 
                 "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Item Price Function" := EventSubscription."Subscriber Function";
@@ -112,30 +112,30 @@ table 6150613 "NP Retail Setup"
             begin
                 //-NPR5.45 [323705]
                 if "Item Price Codeunit ID" = 0 then begin
-                  "Item Price Function" := '';
-                  exit;
+                    "Item Price Function" := '';
+                    exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID","Item Price Codeunit ID");
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                EventSubscription.SetRange("Subscriber Codeunit ID", "Item Price Codeunit ID");
                 if "Item Price Function" <> '' then
-                  EventSubscription.SetRange("Subscriber Function","Item Price Function");
+                    EventSubscription.SetRange("Subscriber Function", "Item Price Function");
                 EventSubscription.FindFirst;
                 //+NPR5.45 [323705]
             end;
         }
-        field(305;"Item Price Codeunit Name";Text[30])
+        field(305; "Item Price Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Codeunit),
-                                                             "Object ID"=FIELD("Item Price Codeunit ID")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+                                                             "Object ID" = FIELD("Item Price Codeunit ID")));
             Caption = 'Item Price Codeunit Name';
             Description = 'NPR5.45';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(310;"Item Price Function";Text[250])
+        field(310; "Item Price Function"; Text[250])
         {
             Caption = 'Item Price Function';
             Description = 'NPR5.45';
@@ -146,11 +146,11 @@ table 6150613 "NP Retail Setup"
             begin
                 //-NPR5.45 [323705]
 
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
-                  exit;
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                    exit;
 
                 "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Item Price Function" := EventSubscription."Subscriber Function";
@@ -163,48 +163,47 @@ table 6150613 "NP Retail Setup"
             begin
                 //-NPR5.45 [323705]
                 if "Item Price Function" = '' then begin
-                  "Item Price Codeunit ID" := 0;
-                  exit;
+                    "Item Price Codeunit ID" := 0;
+                    exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID","Item Price Codeunit ID");
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                EventSubscription.SetRange("Subscriber Codeunit ID", "Item Price Codeunit ID");
                 if "Item Price Function" <> '' then
-                  EventSubscription.SetRange("Subscriber Function","Item Price Function");
+                    EventSubscription.SetRange("Subscriber Function", "Item Price Function");
                 EventSubscription.FindFirst;
                 //+NPR5.45 [323705]
             end;
         }
-        field(10000;"Data Model Build";Integer)
+        field(10000; "Data Model Build"; Integer)
         {
             Caption = 'Data Model Build';
         }
-        field(10001;"Last Data Model Build Upgrade";DateTime)
+        field(10001; "Last Data Model Build Upgrade"; DateTime)
         {
             Caption = 'Last Data Model Build Upgrade';
         }
-        field(10002;"Last Data Model Build User ID";Code[50])
+        field(10002; "Last Data Model Build User ID"; Code[50])
         {
             Caption = 'Last Data Model Build User ID';
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = EndUserIdentifiableInformation;
 
-            trigger OnLookup()
+            trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                UserMgt.LookupUserID("Last Data Model Build User ID");
+                UserSelection.ValidateUserName("Last Data Model Build User ID");
             end;
         }
-        field(10003;"Prev. Data Model Build";Integer)
+        field(10003; "Prev. Data Model Build"; Integer)
         {
             Caption = 'Prev. Data Model Build';
         }
-        field(10010;"Advanced POS Entries Activated";Boolean)
+        field(10010; "Advanced POS Entries Activated"; Boolean)
         {
             Caption = 'Advanced POS Entries Activated';
             Description = 'NPR5.32';
@@ -215,13 +214,13 @@ table 6150613 "NP Retail Setup"
             begin
                 //-NPR5.33
                 if "Advanced POS Entries Activated" then
-                  RetailDataModelARUpgrade.ActivatePoseidonPOSEntries
+                    RetailDataModelARUpgrade.ActivatePoseidonPOSEntries
                 else
-                  RetailDataModelARUpgrade.DeactivatePoseidonPOSEntries;
+                    RetailDataModelARUpgrade.DeactivatePoseidonPOSEntries;
                 //+NPR5.33
             end;
         }
-        field(10020;"Advanced Posting Activated";Boolean)
+        field(10020; "Advanced Posting Activated"; Boolean)
         {
             Caption = 'Advanced Posting Activated';
             Description = 'NPR5.36';
@@ -232,31 +231,31 @@ table 6150613 "NP Retail Setup"
             begin
                 //-NPR5.36 [277103]
                 if "Advanced Posting Activated" then
-                  RetailDataModelARUpgrade.ActivatePoseidonPosting
+                    RetailDataModelARUpgrade.ActivatePoseidonPosting
                 else
-                  RetailDataModelARUpgrade.DeactivatePoseidonPosting;
+                    RetailDataModelARUpgrade.DeactivatePoseidonPosting;
                 //+NPR5.36 [277103]
             end;
         }
-        field(20000;"Environment Database Name";Text[250])
+        field(20000; "Environment Database Name"; Text[250])
         {
             Caption = 'Environment Database Name';
         }
-        field(20001;"Environment Company Name";Text[250])
+        field(20001; "Environment Company Name"; Text[250])
         {
             Caption = 'Environment Company Name';
         }
-        field(20002;"Environment Tenant Name";Text[250])
+        field(20002; "Environment Tenant Name"; Text[250])
         {
             Caption = 'Environment Tenant Name';
         }
-        field(20003;"Environment Type";Option)
+        field(20003; "Environment Type"; Option)
         {
             Caption = 'Environment Type';
             OptionCaption = 'PROD,DEMO,TEST,DEV';
             OptionMembers = PROD,DEMO,TEST,DEV;
         }
-        field(20004;"Environment Verified";Boolean)
+        field(20004; "Environment Verified"; Boolean)
         {
             Caption = 'Environment Verified';
 
@@ -266,20 +265,20 @@ table 6150613 "NP Retail Setup"
             begin
                 //-NPR5.31 [263473]
                 if "Environment Verified" then begin
-                  ActiveSession.Get(ServiceInstanceId, SessionId);
-                  "Environment Database Name" := ActiveSession."Database Name";
-                  "Environment Company Name" := CompanyName;
-                  "Environment Tenant Name" := TenantId;
-                  Modify;
+                    ActiveSession.Get(ServiceInstanceId, SessionId);
+                    "Environment Database Name" := ActiveSession."Database Name";
+                    "Environment Company Name" := CompanyName;
+                    "Environment Tenant Name" := TenantId;
+                    Modify;
                 end;
                 //+NPR5.31 [263473]
             end;
         }
-        field(20005;"Environment Template";Boolean)
+        field(20005; "Environment Template"; Boolean)
         {
             Caption = 'Environment Template';
         }
-        field(30000;"Enable Client Diagnostics";Boolean)
+        field(30000; "Enable Client Diagnostics"; Boolean)
         {
             Caption = 'Enable Client Diagnostics';
             Description = 'NPR5.38,NPR5.40';
@@ -289,7 +288,7 @@ table 6150613 "NP Retail Setup"
 
     keys
     {
-        key(Key1;"Primary Key")
+        key(Key1; "Primary Key")
         {
         }
     }
@@ -312,19 +311,19 @@ table 6150613 "NP Retail Setup"
         //+NPR5.45 [323705]
     end;
 
-    procedure GetPostingProfile(POSUnitNo: Code[10];var POSPostingProfile: Record "POS Posting Profile")
+    procedure GetPostingProfile(POSUnitNo: Code[10]; var POSPostingProfile: Record "POS Posting Profile")
     var
         POSUnit: Record "POS Unit";
     begin
         //-NPR5.52 [365326]
         if POSUnitNo <> '' then begin
-          POSUnit.Get(POSUnitNo);
-          if POSUnit."POS Posting Profile" <> '' then begin
-            POSPostingProfile.Get(POSUnit."POS Posting Profile");
-            exit;
-          end else
-            if "Default POS Posting Profile" = '' then
-              POSUnit.TestField("POS Posting Profile");
+            POSUnit.Get(POSUnitNo);
+            if POSUnit."POS Posting Profile" <> '' then begin
+                POSPostingProfile.Get(POSUnit."POS Posting Profile");
+                exit;
+            end else
+                if "Default POS Posting Profile" = '' then
+                    POSUnit.TestField("POS Posting Profile");
         end;
         TestField("Default POS Posting Profile");
         POSPostingProfile.Get("Default POS Posting Profile");

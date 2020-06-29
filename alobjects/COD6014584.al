@@ -21,7 +21,7 @@ codeunit 6014584 "Mobile Print Mgt."
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved.';
         PING: Label '''';
 
-    procedure PrintJobHTTPRaw(Address: Text;Endpoint: Text;var TempBlob: Record TempBlob)
+    procedure PrintJobHTTPRaw(Address: Text; Endpoint: Text; var TempBlob: Codeunit "Temp Blob")
     var
         InStream: InStream;
         Stream: DotNet npNetMemoryStream;
@@ -30,15 +30,15 @@ codeunit 6014584 "Mobile Print Mgt."
         PrintBytes: Text;
     begin
         //-NPR5.52 [349793]
-        TempBlob.Blob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
         Stream := InStream;
         Base64 := Convert.ToBase64String(Stream.ToArray());
         PrintBytes := Convert.ToString(Stream.ToArray());
-        PrintJobHTTPInternal(Address,Endpoint,Base64);
+        PrintJobHTTPInternal(Address, Endpoint, Base64);
         //+NPR5.52 [349793]
     end;
 
-    procedure PrintJobHTTP(Address: Text;Endpoint: Text;PrintBytes: Text;TargetEncoding: Text)
+    procedure PrintJobHTTP(Address: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         Convert: DotNet npNetConvert;
         Encoding: DotNet npNetEncoding;
@@ -47,11 +47,11 @@ codeunit 6014584 "Mobile Print Mgt."
         //-NPR5.52 [349793]
         Encoding := Encoding.GetEncoding(TargetEncoding);
         Base64 := Convert.ToBase64String(Encoding.GetBytes(PrintBytes));
-        PrintJobHTTPInternal(Address,Endpoint,Base64);
+        PrintJobHTTPInternal(Address, Endpoint, Base64);
         //+NPR5.52 [349793]
     end;
 
-    local procedure PrintJobHTTPInternal(Address: Text;Endpoint: Text;Base64: Text)
+    local procedure PrintJobHTTPInternal(Address: Text; Endpoint: Text; Base64: Text)
     var
         JSBridge: Page "JS Bridge";
         JSON: Text;
@@ -63,10 +63,10 @@ codeunit 6014584 "Mobile Print Mgt."
         FullUrl: Text;
     begin
         if not (CurrentClientType in [CLIENTTYPE::Web, CLIENTTYPE::Phone, CLIENTTYPE::Tablet]) then
-          Error(Err_InvalidClientType, Format(CurrentClientType));
+            Error(Err_InvalidClientType, Format(CurrentClientType));
 
         if StrPos(Address, 'http') <> 1 then
-          Address := 'http://' + Address;
+            Address := 'http://' + Address;
 
         JSON := BuildJSONParams(Address, Endpoint, Base64, 'POST', Err_PrintFailed);
 
@@ -76,7 +76,7 @@ codeunit 6014584 "Mobile Print Mgt."
         //JSBridge.RUNMODAL;
 
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          Error(ERROR_SESSION);
+            Error(ERROR_SESSION);
 
         Model := Model.Model();
         JSString := 'function CallNativeFunction(jsonobject) { ';
@@ -86,14 +86,14 @@ codeunit 6014584 "Mobile Print Mgt."
         JSString += 'if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { ';
         JSString += 'window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
         Model.AddScript(JSString);
-        Model.AddScript('CallNativeFunction('+JSON+');');
+        Model.AddScript('CallNativeFunction(' + JSON + ');');
         ActiveModelID := POSFrontEnd.ShowModel(Model);
         POSFrontEnd.CloseModel(ActiveModelID);
         Clear(ActiveModelID);
         //+NPR5.53 [381396]
     end;
 
-    procedure PrintJobBluetooth(DeviceName: Text;PrintBytes: Text;TargetEncoding: Text)
+    procedure PrintJobBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         Convert: DotNet npNetConvert;
         Encoding: DotNet npNetEncoding;
@@ -106,7 +106,7 @@ codeunit 6014584 "Mobile Print Mgt."
         //+NPR5.52 [349793]
     end;
 
-    procedure PrintJobBluetoothRaw(DeviceName: Text;var TempBlob: Record TempBlob)
+    procedure PrintJobBluetoothRaw(DeviceName: Text; var TempBlob: Codeunit "Temp Blob")
     var
         InStream: InStream;
         Stream: DotNet npNetMemoryStream;
@@ -114,14 +114,14 @@ codeunit 6014584 "Mobile Print Mgt."
         Base64: Text;
     begin
         //-NPR5.52 [349793]
-        TempBlob.Blob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
         Stream := InStream;
         Base64 := Convert.ToBase64String(Stream.ToArray());
         PrintJobBluetoothInternal(DeviceName, Base64);
         //+NPR5.52 [349793]
     end;
 
-    local procedure PrintJobBluetoothInternal(DeviceName: Text;Base64: Text)
+    local procedure PrintJobBluetoothInternal(DeviceName: Text; Base64: Text)
     var
         JSBridge: Page "JS Bridge";
         JSON: Text;
@@ -132,7 +132,7 @@ codeunit 6014584 "Mobile Print Mgt."
         ActiveModelID: Guid;
     begin
         if not (CurrentClientType in [CLIENTTYPE::Web, CLIENTTYPE::Phone, CLIENTTYPE::Tablet]) then
-          Error(Err_InvalidClientType, Format(CurrentClientType));
+            Error(Err_InvalidClientType, Format(CurrentClientType));
 
         JSON := BuildJSONParams(DeviceName, '', Base64, 'BLUETOOTH', Err_PrintFailed);
 
@@ -143,7 +143,7 @@ codeunit 6014584 "Mobile Print Mgt."
         // //+NPR5.33 [282431]
         // JSBridge.RUNMODAL; //js add-in should be part of the POS page in transcendence so a new page doesn't have to open just for this.
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          Error(ERROR_SESSION);
+            Error(ERROR_SESSION);
 
         Model := Model.Model();
         JSString := 'function CallNativeFunction(jsonobject) { ';
@@ -156,7 +156,7 @@ codeunit 6014584 "Mobile Print Mgt."
         //+NPR5.53 [379042]
         JSString += 'window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
         Model.AddScript(JSString);
-        Model.AddScript('CallNativeFunction('+JSON+');');
+        Model.AddScript('CallNativeFunction(' + JSON + ');');
         ActiveModelID := POSFrontEnd.ShowModel(Model);
         POSFrontEnd.CloseModel(ActiveModelID);
         Clear(ActiveModelID);
@@ -167,7 +167,7 @@ codeunit 6014584 "Mobile Print Mgt."
     begin
     end;
 
-    local procedure BuildJSONParams(BaseAddress: Text;Endpoint: Text;PrintJob: Text;RequestType: Text;ErrorCaption: Text) JSON: Text
+    local procedure BuildJSONParams(BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: Text
     begin
         JSON := '{';
         JSON += '"RequestMethod": "PRINT",';

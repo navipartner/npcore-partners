@@ -12,7 +12,7 @@ page 6059963 "MPOS QR Code FactBox"
     {
         area(content)
         {
-            field("QR code";"QR code")
+            field("QR code"; "QR code")
             {
                 ShowCaption = false;
             }
@@ -32,16 +32,16 @@ page 6059963 "MPOS QR Code FactBox"
                 var
                     FileManagement: Codeunit "File Management";
                     fPath: Text[1024];
-                    FileBlob: Record TempBlob;
+                    FileBlob: Codeunit "Temp Blob";
                 begin
                     if "QR code".HasValue then begin
                         CalcFields("QR code");
                         if Company <> '' then
-                          fPath:= StringReplace("User ID" + '_' + Company) + '.png'
+                            fPath := StringReplace("User ID" + '_' + Company) + '.png'
                         else
-                          fPath:= StringReplace("User ID") + '.png';
-                        FileBlob.Blob:= "QR code";
-                        FileManagement.BLOBExport(FileBlob,fPath,true);
+                            fPath := StringReplace("User ID") + '.png';
+                        FileBlob.FromRecord(Rec, FieldNo("QR code"));
+                        FileManagement.BLOBExport(FileBlob, fPath, true);
                     end;
                 end;
             }
@@ -56,30 +56,27 @@ page 6059963 "MPOS QR Code FactBox"
     begin
         Old := '.';
         Pos := StrPos(String, Old);
-        while Pos <> 0 do
-        begin
-          String := DelStr(String, Pos, StrLen(Old));
-          String := InsStr(String, New, Pos);
-          Pos := StrPos(String, Old);
+        while Pos <> 0 do begin
+            String := DelStr(String, Pos, StrLen(Old));
+            String := InsStr(String, New, Pos);
+            Pos := StrPos(String, Old);
         end;
 
         New := '_';
         Old := ' ';
         Pos := StrPos(String, Old);
-        while Pos <> 0 do
-        begin
-          String := DelStr(String, Pos, StrLen(Old));
-          String := InsStr(String, New, Pos);
-          Pos := StrPos(String, Old);
+        while Pos <> 0 do begin
+            String := DelStr(String, Pos, StrLen(Old));
+            String := InsStr(String, New, Pos);
+            Pos := StrPos(String, Old);
         end;
 
         Old := '/';
         Pos := StrPos(String, Old);
-        while Pos <> 0 do
-        begin
-          String := DelStr(String, Pos, StrLen(Old) + 4);
-          String := InsStr(String, New, Pos);
-          Pos := StrPos(String, Old);
+        while Pos <> 0 do begin
+            String := DelStr(String, Pos, StrLen(Old) + 4);
+            String := InsStr(String, New, Pos);
+            Pos := StrPos(String, Old);
         end;
 
         exit(String);

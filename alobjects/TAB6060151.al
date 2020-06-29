@@ -9,11 +9,11 @@ table 6060151 "Event Word Layout"
 
     fields
     {
-        field(1;"Source Record ID";RecordID)
+        field(1; "Source Record ID"; RecordID)
         {
             Caption = 'Source Record ID';
         }
-        field(2;Usage;Option)
+        field(2; Usage; Option)
         {
             Caption = 'Usage';
             OptionCaption = ' ,Customer,Team';
@@ -22,72 +22,75 @@ table 6060151 "Event Word Layout"
             trigger OnValidate()
             begin
                 case Usage of
-                  Usage::" ": "Report ID" := 0;
-                  Usage::Customer: "Report ID" := REPORT::"Event Customer Template";
-                  Usage::Team: "Report ID" := REPORT::"Event Team Template";
+                    Usage::" ":
+                        "Report ID" := 0;
+                    Usage::Customer:
+                        "Report ID" := REPORT::"Event Customer Template";
+                    Usage::Team:
+                        "Report ID" := REPORT::"Event Team Template";
                 end;
             end;
         }
-        field(5;"Report ID";Integer)
+        field(5; "Report ID"; Integer)
         {
             Caption = 'Report ID';
         }
-        field(10;"Basic Layout Code";Code[20])
+        field(10; "Basic Layout Code"; Code[20])
         {
             Caption = 'Basic Layout ID';
-            TableRelation = "Custom Report Layout".Code WHERE ("Report ID"=FIELD("Report ID"));
+            TableRelation = "Custom Report Layout".Code WHERE("Report ID" = FIELD("Report ID"));
 
             trigger OnValidate()
             begin
                 if ("Basic Layout Code" <> xRec."Basic Layout Code") and Layout.HasValue then
-                  if not Confirm(StrSubstNo(ConfirmLayoutChange,FieldCaption("Basic Layout Code"))) then
-                    Error('');
+                    if not Confirm(StrSubstNo(ConfirmLayoutChange, FieldCaption("Basic Layout Code"))) then
+                        Error('');
 
                 //-NPR5.51 [361677]
                 //IF "Basic Layout ID" = 0 THEN BEGIN
                 if "Basic Layout Code" = '' then begin
-                //+NPR5.51 [361677]
-                  Clear(Layout);
-                  Clear("XML Part");
+                    //+NPR5.51 [361677]
+                    Clear(Layout);
+                    Clear("XML Part");
                 end else begin
-                  CustomReportLayout.Get("Basic Layout Code");
-                  if CustomReportLayout.Layout.HasValue then begin
-                    CustomReportLayout.CalcFields(Layout);
-                    Layout := CustomReportLayout.Layout;
-                  end;
-                  if CustomReportLayout."Custom XML Part".HasValue then begin
-                    CustomReportLayout.CalcFields("Custom XML Part");
-                    "XML Part" := CustomReportLayout."Custom XML Part";
-                  end;
+                    CustomReportLayout.Get("Basic Layout Code");
+                    if CustomReportLayout.Layout.HasValue then begin
+                        CustomReportLayout.CalcFields(Layout);
+                        Layout := CustomReportLayout.Layout;
+                    end;
+                    if CustomReportLayout."Custom XML Part".HasValue then begin
+                        CustomReportLayout.CalcFields("Custom XML Part");
+                        "XML Part" := CustomReportLayout."Custom XML Part";
+                    end;
                 end;
             end;
         }
-        field(20;"Layout";BLOB)
+        field(20; "Layout"; BLOB)
         {
             Caption = 'Layout';
         }
-        field(30;"XML Part";BLOB)
+        field(30; "XML Part"; BLOB)
         {
             Caption = 'XML Part';
         }
-        field(40;"Last Modified";DateTime)
+        field(40; "Last Modified"; DateTime)
         {
             Caption = 'Last Modified';
             Editable = false;
         }
-        field(50;"Last Modified by User";Code[50])
+        field(50; "Last Modified by User"; Code[50])
         {
             Caption = 'Last Modified by User';
             Editable = false;
         }
-        field(60;"Basic Layout Description";Text[80])
+        field(60; "Basic Layout Description"; Text[80])
         {
-            CalcFormula = Lookup("Custom Report Layout".Description WHERE (Code=FIELD("Basic Layout Code")));
+            CalcFormula = Lookup ("Custom Report Layout".Description WHERE(Code = FIELD("Basic Layout Code")));
             Caption = 'Basic Layout Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(70;Description;Text[80])
+        field(70; Description; Text[80])
         {
             Caption = 'Description';
         }
@@ -95,7 +98,7 @@ table 6060151 "Event Word Layout"
 
     keys
     {
-        key(Key1;"Source Record ID",Usage)
+        key(Key1; "Source Record ID", Usage)
         {
         }
     }
@@ -107,7 +110,7 @@ table 6060151 "Event Word Layout"
     trigger OnInsert()
     begin
         GetJobFromRecID(Job);
-        Description := StrSubstNo(NewLayoutTxt,Job."No.",Format(Usage));
+        Description := StrSubstNo(NewLayoutTxt, Job."No.", Format(Usage));
     end;
 
     trigger OnModify()
@@ -117,10 +120,10 @@ table 6060151 "Event Word Layout"
 
     var
         ImportWordTxt: Label 'Import Word Document';
-        FileFilterWordTxt: Label 'Word Files (*.docx)|*.docx', Comment='{Split=r''\|''}{Locked=s''1''}';
+        FileFilterWordTxt: Label 'Word Files (*.docx)|*.docx', Comment = '{Split=r''\|''}{Locked=s''1''}';
         NoRecordsErr: Label 'There is no record in the list.';
         NewLayoutTxt: Label '%1 %2 Layout';
-        ErrorInLayoutErr: Label 'Issue found in layout %1 for report ID  %2:\%3.', Comment='%1=a name, %2=a number, %3=a sentence/error description.';
+        ErrorInLayoutErr: Label 'Issue found in layout %1 for report ID  %2:\%3.', Comment = '%1=a name, %2=a number, %3=a sentence/error description.';
         CustomReportLayout: Record "Custom Report Layout";
         EventMgt: Codeunit "Event Management";
         ConfirmLayoutChange: Label 'Changing %1 will remove current layout. If you''ve customized it, it will be lost. We suggest that you first run Export Layout and then try changing again. Do you want to continue?';
@@ -135,7 +138,7 @@ table 6060151 "Event Word Layout"
         GetJobFromRecID(Job);
         //-NPR5.31 [269162]
         //EventCopy.SetFromCode(Job,Usage);
-        EventCopy.SetFromEvent(Job."No.",Usage);
+        EventCopy.SetFromEvent(Job."No.", Usage);
         //+NPR5.31 [269162]
         EventCopy.RunModal;
     end;
@@ -157,72 +160,76 @@ table 6060151 "Event Word Layout"
 
     procedure ImportLayout(DefaultFileName: Text)
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         FileName: Text;
         FileFilterTxt: Text;
         ImportTxt: Text;
     begin
         if IsEmpty then
-          Error(NoRecordsErr);
+            Error(NoRecordsErr);
         ImportTxt := ImportWordTxt;
         FileFilterTxt := FileFilterWordTxt;
-        FileName := FileMgt.BLOBImportWithFilter(TempBlob,ImportTxt,DefaultFileName,FileFilterTxt,FileFilterTxt);
+        FileName := FileMgt.BLOBImportWithFilter(TempBlob, ImportTxt, DefaultFileName, FileFilterTxt, FileFilterTxt);
         if FileName = '' then
-          exit;
+            exit;
 
-        ImportLayoutBlob(TempBlob,UpperCase(FileMgt.GetExtension(FileName)));
+        ImportLayoutBlob(TempBlob, UpperCase(FileMgt.GetExtension(FileName)));
     end;
 
-    procedure ImportLayoutBlob(var TempBlob: Record TempBlob;FileExtension: Text[30])
+    procedure ImportLayoutBlob(var TempBlob: Codeunit "Temp Blob"; FileExtension: Text[30])
     var
-        OutputTempBlob: Record TempBlob;
+        OutputTempBlob: Codeunit "Temp Blob";
         DocumentReportMgt: Codeunit "Document Report Mgt.";
         DocumentInStream: InStream;
         DocumentOutStream: OutStream;
         ErrorMessage: Text;
         XmlPart: Text;
+        RecRef: RecordRef;
     begin
         TestField("Report ID");
-        OutputTempBlob.Blob.CreateOutStream(DocumentOutStream);
-        XmlPart := REPORT.WordXmlPart("Report ID",true);
+        OutputTempBlob.CreateOutStream(DocumentOutStream);
+        XmlPart := REPORT.WordXmlPart("Report ID", true);
 
-        TempBlob.Blob.CreateInStream(DocumentInStream);
-        ErrorMessage := DocumentReportMgt.TryUpdateWordLayout(DocumentInStream,DocumentOutStream,'',XmlPart);
+        TempBlob.CreateInStream(DocumentInStream);
+        ErrorMessage := DocumentReportMgt.TryUpdateWordLayout(DocumentInStream, DocumentOutStream, '', XmlPart);
         if ErrorMessage = '' then begin
-          CopyStream(DocumentOutStream,DocumentInStream);
-          DocumentReportMgt.ValidateWordLayout("Report ID",DocumentInStream,true,true);
+            CopyStream(DocumentOutStream, DocumentInStream);
+            DocumentReportMgt.ValidateWordLayout("Report ID", DocumentInStream, true, true);
         end;
 
         Clear(Layout);
-        Layout := OutputTempBlob.Blob;
+
+        RecRef.GetTable(Rec);
+        TempBlob.ToRecordRef(RecRef, FieldNo("Layout"));
+        RecRef.SetTable(Rec);
 
         InsertCustomXmlPart(Rec);
         Modify(true);
         Commit;
 
         if ErrorMessage <> '' then
-          Message(ErrorMessage);
+            Message(ErrorMessage);
     end;
 
-    procedure ExportLayout(DefaultFileName: Text;ShowFileDialog: Boolean): Text
+    procedure ExportLayout(DefaultFileName: Text; ShowFileDialog: Boolean): Text
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
     begin
-        UpdateLayout(true,false);
+        UpdateLayout(true, false);
 
         if not Layout.HasValue then
-          exit;
+            exit;
 
         if DefaultFileName = '' then
-          DefaultFileName := '*.docx';
+            DefaultFileName := '*.docx';
 
-        TempBlob.Blob := Layout;
-        exit(FileMgt.BLOBExport(TempBlob,DefaultFileName,ShowFileDialog));
+        TempBlob.FromRecord(Rec, FieldNo(Layout));
+        exit(FileMgt.BLOBExport(TempBlob, DefaultFileName, ShowFileDialog));
     end;
 
-    procedure ValidateLayout(useConfirm: Boolean;UpdateContext: Boolean): Boolean
+    procedure ValidateLayout(useConfirm: Boolean; UpdateContext: Boolean): Boolean
     var
         DocumentReportMgt: Codeunit "Document Report Mgt.";
         DocumentInStream: InStream;
@@ -231,24 +238,24 @@ table 6060151 "Event Word Layout"
         TestField("Report ID");
         CalcFields(Layout);
         if not Layout.HasValue then
-          exit;
+            exit;
         Layout.CreateInStream(DocumentInStream);
-        exit(DocumentReportMgt.ValidateWordLayout("Report ID",DocumentInStream,useConfirm,UpdateContext));
+        exit(DocumentReportMgt.ValidateWordLayout("Report ID", DocumentInStream, useConfirm, UpdateContext));
     end;
 
-    procedure UpdateLayout(ContinueOnError: Boolean;IgnoreDelete: Boolean): Boolean
+    procedure UpdateLayout(ContinueOnError: Boolean; IgnoreDelete: Boolean): Boolean
     var
         ErrorMessage: Text;
     begin
         ErrorMessage := TryUpdateLayout(IgnoreDelete);
 
         if ErrorMessage = '' then
-          exit(ValidateLayout(true,true));
+            exit(ValidateLayout(true, true));
 
-        ErrorMessage := StrSubstNo(ErrorInLayoutErr,"Basic Layout Description","Report ID",ErrorMessage);
+        ErrorMessage := StrSubstNo(ErrorInLayoutErr, "Basic Layout Description", "Report ID", ErrorMessage);
         if ContinueOnError then begin
-          Message(ErrorMessage);
-          exit(true);
+            Message(ErrorMessage);
+            exit(true);
         end;
 
         Error(ErrorMessage);
@@ -256,34 +263,38 @@ table 6060151 "Event Word Layout"
 
     procedure TryUpdateLayout(IgnoreDelete: Boolean): Text
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         DocumentReportMgt: Codeunit "Document Report Mgt.";
         DocumentInStream: InStream;
         DocumentOutStream: OutStream;
         PartStream: OutStream;
         WordXmlPart: Text;
         ErrorMessage: Text;
+        RecRef: RecordRef;
     begin
         CalcFields(Layout);
         if not Layout.HasValue then
-          exit('');
+            exit('');
 
         CalcFields("XML Part");
         TestField("XML Part");
         TestField("Report ID");
 
-        WordXmlPart := REPORT.WordXmlPart("Report ID",true);
+        WordXmlPart := REPORT.WordXmlPart("Report ID", true);
 
         Layout.CreateInStream(DocumentInStream);
-        TempBlob.Blob.CreateOutStream(DocumentOutStream);
-        ErrorMessage := DocumentReportMgt.TryUpdateWordLayout(DocumentInStream,DocumentOutStream,GetCustomXmlPart,WordXmlPart);
+        TempBlob.CreateOutStream(DocumentOutStream);
+        ErrorMessage := DocumentReportMgt.TryUpdateWordLayout(DocumentInStream, DocumentOutStream, GetCustomXmlPart, WordXmlPart);
 
         Clear("XML Part");
-        "XML Part".CreateOutStream(PartStream,TEXTENCODING::UTF16);
+        "XML Part".CreateOutStream(PartStream, TEXTENCODING::UTF16);
         PartStream.Write(WordXmlPart);
-        if TempBlob.Blob.HasValue then begin
-          Clear(Layout);
-          Layout := TempBlob.Blob;
+        if TempBlob.HasValue then begin
+            Clear(Layout);
+
+            RecRef.GetTable(Rec);
+            TempBlob.ToRecordRef(RecRef, FieldNo("Layout"));
+            RecRef.SetTable(Rec);
         end;
         Modify;
 
@@ -292,7 +303,7 @@ table 6060151 "Event Word Layout"
 
     procedure EditLayout()
     begin
-        UpdateLayout(true,true);
+        UpdateLayout(true, true);
         EventMgt.EditTemplate(Rec);
     end;
 
@@ -301,10 +312,10 @@ table 6060151 "Event Word Layout"
         OutStr: OutStream;
         WordXmlPart: Text;
     begin
-        EventWordTemplate."XML Part".CreateOutStream(OutStr,TEXTENCODING::UTF16);
-        WordXmlPart := REPORT.WordXmlPart(EventWordTemplate."Report ID",true);
+        EventWordTemplate."XML Part".CreateOutStream(OutStr, TEXTENCODING::UTF16);
+        WordXmlPart := REPORT.WordXmlPart(EventWordTemplate."Report ID", true);
         if WordXmlPart <> '' then
-          OutStr.Write(WordXmlPart);
+            OutStr.Write(WordXmlPart);
     end;
 
     procedure GetCustomXmlPart() XmlPart: Text
@@ -313,9 +324,9 @@ table 6060151 "Event Word Layout"
     begin
         CalcFields("XML Part");
         if not "XML Part".HasValue then
-          exit;
+            exit;
 
-        "XML Part".CreateInStream(InStr,TEXTENCODING::UTF16);
+        "XML Part".CreateInStream(InStr, TEXTENCODING::UTF16);
         InStr.Read(XmlPart);
     end;
 
@@ -325,7 +336,7 @@ table 6060151 "Event Word Layout"
     begin
         TestField(Usage);
 
-        EventMgt.MergeAndSaveWordLayout(Rec,1,'');
+        EventMgt.MergeAndSaveWordLayout(Rec, 1, '');
     end;
 }
 

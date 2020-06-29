@@ -8,98 +8,98 @@ report 6014495 "NP Whse. - Shipment"
 
     dataset
     {
-        dataitem("Warehouse Shipment Header";"Warehouse Shipment Header")
+        dataitem("Warehouse Shipment Header"; "Warehouse Shipment Header")
         {
             DataItemTableView = SORTING("No.");
             RequestFilterFields = "No.";
-            column(HeaderNo_WhseShptHeader;"No.")
+            column(HeaderNo_WhseShptHeader; "No.")
             {
             }
-            dataitem("Integer";"Integer")
+            dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number=CONST(1));
-                column(CompanyName;CompanyName)
+                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                column(CompanyName; CompanyName)
                 {
                 }
-                column(TodayFormatted;Format(Today,0,4))
+                column(TodayFormatted; Format(Today, 0, 4))
                 {
                 }
-                column(AssUid__WhseShptHeader;"Warehouse Shipment Header"."Assigned User ID")
+                column(AssUid__WhseShptHeader; "Warehouse Shipment Header"."Assigned User ID")
                 {
                     IncludeCaption = true;
                 }
-                column(HrdLocCode_WhseShptHeader;"Warehouse Shipment Header"."Location Code")
+                column(HrdLocCode_WhseShptHeader; "Warehouse Shipment Header"."Location Code")
                 {
                     IncludeCaption = true;
                 }
-                column(HeaderNo1_WhseShptHeader;"Warehouse Shipment Header"."No.")
+                column(HeaderNo1_WhseShptHeader; "Warehouse Shipment Header"."No.")
                 {
                     IncludeCaption = true;
                 }
-                column(Show1;not Location."Bin Mandatory")
+                column(Show1; not Location."Bin Mandatory")
                 {
                 }
-                column(Show2;Location."Bin Mandatory")
+                column(Show2; Location."Bin Mandatory")
                 {
                 }
-                column(CurrReportPageNoCaption;CurrReportPageNoCaptionLbl)
+                column(CurrReportPageNoCaption; CurrReportPageNoCaptionLbl)
                 {
                 }
-                column(WarehouseShipmentCaption;WarehouseShipmentCaptionLbl)
+                column(WarehouseShipmentCaption; WarehouseShipmentCaptionLbl)
                 {
                 }
-                dataitem("Warehouse Shipment Line";"Warehouse Shipment Line")
+                dataitem("Warehouse Shipment Line"; "Warehouse Shipment Line")
                 {
-                    DataItemLink = "No."=FIELD("No.");
+                    DataItemLink = "No." = FIELD("No.");
                     DataItemLinkReference = "Warehouse Shipment Header";
-                    DataItemTableView = SORTING("No.","Source Document","Source No.");
-                    column(ShelfNo_WhseShptLine;"Shelf No.")
+                    DataItemTableView = SORTING("No.", "Source Document", "Source No.");
+                    column(ShelfNo_WhseShptLine; "Shelf No.")
                     {
                         IncludeCaption = true;
                     }
-                    column(ItemNo_WhseShptLine;"Item No.")
+                    column(ItemNo_WhseShptLine; "Item No.")
                     {
                         IncludeCaption = true;
                     }
-                    column(Desc_WhseShptLine;Description)
+                    column(Desc_WhseShptLine; Description)
                     {
                         IncludeCaption = true;
                     }
-                    column(UomCode_WhseShptLine;"Unit of Measure Code")
+                    column(UomCode_WhseShptLine; "Unit of Measure Code")
                     {
                         IncludeCaption = true;
                     }
-                    column(LocCode_WhseShptLine;"Location Code")
+                    column(LocCode_WhseShptLine; "Location Code")
                     {
                         IncludeCaption = true;
                     }
-                    column(Qty_WhseShptLine;Quantity)
+                    column(Qty_WhseShptLine; Quantity)
                     {
                         IncludeCaption = true;
                     }
-                    column(SourceNo_WhseShptLine;"Source No.")
+                    column(SourceNo_WhseShptLine; "Source No.")
                     {
                         IncludeCaption = true;
                     }
-                    column(SourceDoc_WhseShptLine;"Source Document")
+                    column(SourceDoc_WhseShptLine; "Source Document")
                     {
                         IncludeCaption = true;
                     }
-                    column(ZoneCode_WhseShptLine;"Zone Code")
+                    column(ZoneCode_WhseShptLine; "Zone Code")
                     {
                         IncludeCaption = true;
                     }
-                    column(BinCode_WhseShptLine;"Bin Code")
+                    column(BinCode_WhseShptLine; "Bin Code")
                     {
                         IncludeCaption = true;
                     }
-                    column(QtyPicked_WhseShptLineCaption;QtyPickedCaptionLbl)
+                    column(QtyPicked_WhseShptLineCaption; QtyPickedCaptionLbl)
                     {
                     }
-                    column(QtyPicked_WhseShptLine;"Qty. Picked")
+                    column(QtyPicked_WhseShptLine; "Qty. Picked")
                     {
                     }
-                    column(Barcode;TmpBarcode.Blob)
+                    column(Barcode; TmpBarcode.Blob)
                     {
                     }
 
@@ -111,10 +111,10 @@ report 6014495 "NP Whse. - Shipment"
                         BarcodeLib.SetShowText(true);
                         BarcodeLib.SetAntiAliasing(false);
                         BarcodeLib.SetBarcodeType('CODE128');
-                        BarcodeLib.GenerateBarcode("Warehouse Shipment Line"."Source No.",TmpBarcode);
-                        TmpBarcode.Blob.CreateInStream(InStr);
-                        TmpBarcode.Blob.CreateOutStream(OuStr);
-                        GenerateBitmap(InStr,OuStr);
+                        BarcodeLib.GenerateBarcode("Warehouse Shipment Line"."Source No.", TmpBarcode);
+                        TmpBarcode.CreateInStream(InStr);
+                        TmpBarcode.CreateOutStream(OuStr);
+                        GenerateBitmap(InStr, OuStr);
                     end;
                 }
             }
@@ -148,7 +148,7 @@ report 6014495 "NP Whse. - Shipment"
         CurrReportPageNoCaptionLbl: Label 'Page';
         WarehouseShipmentCaptionLbl: Label 'Warehouse Shipment';
         BarcodeLib: Codeunit "Barcode Library";
-        TmpBarcode: Record TempBlob;
+        TmpBarcode: Codeunit "Temp Blob";
         PictureFormat: DotNet npNetImageFormat;
         Bitmap: DotNet npNetBitmap;
         InStr: InStream;
@@ -158,17 +158,17 @@ report 6014495 "NP Whse. - Shipment"
     local procedure GetLocation(LocationCode: Code[10])
     begin
         if LocationCode = '' then
-          Location.Init
+            Location.Init
         else
-          if Location.Code <> LocationCode then
-            Location.Get(LocationCode);
+            if Location.Code <> LocationCode then
+                Location.Get(LocationCode);
     end;
 
-    local procedure GenerateBitmap(var SourceStream: InStream;var BitmapStream: OutStream)
+    local procedure GenerateBitmap(var SourceStream: InStream; var BitmapStream: OutStream)
     begin
         Bitmap := Bitmap.Bitmap(SourceStream);
         PictureFormat := PictureFormat.Png;
-        Bitmap.Save(BitmapStream,PictureFormat);
+        Bitmap.Save(BitmapStream, PictureFormat);
     end;
 }
 

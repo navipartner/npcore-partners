@@ -16,62 +16,57 @@ table 6014580 "Object Output Selection"
 
     fields
     {
-        field(1;"User ID";Code[50])
+        field(1; "User ID"; Code[50])
         {
             Caption = 'User ID';
+            NotBlank = true;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnLookup()
-            var
-                UserMgt: Codeunit "User Management";
-            begin
-                UserMgt.LookupUserID("User ID");
-            end;
+            DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                UserMgt.ValidateUserID("User ID");
+                UserSelection.ValidateUserName("User ID");
             end;
         }
-        field(2;"Object Type";Option)
+        field(2; "Object Type"; Option)
         {
             Caption = 'Object Type';
             OptionCaption = 'Codeunit,Report,XMLPort';
             OptionMembers = "Codeunit","Report","XMLPort";
         }
-        field(3;"Object ID";Integer)
+        field(3; "Object ID"; Integer)
         {
             Caption = 'Object ID';
-            TableRelation = IF ("Object Type"=CONST(Codeunit)) AllObj."Object ID" WHERE ("Object Type"=CONST(Codeunit))
-                            ELSE IF ("Object Type"=CONST(Report)) AllObj."Object ID" WHERE ("Object Type"=CONST(Report))
-                            ELSE IF ("Object Type"=CONST(XMLPort)) AllObj."Object ID" WHERE ("Object Type"=CONST(XMLport));
+            TableRelation = IF ("Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit))
+            ELSE
+            IF ("Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = CONST(Report))
+            ELSE
+            IF ("Object Type" = CONST(XMLPort)) AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
 
             trigger OnValidate()
             begin
                 GetObjectName;
             end;
         }
-        field(5;"Object Name";Text[80])
+        field(5; "Object Name"; Text[80])
         {
             Caption = 'Object Name';
         }
-        field(8;"Print Template";Code[20])
+        field(8; "Print Template"; Code[20])
         {
             Caption = 'Print Template';
             TableRelation = "RP Template Header".Code;
         }
-        field(10;"Output Type";Option)
+        field(10; "Output Type"; Option)
         {
             Caption = 'Output Type';
             OptionCaption = 'Printer Name,File,Epson Web,E-mail,Google Print,HTTP,Bluetooth,PrintNode PDF,PrintNode Raw';
             OptionMembers = "Printer Name",File,"Epson Web","E-mail","Google Print",HTTP,Bluetooth,"PrintNode PDF","PrintNode Raw";
         }
-        field(11;"Output Path";Text[250])
+        field(11; "Output Path"; Text[250])
         {
             Caption = 'Output Path';
             //This property is currently not supported
@@ -87,25 +82,25 @@ table 6014580 "Object Output Selection"
                 ID: Text;
             begin
                 case "Output Type" of
-                  "Output Type"::"Printer Name" :
-                    begin
-                      if PAGE.RunModal(PAGE::Printers, Printer) = ACTION::LookupOK then
-                        "Output Path" := Printer.ID;
-                    end;
+                    "Output Type"::"Printer Name":
+                        begin
+                            if PAGE.RunModal(PAGE::Printers, Printer) = ACTION::LookupOK then
+                                "Output Path" := Printer.ID;
+                        end;
 
-                  "Output Type"::"Google Print" :
-                    begin
-                      if GCPMgt.LookupPrinters(ID) then
-                        "Output Path" := ID;
-                    end;
-                  //-NPR5.53 [383562]
-                  "Output Type"::"PrintNode PDF",
-                  "Output Type"::"PrintNode Raw" :
-                    begin
-                      if PrintNodeMgt.LookupPrinter(ID) then
-                        "Output Path" := ID;
-                    end;
-                  //-NPR5.53 [383562]
+                    "Output Type"::"Google Print":
+                        begin
+                            if GCPMgt.LookupPrinters(ID) then
+                                "Output Path" := ID;
+                        end;
+                    //-NPR5.53 [383562]
+                    "Output Type"::"PrintNode PDF",
+                    "Output Type"::"PrintNode Raw":
+                        begin
+                            if PrintNodeMgt.LookupPrinter(ID) then
+                                "Output Path" := ID;
+                        end;
+                //-NPR5.53 [383562]
 
                 end;
             end;
@@ -114,7 +109,7 @@ table 6014580 "Object Output Selection"
 
     keys
     {
-        key(Key1;"User ID","Object Type","Object ID","Print Template")
+        key(Key1; "User ID", "Object Type", "Object ID", "Print Template")
         {
         }
     }
@@ -138,18 +133,18 @@ table 6014580 "Object Output Selection"
         AllObj: Record AllObj;
     begin
         case "Object Type" of
-          "Object Type"::Codeunit:
-            AllObj.SetRange("Object Type",AllObj."Object Type"::Codeunit);
-          "Object Type"::Report:
-            AllObj.SetRange("Object Type",AllObj."Object Type"::Report);
-          "Object Type"::XMLPort:
-            AllObj.SetRange("Object Type",AllObj."Object Type"::XMLport);
+            "Object Type"::Codeunit:
+                AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
+            "Object Type"::Report:
+                AllObj.SetRange("Object Type", AllObj."Object Type"::Report);
+            "Object Type"::XMLPort:
+                AllObj.SetRange("Object Type", AllObj."Object Type"::XMLport);
         end;
 
-        AllObj.SetRange("Object ID","Object ID");
+        AllObj.SetRange("Object ID", "Object ID");
 
         if AllObj.FindFirst then
-          "Object Name" := AllObj."Object Name";
+            "Object Name" := AllObj."Object Name";
     end;
 }
 

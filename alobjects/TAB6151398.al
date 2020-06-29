@@ -8,39 +8,33 @@ table 6151398 "CS Store Users"
 
     fields
     {
-        field(1;"User ID";Code[50])
+        field(1; "User ID"; Code[50])
         {
             Caption = 'User ID';
             NotBlank = true;
             TableRelation = User."User Name";
             ValidateTableRelation = false;
-
-            trigger OnLookup()
-            var
-                UserMgt: Codeunit "User Management";
-            begin
-                UserManagement.LookupUserID("User ID");
-            end;
+            DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                UserManagement.ValidateUserID("User ID");
+                UserSelection.ValidateUserName("User ID");
             end;
         }
-        field(2;"POS Store";Code[10])
+        field(2; "POS Store"; Code[10])
         {
             Caption = 'POS Store';
             NotBlank = true;
             TableRelation = "POS Store";
         }
-        field(10;Supervisor;Code[10])
+        field(10; Supervisor; Code[10])
         {
             Caption = 'Supervisor';
-            TableRelation = "Salesperson/Purchaser" WHERE ("Supervisor POS"=FILTER(true));
+            TableRelation = "Salesperson/Purchaser" WHERE("Supervisor POS" = FILTER(true));
         }
-        field(11;"Adjust Inventory";Boolean)
+        field(11; "Adjust Inventory"; Boolean)
         {
             Caption = 'Adjust Inventory';
         }
@@ -48,7 +42,7 @@ table 6151398 "CS Store Users"
 
     keys
     {
-        key(Key1;"User ID","POS Store")
+        key(Key1; "User ID", "POS Store")
         {
         }
     }
