@@ -527,6 +527,7 @@ codeunit 6014490 "Pakkelabels.dk Mgnt"
         Token: Text;
         FileManagement: Codeunit "File Management";
         ClientFileName: Text;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //-NPR5.34 [283061]
         if not InitPackageProvider then
@@ -571,7 +572,7 @@ codeunit 6014490 "Pakkelabels.dk Mgnt"
 
         TempFileName := StrSubstNo('pakkelabelsdk_%1.pdf', ShipmentID);
         TempFilePath := StrSubstNo('%1%2', TemporaryPath, TempFileName);
-        TempBlob.Export(TempFilePath);
+        TempBlobMgt.ExportToFile(TempBlob, TempFilePath);
 
         //-NPR5.29 [248684]
         if CurrentClientType <> CLIENTTYPE::Windows then
