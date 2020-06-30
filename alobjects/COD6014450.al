@@ -47,7 +47,7 @@ codeunit 6014450 "E-mail Management"
         Text004: Label 'There is not entered any sender email address in the setup.';
         Text006: Label 'The functionality to save report %1 as PDF, returned an error.\\%2';
         Text007: Label 'Shortcut not found.';
-        TempBlobReqParamStore: Codeunit "Temp Blob";
+        ReqParamStoreDict: Dictionary of [Integer, Text];
         Initialized: Boolean;
         Text008: Label 'Mail Server not defined in I-Comm';
         Text010: Label 'Would you like to resend the e-mail?';
@@ -904,20 +904,11 @@ codeunit 6014450 "E-mail Management"
     end;
 
     procedure StoreRequestParameters(ReportID: Integer; Parameters: Text)
-    var
-        OutStr: OutStream;
     begin
-        if TempBlobReqParamStore.Get(ReportID) then begin
-            TempBlobReqParamStore.Blob.CreateOutStream(OutStr);
-            OutStr.WriteText(Parameters);
-            TempBlobReqParamStore.Modify;
-        end else begin
-            TempBlobReqParamStore.Init;
-            TempBlobReqParamStore.Blob.CreateOutStream(OutStr);
-            OutStr.WriteText(Parameters);
-            TempBlobReqParamStore."Primary Key" := ReportID;
-            TempBlobReqParamStore.Insert;
-        end;
+        if ReqParamStoreDict.ContainsKey(ReportID) then
+            ReqParamStoreDict.Set(ReportID, Parameters)
+        else
+            ReqParamStoreDict.Add(ReportID, Parameters);
     end;
 
     local procedure GetReqParametersFromStore(ReportID: Integer): Text
@@ -925,19 +916,14 @@ codeunit 6014450 "E-mail Management"
         InStr: InStream;
         Parameters: Text;
     begin
-        if TempBlobReqParamStore.Get(ReportID) then begin
-            TempBlobReqParamStore.CalcFields(Blob);
-            TempBlobReqParamStore.Blob.CreateInStream(InStr);
-            InStr.ReadText(Parameters);
-            exit(Parameters);
-        end else
-            exit('');
+        if ReqParamStoreDict.ContainsKey(ReportID) then
+            exit(ReqParamStoreDict.Get(ReportID));
     end;
 
     procedure ClearRequestParameters(ReportID: Integer)
     begin
-        if TempBlobReqParamStore.Get(ReportID) then
-            TempBlobReqParamStore.Delete;
+        if ReqParamStoreDict.ContainsKey(ReportID) then
+            ReqParamStoreDict.Remove(ReportID);
     end;
 
     procedure "--- Email Log"()
