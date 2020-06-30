@@ -10,15 +10,15 @@ xmlport 6151137 "M2 Get WorkingDay Calendar"
     {
         textelement(GetCalendar)
         {
-            tableelement(periodrequest;"Entry No. Amount Buffer")
+            tableelement(periodrequest; "Entry No. Amount Buffer")
             {
                 MaxOccurs = Once;
                 XmlName = 'Request';
                 UseTemporary = true;
-                fieldelement(PeriodStart;PeriodRequest."Start Date")
+                fieldelement(PeriodStart; PeriodRequest."Start Date")
                 {
                 }
-                fieldelement(PeriodEnd;PeriodRequest."End Date")
+                fieldelement(PeriodEnd; PeriodRequest."End Date")
                 {
                 }
                 textelement(customernumber)
@@ -53,13 +53,13 @@ xmlport 6151137 "M2 Get WorkingDay Calendar"
                     textattribute(BaseCalendarCode)
                     {
                     }
-                    tableelement(periodresponse;Date)
+                    tableelement(periodresponse; Date)
                     {
                         XmlName = 'Entry';
-                        fieldattribute(Date;PeriodResponse."Period Start")
+                        fieldattribute(Date; PeriodResponse."Period Start")
                         {
                         }
-                        fieldattribute(Day;PeriodResponse."Period Name")
+                        fieldattribute(Day; PeriodResponse."Period Name")
                         {
                         }
                         textattribute(WeekNumber)
@@ -75,10 +75,16 @@ xmlport 6151137 "M2 Get WorkingDay Calendar"
                         trigger OnAfterGetRecord()
                         var
                             CalendarMgmt: Codeunit "Calendar Management";
+                            CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
                         begin
+                            CustomizedCalendarChangeTemp."Base Calendar Code" := BaseCalendarCode;
+                            CustomizedCalendarChangeTemp."Date" := PeriodResponse."Period Start";
+                            CustomizedCalendarChangeTemp.Description := Description;
+                            CustomizedCalendarChangeTemp.Insert();
 
-                            WorkingDay := Format (not CalendarMgmt.CheckDateStatus (BaseCalendarCode, PeriodResponse."Period Start", Description), 0, 9);
-                            WeekNumber := Format (Date2DWY (PeriodResponse."Period Start", 2), 0, 9);
+                            CalendarMgmt.CheckDateStatus(CustomizedCalendarChangeTemp);
+                            WorkingDay := Format(not CustomizedCalendarChangeTemp.Nonworking, 0, 9);
+                            WeekNumber := Format(Date2DWY(PeriodResponse."Period Start", 2), 0, 9);
                         end;
                     }
                 }
@@ -106,22 +112,22 @@ xmlport 6151137 "M2 Get WorkingDay Calendar"
         EntryNo: Integer;
     begin
 
-        PeriodRequest.FindFirst ();
-        if (PeriodRequest."Start Date"  = 0D) then
-          PeriodRequest."Start Date" := Today;
+        PeriodRequest.FindFirst();
+        if (PeriodRequest."Start Date" = 0D) then
+            PeriodRequest."Start Date" := Today;
 
-        if (PeriodRequest."End Date"= 0D) then
-          PeriodRequest."End Date" := CalcDate ('<CM>', Today);
+        if (PeriodRequest."End Date" = 0D) then
+            PeriodRequest."End Date" := CalcDate('<CM>', Today);
 
-        PeriodResponse.SetFilter ("Period Type", '=%1', PeriodResponse."Period Type"::Date);
-        PeriodResponse.SetFilter ("Period Start", '%1..%2', PeriodRequest."Start Date", PeriodRequest."End Date");
+        PeriodResponse.SetFilter("Period Type", '=%1', PeriodResponse."Period Type"::Date);
+        PeriodResponse.SetFilter("Period Start", '%1..%2', PeriodRequest."Start Date", PeriodRequest."End Date");
 
-        if (Customer.Get (CustomerNumber)) then
-          BaseCalendarCode  := Customer."Base Calendar Code";
+        if (Customer.Get(CustomerNumber)) then
+            BaseCalendarCode := Customer."Base Calendar Code";
 
         if (BaseCalendarCode = '') then begin
-          CompanyInformation.Get ();
-          BaseCalendarCode := CompanyInformation."Base Calendar Code";
+            CompanyInformation.Get();
+            BaseCalendarCode := CompanyInformation."Base Calendar Code";
         end;
 
         ResponseCode := 'OK';

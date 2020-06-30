@@ -24,59 +24,59 @@ page 6060119 "TM Admission Schedule Lines"
         {
             repeater(Group)
             {
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
                 }
-                field("Schedule Code";"Schedule Code")
+                field("Schedule Code"; "Schedule Code")
                 {
                 }
-                field("Visibility On Web";"Visibility On Web")
+                field("Visibility On Web"; "Visibility On Web")
                 {
                 }
-                field("Process Order";"Process Order")
+                field("Process Order"; "Process Order")
                 {
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
                 }
-                field("Prebook Is Required";"Prebook Is Required")
+                field("Prebook Is Required"; "Prebook Is Required")
                 {
                 }
-                field("Max Capacity Per Sch. Entry";"Max Capacity Per Sch. Entry")
+                field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
                 }
-                field("Reserved For Web";"Reserved For Web")
-                {
-                    Visible = false;
-                }
-                field("Reserved For Members";"Reserved For Members")
+                field("Reserved For Web"; "Reserved For Web")
                 {
                     Visible = false;
                 }
-                field("Unbookable Before Start (Secs)";"Unbookable Before Start (Secs)")
+                field("Reserved For Members"; "Reserved For Members")
                 {
                     Visible = false;
                 }
-                field("Bookable Passed Start (Secs)";"Bookable Passed Start (Secs)")
+                field("Unbookable Before Start (Secs)"; "Unbookable Before Start (Secs)")
                 {
                     Visible = false;
                 }
-                field("Capacity Control";"Capacity Control")
+                field("Bookable Passed Start (Secs)"; "Bookable Passed Start (Secs)")
+                {
+                    Visible = false;
+                }
+                field("Capacity Control"; "Capacity Control")
                 {
                 }
-                field("Concurrency Code";"Concurrency Code")
+                field("Concurrency Code"; "Concurrency Code")
                 {
                 }
-                field("Prebook From";"Prebook From")
+                field("Prebook From"; "Prebook From")
                 {
                 }
-                field("Schedule Generated Until";"Schedule Generated Until")
+                field("Schedule Generated Until"; "Schedule Generated Until")
                 {
                 }
-                field("Admission Base Calendar Code";"Admission Base Calendar Code")
+                field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
                 }
-                field("Customized Calendar";CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Location,"Admission Code","Schedule Code","Admission Base Calendar Code"))
+                field("Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
                 {
                     Caption = 'Customized Calendar';
                     Editable = false;
@@ -85,46 +85,46 @@ page 6060119 "TM Admission Schedule Lines"
                     begin
                         CurrPage.SaveRecord;
                         TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Location,"Admission Code","Schedule Code","Admission Base Calendar Code");
+                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;
                 }
-                field("Scheduled Start Time";"Scheduled Start Time")
+                field("Scheduled Start Time"; "Scheduled Start Time")
                 {
                 }
-                field("Scheduled Stop Time";"Scheduled Stop Time")
+                field("Scheduled Stop Time"; "Scheduled Stop Time")
                 {
                 }
-                field("Event Arrival From Time";"Event Arrival From Time")
+                field("Event Arrival From Time"; "Event Arrival From Time")
                 {
                 }
-                field("Event Arrival Until Time";"Event Arrival Until Time")
+                field("Event Arrival Until Time"; "Event Arrival Until Time")
                 {
                 }
-                field("Sales From Date (Rel.)";"Sales From Date (Rel.)")
+                field("Sales From Date (Rel.)"; "Sales From Date (Rel.)")
                 {
                 }
-                field("Sales From Time";"Sales From Time")
+                field("Sales From Time"; "Sales From Time")
                 {
                 }
-                field("Sales Until Date (Rel.)";"Sales Until Date (Rel.)")
+                field("Sales Until Date (Rel.)"; "Sales Until Date (Rel.)")
                 {
                 }
-                field("Sales Until Time";"Sales Until Time")
+                field("Sales Until Time"; "Sales Until Time")
                 {
                 }
-                field("Pricing Option";"Pricing Option")
+                field("Pricing Option"; "Pricing Option")
                 {
                 }
-                field("Price Scope";"Price Scope")
+                field("Price Scope"; "Price Scope")
                 {
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
                 }
-                field(Percentage;Percentage)
+                field(Percentage; Percentage)
                 {
                 }
-                field("Amount Includes VAT";"Amount Includes VAT")
+                field("Amount Includes VAT"; "Amount Includes VAT")
                 {
                 }
             }
@@ -146,7 +146,7 @@ page 6060119 "TM Admission Schedule Lines"
                     TMAdmissionSchManagement: Codeunit "TM Admission Sch. Management";
                 begin
 
-                    TMAdmissionSchManagement.CreateAdmissionSchedule ("Admission Code", false, WorkDate);
+                    TMAdmissionSchManagement.CreateAdmissionSchedule("Admission Code", false, WorkDate);
                 end;
             }
             action("Calculate Schedule Entries (Force)")
@@ -159,8 +159,8 @@ page 6060119 "TM Admission Schedule Lines"
                     TMAdmissionSchManagement: Codeunit "TM Admission Sch. Management";
                 begin
                     //-TM1.24 [288396]
-                    if (Confirm (FORCE_GENERATE, false)) then
-                     TMAdmissionSchManagement.CreateAdmissionSchedule ("Admission Code", true, WorkDate);
+                    if (Confirm(FORCE_GENERATE, false)) then
+                        TMAdmissionSchManagement.CreateAdmissionSchedule("Admission Code", true, WorkDate);
                     //+TM1.24 [288396]
                 end;
             }
@@ -174,7 +174,7 @@ page 6060119 "TM Admission Schedule Lines"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "TM Ticket Admissions";
-                RunPageLink = "Admission Code"=FIELD("Admission Code");
+                RunPageLink = "Admission Code" = FIELD("Admission Code");
             }
             action(Schedules)
             {
@@ -184,7 +184,7 @@ page 6060119 "TM Admission Schedule Lines"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "TM Ticket Schedules";
-                RunPageLink = "Schedule Code"=FIELD("Schedule Code");
+                RunPageLink = "Schedule Code" = FIELD("Schedule Code");
             }
             action("Schedule Entries")
             {
@@ -194,8 +194,8 @@ page 6060119 "TM Admission Schedule Lines"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "TM Admission Schedule Entry";
-                RunPageLink = "Admission Code"=FIELD("Admission Code"),
-                              "Schedule Code"=FIELD("Schedule Code");
+                RunPageLink = "Admission Code" = FIELD("Admission Code"),
+                              "Schedule Code" = FIELD("Schedule Code");
             }
         }
     }
@@ -204,13 +204,21 @@ page 6060119 "TM Admission Schedule Lines"
     begin
 
         //-+TM1.19 [266768]
-        Rec.SetFilter (Blocked, '=%1', false);
+        Rec.SetFilter(Blocked, '=%1', false);
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        Clear(CustomizedCalendarChangeTemp);
+        CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
+        CustomizedCalendarChangeTemp."Source Code" := "Admission Code";
+        CustomizedCalendarChangeTemp."Additional Source Code" := "Schedule Code";
+        CustomizedCalendarChangeTemp."Base Calendar Code" := "Admission Base Calendar Code";
+        CustomizedCalendarChangeTemp.Insert();
     end;
 
     var
         FORCE_GENERATE: Label 'This action will regenerate all schedules entries based on the schedule definitions. Manual changes will be lost. Do you want to continue?';
-        CustomizedCalEntry: Record "Customized Calendar Entry";
-        CustomizedCalendar: Record "Customized Calendar Change";
+        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 }
-
