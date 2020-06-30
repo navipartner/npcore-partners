@@ -63,7 +63,7 @@ xmlport 6151402 "Magento Document Export"
                     XmlName = 'lines';
                     tableelement(salesinvline; "Sales Invoice Line")
                     {
-                        LinkFields = "Document No." = FIELD ("No.");
+                        LinkFields = "Document No." = FIELD("No.");
                         LinkTable = SalesInvHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
@@ -75,9 +75,11 @@ xmlport 6151402 "Magento Document Export"
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
+                            var
+                                LineTypeFound: Boolean;
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeList.TryGetValue(SalesInvLine.Type, SalesInvLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesInvLine.Type, SalesInvLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
@@ -142,7 +144,7 @@ xmlport 6151402 "Magento Document Export"
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
-                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
+                        SourceTableView = WHERE("Doc. Type" = FILTER(< 100));
                         UseTemporary = true;
                         textattribute(relatedtypeinvoice)
                         {
@@ -234,7 +236,7 @@ xmlport 6151402 "Magento Document Export"
                     XmlName = 'lines';
                     tableelement(salescrmemoline; "Sales Cr.Memo Line")
                     {
-                        LinkFields = "Document No." = FIELD ("No.");
+                        LinkFields = "Document No." = FIELD("No.");
                         LinkTable = SalesCrMemoHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
@@ -246,9 +248,11 @@ xmlport 6151402 "Magento Document Export"
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
+                            var
+                                LineTypeFound: Boolean;
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeList.TryGetValue(SalesCrMemoLine.Type, SalesCrMemoLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesCrMemoLine.Type, SalesCrMemoLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
@@ -313,7 +317,7 @@ xmlport 6151402 "Magento Document Export"
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
-                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
+                        SourceTableView = WHERE("Doc. Type" = FILTER(< 100));
                         UseTemporary = true;
                         textattribute(relatedtypecrmemo)
                         {
@@ -429,7 +433,7 @@ xmlport 6151402 "Magento Document Export"
                     XmlName = 'lines';
                     tableelement(salesline; "Sales Line")
                     {
-                        LinkFields = "Document Type" = FIELD ("Document Type"), "Document No." = FIELD ("No.");
+                        LinkFields = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
                         LinkTable = SalesHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
@@ -441,9 +445,11 @@ xmlport 6151402 "Magento Document Export"
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
+                            var
+                                LineTypeFound: Boolean;
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeList.TryGetValue(SalesLine.Type, SalesLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesLine.Type, SalesLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
@@ -517,7 +523,7 @@ xmlport 6151402 "Magento Document Export"
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
-                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
+                        SourceTableView = WHERE("Doc. Type" = FILTER(< 100));
                         UseTemporary = true;
                         textattribute(relatedtypeorder)
                         {
@@ -667,7 +673,7 @@ xmlport 6151402 "Magento Document Export"
                     XmlName = 'lines';
                     tableelement(salesshipmentline; "Sales Shipment Line")
                     {
-                        LinkFields = "Document No." = FIELD ("No.");
+                        LinkFields = "Document No." = FIELD("No.");
                         LinkTable = SalesShipmentHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
@@ -679,10 +685,11 @@ xmlport 6151402 "Magento Document Export"
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
+                            var
+                                LineTypeFound: Boolean;
                             begin
-
                                 //-MAG2.20 [345376]
-                                LineTypeList.TryGetValue(SalesShipmentLine.Type, ShipmentLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesShipmentLine.Type, ShipmentLineType);
                                 //+MAG2.20 [345376]
                             end;
                         }
@@ -719,7 +726,7 @@ xmlport 6151402 "Magento Document Export"
                     tableelement(tmpdocsearchresultshipment; "Document Search Result")
                     {
                         XmlName = 'document';
-                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
+                        SourceTableView = WHERE("Doc. Type" = FILTER(< 100));
                         UseTemporary = true;
                         textattribute(relatedtypeshipment)
                         {
@@ -839,7 +846,7 @@ xmlport 6151402 "Magento Document Export"
                     XmlName = 'lines';
                     tableelement(quoteline; "Sales Line")
                     {
-                        LinkFields = "Document Type" = FIELD ("Document Type"), "Document No." = FIELD ("No.");
+                        LinkFields = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
                         LinkTable = SalesQuote;
                         MinOccurs = Zero;
                         XmlName = 'line';
@@ -851,9 +858,10 @@ xmlport 6151402 "Magento Document Export"
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
+                            var
+                                LineTypeFound: Boolean;
                             begin
-
-                                LineTypeList.TryGetValue(SalesLine.Type, QuoteLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesLine.Type, QuoteLineType);
                             end;
                         }
                         fieldelement(no; QuoteLine."No.")
@@ -965,7 +973,7 @@ xmlport 6151402 "Magento Document Export"
     trigger OnInitXmlPort()
     begin
         //-MAG2.12 [309647]
-        InitLineTypeList();
+        InitLineTypeDict();
         //+MAG2.12 [309647]
     end;
 
@@ -979,7 +987,7 @@ xmlport 6151402 "Magento Document Export"
 
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
-        LineTypeList: DotNet npNetDictionary_Of_T_U;
+        LineTypeDict: Dictionary of [Integer, Text];
         CustomerNo: Code[20];
         EndDate: Date;
         StartDate: Date;
@@ -1034,7 +1042,7 @@ xmlport 6151402 "Magento Document Export"
         //+MAG2.25 [388058]
     end;
 
-    local procedure InitLineTypeList()
+    local procedure InitLineTypeDict()
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -1044,8 +1052,6 @@ xmlport 6151402 "Magento Document Export"
         i: Integer;
     begin
         //-MAG2.12 [309647]
-        LineTypeList := LineTypeList.Dictionary();
-
         RecRef.GetTable(SalesInvLine);
         FieldRef := RecRef.Field(SalesInvLine.FieldNo(Type));
         OptionString := FieldRef.OptionString;
@@ -1054,7 +1060,7 @@ xmlport 6151402 "Magento Document Export"
             if Position = 0 then
                 Position := StrLen(OptionString) + 1;
             LineType := DelStr(OptionString, Position);
-            LineTypeList.Add(i, LineType);
+            LineTypeDict.Add(i, LineType);
 
             i += 1;
             OptionString := DelStr(OptionString, 1, Position);
@@ -1102,7 +1108,7 @@ xmlport 6151402 "Magento Document Export"
                 TmpDocumentSearchResult.Description := CopyStr(LocalSalesShipmentHeader."Shipment Method Code", 1, MaxStrLen(TmpDocumentSearchResult.Description));
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
                     if (TmpDocumentSearchResult.Insert()) then;
-                //+MAG2.22 [345376]
+            //+MAG2.22 [345376]
 
             until (LocalSalesShipmentHeader.Next() = 0);
         end;
