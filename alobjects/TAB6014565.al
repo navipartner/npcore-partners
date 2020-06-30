@@ -4,33 +4,33 @@ table 6014565 "RP Template Setup"
 
     fields
     {
-        field(1;"Primary Key";Code[10])
+        field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
         }
-        field(2;"Version Major Number";Integer)
+        field(2; "Version Major Number"; Integer)
         {
             Caption = 'Version Major Number';
             InitValue = 1;
             MinValue = 1;
         }
-        field(3;"Version Prefix";Code[3])
+        field(3; "Version Prefix"; Code[3])
         {
             Caption = 'Version Prefix';
 
             trigger OnValidate()
             var
-                TypeHelper: Codeunit "Type Helper";
+                RegEx: Codeunit DotNet_Regex;
             begin
-                if not TypeHelper.IsMatch("Version Prefix", '^[a-zA-Z]+$') then
-                  Error(Err_InvalidPrefix);
+                if not RegEx.IsMatch("Version Prefix", '^[a-zA-Z]+$') then
+                    Error(Err_InvalidPrefix);
             end;
         }
     }
 
     keys
     {
-        key(Key1;"Primary Key")
+        key(Key1; "Primary Key")
         {
         }
     }
@@ -42,10 +42,10 @@ table 6014565 "RP Template Setup"
     trigger OnInsert()
     begin
         if "Version Prefix" = '' then
-          "Version Prefix" := 'NPK';
+            "Version Prefix" := 'NPK';
 
         if "Version Major Number" = 0 then
-          "Version Major Number" := 1;
+            "Version Major Number" := 1;
     end;
 
     var

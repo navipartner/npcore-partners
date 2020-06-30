@@ -453,7 +453,7 @@ codeunit 6184511 "EFT Mock Client Integration"
     [EventSubscriber(ObjectType::Table, 6184484, 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidateUnitGenParameterValue(var Parameter: Record "EFT Type POS Unit Gen. Param.")
     var
-        TypeHelper: Codeunit "Type Helper";
+        RegEx: Codeunit DotNet_Regex;
     begin
         if Parameter."Integration Type" <> IntegrationType() then
             exit;
@@ -461,7 +461,7 @@ codeunit 6184511 "EFT Mock Client Integration"
         case Parameter.Name of
             'LAN IP':
                 if Parameter.Value <> '' then
-                    if not TypeHelper.IsMatch(Parameter.Value, '^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\.(?!$)|$)){4}$') then
+                    if not RegEx.IsMatch(Parameter.Value, '^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\.(?!$)|$)){4}$') then
                         Parameter.FieldError(Value);
         end;
     end;

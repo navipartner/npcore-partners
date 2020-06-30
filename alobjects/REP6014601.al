@@ -14,28 +14,28 @@ report 6014601 "Update Barcodes"
 
     dataset
     {
-        dataitem(Item;Item)
+        dataitem(Item; Item)
         {
             RequestFilterFields = "No.";
-            column(No_Item;"No.")
+            column(No_Item; "No.")
             {
                 IncludeCaption = true;
             }
-            column(CrossReferenceNo;CrossReferenceNo)
+            column(CrossReferenceNo; CrossReferenceNo)
             {
             }
-            dataitem("Item Variant";"Item Variant")
+            dataitem("Item Variant"; "Item Variant")
             {
-                DataItemLink = "Item No."=FIELD("No.");
-                DataItemTableView = SORTING("Item No.",Code);
-                column(ItemNo_ItemVariant;"Item No.")
+                DataItemLink = "Item No." = FIELD("No.");
+                DataItemTableView = SORTING("Item No.", Code);
+                column(ItemNo_ItemVariant; "Item No.")
                 {
                 }
-                column(Code_ItemVariant;Code)
+                column(Code_ItemVariant; Code)
                 {
                     IncludeCaption = true;
                 }
-                column(CrossReferenceNo2;CrossReferenceNo)
+                column(CrossReferenceNo2; CrossReferenceNo)
                 {
                 }
 
@@ -61,11 +61,11 @@ report 6014601 "Update Barcodes"
             {
                 group(Settings)
                 {
-                    field(InsertMissingBarcode;InsertMissingBarcode)
+                    field(InsertMissingBarcode; InsertMissingBarcode)
                     {
                         Caption = 'Insert missing barcode';
                     }
-                    field(IgnoreAltNo;IgnoreAltNo)
+                    field(IgnoreAltNo; IgnoreAltNo)
                     {
                         Caption = 'Ignore Alt. No.';
                     }
@@ -95,73 +95,73 @@ report 6014601 "Update Barcodes"
         IgnoreAltNo: Boolean;
         AddPrefix: Text;
 
-    local procedure InsertBarcode(ItemNo: Code[20];VariantCode: Code[20]): Text
+    local procedure InsertBarcode(ItemNo: Code[20]; VariantCode: Code[20]): Text
     begin
-        ItemCrossReference.SetRange("Item No.",ItemNo);
-        ItemCrossReference.SetRange("Variant Code",VariantCode);
-        ItemCrossReference.SetRange("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
+        ItemCrossReference.SetRange("Item No.", ItemNo);
+        ItemCrossReference.SetRange("Variant Code", VariantCode);
+        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
         if ItemCrossReference.FindFirst then
-          if  (CheckBarcodeValidEAN13(ItemCrossReference."Cross-Reference No.") or CheckBarcodeValidEAN8(ItemCrossReference."Cross-Reference No.")) then begin
-            exit(ItemCrossReference."Cross-Reference No.");
-          end;
+            if (CheckBarcodeValidEAN13(ItemCrossReference."Cross-Reference No.") or CheckBarcodeValidEAN8(ItemCrossReference."Cross-Reference No.")) then begin
+                exit(ItemCrossReference."Cross-Reference No.");
+            end;
 
         //-NPR5.36 [289169]
         AlternativeNo.SetRange(Code, ItemNo);
         AlternativeNo.SetRange("Variant Code", VariantCode);
         if (AlternativeNo.FindFirst) and (not IgnoreAltNo) then
-          if  (CheckBarcodeValidEAN13(AlternativeNo."Alt. No.") or CheckBarcodeValidEAN8(AlternativeNo."Alt. No.")) then begin
-            exit(AlternativeNo."Alt. No.");
-          end;
+            if (CheckBarcodeValidEAN13(AlternativeNo."Alt. No.") or CheckBarcodeValidEAN8(AlternativeNo."Alt. No.")) then begin
+                exit(AlternativeNo."Alt. No.");
+            end;
         //+NPR5.36 [289169]
 
         if not InsertMissingBarcode then
             exit;
 
-        VarietyCloneData.InsertDefaultBarcode(ItemNo,VariantCode,false);
+        VarietyCloneData.InsertDefaultBarcode(ItemNo, VariantCode, false);
 
         Clear(ItemCrossReference);
-        ItemCrossReference.SetRange("Item No.",ItemNo);
-        ItemCrossReference.SetRange("Variant Code",VariantCode);
-        ItemCrossReference.SetRange("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
+        ItemCrossReference.SetRange("Item No.", ItemNo);
+        ItemCrossReference.SetRange("Variant Code", VariantCode);
+        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
         if ItemCrossReference.FindFirst then
-          exit(ItemCrossReference."Cross-Reference No.");
+            exit(ItemCrossReference."Cross-Reference No.");
 
         //-NPR5.36 [289169]
         if AlternativeNo.FindFirst and (not IgnoreAltNo) then
-          exit(AlternativeNo."Alt. No.");
+            exit(AlternativeNo."Alt. No.");
         //+NPR5.36 [289169]
     end;
 
     local procedure CheckBarcodeValidEAN13(barcode: Code[20]): Boolean
     var
-        TypeHelper: Codeunit "Type Helper";
+        RegEx: Codeunit DotNet_Regex;
     begin
         //-NPR5.36 [290792]
         //-NPR5.36 [289169]
         //IF (STRLEN(barcode) <> 13) OR (NOT EVALUATE(DecimalBuffer, barcode)) THEN
         //IF STRLEN(barcode) <> 13 THEN
         //+NPR5.36 [289169]
-        if (StrLen(barcode) <> 13) or (not TypeHelper.IsMatch(barcode, '^[0-9]+$')) then
-        //+NPR5.36 [290792]
-          exit(false)
+        if (StrLen(barcode) <> 13) or (not RegEx.IsMatch(barcode, '^[0-9]+$')) then
+            //+NPR5.36 [290792]
+            exit(false)
         else
-          exit(not (StrCheckSum(barcode,'1313131313131') <> 0))
+            exit(not (StrCheckSum(barcode, '1313131313131') <> 0))
     end;
 
     local procedure CheckBarcodeValidEAN8(barcode: Code[20]): Boolean
     var
-        TypeHelper: Codeunit "Type Helper";
+        RegEx: Codeunit DotNet_Regex;
     begin
         //-NPR5.36 [290792]
         //-NPR5.36 [289169]
         //IF (STRLEN(barcode) <> 8) OR (NOT EVALUATE(DecimalBuffer, barcode)) THEN
         //IF STRLEN(barcode) <> 8 THEN
         //+NPR5.36 [289169]
-        if (StrLen(barcode) <> 8) or (not TypeHelper.IsMatch(barcode, '^[0-9]+$')) then
-        //+NPR5.36 [290792]
-          exit(false)
+        if (StrLen(barcode) <> 8) or (not RegEx.IsMatch(barcode, '^[0-9]+$')) then
+            //+NPR5.36 [290792]
+            exit(false)
         else
-          exit(not (StrCheckSum(barcode,'3131313') <> 0))
+            exit(not (StrCheckSum(barcode, '3131313') <> 0))
     end;
 }
 
