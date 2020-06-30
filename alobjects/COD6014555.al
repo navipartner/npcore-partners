@@ -42,6 +42,10 @@ codeunit 6014555 "NPR Attribute Management"
         Text000: Label 'Variant must be Record or RecordRef.';
         Text001: Label 'Attribute %1 is not defined';
         Text002: Label 'Attribute %1 does not have a value %2!';
+        AlphabetText: Label 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        TodayText: Label 'TODAY';
+        WorkdateText: Label 'WORKDATE';
+        NowText: Label 'NOW';
 
     procedure GetAttributeCaption(Language: Integer; CaptionRef: Text[80]) Caption: Text[100]
     var
@@ -233,7 +237,6 @@ codeunit 6014555 "NPR Attribute Management"
     procedure SetAttributeValue(SetID: Integer; AttributeCode: Code[20]; var TextValue: Text[1024]; var vAttributeValue: Record "NPR Attribute Value Set"): Boolean
     var
         Attribute: Record "NPR Attribute";
-        FilterTokens: Codeunit "Filter Tokens";
         myDate: Date;
         myInt: Integer;
         HaveAttributeSet: Boolean;
@@ -262,7 +265,7 @@ codeunit 6014555 "NPR Attribute Management"
                     //-NPR5.38 [296231]
                     if GuiAllowed then
                         //+NPR5.38 [296231]
-                        FilterTokens.MakeText(TextValue);
+                        MakeText(TextValue);
                     vAttributeValue."Text Value" := CopyStr(TextValue, 1, MaxStrLen(TextValue));
                 end;
             Attribute."Value Datatype"::DT_CODE:
@@ -274,14 +277,14 @@ codeunit 6014555 "NPR Attribute Management"
                 end;
             Attribute."Value Datatype"::DT_DATE:
                 begin
-                    FilterTokens.MakeDateText(TextValue);
+                    MakeDateText(TextValue);
                     Evaluate(myDate, TextValue);
                     vAttributeValue."Datetime Value" := CreateDateTime(myDate, 0T);
                     vAttributeValue."Text Value" := Format(myDate, 0, 9);
                 end;
             Attribute."Value Datatype"::DT_DATETIME:
                 begin
-                    FilterTokens.MakeDateTimeText(TextValue);
+                    MakeDateTimeText(TextValue);
                     Evaluate(vAttributeValue."Datetime Value", TextValue);
                     vAttributeValue."Text Value" := Format(vAttributeValue."Datetime Value", 0, 9);
                 end;
@@ -1563,5 +1566,162 @@ codeunit 6014555 "NPR Attribute Management"
             SetMasterDataAttributeValue(TableID, AttributeReference, PKCode, Value);
         end;
     end;
+
+    procedure MakeText(VAR Text: Text): Integer;
+    VAR
+        StandardText: Record "Standard Text";
+        PartOfText: Text[132];
+        Position: Integer;
+        Length: Integer;
+    BEGIN
+        Position := 1;
+        Length := STRLEN(Text);
+        ReadCharacter(' ', Text, Position, Length);
+        if not ReadSymbol('?', Text, Position, Length) then
+            exit(0);
+        PartOfText := COPYSTR(Text, Position);
+        if PartOfText = '' then begin
+            if PAGE.RUNMODAL(0, StandardText) = ACTION::LookupOK then
+                Text := StandardText.Description;
+            exit(0);
+        end;
+        StandardText.Code := COPYSTR(Text, Position, MAXSTRLEN(StandardText.Code));
+        if not StandardText.FIND('=>') or
+           (UPPERCASE(PartOfText) <> COPYSTR(StandardText.Code, 1, STRLEN(PartOfText)))
+        then
+            exit(Position);
+        Text := StandardText.Description;
+        exit(0);
+    end;
+
+    local procedure ReadCharacter(Character: Text[50]; Text: Text; VAR Position: Integer; Length: Integer);
+    begin
+        while (Position <= Length) and (STRPOS(Character, UPPERCASE(COPYSTR(Text, Position, 1))) <> 0) do
+            Position := Position + 1;
+    end;
+
+    local procedure ReadSymbol(Token: Text[30]; Text: Text; VAR Position: Integer; Length: Integer): Boolean;
+    begin
+        if Token <> COPYSTR(Text, Position, STRLEN(Token)) then
+            exit(false);
+        Position := Position + STRLEN(Token);
+        ReadCharacter(' ', Text, Position, Length);
+        exit(true);
+    end;
+
+    procedure MakeDateText(VAR DateText: Text): Integer;
+    VAR
+        Date: Date;
+        PartOfText: Text;
+        Position: Integer;
+        Length: Integer;
+    BEGIN
+        Position := 1;
+        Length := STRLEN(DateText);
+        ReadCharacter(' ', DateText, Position, Length);
+        if not FindText(PartOfText, DateText, Position, Length) then
+            exit(0);
+        case PartOfText of
+            COPYSTR('TODAY', 1, STRLEN(PartOfText)), COPYSTR(TodayText, 1, STRLEN(PartOfText)):
+                Date := TODAY;
+            COPYSTR('WORKDATE', 1, STRLEN(PartOfText)), COPYSTR(WorkdateText, 1, STRLEN(PartOfText)):
+                Date := WORKDATE;
+            else
+                exit(0);
+        end;
+        Position := Position + STRLEN(PartOfText);
+        ReadCharacter(' ', DateText, Position, Length);
+        if Position > Length then begin
+            DateText := FORMAT(Date);
+            exit(0);
+        end;
+        exit(Position);
+    END;
+
+    LOCAL PROCEDURE FindText(VAR PartOfText: Text; Text: Text; Position: Integer; Length: Integer): Boolean;
+    VAR
+        Position2: Integer;
+    BEGIN
+        Position2 := Position;
+        ReadCharacter(AlphabetText, Text, Position, Length);
+        if Position = Position2 then
+            exit(false);
+        PartOfText := UPPERCASE(COPYSTR(Text, Position2, Position - Position2));
+        exit(true);
+    END;
+
+    PROCEDURE MakeDateTimeText(VAR DateTimeText: Text): Integer;
+    VAR
+        Date: Date;
+        Time: Time;
+    BEGIN
+        if GetSeparateDateTime(DateTimeText, Date, Time) then begin
+            if Date = 0D then
+                exit(0);
+            if Time = 000000T then
+                Time := 000000T;
+            DateTimeText := FORMAT(CREATEDATETIME(Date, Time));
+        end;
+        exit(0);
+    END;
+
+    PROCEDURE GetSeparateDateTime(DateTimeText: Text; VAR Date: Date; VAR Time: Time): Boolean;
+    VAR
+        DateText: Text[250];
+        TimeText: Text[250];
+        Position: Integer;
+        Length: Integer;
+    BEGIN
+        if DateTimeText in [NowText, 'NOW'] then
+            DateTimeText := FORMAT(CURRENTDATETIME);
+        Date := 0D;
+        Time := 000000T;
+        Position := 1;
+        Length := STRLEN(DateTimeText);
+        ReadCharacter(' ', DateTimeText, Position, Length);
+        ReadUntilCharacter(' ', DateTimeText, Position, Length);
+        DateText := DELCHR(COPYSTR(DateTimeText, 1, Position - 1), '<>');
+        TimeText := DELCHR(COPYSTR(DateTimeText, Position), '<>');
+        if DateText = '' then
+            exit(true);
+
+        if MakeDateText(DateText) = 0 then;
+        if not EVALUATE(Date, DateText) then
+            exit(false);
+
+        if TimeText = '' then
+            exit(true);
+
+        if MakeTimeText(TimeText) = 0 then;
+        if EVALUATE(Time, TimeText) then
+            exit(true);
+    END;
+
+    LOCAL PROCEDURE ReadUntilCharacter(Character: Text[50]; Text: Text; VAR Position: Integer; Length: Integer);
+    BEGIN
+        while (Position <= Length) and (STRPOS(Character, UPPERCASE(COPYSTR(Text, Position, 1))) = 0) do
+            Position := Position + 1;
+    END;
+
+    PROCEDURE MakeTimeText(VAR TimeText: Text): Integer;
+    VAR
+        PartOfText: Text[132];
+        Position: Integer;
+        Length: Integer;
+    BEGIN
+        Position := 1;
+        Length := STRLEN(TimeText);
+        ReadCharacter(' ', TimeText, Position, Length);
+        if not FindText(PartOfText, TimeText, Position, Length) then
+            exit(0);
+        if PartOfText <> COPYSTR(TimeText, 1, STRLEN(PartOfText)) then
+            exit(0);
+        Position := Position + STRLEN(PartOfText);
+        ReadCharacter(' ', TimeText, Position, Length);
+        if Position <= Length then
+            exit(Position);
+        TimeText := FORMAT(000000T + ROUND(TIME - 000000T, 1000));
+        exit(0);
+    END;
 }
 
