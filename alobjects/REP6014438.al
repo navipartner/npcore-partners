@@ -63,7 +63,7 @@ report 6014438 "Gift Voucher A5 Right"
                 column(City_GiftVoucher; "Gift Voucher".City)
                 {
                 }
-                column(Blob_TempBlob; TempBlob.Blob)
+                column(Blob_TempBlob; BlobBuffer."Buffer 1")
                 {
                 }
                 column(IssueDate_GiftVoucher; StrSubstNo('%1', "Gift Voucher"."Issue Date") + TextRegister + StrSubstNo('%1', "Register No.") + TextSalesTicket + "Gift Voucher"."Sales Ticket No." + ' - ' + "Gift Voucher"."No." + ' - ' + Format(Time))
@@ -82,6 +82,7 @@ report 6014438 "Gift Voucher A5 Right"
                         CopyText := TextCopy;
 
                     BarcodeLib.GenerateBarcode("Gift Voucher"."No.", TempBlob);
+                    BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
                     if Register.Get("Register No.") then;
 
@@ -191,5 +192,6 @@ report 6014438 "Gift Voucher A5 Right"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         TextRegister: Label ' , Register';
         TextSalesTicket: Label ' - Sales Ticket';
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

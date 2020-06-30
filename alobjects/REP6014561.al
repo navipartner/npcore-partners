@@ -48,7 +48,7 @@ report 6014561 "Gift Voucher A5"
                 column(DetailsText; DetailsText)
                 {
                 }
-                column(Barcode; TempBlob.Blob)
+                column(Barcode; BlobBuffer."Buffer 1")
                 {
                 }
                 column(SalesPersonText; SalesPersonText)
@@ -108,6 +108,7 @@ report 6014561 "Gift Voucher A5"
                     //-NPR5.38
 
                     BarcodeLib.GenerateBarcode("Gift Voucher"."No.", TempBlob);
+                    BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
                     if Get("Gift Voucher".Salesperson) then
                         if RetailSetup."Salesperson on Sales Ticket" then
@@ -176,5 +177,6 @@ report 6014561 "Gift Voucher A5"
         BarcodeLib: Codeunit "Barcode Library";
         Text1002: Label 'Phone No.: %1';
         Text1003: Label 'VAT No.: %1';
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

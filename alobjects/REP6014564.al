@@ -47,7 +47,7 @@ report 6014564 "Credit Voucher A5"
                 column(DetailsText; DetailsText)
                 {
                 }
-                column(Barcode; TempBlob.Blob)
+                column(Barcode; BlobBuffer."Buffer 1")
                 {
                 }
                 column(SalesPersonText; SalespersonText)
@@ -111,6 +111,7 @@ report 6014564 "Credit Voucher A5"
                     //-NPR5.38
 
                     BarcodeLib.GenerateBarcode("Credit Voucher"."No.", TempBlob);
+                    BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
                     if Get("Credit Voucher".Salesperson) then
                         if RetailSetup."Salesperson on Sales Ticket" then
@@ -170,5 +171,6 @@ report 6014564 "Credit Voucher A5"
         RegisterVatNoText: Text;
         ZipCodeCityText: Text;
         TempBlob: Codeunit "Temp Blob";
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 
