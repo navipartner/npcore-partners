@@ -994,7 +994,7 @@ codeunit 6151151 "M2 Account Manager"
 
         Account.Validate("Phone No.", TmpAccount."Phone No.");
         Account.Modify();
-        Account.OnModify(ContactXrec);
+        Account.DoModify(ContactXrec);
 
         TmpAccountResponse.TransferFields(Account, true);
         TmpAccountResponse.Insert();
