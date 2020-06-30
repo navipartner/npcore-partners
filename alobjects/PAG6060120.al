@@ -89,7 +89,7 @@ page 6060120 "TM Ticket Admissions"
                 field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
                 }
-                field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Location, "Admission Code", '', "Admission Base Calendar Code"))
+                field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeAdmissionTemp))
                 {
                     Caption = 'Admission Customized Calendar';
                     Editable = false;
@@ -98,13 +98,13 @@ page 6060120 "TM Ticket Admissions"
                     begin
                         CurrPage.SaveRecord;
                         TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Location, "Admission Code", '', "Admission Base Calendar Code");
+                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeAdmissionTemp);
                     end;
                 }
                 field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
                 }
-                field("TicketCustomized Calendar"; CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Service, "Admission Code", '', "Ticket Base Calendar Code"))
+                field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTicketTemp))
                 {
                     Caption = 'Ticket Customized Calendar';
                     Editable = false;
@@ -113,7 +113,7 @@ page 6060120 "TM Ticket Admissions"
                     begin
                         CurrPage.SaveRecord;
                         TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Service, "Admission Code", '', "Ticket Base Calendar Code");
+                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTicketTemp);
                     end;
                 }
                 field("eTicket Type Code"; "eTicket Type Code")
@@ -210,9 +210,24 @@ page 6060120 "TM Ticket Admissions"
         }
     }
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        Clear(CustomizedCalendarChangeAdmissionTemp);
+        CustomizedCalendarChangeAdmissionTemp."Source Type" := CustomizedCalendarChangeAdmissionTemp."Source Type"::Location;
+        CustomizedCalendarChangeAdmissionTemp."Source Code" := "Admission Code";
+        CustomizedCalendarChangeAdmissionTemp."Base Calendar Code" := "Admission Base Calendar Code";
+        CustomizedCalendarChangeAdmissionTemp.Insert();
+
+        Clear(CustomizedCalendarChangeTicketTemp);
+        CustomizedCalendarChangeTicketTemp."Source Type" := CustomizedCalendarChangeTicketTemp."Source Type"::Service;
+        CustomizedCalendarChangeTicketTemp."Source Code" := "Admission Code";
+        CustomizedCalendarChangeTicketTemp."Base Calendar Code" := "Ticket Base Calendar Code";
+        CustomizedCalendarChangeTicketTemp.Insert();
+    end;
+
     var
-        CustomizedCalEntry: Record "Customized Calendar Entry";
-        CustomizedCalendar: Record "Customized Calendar Change";
+        CustomizedCalendarChangeAdmissionTemp: Record "Customized Calendar Change" temporary;
+        CustomizedCalendarChangeTicketTemp: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 }
 

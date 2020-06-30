@@ -19,119 +19,119 @@ page 6060118 "TM Ticket Schedules"
         {
             repeater(Group)
             {
-                field("Schedule Code";"Schedule Code")
+                field("Schedule Code"; "Schedule Code")
                 {
                 }
-                field("Schedule Type";"Schedule Type")
+                field("Schedule Type"; "Schedule Type")
                 {
                 }
-                field("Admission Is";"Admission Is")
+                field("Admission Is"; "Admission Is")
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Start From";"Start From")
+                field("Start From"; "Start From")
                 {
                 }
-                field("Recurrence Until Pattern";"Recurrence Until Pattern")
+                field("Recurrence Until Pattern"; "Recurrence Until Pattern")
                 {
                 }
-                field("End After Occurrence Count";"End After Occurrence Count")
+                field("End After Occurrence Count"; "End After Occurrence Count")
                 {
                 }
-                field("End After Date";"End After Date")
+                field("End After Date"; "End After Date")
                 {
                 }
-                field("Recurrence Pattern";"Recurrence Pattern")
+                field("Recurrence Pattern"; "Recurrence Pattern")
                 {
                 }
-                field("Recur Every N On";"Recur Every N On")
+                field("Recur Every N On"; "Recur Every N On")
                 {
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
                 }
-                field("Stop Time";"Stop Time")
+                field("Stop Time"; "Stop Time")
                 {
                 }
-                field("Event Duration";"Event Duration")
+                field("Event Duration"; "Event Duration")
                 {
                 }
-                field("Event Arrival From Time";"Event Arrival From Time")
+                field("Event Arrival From Time"; "Event Arrival From Time")
                 {
                 }
-                field("Event Arrival Until Time";"Event Arrival Until Time")
+                field("Event Arrival Until Time"; "Event Arrival Until Time")
                 {
                 }
-                field("Sales From Date (Rel.)";"Sales From Date (Rel.)")
+                field("Sales From Date (Rel.)"; "Sales From Date (Rel.)")
                 {
                 }
-                field("Sales From Time";"Sales From Time")
+                field("Sales From Time"; "Sales From Time")
                 {
                 }
-                field("Sales Until Date (Rel.)";"Sales Until Date (Rel.)")
+                field("Sales Until Date (Rel.)"; "Sales Until Date (Rel.)")
                 {
                 }
-                field("Sales Until Time";"Sales Until Time")
+                field("Sales Until Time"; "Sales Until Time")
                 {
                 }
-                field(Monday;Monday)
+                field(Monday; Monday)
                 {
                 }
-                field(Tuesday;Tuesday)
+                field(Tuesday; Tuesday)
                 {
                 }
-                field(Wednesday;Wednesday)
+                field(Wednesday; Wednesday)
                 {
                 }
-                field(Thursday;Thursday)
+                field(Thursday; Thursday)
                 {
                 }
-                field(Friday;Friday)
+                field(Friday; Friday)
                 {
                 }
-                field(Saturday;Saturday)
+                field(Saturday; Saturday)
                 {
                 }
-                field(Sunday;Sunday)
+                field(Sunday; Sunday)
                 {
                 }
-                field("Prebook Is Required";"Prebook Is Required")
+                field("Prebook Is Required"; "Prebook Is Required")
                 {
                 }
-                field("Notify Stakeholder";"Notify Stakeholder")
+                field("Notify Stakeholder"; "Notify Stakeholder")
                 {
                 }
-                field("Max Capacity Per Sch. Entry";"Max Capacity Per Sch. Entry")
+                field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
                 }
-                field("Reserved For Web";"Reserved For Web")
-                {
-                    Visible = false;
-                }
-                field("Reserved For Members";"Reserved For Members")
+                field("Reserved For Web"; "Reserved For Web")
                 {
                     Visible = false;
                 }
-                field("Unbookable Before Start (Secs)";"Unbookable Before Start (Secs)")
+                field("Reserved For Members"; "Reserved For Members")
                 {
                     Visible = false;
                 }
-                field("Bookable Passed Start (Secs)";"Bookable Passed Start (Secs)")
+                field("Unbookable Before Start (Secs)"; "Unbookable Before Start (Secs)")
                 {
                     Visible = false;
                 }
-                field("Capacity Control";"Capacity Control")
+                field("Bookable Passed Start (Secs)"; "Bookable Passed Start (Secs)")
+                {
+                    Visible = false;
+                }
+                field("Capacity Control"; "Capacity Control")
                 {
                 }
-                field("Prebook From";"Prebook From")
+                field("Prebook From"; "Prebook From")
                 {
                 }
-                field("Admission Base Calendar Code";"Admission Base Calendar Code")
+                field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
                 }
-                field("Customized Calendar";CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Location,'',"Schedule Code","Admission Base Calendar Code"))
+                field("Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
                 {
                     Caption = 'Customized Calendar';
                     Editable = false;
@@ -140,7 +140,7 @@ page 6060118 "TM Ticket Schedules"
                     begin
                         CurrPage.SaveRecord;
                         TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Location,'',"Schedule Code","Admission Base Calendar Code");
+                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;
                 }
             }
@@ -167,14 +167,22 @@ page 6060118 "TM Ticket Schedules"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "TM Admission Schedule Lines";
-                RunPageLink = "Schedule Code"=FIELD("Schedule Code");
+                RunPageLink = "Schedule Code" = FIELD("Schedule Code");
             }
         }
     }
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        Clear(CustomizedCalendarChangeTemp);
+        CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
+        CustomizedCalendarChangeTemp."Additional Source Code" := "Schedule Code";
+        CustomizedCalendarChangeTemp."Base Calendar Code" := "Admission Base Calendar Code";
+        CustomizedCalendarChangeTemp.Insert();
+    end;
+
     var
-        CustomizedCalEntry: Record "Customized Calendar Entry";
-        CustomizedCalendar: Record "Customized Calendar Change";
+        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 }
 
