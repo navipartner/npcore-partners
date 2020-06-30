@@ -35,107 +35,104 @@ page 6151371 "CS Setup"
         {
             group(General)
             {
-                field("Enable Capture Service";"Enable Capture Service")
+                field("Enable Capture Service"; "Enable Capture Service")
                 {
                 }
-                field("Log Communication";"Log Communication")
+                field("Log Communication"; "Log Communication")
                 {
                 }
-                field("Web Service Is Published";"Web Service Is Published")
+                field("Web Service Is Published"; "Web Service Is Published")
                 {
                 }
-                field("Warehouse Type";"Warehouse Type")
+                field("Warehouse Type"; "Warehouse Type")
                 {
                 }
-                field("Media Library";"Media Library")
+                field("Media Library"; "Media Library")
                 {
                 }
-                field("Zero Def. Qty. to Handle";"Zero Def. Qty. to Handle")
+                field("Zero Def. Qty. to Handle"; "Zero Def. Qty. to Handle")
                 {
                 }
-                field("Sum Qty. to Handle";"Sum Qty. to Handle")
+                field("Sum Qty. to Handle"; "Sum Qty. to Handle")
                 {
                 }
             }
             group("Stock-Take")
             {
                 Caption = 'Stock-Take';
-                field("Filter Worksheets by Location";"Filter Worksheets by Location")
+                field("Filter Worksheets by Location"; "Filter Worksheets by Location")
                 {
                 }
-                field("Error On Invalid Barcode";"Error On Invalid Barcode")
+                field("Error On Invalid Barcode"; "Error On Invalid Barcode")
                 {
                 }
-                field("Aggregate Stock-Take Summarize";"Aggregate Stock-Take Summarize")
+                field("Aggregate Stock-Take Summarize"; "Aggregate Stock-Take Summarize")
                 {
                 }
-                field("Create Worksheet after Trans.";"Create Worksheet after Trans.")
+                field("Create Worksheet after Trans."; "Create Worksheet after Trans.")
                 {
                 }
             }
             group(RFID)
             {
                 Caption = 'RFID';
-                field("Stock-Take Template";"Stock-Take Template")
+                field("Stock-Take Template"; "Stock-Take Template")
                 {
                 }
-                field("Earliest Start Date/Time";"Earliest Start Date/Time")
+                field("Earliest Start Date/Time"; "Earliest Start Date/Time")
                 {
                 }
-                field("Batch Size";"Batch Size")
+                field("Batch Size"; "Batch Size")
                 {
                 }
             }
             group("Price Calculation")
             {
                 Caption = 'Price Calculation';
-                field("Price Calc. Customer No.";"Price Calc. Customer No.")
+                field("Price Calc. Customer No."; "Price Calc. Customer No.")
                 {
                 }
             }
             group(Search)
             {
                 Caption = 'Search';
-                field("Max Records In Search Result";"Max Records In Search Result")
+                field("Max Records In Search Result"; "Max Records In Search Result")
                 {
                 }
             }
             group(Worksheets)
             {
                 Caption = 'Worksheets';
-                field("Item Reclass. Jour Temp Name";"Item Reclass. Jour Temp Name")
+                field("Item Reclass. Jour Temp Name"; "Item Reclass. Jour Temp Name")
                 {
                 }
-                field("Item Reclass. Jour Batch Name";"Item Reclass. Jour Batch Name")
+                field("Item Reclass. Jour Batch Name"; "Item Reclass. Jour Batch Name")
                 {
                 }
             }
             group("Physical Inventory Counting")
             {
                 Caption = 'Physical Inventory Counting';
-                field("Phys. Inv Jour Temp Name";"Phys. Inv Jour Temp Name")
+                field("Phys. Inv Jour Temp Name"; "Phys. Inv Jour Temp Name")
                 {
                 }
-                field("Phys. Inv Jour No. Series";"Phys. Inv Jour No. Series")
+                field("Phys. Inv Jour No. Series"; "Phys. Inv Jour No. Series")
                 {
                 }
             }
             group("Job Queue")
             {
                 Caption = 'Job Queue';
-                field("Post with Job Queue";"Post with Job Queue")
+                field("Post with Job Queue"; "Post with Job Queue")
                 {
                 }
-                field("Job Queue Category Code";"Job Queue Category Code")
+                field("Job Queue Category Code"; "Job Queue Category Code")
                 {
                 }
-                field("Job Queue Priority for Post";"Job Queue Priority for Post")
+                field("Notify On Success"; "Notify On Success")
                 {
                 }
-                field("Notify On Success";"Notify On Success")
-                {
-                }
-                field("Run in User Session";"Run in User Session")
+                field("Run in User Session"; "Run in User Session")
                 {
                 }
             }
