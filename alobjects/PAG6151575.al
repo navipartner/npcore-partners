@@ -16,23 +16,19 @@ page 6151575 "Event Notes"
         {
             repeater(Group)
             {
-                field(URL1;URL1)
+                field(URL1; URL1)
                 {
                     Caption = 'No.';
                 }
-                field(URL2;URL2)
-                {
-                    Caption = 'Description';
-                }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
                     Caption = 'From User';
                 }
-                field("To User ID";"To User ID")
+                field("To User ID"; "To User ID")
                 {
                     Caption = 'To User';
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                     Caption = 'Note';
                 }
@@ -58,7 +54,7 @@ page 6151575 "Event Notes"
                 begin
                     //-NPR5.32 [277397]
                     if "Link ID" = 0 then
-                      exit;
+                        exit;
                     //+NPR5.32 [277397]
                     RecRef.Get("Record ID");
                     RecRef.SetTable(Job);
@@ -90,37 +86,36 @@ page 6151575 "Event Notes"
         NoteText: BigText;
         LinkID: Integer;
     begin
-        Job.SetRange("Event",true);
-        Job.SetFilter("Starting Date",'>=%1',WorkDate);
+        Job.SetRange("Event", true);
+        Job.SetFilter("Starting Date", '>=%1', WorkDate);
         if Job.FindSet then
-          repeat
-            JobCount += 1;
-            RecordLink.SetRange("Record ID",Job.RecordId);
-            RecordLink.SetRange(Type,RecordLink.Type::Note);
-            if RecordLink.FindSet then
-              repeat
-                if RecordLink.Note.HasValue then begin
-                  Clear(NoteText);
-                  Clear(NoteInStream);
-                  RecordLink.CalcFields(Note);
-                  RecordLink.Note.CreateInStream(NoteInStream);
-                  MemoryStream := MemoryStream.MemoryStream;
-                  MemoryStream := NoteInStream;
-                  BinaryReader := BinaryReader.BinaryReader(MemoryStream);
-                  NoteText.AddText(BinaryReader.ReadString);
-                  LinkID += 1;
-                  Init;
-                  "Link ID" := LinkID;
-                  URL1 := Job."No.";
-                  URL2 := Job.Description;
-                  "Record ID" := RecordLink."Record ID";
-                  "User ID" := GetUserName(RecordLink."User ID");
-                  "To User ID" := GetUserName(RecordLink."To User ID");
-                  Description := CopyStr(Format(NoteText),1,MaxStrLen(Description));
-                  Insert;
-                end;
-              until RecordLink.Next = 0;
-          until (Job.Next = 0) or (JobCount = MaxNoOfEvents);
+            repeat
+                JobCount += 1;
+                RecordLink.SetRange("Record ID", Job.RecordId);
+                RecordLink.SetRange(Type, RecordLink.Type::Note);
+                if RecordLink.FindSet then
+                    repeat
+                        if RecordLink.Note.HasValue then begin
+                            Clear(NoteText);
+                            Clear(NoteInStream);
+                            RecordLink.CalcFields(Note);
+                            RecordLink.Note.CreateInStream(NoteInStream);
+                            MemoryStream := MemoryStream.MemoryStream;
+                            MemoryStream := NoteInStream;
+                            BinaryReader := BinaryReader.BinaryReader(MemoryStream);
+                            NoteText.AddText(BinaryReader.ReadString);
+                            LinkID += 1;
+                            Init;
+                            "Link ID" := LinkID;
+                            URL1 := Job."No.";
+                            "Record ID" := RecordLink."Record ID";
+                            "User ID" := GetUserName(RecordLink."User ID");
+                            "To User ID" := GetUserName(RecordLink."To User ID");
+                            Description := CopyStr(Format(NoteText), 1, MaxStrLen(Description));
+                            Insert;
+                        end;
+                    until RecordLink.Next = 0;
+            until (Job.Next = 0) or (JobCount = MaxNoOfEvents);
     end;
 
     local procedure GetUserName(UserID: Text): Text
@@ -128,11 +123,11 @@ page 6151575 "Event Notes"
         User: Record User;
         EveryoneText: Label 'Everyone';
     begin
-        User.SetRange("User Name",UserID);
+        User.SetRange("User Name", UserID);
         if User.FindFirst and (User."Full Name" <> '') then
-          exit(User."Full Name");
+            exit(User."Full Name");
         if UserID = '' then
-          exit(EveryoneText);
+            exit(EveryoneText);
         exit(UserID);
     end;
 }
