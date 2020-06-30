@@ -17,7 +17,7 @@ report 6060127 "MM Member Card Print"
             column(MemberType; MemberType)
             {
             }
-            column(QRBlob; TmpQR.Blob)
+            column(QRBlob; BlobBuffer."Buffer 1")
             {
             }
             column(RegisterPicture; POSViewProfile.Picture)
@@ -60,6 +60,7 @@ report 6060127 "MM Member Card Print"
                 BarcodeLib.SetSizeY(2);
                 BarcodeLib.SetBarcodeType('QR');
                 BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.", TmpQR);
+                BlobBuffer.GetFromTempBlob(TmpQR, 1);
 
                 MemberDate := Format("MM Member Card"."Valid Until");
 
@@ -111,5 +112,6 @@ report 6060127 "MM Member Card Print"
         MemberDate: Text;
         POSUnit: Record "POS Unit";
         POSViewProfile: Record "POS View Profile";
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

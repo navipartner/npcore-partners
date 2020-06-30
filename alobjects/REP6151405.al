@@ -210,7 +210,7 @@ report 6151405 "Magento Credit Voucher"
             column(SalesOrderNo_CreditVoucher; "Credit Voucher"."Sales Order No.")
             {
             }
-            column(Barcode_CreditVoucher; TempBlobBarcode.Blob)
+            column(Barcode_CreditVoucher; BlobBuffer."Buffer 1")
             {
             }
 
@@ -222,6 +222,7 @@ report 6151405 "Magento Credit Voucher"
                 MagentoBarcodeLibrary.SetDpiX(600);
                 MagentoBarcodeLibrary.SetDpiY(600);
                 MagentoBarcodeLibrary.GenerateBarcode("No.", TempBlobBarcode);
+                BlobBuffer.GetFromTempBlob(TempBlobBarcode, 1);
                 //+MAG2.22 [357825]
             end;
         }
@@ -251,5 +252,6 @@ report 6151405 "Magento Credit Voucher"
 
     var
         TempBlobBarcode: Codeunit "Temp Blob";
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

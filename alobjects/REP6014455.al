@@ -64,13 +64,14 @@ report 6014455 "Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol1; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol1; TempBlobCol1.Blob)
+            column(BarCodeTempBlobCol1; BlobBuffer."Buffer 1")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
+                BlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
             end;
         }
         dataitem(TMPRetail_Journal_Line_Col2; "Retail Journal Line")
@@ -95,13 +96,14 @@ report 6014455 "Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol2; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol2; TempBlobCol2.Blob)
+            column(BarCodeTempBlobCol2; BlobBuffer."Buffer 2")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol2);
+                BlobBuffer.GetFromTempBlob(TempBlobCol2, 2);
             end;
         }
         dataitem(TMPRetail_Journal_Line_Col3; "Retail Journal Line")
@@ -126,13 +128,14 @@ report 6014455 "Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol3; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol3; TempBlobCol3.Blob)
+            column(BarCodeTempBlobCol3; BlobBuffer."Buffer 3")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol3);
+                BlobBuffer.GetFromTempBlob(TempBlobCol3, 3);
             end;
         }
     }
@@ -191,6 +194,7 @@ report 6014455 "Item Barcode Status Sheet"
         LineNo: Integer;
         ItemFilter: Text;
         ItemVariantFilter: Text;
+        BlobBuffer: Record "BLOB buffer" temporary;
 
     local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])
     begin

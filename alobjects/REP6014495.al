@@ -99,7 +99,7 @@ report 6014495 "NP Whse. - Shipment"
                     column(QtyPicked_WhseShptLine; "Qty. Picked")
                     {
                     }
-                    column(Barcode; TmpBarcode.Blob)
+                    column(Barcode; BlobBuffer."Buffer 1")
                     {
                     }
 
@@ -115,6 +115,7 @@ report 6014495 "NP Whse. - Shipment"
                         TmpBarcode.CreateInStream(InStr);
                         TmpBarcode.CreateOutStream(OuStr);
                         GenerateBitmap(InStr, OuStr);
+                        BlobBuffer.GetFromTempBlob(TmpBarcode, 1);
                     end;
                 }
             }
@@ -154,6 +155,7 @@ report 6014495 "NP Whse. - Shipment"
         InStr: InStream;
         OuStr: OutStream;
         QtyPickedCaptionLbl: Label 'Qty. Picked';
+        BlobBuffer: Record "BLOB Buffer" temporary;
 
     local procedure GetLocation(LocationCode: Code[10])
     begin

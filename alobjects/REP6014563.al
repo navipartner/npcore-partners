@@ -68,7 +68,7 @@ report 6014563 "Receipt A5 - No Addr."
             column(ShowVendorItemNo_NPRetailConfig; NPRetailConfig."Show vendoe Itemno.")
             {
             }
-            column(Barcode; TempBlob.Blob)
+            column(Barcode; BlobBuffer."Buffer 1")
             {
             }
             dataitem(CommentLoop; "Integer")
@@ -571,6 +571,7 @@ report 6014563 "Receipt A5 - No Addr."
                     SalesPersonText := StrSubstNo(Text001, "Salesperson Code");
 
                 BarcodeLib.GenerateBarcode("Sales Ticket No.", TempBlob);
+                BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
                 //-NPR4.18
                 Register.Get("Register No.");
@@ -662,5 +663,6 @@ report 6014563 "Receipt A5 - No Addr."
         BarcodeLib: Codeunit "Barcode Library";
         TempBlob: Codeunit "Temp Blob";
         TempRetailComment: Record "Retail Comment" temporary;
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

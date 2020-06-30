@@ -67,7 +67,7 @@ report 6014428 "Shelf Labels"
             column(Itemgroup_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Item group")
             {
             }
-            column(BarCodeTempBlobCol1; TempBlobCol1.Blob)
+            column(BarCodeTempBlobCol1; BlobBuffer."Buffer 1")
             {
             }
             column(Assortment_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1.Assortment)
@@ -107,6 +107,7 @@ report 6014428 "Shelf Labels"
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
+                BlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
 
                 Clear(ItemVariant);
                 if Item.Get("Item No.") then begin
@@ -223,6 +224,7 @@ report 6014428 "Shelf Labels"
         ItemVariant: Record "Item Variant";
         k: Integer;
         UnitPriceOption: Option "Use Retail Journal Line Prices","Use Item Card Unit Prices","Use Campaign Unit Prices";
+        BlobBuffer: Record "BLOB buffer" temporary;
 
     local procedure GetItemNPRAttr(ItemRec: Record Item)
     var

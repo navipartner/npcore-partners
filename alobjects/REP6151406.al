@@ -215,7 +215,7 @@ report 6151406 "Magento Gift Voucher"
             column(Message_GiftVoucher; GiftVoucherMessage)
             {
             }
-            column(Barcode_GiftVoucher; TempBlobBarcode.Blob)
+            column(Barcode_GiftVoucher; BlobBuffer."Buffer 1")
             {
             }
 
@@ -243,6 +243,7 @@ report 6151406 "Magento Gift Voucher"
                 MagentoBarcodeLibrary.SetDpiX(600);
                 MagentoBarcodeLibrary.SetDpiY(600);
                 MagentoBarcodeLibrary.GenerateBarcode("No.", TempBlobBarcode);
+                BlobBuffer.GetFromTempBlob(TempBlobBarcode, 1);
                 //+MAG2.22 [357825]
             end;
         }
@@ -273,5 +274,6 @@ report 6151406 "Magento Gift Voucher"
     var
         TempBlobBarcode: Codeunit "Temp Blob";
         GiftVoucherMessage: Text;
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 
