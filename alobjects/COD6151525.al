@@ -122,17 +122,28 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         IStream: InStream;
         OStream: OutStream;
         TempBlob: Codeunit "Temp Blob";
+        Recipients: List of [Text];
+        CCRecipients: List of [Text];
+        BCCRecipients: List of [Text];
     begin
-        SMTPMail.CreateMessage(NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address", NcEndpointEmail."Recipient E-Mail Address", Subject, Body, true);
+        Recipients.Add(NcEndpointEmail."Recipient E-Mail Address");
+        SMTPMail.CreateMessage(NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address", Recipients, Subject, Body, true);
         TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
         OStream.WriteText(OutputText);
         TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
         SMTPMail.AddAttachmentStream(IStream, Filename);
-        if NcEndpointEmail."CC E-Mail Address" <> '' then
-            SMTPMail.AddCC(NcEndpointEmail."CC E-Mail Address");
-        if NcEndpointEmail."BCC E-Mail Address" <> '' then
-            SMTPMail.AddBCC(NcEndpointEmail."BCC E-Mail Address");
-        if SMTPMail.TrySend then begin
+
+        if NcEndpointEmail."CC E-Mail Address" <> '' then begin
+            CCRecipients.Add(NcEndpointEmail."CC E-Mail Address");
+            SMTPMail.AddCC(CCRecipients);
+        end;
+
+        if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
+            BCCRecipients.Add(NcEndpointEmail."BCC E-Mail Address");
+            SMTPMail.AddBCC(BCCRecipients);
+        end;
+
+        if SMTPMail.Send then begin
             //Positive Response
             NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccess, NcEndpointEmail."Recipient E-Mail Address"));
         end else begin
@@ -147,22 +158,30 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         TextEmailSuccess: Label 'File emailed to %1.';
         SMTPMail: Codeunit "SMTP Mail";
         InStream: InStream;
+        Recipients: List of [Text];
+        CCRecipients: List of [Text];
+        BCCRecipients: List of [Text];        
     begin
         //-NC2.12 [308107]
+        Recipients.Add(NcEndpointEmail."Recipient E-Mail Address");
         SMTPMail.CreateMessage(
           NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address",
-          NcEndpointEmail."Recipient E-Mail Address", NcEndpointEmail."Subject Text", NcEndpointEmail."Body Text", true);
+          Recipients, NcEndpointEmail."Subject Text", NcEndpointEmail."Body Text", true);
 
         NcTaskOutput.Data.CreateInStream(InStream, TEXTENCODING::UTF8);
         SMTPMail.AddAttachmentStream(InStream, NcTaskOutput.Name);
 
-        if NcEndpointEmail."CC E-Mail Address" <> '' then
-            SMTPMail.AddCC(NcEndpointEmail."CC E-Mail Address");
+        if NcEndpointEmail."CC E-Mail Address" <> '' then begin
+            CCRecipients.Add(NcEndpointEmail."CC E-Mail Address");
+            SMTPMail.AddCC(CCRecipients);
+        end;
 
-        if NcEndpointEmail."BCC E-Mail Address" <> '' then
-            SMTPMail.AddBCC(NcEndpointEmail."BCC E-Mail Address");
+        if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
+            BCCRecipients.Add(NcEndpointEmail."BCC E-Mail Address");
+            SMTPMail.AddBCC(BCCRecipients);
+        end;
 
-        if not SMTPMail.TrySend then
+        if not SMTPMail.Send then
             Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", SMTPMail.GetLastSendMailErrorText);
         //+NC2.12 [308107]
     end;
