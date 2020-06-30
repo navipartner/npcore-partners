@@ -39,6 +39,12 @@ codeunit 6060062 "Process Catalog File"
         ImportVendorCatalogFile: Codeunit "Import Vendor Catalog File";
         ServerTempPath: Text;
         DataCompression: Codeunit "Data Compression";
+        ArchiveEntryList: List of [Text];
+        ArchiveEntry: Text;
+        ArchiveEntrySize: Integer;
+        TempFile: File;
+        InStr: InStream;
+        OutStr: OutStream;
     begin
         if Exists(TemporaryPath + GetZipFilename) then
             Erase(TemporaryPath + GetZipFilename);
@@ -46,12 +52,23 @@ codeunit 6060062 "Process Catalog File"
         //Store blob as zipfile
         NcImportEntry.CalcFields("Document Source");
         TempBlob.FromRecord(NcImportEntry, NcImportEntry.FieldNo("Document Source"));
-        FileManagement.BLOBExportToServerFile(TempBlob, TemporaryPath + GetZipFilename);
-
+        TempBlob.CreateInStream(InStr);
         //Extract zipfile
-        ServerTempPath := FileManagement.ServerCreateTempSubDirectory;
-        DataCompression.Ex ExtractZipFile(TemporaryPath + GetZipFilename, ServerTempPath);
-        FileManagement.GetServerDirectoryFilesList(TempNameValueBuffer, ServerTempPath);
+        TempFile.CreateTempFile();
+        TempFile.CreateOutStream(OutStr);
+
+        if DataCompression.IsGZip(InStr) then begin
+            DataCompression.GZipDecompress(InStr, OutStr);
+        end else begin
+            DataCompression.OpenZipArchive(TempBlob, false);
+            DataCompression.GetEntryList(ArchiveEntryList);
+            foreach ArchiveEntry in ArchiveEntryList do begin
+                DataCompression.ExtractEntry(ArchiveEntry, OutStr, ArchiveEntrySize);
+            end;
+            TempFile.Close();
+        end;
+
+        FileManagement.GetServerDirectoryFilesList(TempNameValueBuffer, TempFile.Name);
 
         //Process fields
         if TempNameValueBuffer.FindFirst then
