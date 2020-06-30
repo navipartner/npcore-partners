@@ -118,7 +118,7 @@ codeunit 6014427 "System Event Wrapper"
         OnAfterCompanyClose();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Caption Class", 'OnAfterCaptionClassTranslate', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Caption Class", 'OnAfterCaptionClassResolve', '', true, true)]
     local procedure C42OnAfterCaptionClassTranslate(Language: Integer; CaptionExpression: Text[1024]; var Caption: Text[1024])
     begin
         OnAfterCaptionClassTranslate(Language, CaptionExpression, Caption);
