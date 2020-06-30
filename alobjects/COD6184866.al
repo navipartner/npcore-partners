@@ -164,6 +164,7 @@ codeunit 6184866 "External Storage Interface"
         Paths: DotNet npNetXmlDocument;
         Path: DotNet npNetXmlNode;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on DropBox server
@@ -248,7 +249,7 @@ codeunit 6184866 "External Storage Interface"
             DropBoxOverview.SetRange("File Name", DirectoryName);
             DropBoxOverview.SetRange(Name, File.Name);
             if DropBoxOverview.IsEmpty or Reupload then begin
-                TempBlob.Import(File.Path + '\' + File.Name);
+                TempBlobMgt.ImportFromFile(TempBlob, File.Path + '\' + File.Name);
 
                 DropboxAPIMgt.UploadToDropbox(TempBlob, DropBoxAPISetup."Account Code", DirectoryName + '/' + File.Name, true, false);
 
@@ -277,6 +278,7 @@ codeunit 6184866 "External Storage Interface"
         StorageServerFileName: Text;
         Dialog: Dialog;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]: file path [and name] on the DropBox storage server
         //TempStorageOperationParameter[second]: data exchange type used to import incoming document
@@ -318,7 +320,7 @@ codeunit 6184866 "External Storage Interface"
             if DataExchangeType > '' then
                 CreateIncomingDocument(TempBlob, DropBoxOverview.Name, DataExchangeType)
             else
-                TempBlob.Export(DropBoxAPISetup."Storage On Server" + DropBoxOverview.Name);
+                TempBlobMgt.ExportToFile(TempBlob, DropBoxAPISetup."Storage On Server" + DropBoxOverview.Name);
 
             if GuiAllowed then begin
                 Dialog.Update(1, (i / DropBoxOverview.Count * 10000) div 1);
@@ -428,6 +430,7 @@ codeunit 6184866 "External Storage Interface"
         XMLContainerList: DotNet npNetXmlNodeList;
         Dialog: Dialog;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on Azure Storage
@@ -524,7 +527,7 @@ codeunit 6184866 "External Storage Interface"
             AzureStorageOverview.SetRange("File Name", DirectoryName);
             AzureStorageOverview.SetRange(Name, File.Name);
             if AzureStorageOverview.IsEmpty or Reupload then begin
-                TempBlob.Import(File.Path + '/' + File.Name);
+                TempBlobMgt.ImportFromFile(TempBlob, File.Path + '/' + File.Name);
 
                 AzureStoageAPIMgt.UploadToAzureStorage(TempBlob, AzureStorageAPISetup."Account Name", '', ContainerName,
                                                       DirectoryName + '/' + File.Name, '', false);
@@ -556,6 +559,7 @@ codeunit 6184866 "External Storage Interface"
         ContainerName: Text;
         DirectoryFileName: Text;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   directory [and file name] on the Azure storage server
         //TempStorageOperationParameter[second]:  container name on the Azure storage server
@@ -605,7 +609,7 @@ codeunit 6184866 "External Storage Interface"
             if DataExchangeType > '' then
                 CreateIncomingDocument(TempBlob, AzureStorageOverview.Name, DataExchangeType)
             else
-                TempBlob.Export(AzureStorageAPISetup."Storage On Server" + AzureStorageOverview.Name);
+                TempBlobMgt.ExportToFile(TempBlob, AzureStorageAPISetup."Storage On Server" + AzureStorageOverview.Name);
 
             if GuiAllowed then begin
                 Dialog.Update(1, (i / AzureStorageOverview.Count * 10000) div 1);
@@ -724,6 +728,7 @@ codeunit 6184866 "External Storage Interface"
         Directories: DotNet npNetXmlDocument;
         Directory: DotNet npNetXmlNode;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on FTP server
@@ -808,7 +813,7 @@ codeunit 6184866 "External Storage Interface"
             FTPOverview.SetRange("File Name", DirectoryName);
             FTPOverview.SetRange(Name, File.Name);
             if FTPOverview.IsEmpty or Reupload then begin
-                TempBlob.Import(File.Path + '\' + File.Name);
+                TempBlobMgt.ImportFromFile(TempBlob, File.Path + '\' + File.Name);
 
                 FTPManagement.UploadToFTP(TempBlob, FTPSetup.Code, DirectoryName, File.Name, false, false);
 
@@ -837,6 +842,7 @@ codeunit 6184866 "External Storage Interface"
         StorageServerFilePath: Text;
         StorageServerFileName: Text;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]: file path [and name] on the FTP storage server
         //TempStorageOperationParameter[second]: data exchange type used to import incoming document
@@ -878,7 +884,7 @@ codeunit 6184866 "External Storage Interface"
             if DataExchangeType > '' then
                 CreateIncomingDocument(TempBlob, FTPOverview.Name, DataExchangeType)
             else
-                TempBlob.Export(FTPSetup."Storage On Server" + FTPOverview.Name);
+                TempBlobMgt.ExportToFile(TempBlob, FTPSetup."Storage On Server" + FTPOverview.Name);
 
             if GuiAllowed then begin
                 Dialog.Update(1, (i / FTPOverview.Count * 10000) div 1);

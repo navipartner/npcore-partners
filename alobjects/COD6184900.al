@@ -1,12 +1,28 @@
 codeunit 6184900 "Temp Blob Management"
 {
-    procedure ToRecord(var SourceTempBlob: Codeunit "Temp Blob"; var RecordVariant: Variant; FieldNo: Integer)
+    procedure ExportToFile(var TempBlob: Codeunit "Temp Blob"; Path: Text)
     var
-        RecRef: RecordRef;
-        FldRef: FieldRef;
+        OutputFile: File;
+        InStr: InStream;
+        OutStr: OutStream;
     begin
-        RecRef.GetTable(RecordVariant);
-        FldRef := RecRef.Field(FieldNo);
-        SourceTempBlob.ToFieldRef(FldRef);
+        OutputFile.Create(Path);
+        TempBlob.CreateInStream(InStr);
+        OutputFile.CreateOutStream(OutStr);
+        CopyStream(OutStr, InStr);
+        OutputFile.Close();
+    end;
+
+    procedure ImportFromFile(var TempBlob: Codeunit "Temp Blob"; Path: Text)
+    var
+        InputFile: File;
+        InStr: InStream;
+        OutStr: OutStream;
+    begin
+        InputFile.Open(Path);
+        InputFile.CreateInStream(InStr);
+        TempBlob.CreateOutStream(OutStr);
+        CopyStream(OutStr, InStr);
+        InputFile.Close();
     end;
 }
