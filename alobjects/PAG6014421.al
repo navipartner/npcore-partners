@@ -24,22 +24,22 @@ page 6014421 "Item Group Page"
             group(General)
             {
                 Caption = 'General';
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field("Webshop Picture";"Webshop Picture")
+                field("Webshop Picture"; "Webshop Picture")
                 {
                 }
-                field("Search Description";"Search Description")
+                field("Search Description"; "Search Description")
                 {
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
 
                     trigger OnValidate()
@@ -51,7 +51,7 @@ page 6014421 "Item Group Page"
             group(Settings)
             {
                 Caption = 'Settings';
-                field("Parent Item Group No.";"Parent Item Group No.")
+                field("Parent Item Group No."; "Parent Item Group No.")
                 {
 
                     trigger OnValidate()
@@ -59,16 +59,16 @@ page 6014421 "Item Group Page"
                         ParentItemGroupOnAfterValidate;
                     end;
                 }
-                field("Used Goods Group";"Used Goods Group")
+                field("Used Goods Group"; "Used Goods Group")
                 {
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
                 }
-                field("Item Discount Group";"Item Discount Group")
+                field("Item Discount Group"; "Item Discount Group")
                 {
                 }
-                field(Warranty;Warranty)
+                field(Warranty; Warranty)
                 {
                     Caption = 'Warranty certificate';
 
@@ -77,7 +77,7 @@ page 6014421 "Item Group Page"
                         GarantibevisOnAfterValidate;
                     end;
                 }
-                field("Warranty File";"Warranty File")
+                field("Warranty File"; "Warranty File")
                 {
 
                     trigger OnValidate()
@@ -85,7 +85,7 @@ page 6014421 "Item Group Page"
                         WarrantyFileOnAfterValidate;
                     end;
                 }
-                field("Insurance Category";"Insurance Category")
+                field("Insurance Category"; "Insurance Category")
                 {
 
                     trigger OnValidate()
@@ -93,37 +93,37 @@ page 6014421 "Item Group Page"
                         InsuranceSectOnAfterValidate;
                     end;
                 }
-                field("Tarif No.";"Tarif No.")
+                field("Tarif No."; "Tarif No.")
                 {
                 }
-                field(Level;Level)
-                {
-                    Editable = false;
-                }
-                field("Belongs In Main Item Group";"Belongs In Main Item Group")
+                field(Level; Level)
                 {
                     Editable = false;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Belongs In Main Item Group"; "Belongs In Main Item Group")
                 {
                     Editable = false;
                 }
-                field("Base Unit of Measure";"Base Unit of Measure")
+                field("Last Date Modified"; "Last Date Modified")
+                {
+                    Editable = false;
+                }
+                field("Base Unit of Measure"; "Base Unit of Measure")
                 {
                 }
-                field("Sales Unit of Measure";"Sales Unit of Measure")
+                field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
                 }
-                field("Purch. Unit of Measure";"Purch. Unit of Measure")
+                field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                 {
                 }
-                field(Internet;Internet)
+                field(Internet; Internet)
                 {
                 }
-                field("Variety Group";"Variety Group")
+                field("Variety Group"; "Variety Group")
                 {
                 }
-                field("Config. Template Header";"Config. Template Header")
+                field("Config. Template Header"; "Config. Template Header")
                 {
                 }
             }
@@ -133,43 +133,43 @@ page 6014421 "Item Group Page"
                 group("VAT Setup")
                 {
                     Caption = 'VAT Setup';
-                    field("VATPostingSetup.""VAT %""";VATPostingSetup."VAT %")
+                    field("VATPostingSetup.""VAT %"""; VATPostingSetup."VAT %")
                     {
                         Caption = 'VAT %';
                         Editable = false;
                     }
-                    field("GLAccountSale.""No.""";GLAccountSale."No.")
+                    field("GLAccountSale.""No."""; GLAccountSale."No.")
                     {
                         Caption = 'Account Sales VAT';
                         Editable = false;
                     }
-                    field("GLAccountSale.Name";GLAccountSale.Name)
+                    field("GLAccountSale.Name"; GLAccountSale.Name)
                     {
                         Caption = 'Account Name';
                         Editable = false;
                     }
-                    field("GLAccountPurch.""No.""";GLAccountPurch."No.")
+                    field("GLAccountPurch.""No."""; GLAccountPurch."No.")
                     {
                         Caption = 'Account Purchase VAT';
                         Editable = false;
                     }
-                    field("GLAccountPurch.Name";GLAccountPurch.Name)
+                    field("GLAccountPurch.Name"; GLAccountPurch.Name)
                     {
                         Caption = 'Account Name';
                         Editable = false;
                     }
-                    field("GLAccountReverse.""No.""";GLAccountReverse."No.")
+                    field("GLAccountReverse.""No."""; GLAccountReverse."No.")
                     {
                         Caption = 'Account Recipient';
                         Editable = false;
                     }
-                    field("GLAccountReverse.Name";GLAccountReverse.Name)
+                    field("GLAccountReverse.Name"; GLAccountReverse.Name)
                     {
                         Caption = 'Account Name';
                         Editable = false;
                     }
                 }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
 
                     trigger OnValidate()
@@ -180,7 +180,7 @@ page 6014421 "Item Group Page"
                         //+NPR5.20
                     end;
                 }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
 
                     trigger OnValidate()
@@ -194,34 +194,34 @@ page 6014421 "Item Group Page"
                         //+NPR5.20
                     end;
                 }
-                field("Inventory Posting Group";"Inventory Posting Group")
+                field("Inventory Posting Group"; "Inventory Posting Group")
                 {
                 }
-                field("VAT Prod. Posting Group";"VAT Prod. Posting Group")
+                field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
                 }
-                field("Tax Group Code";"Tax Group Code")
+                field("Tax Group Code"; "Tax Group Code")
                 {
                 }
-                field("VAT Bus. Posting Group";"VAT Bus. Posting Group")
+                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
                 }
-                field("Costing Method";"Costing Method")
+                field("Costing Method"; "Costing Method")
                 {
                 }
             }
             group(Pictures)
             {
                 Caption = 'Pictures';
-                field(Control1160330017;Picture)
+                field(Control1160330017; Picture)
                 {
                     ShowCaption = false;
                 }
             }
-            part(SubForm;"Item Group Subpage")
+            part(SubForm; "Item Group Subpage")
             {
                 Caption = 'Child Groups';
-                SubPageLink = "Parent Item Group No."=FIELD(FILTER("No."));
+                SubPageLink = "Parent Item Group No." = FIELD(FILTER("No."));
                 SubPageView = SORTING("No.");
             }
         }
@@ -242,29 +242,33 @@ page 6014421 "Item Group Page"
 
                     trigger OnAction()
                     var
-                        TempBlob: Record TempBlob;
+                        TempBlob: Codeunit "Temp Blob";
                         Name: Text[200];
                         TextName: Text[1024];
                         PictureExists: Boolean;
                         Index: Integer;
                         Text001: Label 'Do you want to replace the existing picture of %1 %2?';
+                        RecRef: RecordRef;
                     begin
                         PictureExists := Picture.HasValue;
 
-                        Clear (TempBlob) ;
+                        Clear(TempBlob);
 
-                        Name    := FileManagement.BLOBImport(TempBlob,TextName);
-                        Picture := TempBlob.Blob;
+                        Name := FileManagement.BLOBImport(TempBlob, TextName);
+
+                        RecRef.GetTable(Rec);
+                        TempBlob.ToRecordRef(RecRef, FieldNo(Picture));
+                        RecRef.SetTable(Rec);
 
                         if Name = '' then
-                          exit;
-                        if PictureExists then
-                          if not Confirm(Text001,false,TableCaption,"No.") then
                             exit;
+                        if PictureExists then
+                            if not Confirm(Text001, false, TableCaption, "No.") then
+                                exit;
 
-                        while(StrPos(Name,'.') > 0 ) do begin
-                          Index := StrPos(Name,'.');
-                          Name  := CopyStr(Name,Index+1);
+                        while (StrPos(Name, '.') > 0) do begin
+                            Index := StrPos(Name, '.');
+                            Name := CopyStr(Name, Index + 1);
                         end;
 
                         "Picture Extention" := Name;
@@ -283,10 +287,10 @@ page 6014421 "Item Group Page"
                         Text002: Label 'Do you want to delete the picture of %1 %2?';
                     begin
                         if Picture.HasValue then
-                          if Confirm(Text002,false,TableCaption,"No.") then begin
-                            Clear(Picture);
-                            CurrPage.SaveRecord;
-                          end;
+                            if Confirm(Text002, false, TableCaption, "No.") then begin
+                                Clear(Picture);
+                                CurrPage.SaveRecord;
+                            end;
                     end;
                 }
             }
@@ -299,8 +303,8 @@ page 6014421 "Item Group Page"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014410),
-                                  "No."=FIELD("No.");
+                    RunPageLink = "Table ID" = CONST(6014410),
+                                  "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                 }
             }
@@ -314,7 +318,7 @@ page 6014421 "Item Group Page"
 
                     trigger OnAction()
                     begin
-                        RetailTableCode.CreateItemGroupNoSeries( Rec );
+                        RetailTableCode.CreateItemGroupNoSeries(Rec);
                     end;
                 }
                 action("Create Number Series to All Item Groups")
@@ -327,12 +331,13 @@ page 6014421 "Item Group Page"
                         ItemGroup: Record "Item Group";
                         MsgCreated: Label 'Number Series has been created for %1 Item Groups';
                     begin
-                        ItemGroup.SetFilter( "No. Series", '<>%1', '' );
-                        if ItemGroup.Find('-') then repeat
-                          RetailTableCode.CreateItemGroupNoSeries( ItemGroup );
-                        until ItemGroup.Next = 0;
+                        ItemGroup.SetFilter("No. Series", '<>%1', '');
+                        if ItemGroup.Find('-') then
+                            repeat
+                                RetailTableCode.CreateItemGroupNoSeries(ItemGroup);
+                            until ItemGroup.Next = 0;
 
-                        Message( MsgCreated, ItemGroup.Count );
+                        Message(MsgCreated, ItemGroup.Count);
                     end;
                 }
                 separator(Separator6150621)
@@ -352,16 +357,17 @@ page 6014421 "Item Group Page"
                         //-NPR70.00.01.05
                         CurrPage.SetSelectionFilter(ItemGroupSelected);
 
-                        if ItemGroupSelected.FindSet then repeat
-                          FilterText += ItemGroupSelected."No." +'|';
-                        until ItemGroupSelected.Next=0;
+                        if ItemGroupSelected.FindSet then
+                            repeat
+                                FilterText += ItemGroupSelected."No." + '|';
+                            until ItemGroupSelected.Next = 0;
 
-                        ItemGroupSelectedMark.SetFilter("No.",CopyStr(FilterText,1,StrLen(FilterText)-1));
+                        ItemGroupSelectedMark.SetFilter("No.", CopyStr(FilterText, 1, StrLen(FilterText) - 1));
 
                         if StrLen(FilterText) > 1 then
-                          REPORT.Run(6014610,true,false,ItemGroupSelectedMark)
+                            REPORT.Run(6014610, true, false, ItemGroupSelectedMark)
                         else
-                          REPORT.Run(6014610,true,false,ItemGroupSelected);
+                            REPORT.Run(6014610, true, false, ItemGroupSelected);
                         //+NPR70.00.01.05
                     end;
                 }
@@ -379,7 +385,7 @@ page 6014421 "Item Group Page"
                     Promoted = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item Group No."=FIELD("No.");
+                    RunPageLink = "Item Group No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+N';
                 }
                 action("&VAT Posting Grups")
@@ -391,10 +397,10 @@ page 6014421 "Item Group Page"
                     var
                         VATPostingSetup: Record "VAT Posting Setup";
                     begin
-                        if VATPostingSetup.Get("VAT Bus. Posting Group","VAT Prod. Posting Group") then
-                          PAGE.RunModal(PAGE::"VAT Posting Setup Card",VATPostingSetup)
+                        if VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then
+                            PAGE.RunModal(PAGE::"VAT Posting Setup Card", VATPostingSetup)
                         else
-                          Error(Text10600000);
+                            Error(Text10600000);
                     end;
                 }
                 action("Page Item List")
@@ -402,7 +408,7 @@ page 6014421 "Item Group Page"
                     Caption = '&Item List';
                     Image = ItemWorksheet;
                     RunObject = Page "Item List";
-                    RunPageLink = "Item Group"=FIELD("No.");
+                    RunPageLink = "Item Group" = FIELD("No.");
                 }
             }
         }
@@ -440,27 +446,27 @@ page 6014421 "Item Group Page"
         ErrVbGr: Label 'Item Post. Gr. must contain a value!';
     begin
         if "Gen. Prod. Posting Group" = '' then begin
-          if bError then
-            Error( ErrPrGr )
-          else
-            Message( ErrPrGr );
-          exit( false );
+            if bError then
+                Error(ErrPrGr)
+            else
+                Message(ErrPrGr);
+            exit(false);
         end;
         if "Gen. Bus. Posting Group" = '' then begin
-          if bError then
-            Error( ErrVirkGr )
-          else
-            Message( ErrVirkGr );
-          exit( false );
+            if bError then
+                Error(ErrVirkGr)
+            else
+                Message(ErrVirkGr);
+            exit(false);
         end;
         if "Inventory Posting Group" = '' then begin
-          if bError then
-            Error( ErrVbGr )
-          else
-            Message( ErrVbGr );
-          exit( false );
+            if bError then
+                Error(ErrVbGr)
+            else
+                Message(ErrVbGr);
+            exit(false);
         end;
-        exit( true );
+        exit(true);
     end;
 
     local procedure BlockedOnAfterValidate()
@@ -478,14 +484,15 @@ page 6014421 "Item Group Page"
         Item: Record Item;
     begin
         if Confirm(Text10600003, false) then begin
-          Item.SetCurrentKey("Item Group");
-          Item.SetRange("Item Group", "No.");
-          if Item.Find('-') then repeat
-            if Warranty then
-              Item."Guarantee voucher" := true else
-              Item."Guarantee voucher" := false;
-              Item.Modify;
-          until Item.Next = 0;
+            Item.SetCurrentKey("Item Group");
+            Item.SetRange("Item Group", "No.");
+            if Item.Find('-') then
+                repeat
+                    if Warranty then
+                        Item."Guarantee voucher" := true else
+                        Item."Guarantee voucher" := false;
+                    Item.Modify;
+                until Item.Next = 0;
         end;
     end;
 
@@ -494,12 +501,13 @@ page 6014421 "Item Group Page"
         Item: Record Item;
     begin
         if Confirm(Text10600003, false) then begin
-          Item.SetCurrentKey("Item Group");
-          Item.SetRange("Item Group", "No.");
-          if Item.Find('-') then repeat
-            Item."Guarantee Index" := "Warranty File";
-            Item.Modify;
-          until Item.Next = 0;
+            Item.SetCurrentKey("Item Group");
+            Item.SetRange("Item Group", "No.");
+            if Item.Find('-') then
+                repeat
+                    Item."Guarantee Index" := "Warranty File";
+                    Item.Modify;
+                until Item.Next = 0;
         end;
     end;
 
@@ -508,29 +516,30 @@ page 6014421 "Item Group Page"
         Item: Record Item;
     begin
         if Confirm(Text10600003, false) then begin
-          Item.SetCurrentKey("Item Group");
-          Item.SetRange("Item Group", "No.");
-          if Item.Find('-') then repeat
-            Item."Insurrance category" := "Insurance Category";
-            Item.Modify;
-          until Item.Next = 0;
+            Item.SetCurrentKey("Item Group");
+            Item.SetRange("Item Group", "No.");
+            if Item.Find('-') then
+                repeat
+                    Item."Insurrance category" := "Insurance Category";
+                    Item.Modify;
+                until Item.Next = 0;
         end;
     end;
 
     local procedure LoadRecReferences()
     begin
         //-NPR5.20
-        if not VATPostingSetup.Get("VAT Bus. Posting Group","VAT Prod. Posting Group") then
-          VATPostingSetup.Init;
+        if not VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then
+            VATPostingSetup.Init;
 
         if not GLAccountSale.Get(VATPostingSetup."Sales VAT Account") then
-          GLAccountSale.Init;
+            GLAccountSale.Init;
 
         if not GLAccountPurch.Get(VATPostingSetup."Purchase VAT Account") then
-          GLAccountPurch.Init;
+            GLAccountPurch.Init;
 
         if not GLAccountReverse.Get(VATPostingSetup."Reverse Chrg. VAT Acc.") then
-          GLAccountReverse.Init;
+            GLAccountReverse.Init;
         //+NPR5.20
     end;
 }

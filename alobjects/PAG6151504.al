@@ -247,14 +247,14 @@ page 6151504 "Nc Import List"
 
                 trigger OnAction()
                 var
-                    TempBlob: Record TempBlob temporary;
+                    TempBlob: Codeunit "Temp Blob";
                     FileMgt: Codeunit "File Management";
                     Path: Text;
                 begin
                     //-NC2.23 [360787]
                     CalcFields("Document Source");
-                    TempBlob.Blob := "Document Source";
-                    if not TempBlob.Blob.HasValue then
+                    TempBlob.FromRecord(Rec, FieldNo("Document Source"));
+                    if not TempBlob.HasValue then
                         exit;
                     Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", true);
                     //+NC2.23 [360787]
@@ -270,11 +270,12 @@ page 6151504 "Nc Import List"
 
                 trigger OnAction()
                 var
-                    TempBlob: Record TempBlob temporary;
+                    TempBlob: Codeunit "Temp Blob";
                     FileMgt: Codeunit "File Management";
                     Path: Text;
                     FileName: Text;
                     Extension: Text;
+                    RecRef: RecordRef;
                 begin
                     //-NC2.23 [360787]
                     //-NC2.24 [373525]
@@ -287,7 +288,10 @@ page 6151504 "Nc Import List"
                     if FileName = '' then
                         exit;
 
-                    "Document Source" := TempBlob.Blob;
+                    RecRef.GetTable(Rec);
+                    TempBlob.ToRecordRef(RecRef, Rec.FieldNo("Document Source"));
+                    RecRef.SetTable(Rec);
+
                     Modify(true);
                     Clear(TempBlob);
                     //+NC2.23 [360787]
@@ -342,9 +346,10 @@ page 6151504 "Nc Import List"
 
     local procedure AddFile()
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         Filename: Text;
+        RecRef: RecordRef;
     begin
         //-NC2.08 [297159]
         Filename := FileMgt.BLOBImport(TempBlob, '*.*');
@@ -356,7 +361,11 @@ page 6151504 "Nc Import List"
         Init;
         "Entry No." := 0;
         "Document Name" := CopyStr(Filename, 1, MaxStrLen("Document Name"));
-        "Document Source" := TempBlob.Blob;
+
+        RecRef.GetTable(Rec);
+        TempBlob.ToRecordRef(RecRef, FieldNo("Document Source"));
+        RecRef.SetTable(Rec);
+
         Date := CurrentDateTime;
         Insert(true);
         CurrPage.Update(false);
@@ -417,15 +426,16 @@ page 6151504 "Nc Import List"
 
     local procedure EditFile()
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         f: File;
         InStr: InStream;
         OutStr: OutStream;
         Path: Text;
+        RecRef: RecordRef;
     begin
         CalcFields("Document Source");
-        TempBlob.Blob := "Document Source";
+        TempBlob.FromRecord(Rec, FieldNo("Document Source"));
         Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", false);
         SyncMgt.RunProcess('notepad.exe', Path, true);
         Path := FileMgt.UploadFileSilent(Path);
@@ -434,13 +444,15 @@ page 6151504 "Nc Import List"
         f.CreateInStream(InStr);
         //-NC2.24 [373525]
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         CopyStream(OutStr, InStr);
         //+NC2.24 [373525]
         f.Close;
         Erase(Path);
 
-        "Document Source" := TempBlob.Blob;
+        RecRef.GetTable(Rec);
+        TempBlob.ToRecordRef(RecRef, FieldNo("Document Source"));
+        RecRef.SetTable(Rec);
         Modify(true);
         Clear(TempBlob);
     end;
@@ -492,7 +504,7 @@ page 6151504 "Nc Import List"
 
     local procedure ShowDocumentSource()
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
@@ -508,7 +520,7 @@ page 6151504 "Nc Import List"
                 Content := StreamReader.ReadToEnd();
                 Message(Content);
             end else begin
-                TempBlob.Blob := "Document Source";
+                TempBlob.FromRecord(Rec, FieldNo("Document Source"));
                 Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", false);
                 HyperLink(Path);
             end
@@ -519,7 +531,7 @@ page 6151504 "Nc Import List"
 
     local procedure ShowFormattedDocumentSource()
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
@@ -544,7 +556,7 @@ page 6151504 "Nc Import List"
             if not NcImportType."XML Stylesheet".HasValue then
                 Error(Text006);
 
-            TempBlob.Blob := NcImportType."XML Stylesheet";
+            TempBlob.FromRecord(NcImportType, NcImportType.FieldNo("XML Stylesheet"));
             XMLStylesheetPath := FileMgt.BLOBExport(TempBlob, 'Stylesheet.xslt', false);
             //HYPERLINK(XMLStylesheetPath);
 
@@ -553,7 +565,7 @@ page 6151504 "Nc Import List"
 
             LocalTempFile := FileMgt.ClientTempFileName('html');
 
-            TempBlob.Blob := "Document Source";
+            TempBlob.FromRecord(Rec, FieldNo("Document Source"));
             Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", false);
 
             XslCompiledTransform.Transform(Path, LocalTempFile);

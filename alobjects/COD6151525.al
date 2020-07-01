@@ -9,7 +9,7 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
     begin
     end;
 
-    local procedure ProcessNcEndpoints(NcTriggerCode: Code[20];Output: Text;var NcTask: Record "Nc Task";Filename: Text;Subject: Text;Body: Text)
+    local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "Nc Task"; Filename: Text; Subject: Text; Body: Text)
     var
         NcTrigger: Record "Nc Trigger";
         NcEndpoint: Record "Nc Endpoint";
@@ -17,53 +17,54 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         NcEndpointTriggerLink: Record "Nc Endpoint Trigger Link";
     begin
         case NcTask."Table No." of
-          DATABASE :: "Nc Trigger" :
-            begin
-              NcEndpointTriggerLink.Reset;
-              NcEndpointTriggerLink.SetRange("Trigger Code",NcTriggerCode);
-              if NcEndpointTriggerLink.FindSet then repeat
-                if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
-                  if NcEndpoint."Endpoint Type" = NcEndpointEmail.GetEndpointTypeCode then begin
-                    if NcEndpointEmail.Get(NcEndpointTriggerLink."Endpoint Code") then begin
-                      ProcessNcEndpointTrigger(NcTriggerCode,Output,Filename,Subject,Body,NcTask,NcEndpointEmail);
-                    end;
-                  end;
+            DATABASE::"Nc Trigger":
+                begin
+                    NcEndpointTriggerLink.Reset;
+                    NcEndpointTriggerLink.SetRange("Trigger Code", NcTriggerCode);
+                    if NcEndpointTriggerLink.FindSet then
+                        repeat
+                            if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
+                                if NcEndpoint."Endpoint Type" = NcEndpointEmail.GetEndpointTypeCode then begin
+                                    if NcEndpointEmail.Get(NcEndpointTriggerLink."Endpoint Code") then begin
+                                        ProcessNcEndpointTrigger(NcTriggerCode, Output, Filename, Subject, Body, NcTask, NcEndpointEmail);
+                                    end;
+                                end;
+                            end;
+                        until NcEndpointTriggerLink.Next = 0;
                 end;
-              until NcEndpointTriggerLink.Next = 0;
-            end;
-          DATABASE :: "Nc Endpoint E-mail":
-            begin
-              //Process Endpoint Task
-              NcEndpointEmail.SetPosition(NcTask."Record Position");
-              NcEndpointEmail.SetRange(Code,NcEndpointEmail.Code);
-              NcEndpointEmail.SetRange(Enabled,true);
-              if NcEndpointEmail.FindFirst then begin
-                ProcessEndPointTask(NcEndpointEmail,NcTask,Output,Filename,Subject,Body);
-                NcTask.Modify;
-              end;
-            end;
+            DATABASE::"Nc Endpoint E-mail":
+                begin
+                    //Process Endpoint Task
+                    NcEndpointEmail.SetPosition(NcTask."Record Position");
+                    NcEndpointEmail.SetRange(Code, NcEndpointEmail.Code);
+                    NcEndpointEmail.SetRange(Enabled, true);
+                    if NcEndpointEmail.FindFirst then begin
+                        ProcessEndPointTask(NcEndpointEmail, NcTask, Output, Filename, Subject, Body);
+                        NcTask.Modify;
+                    end;
+                end;
         end;
     end;
 
-    local procedure ProcessNcEndpointTrigger(NcTriggerCode: Code[20];Output: Text;Filename: Text;Subject: Text;Body: Text;var NcTask: Record "Nc Task";NcEndpointEmail: Record "Nc Endpoint E-mail")
+    local procedure ProcessNcEndpointTrigger(NcTriggerCode: Code[20]; Output: Text; Filename: Text; Subject: Text; Body: Text; var NcTask: Record "Nc Task"; NcEndpointEmail: Record "Nc Endpoint E-mail")
     var
         NcTrigger: Record "Nc Trigger";
     begin
         if not NcEndpointEmail.Enabled then
-          exit;
+            exit;
         NcTrigger.Get(NcTriggerCode);
         if not NcTrigger."Split Trigger and Endpoint" then begin
-          //Process Trigger Task Directly
-          EmailProcess (NcTask,NcEndpointEmail,Output,Filename,Subject,Body);
-          NcTask.Modify;
+            //Process Trigger Task Directly
+            EmailProcess(NcTask, NcEndpointEmail, Output, Filename, Subject, Body);
+            NcTask.Modify;
         end else begin
-          //Insert New Task per Endpoint
-          InsertEndpointTask(NcEndpointEmail,NcTask,Filename,Subject,Body);
-          NcTask.Modify;
+            //Insert New Task per Endpoint
+            InsertEndpointTask(NcEndpointEmail, NcTask, Filename, Subject, Body);
+            NcTask.Modify;
         end;
     end;
 
-    local procedure InsertEndpointTask(var NcEndpointEmail: Record "Nc Endpoint E-mail";var NcTask: Record "Nc Task";Filename: Text;Subject: Text;Body: Text)
+    local procedure InsertEndpointTask(var NcEndpointEmail: Record "Nc Endpoint E-mail"; var NcTask: Record "Nc Task"; Filename: Text; Subject: Text; Body: Text)
     var
         NcTriggerSyncMgt: Codeunit "Nc Trigger Sync. Mgt.";
         NewTask: Record "Nc Task";
@@ -73,44 +74,44 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         TaskEntryNo: BigInteger;
     begin
         RecRef.Get(NcEndpointEmail.RecordId);
-        NcTriggerSyncMgt.InsertTask(RecRef,TaskEntryNo);
+        NcTriggerSyncMgt.InsertTask(RecRef, TaskEntryNo);
         NewTask.Get(TaskEntryNo);
         TempNcEndPointEmail.Init;
         TempNcEndPointEmail.Copy(NcEndpointEmail);
         TempNcEndPointEmail."Output Nc Task Entry No." := NcTask."Entry No.";
         if Filename <> '' then
-          TempNcEndPointEmail."Filename Attachment":= Filename;
+            TempNcEndPointEmail."Filename Attachment" := Filename;
         if Subject <> '' then
-          TempNcEndPointEmail."Subject Text" := Subject;
-        if Body  <> '' then
-          TempNcEndPointEmail."Body Text" := Body;
-        NcTriggerSyncMgt.FillFields(NewTask,TempNcEndPointEmail);
-        NcTriggerSyncMgt.AddResponse(NcTask,StrSubstNo(TextTaskInserted,NcEndpointEmail.Code,NcEndpointEmail.Description,NcEndpointEmail."Recipient E-Mail Address",NewTask."Entry No."));
+            TempNcEndPointEmail."Subject Text" := Subject;
+        if Body <> '' then
+            TempNcEndPointEmail."Body Text" := Body;
+        NcTriggerSyncMgt.FillFields(NewTask, TempNcEndPointEmail);
+        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInserted, NcEndpointEmail.Code, NcEndpointEmail.Description, NcEndpointEmail."Recipient E-Mail Address", NewTask."Entry No."));
     end;
 
-    local procedure ProcessEndPointTask(var NcEndpointEmail: Record "Nc Endpoint E-mail";var NcTask: Record "Nc Task";Output: Text;Filename: Text;Subject: Text;Body: Text)
+    local procedure ProcessEndPointTask(var NcEndpointEmail: Record "Nc Endpoint E-mail"; var NcTask: Record "Nc Task"; Output: Text; Filename: Text; Subject: Text; Body: Text)
     var
         NcTaskMgt: Codeunit "Nc Task Mgt.";
         TextNoOutput: Label 'FTP Task not executed because there was no output to send.';
         RecRef: RecordRef;
         FldRef: FieldRef;
     begin
-        NcTaskMgt.RestoreRecord(NcTask."Entry No.",RecRef);
+        NcTaskMgt.RestoreRecord(NcTask."Entry No.", RecRef);
         if Output = '' then
-          Error(TextNoOutput);
+            Error(TextNoOutput);
         FldRef := RecRef.Field(NcEndpointEmail.FieldNo("Filename Attachment"));
         if Format(FldRef.Value) <> '' then
-          Filename := Format(FldRef.Value);
+            Filename := Format(FldRef.Value);
         FldRef := RecRef.Field(NcEndpointEmail.FieldNo("Body Text"));
         if Format(FldRef.Value) <> '' then
-          Body := Format(FldRef.Value);
+            Body := Format(FldRef.Value);
         FldRef := RecRef.Field(NcEndpointEmail.FieldNo("Subject Text"));
         if Format(FldRef.Value) <> '' then
-          Subject := Format(FldRef.Value);
-        EmailProcess(NcTask,NcEndpointEmail,Output,Filename,Subject,Body);
+            Subject := Format(FldRef.Value);
+        EmailProcess(NcTask, NcEndpointEmail, Output, Filename, Subject, Body);
     end;
 
-    local procedure EmailProcess(var NcTask: Record "Nc Task";NcEndpointEmail: Record "Nc Endpoint E-mail";OutputText: Text;Filename: Text;Subject: Text;Body: Text)
+    local procedure EmailProcess(var NcTask: Record "Nc Task"; NcEndpointEmail: Record "Nc Endpoint E-mail"; OutputText: Text; Filename: Text; Subject: Text; Body: Text)
     var
         ResponseDescriptionText: Text;
         ResponseCodeText: Text;
@@ -120,49 +121,68 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         SMTPMail: Codeunit "SMTP Mail";
         IStream: InStream;
         OStream: OutStream;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
+        Recipients: List of [Text];
+        CCRecipients: List of [Text];
+        BCCRecipients: List of [Text];
     begin
-        SMTPMail.CreateMessage(NcEndpointEmail."Sender Name",NcEndpointEmail."Sender E-Mail Address",NcEndpointEmail."Recipient E-Mail Address",Subject,Body,true);
-        TempBlob.Blob.CreateOutStream(OStream,TEXTENCODING::UTF8);
+        Recipients.Add(NcEndpointEmail."Recipient E-Mail Address");
+        SMTPMail.CreateMessage(NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address", Recipients, Subject, Body, true);
+        TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
         OStream.WriteText(OutputText);
-        TempBlob.Blob.CreateInStream(IStream,TEXTENCODING::UTF8);
-        SMTPMail.AddAttachmentStream(IStream,Filename);
-        if NcEndpointEmail."CC E-Mail Address" <> '' then
-          SMTPMail.AddCC(NcEndpointEmail."CC E-Mail Address");
-        if NcEndpointEmail."BCC E-Mail Address" <> '' then
-          SMTPMail.AddBCC(NcEndpointEmail."BCC E-Mail Address");
-        if SMTPMail.TrySend then begin
-          //Positive Response
-          NcTriggerSyncMgt.AddResponse(NcTask,StrSubstNo(TextEmailSuccess,NcEndpointEmail."Recipient E-Mail Address"));
+        TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
+        SMTPMail.AddAttachmentStream(IStream, Filename);
+
+        if NcEndpointEmail."CC E-Mail Address" <> '' then begin
+            CCRecipients.Add(NcEndpointEmail."CC E-Mail Address");
+            SMTPMail.AddCC(CCRecipients);
+        end;
+
+        if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
+            BCCRecipients.Add(NcEndpointEmail."BCC E-Mail Address");
+            SMTPMail.AddBCC(BCCRecipients);
+        end;
+
+        if SMTPMail.Send then begin
+            //Positive Response
+            NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccess, NcEndpointEmail."Recipient E-Mail Address"));
         end else begin
-          //Negative Response
-          Error(TextEmailFailed,NcEndpointEmail."Recipient E-Mail Address",SMTPMail.GetLastSendMailErrorText);
+            //Negative Response
+            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", SMTPMail.GetLastSendMailErrorText);
         end;
     end;
 
-    local procedure EmailProcessOutput(NcTaskOutput: Record "Nc Task Output";NcEndpointEmail: Record "Nc Endpoint E-mail")
+    local procedure EmailProcessOutput(NcTaskOutput: Record "Nc Task Output"; NcEndpointEmail: Record "Nc Endpoint E-mail")
     var
         TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
         TextEmailSuccess: Label 'File emailed to %1.';
         SMTPMail: Codeunit "SMTP Mail";
         InStream: InStream;
+        Recipients: List of [Text];
+        CCRecipients: List of [Text];
+        BCCRecipients: List of [Text];        
     begin
         //-NC2.12 [308107]
+        Recipients.Add(NcEndpointEmail."Recipient E-Mail Address");
         SMTPMail.CreateMessage(
-          NcEndpointEmail."Sender Name",NcEndpointEmail."Sender E-Mail Address",
-          NcEndpointEmail."Recipient E-Mail Address",NcEndpointEmail."Subject Text",NcEndpointEmail."Body Text",true);
+          NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address",
+          Recipients, NcEndpointEmail."Subject Text", NcEndpointEmail."Body Text", true);
 
-        NcTaskOutput.Data.CreateInStream(InStream,TEXTENCODING::UTF8);
-        SMTPMail.AddAttachmentStream(InStream,NcTaskOutput.Name);
+        NcTaskOutput.Data.CreateInStream(InStream, TEXTENCODING::UTF8);
+        SMTPMail.AddAttachmentStream(InStream, NcTaskOutput.Name);
 
-        if NcEndpointEmail."CC E-Mail Address" <> '' then
-          SMTPMail.AddCC(NcEndpointEmail."CC E-Mail Address");
+        if NcEndpointEmail."CC E-Mail Address" <> '' then begin
+            CCRecipients.Add(NcEndpointEmail."CC E-Mail Address");
+            SMTPMail.AddCC(CCRecipients);
+        end;
 
-        if NcEndpointEmail."BCC E-Mail Address" <> '' then
-          SMTPMail.AddBCC(NcEndpointEmail."BCC E-Mail Address");
+        if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
+            BCCRecipients.Add(NcEndpointEmail."BCC E-Mail Address");
+            SMTPMail.AddBCC(BCCRecipients);
+        end;
 
-        if not SMTPMail.TrySend then
-          Error(TextEmailFailed,NcEndpointEmail."Recipient E-Mail Address",SMTPMail.GetLastSendMailErrorText);
+        if not SMTPMail.Send then
+            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", SMTPMail.GetLastSendMailErrorText);
         //+NC2.12 [308107]
     end;
 
@@ -171,9 +191,9 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
-    local procedure OnAfterGetOutputTriggerTaskFTPOutput(NcTriggerCode: Code[20];Output: Text;var NcTask: Record "Nc Task";Filename: Text;Subject: Text;Body: Text)
+    local procedure OnAfterGetOutputTriggerTaskFTPOutput(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "Nc Task"; Filename: Text; Subject: Text; Body: Text)
     begin
-        ProcessNcEndpoints(NcTriggerCode,Output,NcTask,Filename,Subject,Body);
+        ProcessNcEndpoints(NcTriggerCode, Output, NcTask, Filename, Subject, Body);
     end;
 
     [EventSubscriber(ObjectType::Table, 6151531, 'OnSetupEndpointTypes', '', false, false)]
@@ -183,57 +203,57 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         NcEndpointType: Record "Nc Endpoint Type";
     begin
         if not NcEndpointType.Get(NcEndpointEmail.GetEndpointTypeCode) then begin
-          NcEndpointType.Init;
-          NcEndpointType.Code := NcEndpointEmail.GetEndpointTypeCode;
-          NcEndpointType.Insert;
+            NcEndpointType.Init;
+            NcEndpointType.Code := NcEndpointEmail.GetEndpointTypeCode;
+            NcEndpointType.Insert;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6151533, 'OnOpenEndpointSetup', '', false, false)]
-    local procedure OnOpenEndpointSetupOpenPage(var Sender: Record "Nc Endpoint";var Handled: Boolean)
+    local procedure OnOpenEndpointSetupOpenPage(var Sender: Record "Nc Endpoint"; var Handled: Boolean)
     var
         NcEndpointEmail: Record "Nc Endpoint E-mail";
     begin
         if Handled then
-          exit;
+            exit;
         if Sender."Endpoint Type" <> NcEndpointEmail.GetEndpointTypeCode then
-          exit;
+            exit;
         if not NcEndpointEmail.Get(Sender.Code) then begin
-          NcEndpointEmail.Init;
-          NcEndpointEmail.Validate(Code,Sender.Code);
-          NcEndpointEmail.Description := Sender.Description;
-          NcEndpointEmail.Insert;
-        end else begin
-          if NcEndpointEmail.Description <> Sender.Description then begin
+            NcEndpointEmail.Init;
+            NcEndpointEmail.Validate(Code, Sender.Code);
             NcEndpointEmail.Description := Sender.Description;
-            NcEndpointEmail.Modify(true);
-          end;
+            NcEndpointEmail.Insert;
+        end else begin
+            if NcEndpointEmail.Description <> Sender.Description then begin
+                NcEndpointEmail.Description := Sender.Description;
+                NcEndpointEmail.Modify(true);
+            end;
         end;
         PAGE.Run(PAGE::"Nc Endpoint E-mail Card", NcEndpointEmail);
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Table, 6151533, 'OnAfterDeleteEvent', '', false, false)]
-    local procedure OnDeleteEndpoint(var Rec: Record "Nc Endpoint";RunTrigger: Boolean)
+    local procedure OnDeleteEndpoint(var Rec: Record "Nc Endpoint"; RunTrigger: Boolean)
     var
         NcEndpointEmail: Record "Nc Endpoint E-mail";
     begin
         if NcEndpointEmail.Get(Rec.Code) then
-          NcEndpointEmail.Delete(true);
+            NcEndpointEmail.Delete(true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151519, 'OnRunEndpoint', '', true, true)]
-    local procedure OnRunEndpoint(NcTaskOutput: Record "Nc Task Output";NcEndpoint: Record "Nc Endpoint")
+    local procedure OnRunEndpoint(NcTaskOutput: Record "Nc Task Output"; NcEndpoint: Record "Nc Endpoint")
     var
         NcEndpointEmail: Record "Nc Endpoint E-mail";
     begin
         //-NC2.12 [308107]
         if NcEndpoint."Endpoint Type" <> NcEndpointEmail.GetEndpointTypeCode() then
-          exit;
+            exit;
         if not NcEndpointEmail.Get(NcEndpoint.Code) then
-          exit;
+            exit;
 
-        EmailProcessOutput(NcTaskOutput,NcEndpointEmail);
+        EmailProcessOutput(NcTaskOutput, NcEndpointEmail);
         //+NC2.12 [308107]
     end;
 }

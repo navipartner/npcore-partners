@@ -25,28 +25,28 @@ page 6059897 "Data Log Setup"
         {
             repeater(Group)
             {
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
                 }
-                field("Log Insertion";"Log Insertion")
+                field("Log Insertion"; "Log Insertion")
                 {
                 }
-                field("Log Modification";"Log Modification")
+                field("Log Modification"; "Log Modification")
                 {
                 }
-                field("Log Deletion";"Log Deletion")
+                field("Log Deletion"; "Log Deletion")
                 {
                 }
-                field("Keep Log for";"Keep Log for")
+                field("Keep Log for"; "Keep Log for")
                 {
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
                 }
             }
@@ -95,7 +95,7 @@ page 6059897 "Data Log Setup"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "Data Log Subscribers";
-                RunPageLink = "Table ID"=FIELD("Table ID");
+                RunPageLink = "Table ID" = FIELD("Table ID");
             }
             action(DataLog)
             {
@@ -105,7 +105,7 @@ page 6059897 "Data Log Setup"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "Data Log Records";
-                RunPageLink = "Table ID"=FIELD("Table ID");
+                RunPageLink = "Table ID" = FIELD("Table ID");
                 ShortCutKey = 'Ctrl+F7';
             }
         }
@@ -116,7 +116,7 @@ page 6059897 "Data Log Setup"
         Text002: Label '%1 record quantity withing the filter:  %2\Do you wish to add the records to Data Log?';
         DataLogMgt: Codeunit "Data Log Management";
         DataLogSubscriberMgt: Codeunit "Data Log Subscriber Mgt.";
-        Text003: Label 'Data Log Filters - %1', Comment='%1 = Table Name';
+        Text003: Label 'Data Log Filters - %1', Comment = '%1 = Table Name';
         Text004: Label 'Adding records to Data Log: @1@@@@@@@@@@@@@@@@@@@@@@@';
 
     local procedure AddRecordsToDataLog()
@@ -129,22 +129,22 @@ page 6059897 "Data Log Setup"
         Total: Integer;
     begin
         //-DL1.11
-        if not RunDynamicRequestPage(Filters,'') then
-          exit;
+        if not RunDynamicRequestPage(Filters, '') then
+            exit;
 
-        if not SetFiltersOnTable(Filters,RecRef) then
-          exit;
+        if not SetFiltersOnTable(Filters, RecRef) then
+            exit;
 
         Total := RecRef.Count;
-        if not Confirm(StrSubstNo(Text002,"Table Name",Total),true) then
-          exit;
+        if not Confirm(StrSubstNo(Text002, "Table Name", Total), true) then
+            exit;
 
         Counter := 0;
         Window.Open(Text004);
         repeat
-          Counter += 1;
-          Window.Update(1,Round((Counter / Total) * 10000,1));
-          DataLogMgt.OnDatabaseInsert(RecRef);
+            Counter += 1;
+            Window.Update(1, Round((Counter / Total) * 10000, 1));
+            DataLogMgt.OnDatabaseInsert(RecRef);
         until RecRef.Next = 0;
         Window.Close;
         //+DL1.11
@@ -152,15 +152,15 @@ page 6059897 "Data Log Setup"
 
     procedure CleanDataLog()
     begin
-        if Confirm(Text001,false) then
-          //-DL1.07
-          //DataLogMgt.CleanDataLog();
-          DataLogSubscriberMgt.CleanDataLog();
-          //+DL1.07
+        if Confirm(Text001, false) then
+            //-DL1.07
+            //DataLogMgt.CleanDataLog();
+            DataLogSubscriberMgt.CleanDataLog();
+        //+DL1.07
         CurrPage.Update(false);
     end;
 
-    local procedure RunDynamicRequestPage(var ReturnFilters: Text;Filters: Text): Boolean
+    local procedure RunDynamicRequestPage(var ReturnFilters: Text; Filters: Text): Boolean
     var
         TableMetadata: Record "Table Metadata";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
@@ -175,40 +175,40 @@ page 6059897 "Data Log Setup"
     begin
         //-DL1.11
         if not TableMetadata.Get("Table ID") then
-          exit(false);
+            exit(false);
 
         //-NPR5.41 [308556]
-        DynamicRequestPageField.SetRange("Table ID","Table ID");
+        DynamicRequestPageField.SetRange("Table ID", "Table ID");
         if not DynamicRequestPageField.FindSet then begin
-          RecRef.Open("Table ID");
-          RecRef.CurrentKeyIndex(1);
-          KyRef := RecRef.KeyIndex(1);
-          for j := 1 to KyRef.FieldCount do begin
-            Clear(FldRef);
-            FldRef := RecRef.FieldIndex(j);
-            DynamicRequestPageField1.Init;
-            DynamicRequestPageField1.Validate("Table ID","Table ID");
-            DynamicRequestPageField1.Validate("Field ID",FldRef.Number);
-            DynamicRequestPageField1.Insert(true);
-            Commit;
-          end;
+            RecRef.Open("Table ID");
+            RecRef.CurrentKeyIndex(1);
+            KyRef := RecRef.KeyIndex(1);
+            for j := 1 to KyRef.FieldCount do begin
+                Clear(FldRef);
+                FldRef := RecRef.FieldIndex(j);
+                DynamicRequestPageField1.Init;
+                DynamicRequestPageField1.Validate("Table ID", "Table ID");
+                DynamicRequestPageField1.Validate("Field ID", FldRef.Number);
+                DynamicRequestPageField1.Insert(true);
+                Commit;
+            end;
         end;
         //+NPR5.41 [308556]
 
         //-DL1.12 [250790]
         //IF NOT RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder,"Table Name","Table ID") THEN
-        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder,CopyStr("Table Name",1,20),"Table ID") then
-        //+DL1.12 [250790]
-          exit(false);
+        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, CopyStr("Table Name", 1, 20), "Table ID") then
+            //+DL1.12 [250790]
+            exit(false);
         if Filters <> '' then
-          //-DL1.12 [250790]
-          //IF NOT RequestPageParametersHelper.SetViewOnDynamicRequestPage(
-             //FilterPageBuilder,Filters,"Table Name","Table ID")
-          if not RequestPageParametersHelper.SetViewOnDynamicRequestPage(
-             FilterPageBuilder,Filters,CopyStr("Table Name",1,20),"Table ID")
+            //-DL1.12 [250790]
+            //IF NOT RequestPageParametersHelper.SetViewOnDynamicRequestPage(
+            //FilterPageBuilder,Filters,"Table Name","Table ID")
+            if not RequestPageParametersHelper.SetViewOnDynamicRequestPage(
+             FilterPageBuilder, Filters, CopyStr("Table Name", 1, 20), "Table ID")
           //+DL1.12 [250790]
           then
-            exit(false);
+                exit(false);
         //-NPR5.40 [308461]
         //-DL1.15 [297941]
         //RecRef.OPEN("Table ID");
@@ -233,24 +233,24 @@ page 6059897 "Data Log Setup"
         // END;
         //+NPR5.41 [308556]
         //+NPR5.40 [308461]
-        FilterPageBuilder.PageCaption := StrSubstNo(Text003,"Table Name");
+        FilterPageBuilder.PageCaption := StrSubstNo(Text003, "Table Name");
         if not FilterPageBuilder.RunModal then
-          exit(false);
+            exit(false);
 
         //-DL1.12 [250790]
         //ReturnFilters :=
         //  RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder,"Table Name","Table ID");
         ReturnFilters :=
-          RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder,CopyStr("Table Name",1,20),"Table ID");
+          RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr("Table Name", 1, 20), "Table ID");
         //+DL1.12 [250790]
 
         exit(true);
         //+DL1.11
     end;
 
-    local procedure SetFiltersOnTable(Filters: Text;var RecRef: RecordRef): Boolean
+    local procedure SetFiltersOnTable(Filters: Text; var RecRef: RecordRef): Boolean
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         OutStream: OutStream;
     begin
@@ -258,14 +258,14 @@ page 6059897 "Data Log Setup"
         RecRef.Open("Table ID");
 
         if Filters = '' then
-          exit(RecRef.FindSet);
+            exit(RecRef.FindSet);
 
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
         OutStream.WriteText(Filters);
 
-        if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef,TempBlob) then
-          exit(false);
+        if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
+            exit(false);
 
         exit(RecRef.FindSet);
         //+DL1.11

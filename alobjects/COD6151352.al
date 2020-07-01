@@ -18,7 +18,7 @@ codeunit 6151352 "CS Wrapper Functions"
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         MediaGuid: Guid;
         TenantMedia: Record "Tenant Media";
         ItemCrossReference: Record "Item Cross Reference";
@@ -35,58 +35,63 @@ codeunit 6151352 "CS Wrapper Functions"
         MagentoPicture: Record "Magento Picture";
         MagentoPictureLink: Record "Magento Picture Link";
         TempMagentoPicture: Record "Magento Picture" temporary;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         if (StrLen(Barcode) <= MaxStrLen(CSRfidData.Key)) and (StrLen(Barcode) > MaxStrLen(CSRfidTagModels.Family)) then begin
 
-          TagFamily := CopyStr(Barcode,1,4);
-          TagModel  := CopyStr(Barcode,5,4);
-          TagId     := CopyStr(Barcode,5);
+            TagFamily := CopyStr(Barcode, 1, 4);
+            TagModel := CopyStr(Barcode, 5, 4);
+            TagId := CopyStr(Barcode, 5);
 
-          if CSRfidTagModels.Get(TagFamily,TagModel) then
-            if (StrLen(TagId) <= MaxStrLen(ItemCrossReference."Cross-Reference No.")) then
-              Barcode := TagId;
+            if CSRfidTagModels.Get(TagFamily, TagModel) then
+                if (StrLen(TagId) <= MaxStrLen(ItemCrossReference."Cross-Reference No.")) then
+                    Barcode := TagId;
 
         end;
 
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
-          exit('');
+            exit('');
 
         if not Item.Get(ItemNo) then
-          exit('');
+            exit('');
 
         if VariantCode <> '' then
-          Item.SetFilter("Variant Filter",VariantCode);
+            Item.SetFilter("Variant Filter", VariantCode);
 
         CSSetup.Get;
         case CSSetup."Media Library" of
-          CSSetup."Media Library"::"Dynamics NAV" : begin
-            if Item.Picture.Count >= 1 then begin
-              Clear(PictureBase64);
-              TempBlob.Init;
-              MediaGuid := Item.Picture.Item(1);
-              TenantMedia.Get(MediaGuid);
-              TenantMedia.CalcFields(Content);
-              TempBlob.Blob:=TenantMedia.Content;
-              PictureBase64 := TempBlob.ToBase64String;
-            end;
-          end;
-          CSSetup."Media Library"::Magento : begin
-            MagentoPictureLink.SetRange("Item No.",Item."No.");
-            MagentoPictureLink.SetRange("Base Image",true);
-            if MagentoPictureLink.FindFirst then begin
-              if MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then begin
-                TempMagentoPicture := MagentoPicture;
-                if TempMagentoPicture.DownloadPicture(TempMagentoPicture) then begin
-                  TempMagentoPicture.Picture.CreateInStream(InStr);
-                  MemoryStream := InStr;
-                  BinaryReader := BinaryReader.BinaryReader(InStr);
-                  PictureBase64 := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-                  MemoryStream.Dispose;
-                  Clear(MemoryStream);
+            CSSetup."Media Library"::"Dynamics NAV":
+                begin
+                    if Item.Picture.Count >= 1 then begin
+                        Clear(PictureBase64);
+                        Clear(TempBlob);
+                        MediaGuid := Item.Picture.Item(1);
+                        TenantMedia.Get(MediaGuid);
+                        TenantMedia.CalcFields(Content);
+                        TempBlob.FromRecord(TenantMedia, TenantMedia.FieldNo(Content));
+
+                        TempBlob.CreateInStream(InStr);
+                        PictureBase64 := Base64Convert.ToBase64(Instr);
+                    end;
                 end;
-              end;
-            end;
-          end;
+            CSSetup."Media Library"::Magento:
+                begin
+                    MagentoPictureLink.SetRange("Item No.", Item."No.");
+                    MagentoPictureLink.SetRange("Base Image", true);
+                    if MagentoPictureLink.FindFirst then begin
+                        if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then begin
+                            TempMagentoPicture := MagentoPicture;
+                            if TempMagentoPicture.DownloadPicture(TempMagentoPicture) then begin
+                                TempMagentoPicture.Picture.CreateInStream(InStr);
+                                MemoryStream := InStr;
+                                BinaryReader := BinaryReader.BinaryReader(InStr);
+                                PictureBase64 := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+                                MemoryStream.Dispose;
+                                Clear(MemoryStream);
+                            end;
+                        end;
+                    end;
+                end;
         end;
 
 
@@ -117,18 +122,20 @@ codeunit 6151352 "CS Wrapper Functions"
         Var09: Text;
         Var10: Text;
         Var11: Text;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         MediaGuid: Guid;
         TenantMedia: Record "Tenant Media";
+        Base64Convert: Codeunit "Base64 Convert";
+        InStr: InStream;
     begin
         if Barcode = '' then
-          exit('');
+            exit('');
 
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
-          exit('');
+            exit('');
 
         if not Item.Get(ItemNo) then
-          exit('');
+            exit('');
 
         Var01 := '-';
         Var02 := '-';
@@ -143,8 +150,8 @@ codeunit 6151352 "CS Wrapper Functions"
         Var11 := '';
 
         if VariantCode <> '' then
-          Item.SetFilter("Variant Filter",VariantCode);
-        Item.CalcFields(Inventory,"Qty. on Purch. Order");
+            Item.SetFilter("Variant Filter", VariantCode);
+        Item.CalcFields(Inventory, "Qty. on Purch. Order");
 
         Var01 := Item."No.";
         Var02 := Item.Description;
@@ -153,36 +160,36 @@ codeunit 6151352 "CS Wrapper Functions"
         Var05 := VariantCode;
 
         if Item."Qty. on Purch. Order" > 0 then begin
-          Clear(PurchaseLine);
-          PurchaseLine.SetRange("Document Type",PurchaseLine."Document Type"::Order);
-          PurchaseLine.SetRange(Type,PurchaseLine.Type::Item);
-          PurchaseLine.SetRange("No.",Item."No.");
-          if VariantCode <> '' then
-            PurchaseLine.SetRange("Variant Code",VariantCode);
-          if PurchaseLine.FindLast then
-            Var06 := Format(PurchaseLine."Expected Receipt Date");
+            Clear(PurchaseLine);
+            PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+            PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+            PurchaseLine.SetRange("No.", Item."No.");
+            if VariantCode <> '' then
+                PurchaseLine.SetRange("Variant Code", VariantCode);
+            if PurchaseLine.FindLast then
+                Var06 := Format(PurchaseLine."Expected Receipt Date");
         end;
 
         Clear(ItemLedgerEntry);
-        ItemLedgerEntry.SetRange("Entry Type",ItemLedgerEntry."Entry Type"::Sale);
-        ItemLedgerEntry.SetRange("Item No.",Item."No.");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+        ItemLedgerEntry.SetRange("Item No.", Item."No.");
         if VariantCode <> '' then
-          ItemLedgerEntry.SetRange("Variant Code",VariantCode);
+            ItemLedgerEntry.SetRange("Variant Code", VariantCode);
         if ItemLedgerEntry.FindLast then
-          Var07 := Format(ItemLedgerEntry."Posting Date");
+            Var07 := Format(ItemLedgerEntry."Posting Date");
 
         Clear(Item2);
         Item2.Get(Item."No.");
         if VariantCode <> '' then
-          Item2.SetFilter("Variant Filter",VariantCode);
-        Item2.SetFilter("Date Filter",'%1..%2', 0D, Today);
+            Item2.SetFilter("Variant Filter", VariantCode);
+        Item2.SetFilter("Date Filter", '%1..%2', 0D, Today);
         Item2.CalcFields("Sales (Qty.)");
         Var08 := Format(Item2."Sales (Qty.)");
 
         Clear(Item2);
         Item2.Get(Item."No.");
         if VariantCode <> '' then
-          Item2.SetFilter("Variant Filter",VariantCode);
+            Item2.SetFilter("Variant Filter", VariantCode);
         Item2.SetRange("Date Filter", CalcDate('<-CY>', WorkDate), CalcDate('<CY>', WorkDate));
         Item2.CalcFields("Sales (Qty.)");
         Var09 := Format(Item2."Sales (Qty.)");
@@ -190,74 +197,76 @@ codeunit 6151352 "CS Wrapper Functions"
         Clear(Item2);
         Item2.Get(Item."No.");
         if VariantCode <> '' then
-          Item2.SetFilter("Variant Filter",VariantCode);
+            Item2.SetFilter("Variant Filter", VariantCode);
         Item2.SetRange("Date Filter", CalcDate('<CY-2Y+1D>', WorkDate), CalcDate('<CY-1Y>', WorkDate));
         Item2.CalcFields("Sales (Qty.)");
         Var10 := Format(Item2."Sales (Qty.)");
 
         if Item.Picture.Count >= 1 then begin
-          TempBlob.Init;
-          MediaGuid := Item.Picture.Item(1);
-          TenantMedia.Get(MediaGuid);
-          TenantMedia.CalcFields(Content);
-          TempBlob.Blob:=TenantMedia.Content;
-          Var11 := TempBlob.ToBase64String;
+            Clear(TempBlob);
+            MediaGuid := Item.Picture.Item(1);
+            TenantMedia.Get(MediaGuid);
+            TenantMedia.CalcFields(Content);
+            TempBlob.FromRecord(TenantMedia, TenantMedia.FieldNo(Content));
+
+            TempBlob.CreateInStream(InStr);
+            Var11 := Base64Convert.ToBase64(Instr);
         end;
 
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
+            WriteStartObject;
 
-          WritePropertyName('item');
-          WriteStartArray;
+            WritePropertyName('item');
+            WriteStartArray;
 
-              WriteStartObject;
-              WritePropertyName('1');
-              WriteValue(Var01);
-              WritePropertyName('2');
-              WriteValue(Var02);
+            WriteStartObject;
+            WritePropertyName('1');
+            WriteValue(Var01);
+            WritePropertyName('2');
+            WriteValue(Var02);
 
-              WritePropertyName('headerlabel');
-              WriteValue(headerlabel + ' : ' + Var03);
-              WritePropertyName('3');
-              //WriteValue(Var03);
-              WriteValue('');
-              WritePropertyName('linelabel1');
-              //WriteValue(FORMAT(CALCDATE('<CY>', WORKDATE),0,'<Year4>-<Month,2>-<Day,2>'));
-              WriteValue(Var01);
-              WritePropertyName('8');
-              WriteValue(Var08);
-              WritePropertyName('linelabel2');
-              //WriteValue(FORMAT(CALCDATE('<CY-1Y>', WORKDATE),0,'<Year4>-<Month,2>-<Day,2>'));
-              WriteValue(CopyStr(Var02,16,8));
-              WritePropertyName('9');
-              WriteValue(Var09);
-              WritePropertyName('linelabel3');
-              //WriteValue(FORMAT(CALCDATE('<CY-2Y>', WORKDATE),0,'<Year4>-<Month,2>-<Day,2>'));
-              WriteValue(Var04);
-              WritePropertyName('10');
-              WriteValue(Var10);
-              WritePropertyName('footerlabel');
-              WriteValue(footerlabel);
-              WritePropertyName('6');
-              WriteValue(Var06);
+            WritePropertyName('headerlabel');
+            WriteValue(headerlabel + ' : ' + Var03);
+            WritePropertyName('3');
+            //WriteValue(Var03);
+            WriteValue('');
+            WritePropertyName('linelabel1');
+            //WriteValue(FORMAT(CALCDATE('<CY>', WORKDATE),0,'<Year4>-<Month,2>-<Day,2>'));
+            WriteValue(Var01);
+            WritePropertyName('8');
+            WriteValue(Var08);
+            WritePropertyName('linelabel2');
+            //WriteValue(FORMAT(CALCDATE('<CY-1Y>', WORKDATE),0,'<Year4>-<Month,2>-<Day,2>'));
+            WriteValue(CopyStr(Var02, 16, 8));
+            WritePropertyName('9');
+            WriteValue(Var09);
+            WritePropertyName('linelabel3');
+            //WriteValue(FORMAT(CALCDATE('<CY-2Y>', WORKDATE),0,'<Year4>-<Month,2>-<Day,2>'));
+            WriteValue(Var04);
+            WritePropertyName('10');
+            WriteValue(Var10);
+            WritePropertyName('footerlabel');
+            WriteValue(footerlabel);
+            WritePropertyName('6');
+            WriteValue(Var06);
 
-              WritePropertyName('4');
-              WriteValue(Var04);
-              WritePropertyName('5');
-              WriteValue(Var05);
-              WritePropertyName('7');
-              WriteValue(Var07);
-              WritePropertyName('11');
-              WriteValue(Var11);
+            WritePropertyName('4');
+            WriteValue(Var04);
+            WritePropertyName('5');
+            WriteValue(Var05);
+            WritePropertyName('7');
+            WriteValue(Var07);
+            WritePropertyName('11');
+            WriteValue(Var11);
 
-              WriteEndObject;
+            WriteEndObject;
 
-          WriteEndArray;
+            WriteEndArray;
 
-          WriteEndObject;
-          JObject := Token;
-          Result := JObject.ToString();
+            WriteEndObject;
+            JObject := Token;
+            Result := JObject.ToString();
 
         end;
 

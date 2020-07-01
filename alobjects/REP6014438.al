@@ -10,66 +10,66 @@ report 6014438 "Gift Voucher A5 Right"
 
     dataset
     {
-        dataitem("Integer";"Integer")
+        dataitem("Integer"; "Integer")
         {
-            dataitem("Gift Voucher";"Gift Voucher")
+            dataitem("Gift Voucher"; "Gift Voucher")
             {
                 MaxIteration = 1;
-                column(No_GiftVoucher;"Gift Voucher"."No.")
+                column(No_GiftVoucher; "Gift Voucher"."No.")
                 {
                 }
-                column(RegisterNo_Register;Register."Register No.")
+                column(RegisterNo_Register; Register."Register No.")
                 {
                 }
-                column(Name_Register;Register.Name)
+                column(Name_Register; Register.Name)
                 {
                 }
-                column(CopyText;CopyText)
+                column(CopyText; CopyText)
                 {
                 }
-                column(Address_Register;Register.Address)
+                column(Address_Register; Register.Address)
                 {
                 }
-                column(PostCodeCity_Register;Register."Post Code" + ' ' + Register.City)
+                column(PostCodeCity_Register; Register."Post Code" + ' ' + Register.City)
                 {
                 }
-                column(Telephone_Register;Format(Register."Phone No."))
+                column(Telephone_Register; Format(Register."Phone No."))
                 {
                 }
-                column(FaxText;FaxText)
+                column(FaxText; FaxText)
                 {
                 }
-                column(VAT_Register;Format(Register."VAT No."))
+                column(VAT_Register; Format(Register."VAT No."))
                 {
                 }
-                column(Email_Register;Register."E-mail")
+                column(Email_Register; Register."E-mail")
                 {
                 }
-                column(wwwaddress_Register;Register.Website)
+                column(wwwaddress_Register; Register.Website)
                 {
                 }
-                column(Name_GiftVoucher;"Gift Voucher".Name)
+                column(Name_GiftVoucher; "Gift Voucher".Name)
                 {
                 }
-                column(Amount_GiftVoucher;"Gift Voucher".Amount)
+                column(Amount_GiftVoucher; "Gift Voucher".Amount)
                 {
                 }
-                column(Address_GiftVoucher;"Gift Voucher".Address)
+                column(Address_GiftVoucher; "Gift Voucher".Address)
                 {
                 }
-                column(ZIPCode_GiftVoucher;"Gift Voucher"."ZIP Code")
+                column(ZIPCode_GiftVoucher; "Gift Voucher"."ZIP Code")
                 {
                 }
-                column(City_GiftVoucher;"Gift Voucher".City)
+                column(City_GiftVoucher; "Gift Voucher".City)
                 {
                 }
-                column(Blob_TempBlob;TempBlob.Blob)
+                column(Blob_TempBlob; BlobBuffer."Buffer 1")
                 {
                 }
-                column(IssueDate_GiftVoucher;StrSubstNo('%1',"Gift Voucher"."Issue Date")+ TextRegister + StrSubstNo('%1',"Register No.") + TextSalesTicket + "Gift Voucher"."Sales Ticket No." +' - ' + "Gift Voucher"."No."+' - ' +Format(Time))
+                column(IssueDate_GiftVoucher; StrSubstNo('%1', "Gift Voucher"."Issue Date") + TextRegister + StrSubstNo('%1', "Register No.") + TextSalesTicket + "Gift Voucher"."Sales Ticket No." + ' - ' + "Gift Voucher"."No." + ' - ' + Format(Time))
                 {
                 }
-                column(SalepersonText;SalepersonText)
+                column(SalepersonText; SalepersonText)
                 {
                 }
 
@@ -78,34 +78,35 @@ report 6014438 "Gift Voucher A5 Right"
                     "Gift Voucher"."No. Printed" += 1;
                     "Gift Voucher".Modify();
 
-                    if ("Gift Voucher"."No. Printed" > 1 ) and (RetailSetup."Copy No. on Sales Ticket" ) then
-                      CopyText := TextCopy;
+                    if ("Gift Voucher"."No. Printed" > 1) and (RetailSetup."Copy No. on Sales Ticket") then
+                        CopyText := TextCopy;
 
-                    BarcodeLib.GenerateBarcode("Gift Voucher"."No.",TempBlob);
+                    BarcodeLib.GenerateBarcode("Gift Voucher"."No.", TempBlob);
+                    BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
                     if Register.Get("Register No.") then;
 
                     ShowBody1 := RetailSetup."Name on Sales Ticket";
 
-                    if(StrLen(Format(Register."Fax No.")) > 0) then
-                      FaxText := TextFax + Format(Register."Fax No.");
+                    if (StrLen(Format(Register."Fax No.")) > 0) then
+                        FaxText := TextFax + Format(Register."Fax No.");
 
                     ShowEmail := Register."E-mail" <> '';
                     ShowWebAdd := Register.Website <> '';
                     ShowNameBody := Register.Name <> '';
 
                     if RetailSetup."Bar Code on Sales Ticket Print" then
-                      Barcode := "No."
+                        Barcode := "No."
                     else
-                      Barcode := '';
+                        Barcode := '';
 
                     if SalespersonPurchaser.Get("Gift Voucher".Salesperson) then;
 
 
                     if RetailSetup."Salesperson on Sales Ticket" then
-                      SalepersonText := TextSalesperson + ' ' + Format(SalespersonPurchaser.Name)
+                        SalepersonText := TextSalesperson + ' ' + Format(SalespersonPurchaser.Name)
                     else
-                      SalepersonText := '';
+                        SalepersonText := '';
                 end;
             }
 
@@ -116,14 +117,14 @@ report 6014438 "Gift Voucher A5 Right"
                 //AuditRoll.SETRANGE("Sales Ticket No.","Gift Voucher"."Sales Ticket No.");
                 //+NPR5.40
 
-                if LoopCounter >0 then
-                  CurrReport.Break;
+                if LoopCounter > 0 then
+                    CurrReport.Break;
                 LoopCounter += 1;
             end;
 
             trigger OnPreDataItem()
             begin
-                Register.Get(RetailFormCode.FetchRegisterNumber );
+                Register.Get(RetailFormCode.FetchRegisterNumber);
             end;
         }
     }
@@ -178,7 +179,7 @@ report 6014438 "Gift Voucher A5 Right"
         CopyText: Text[30];
         SalepersonText: Text[80];
         FaxText: Text[50];
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         TextFax: Label 'Fax No.:';
         TextCopy: Label 'COPY';
         RetailFormCode: Codeunit "Retail Form Code";
@@ -191,5 +192,6 @@ report 6014438 "Gift Voucher A5 Right"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         TextRegister: Label ' , Register';
         TextSalesTicket: Label ' - Sales Ticket';
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

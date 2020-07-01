@@ -3558,11 +3558,11 @@ codeunit 6060127 "MM Membership Management"
 
         Contact."Magento Contact" := (not Member.Blocked) and (Member."E-Mail Address" <> '');
 
-        Contact.Modify (true);
+        Contact.Modify(True);
 
         //-MM1.36 [335667]
         // Code on Modify trigger requires XREC (modification from a page) to properly handle customer synchronization
-        Contact.OnModify (ContactXRec);
+        Contact.DoModify(ContactXRec);
         //+MM1.36 [335667]
     end;
 

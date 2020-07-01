@@ -223,7 +223,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     begin
 
                         //-TM1.39 [334644]
-                        if SystemEventWrapper.MakeDateFilter(DateFactFilter) = 0 then;
+                        SystemEventWrapper.MakeDateFilter(DateFactFilter);
                         //+TM1.39 [334644]
 
                         TicketStatistics.SetFilter("Admission Date", DateFactFilter);
@@ -561,7 +561,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                             FieldRef.SetFilter(FilterAndFilter(AdmissionCodeFilter, BlockedAdmissionFactFilter));
                         end;
                     end;
-                    //-TM1.36 [323024]
+                //-TM1.36 [323024]
                 ColumnFactOption::VARIANT_CODE:
                     begin
                         FieldRef.SetFilter('%1', TicketFact."Fact Name"::VARIANT_CODE);
@@ -747,13 +747,13 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                         else
                             BlockedHourFactFilter := StrSubstNo('%1&<>%2', BlockedHourFactFilter, TicketAccessFact."Fact Code");
 
-                        //-TM1.36 [323024]
+                    //-TM1.36 [323024]
                     TicketAccessFact."Fact Name"::VARIANT_CODE:
                         if (BlockedVariantFactFilter = '') then
                             BlockedVariantFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
                         else
                             BlockedVariantFactFilter := StrSubstNo('%1&<>%2', BlockedVariantFactFilter, TicketAccessFact."Fact Code");
-                        //+TM1.36 [323024]
+                //+TM1.36 [323024]
                 end;
             until (TicketAccessFact.Next() = 0);
         end;

@@ -6,30 +6,30 @@ table 6184860 "Azure Storage API Setup"
 
     fields
     {
-        field(1;"Account Name";Text[24])
+        field(1; "Account Name"; Text[24])
         {
             Caption = 'Azure Account Name';
         }
-        field(5;"Account Description";Text[250])
+        field(5; "Account Description"; Text[250])
         {
             Caption = 'Azure Account Description';
         }
-        field(10;"Access Key";Guid)
+        field(10; "Access Key"; Guid)
         {
             Caption = 'Shared Access Key';
             Description = 'Storage account -> Settings section -> Access keys -> key1 or key2';
         }
-        field(20;"Admin Key";Guid)
+        field(20; "Admin Key"; Guid)
         {
             Caption = 'Search App Admin Key';
             Description = 'Search Service -> Settings section -> Keys -> "Primary admin key" or "Secondary admin key"';
         }
-        field(30;Timeout;Integer)
+        field(30; Timeout; Integer)
         {
             Caption = 'Timeout';
             Description = 'Miliseconds. Accounts are set up per region, might affect request timeout threshold';
         }
-        field(40;"Storage On Server";Text[250])
+        field(40; "Storage On Server"; Text[250])
         {
             Caption = 'Server files location';
 
@@ -38,17 +38,17 @@ table 6184860 "Azure Storage API Setup"
                 FileManagement: Codeunit "File Management";
             begin
                 if not FileManagement.ServerDirectoryExists("Storage On Server") then
-                  Error(BadDirErr, "Storage On Server", TableCaption);
+                    Error(BadDirErr, "Storage On Server", TableCaption);
 
                 if CopyStr("Storage On Server", StrLen("Storage On Server")) <> '\' then
-                  "Storage On Server" += '\';
+                    "Storage On Server" += '\';
             end;
         }
     }
 
     keys
     {
-        key(Key1;"Account Name")
+        key(Key1; "Account Name")
         {
         }
     }
@@ -62,71 +62,52 @@ table 6184860 "Azure Storage API Setup"
         BadDirErr: Label 'Directory "%1" does not exist on the server, please check %2';
 
     procedure HandleAccessKey("Key": Text): Text
-    var
-        ServicePassword: Record "Service Password";
     begin
-        ServicePassword.SetRange(Key,"Access Key");
-        if Key = '' then begin
-          if ServicePassword.FindFirst then
-            ServicePassword.Delete;
-          exit;
+        if "Key" = '' then begin
+            if IsolatedStorage.Contains("Access Key", DataScope::Company) then
+                IsolatedStorage.Delete("Access Key", DataScope::Company);
+            exit;
         end;
 
-        if not ServicePassword.FindFirst then begin
-          "Access Key" := CreateGuid;
-          Modify;
-          ServicePassword.Key := "Access Key";
-          ServicePassword.Insert;
+        if not IsolatedStorage.Contains("Access Key", DataScope::Company) then begin
+            "Access Key" := CreateGuid();
+            Modify;
         end;
-
-        ServicePassword.SavePassword(Key);
-        ServicePassword.Modify;
+        IsolatedStorage.Set("Access Key", "Key", DataScope::Company);
     end;
 
     procedure GetAccessKey(): Text
     var
-        ServicePassword: Record "Service Password";
+        TokenValue: Text;
     begin
-        ServicePassword.SetRange(Key,"Access Key");
+        if not IsolatedStorage.Get("Access Key", DataScope::Company, TokenValue) then
+            Error(NoKeyErr);
 
-        if not ServicePassword.FindFirst then
-          Error(NoKeyErr);
-
-        exit(ServicePassword.GetPassword());
+        exit(TokenValue);
     end;
 
     procedure HandleAdminKey("Key": Text): Text
-    var
-        ServicePassword: Record "Service Password";
     begin
-        ServicePassword.SetRange(Key,"Admin Key");
-        if Key = '' then begin
-          if ServicePassword.FindFirst then
-            ServicePassword.Delete;
-          exit;
+        if "Key" = '' then begin
+            if IsolatedStorage.Contains("Admin Key", DataScope::Company) then
+                IsolatedStorage.Delete("Admin Key", DataScope::Company);
+            exit;
         end;
 
-        if not ServicePassword.FindFirst then begin
-          "Admin Key" := CreateGuid;
-          Modify;
-          ServicePassword.Key := "Admin Key";
-          ServicePassword.Insert;
+        if not IsolatedStorage.Contains("Admin Key", DataScope::Company) then begin
+            "Admin Key" := CreateGuid();
+            Modify;
         end;
-
-        ServicePassword.SavePassword(Key);
-        ServicePassword.Modify;
+        IsolatedStorage.Set("Admin Key", "Key", DataScope::Company);
     end;
 
     procedure GetAdminKey(): Text
     var
-        ServicePassword: Record "Service Password";
+        TokenValue: Text;
     begin
-        ServicePassword.SetRange(Key,"Admin Key");
+        if not IsolatedStorage.Get("Admin Key", DataScope::Company, TokenValue) then
+            Error(NoKeyErr);
 
-        if not ServicePassword.FindFirst then
-          Error(NoKeyErr);
-
-        exit(ServicePassword.GetPassword());
+        exit(TokenValue);
     end;
 }
-

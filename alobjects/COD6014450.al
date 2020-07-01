@@ -47,7 +47,7 @@ codeunit 6014450 "E-mail Management"
         Text004: Label 'There is not entered any sender email address in the setup.';
         Text006: Label 'The functionality to save report %1 as PDF, returned an error.\\%2';
         Text007: Label 'Shortcut not found.';
-        TempBlobReqParamStore: Record TempBlob temporary;
+        ReqParamStoreDict: Dictionary of [Integer, Text];
         Initialized: Boolean;
         Text008: Label 'Mail Server not defined in I-Comm';
         Text010: Label 'Would you like to resend the e-mail?';
@@ -64,31 +64,31 @@ codeunit 6014450 "E-mail Management"
         NoOutputFromReport: Label 'No output from report.';
         NoMatchingEnd: Label 'No End-Tag found for Start-Tag at position %1 in %2.';
 
-    procedure SendEmail(var RecRef: RecordRef;RecipientEmail: Text;Silent: Boolean) ErrorMessage: Text
+    procedure SendEmail(var RecRef: RecordRef; RecipientEmail: Text; Silent: Boolean) ErrorMessage: Text
     var
         EmailTemplateHeader: Record "E-mail Template Header";
     begin
-        exit(SendEmailTemplate(RecRef,EmailTemplateHeader,RecipientEmail,Silent));
+        exit(SendEmailTemplate(RecRef, EmailTemplateHeader, RecipientEmail, Silent));
     end;
 
-    procedure SendEmailTemplate(var RecRef: RecordRef;var EmailTemplateHeader: Record "E-mail Template Header";RecipientEmail: Text;Silent: Boolean) ErrorMessage: Text
+    procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "E-mail Template Header"; RecipientEmail: Text; Silent: Boolean) ErrorMessage: Text
     begin
-        ErrorMessage := SetupEmailTemplate(RecRef,RecipientEmail,Silent,EmailTemplateHeader);
+        ErrorMessage := SetupEmailTemplate(RecRef, RecipientEmail, Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
-          exit;
+            exit;
         if ErrorMessage = '' then
-          ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader,RecRef,0);
+            ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, 0);
 
         if ErrorMessage = '' then
-          ErrorMessage := SendSmtpMessage(RecRef,Silent);
+            ErrorMessage := SendSmtpMessage(RecRef, Silent);
 
         if (ErrorMessage <> '') and not Silent then
-          Error(ErrorMessage);
+            Error(ErrorMessage);
 
         exit(ErrorMessage);
     end;
 
-    procedure SendReport(ReportID: Integer;var RecRef: RecordRef;RecipientEmail: Text[250];Silent: Boolean): Text
+    procedure SendReport(ReportID: Integer; var RecRef: RecordRef; RecipientEmail: Text[250]; Silent: Boolean): Text
     var
         EmailTemplateHeader: Record "E-mail Template Header";
         FileManagement: Codeunit "File Management";
@@ -96,10 +96,10 @@ codeunit 6014450 "E-mail Management"
         Filename: Text;
         ErrorMessage: Text;
     begin
-        exit(SendReportTemplate(ReportID,RecRef,EmailTemplateHeader,RecipientEmail,Silent));
+        exit(SendReportTemplate(ReportID, RecRef, EmailTemplateHeader, RecipientEmail, Silent));
     end;
 
-    procedure SendReportTemplate(ReportID: Integer;var RecRef: RecordRef;var EmailTemplateHeader: Record "E-mail Template Header";RecipientEmail: Text[250];Silent: Boolean): Text
+    procedure SendReportTemplate(ReportID: Integer; var RecRef: RecordRef; var EmailTemplateHeader: Record "E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean): Text
     var
         FileManagement: Codeunit "File Management";
         InStream: InStream;
@@ -108,62 +108,62 @@ codeunit 6014450 "E-mail Management"
     begin
         ErrorMessage := '';
         if ReportID = 0 then
-          ErrorMessage := Text012;
+            ErrorMessage := Text012;
 
         if ErrorMessage = '' then
-          ErrorMessage := SetupEmailTemplate(RecRef,RecipientEmail,Silent,EmailTemplateHeader);
+            ErrorMessage := SetupEmailTemplate(RecRef, RecipientEmail, Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
-          exit;
+            exit;
 
         if ErrorMessage = '' then
-          ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader,RecRef,ReportID);
+            ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, ReportID);
 
         AddEmailAttachmentsToSmtpMessage(EmailTemplateHeader);
 
         if ErrorMessage = '' then begin
-          Filename := GetFilename(EmailTemplateHeader,RecRef);
-          RecRef.SetRecFilter;
-          if not PrintPDF(ReportID,RecRef,Filename) then
-            ErrorMessage := StrSubstNo(Text006,ReportID,GetLastErrorText);
+            Filename := GetFilename(EmailTemplateHeader, RecRef);
+            RecRef.SetRecFilter;
+            if not PrintPDF(ReportID, RecRef, Filename) then
+                ErrorMessage := StrSubstNo(Text006, ReportID, GetLastErrorText);
         end;
 
         if ErrorMessage = '' then
-          ErrorMessage := AddAdditionalReportsToSmtpMessage(EmailTemplateHeader,RecRef);
+            ErrorMessage := AddAdditionalReportsToSmtpMessage(EmailTemplateHeader, RecRef);
 
         if ErrorMessage = '' then
-          ErrorMessage := SendSmtpMessage(RecRef,Silent);
+            ErrorMessage := SendSmtpMessage(RecRef, Silent);
 
         if (ErrorMessage <> '') and not Silent then
-          Error(ErrorMessage);
+            Error(ErrorMessage);
 
-        exit(CopyStr(ErrorMessage,1,1024));
+        exit(CopyStr(ErrorMessage, 1, 1024));
     end;
 
     procedure "--- SmtpMessage"()
     begin
     end;
 
-    local procedure AddAdditionalReportsToSmtpMessage(EmailTemplateHeader: Record "E-mail Template Header";var RecRef: RecordRef) ErrorMessage: Text
+    local procedure AddAdditionalReportsToSmtpMessage(EmailTemplateHeader: Record "E-mail Template Header"; var RecRef: RecordRef) ErrorMessage: Text
     var
         EmailTemplateReport: Record "E-mail Template Report";
         EmailTemplateMgt: Codeunit "E-mail Template Mgt.";
         Filename: Text[250];
     begin
         EmailTemplateReport.Reset;
-        EmailTemplateReport.SetRange("E-mail Template Code",EmailTemplateHeader.Code);
+        EmailTemplateReport.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
         if EmailTemplateReport.FindSet then
-          repeat
-            //-NPR5.48 [341711]
-            //Filename := ParseEmailText(RecRef,EmailTemplateReport.Filename,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag");
-            Filename := EmailTemplateMgt.MergeMailContent(RecRef,EmailTemplateReport.Filename,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag");
-            //+NPR5.48 [341711]
-            if StrPos(Filename,'.pdf') = 0 then
-              Filename += '.pdf';
-            Filename := ReplaceSpecialChar(Filename);
+            repeat
+                //-NPR5.48 [341711]
+                //Filename := ParseEmailText(RecRef,EmailTemplateReport.Filename,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag");
+                Filename := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateReport.Filename, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
+                //+NPR5.48 [341711]
+                if StrPos(Filename, '.pdf') = 0 then
+                    Filename += '.pdf';
+                Filename := ReplaceSpecialChar(Filename);
 
-            if not PrintPDF(EmailTemplateReport."Report ID",RecRef,Filename) then
-              ErrorMessage := StrSubstNo(Text006,EmailTemplateReport."Report ID",GetLastErrorText);
-          until (EmailTemplateReport.Next = 0) or (ErrorMessage <> '');
+                if not PrintPDF(EmailTemplateReport."Report ID", RecRef, Filename) then
+                    ErrorMessage := StrSubstNo(Text006, EmailTemplateReport."Report ID", GetLastErrorText);
+            until (EmailTemplateReport.Next = 0) or (ErrorMessage <> '');
 
         exit(ErrorMessage);
     end;
@@ -174,15 +174,15 @@ codeunit 6014450 "E-mail Management"
         RecRef: RecordRef;
     begin
         RecRef.GetTable(EmailTemplateHeader);
-        EmailAttachment.SetRange("Table No.",RecRef.Number);
-        EmailAttachment.SetRange("Primary Key",RecRef.GetPosition(false));
+        EmailAttachment.SetRange("Table No.", RecRef.Number);
+        EmailAttachment.SetRange("Primary Key", RecRef.GetPosition(false));
         if EmailAttachment.FindSet then
-          repeat
-            if EmailAttachment.Description <> '' then begin
-              EmailAttachment.CalcFields("Attached File");
-              AddAttachmentToBuffer(EmailAttachment);
-            end;
-          until EmailAttachment.Next = 0;
+            repeat
+                if EmailAttachment.Description <> '' then begin
+                    EmailAttachment.CalcFields("Attached File");
+                    AddAttachmentToBuffer(EmailAttachment);
+                end;
+            until EmailAttachment.Next = 0;
     end;
 
     procedure AddFileToSmtpMessage(Filename: Text[250]) FileAttached: Boolean
@@ -194,17 +194,17 @@ codeunit 6014450 "E-mail Management"
         Pos: Integer;
     begin
         if not Exists(Filename) then
-          exit(false);
+            exit(false);
 
         AttachmentFile.Open(Filename);
         AttachmentFile.CreateInStream(InStream);
         EmailAttachmentTemp.Init;
         EmailAttachmentTemp."Attached File".CreateOutStream(OutStream);
-        CopyStream(OutStream,InStream);
-        Pos := StrPos(Filename,'\');
+        CopyStream(OutStream, InStream);
+        Pos := StrPos(Filename, '\');
         while Pos > 0 do begin
-          Filename := CopyStr(Filename,Pos+1);
-          Pos := StrPos(Filename,'\');
+            Filename := CopyStr(Filename, Pos + 1);
+            Pos := StrPos(Filename, '\');
         end;
         EmailAttachmentTemp.Description := ReplaceSpecialChar(Filename);
         EmailAttachmentTemp.Insert;
@@ -224,14 +224,14 @@ codeunit 6014450 "E-mail Management"
     begin
         EmailAttachment.CalcFields("Attached File");
         if not EmailAttachment."Attached File".HasValue then begin
-          SetLastErrorMessage(StrSubstNo(AttachmentNoData,EmailAttachment.Description));
-          exit(false);
+            SetLastErrorMessage(StrSubstNo(AttachmentNoData, EmailAttachment.Description));
+            exit(false);
         end;
         AttachmentBuffer.Reset;
         if AttachmentBuffer.FindLast then
-          NextAttachmentLineNo := AttachmentBuffer."Line No." + 1
+            NextAttachmentLineNo := AttachmentBuffer."Line No." + 1
         else
-          NextAttachmentLineNo := 1;
+            NextAttachmentLineNo := 1;
         AttachmentBuffer := EmailAttachment;
         AttachmentBuffer."Table No." := 0;
         AttachmentBuffer."Primary Key" := '';
@@ -240,7 +240,7 @@ codeunit 6014450 "E-mail Management"
         exit(true);
     end;
 
-    procedure CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader: Record "E-mail Template Header";var RecRef: RecordRef;ReportID: Integer) ErrorMessage: Text[1024]
+    procedure CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader: Record "E-mail Template Header"; var RecRef: RecordRef; ReportID: Integer) ErrorMessage: Text[1024]
     var
         EmailTemplateLine: Record "E-mail Template Line";
         EmailTemplateMgt: Codeunit "E-mail Template Mgt.";
@@ -254,21 +254,21 @@ codeunit 6014450 "E-mail Management"
         i: Integer;
     begin
         if not IsNull(SmtpMessage) then
-          SmtpMessage.Dispose;
+            SmtpMessage.Dispose;
         SmtpMessage := SmtpMessage.SmtpMessage;
         if EmailTemplateHeader."Default Recipient Address" = '' then
-          exit(Text003);
+            exit(Text003);
         if EmailTemplateHeader."From E-mail Address" = '' then
-          exit(Text004);
+            exit(Text004);
         UseTransactionalEmailCode := '';
         TransactionalType := 0;
         if (EmailTemplateHeader."Transactional E-mail" = EmailTemplateHeader."Transactional E-mail"::"Campaign Monitor Transactional") then begin
-          TransactionalType := TransactionalType::Classic;
-          TransactionalEmailRecipient := EmailTemplateHeader."Default Recipient Address";
-          if EmailTemplateHeader."Transactional E-mail Code" <> '' then begin
-            TransactionalType := TransactionalType::Smart;
-            UseTransactionalEmailCode := EmailTemplateHeader."Transactional E-mail Code";
-          end;
+            TransactionalType := TransactionalType::Classic;
+            TransactionalEmailRecipient := EmailTemplateHeader."Default Recipient Address";
+            if EmailTemplateHeader."Transactional E-mail Code" <> '' then begin
+                TransactionalType := TransactionalType::Smart;
+                UseTransactionalEmailCode := EmailTemplateHeader."Transactional E-mail Code";
+            end;
         end;
 
         SmtpMessage.AddRecipients(EmailTemplateHeader."Default Recipient Address");
@@ -276,58 +276,58 @@ codeunit 6014450 "E-mail Management"
         SmtpMessage.FromAddress := EmailTemplateHeader."From E-mail Address";
         SmtpMessage.FromName := EmailTemplateHeader."From E-mail Name";
         if EmailTemplateHeader."Sender as bcc" then
-          SmtpMessage.AddBCC(EmailTemplateHeader."From E-mail Address");
+            SmtpMessage.AddBCC(EmailTemplateHeader."From E-mail Address");
 
         EmailString := EmailTemplateHeader."Default Recipient Address CC";
         while EmailString <> '' do begin
-          Email := CutNextEmail(EmailString);
-          if Email <> '' then
-            SmtpMessage.AddCC(Email);
+            Email := CutNextEmail(EmailString);
+            if Email <> '' then
+                SmtpMessage.AddCC(Email);
         end;
 
         EmailString := EmailTemplateHeader."Default Recipient Address BCC";
         while EmailString <> '' do begin
-          Email := CutNextEmail(EmailString);
-          if Email <> '' then
-            SmtpMessage.AddBCC(Email);
+            Email := CutNextEmail(EmailString);
+            if Email <> '' then
+                SmtpMessage.AddBCC(Email);
         end;
 
         if TransactionalType <> TransactionalType::Smart then begin
-          //-NPR5.48 [341711]
-          //SmtpMessage.Subject(ParseEmailText(RecRef,EmailTemplateHeader.Subject,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag"));
-          HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef,EmailTemplateHeader.Subject,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag");
-          SmtpMessage.Subject(HtmlLine);
-          //+NPR5.48 [341711]
-          SmtpMessage.HtmlFormatted(true);
-          if not EmailTemplateHeader."Use HTML Template" then begin
-            EmailTemplateLine.SetRange("E-mail Template Code",EmailTemplateHeader.Code);
-            if EmailTemplateLine.FindSet then
-              repeat
-                //-NPR5.48 [341711]
-                //SmtpMessage.AppendBody(ParseEmailText(RecRef,EmailTemplateLine."Mail Body Line",EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag") + '<br/>' );
-                HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef,EmailTemplateLine."Mail Body Line",EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
-                SmtpMessage.AppendBody(HtmlLine);
-                //+NPR5.48 [341711]
-              until EmailTemplateLine.Next = 0;
-          end else begin
-            EmailTemplateHeader.CalcFields("HTML Template");
-            if EmailTemplateHeader."HTML Template".HasValue then begin
-              //-NPR5.48 [341711]
-              //EmailTemplateHeader."HTML Template".CREATEINSTREAM(InStream);
-              EmailTemplateHeader."HTML Template".CreateInStream(InStream,TEXTENCODING::UTF8);
-              //+NPR5.48 [341711]
-              while not InStream.EOS do begin
-                HtmlLine := '';
-                InStream.ReadText(HtmlLine);
-                //-NPR5.48 [341711]
-                //SmtpMessage.AppendBody(ParseEmailText(RecRef, HtmlLine,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag") + '<br/>' );
-                HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef,HtmlLine,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
-                SmtpMessage.AppendBody(HtmlLine);
-                //+NPR5.48 [341711]
-              end;
-              Clear(InStream);
+            //-NPR5.48 [341711]
+            //SmtpMessage.Subject(ParseEmailText(RecRef,EmailTemplateHeader.Subject,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag"));
+            HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateHeader.Subject, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
+            SmtpMessage.Subject(HtmlLine);
+            //+NPR5.48 [341711]
+            SmtpMessage.HtmlFormatted(true);
+            if not EmailTemplateHeader."Use HTML Template" then begin
+                EmailTemplateLine.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
+                if EmailTemplateLine.FindSet then
+                    repeat
+                        //-NPR5.48 [341711]
+                        //SmtpMessage.AppendBody(ParseEmailText(RecRef,EmailTemplateLine."Mail Body Line",EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag") + '<br/>' );
+                        HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateLine."Mail Body Line", EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
+                        SmtpMessage.AppendBody(HtmlLine);
+                    //+NPR5.48 [341711]
+                    until EmailTemplateLine.Next = 0;
+            end else begin
+                EmailTemplateHeader.CalcFields("HTML Template");
+                if EmailTemplateHeader."HTML Template".HasValue then begin
+                    //-NPR5.48 [341711]
+                    //EmailTemplateHeader."HTML Template".CREATEINSTREAM(InStream);
+                    EmailTemplateHeader."HTML Template".CreateInStream(InStream, TEXTENCODING::UTF8);
+                    //+NPR5.48 [341711]
+                    while not InStream.EOS do begin
+                        HtmlLine := '';
+                        InStream.ReadText(HtmlLine);
+                        //-NPR5.48 [341711]
+                        //SmtpMessage.AppendBody(ParseEmailText(RecRef, HtmlLine,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag") + '<br/>' );
+                        HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, HtmlLine, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
+                        SmtpMessage.AppendBody(HtmlLine);
+                        //+NPR5.48 [341711]
+                    end;
+                    Clear(InStream);
+                end;
             end;
-          end;
         end;
 
         AttachmentBuffer.DeleteAll;
@@ -335,7 +335,7 @@ codeunit 6014450 "E-mail Management"
         exit('');
     end;
 
-    procedure SendSmtpMessage(var RecRef: RecordRef;Silent: Boolean) ErrorMessage: Text[1024]
+    procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
     var
         TransactionalEmail: Record "Smart Email";
         CampaignMonitorMgt: Codeunit "CampaignMonitor Mgt.";
@@ -345,65 +345,65 @@ codeunit 6014450 "E-mail Management"
         FromAddress: Text;
     begin
         if TransactionalType = TransactionalType::Smart then
-          if TransactionalEmail.Get(UseTransactionalEmailCode) then begin
-            ErrorMessage := CopyStr(CampaignMonitorMgt.SendSmartEmailWAttachment(TransactionalEmail,TransactionalEmailRecipient,SmtpMessage.CC,SmtpMessage.Bcc,RecRef,AttachmentBuffer,Silent),1,MaxStrLen(ErrorMessage));
-            HandledByTransactional := true;
-          end;
+            if TransactionalEmail.Get(UseTransactionalEmailCode) then begin
+                ErrorMessage := CopyStr(CampaignMonitorMgt.SendSmartEmailWAttachment(TransactionalEmail, TransactionalEmailRecipient, SmtpMessage.CC, SmtpMessage.Bcc, RecRef, AttachmentBuffer, Silent), 1, MaxStrLen(ErrorMessage));
+                HandledByTransactional := true;
+            end;
         if TransactionalType = TransactionalType::Classic then begin
-          FromName := SmtpMessage.FromName;
-          FromAddress := SmtpMessage.FromAddress;
-          if (FromName <> '') and (FromName <> FromAddress) then
-            FromAddress := StrSubstNo('%1 %2',FromName,FromAddress);
-          ErrorMessage := CampaignMonitorMgt.SendClasicMail(TransactionalEmailRecipient,SmtpMessage.CC,SmtpMessage.Bcc,SmtpMessage.Subject,SmtpMessage.Body,'',FromAddress,'',true,true,'','',AttachmentBuffer,Silent);
-          HandledByTransactional := true;
+            FromName := SmtpMessage.FromName;
+            FromAddress := SmtpMessage.FromAddress;
+            if (FromName <> '') and (FromName <> FromAddress) then
+                FromAddress := StrSubstNo('%1 %2', FromName, FromAddress);
+            ErrorMessage := CampaignMonitorMgt.SendClasicMail(TransactionalEmailRecipient, SmtpMessage.CC, SmtpMessage.Bcc, SmtpMessage.Subject, SmtpMessage.Body, '', FromAddress, '', true, true, '', '', AttachmentBuffer, Silent);
+            HandledByTransactional := true;
         end;
 
         if not HandledByTransactional then begin
-          Initialize();
-          if EmailSetup."Mail Server" = '' then begin
-            if Silent then
-              exit(Text008);
-            Error(Text008);
-          end;
-          if EmailSetup."Mail Server Port" <= 0 then
-            EmailSetup."Mail Server Port" := 25;
-          AttachmentBuffer.Reset;
-          if AttachmentBuffer.FindSet then
-            repeat
-              if AttachmentBuffer.Description <> '' then begin
-                AttachmentBuffer.CalcFields("Attached File");
-                Clear(InStream);
-                if AttachmentBuffer."Attached File".HasValue then begin
-                  AttachmentBuffer."Attached File".CreateInStream(InStream);
-                end;
-                if (StrLen(SmtpMessage.AddAttachment(InStream,AttachmentBuffer.Description))>0) then
-                  Clear(InStream);
-              end;
-            until AttachmentBuffer.Next = 0;
-          ErrorMessage := SmtpMessage.Send(EmailSetup."Mail Server",EmailSetup."Mail Server Port",EmailSetup.Username <> '',
-                                           EmailSetup.Username,EmailSetup.Password,EmailSetup."Enable Ssl");
+            Initialize();
+            if EmailSetup."Mail Server" = '' then begin
+                if Silent then
+                    exit(Text008);
+                Error(Text008);
+            end;
+            if EmailSetup."Mail Server Port" <= 0 then
+                EmailSetup."Mail Server Port" := 25;
+            AttachmentBuffer.Reset;
+            if AttachmentBuffer.FindSet then
+                repeat
+                    if AttachmentBuffer.Description <> '' then begin
+                        AttachmentBuffer.CalcFields("Attached File");
+                        Clear(InStream);
+                        if AttachmentBuffer."Attached File".HasValue then begin
+                            AttachmentBuffer."Attached File".CreateInStream(InStream);
+                        end;
+                        if (StrLen(SmtpMessage.AddAttachment(InStream, AttachmentBuffer.Description)) > 0) then
+                            Clear(InStream);
+                    end;
+                until AttachmentBuffer.Next = 0;
+            ErrorMessage := SmtpMessage.Send(EmailSetup."Mail Server", EmailSetup."Mail Server Port", EmailSetup.Username <> '',
+                                             EmailSetup.Username, EmailSetup.Password, EmailSetup."Enable Ssl");
         end;
         AttachmentBuffer.DeleteAll;
 
         if ErrorMessage = '' then begin
-          AddEmailLogEntry(RecRef);
-          SmtpMessage.Dispose();
-          Clear(SmtpMessage);
+            AddEmailLogEntry(RecRef);
+            SmtpMessage.Dispose();
+            Clear(SmtpMessage);
 
-          if Silent then
-            exit('')
-          else begin
-            Message(Text002);
-            exit('');
-          end;
+            if Silent then
+                exit('')
+            else begin
+                Message(Text002);
+                exit('');
+            end;
         end else begin
-          SmtpMessage.Dispose();
-          Clear(SmtpMessage);
+            SmtpMessage.Dispose();
+            Clear(SmtpMessage);
 
-          if Silent then
-            exit(ErrorMessage)
-          else
-            Error(ErrorMessage);
+            if Silent then
+                exit(ErrorMessage)
+            else
+                Error(ErrorMessage);
         end;
     end;
 
@@ -411,23 +411,23 @@ codeunit 6014450 "E-mail Management"
     begin
     end;
 
-    procedure SetupEmailTemplate(var RecRef: RecordRef;RecipientEmail: Text[250];Silent: Boolean;var EmailTemplateHeader: Record "E-mail Template Header") ErrorMessage: Text[1024]
+    procedure SetupEmailTemplate(var RecRef: RecordRef; RecipientEmail: Text[250]; Silent: Boolean; var EmailTemplateHeader: Record "E-mail Template Header") ErrorMessage: Text[1024]
     begin
         ErrorMessage := '';
-        if GetEmailTemplateHeader(RecRef,EmailTemplateHeader) then begin
-          if Silent then
-            EmailTemplateHeader."Verify Recipient" := false;
-          EmailTemplateHeader."Default Recipient Address" := GetEmailRecepientAddress(EmailTemplateHeader,RecipientEmail);
-          EmailTemplateHeader."From E-mail Address" := GetEmailFromAddress(EmailTemplateHeader);
-          EmailTemplateHeader."From E-mail Name" := GetEmailFromName(EmailTemplateHeader);
-          //-NPR5.48 [336330]
-          OnAfterSetFromEmail(EmailTemplateHeader.Code,RecRef,RecipientEmail,Silent,EmailTemplateHeader."From E-mail Address",EmailTemplateHeader."From E-mail Name");
-          //+NPR5.48 [336330]
+        if GetEmailTemplateHeader(RecRef, EmailTemplateHeader) then begin
+            if Silent then
+                EmailTemplateHeader."Verify Recipient" := false;
+            EmailTemplateHeader."Default Recipient Address" := GetEmailRecepientAddress(EmailTemplateHeader, RecipientEmail);
+            EmailTemplateHeader."From E-mail Address" := GetEmailFromAddress(EmailTemplateHeader);
+            EmailTemplateHeader."From E-mail Name" := GetEmailFromName(EmailTemplateHeader);
+            //-NPR5.48 [336330]
+            OnAfterSetFromEmail(EmailTemplateHeader.Code, RecRef, RecipientEmail, Silent, EmailTemplateHeader."From E-mail Address", EmailTemplateHeader."From E-mail Name");
+            //+NPR5.48 [336330]
         end else
-          ErrorMessage := Text011;
+            ErrorMessage := Text011;
 
         if (ErrorMessage <> '') and not Silent then
-          Error(ErrorMessage);
+            Error(ErrorMessage);
 
         exit(ErrorMessage);
     end;
@@ -441,7 +441,7 @@ codeunit 6014450 "E-mail Management"
     begin
     end;
 
-    local procedure PrintPDF(ReportID: Integer;RecVariant: Variant;Filename: Text): Boolean
+    local procedure PrintPDF(ReportID: Integer; RecVariant: Variant; Filename: Text): Boolean
     var
         EmailAttachmentTemp: Record "E-mail Attachment" temporary;
         Result: Boolean;
@@ -452,15 +452,15 @@ codeunit 6014450 "E-mail Management"
         EmailAttachmentTemp.Description := Filename;
         EmailAttachmentTemp."Attached File".CreateOutStream(OStream);
         Parameters := GetReqParametersFromStore(ReportID);
-        Result := REPORT.SaveAs(ReportID,Parameters,REPORTFORMAT::Pdf,OStream,RecVariant);
+        Result := REPORT.SaveAs(ReportID, Parameters, REPORTFORMAT::Pdf, OStream, RecVariant);
         ClearRequestParameters(ReportID);
         if not EmailAttachmentTemp."Attached File".HasValue then begin
-          Result := false;
-          SetLastErrorMessage(NoOutputFromReport);
+            Result := false;
+            SetLastErrorMessage(NoOutputFromReport);
         end;
         if Result then begin
-          EmailAttachmentTemp.Insert;
-          Result := AddAttachmentToBuffer(EmailAttachmentTemp);
+            EmailAttachmentTemp.Insert;
+            Result := AddAttachmentToBuffer(EmailAttachmentTemp);
         end;
 
         ClearGlobalCustomReport;
@@ -475,7 +475,7 @@ codeunit 6014450 "E-mail Management"
     begin
         Initialize();
         if EmailTemplateHeader."From E-mail Address" <> '' then
-          exit(EmailTemplateHeader."From E-mail Address");
+            exit(EmailTemplateHeader."From E-mail Address");
 
         exit(EmailSetup."From E-mail Address");
     end;
@@ -484,24 +484,24 @@ codeunit 6014450 "E-mail Management"
     begin
         Initialize();
         if EmailTemplateHeader."From E-mail Name" <> '' then
-          exit(EmailTemplateHeader."From E-mail Name");
+            exit(EmailTemplateHeader."From E-mail Name");
 
         exit(EmailSetup."From Name");
     end;
 
-    local procedure GetEmailRecepientAddress(EmailTemplateHeader: Record "E-mail Template Header";EmailRecipientAddress: Text[250]) NewEmailRecipientAddress: Text[250]
+    local procedure GetEmailRecepientAddress(EmailTemplateHeader: Record "E-mail Template Header"; EmailRecipientAddress: Text[250]) NewEmailRecipientAddress: Text[250]
     begin
         NewEmailRecipientAddress := EmailRecipientAddress;
         if NewEmailRecipientAddress = '' then
-          NewEmailRecipientAddress := EmailTemplateHeader."Default Recipient Address";
+            NewEmailRecipientAddress := EmailTemplateHeader."Default Recipient Address";
 
         if EmailTemplateHeader."Verify Recipient" or (NewEmailRecipientAddress = '') then
-          NewEmailRecipientAddress := VerifyEmailAddress(NewEmailRecipientAddress);
+            NewEmailRecipientAddress := VerifyEmailAddress(NewEmailRecipientAddress);
 
         exit(NewEmailRecipientAddress);
     end;
 
-    procedure GetEmailTemplateHeader(var RecRef: RecordRef;var EmailTemplateHeader: Record "E-mail Template Header") RecordExists: Boolean
+    procedure GetEmailTemplateHeader(var RecRef: RecordRef; var EmailTemplateHeader: Record "E-mail Template Header") RecordExists: Boolean
     var
         EmailTemplateFilter: Record "E-mail Template Filter";
         FieldRef: FieldRef;
@@ -510,58 +510,64 @@ codeunit 6014450 "E-mail Management"
         Stop: Boolean;
     begin
         if EmailTemplateHeader.GetFilters = '' then
-          EmailTemplateHeader.SetFilter(Group,'%1',GetDefaultGroupFilter);
-        EmailTemplateHeader.SetRange("Table No.",RecRef.Number);
-        if EmailTemplateHeader.Find('-') then repeat
-          RecordExists := true;
-          EmailTemplateFilter.SetRange("E-mail Template Code",EmailTemplateHeader.Code);
-          EmailTemplateFilter.SetRange("Table No.",EmailTemplateHeader."Table No.");
-          if EmailTemplateFilter.Find('-') then repeat
-            RecordExists := false;
-            FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
-            FieldRef.SetFilter(EmailTemplateFilter.Value);
-            if RecRef.Find then
-              RecordExists := true;
-            FieldRef.SetRange();
-          until not RecordExists or  (EmailTemplateFilter.Next = 0);
-          if RecordExists then
-            Stop := true
-          else Stop := EmailTemplateHeader.Next = 0;
-        until Stop;
+            EmailTemplateHeader.SetFilter(Group, '%1', GetDefaultGroupFilter);
+        EmailTemplateHeader.SetRange("Table No.", RecRef.Number);
+        if EmailTemplateHeader.Find('-') then
+            repeat
+                RecordExists := true;
+                EmailTemplateFilter.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
+                EmailTemplateFilter.SetRange("Table No.", EmailTemplateHeader."Table No.");
+                if EmailTemplateFilter.Find('-') then
+                    repeat
+                        RecordExists := false;
+                        FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
+                        FieldRef.SetFilter(EmailTemplateFilter.Value);
+                        if RecRef.Find then
+                            RecordExists := true;
+                        FieldRef.SetRange();
+                    until not RecordExists or (EmailTemplateFilter.Next = 0);
+                if RecordExists then
+                    Stop := true
+                else
+                    Stop := EmailTemplateHeader.Next = 0;
+            until Stop;
 
         if not RecordExists then begin
-          if EmailTemplateHeader.Find('-') then repeat
-            RecordExists := true;
-            EmailTemplateFilter.SetRange("E-mail Template Code",EmailTemplateHeader.Code);
-            EmailTemplateFilter.SetRange("Table No.",EmailTemplateHeader."Table No.");
-            if EmailTemplateFilter.Find('-') then repeat
-              RecordExists := false;
-              FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
-              FieldRef.SetFilter(EmailTemplateFilter.Value);
-              if RecRef.Find then
-                RecordExists := true;
-              FieldRef.SetRange();
-            until not RecordExists or  (EmailTemplateFilter.Next = 0);
-            if RecordExists then
-              Stop := true
-            else Stop := EmailTemplateHeader.Next = 0;
-          until Stop;
+            if EmailTemplateHeader.Find('-') then
+                repeat
+                    RecordExists := true;
+                    EmailTemplateFilter.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
+                    EmailTemplateFilter.SetRange("Table No.", EmailTemplateHeader."Table No.");
+                    if EmailTemplateFilter.Find('-') then
+                        repeat
+                            RecordExists := false;
+                            FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
+                            FieldRef.SetFilter(EmailTemplateFilter.Value);
+                            if RecRef.Find then
+                                RecordExists := true;
+                            FieldRef.SetRange();
+                        until not RecordExists or (EmailTemplateFilter.Next = 0);
+                    if RecordExists then
+                        Stop := true
+                    else
+                        Stop := EmailTemplateHeader.Next = 0;
+                until Stop;
         end;
 
         exit(RecordExists);
     end;
 
-    procedure GetFilename(EmailTemplateHeader: Record "E-mail Template Header";var RecRef: RecordRef) Filename: Text
+    procedure GetFilename(EmailTemplateHeader: Record "E-mail Template Header"; var RecRef: RecordRef) Filename: Text
     var
         EmailTemplateMgt: Codeunit "E-mail Template Mgt.";
     begin
         //-NPR5.48 [341711]
         //Filename := ParseEmailText(RecRef,EmailTemplateHeader.Filename,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag");
-        Filename := EmailTemplateMgt.MergeMailContent(RecRef,EmailTemplateHeader.Filename,EmailTemplateHeader."Fieldnumber Start Tag",EmailTemplateHeader."Fieldnumber End Tag");
+        Filename := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateHeader.Filename, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
         //-NPR5.48 [341711]
 
-        if StrPos(Filename,'.pdf') = 0 then
-          Filename += '.pdf';
+        if StrPos(Filename, '.pdf') = 0 then
+            Filename += '.pdf';
 
         Filename := ReplaceSpecialChar(Filename);
     end;
@@ -573,7 +579,7 @@ codeunit 6014450 "E-mail Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure GetReportIDEvent(RecRef: RecordRef;var ReportID: Integer)
+    local procedure GetReportIDEvent(RecRef: RecordRef; var ReportID: Integer)
     begin
     end;
 
@@ -587,188 +593,188 @@ codeunit 6014450 "E-mail Management"
         CustomReportSelection: Record "Custom Report Selection";
     begin
         ReportID := 0;
-        GetReportIDEvent(RecRef,ReportID);
+        GetReportIDEvent(RecRef, ReportID);
 
         //-NPR5.51 [358470]
         if ReportID = 0 then
-          if GetEmailTemplateHeader(RecRef,EmailTemplateHeader) and (EmailTemplateHeader."Report ID" <> 0) then
-            ReportID := EmailTemplateHeader."Report ID";
+            if GetEmailTemplateHeader(RecRef, EmailTemplateHeader) and (EmailTemplateHeader."Report ID" <> 0) then
+                ReportID := EmailTemplateHeader."Report ID";
 
         if ReportID > 0 then begin
-          case RecRef.Number of
-            DATABASE::"Sales Cr.Memo Header":
-              GetCustomEmailForReportID(DATABASE::Customer,Format(RecRef.Field(4).Value),ReportSelections.Usage::"S.Cr.Memo",EmailTemplateHeader."Report ID");
-            DATABASE::"Sales Header":
-              begin
-                RecRef.SetTable(SalesHeader);
-                case SalesHeader."Document Type" of
-                  SalesHeader."Document Type"::Quote:
-                    GetCustomEmailForReportID(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Quote",EmailTemplateHeader."Report ID");
-                  SalesHeader."Document Type"::Order:
-                    GetCustomEmailForReportID(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Order",EmailTemplateHeader."Report ID");
-                  SalesHeader."Document Type"::"Return Order":
-                    GetCustomEmailForReportID(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Return",EmailTemplateHeader."Report ID");
-                end;
-              end;
-            DATABASE::"Sales Invoice Header":
-              GetCustomEmailForReportID(DATABASE::Customer,Format(RecRef.Field(4).Value),ReportSelections.Usage::"S.Invoice",EmailTemplateHeader."Report ID");
-          end;
-          exit(ReportID);
+            case RecRef.Number of
+                DATABASE::"Sales Cr.Memo Header":
+                    GetCustomEmailForReportID(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Cr.Memo", EmailTemplateHeader."Report ID");
+                DATABASE::"Sales Header":
+                    begin
+                        RecRef.SetTable(SalesHeader);
+                        case SalesHeader."Document Type" of
+                            SalesHeader."Document Type"::Quote:
+                                GetCustomEmailForReportID(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Quote", EmailTemplateHeader."Report ID");
+                            SalesHeader."Document Type"::Order:
+                                GetCustomEmailForReportID(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Order", EmailTemplateHeader."Report ID");
+                            SalesHeader."Document Type"::"Return Order":
+                                GetCustomEmailForReportID(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Return", EmailTemplateHeader."Report ID");
+                        end;
+                    end;
+                DATABASE::"Sales Invoice Header":
+                    GetCustomEmailForReportID(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Invoice", EmailTemplateHeader."Report ID");
+            end;
+            exit(ReportID);
         end;
         //+NPR5.51 [358470]
 
 
         Clear(ReportSelections);
-        ReportSelections.SetFilter("Report ID",'<>%1',0);
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
         case RecRef.Number of
-          DATABASE::"Issued Reminder Header":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::Reminder);
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
-          DATABASE::"Issued Fin. Charge Memo Header":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::"Fin.Charge");
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
-          DATABASE::"Sales Cr.Memo Header":
-            begin
-              ReportID := GetCustomReportSelection(DATABASE::Customer,Format(RecRef.Field(4).Value),ReportSelections.Usage::"S.Cr.Memo");
-              if ReportID = 0 then begin
-                ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Cr.Memo");
-                if ReportSelections.FindFirst then
-                  ReportID := ReportSelections."Report ID";
-              end;
-            end;
-          DATABASE::"Sales Header":
-            begin
-              RecRef.SetTable(SalesHeader);
-              case SalesHeader."Document Type" of
-                SalesHeader."Document Type"::Quote:
-                  begin
-                    ReportID := GetCustomReportSelection(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Quote");
-                    if ReportID = 0 then begin
-                      ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Quote");
-                      if ReportSelections.FindFirst then
+            DATABASE::"Issued Reminder Header":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::Reminder);
+                    if ReportSelections.FindFirst then
                         ReportID := ReportSelections."Report ID";
-                    end;
-                  end;
-                SalesHeader."Document Type"::Order:
-                  begin
-                    ReportID := GetCustomReportSelection(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Order");
-                    if ReportID = 0 then begin
-                      ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Order");
-                      if ReportSelections.FindFirst then
+                end;
+            DATABASE::"Issued Fin. Charge Memo Header":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"Fin.Charge");
+                    if ReportSelections.FindFirst then
                         ReportID := ReportSelections."Report ID";
-                    end;
-                  end;
-                SalesHeader."Document Type"::"Return Order":
-                  begin
-                    ReportID := GetCustomReportSelection(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Return");
+                end;
+            DATABASE::"Sales Cr.Memo Header":
+                begin
+                    ReportID := GetCustomReportSelection(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Cr.Memo");
                     if ReportID = 0 then begin
-                      ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Return");
-                      if ReportSelections.FindFirst then
-                        ReportID := ReportSelections."Report ID";
+                        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Cr.Memo");
+                        if ReportSelections.FindFirst then
+                            ReportID := ReportSelections."Report ID";
                     end;
-                  end;
-              end;
-            end;
-          DATABASE::"Sales Invoice Header":
-            begin
-              ReportID := GetCustomReportSelection(DATABASE::Customer,Format(RecRef.Field(4).Value),ReportSelections.Usage::"S.Invoice");
-              if ReportID = 0 then begin
-                ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Invoice");
-                if ReportSelections.FindFirst then
-                  ReportID := ReportSelections."Report ID";
-              end;
-            end;
-          DATABASE::"Sales Shipment Header":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Shipment");
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
-          DATABASE::"Purch. Cr. Memo Hdr.":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::"P.Cr.Memo");
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
-          DATABASE::"Purchase Header":
-            begin
-              RecRef.SetTable(PurchHeader);
-              case PurchHeader."Document Type" of
-                PurchHeader."Document Type"::Quote:
-                  begin
-                    ReportSelections.SetRange(Usage,ReportSelections.Usage::"P.Quote");
+                end;
+            DATABASE::"Sales Header":
+                begin
+                    RecRef.SetTable(SalesHeader);
+                    case SalesHeader."Document Type" of
+                        SalesHeader."Document Type"::Quote:
+                            begin
+                                ReportID := GetCustomReportSelection(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Quote");
+                                if ReportID = 0 then begin
+                                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Quote");
+                                    if ReportSelections.FindFirst then
+                                        ReportID := ReportSelections."Report ID";
+                                end;
+                            end;
+                        SalesHeader."Document Type"::Order:
+                            begin
+                                ReportID := GetCustomReportSelection(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Order");
+                                if ReportID = 0 then begin
+                                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Order");
+                                    if ReportSelections.FindFirst then
+                                        ReportID := ReportSelections."Report ID";
+                                end;
+                            end;
+                        SalesHeader."Document Type"::"Return Order":
+                            begin
+                                ReportID := GetCustomReportSelection(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Return");
+                                if ReportID = 0 then begin
+                                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Return");
+                                    if ReportSelections.FindFirst then
+                                        ReportID := ReportSelections."Report ID";
+                                end;
+                            end;
+                    end;
+                end;
+            DATABASE::"Sales Invoice Header":
+                begin
+                    ReportID := GetCustomReportSelection(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Invoice");
+                    if ReportID = 0 then begin
+                        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
+                        if ReportSelections.FindFirst then
+                            ReportID := ReportSelections."Report ID";
+                    end;
+                end;
+            DATABASE::"Sales Shipment Header":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Shipment");
                     if ReportSelections.FindFirst then
-                      ReportID := ReportSelections."Report ID";
-                  end;
-                PurchHeader."Document Type"::Order:
-                  begin
-                    ReportSelections.SetRange(Usage,ReportSelections.Usage::"P.Order");
+                        ReportID := ReportSelections."Report ID";
+                end;
+            DATABASE::"Purch. Cr. Memo Hdr.":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Cr.Memo");
                     if ReportSelections.FindFirst then
-                      ReportID := ReportSelections."Report ID";
-                  end;
-                PurchHeader."Document Type"::"Return Order":
-                  begin
-                    ReportSelections.SetRange(Usage,ReportSelections.Usage::"P.Return");
+                        ReportID := ReportSelections."Report ID";
+                end;
+            DATABASE::"Purchase Header":
+                begin
+                    RecRef.SetTable(PurchHeader);
+                    case PurchHeader."Document Type" of
+                        PurchHeader."Document Type"::Quote:
+                            begin
+                                ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Quote");
+                                if ReportSelections.FindFirst then
+                                    ReportID := ReportSelections."Report ID";
+                            end;
+                        PurchHeader."Document Type"::Order:
+                            begin
+                                ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Order");
+                                if ReportSelections.FindFirst then
+                                    ReportID := ReportSelections."Report ID";
+                            end;
+                        PurchHeader."Document Type"::"Return Order":
+                            begin
+                                ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Return");
+                                if ReportSelections.FindFirst then
+                                    ReportID := ReportSelections."Report ID";
+                            end;
+                    end;
+                end;
+            DATABASE::"Purch. Inv. Header":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Invoice");
                     if ReportSelections.FindFirst then
-                      ReportID := ReportSelections."Report ID";
-                  end;
-              end;
-            end;
-          DATABASE::"Purch. Inv. Header":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::"P.Invoice");
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
-          DATABASE::"Purch. Rcpt. Header":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::"P.Receipt");
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
-          DATABASE::"Service Header" :
-            begin
-              RecRef.SetTable(ServHeader);
-              case ServHeader."Document Type" of
-                ServHeader."Document Type"::Quote:
-                  begin
-                    ReportSelections.SetRange(Usage,ReportSelections.Usage::"SM.Quote");
+                        ReportID := ReportSelections."Report ID";
+                end;
+            DATABASE::"Purch. Rcpt. Header":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Receipt");
                     if ReportSelections.FindFirst then
-                      ReportID := ReportSelections."Report ID";
-                  end;
-                ServHeader."Document Type"::Order:
-                  begin
-                    ReportSelections.SetRange(Usage,ReportSelections.Usage::"SM.Order");
+                        ReportID := ReportSelections."Report ID";
+                end;
+            DATABASE::"Service Header":
+                begin
+                    RecRef.SetTable(ServHeader);
+                    case ServHeader."Document Type" of
+                        ServHeader."Document Type"::Quote:
+                            begin
+                                ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Quote");
+                                if ReportSelections.FindFirst then
+                                    ReportID := ReportSelections."Report ID";
+                            end;
+                        ServHeader."Document Type"::Order:
+                            begin
+                                ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Order");
+                                if ReportSelections.FindFirst then
+                                    ReportID := ReportSelections."Report ID";
+                            end;
+                    end;
+                end;
+            DATABASE::"Service Shipment Header":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Shipment");
                     if ReportSelections.FindFirst then
-                      ReportID := ReportSelections."Report ID";
-                  end;
-              end;
-            end;
-          DATABASE::"Service Shipment Header":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::"SM.Shipment");
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
-          DATABASE::"Service Invoice Header":
-            begin
-              ReportSelections.SetRange(Usage,ReportSelections.Usage::"SM.Invoice");
-              if ReportSelections.FindFirst then
-                ReportID := ReportSelections."Report ID";
-            end;
+                        ReportID := ReportSelections."Report ID";
+                end;
+            DATABASE::"Service Invoice Header":
+                begin
+                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Invoice");
+                    if ReportSelections.FindFirst then
+                        ReportID := ReportSelections."Report ID";
+                end;
         end;
 
         exit(ReportID);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure GetEmailAddressEvent(var RecRef: RecordRef;var EmailAddress: Text;var Handled: Boolean)
+    local procedure GetEmailAddressEvent(var RecRef: RecordRef; var EmailAddress: Text; var Handled: Boolean)
     begin
     end;
 
@@ -778,88 +784,88 @@ codeunit 6014450 "E-mail Management"
         Handled: Boolean;
         Customer: Record Customer;
     begin
-        GetEmailAddressEvent(RecRef,EmailAddress,Handled);
+        GetEmailAddressEvent(RecRef, EmailAddress, Handled);
         if Handled then
-          exit(EmailAddress);
+            exit(EmailAddress);
 
         case RecRef.Number of
-          DATABASE::Customer:
-            exit(RecRef.Field(102).Value);
-          DATABASE::"Sales Header":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Sales Shipment Header":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Sales Invoice Header":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Sales Cr.Memo Header":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Purch. Cr. Memo Hdr.":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Purchase Header":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Purch. Inv. Header":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Purch. Rcpt. Header":
-            exit(RecRef.Field(6014414).Value);
-          DATABASE::"Service Header":
-            exit(RecRef.Field(5916).Value);
-          DATABASE::"Service Invoice Header":
-            exit(RecRef.Field(5916).Value);
-          DATABASE::"Service Shipment Header":
-            exit(RecRef.Field(5916).Value);
-          DATABASE::"Issued Fin. Charge Memo Header":
-            if Customer.Get(RecRef.Field(2).Value) then
-              exit(Customer."E-Mail")
-            else
-              exit('');
-          DATABASE::"Issued Reminder Header":
-            if Customer.Get(RecRef.Field(2).Value) then
-              exit(Customer."E-Mail")
-            else
-              exit('');
+            DATABASE::Customer:
+                exit(RecRef.Field(102).Value);
+            DATABASE::"Sales Header":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Sales Shipment Header":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Sales Invoice Header":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Sales Cr.Memo Header":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Purch. Cr. Memo Hdr.":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Purchase Header":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Purch. Inv. Header":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Purch. Rcpt. Header":
+                exit(RecRef.Field(6014414).Value);
+            DATABASE::"Service Header":
+                exit(RecRef.Field(5916).Value);
+            DATABASE::"Service Invoice Header":
+                exit(RecRef.Field(5916).Value);
+            DATABASE::"Service Shipment Header":
+                exit(RecRef.Field(5916).Value);
+            DATABASE::"Issued Fin. Charge Memo Header":
+                if Customer.Get(RecRef.Field(2).Value) then
+                    exit(Customer."E-Mail")
+                else
+                    exit('');
+            DATABASE::"Issued Reminder Header":
+                if Customer.Get(RecRef.Field(2).Value) then
+                    exit(Customer."E-Mail")
+                else
+                    exit('');
         end;
     end;
 
-    local procedure GetCustomReportSelection(SourceType: Integer;BillToCustomer: Code[20];NewUsage: Option "S.Quote","S.Order","S.Invoice","S.Cr.Memo","S.Test","P.Quote","P.Order","P.Invoice","P.Cr.Memo","P.Receipt","P.Ret.Shpt.","P.Test","B.Stmt","B.Recon.Test","B.Check",Reminder,"Fin.Charge","Rem.Test","F.C.Test","Prod. Order","S.Blanket","P.Blanket",M1,M2,M3,M4,Inv1,Inv2,Inv3,"SM.Quote","SM.Order","SM.Invoice","SM.Credit Memo","SM.Contract Quote","SM.Contract","SM.Test","S.Return","P.Return","S.Shipment","S.Ret.Rcpt.","S.Work Order","Invt. Period Test","SM.Shipment","S.Test Prepmt.","P.Test Prepmt.","S.Arch. Quote","S.Arch. Order","P.Arch. Quote","P.Arch. Order","S. Arch. Return Order","P. Arch. Return Order","Asm. Order","P.Assembly Order","S.Order Pick Instruction",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"C.Statement","V.Remittance") ReportID: Integer
+    local procedure GetCustomReportSelection(SourceType: Integer; BillToCustomer: Code[20]; NewUsage: Option "S.Quote","S.Order","S.Invoice","S.Cr.Memo","S.Test","P.Quote","P.Order","P.Invoice","P.Cr.Memo","P.Receipt","P.Ret.Shpt.","P.Test","B.Stmt","B.Recon.Test","B.Check",Reminder,"Fin.Charge","Rem.Test","F.C.Test","Prod. Order","S.Blanket","P.Blanket",M1,M2,M3,M4,Inv1,Inv2,Inv3,"SM.Quote","SM.Order","SM.Invoice","SM.Credit Memo","SM.Contract Quote","SM.Contract","SM.Test","S.Return","P.Return","S.Shipment","S.Ret.Rcpt.","S.Work Order","Invt. Period Test","SM.Shipment","S.Test Prepmt.","P.Test Prepmt.","S.Arch. Quote","S.Arch. Order","P.Arch. Quote","P.Arch. Order","S. Arch. Return Order","P. Arch. Return Order","Asm. Order","P.Assembly Order","S.Order Pick Instruction",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"C.Statement","V.Remittance") ReportID: Integer
     var
         CustomReportSelection: Record "Custom Report Selection";
         EmailNaviDocsMgtWrapper: Codeunit "E-mail NaviDocs Mgt. Wrapper";
     begin
-        CustomReportSelection.SetRange("Source Type",SourceType);
-        CustomReportSelection.SetRange("Source No.",BillToCustomer);
-        CustomReportSelection.SetRange(Usage,NewUsage);
+        CustomReportSelection.SetRange("Source Type", SourceType);
+        CustomReportSelection.SetRange("Source No.", BillToCustomer);
+        CustomReportSelection.SetRange(Usage, NewUsage);
         ReportID := 0;
         if CustomReportSelection.FindFirst then begin
-          ReportID := CustomReportSelection."Report ID";
-          if EmailNaviDocsMgtWrapper.HasCustomReportLayout(CustomReportSelection) or
-              (CustomReportSelection."Send To Email" <> '') then begin
-            UseCustomReportSelection := true;
-            GlobalCustomReportSelection := CustomReportSelection;
-          end;
+            ReportID := CustomReportSelection."Report ID";
+            if EmailNaviDocsMgtWrapper.HasCustomReportLayout(CustomReportSelection) or
+                (CustomReportSelection."Send To Email" <> '') then begin
+                UseCustomReportSelection := true;
+                GlobalCustomReportSelection := CustomReportSelection;
+            end;
         end;
         exit(ReportID);
     end;
 
-    local procedure GetCustomEmailForReportID(SourceType: Integer;BillToCustomer: Code[20];NewUsage: Option "S.Quote","S.Order","S.Invoice","S.Cr.Memo","S.Test","P.Quote","P.Order","P.Invoice","P.Cr.Memo","P.Receipt","P.Ret.Shpt.","P.Test","B.Stmt","B.Recon.Test","B.Check",Reminder,"Fin.Charge","Rem.Test","F.C.Test","Prod. Order","S.Blanket","P.Blanket",M1,M2,M3,M4,Inv1,Inv2,Inv3,"SM.Quote","SM.Order","SM.Invoice","SM.Credit Memo","SM.Contract Quote","SM.Contract","SM.Test","S.Return","P.Return","S.Shipment","S.Ret.Rcpt.","S.Work Order","Invt. Period Test","SM.Shipment","S.Test Prepmt.","P.Test Prepmt.","S.Arch. Quote","S.Arch. Order","P.Arch. Quote","P.Arch. Order","S. Arch. Return Order","P. Arch. Return Order","Asm. Order","P.Assembly Order","S.Order Pick Instruction",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"C.Statement","V.Remittance";ReportID: Integer)
+    local procedure GetCustomEmailForReportID(SourceType: Integer; BillToCustomer: Code[20]; NewUsage: Option "S.Quote","S.Order","S.Invoice","S.Cr.Memo","S.Test","P.Quote","P.Order","P.Invoice","P.Cr.Memo","P.Receipt","P.Ret.Shpt.","P.Test","B.Stmt","B.Recon.Test","B.Check",Reminder,"Fin.Charge","Rem.Test","F.C.Test","Prod. Order","S.Blanket","P.Blanket",M1,M2,M3,M4,Inv1,Inv2,Inv3,"SM.Quote","SM.Order","SM.Invoice","SM.Credit Memo","SM.Contract Quote","SM.Contract","SM.Test","S.Return","P.Return","S.Shipment","S.Ret.Rcpt.","S.Work Order","Invt. Period Test","SM.Shipment","S.Test Prepmt.","P.Test Prepmt.","S.Arch. Quote","S.Arch. Order","P.Arch. Quote","P.Arch. Order","S. Arch. Return Order","P. Arch. Return Order","Asm. Order","P.Assembly Order","S.Order Pick Instruction",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"C.Statement","V.Remittance"; ReportID: Integer)
     var
         CustomReportSelection: Record "Custom Report Selection";
         EmailNaviDocsMgtWrapper: Codeunit "E-mail NaviDocs Mgt. Wrapper";
     begin
         //-NPR5.51 [358470]
         if UseCustomReportSelection then
-          exit;
-        CustomReportSelection.SetRange("Source Type",SourceType);
-        CustomReportSelection.SetRange("Source No.",BillToCustomer);
-        CustomReportSelection.SetRange(Usage,NewUsage);
-        CustomReportSelection.SetRange("Report ID",ReportID);
-        if not CustomReportSelection.FindFirst then begin
-          CustomReportSelection.SetRange("Report ID",0);
-          if not CustomReportSelection.FindFirst then
             exit;
+        CustomReportSelection.SetRange("Source Type", SourceType);
+        CustomReportSelection.SetRange("Source No.", BillToCustomer);
+        CustomReportSelection.SetRange(Usage, NewUsage);
+        CustomReportSelection.SetRange("Report ID", ReportID);
+        if not CustomReportSelection.FindFirst then begin
+            CustomReportSelection.SetRange("Report ID", 0);
+            if not CustomReportSelection.FindFirst then
+                exit;
         end;
         if CustomReportSelection."Send To Email" <> '' then begin
-          UseCustomReportSelection := true;
-          GlobalCustomReportSelection := CustomReportSelection;
+            UseCustomReportSelection := true;
+            GlobalCustomReportSelection := CustomReportSelection;
         end;
         //+NPR5.51 [358470]
     end;
@@ -867,7 +873,7 @@ codeunit 6014450 "E-mail Management"
     procedure GetCustomReportEmailAddress(): Text
     begin
         if UseCustomReportSelection then
-          exit(GlobalCustomReportSelection."Send To Email");
+            exit(GlobalCustomReportSelection."Send To Email");
         exit('');
     end;
 
@@ -878,10 +884,10 @@ codeunit 6014450 "E-mail Management"
         CustomReportLayoutVariant: Variant;
     begin
         if UseCustomReportSelection then
-          if EmailNaviDocsMgtWrapper.HasCustomReportLayout(GlobalCustomReportSelection) then begin
-            EmailNaviDocsMgtWrapper.GetCustomReportLayoutVariant(GlobalCustomReportSelection,CustomReportLayoutVariant);
-            ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutVariant);
-          end;
+            if EmailNaviDocsMgtWrapper.HasCustomReportLayout(GlobalCustomReportSelection) then begin
+                EmailNaviDocsMgtWrapper.GetCustomReportLayoutVariant(GlobalCustomReportSelection, CustomReportLayoutVariant);
+                ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutVariant);
+            end;
     end;
 
     local procedure ClearGlobalCustomReport()
@@ -892,26 +898,17 @@ codeunit 6014450 "E-mail Management"
         BlankVariant: Variant;
     begin
         if UseCustomReportSelection then begin
-          EmailNaviDocsMgtWrapper.GetCustomReportLayoutVariant(CustomReportSelection,BlankVariant);
-          ReportLayoutSelection.SetTempLayoutSelected(BlankVariant);
+            EmailNaviDocsMgtWrapper.GetCustomReportLayoutVariant(CustomReportSelection, BlankVariant);
+            ReportLayoutSelection.SetTempLayoutSelected(BlankVariant);
         end;
     end;
 
-    procedure StoreRequestParameters(ReportID: Integer;Parameters: Text)
-    var
-        OutStr: OutStream;
+    procedure StoreRequestParameters(ReportID: Integer; Parameters: Text)
     begin
-        if TempBlobReqParamStore.Get(ReportID) then begin
-          TempBlobReqParamStore.Blob.CreateOutStream(OutStr);
-          OutStr.WriteText(Parameters);
-          TempBlobReqParamStore.Modify;
-        end else begin
-          TempBlobReqParamStore.Init;
-          TempBlobReqParamStore.Blob.CreateOutStream(OutStr);
-          OutStr.WriteText(Parameters);
-          TempBlobReqParamStore."Primary Key" := ReportID;
-          TempBlobReqParamStore.Insert;
-        end;
+        if ReqParamStoreDict.ContainsKey(ReportID) then
+            ReqParamStoreDict.Set(ReportID, Parameters)
+        else
+            ReqParamStoreDict.Add(ReportID, Parameters);
     end;
 
     local procedure GetReqParametersFromStore(ReportID: Integer): Text
@@ -919,19 +916,14 @@ codeunit 6014450 "E-mail Management"
         InStr: InStream;
         Parameters: Text;
     begin
-        if TempBlobReqParamStore.Get(ReportID) then begin
-          TempBlobReqParamStore.CalcFields(Blob);
-          TempBlobReqParamStore.Blob.CreateInStream(InStr);
-          InStr.ReadText(Parameters);
-          exit(Parameters);
-        end else
-          exit('');
+        if ReqParamStoreDict.ContainsKey(ReportID) then
+            exit(ReqParamStoreDict.Get(ReportID));
     end;
 
     procedure ClearRequestParameters(ReportID: Integer)
     begin
-        if TempBlobReqParamStore.Get(ReportID) then
-          TempBlobReqParamStore.Delete;
+        if ReqParamStoreDict.ContainsKey(ReportID) then
+            ReqParamStoreDict.Remove(ReportID);
     end;
 
     procedure "--- Email Log"()
@@ -941,7 +933,7 @@ codeunit 6014450 "E-mail Management"
     local procedure AddEmailLogEntry(RecRef: RecordRef)
     var
         EmailLog: Record "E-mail Log";
-        Chr: array [2] of Char;
+        Chr: array[2] of Char;
         i: Integer;
     begin
         Chr[1] := 13;
@@ -952,9 +944,9 @@ codeunit 6014450 "E-mail Management"
         EmailLog."Sent Time" := Time;
         EmailLog."Sent Date" := Today;
         EmailLog."Sent Username" := UserId;
-        EmailLog."Recipient E-mail" := CopyStr(SmtpMessage."To",1,MaxStrLen(EmailLog."Recipient E-mail"));
-        EmailLog."From E-mail" := CopyStr(SmtpMessage.FromAddress,1,MaxStrLen(EmailLog."From E-mail"));
-        EmailLog."E-mail subject" := CopyStr(SmtpMessage.Subject,1,MaxStrLen(EmailLog."E-mail subject"));
+        EmailLog."Recipient E-mail" := CopyStr(SmtpMessage."To", 1, MaxStrLen(EmailLog."Recipient E-mail"));
+        EmailLog."From E-mail" := CopyStr(SmtpMessage.FromAddress, 1, MaxStrLen(EmailLog."From E-mail"));
+        EmailLog."E-mail subject" := CopyStr(SmtpMessage.Subject, 1, MaxStrLen(EmailLog."E-mail subject"));
         EmailLog.Insert(true);
     end;
 
@@ -963,8 +955,8 @@ codeunit 6014450 "E-mail Management"
         EmailLog: Record "E-mail Log";
     begin
         Clear(EmailLog);
-        EmailLog.SetRange("Table No.",RecRef.Number);
-        EmailLog.SetRange("Primary Key",RecRef.GetPosition(false));
+        EmailLog.SetRange("Table No.", RecRef.Number);
+        EmailLog.SetRange("Primary Key", RecRef.GetPosition(false));
         exit(EmailLog.FindFirst);
     end;
 
@@ -977,25 +969,25 @@ codeunit 6014450 "E-mail Management"
         Position: Integer;
     begin
         if EmailString = '' then
-          exit('');
+            exit('');
 
-        EmailString := ConvertStr(EmailString,',',';');
-        Position := StrPos(EmailString,';');
+        EmailString := ConvertStr(EmailString, ',', ';');
+        Position := StrPos(EmailString, ';');
         case Position of
-          0:
-            begin
-              NextEmail := EmailString;
-              EmailString := '';
-            end;
-          1:
-            begin
-              NextEmail := '';
-              EmailString := '';
-            end;
-          else begin
-            NextEmail := CopyStr(EmailString,1,Position - 1);
-            EmailString := DelStr(EmailString,1,Position);
-          end;
+            0:
+                begin
+                    NextEmail := EmailString;
+                    EmailString := '';
+                end;
+            1:
+                begin
+                    NextEmail := '';
+                    EmailString := '';
+                end;
+            else begin
+                    NextEmail := CopyStr(EmailString, 1, Position - 1);
+                    EmailString := DelStr(EmailString, 1, Position);
+                end;
         end;
         exit(NextEmail);
     end;
@@ -1003,8 +995,8 @@ codeunit 6014450 "E-mail Management"
     local procedure Initialize()
     begin
         if not Initialized then begin
-          EmailSetup.Get;
-          Initialized := true;
+            EmailSetup.Get;
+            Initialized := true;
         end;
     end;
 
@@ -1014,22 +1006,31 @@ codeunit 6014450 "E-mail Management"
     begin
         Output := '';
         for i := 1 to StrLen(Input) do
-          case Input[i] of
-            '0','1','2','3','4','5','6','7','8','9',
-            'a','b','c','d','e','f','g','h','i','j','A','B','C','D','E','F','G','H','I','J',
-            'k','l','m','n','o','p','q','r','s','t','K','L','M','N','O','P','Q','R','S','T',
-            'u','v','w','x','y','z','U','V','W','X','Y','Z','-','.': Output += Format(Input[i]);
-            'æ': Output += 'ae';
-            'ø','ö': Output += 'oe';
-            'å','ä': Output += 'aa';
-            'è','é','ë','ê': Output += 'e';
-            'Æ': Output += 'AE';
-            'Ø','Ö': Output += 'OE';
-            'Å','Ä': Output += 'AA';
-            'É','È','Ë','Ê': Output += 'E';
-            else
-              Output += '-';
-          end;
+            case Input[i] of
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+              'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+              'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+              'u', 'v', 'w', 'x', 'y', 'z', 'U', 'V', 'W', 'X', 'Y', 'Z', '-', '.':
+                    Output += Format(Input[i]);
+                'æ':
+                    Output += 'ae';
+                'ø', 'ö':
+                    Output += 'oe';
+                'å', 'ä':
+                    Output += 'aa';
+                'è', 'é', 'ë', 'ê':
+                    Output += 'e';
+                'Æ':
+                    Output += 'AE';
+                'Ø', 'Ö':
+                    Output += 'OE';
+                'Å', 'Ä':
+                    Output += 'AA';
+                'É', 'È', 'Ë', 'Ê':
+                    Output += 'E';
+                else
+                    Output += '-';
+            end;
 
         exit(Output);
     end;
@@ -1039,7 +1040,7 @@ codeunit 6014450 "E-mail Management"
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        MailManagement.CheckValidEmailAddress (EmailAddress);
+        MailManagement.CheckValidEmailAddress(EmailAddress);
     end;
 
     local procedure SetLastErrorMessage(ErrorMessage: Text)
@@ -1054,7 +1055,7 @@ codeunit 6014450 "E-mail Management"
     procedure ConfirmResendEmail(var RecRef: RecordRef): Boolean
     begin
         if EmailLogExists(RecRef) then
-          exit(Confirm(Text010));
+            exit(Confirm(Text010));
 
         exit(true);
     end;
@@ -1064,9 +1065,9 @@ codeunit 6014450 "E-mail Management"
         EmailLog: Record "E-mail Log";
     begin
         Clear(EmailLog);
-        EmailLog.SetRange("Table No.",RecRef.Number);
-        EmailLog.SetRange("Primary Key",RecRef.GetPosition(false));
-        PAGE.Run(PAGE::"E-mail Log",EmailLog);
+        EmailLog.SetRange("Table No.", RecRef.Number);
+        EmailLog.SetRange("Primary Key", RecRef.GetPosition(false));
+        PAGE.Run(PAGE::"E-mail Log", EmailLog);
     end;
 
     local procedure VerifyEmailAddress(RecipientEmail: Text) NewRecipientEmail: Text
@@ -1074,18 +1075,18 @@ codeunit 6014450 "E-mail Management"
         InputDialog: Page "Input Dialog";
     begin
         Clear(InputDialog);
-        InputDialog.SetInput(1,RecipientEmail,Text001);
+        InputDialog.SetInput(1, RecipientEmail, Text001);
         InputDialog.LookupMode(true);
         if InputDialog.RunModal <> ACTION::LookupOK then
-          exit('');
+            exit('');
 
-        InputDialog.InputText(1,NewRecipientEmail);
+        InputDialog.InputText(1, NewRecipientEmail);
 
         exit(NewRecipientEmail);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSetFromEmail(EmailTemplateHeaderCode: Code[20];RecRef: RecordRef;RecipientEmail: Text[250];Silent: Boolean;var FromEmailAddress: Text[80];var FromEmailName: Text[80])
+    local procedure OnAfterSetFromEmail(EmailTemplateHeaderCode: Code[20]; RecRef: RecordRef; RecipientEmail: Text[250]; Silent: Boolean; var FromEmailAddress: Text[80]; var FromEmailName: Text[80])
     begin
     end;
 }

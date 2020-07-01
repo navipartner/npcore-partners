@@ -26,16 +26,16 @@ page 6014450 "Mixed Discount"
                 group(Control6014423)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
 
                         trigger OnAssistEdit()
                         begin
                             if Assistedit(xRec) then
-                              CurrPage.Update;
+                                CurrPage.Update;
                         end;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
                         Importance = Promoted;
                     }
@@ -43,7 +43,7 @@ page 6014450 "Mixed Discount"
                     {
                         ShowCaption = false;
                         Visible = ("Mix Type" <> 2);
-                        field("Mix Type";"Mix Type")
+                        field("Mix Type"; "Mix Type")
                         {
                             OptionCaption = 'Standard,Combination';
 
@@ -58,7 +58,7 @@ page 6014450 "Mixed Discount"
                     {
                         ShowCaption = false;
                         Visible = ("Mix Type" <> 1);
-                        field(Lot;Lot)
+                        field(Lot; Lot)
                         {
                             ToolTip = 'Define Quantity on Lines - All items and quantity on lines must be bought';
 
@@ -72,7 +72,7 @@ page 6014450 "Mixed Discount"
                         {
                             ShowCaption = false;
                             Visible = (NOT Lot);
-                            field("Min. Quantity";"Min. Quantity")
+                            field("Min. Quantity"; "Min. Quantity")
                             {
 
                                 trigger OnValidate()
@@ -80,7 +80,7 @@ page 6014450 "Mixed Discount"
                                     CurrPage.Update(true);
                                 end;
                             }
-                            field("Max. Quantity";"Max. Quantity")
+                            field("Max. Quantity"; "Max. Quantity")
                             {
                             }
                         }
@@ -89,10 +89,10 @@ page 6014450 "Mixed Discount"
                     {
                         ShowCaption = false;
                         Visible = ("Mix Type" = 1) OR (Lot);
-                        field("CalcMinQty()";CalcMinQty())
+                        field("CalcMinQty()"; CalcMinQty())
                         {
                             Caption = 'Item Qty. per Lot';
-                            DecimalPlaces = 0:5;
+                            DecimalPlaces = 0 : 5;
 
                             trigger OnValidate()
                             begin
@@ -104,7 +104,7 @@ page 6014450 "Mixed Discount"
                     {
                         ShowCaption = false;
                         Visible = ("Mix Type" <> 2);
-                        field("Discount Type";"Discount Type")
+                        field("Discount Type"; "Discount Type")
                         {
 
                             trigger OnValidate()
@@ -116,8 +116,8 @@ page 6014450 "Mixed Discount"
                         group(Control6014403)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type"=0;
-                            field("Total Amount";"Total Amount")
+                            Visible = "Discount Type" = 0;
+                            field("Total Amount"; "Total Amount")
                             {
 
                                 trigger OnValidate()
@@ -125,15 +125,15 @@ page 6014450 "Mixed Discount"
                                     CurrPage.Update(true);
                                 end;
                             }
-                            field("Total Amount Excl. VAT";"Total Amount Excl. VAT")
+                            field("Total Amount Excl. VAT"; "Total Amount Excl. VAT")
                             {
                             }
                         }
                         group(Control6014404)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type"=1;
-                            field("Total Discount %";"Total Discount %")
+                            Visible = "Discount Type" = 1;
+                            field("Total Discount %"; "Total Discount %")
                             {
 
                                 trigger OnValidate()
@@ -145,8 +145,8 @@ page 6014450 "Mixed Discount"
                         group(Control6014405)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type"=2;
-                            field("Total Discount Amount";"Total Discount Amount")
+                            Visible = "Discount Type" = 2;
+                            field("Total Discount Amount"; "Total Discount Amount")
                             {
 
                                 trigger OnValidate()
@@ -158,8 +158,8 @@ page 6014450 "Mixed Discount"
                         group(Control6014416)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type"=3;
-                            field("Item Discount Qty.";"Item Discount Qty.")
+                            Visible = "Discount Type" = 3;
+                            field("Item Discount Qty."; "Item Discount Qty.")
                             {
 
                                 trigger OnValidate()
@@ -167,7 +167,7 @@ page 6014450 "Mixed Discount"
                                     CurrPage.Update(true);
                                 end;
                             }
-                            field("Item Discount %";"Item Discount %")
+                            field("Item Discount %"; "Item Discount %")
                             {
 
                                 trigger OnValidate()
@@ -179,12 +179,12 @@ page 6014450 "Mixed Discount"
                         group(Control6014407)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type"<>2) AND (NOT "Lot");
-                            field(MinimumDiscount;MixedDiscountMgt.CalcExpectedDiscAmount(Rec,false))
+                            Visible = ("Discount Type" <> 2) AND (NOT "Lot");
+                            field(MinimumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, false))
                             {
                                 Caption = 'Min. Discount Amount';
                             }
-                            field(MaximumDiscount;MixedDiscountMgt.CalcExpectedDiscAmount(Rec,true))
+                            field(MaximumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                             {
                                 Caption = 'Max. Discount Amount';
                                 Editable = false;
@@ -193,8 +193,8 @@ page 6014450 "Mixed Discount"
                         group(Control6014417)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type"<>2) AND ("Lot");
-                            field(Discount;MixedDiscountMgt.CalcExpectedDiscAmount(Rec,true))
+                            Visible = ("Discount Type" <> 2) AND ("Lot");
+                            field(Discount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                             {
                                 Caption = 'Discount Amount';
                                 Editable = false;
@@ -205,11 +205,11 @@ page 6014450 "Mixed Discount"
                 group(Control6014401)
                 {
                     ShowCaption = false;
-                    field("Created the";"Created the")
+                    field("Created the"; "Created the")
                     {
                         Editable = false;
                     }
-                    field("Last Date Modified";"Last Date Modified")
+                    field("Last Date Modified"; "Last Date Modified")
                     {
                         Editable = false;
                     }
@@ -217,10 +217,10 @@ page 6014450 "Mixed Discount"
                     {
                         ShowCaption = false;
                         Visible = "Mix Type" <> 2;
-                        field("Block Custom Discount";"Block Custom Discount")
+                        field("Block Custom Discount"; "Block Custom Discount")
                         {
                         }
-                        field(Status;Status)
+                        field(Status; Status)
                         {
                         }
                     }
@@ -233,23 +233,23 @@ page 6014450 "Mixed Discount"
                 group(Control6150614)
                 {
                     ShowCaption = false;
-                    field("Starting date";"Starting date")
+                    field("Starting date"; "Starting date")
                     {
                         Importance = Promoted;
                     }
-                    field("Ending date";"Ending date")
+                    field("Ending date"; "Ending date")
                     {
                         Importance = Promoted;
                     }
-                    field("Starting time";"Starting time")
+                    field("Starting time"; "Starting time")
                     {
                         Visible = false;
                     }
-                    field("Ending time";"Ending time")
+                    field("Ending time"; "Ending time")
                     {
                         Visible = false;
                     }
-                    field("Customer Disc. Group Filter";"Customer Disc. Group Filter")
+                    field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
                     {
                         AssistEdit = false;
 
@@ -262,16 +262,16 @@ page 6014450 "Mixed Discount"
                 group(Control6150618)
                 {
                     ShowCaption = false;
-                    part(Control6014425;"Mixed Discount Time Intervals")
+                    part(Control6014425; "Mixed Discount Time Intervals")
                     {
-                        SubPageLink = "Mix Code"=FIELD(Code);
+                        SubPageLink = "Mix Code" = FIELD(Code);
                     }
                 }
             }
-            part(SubForm;"Mixed Discount Lines")
+            part(SubForm; "Mixed Discount Lines")
             {
                 ShowFilter = false;
-                SubPageLink = Code=FIELD(Code);
+                SubPageLink = Code = FIELD(Code);
                 UpdatePropagation = Both;
             }
         }
@@ -286,8 +286,8 @@ page 6014450 "Mixed Discount"
                 Caption = 'Default Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6014411),
-                              "No."=FIELD(Code);
+                RunPageLink = "Table ID" = CONST(6014411),
+                              "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
 
                 trigger OnAction()
@@ -341,13 +341,13 @@ page 6014450 "Mixed Discount"
                         var
                             ItemList: Page "Item List";
                         begin
-                            Clear( ItemList );
+                            Clear(ItemList);
                             ItemList.LookupMode := true;
-                            if ( ItemList.RunModal = ACTION::LookupOK ) then begin
-                              Item.Reset;
-                              ItemList.GetRecord( Item );
-                              Item.SetRange( "No.", Item."No." );
-                              TransferToMix();
+                            if (ItemList.RunModal = ACTION::LookupOK) then begin
+                                Item.Reset;
+                                ItemList.GetRecord(Item);
+                                Item.SetRange("No.", Item."No.");
+                                TransferToMix();
                             end;
                         end;
                     }
@@ -361,13 +361,13 @@ page 6014450 "Mixed Discount"
                             Varegruppe: Record "Item Group";
                             Varegrp: Page "Item Group Tree";
                         begin
-                            Clear( Varegrp );
+                            Clear(Varegrp);
                             Varegrp.LookupMode := true;
-                            if ( Varegrp.RunModal = ACTION::LookupOK ) then begin
-                              Item.Reset;
-                              Varegrp.GetRecord( Varegruppe );
-                              Item.SetRange( "Item Group", Varegruppe."No." );
-                              TransferToMix();
+                            if (Varegrp.RunModal = ACTION::LookupOK) then begin
+                                Item.Reset;
+                                Varegrp.GetRecord(Varegruppe);
+                                Item.SetRange("Item Group", Varegruppe."No.");
+                                TransferToMix();
                             end;
                         end;
                     }
@@ -381,13 +381,13 @@ page 6014450 "Mixed Discount"
                             Kreditor: Record Vendor;
                             KreditorForm: Page "Vendor List";
                         begin
-                            Clear( KreditorForm );
+                            Clear(KreditorForm);
                             KreditorForm.LookupMode := true;
-                            if ( KreditorForm.RunModal = ACTION::LookupOK ) then begin
-                              KreditorForm.GetRecord( Kreditor );
-                              Item.Reset;
-                              Item.SetRange( "Vendor No.", Kreditor."No." );
-                              TransferToMix();
+                            if (KreditorForm.RunModal = ACTION::LookupOK) then begin
+                                KreditorForm.GetRecord(Kreditor);
+                                Item.Reset;
+                                Item.SetRange("Vendor No.", Kreditor."No.");
+                                TransferToMix();
                             end;
                         end;
                     }
@@ -401,8 +401,8 @@ page 6014450 "Mixed Discount"
                             MsgOkCancel: Label 'Transfer all items to this mix?';
                         begin
                             Item.Reset;
-                            if DIALOG.Confirm( MsgOkCancel, false ) then
-                              TransferToMix();
+                            if DIALOG.Confirm(MsgOkCancel, false) then
+                                TransferToMix();
                         end;
                     }
                     action("Compress to Item Disc. Group")
@@ -488,20 +488,20 @@ page 6014450 "Mixed Discount"
                         MixedDiscountLine1: Record "Mixed Discount Line";
                     begin
                         //-NPR5.30 [265244]
-                        if PAGE.RunModal(PAGE::"Mixed Discount List",MixedDiscount1) <> ACTION::LookupOK then exit;
-                          MixedDiscountLine1.Reset;
-                          MixedDiscountLine1.SetRange(Code,Code);
-                          MixedDiscountLine1.DeleteAll;
+                        if PAGE.RunModal(PAGE::"Mixed Discount List", MixedDiscount1) <> ACTION::LookupOK then exit;
+                        MixedDiscountLine1.Reset;
+                        MixedDiscountLine1.SetRange(Code, Code);
+                        MixedDiscountLine1.DeleteAll;
 
-                          MixedDiscountLine1.Reset;
-                          MixedDiscountLine1.SetRange(Code,MixedDiscount1.Code);
-                          if MixedDiscountLine1.FindSet then
+                        MixedDiscountLine1.Reset;
+                        MixedDiscountLine1.SetRange(Code, MixedDiscount1.Code);
+                        if MixedDiscountLine1.FindSet then
                             repeat
-                              MixedDiscountLine.Init;
-                              MixedDiscountLine.TransferFields(MixedDiscountLine1);
-                              MixedDiscountLine.Code := Code;
-                              MixedDiscountLine.Insert(true);
-                            until MixedDiscountLine1.Next=0;
+                                MixedDiscountLine.Init;
+                                MixedDiscountLine.TransferFields(MixedDiscountLine1);
+                                MixedDiscountLine.Code := Code;
+                                MixedDiscountLine.Insert(true);
+                            until MixedDiscountLine1.Next = 0;
 
                         //+NPR5.30 [265244]
                     end;
@@ -539,23 +539,23 @@ page 6014450 "Mixed Discount"
         MixedDiscountList: Page "Mixed Discount List";
     begin
         if not Item.Find('-') then
-          Error( ErrorNo1 );
-        Clear( MixedDiscountList );
+            Error(ErrorNo1);
+        Clear(MixedDiscountList);
         repeat
-          if MixedDiscountLine.Get( Code, Item."No." ) then
-            Error( ErrorNo2, Item."No." );
-          MixedDiscountLine.Init;
-          MixedDiscountLine.Code := Code;
-          MixedDiscountLine."No." := Item."No.";
-          MixedDiscountLine.Quantity := 1;
-          MixedDiscountLine.Description := Item.Description;
-          MixedDiscountLine."Unit cost" := Item."Unit Cost";
-          MixedDiscountLine."Unit price incl. VAT" := Item."Price Includes VAT";
-          MixedDiscountLine.Status := Status;
-          MixedDiscountLine."Unit price" := Item."Unit Price";
-          MixedDiscountLine.Insert;
+            if MixedDiscountLine.Get(Code, Item."No.") then
+                Error(ErrorNo2, Item."No.");
+            MixedDiscountLine.Init;
+            MixedDiscountLine.Code := Code;
+            MixedDiscountLine."No." := Item."No.";
+            MixedDiscountLine.Quantity := 1;
+            MixedDiscountLine.Description := Item.Description;
+            MixedDiscountLine."Unit cost" := Item."Unit Cost";
+            MixedDiscountLine."Unit price incl. VAT" := Item."Price Includes VAT";
+            MixedDiscountLine.Status := Status;
+            MixedDiscountLine."Unit price" := Item."Unit Price";
+            MixedDiscountLine.Insert;
         until Item.Next = 0;
-        Message( OkMsg, Item.Count, Code );
+        Message(OkMsg, Item.Count, Code);
     end;
 
     procedure CollapseToItemDiscGroup()
@@ -564,7 +564,7 @@ page 6014450 "Mixed Discount"
         ItemDiscGrpRec: Record "Item Discount Group";
     begin
         if not Confirm(TxtCompChngeContinue) then
-          exit;
+            exit;
 
         Clear(ItemDiscGrpRec);
         ItemDiscGrpRec.Init;
@@ -575,17 +575,18 @@ page 6014450 "Mixed Discount"
         Clear(MixedDiscountLine);
         MixedDiscountLine.ClearMarks;
         MixedDiscountLine.SetRange(Code, Code);
-        if MixedDiscountLine.Find('-') then repeat
-          if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::Item then begin
-            Item.Reset;
-            if Item.Get(MixedDiscountLine."No.") then
-              if not Item."Group sale" then begin
-                Item."Item Disc. Group" := Code;
-                Item.Modify(true);
-                MixedDiscountLine.Mark(true);
-              end;
-          end;
-        until MixedDiscountLine.Next = 0;
+        if MixedDiscountLine.Find('-') then
+            repeat
+                if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::Item then begin
+                    Item.Reset;
+                    if Item.Get(MixedDiscountLine."No.") then
+                        if not Item."Group sale" then begin
+                            Item."Item Disc. Group" := Code;
+                            Item.Modify(true);
+                            MixedDiscountLine.Mark(true);
+                        end;
+                end;
+            until MixedDiscountLine.Next = 0;
 
         MixedDiscountLine.MarkedOnly(true);
         MixedDiscountLine.DeleteAll(true);
@@ -598,7 +599,7 @@ page 6014450 "Mixed Discount"
         MixedDiscountLine."No." := Code;
         MixedDiscountLine.Description := TxtCompressItems;
         if not MixedDiscountLine.Insert(true) then
-          if MixedDiscountLine.Modify(true) then;
+            if MixedDiscountLine.Modify(true) then;
     end;
 
     local procedure "--- Filter Assist"()
@@ -632,64 +633,64 @@ page 6014450 "Mixed Discount"
         RecRef: RecordRef;
         Caption: Text;
     begin
-        if not SetFiltersOnRecRef(AssistFieldNo,RecRef) then
-          exit;
+        if not SetFiltersOnRecRef(AssistFieldNo, RecRef) then
+            exit;
         Caption := GetFieldCaption(AssistFieldNo);
-        if not RunDynamicRequestPage(Caption,RecRef) then
-          exit;
+        if not RunDynamicRequestPage(Caption, RecRef) then
+            exit;
 
-        UpdateFiltersOnCurrRec(AssistFieldNo,RecRef);
+        UpdateFiltersOnCurrRec(AssistFieldNo, RecRef);
     end;
 
-    local procedure RunDynamicRequestPage(Caption: Text;var RecRef: RecordRef): Boolean
+    local procedure RunDynamicRequestPage(Caption: Text; var RecRef: RecordRef): Boolean
     var
         TableMetadata: Record "Table Metadata";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
         OutStream: OutStream;
         ReturnFilters: Text;
         EntityID: Code[20];
     begin
-        EntityID := CopyStr(Caption,1,20);
-        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number) then
-          exit(false);
-        FilterPageBuilder.SetView(RecRef.Caption,RecRef.GetView);
+        EntityID := CopyStr(Caption, 1, 20);
+        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
+            exit(false);
+        FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView);
         FilterPageBuilder.PageCaption := Caption;
         if not FilterPageBuilder.RunModal then
-          exit(false);
+            exit(false);
 
-        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number);
+        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number);
 
         RecRef.Reset;
         if ReturnFilters <> '' then begin
-          Clear(TempBlob);
-          TempBlob.Blob.CreateOutStream(OutStream);
-          OutStream.WriteText(ReturnFilters);
-          if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef,TempBlob) then
-            exit;
+            Clear(TempBlob);
+            TempBlob.CreateOutStream(OutStream);
+            OutStream.WriteText(ReturnFilters);
+            if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
+                exit;
         end;
 
         exit(true);
     end;
 
-    local procedure SetFiltersOnRecRef(FilterFieldNo: Integer;var RecRef: RecordRef): Boolean
+    local procedure SetFiltersOnRecRef(FilterFieldNo: Integer; var RecRef: RecordRef): Boolean
     var
         CustomerDiscountGroup: Record "Customer Discount Group";
     begin
         case FilterFieldNo of
-          FieldNo("Customer Disc. Group Filter"):
-            begin
-              CustomerDiscountGroup.SetFilter(Code,"Customer Disc. Group Filter");
-              RecRef.GetTable(CustomerDiscountGroup);
-              exit(true);
-            end;
+            FieldNo("Customer Disc. Group Filter"):
+                begin
+                    CustomerDiscountGroup.SetFilter(Code, "Customer Disc. Group Filter");
+                    RecRef.GetTable(CustomerDiscountGroup);
+                    exit(true);
+                end;
         end;
 
         exit(false);
     end;
 
-    local procedure UpdateFiltersOnCurrRec(FilterFieldNo: Integer;RecRef: RecordRef)
+    local procedure UpdateFiltersOnCurrRec(FilterFieldNo: Integer; RecRef: RecordRef)
     var
         CustomerDiscountGroup: Record "Customer Discount Group";
         DimensionValue: Record "Dimension Value";
@@ -701,17 +702,17 @@ page 6014450 "Mixed Discount"
         CurrFieldRef := CurrRecRef.Field(FilterFieldNo);
 
         if RecRef.IsEmpty then begin
-          CurrFieldRef.Value := '';
-          CurrRecRef.SetTable(Rec);
-          exit;
+            CurrFieldRef.Value := '';
+            CurrRecRef.SetTable(Rec);
+            exit;
         end;
 
         RecRef.FindSet;
         PrimaryKeyFilter := GetPrimaryKeyValue(RecRef);
         while RecRef.Next <> 0 do
-          PrimaryKeyFilter += '|' + GetPrimaryKeyValue(RecRef);
+            PrimaryKeyFilter += '|' + GetPrimaryKeyValue(RecRef);
 
-        CurrFieldRef.Value := CopyStr(PrimaryKeyFilter,1,CurrFieldRef.Length);
+        CurrFieldRef.Value := CopyStr(PrimaryKeyFilter, 1, CurrFieldRef.Length);
         CurrRecRef.SetTable(Rec);
     end;
 

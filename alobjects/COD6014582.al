@@ -38,8 +38,8 @@ codeunit 6014582 "Print Method Mgt."
                 if (POSSession.IsActiveSession(POSFrontEnd)) then
                     POSProxyRawPrint.Print(POSFrontEnd, PrinterName, TargetEncoding, PrintBytes, false)
                 else
-        //-NPR5.51 [360975]
-              HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintBytes, TargetEncoding);
+                    //-NPR5.51 [360975]
+                    HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintBytes, TargetEncoding);
         //+NPR5.51 [360975]
         end;
     end;
@@ -69,9 +69,9 @@ codeunit 6014582 "Print Method Mgt."
                 else
                     // TODO: CTRLUPGRADE - invokes old obsolete Proxy Manager Stargate v1 protocol
                     ERROR('CTRLUPGRADE');
-                /*
-                FilePrintProxyProtocol.PrintJob(PrinterName, Stream, FileExtension, false);
-                */
+        /*
+        FilePrintProxyProtocol.PrintJob(PrinterName, Stream, FileExtension, false);
+        */
         end;
     end;
 
@@ -108,21 +108,21 @@ codeunit 6014582 "Print Method Mgt."
         SmtpMail.Send();
     end;
 
-    procedure PrintViaPrintNodePdf(PrinterID: Text;var PdfStream: DotNet npNetMemoryStream;DocumentDescription: Text)
+    procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: DotNet npNetMemoryStream; DocumentDescription: Text)
     var
         PrintNodeAPIMgt: Codeunit "PrintNode API Mgt.";
     begin
         //-NPR5.53 [383562]
-        PrintNodeAPIMgt.SendPDFStream(PrinterID,PdfStream,DocumentDescription,'','');
+        PrintNodeAPIMgt.SendPDFStream(PrinterID, PdfStream, DocumentDescription, '', '');
         //+NPR5.53 [383562]
     end;
 
-    procedure PrintViaPrintNodeRaw(PrinterID: Text;PrintBytes: Text;TargetEncoding: Text)
+    procedure PrintViaPrintNodeRaw(PrinterID: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         PrintNodeAPIMgt: Codeunit "PrintNode API Mgt.";
     begin
         //-NPR5.53 [383562]
-        PrintNodeAPIMgt.SendRawText(PrinterID,PrintBytes,TargetEncoding,'','','');
+        PrintNodeAPIMgt.SendRawText(PrinterID, PrintBytes, TargetEncoding, '', '', '');
         //+NPR5.53 [383562]
     end;
 
@@ -155,7 +155,7 @@ codeunit 6014582 "Print Method Mgt."
         [RunOnClient]
         DialogResult: DotNet npNetDialogResult;
         FileMgt: Codeunit "File Management";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;
         Filename: Text;
     begin
@@ -176,9 +176,9 @@ codeunit 6014582 "Print Method Mgt."
             PrinterName := PrintDialog.PrinterSettings.PrinterName;
         end;
 
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
         CopyStream(OutStream, Stream);
-        if not TempBlob.Blob.HasValue then
+        if not TempBlob.HasValue then
             exit;
 
         Filename := FileMgt.BLOBExport(TempBlob, FileExtension, false);

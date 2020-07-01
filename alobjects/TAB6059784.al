@@ -40,9 +40,9 @@ table 6059784 "TM Ticket Type"
         field(21; "Print Object ID"; Integer)
         {
             Caption = 'Print Object ID';
-            TableRelation = IF ("Print Object Type" = CONST (CODEUNIT)) AllObj."Object ID" WHERE ("Object Type" = CONST (Codeunit))
+            TableRelation = IF ("Print Object Type" = CONST(CODEUNIT)) AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit))
             ELSE
-            IF ("Print Object Type" = CONST (REPORT)) AllObj."Object ID" WHERE ("Object Type" = CONST (Report));
+            IF ("Print Object Type" = CONST(REPORT)) AllObj."Object ID" WHERE("Object Type" = CONST(Report));
         }
         field(22; "Print Object Type"; Option)
         {
@@ -228,7 +228,7 @@ table 6059784 "TM Ticket Type"
 
     local procedure ImportPassTemplate(Path: Text[1024]; UseDialog: Boolean)
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         outstream: OutStream;
         instream: InStream;
     begin
@@ -239,7 +239,7 @@ table 6059784 "TM Ticket Type"
             FileManagement.BLOBImport(TempBlob, Path);
         end;
 
-        TempBlob.Blob.CreateInStream(instream);
+        TempBlob.CreateInStream(instream);
         "eTicket Template".CreateOutStream(outstream, TEXTENCODING::UTF8);
         CopyStream(outstream, instream);
 
@@ -255,11 +255,11 @@ table 6059784 "TM Ticket Type"
 
         //-TM1.42 [362783]
         // RunCmdModal('"notepad.exe" "'+ Path + '"');
-        RunProcess (Path, '', true);
+        RunProcess(Path, '', true);
         //+TM1.42 [362783]
     end;
 
-    procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
+    procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
     var
         [RunOnClient]
         Process: DotNet npNetProcess;
@@ -268,10 +268,10 @@ table 6059784 "TM Ticket Type"
     begin
 
         //-TM1.42 [362783]
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
+        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
         Process := Process.Start(ProcessStartInfo);
         if Modal then
-          Process.WaitForExit();
+            Process.WaitForExit();
 
         //+TM1.42 [362783]
     end;

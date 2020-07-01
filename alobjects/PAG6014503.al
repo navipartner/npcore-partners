@@ -30,83 +30,83 @@ page 6014503 "Customer Repair Card"
             group(General)
             {
                 Caption = 'General';
-                field("No.";"No.")
+                field("No."; "No.")
                 {
 
                     trigger OnAssistEdit()
                     begin
                         if AssistEdit(xRec) then
-                          CurrPage.Update;
+                            CurrPage.Update;
                     end;
                 }
-                field("Customer Type";"Customer Type")
+                field("Customer Type"; "Customer Type")
                 {
                     Caption = 'Customer Type';
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
 
                     trigger OnDrillDown()
                     begin
                         // LS 13-05-10
                         // Added to get customer ledger entries for the customer
-                        if "Customer No."<> '' then begin
-                          CustLedgerEntry.Reset;
-                          CustLedgerEntry.SetRange(CustLedgerEntry."Customer No.","Customer No.");
-                          PAGE.RunModal(PAGE::"Customer Ledger Entries",CustLedgerEntry)
+                        if "Customer No." <> '' then begin
+                            CustLedgerEntry.Reset;
+                            CustLedgerEntry.SetRange(CustLedgerEntry."Customer No.", "Customer No.");
+                            PAGE.RunModal(PAGE::"Customer Ledger Entries", CustLedgerEntry)
                         end;
                         // END of LS 13-05-10
                     end;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
                 }
-                field("Address 2";"Address 2")
+                field("Address 2"; "Address 2")
                 {
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
                 }
-                field(City;City)
+                field(City; City)
                 {
                 }
-                field("Contact Person";"Contact Person")
+                field("Contact Person"; "Contact Person")
                 {
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
                 }
-                field("Mobile Phone No.";"Mobile Phone No.")
-                {
-                    ShowMandatory = true;
-                }
-                field("E-mail";"E-mail")
+                field("Mobile Phone No."; "Mobile Phone No.")
                 {
                     ShowMandatory = true;
                 }
-                field(Location;Location)
+                field("E-mail"; "E-mail")
+                {
+                    ShowMandatory = true;
+                }
+                field(Location; Location)
                 {
                 }
-                field("Bag No";"Bag No")
+                field("Bag No"; "Bag No")
                 {
                 }
-                field("Contact after";"Contact after")
+                field("Contact after"; "Contact after")
                 {
                 }
-                field("Delivery reff.";"Delivery reff.")
+                field("Delivery reff."; "Delivery reff.")
                 {
                 }
-                field(Finalized;Finalized)
+                field(Finalized; Finalized)
                 {
                 }
             }
             group("Repairer Details")
             {
                 Caption = 'Repairer Details';
-                field("In-house Repairer";"In-house Repairer")
+                field("In-house Repairer"; "In-house Repairer")
                 {
 
                     trigger OnValidate()
@@ -117,31 +117,31 @@ page 6014503 "Customer Repair Card"
                         //+NPR5.27
                     end;
                 }
-                field("Repairer No.";"Repairer No.")
+                field("Repairer No."; "Repairer No.")
                 {
                     Enabled = RepairedNoEnabled;
                 }
-                field("Repairer Name";"Repairer Name")
+                field("Repairer Name"; "Repairer Name")
                 {
                     Enabled = RepairNameEnabled;
                 }
-                field("Repairer Address";"Repairer Address")
+                field("Repairer Address"; "Repairer Address")
                 {
                     Enabled = RepairAddressEnabled;
                 }
-                field("Repairer Address2";"Repairer Address2")
+                field("Repairer Address2"; "Repairer Address2")
                 {
                     Enabled = RepairAddress2Enabled;
                 }
-                field("Repairer Post Code";"Repairer Post Code")
+                field("Repairer Post Code"; "Repairer Post Code")
                 {
                     Enabled = RepairPostCodeEnabled;
                 }
-                field("Repairer City";"Repairer City")
+                field("Repairer City"; "Repairer City")
                 {
                     Enabled = RepairCityEnabled;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                 }
             }
@@ -151,7 +151,7 @@ page 6014503 "Customer Repair Card"
                 group(Control6150643)
                 {
                     ShowCaption = false;
-                    field("Item No.";"Item No.")
+                    field("Item No."; "Item No.")
                     {
                         ShowMandatory = true;
 
@@ -167,17 +167,17 @@ page 6014503 "Customer Repair Card"
                             //+NPR5.27
                         end;
                     }
-                    field("Item Description";"Item Description")
+                    field("Item Description"; "Item Description")
                     {
                     }
-                    field("Unit Cost";"Unit Cost")
+                    field("Unit Cost"; "Unit Cost")
                     {
                     }
-                    field("Variant Code";"Variant Code")
+                    field("Variant Code"; "Variant Code")
                     {
                         Caption = 'Variant code';
                     }
-                    field(Worranty;Worranty)
+                    field(Worranty; Worranty)
                     {
 
                         trigger OnValidate()
@@ -187,64 +187,64 @@ page 6014503 "Customer Repair Card"
                             //+NPR5.27
                         end;
                     }
-                    field("Warranty Text";"Warranty Text")
+                    field("Warranty Text"; "Warranty Text")
                     {
                         Enabled = WarantyTextEnabled;
                     }
-                    field(Status;Status)
+                    field(Status; Status)
                     {
                     }
-                    field(Brand;Brand)
+                    field(Brand; Brand)
                     {
                     }
-                    field("Serial No.";"Serial No.")
-                    {
-                        ShowMandatory = true;
-                    }
-                    field("Alt. Serial No.";"Alt. Serial No.")
-                    {
-                    }
-                    field(Accessories;Accessories)
+                    field("Serial No."; "Serial No.")
                     {
                         ShowMandatory = true;
                     }
-                    field("Accessories 1";"Accessories 1")
+                    field("Alt. Serial No."; "Alt. Serial No.")
                     {
                     }
-                    field("Costs Paid by Offer";"Costs Paid by Offer")
+                    field(Accessories; Accessories)
+                    {
+                        ShowMandatory = true;
+                    }
+                    field("Accessories 1"; "Accessories 1")
+                    {
+                    }
+                    field("Costs Paid by Offer"; "Costs Paid by Offer")
                     {
                     }
                 }
                 group(Control6150658)
                 {
                     ShowCaption = false;
-                    field("Prices Including VAT";"Prices Including VAT")
+                    field("Prices Including VAT"; "Prices Including VAT")
                     {
                     }
-                    field("To Ship";"To Ship")
+                    field("To Ship"; "To Ship")
                     {
                     }
-                    field("Handed In Date";"Handed In Date")
-                    {
-                        ShowMandatory = true;
-                    }
-                    field("Expected Completion Date";"Expected Completion Date")
+                    field("Handed In Date"; "Handed In Date")
                     {
                         ShowMandatory = true;
                     }
-                    field("Salesperson Code";"Salesperson Code")
+                    field("Expected Completion Date"; "Expected Completion Date")
                     {
                         ShowMandatory = true;
                     }
-                    field("Date Delivered";"Date Delivered")
+                    field("Salesperson Code"; "Salesperson Code")
                     {
                         ShowMandatory = true;
                     }
-                    field("Delivering Salespers.";"Delivering Salespers.")
+                    field("Date Delivered"; "Date Delivered")
                     {
                         ShowMandatory = true;
                     }
-                    field("Delivering Sales Ticket No.";"Delivering Sales Ticket No.")
+                    field("Delivering Salespers."; "Delivering Salespers.")
+                    {
+                        ShowMandatory = true;
+                    }
+                    field("Delivering Sales Ticket No."; "Delivering Sales Ticket No.")
                     {
                     }
                 }
@@ -255,22 +255,22 @@ page 6014503 "Customer Repair Card"
                 group(Control6150670)
                 {
                     ShowCaption = false;
-                    field("Invoice To";"Invoice To")
+                    field("Invoice To"; "Invoice To")
                     {
                     }
-                    field("Customer Name";"Customer Name")
+                    field("Customer Name"; "Customer Name")
                     {
                     }
-                    field("Customer Address";"Customer Address")
+                    field("Customer Address"; "Customer Address")
                     {
                     }
-                    field("Customer Address 2";"Customer Address 2")
+                    field("Customer Address 2"; "Customer Address 2")
                     {
                     }
-                    field("Customer Post Code";"Customer Post Code")
+                    field("Customer Post Code"; "Customer Post Code")
                     {
                     }
-                    field("Customer City";"Customer City")
+                    field("Customer City"; "Customer City")
                     {
                     }
                 }
@@ -281,41 +281,41 @@ page 6014503 "Customer Repair Card"
                 group(Control6150642)
                 {
                     ShowCaption = false;
-                    field("Price when Not Accepted";"Price when Not Accepted")
+                    field("Price when Not Accepted"; "Price when Not Accepted")
                     {
                     }
-                    field(Delivered;Delivered)
+                    field(Delivered; Delivered)
                     {
                     }
-                    field("Service nr.";"Service nr.")
+                    field("Service nr."; "Service nr.")
                     {
                     }
-                    field(Type;Type)
+                    field(Type; Type)
                     {
                     }
-                    field("Customer Answer";"Customer Answer")
+                    field("Customer Answer"; "Customer Answer")
                     {
                     }
                 }
                 group(Control6150685)
                 {
                     ShowCaption = false;
-                    field("Requested Returned, No Repair";"Requested Returned, No Repair")
+                    field("Requested Returned, No Repair"; "Requested Returned, No Repair")
                     {
                     }
-                    field("Approved by repairer";"Approved by repairer")
+                    field("Approved by repairer"; "Approved by repairer")
                     {
                     }
-                    field("Return from Repair";"Return from Repair")
+                    field("Return from Repair"; "Return from Repair")
                     {
                     }
-                    field(Claimed;Claimed)
+                    field(Claimed; Claimed)
                     {
                     }
-                    field("Offer Sent";"Offer Sent")
+                    field("Offer Sent"; "Offer Sent")
                     {
                     }
-                    field("Reported Ready and Sent";"Reported Ready and Sent")
+                    field("Reported Ready and Sent"; "Reported Ready and Sent")
                     {
                     }
                 }
@@ -323,35 +323,35 @@ page 6014503 "Customer Repair Card"
             group("Defect Description")
             {
                 Caption = 'Defect Description';
-                part(vv;"Customer Repair Journal")
+                part(vv; "Customer Repair Journal")
                 {
-                    SubPageLink = "Customer Repair No."=FIELD("No."),
-                                  Type=CONST(Fejlbeskrivelse);
+                    SubPageLink = "Customer Repair No." = FIELD("No."),
+                                  Type = CONST(Fejlbeskrivelse);
                 }
             }
             group("Repair Description")
             {
                 Caption = 'Repair Description';
-                part(CustomerRepairJournal;"Customer Repair Journal")
+                part(CustomerRepairJournal; "Customer Repair Journal")
                 {
-                    SubPageLink = "Customer Repair No."=FIELD("No."),
-                                  Type=CONST(Reparationsbeskrivelse);
+                    SubPageLink = "Customer Repair No." = FIELD("No."),
+                                  Type = CONST(Reparationsbeskrivelse);
                 }
             }
             group(Picture)
             {
                 Caption = 'Picture';
-                field("Picture Documentation1";"Picture Documentation1")
+                field("Picture Documentation1"; "Picture Documentation1")
                 {
                 }
-                field("Picture Documentation2";"Picture Documentation2")
+                field("Picture Documentation2"; "Picture Documentation2")
                 {
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014416;Notes)
+            systempart(Control6014416; Notes)
             {
             }
         }
@@ -379,14 +379,14 @@ page 6014503 "Customer Repair Card"
                         RecID: RecordID;
                     begin
                         //-NPR5.30 [262923]
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair Label");
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair Label");
                         if ReportSelectionContract.FindFirst then begin
-                          RecRef.Open(DATABASE::"Customer Repair");
-                          RecID:=Rec.RecordId;
-                          RecRef.Get(RecID);
-                          RecRef.SetRecFilter;
-                          if ReportSelectionContract."Codeunit ID" = CODEUNIT::"RP Matrix Print Mgt." then
-                            MatrixPrintMgt.ProcessTemplate(ReportSelectionContract."Print Template",RecRef);
+                            RecRef.Open(DATABASE::"Customer Repair");
+                            RecID := Rec.RecordId;
+                            RecRef.Get(RecID);
+                            RecRef.SetRecFilter;
+                            if ReportSelectionContract."Codeunit ID" = CODEUNIT::"RP Matrix Print Mgt." then
+                                MatrixPrintMgt.ProcessTemplate(ReportSelectionContract."Print Template", RecRef);
                         end;
                         //+NPR5.30 [262923]
                     end;
@@ -408,29 +408,29 @@ page 6014503 "Customer Repair Card"
                         //REPORT.RUN(REPORT::"Repair Offer",TRUE,FALSE,rep);
                         //+NPR5.25
 
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair offer");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair offer");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
                         //-NPR5.25
                         //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
-                        ReportSelectionContract.SetRange("Register No.",Register);
+                        ReportSelectionContract.SetRange("Register No.", Register);
                         //+NPR5.25
                         if not ReportSelectionContract.Find('-') then
-                          ReportSelectionContract.SetRange("Register No.",'');
+                            ReportSelectionContract.SetRange("Register No.", '');
 
                         //-NPR5.25
                         //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
                         if ReportSelectionContract.FindSet then begin
-                        //+NPR5.25
-                          repeat
-                            //-NPR5.36
-                            //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
-                            ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID",true,false,CustomerRepairGlobal);
+                            //+NPR5.25
+                            repeat
+                                //-NPR5.36
+                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
+                                ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", true, false, CustomerRepairGlobal);
                             //+NPR5.36
-                          until ReportSelectionContract.Next = 0;
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                     end;
                 }
@@ -450,29 +450,29 @@ page 6014503 "Customer Repair Card"
                         //-NPR5.25
                         //REPORT.RUN(REPORT::"Repair Done",TRUE,FALSE,rep);
                         //+NPR5.25
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair finished");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair finished");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
                         //-NPR5.25
                         //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
-                        ReportSelectionContract.SetRange("Register No.",Register);
+                        ReportSelectionContract.SetRange("Register No.", Register);
                         //+NPR5.25
 
                         if not ReportSelectionContract.Find('-') then
-                          ReportSelectionContract.SetRange("Register No.",'');
+                            ReportSelectionContract.SetRange("Register No.", '');
                         //-NPR5.25
                         //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
                         if ReportSelectionContract.FindSet then begin
-                        //+NPR5.25
-                          repeat
-                             //-NPR5.36
-                             //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
-                            ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID",true,false,CustomerRepairGlobal);
-                             //+NPR5.36
-                          until ReportSelectionContract.Next = 0;
+                            //+NPR5.25
+                            repeat
+                                //-NPR5.36
+                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
+                                ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", true, false, CustomerRepairGlobal);
+                            //+NPR5.36
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                     end;
                 }
@@ -492,29 +492,29 @@ page 6014503 "Customer Repair Card"
                         //-NPR5.25
                         //REPORT.RUN(REPORT::"Repair Warranty",TRUE,FALSE,rep);
                         //+NPR5.25
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair warranty");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair warranty");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
                         //-NPR5.25
                         //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
-                        ReportSelectionContract.SetRange("Register No.",Register);
+                        ReportSelectionContract.SetRange("Register No.", Register);
                         //+NPR5.25
 
                         if not ReportSelectionContract.Find('-') then
-                          ReportSelectionContract.SetRange("Register No.",'');
+                            ReportSelectionContract.SetRange("Register No.", '');
                         //-NPR5.25
                         //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
                         if ReportSelectionContract.FindSet then begin
-                        //+NPR5.25
-                          repeat
-                            //-NPR5.36
-                            //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
-                            ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID",true,false,CustomerRepairGlobal);
+                            //+NPR5.25
+                            repeat
+                                //-NPR5.36
+                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
+                                ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", true, false, CustomerRepairGlobal);
                             //+NPR5.36
-                          until ReportSelectionContract.Next = 0;
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                     end;
                 }
@@ -534,28 +534,28 @@ page 6014503 "Customer Repair Card"
                         //-NPR5.25
                         //REPORT.RUN(REPORT::"Repair Receipt",TRUE,FALSE,rep);
                         //+NPR5.25
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Customer receipt");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Customer receipt");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
                         //-NPR5.25
                         //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
-                        ReportSelectionContract.SetRange("Register No.",Register);
+                        ReportSelectionContract.SetRange("Register No.", Register);
                         //+NPR5.25
                         if not ReportSelectionContract.Find('-') then
-                          ReportSelectionContract.SetRange("Register No.",'');
+                            ReportSelectionContract.SetRange("Register No.", '');
                         //-NPR5.25
                         //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
                         if ReportSelectionContract.FindSet then begin
-                        //+NPR5.25
-                          repeat
-                            //-NPR5.36
-                            //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
-                            ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID",false,false,CustomerRepairGlobal);
+                            //+NPR5.25
+                            repeat
+                                //-NPR5.36
+                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
+                                ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", false, false, CustomerRepairGlobal);
                             //+NPR5.36
-                          until ReportSelectionContract.Next = 0;
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                     end;
                 }
@@ -575,27 +575,27 @@ page 6014503 "Customer Repair Card"
                         //-NPR5.25
                         //REPORT.RUN(REPORT::"Delivery Note for Repair",TRUE,FALSE,rep);
                         //+NPR5.25
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Shipment note");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Shipment note");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
                         //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
-                        ReportSelectionContract.SetRange("Register No.",Register);
+                        ReportSelectionContract.SetRange("Register No.", Register);
                         //+NPR5.25
                         if not ReportSelectionContract.Find('-') then
-                          ReportSelectionContract.SetRange("Register No.",'');
+                            ReportSelectionContract.SetRange("Register No.", '');
                         //-NPR5.25
                         //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
                         if ReportSelectionContract.FindSet then begin
-                        //+NPR5.25
-                          repeat
-                            //-NPR5.36
-                            //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
-                            ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID",false,false,CustomerRepairGlobal);
+                            //+NPR5.25
+                            repeat
+                                //-NPR5.36
+                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
+                                ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", false, false, CustomerRepairGlobal);
                             //+NPR5.36
-                          until ReportSelectionContract.Next = 0;
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                     end;
                 }
@@ -615,6 +615,8 @@ page 6014503 "Customer Repair Card"
                         PromotedCategory = Category4;
 
                         trigger OnAction()
+                        var
+                            RecRef: RecordRef;
                         begin
                             //-NPR5.25
                             //TextName:="Picture Documentation1".IMPORT(Text10600000,TRUE);
@@ -623,18 +625,20 @@ page 6014503 "Customer Repair Card"
                             Clear(TempBlob);
                             //-NPR5.26
                             //Name := FileManagement.BLOBImport(TempBlob,TextName);
-                            "Picture Path 1" := FileManagement.BLOBImport(TempBlob,TextName);
+                            "Picture Path 1" := FileManagement.BLOBImport(TempBlob, TextName);
                             //+NPR5.26
-                            "Picture Documentation1" := TempBlob.Blob;
+                            RecRef.GetTable(Rec);
+                            TempBlob.ToRecordRef(RecRef, FieldNo("Picture Documentation1"));
+                            RecRef.SetTable(Rec);
                             //-NPR5.26
                             //IF Name= '' THEN
                             //  EXIT;
                             if "Picture Path 1" = '' then
-                              exit;
+                                exit;
                             //+NPR5.26
                             if ImageFound then
-                              if not Confirm(Text10600001,false) then
-                                exit;
+                                if not Confirm(Text10600001, false) then
+                                    exit;
                             CurrPage.SaveRecord;
                         end;
                     }
@@ -656,12 +660,12 @@ page 6014503 "Customer Repair Card"
                             //TempBlob.Blob := "Picture Documentation1";
                             //IF "Picture Documentation1".HASVALUE THEN
                             //   Name := FileManagement.BLOBExport(TempBlob,TextName,TRUE);
-                            CustomerRepair.SetRange("No.","No.");
-                            if CustomerRepair.FindFirst then  begin
-                              CustomerRepair.CalcFields("Picture Documentation1");
-                              TempBlob.Blob := CustomerRepair."Picture Documentation1";
-                              if CustomerRepair."Picture Documentation1".HasValue then
-                                FileManagement.BLOBExport(TempBlob,CustomerRepair."Picture Path 1",true);
+                            CustomerRepair.SetRange("No.", "No.");
+                            if CustomerRepair.FindFirst then begin
+                                CustomerRepair.CalcFields("Picture Documentation1");
+                                TempBlob.FromRecord(CustomerRepair, CustomerRepair.FieldNo("Picture Documentation1"));
+                                if CustomerRepair."Picture Documentation1".HasValue then
+                                    FileManagement.BLOBExport(TempBlob, CustomerRepair."Picture Path 1", true);
                             end;
                             //+NPR5.26
                         end;
@@ -676,10 +680,10 @@ page 6014503 "Customer Repair Card"
                         trigger OnAction()
                         begin
                             if "Picture Documentation1".HasValue then
-                              if Confirm(Text10600002,false) then begin
-                                Clear("Picture Documentation1");
-                                CurrPage.SaveRecord;
-                              end;
+                                if Confirm(Text10600002, false) then begin
+                                    Clear("Picture Documentation1");
+                                    CurrPage.SaveRecord;
+                                end;
                         end;
                     }
                 }
@@ -705,12 +709,12 @@ page 6014503 "Customer Repair Card"
                             //TempBlob.Blob := "Picture Documentation2";
                             //IF "Picture Documentation2".HASVALUE THEN
                             //   Name := FileManagement.BLOBExport(TempBlob,TextName,TRUE);
-                            CustomerRepair.SetRange("No.","No.");
+                            CustomerRepair.SetRange("No.", "No.");
                             if CustomerRepair.FindFirst then begin
-                              CustomerRepair.CalcFields("Picture Documentation2");
-                              TempBlob.Blob := CustomerRepair."Picture Documentation2";
-                              if CustomerRepair."Picture Documentation2".HasValue then
-                                FileManagement.BLOBExport(TempBlob,CustomerRepair."Picture Path 2",true);
+                                CustomerRepair.CalcFields("Picture Documentation2");
+                                TempBlob.FromRecord(CustomerRepair, CustomerRepair.FieldNo("Picture Documentation2"));
+                                if CustomerRepair."Picture Documentation2".HasValue then
+                                    FileManagement.BLOBExport(TempBlob, CustomerRepair."Picture Path 2", true);
                             end;
                             //+NPR5.26
                         end;
@@ -728,7 +732,7 @@ page 6014503 "Customer Repair Card"
                     Caption = 'List';
                     Image = List;
                     RunObject = Page "Customer Repair List";
-                    RunPageView = WHERE(Status=FILTER(<>Claimed));
+                    RunPageView = WHERE(Status = FILTER(<> Claimed));
                     ShortCutKey = 'F5';
                 }
                 action("Repair Closed/Claimed List")
@@ -736,7 +740,7 @@ page 6014503 "Customer Repair Card"
                     Caption = 'Repair Closed/Claimed List';
                     Image = List;
                     RunObject = Page "Customer Repair List";
-                    RunPageView = WHERE(Status=FILTER(Claimed));
+                    RunPageView = WHERE(Status = FILTER(Claimed));
                     ShortCutKey = 'F5';
                 }
                 action("Finalize Repair")
@@ -749,8 +753,8 @@ page 6014503 "Customer Repair Card"
                     trigger OnAction()
                     begin
                         //-NPR70.00.00.02
-                        if Confirm(Text10600004,true) then
-                          PostItemPart(Rec);
+                        if Confirm(Text10600004, true) then
+                            PostItemPart(Rec);
                         //+NPR70.00.00.02
                     end;
                 }
@@ -777,11 +781,11 @@ page 6014503 "Customer Repair Card"
                     trigger OnAction()
                     begin
                         //-NPR70.00.00.02
-                        if Confirm(Text10600005,true) then begin
-                          PostItemPart(Rec);
-                          SetRecFilter;
-                          if xRec.Finalized = false then
-                           REPORT.RunModal(6014502,false,true,Rec);
+                        if Confirm(Text10600005, true) then begin
+                            PostItemPart(Rec);
+                            SetRecFilter;
+                            if xRec.Finalized = false then
+                                REPORT.RunModal(6014502, false, true, Rec);
                         end;
                         //+NPR70.00.00.02
                     end;
@@ -851,17 +855,17 @@ page 6014503 "Customer Repair Card"
                         CustomerRepair := Rec;
                         CustomerRepair.SetRecFilter;
 
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair offer");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
-                        ReportSelectionContract.SetRange("Register No.","Register No.");
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair offer");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
+                        ReportSelectionContract.SetRange("Register No.", "Register No.");
                         if ReportSelectionContract.FindFirst then begin
-                          repeat
-                            SendMail(ReportSelectionContract."Report ID",CustomerRepair);
-                          until ReportSelectionContract.Next = 0;
+                            repeat
+                                SendMail(ReportSelectionContract."Report ID", CustomerRepair);
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                         Message(EmailSent);
                         //+NPR5.27
@@ -881,17 +885,17 @@ page 6014503 "Customer Repair Card"
                         CustomerRepair := Rec;
                         CustomerRepair.SetRecFilter;
 
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair finished");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
-                        ReportSelectionContract.SetRange("Register No.","Register No.");
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair finished");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
+                        ReportSelectionContract.SetRange("Register No.", "Register No.");
                         if ReportSelectionContract.FindFirst then begin
-                          repeat
-                            SendMail(ReportSelectionContract."Report ID",CustomerRepair);
-                          until ReportSelectionContract.Next = 0;
+                            repeat
+                                SendMail(ReportSelectionContract."Report ID", CustomerRepair);
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                         Message(EmailSent);
                         //+NPR5.27
@@ -911,17 +915,17 @@ page 6014503 "Customer Repair Card"
                         CustomerRepair := Rec;
                         CustomerRepair.SetRecFilter;
 
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair warranty");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
-                        ReportSelectionContract.SetRange("Register No.","Register No.");
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair warranty");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
+                        ReportSelectionContract.SetRange("Register No.", "Register No.");
                         if ReportSelectionContract.FindFirst then begin
-                          repeat
-                            SendMail(ReportSelectionContract."Report ID",CustomerRepair);
-                          until ReportSelectionContract.Next = 0;
+                            repeat
+                                SendMail(ReportSelectionContract."Report ID", CustomerRepair);
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                         Message(EmailSent);
                         //+NPR5.27
@@ -940,17 +944,17 @@ page 6014503 "Customer Repair Card"
                         //-NPR5.27
                         CustomerRepair := Rec;
                         CustomerRepair.SetRecFilter;
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Customer receipt");
-                        ReportSelectionContract.SetFilter("Report ID",'<> 0');
-                        ReportSelectionContract.SetRange("Register No.","Register No.");
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Customer receipt");
+                        ReportSelectionContract.SetFilter("Report ID", '<> 0');
+                        ReportSelectionContract.SetRange("Register No.", "Register No.");
                         if ReportSelectionContract.FindFirst then begin
-                          repeat
-                            SendMail(ReportSelectionContract."Report ID",CustomerRepair);
-                          until ReportSelectionContract.Next = 0;
+                            repeat
+                                SendMail(ReportSelectionContract."Report ID", CustomerRepair);
+                            until ReportSelectionContract.Next = 0;
                         end else begin
-                          Error(ErrNoReportFound,
-                                ReportSelectionContract.FieldCaption("Report Type"),
-                                ReportSelectionContract.TableCaption);
+                            Error(ErrNoReportFound,
+                                  ReportSelectionContract.FieldCaption("Report Type"),
+                                  ReportSelectionContract.TableCaption);
                         end;
                         Message(EmailSent);
                         //+NPR5.27
@@ -982,10 +986,10 @@ page 6014503 "Customer Repair Card"
         //  SearchNoEnabled := TRUE;
         //+NPR5.40
         if Worranty = true then
-          WarantyTextEnabled := true
+            WarantyTextEnabled := true
         else begin
-          WarantyTextEnabled := false;
-          "Warranty Text" := '';
+            WarantyTextEnabled := false;
+            "Warranty Text" := '';
         end;
 
         //-NPR5.27
@@ -1006,7 +1010,7 @@ page 6014503 "Customer Repair Card"
         SetOwnRepair;
         //+NPR5.27
         RetailSetup.Get;
-        Validate("Customer Type",RetailSetup."Rep. Cust. Default");
+        Validate("Customer Type", RetailSetup."Rep. Cust. Default");
     end;
 
     trigger OnOpenPage()
@@ -1043,7 +1047,7 @@ page 6014503 "Customer Repair Card"
         [InDataSet]
         RepairCityEnabled: Boolean;
         FileManagement: Codeunit "File Management";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         TextName: Text[1024];
         Show: Boolean;
         Text10600004: Label 'Do you want to finalize the Repair?';
@@ -1072,14 +1076,14 @@ page 6014503 "Customer Repair Card"
 
     end;
 
-    local procedure SendMail(ReportNo: Integer;CustomerRep: Record "Customer Repair")
+    local procedure SendMail(ReportNo: Integer; CustomerRep: Record "Customer Repair")
     var
         Recref: RecordRef;
         EmailMgt: Codeunit "E-mail Management";
     begin
         //-NPR5.27
         Recref.GetTable(CustomerRep);
-        EmailMgt.SendReport(ReportNo,Recref,CustomerRep."E-mail",true);
+        EmailMgt.SendReport(ReportNo, Recref, CustomerRep."E-mail", true);
         //+NPR5.27
     end;
 }

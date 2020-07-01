@@ -88,7 +88,7 @@ page 6060142 "MM Member Notification Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "E-mail Templates";
-                RunPageView = WHERE ("Table No." = CONST (6060139));
+                RunPageView = WHERE("Table No." = CONST(6060139));
             }
             action("SMS Template")
             {
@@ -97,7 +97,7 @@ page 6060142 "MM Member Notification Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "SMS Template List";
-                RunPageView = WHERE ("Table No." = CONST (6060139));
+                RunPageView = WHERE("Table No." = CONST(6060139));
             }
             action("Edit Pass Template")
             {
@@ -119,7 +119,7 @@ page 6060142 "MM Member Notification Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "MM Membership Notification";
-                RunPageLink = "Notification Trigger" = CONST (RENEWAL);
+                RunPageLink = "Notification Trigger" = CONST(RENEWAL);
             }
         }
         area(processing)
@@ -214,7 +214,7 @@ page 6060142 "MM Member Notification Setup"
 
     local procedure ImportPassTemplate(Path: Text[1024]; UseDialog: Boolean)
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         outstream: OutStream;
         instream: InStream;
     begin
@@ -225,7 +225,7 @@ page 6060142 "MM Member Notification Setup"
             FileManagement.BLOBImport(TempBlob, Path);
         end;
 
-        TempBlob.Blob.CreateInStream(instream);
+        TempBlob.CreateInStream(instream);
         "PUT Passes Template".CreateOutStream(outstream, TEXTENCODING::UTF8);
         CopyStream(outstream, instream);
 
@@ -241,11 +241,11 @@ page 6060142 "MM Member Notification Setup"
 
         //-MM1.40 [362794]
         // RunCmdModal('"notepad.exe" "'+ Path + '"');
-        RunProcess (Path, '', true);
+        RunProcess(Path, '', true);
         //+MM1.40 [362794]
     end;
 
-    procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
+    procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
     var
         [RunOnClient]
         Process: DotNet npNetProcess;
@@ -254,10 +254,10 @@ page 6060142 "MM Member Notification Setup"
     begin
 
         //-#362783 [362783]
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
+        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
         Process := Process.Start(ProcessStartInfo);
         if Modal then
-          Process.WaitForExit();
+            Process.WaitForExit();
 
         //+#362783 [362783]
     end;

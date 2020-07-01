@@ -9,42 +9,42 @@ report 6060127 "MM Member Card Print"
 
     dataset
     {
-        dataitem("MM Member Card";"MM Member Card")
+        dataitem("MM Member Card"; "MM Member Card")
         {
-            column(MemberDate;MemberDate)
+            column(MemberDate; MemberDate)
             {
             }
-            column(MemberType;MemberType)
+            column(MemberType; MemberType)
             {
             }
-            column(QRBlob;TmpQR.Blob)
+            column(QRBlob; BlobBuffer."Buffer 1")
             {
             }
-            column(RegisterPicture;POSViewProfile.Picture)
+            column(RegisterPicture; POSViewProfile.Picture)
             {
             }
-            dataitem("MM Member";"MM Member")
+            dataitem("MM Member"; "MM Member")
             {
-                DataItemLink = "Entry No."=FIELD("Member Entry No.");
-                column(MemberName;MemberName)
+                DataItemLink = "Entry No." = FIELD("Member Entry No.");
+                column(MemberName; MemberName)
                 {
                 }
-                column(MemberPicture;"MM Member".Picture)
+                column(MemberPicture; "MM Member".Picture)
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
                     if "MM Member".Picture.HasValue then
-                      "MM Member".CalcFields(Picture);
+                        "MM Member".CalcFields(Picture);
 
                     Clear(MemberName);
                     if "MM Member"."First Name" <> '' then
-                      MemberName += "MM Member"."First Name" + ' ';
+                        MemberName += "MM Member"."First Name" + ' ';
                     if "MM Member"."Middle Name" <> '' then
-                      MemberName += "MM Member"."Middle Name" + ' ';
+                        MemberName += "MM Member"."Middle Name" + ' ';
                     if "MM Member"."Last Name" <> '' then
-                      MemberName += "MM Member"."Last Name";
+                        MemberName += "MM Member"."Last Name";
                 end;
             }
 
@@ -59,13 +59,14 @@ report 6060127 "MM Member Card Print"
                 BarcodeLib.SetSizeX(2);
                 BarcodeLib.SetSizeY(2);
                 BarcodeLib.SetBarcodeType('QR');
-                BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.",TmpQR);
+                BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.", TmpQR);
+                BlobBuffer.GetFromTempBlob(TmpQR, 1);
 
                 MemberDate := Format("MM Member Card"."Valid Until");
 
                 Clear(MemberType);
-                if MMMembershipRole.Get("Membership Entry No.","Member Entry No.") then
-                  MemberType := Format (MMMembershipRole."Member Role");
+                if MMMembershipRole.Get("Membership Entry No.", "Member Entry No.") then
+                    MemberType := Format(MMMembershipRole."Member Role");
             end;
 
             trigger OnPreDataItem()
@@ -79,8 +80,8 @@ report 6060127 "MM Member Card Print"
                     Register.CALCFIELDS(Picture);
                 */
                 if POSUnit.Get(RetailFormCode.FetchRegisterNumber) then
-                  if POSViewProfile.Get(POSUnit."POS View Profile") and POSViewProfile.Picture.HasValue then
-                    POSViewProfile.CalcFields(Picture);
+                    if POSViewProfile.Get(POSUnit."POS View Profile") and POSViewProfile.Picture.HasValue then
+                        POSViewProfile.CalcFields(Picture);
                 //+MM1.37 [350288]
 
             end;
@@ -105,11 +106,12 @@ report 6060127 "MM Member Card Print"
     }
 
     var
-        TmpQR: Record TempBlob temporary;
+        TmpQR: Codeunit "Temp Blob";
         MemberName: Text;
         MemberType: Text;
         MemberDate: Text;
         POSUnit: Record "POS Unit";
         POSViewProfile: Record "POS View Profile";
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

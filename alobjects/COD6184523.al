@@ -39,12 +39,10 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
         EFTTypePOSUnitBLOBParam: Record "EFT Type POS Unit BLOB Param.";
-        Blob1: Record TempBlob temporary;
-        Blob2: Record TempBlob temporary;
         EFTInterface: Codeunit "EFT Interface";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         EFTSetup.ShowEftPOSUnitParameters();
     end;
@@ -54,11 +52,9 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
     var
         EFTTypePaymentBLOBParam: Record "EFT Type Payment BLOB Param.";
         EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
-        Blob1: Record TempBlob temporary;
-        Blob2: Record TempBlob temporary;
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         GetMerchantID(EFTSetup);
         GetEnvironment(EFTSetup);
@@ -67,10 +63,10 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
-    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         Handled := true;
 
@@ -80,21 +76,21 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
-    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         //TODO: Implement API request looking up transaction results so lost results can be recovered later in case of error.
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
-    local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         Handled := true;
 
@@ -104,12 +100,12 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
-    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         EFTISMPBaxiProtocol: Codeunit "EFT ISMP Baxi Protocol";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         EFTISMPBaxiProtocol.SendEftDeviceRequest(EftTransactionRequest);
@@ -131,13 +127,13 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
     begin
     end;
 
-    procedure InitializeGlobals(PaymentType: Code[10];RegisterNo: Code[10])
+    procedure InitializeGlobals(PaymentType: Code[10]; RegisterNo: Code[10])
     var
         EFTSetupIn: Record "EFT Setup";
     begin
         EFTSetupIn.FindSetup(RegisterNo, PaymentType);
         if Format(EFTSetupIn.RecordId) = Format(EFTSetup.RecordId) then
-          exit;
+            exit;
         EFTSetupIn.TestField("EFT Integration Type", IntegrationType());
 
         EFTSetup := EFTSetupIn;
@@ -147,7 +143,7 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
         MerchantID := GetMerchantID(EFTSetup);
 
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
     end;
 
     procedure PaymentStart(var EftTransactionRequest: Record "EFT Transaction Request"): Boolean
@@ -159,12 +155,12 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
         EftTransactionRequest.Modify;
 
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
 
         exit(true);
     end;
 
-    procedure GetPaymentStatus(var EFTTransReq: Record "EFT Transaction Request";TransactionNo: Integer): Boolean
+    procedure GetPaymentStatus(var EFTTransReq: Record "EFT Transaction Request"; TransactionNo: Integer): Boolean
     var
         PaymentStatus: Integer;
         CustomerID: Text;
@@ -174,55 +170,55 @@ codeunit 6184523 "EFT ISMP Baxi Integration"
         SalePOS: Record "Sale POS";
     begin
         if MPOSNetsTransactions.Get(TransactionNo) then begin
-          if (MPOSNetsTransactions."Callback Result" <> EFTTransReq."Result Code") or ((MPOSNetsTransactions."Callback ResponseCode" <> '') and (MPOSNetsTransactions."Callback RejectionSource" = 0)) then begin
-            //Baxi result code if succes(GODKENDT) is = 0
-            if ((MPOSNetsTransactions."Callback ResponseCode" <> '') and (MPOSNetsTransactions."Callback RejectionSource" = 0)) then
-              EFTTransReq."Result Code" := 1
-            else
-              EFTTransReq."Result Code" := MPOSNetsTransactions."Callback Result";
-            if (StrLen(MPOSNetsTransactions."Callback StatusDescription") > MaxStrLen(EFTTransReq."Result Description")) then
-              EFTTransReq."Result Description" := 'NO ISMP CONNECTION'
-            else
-              EFTTransReq."Result Description" := CopyStr(MPOSNetsTransactions."Callback StatusDescription", 1, MaxStrLen(EFTTransReq."Result Description"));
-          end;
-
-          //IF NOT (MPOSNetsTransactions."Callback CardIssuerName" IN ['', 'null']) THEN
-          //  EFTTransReq."External Customer ID" := MPOSNetsTransactions."Callback CardIssuerName";
-
-        //  IF MPOSNetsTransactions."Callback SessionNumber" <> '' THEN BEGIN
-        //    EFTTransReq."External Transaction ID" := MPOSNetsTransactions."Callback SessionNumber";
-        //    EFTTransReq."Reference Number Output" := MPOSNetsTransactions."Callback SessionNumber";
-        //  END;
-
-          if EFTTransReq."Result Code" = 1 then begin //Success
-            EFTTransReq.Successful := true;
-            EFTTransReq."Amount Output" := EFTTransReq."Amount Input";
-            EFTTransReq."Result Amount" := EFTTransReq."Amount Input";
-            EFTTransReq."Tip Amount" := MPOSNetsTransactions."Callback TipAmount";
-            EFTTransReq."Card Issuer ID" := MPOSNetsTransactions."Callback CardIssuerName";
-
-            if EFTTransReq."Card Number" <> MPOSNetsTransactions."Callback TruncatedPan" then begin
-              SalePOS.Get(EFTTransReq."Register No.", EFTTransReq."Sales Ticket No.");
-              if CreditCardHelper.FindPaymentType(MPOSNetsTransactions."Callback TruncatedPan", PaymentTypePOS, SalePOS."Location Code") then begin
-                EFTTransReq."POS Payment Type Code" := PaymentTypePOS."No.";
-                EFTTransReq."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransReq."Card Name"));
-              end;
-              EFTTransReq."Card Number" := MPOSNetsTransactions."Callback TruncatedPan";
+            if (MPOSNetsTransactions."Callback Result" <> EFTTransReq."Result Code") or ((MPOSNetsTransactions."Callback ResponseCode" <> '') and (MPOSNetsTransactions."Callback RejectionSource" = 0)) then begin
+                //Baxi result code if succes(GODKENDT) is = 0
+                if ((MPOSNetsTransactions."Callback ResponseCode" <> '') and (MPOSNetsTransactions."Callback RejectionSource" = 0)) then
+                    EFTTransReq."Result Code" := 1
+                else
+                    EFTTransReq."Result Code" := MPOSNetsTransactions."Callback Result";
+                if (StrLen(MPOSNetsTransactions."Callback StatusDescription") > MaxStrLen(EFTTransReq."Result Description")) then
+                    EFTTransReq."Result Description" := 'NO ISMP CONNECTION'
+                else
+                    EFTTransReq."Result Description" := CopyStr(MPOSNetsTransactions."Callback StatusDescription", 1, MaxStrLen(EFTTransReq."Result Description"));
             end;
-          end;
 
-          MPOSNetsTransactions.CalcFields("Callback Receipt 1");
-          if MPOSNetsTransactions."Callback Receipt 1".HasValue then begin
-            EFTTransReq."Receipt 1" := MPOSNetsTransactions."Callback Receipt 1";
-          end;
-          MPOSNetsTransactions.CalcFields("Callback Receipt 2");
-          if MPOSNetsTransactions."Callback Receipt 2".HasValue then begin
-            EFTTransReq."Receipt 2" := MPOSNetsTransactions."Callback Receipt 2";
-          end;
+            //IF NOT (MPOSNetsTransactions."Callback CardIssuerName" IN ['', 'null']) THEN
+            //  EFTTransReq."External Customer ID" := MPOSNetsTransactions."Callback CardIssuerName";
 
-          EFTTransReq.Modify; //Persist changes across multiple status checks.
+            //  IF MPOSNetsTransactions."Callback SessionNumber" <> '' THEN BEGIN
+            //    EFTTransReq."External Transaction ID" := MPOSNetsTransactions."Callback SessionNumber";
+            //    EFTTransReq."Reference Number Output" := MPOSNetsTransactions."Callback SessionNumber";
+            //  END;
 
-          exit(true);
+            if EFTTransReq."Result Code" = 1 then begin //Success
+                EFTTransReq.Successful := true;
+                EFTTransReq."Amount Output" := EFTTransReq."Amount Input";
+                EFTTransReq."Result Amount" := EFTTransReq."Amount Input";
+                EFTTransReq."Tip Amount" := MPOSNetsTransactions."Callback TipAmount";
+                EFTTransReq."Card Issuer ID" := MPOSNetsTransactions."Callback CardIssuerName";
+
+                if EFTTransReq."Card Number" <> MPOSNetsTransactions."Callback TruncatedPan" then begin
+                    SalePOS.Get(EFTTransReq."Register No.", EFTTransReq."Sales Ticket No.");
+                    if CreditCardHelper.FindPaymentType(MPOSNetsTransactions."Callback TruncatedPan", PaymentTypePOS, SalePOS."Location Code") then begin
+                        EFTTransReq."POS Payment Type Code" := PaymentTypePOS."No.";
+                        EFTTransReq."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransReq."Card Name"));
+                    end;
+                    EFTTransReq."Card Number" := MPOSNetsTransactions."Callback TruncatedPan";
+                end;
+            end;
+
+            MPOSNetsTransactions.CalcFields("Callback Receipt 1");
+            if MPOSNetsTransactions."Callback Receipt 1".HasValue then begin
+                EFTTransReq."Receipt 1" := MPOSNetsTransactions."Callback Receipt 1";
+            end;
+            MPOSNetsTransactions.CalcFields("Callback Receipt 2");
+            if MPOSNetsTransactions."Callback Receipt 2".HasValue then begin
+                EFTTransReq."Receipt 2" := MPOSNetsTransactions."Callback Receipt 2";
+            end;
+
+            EFTTransReq.Modify; //Persist changes across multiple status checks.
+
+            exit(true);
         end;
 
         exit(false);

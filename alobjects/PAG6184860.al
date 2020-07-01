@@ -4,7 +4,6 @@ page 6184860 "Azure Storage Setup"
 
     Caption = 'Azure Storage Setup';
     PageType = List;
-    Permissions = TableData "Service Password"=rimd;
     SourceTable = "Azure Storage API Setup";
 
     layout
@@ -13,13 +12,13 @@ page 6184860 "Azure Storage Setup"
         {
             repeater(Group)
             {
-                field("Account Name";"Account Name")
+                field("Account Name"; "Account Name")
                 {
                 }
-                field("Account Description";"Account Description")
+                field("Account Description"; "Account Description")
                 {
                 }
-                field(AccessKey;AccessKey)
+                field(AccessKey; AccessKey)
                 {
                     Caption = 'Shared Access Key';
                     ExtendedDatatype = Masked;
@@ -30,7 +29,7 @@ page 6184860 "Azure Storage Setup"
                         HandleAccessKey(AccessKey);
                     end;
                 }
-                field(AdminKey;AdminKey)
+                field(AdminKey; AdminKey)
                 {
                     Caption = 'Search App Admin Key';
                     ExtendedDatatype = Masked;
@@ -41,11 +40,11 @@ page 6184860 "Azure Storage Setup"
                         HandleAdminKey(AdminKey);
                     end;
                 }
-                field(Timeout;Timeout)
+                field(Timeout; Timeout)
                 {
                     ToolTip = 'Miliseconds';
                 }
-                field("Storage On Server";"Storage On Server")
+                field("Storage On Server"; "Storage On Server")
                 {
                 }
             }
@@ -57,19 +56,13 @@ page 6184860 "Azure Storage Setup"
     }
 
     trigger OnAfterGetRecord()
-    var
-        ServicePassword: Record "Service Password";
     begin
         if not IsNullGuid("Access Key") then begin
-          ServicePassword.SetRange(Key, "Access Key");
-          ServicePassword.FindFirst;
-          AccessKey := ServicePassword.GetPassword();
+            IsolatedStorage.Get("Access Key", DataScope::Company, AccessKey);
         end;
 
         if not IsNullGuid("Admin Key") then begin
-          ServicePassword.SetRange(Key, "Admin Key");
-          ServicePassword.FindFirst;
-          AdminKey := ServicePassword.GetPassword();
+            IsolatedStorage.Get("Admin Key", DataScope::Company, AdminKey);
         end;
     end;
 

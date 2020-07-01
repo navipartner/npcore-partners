@@ -9,7 +9,7 @@ table 6151024 "NpRv Partner"
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
             NotBlank = true;
@@ -21,7 +21,7 @@ table 6151024 "NpRv Partner"
                 NpRvPartnerMgt.InitLocalPartner(Rec);
             end;
         }
-        field(5;Name;Text[50])
+        field(5; Name; Text[50])
         {
             Caption = 'Name';
             TableRelation = Company;
@@ -36,39 +36,31 @@ table 6151024 "NpRv Partner"
             begin
                 //-NPR5.53 [379761]
                 if StrLen(Name) <= MaxStrLen(Company.Name) then begin
-                  if Company.Get(Name) then
-                    "Service Url" := NpRvPartnerMgt.GetGlobalVoucherWSUrl(Company.Name);
+                    if Company.Get(Name) then
+                        "Service Url" := NpRvPartnerMgt.GetGlobalVoucherWSUrl(Company.Name);
                 end;
                 //+NPR5.53 [379761]
             end;
         }
-        field(10;"Service Url";Text[250])
+        field(10; "Service Url"; Text[250])
         {
             Caption = 'Service Url';
         }
-        field(15;"Service Username";Code[50])
+        field(15; "Service Username"; Code[50])
         {
             Caption = 'Service Username';
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnLookup()
-            var
-                UserMgt: Codeunit "User Management";
-            begin
-                UserMgt.LookupUserID("Service Username");
-            end;
+            DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                UserMgt.ValidateUserID("Service Username");
+                UserSelection.ValidateUserName("Service Username");
             end;
         }
-        field(20;"Service Password";Text[100])
+        field(20; "Service Password"; Text[100])
         {
             Caption = 'Service Password';
         }
@@ -76,7 +68,7 @@ table 6151024 "NpRv Partner"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }

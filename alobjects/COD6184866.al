@@ -44,7 +44,7 @@ codeunit 6184866 "External Storage Interface"
     begin
     end;
 
-    procedure HandleOperation(StorageID: Text[24];var TempStorageOperationType: Record "Storage Operation Type" temporary;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure HandleOperation(StorageID: Text[24]; var TempStorageOperationType: Record "Storage Operation Type" temporary; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         StorageType: Record "Storage Type";
         AzureStorageAPIMgt: Codeunit "Azure Storage API Mgt.";
@@ -52,78 +52,78 @@ codeunit 6184866 "External Storage Interface"
         FTPManagement: Codeunit "FTP Management";
     begin
         case TempStorageOperationType."Storage Type" of
-          DropboxAPIMgt.StorageType():
-            HandleDropBoxOperation(StorageID, TempStorageOperationType, TempStorageOperationParameter);
-          AzureStorageAPIMgt.StorageType():
-            HandleAzureStorageOperation(StorageID, TempStorageOperationType, TempStorageOperationParameter);
-          FTPManagement.StorageType():
-            HandleFTPOperation(StorageID, TempStorageOperationType, TempStorageOperationParameter);
-          else
-            Error(UnhandledStorageErr);
+            DropboxAPIMgt.StorageType():
+                HandleDropBoxOperation(StorageID, TempStorageOperationType, TempStorageOperationParameter);
+            AzureStorageAPIMgt.StorageType():
+                HandleAzureStorageOperation(StorageID, TempStorageOperationType, TempStorageOperationParameter);
+            FTPManagement.StorageType():
+                HandleFTPOperation(StorageID, TempStorageOperationType, TempStorageOperationParameter);
+            else
+                Error(UnhandledStorageErr);
         end;
     end;
 
-    local procedure HandleDropBoxOperation(StorageID: Text[24];var TempStorageOperationType: Record "Storage Operation Type" temporary;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    local procedure HandleDropBoxOperation(StorageID: Text[24]; var TempStorageOperationType: Record "Storage Operation Type" temporary; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         DropBoxOverview: Record "DropBox Overview";
     begin
         case TempStorageOperationType."Operation Code" of
-              UploadCaption:
+            UploadCaption:
                 DropBoxUpload(StorageID, TempStorageOperationParameter);
-              DownloadCaption:
+            DownloadCaption:
                 DropBoxDownload(StorageID, TempStorageOperationParameter);
-              DeleteCaption:
+            DeleteCaption:
                 DropBoxDelete(StorageID, TempStorageOperationParameter);
-              ListCaption:
+            ListCaption:
                 DropBoxUpdateRefresh(StorageID, TempStorageOperationParameter);
-              OverviewCaption:
+            OverviewCaption:
                 DropBoxOverviewRun(StorageID, DropBoxOverview);
-              else
+            else
                 Error(NotYetImplementedErr, TempStorageOperationType."Operation Code", TempStorageOperationType."Storage Type");
-            end;
+        end;
     end;
 
-    local procedure HandleAzureStorageOperation(StorageID: Text[24];var TempStorageOperationType: Record "Storage Operation Type" temporary;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    local procedure HandleAzureStorageOperation(StorageID: Text[24]; var TempStorageOperationType: Record "Storage Operation Type" temporary; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         AzureStorageOverview: Record "Azure Storage Overview";
     begin
         case TempStorageOperationType."Operation Code" of
-              UploadCaption:
+            UploadCaption:
                 AzureStorageUpload(StorageID, TempStorageOperationParameter);
-              DownloadCaption:
+            DownloadCaption:
                 AzureStorageDownload(StorageID, TempStorageOperationParameter);
-              DeleteCaption:
+            DeleteCaption:
                 AzureStorageDelete(StorageID, TempStorageOperationParameter);
-              ListCaption:
+            ListCaption:
                 AzureStorageUpdateRefresh(StorageID, TempStorageOperationParameter);
-              OverviewCaption:
+            OverviewCaption:
                 AzureStorageOverviewRun(StorageID, AzureStorageOverview);
-              else
+            else
                 Error(NotYetImplementedErr, TempStorageOperationType."Operation Code", TempStorageOperationType."Storage Type");
-            end;
+        end;
     end;
 
-    local procedure HandleFTPOperation(StorageID: Text[24];var TempStorageOperationType: Record "Storage Operation Type" temporary;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    local procedure HandleFTPOperation(StorageID: Text[24]; var TempStorageOperationType: Record "Storage Operation Type" temporary; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         FTPOverview: Record "FTP Overview";
     begin
         case TempStorageOperationType."Operation Code" of
-              UploadCaption:
+            UploadCaption:
                 FTPUpload(StorageID, TempStorageOperationParameter);
-              DownloadCaption:
+            DownloadCaption:
                 FTPDownload(StorageID, TempStorageOperationParameter);
-              DeleteCaption:
+            DeleteCaption:
                 FTPDelete(StorageID, TempStorageOperationParameter);
-              ListCaption:
+            ListCaption:
                 FTPUpdateRefresh(StorageID, TempStorageOperationParameter);
-              OverviewCaption:
+            OverviewCaption:
                 FTPOverviewRun(StorageID, FTPOverview);
-              else
+            else
                 Error(NotYetImplementedErr, TempStorageOperationType."Operation Code", TempStorageOperationType."Storage Type");
-            end;
+        end;
     end;
 
-    procedure DropBoxUpdateRefresh(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure DropBoxUpdateRefresh(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         DropboxAPIMgt: Codeunit "Dropbox API Mgt.";
         Dialog: Dialog;
@@ -134,23 +134,23 @@ codeunit 6184866 "External Storage Interface"
         //TempStorageOperationParameter: boolean used to call refresh or simply to update
 
         if TempStorageOperationParameter."Parameter Value" > '' then
-          Evaluate(Refresh, TempStorageOperationParameter."Parameter Value");
+            Evaluate(Refresh, TempStorageOperationParameter."Parameter Value");
 
         if GuiAllowed then
-          Dialog.Open(ProcessingCaption);
+            Dialog.Open(ProcessingCaption);
 
         DropboxAPIMgt.ListFolderFilesDropBox(AccountCode, '', Cursor, Paths, Refresh, true, false);
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure DropBoxUpload(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure DropBoxUpload(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         DropBoxOverview: Record "DropBox Overview";
         TempDropBoxOverview: Record "DropBox Overview" temporary;
         DropBoxAPISetup: Record "DropBox API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         File: Record File;
         ServerOverview: Page "Server Overview";
         FileManagement: Codeunit "File Management";
@@ -164,6 +164,7 @@ codeunit 6184866 "External Storage Interface"
         Paths: DotNet npNetXmlDocument;
         Path: DotNet npNetXmlNode;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on DropBox server
@@ -174,101 +175,101 @@ codeunit 6184866 "External Storage Interface"
         ServerFileName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          DirectoryName := TempStorageOperationParameter."Parameter Value";
+            DirectoryName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          if TempStorageOperationParameter."Parameter Value" > '' then
-            Evaluate(Reupload, TempStorageOperationParameter."Parameter Value");
+            if TempStorageOperationParameter."Parameter Value" > '' then
+                Evaluate(Reupload, TempStorageOperationParameter."Parameter Value");
 
         if ServerFileName = '' then begin
-          if not FileManagement.ServerDirectoryExists(DropBoxAPISetup."Storage On Server") then
-            Error(BadDirErr, DropBoxAPISetup."Storage On Server", DropBoxAPISetup.TableCaption);
+            if not FileManagement.ServerDirectoryExists(DropBoxAPISetup."Storage On Server") then
+                Error(BadDirErr, DropBoxAPISetup."Storage On Server", DropBoxAPISetup.TableCaption);
 
-          File.SetRange(Path, DropBoxAPISetup."Storage On Server");
-          File.SetRange("Is a file", true);
-          ServerOverview.SetTableView(File);
-          ServerOverview.Editable := false;
-          ServerOverview.LookupMode := true;
-          if ServerOverview.RunModal <> ACTION::LookupOK then
-            exit;
+            File.SetRange(Path, DropBoxAPISetup."Storage On Server");
+            File.SetRange("Is a file", true);
+            ServerOverview.SetTableView(File);
+            ServerOverview.Editable := false;
+            ServerOverview.LookupMode := true;
+            if ServerOverview.RunModal <> ACTION::LookupOK then
+                exit;
 
-          ServerOverview.GetRecord(File);
+            ServerOverview.GetRecord(File);
 
-          File.SetRecFilter;
+            File.SetRecFilter;
         end else begin
-          File.SetRange(Path, FileManagement.GetDirectoryName(ServerFileName));
+            File.SetRange(Path, FileManagement.GetDirectoryName(ServerFileName));
 
-          File.Name := FileManagement.GetFileName(ServerFileName);
-          if File.Name > '' then
-            File.SetRange(Name, File.Name);
+            File.Name := FileManagement.GetFileName(ServerFileName);
+            if File.Name > '' then
+                File.SetRange(Name, File.Name);
 
-          File.SetRange("Is a file", true);
+            File.SetRange("Is a file", true);
         end;
 
         if not File.FindSet then
-          exit;
-
-        if StrPos(UpperCase(File.Path), UpperCase(FileManagement.GetDirectoryName(DropBoxAPISetup."Storage On Server"))) <> 1 then
-          Error(DirectoryNotAllowedErr, DropBoxAPISetup."Storage On Server");
-
-        if DirectoryName = '' then begin
-          if GuiAllowed then
-            Dialog.Open(DirectoryListCaption);
-
-          DropboxAPIMgt.ListFolderFilesDropBox(DropBoxAPISetup."Account Code", '', Cursor, Paths, false, false, false);
-
-          foreach Path in Paths.SelectNodes('/root/*') do begin
-            TempDropBoxOverview.SetRange("File Name", Path.InnerText);
-            if TempDropBoxOverview.IsEmpty then begin
-              TempDropBoxOverview."Account Code" := DropBoxAPISetup."Account Code";
-              TempDropBoxOverview."File Name" := Path.InnerText;
-
-              TempDropBoxOverview.Insert;
-            end;
-          end;
-
-          TempDropBoxOverview.Reset;
-
-          Commit;
-
-          if GuiAllowed then
-            Dialog.Close;
-
-          if not (PAGE.RunModal(PAGE::"DropBox Dir. Select", TempDropBoxOverview) = ACTION::LookupOK) then
             exit;
 
-          DirectoryName := TempDropBoxOverview."File Name";
+        if StrPos(UpperCase(File.Path), UpperCase(FileManagement.GetDirectoryName(DropBoxAPISetup."Storage On Server"))) <> 1 then
+            Error(DirectoryNotAllowedErr, DropBoxAPISetup."Storage On Server");
+
+        if DirectoryName = '' then begin
+            if GuiAllowed then
+                Dialog.Open(DirectoryListCaption);
+
+            DropboxAPIMgt.ListFolderFilesDropBox(DropBoxAPISetup."Account Code", '', Cursor, Paths, false, false, false);
+
+            foreach Path in Paths.SelectNodes('/root/*') do begin
+                TempDropBoxOverview.SetRange("File Name", Path.InnerText);
+                if TempDropBoxOverview.IsEmpty then begin
+                    TempDropBoxOverview."Account Code" := DropBoxAPISetup."Account Code";
+                    TempDropBoxOverview."File Name" := Path.InnerText;
+
+                    TempDropBoxOverview.Insert;
+                end;
+            end;
+
+            TempDropBoxOverview.Reset;
+
+            Commit;
+
+            if GuiAllowed then
+                Dialog.Close;
+
+            if not (PAGE.RunModal(PAGE::"DropBox Dir. Select", TempDropBoxOverview) = ACTION::LookupOK) then
+                exit;
+
+            DirectoryName := TempDropBoxOverview."File Name";
         end;
 
         if GuiAllowed then
-          Dialog.Open(UploadMsgCaption);
+            Dialog.Open(UploadMsgCaption);
 
         repeat
-          DropBoxOverview.SetRange("Account Code", AccountCode);
-          DropBoxOverview.SetRange("File Name", DirectoryName);
-          DropBoxOverview.SetRange(Name, File.Name);
-          if DropBoxOverview.IsEmpty or Reupload then begin
-            TempBlob.Blob.Import(File.Path + '\' + File.Name);
+            DropBoxOverview.SetRange("Account Code", AccountCode);
+            DropBoxOverview.SetRange("File Name", DirectoryName);
+            DropBoxOverview.SetRange(Name, File.Name);
+            if DropBoxOverview.IsEmpty or Reupload then begin
+                TempBlobMgt.ImportFromFile(TempBlob, File.Path + '\' + File.Name);
 
-            DropboxAPIMgt.UploadToDropbox(TempBlob, DropBoxAPISetup."Account Code", DirectoryName + '/' + File.Name, true, false);
+                DropboxAPIMgt.UploadToDropbox(TempBlob, DropBoxAPISetup."Account Code", DirectoryName + '/' + File.Name, true, false);
 
-            Commit;
-          end;
+                Commit;
+            end;
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / File.Count * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / File.Count * 10000) div 1);
+                i += 1;
+            end;
         until File.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure DropBoxDownload(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure DropBoxDownload(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         DropBoxOverview: Record "DropBox Overview";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         DropBoxAPISetup: Record "DropBox API Setup";
         DropboxAPIMgt: Codeunit "Dropbox API Mgt.";
         FileManagement: Codeunit "File Management";
@@ -277,60 +278,61 @@ codeunit 6184866 "External Storage Interface"
         StorageServerFileName: Text;
         Dialog: Dialog;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]: file path [and name] on the DropBox storage server
         //TempStorageOperationParameter[second]: data exchange type used to import incoming document
 
         if TempStorageOperationParameter."Parameter Value" = '' then begin
-          if not DropBoxOverviewRun(AccountCode, DropBoxOverview) then
-            exit;
+            if not DropBoxOverviewRun(AccountCode, DropBoxOverview) then
+                exit;
 
-          DropBoxOverview.SetRecFilter;
+            DropBoxOverview.SetRecFilter;
         end else begin
-          StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
-          StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName) - 1);
+            StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
+            StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName) - 1);
 
-          DropBoxOverview.SetRange("Account Code", AccountCode);
-          DropBoxOverview.SetRange("File Name", StorageServerFilePath);
+            DropBoxOverview.SetRange("Account Code", AccountCode);
+            DropBoxOverview.SetRange("File Name", StorageServerFilePath);
 
-          if StorageServerFileName > '' then
-            DropBoxOverview.SetRange(Name, StorageServerFileName);
+            if StorageServerFileName > '' then
+                DropBoxOverview.SetRange(Name, StorageServerFileName);
         end;
 
         if not (TempStorageOperationParameter.Next = 0) then
-          DataExchangeType := TempStorageOperationParameter."Parameter Value";
+            DataExchangeType := TempStorageOperationParameter."Parameter Value";
 
         if not DropBoxOverview.FindSet then
-          exit;
+            exit;
 
         DropBoxAPISetup.Get(AccountCode);
 
         if DataExchangeType = '' then
-          if not FileManagement.ServerDirectoryExists(DropBoxAPISetup."Storage On Server") then
-            Error(BadDirErr, DropBoxAPISetup."Storage On Server", DropBoxAPISetup.TableCaption);
+            if not FileManagement.ServerDirectoryExists(DropBoxAPISetup."Storage On Server") then
+                Error(BadDirErr, DropBoxAPISetup."Storage On Server", DropBoxAPISetup.TableCaption);
 
         if GuiAllowed then
-          Dialog.Open(DownloadingCaption);
+            Dialog.Open(DownloadingCaption);
 
         repeat
-          DropboxAPIMgt.DownloadFromDropbox(TempBlob, AccountCode, DropBoxOverview."File Name" + '/' + DropBoxOverview.Name, false);
+            DropboxAPIMgt.DownloadFromDropbox(TempBlob, AccountCode, DropBoxOverview."File Name" + '/' + DropBoxOverview.Name, false);
 
-          if DataExchangeType > '' then
-            CreateIncomingDocument(TempBlob, DropBoxOverview.Name, DataExchangeType)
-          else
-            TempBlob.Blob.Export(DropBoxAPISetup."Storage On Server" + DropBoxOverview.Name);
+            if DataExchangeType > '' then
+                CreateIncomingDocument(TempBlob, DropBoxOverview.Name, DataExchangeType)
+            else
+                TempBlobMgt.ExportToFile(TempBlob, DropBoxAPISetup."Storage On Server" + DropBoxOverview.Name);
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / DropBoxOverview.Count * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / DropBoxOverview.Count * 10000) div 1);
+                i += 1;
+            end;
         until DropBoxOverview.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure DropBoxDelete(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure DropBoxDelete(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         DropBoxOverview: Record "DropBox Overview";
         DropboxAPIMgt: Codeunit "Dropbox API Mgt.";
@@ -344,50 +346,50 @@ codeunit 6184866 "External Storage Interface"
         //TempStorageOperationParameter: file path [and name] on the DropBox storage server
 
         if TempStorageOperationParameter."Parameter Value" = '' then begin
-          if not DropBoxOverviewRun(AccountCode, DropBoxOverview) then
-            exit;
+            if not DropBoxOverviewRun(AccountCode, DropBoxOverview) then
+                exit;
 
-          DropBoxOverview.SetRecFilter;
+            DropBoxOverview.SetRecFilter;
         end else begin
-          StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
-          StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName) - 1);
+            StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
+            StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName) - 1);
 
-          DropBoxOverview.SetRange("Account Code", AccountCode);
-          DropBoxOverview.SetRange("File Name", StorageServerFilePath);
+            DropBoxOverview.SetRange("Account Code", AccountCode);
+            DropBoxOverview.SetRange("File Name", StorageServerFilePath);
 
-          if StorageServerFileName > '' then
-            DropBoxOverview.SetRange(Name, StorageServerFileName);
+            if StorageServerFileName > '' then
+                DropBoxOverview.SetRange(Name, StorageServerFileName);
         end;
 
         if not DropBoxOverview.FindSet then
-          exit;
+            exit;
 
         if GuiAllowed then
-          Dialog.Open(DeletingCaption);
+            Dialog.Open(DeletingCaption);
 
         repeat
-          OverviewCount := DropBoxOverview.Count;
+            OverviewCount := DropBoxOverview.Count;
 
-          DropboxAPIMgt.DeleteFromDropbox(AccountCode, DropBoxOverview."File Name" + '/' + DropBoxOverview.Name, false);
+            DropboxAPIMgt.DeleteFromDropbox(AccountCode, DropBoxOverview."File Name" + '/' + DropBoxOverview.Name, false);
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / OverviewCount * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / OverviewCount * 10000) div 1);
+                i += 1;
+            end;
         until DropBoxOverview.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure DropBoxOverviewRun(AccountCode: Text;var DropBoxOverview: Record "DropBox Overview"): Boolean
+    procedure DropBoxOverviewRun(AccountCode: Text; var DropBoxOverview: Record "DropBox Overview"): Boolean
     begin
         DropBoxOverview.SetRange("Account Code", AccountCode);
 
         exit(PAGE.RunModal(PAGE::"DropBox Overview", DropBoxOverview) = ACTION::LookupOK);
     end;
 
-    procedure AzureStorageUpdateRefresh(AccountName: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure AzureStorageUpdateRefresh(AccountName: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         AzureStoageAPIMgt: Codeunit "Azure Storage API Mgt.";
         Refresh: Boolean;
@@ -397,23 +399,23 @@ codeunit 6184866 "External Storage Interface"
         //TempStorageOperationParameter: boolean used to call refresh or simply to update
 
         if TempStorageOperationParameter."Parameter Value" > '' then
-          Evaluate(Refresh, TempStorageOperationParameter."Parameter Value");
+            Evaluate(Refresh, TempStorageOperationParameter."Parameter Value");
 
         if GuiAllowed then
-          Dialog.Open(ProcessingCaption);
+            Dialog.Open(ProcessingCaption);
 
         AzureStoageAPIMgt.ListAzureStorage(AccountName, '', '', Refresh, true, false, ResponseXMLString);
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure AzureStorageUpload(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure AzureStorageUpload(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         AzureStorageAPISetup: Record "Azure Storage API Setup";
         AzureStorageOverview: Record "Azure Storage Overview";
         TempAzureStorageOverview: Record "Azure Storage Overview" temporary;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         File: Record File;
         ServerOverview: Page "Server Overview";
         FileManagement: Codeunit "File Management";
@@ -428,6 +430,7 @@ codeunit 6184866 "External Storage Interface"
         XMLContainerList: DotNet npNetXmlNodeList;
         Dialog: Dialog;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on Azure Storage
@@ -438,114 +441,114 @@ codeunit 6184866 "External Storage Interface"
         ServerFileName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          DirectoryName := TempStorageOperationParameter."Parameter Value";
+            DirectoryName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          ContainerName := TempStorageOperationParameter."Parameter Value";
+            ContainerName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          if TempStorageOperationParameter."Parameter Value" > '' then
-            Evaluate(Reupload, TempStorageOperationParameter."Parameter Value");
+            if TempStorageOperationParameter."Parameter Value" > '' then
+                Evaluate(Reupload, TempStorageOperationParameter."Parameter Value");
 
         if not FileManagement.ServerDirectoryExists(AzureStorageAPISetup."Storage On Server") then
-          Error(BadDirErr, AzureStorageAPISetup."Storage On Server", AzureStorageAPISetup.TableCaption);
+            Error(BadDirErr, AzureStorageAPISetup."Storage On Server", AzureStorageAPISetup.TableCaption);
 
         if ServerFileName = '' then begin
-          File.SetRange(Path, AzureStorageAPISetup."Storage On Server");
-          File.SetRange("Is a file", true);
-          ServerOverview.SetTableView(File);
-          ServerOverview.Editable := false;
-          ServerOverview.LookupMode := true;
-          if ServerOverview.RunModal <> ACTION::LookupOK then
-            exit;
+            File.SetRange(Path, AzureStorageAPISetup."Storage On Server");
+            File.SetRange("Is a file", true);
+            ServerOverview.SetTableView(File);
+            ServerOverview.Editable := false;
+            ServerOverview.LookupMode := true;
+            if ServerOverview.RunModal <> ACTION::LookupOK then
+                exit;
 
-          ServerOverview.GetRecord(File);
+            ServerOverview.GetRecord(File);
 
-          File.SetRecFilter;
+            File.SetRecFilter;
         end else begin
-          File.SetRange(Path, FileManagement.GetDirectoryName(ServerFileName));
+            File.SetRange(Path, FileManagement.GetDirectoryName(ServerFileName));
 
-          File.Name := FileManagement.GetFileName(ServerFileName);
-          if File.Name > '' then
-            File.SetRange(Name, File.Name);
+            File.Name := FileManagement.GetFileName(ServerFileName);
+            if File.Name > '' then
+                File.SetRange(Name, File.Name);
 
-          File.SetRange("Is a file", true);
+            File.SetRange("Is a file", true);
         end;
 
         if not File.FindSet then
-          exit;
-
-        if StrPos(UpperCase(File.Path), UpperCase(FileManagement.GetDirectoryName(AzureStorageAPISetup."Storage On Server"))) = 0 then
-          Error(DirectoryNotAllowedErr, AzureStorageAPISetup."Storage On Server");
-
-        if (DirectoryName = '') or (ContainerName = '') then begin
-          if GuiAllowed then
-            Dialog.Open(DirectoryListCaption);
-
-          AzureStoageAPIMgt.ListAzureStorage(AzureStorageAPISetup."Account Name", '', '', false, false, false, StorageMappingXML);
-
-          TempAzureStorageOverview."Account name" := AzureStorageAPISetup."Account Name";
-          RequestManagement.GetNodesFromXmlText(StorageMappingXML, '//Blob/Name', XMLFolderList);
-          AzureStoageAPIMgt.GetAzureStorageFromXml(TempAzureStorageOverview, XMLFolderList, false);
-
-          RequestManagement.GetNodesFromXmlText(StorageMappingXML, '//Container/Name', XMLContainerList);
-          AzureStoageAPIMgt.GetAzureStorageFromXml(TempAzureStorageOverview, XMLContainerList, true);
-
-          TempAzureStorageOverview.Reset;
-
-          Commit;
-
-          if GuiAllowed then
-            Dialog.Close;
-
-          if not (PAGE.RunModal(PAGE::"Azure Storage Dir. Select", TempAzureStorageOverview) = ACTION::LookupOK) then
             exit;
 
-          DirectoryName := TempAzureStorageOverview."File Name";
-          ContainerName := TempAzureStorageOverview."Container Name";
+        if StrPos(UpperCase(File.Path), UpperCase(FileManagement.GetDirectoryName(AzureStorageAPISetup."Storage On Server"))) = 0 then
+            Error(DirectoryNotAllowedErr, AzureStorageAPISetup."Storage On Server");
+
+        if (DirectoryName = '') or (ContainerName = '') then begin
+            if GuiAllowed then
+                Dialog.Open(DirectoryListCaption);
+
+            AzureStoageAPIMgt.ListAzureStorage(AzureStorageAPISetup."Account Name", '', '', false, false, false, StorageMappingXML);
+
+            TempAzureStorageOverview."Account name" := AzureStorageAPISetup."Account Name";
+            RequestManagement.GetNodesFromXmlText(StorageMappingXML, '//Blob/Name', XMLFolderList);
+            AzureStoageAPIMgt.GetAzureStorageFromXml(TempAzureStorageOverview, XMLFolderList, false);
+
+            RequestManagement.GetNodesFromXmlText(StorageMappingXML, '//Container/Name', XMLContainerList);
+            AzureStoageAPIMgt.GetAzureStorageFromXml(TempAzureStorageOverview, XMLContainerList, true);
+
+            TempAzureStorageOverview.Reset;
+
+            Commit;
+
+            if GuiAllowed then
+                Dialog.Close;
+
+            if not (PAGE.RunModal(PAGE::"Azure Storage Dir. Select", TempAzureStorageOverview) = ACTION::LookupOK) then
+                exit;
+
+            DirectoryName := TempAzureStorageOverview."File Name";
+            ContainerName := TempAzureStorageOverview."Container Name";
         end;
 
         AzureStorageOverview.SetRange("Account name", AzureStorageAPISetup."Account Name");
         AzureStorageOverview.SetRange("Container Name", ContainerName);
         if AzureStorageOverview.IsEmpty then begin
-          if GuiAllowed then
-            Dialog.Open(CreatingAzureContainerCaption);
+            if GuiAllowed then
+                Dialog.Open(CreatingAzureContainerCaption);
 
-          if AzureStoageAPIMgt.CreateContainerAzureStorage(AzureStorageAPISetup."Account Name", '', ContainerName, true) then;
+            if AzureStoageAPIMgt.CreateContainerAzureStorage(AzureStorageAPISetup."Account Name", '', ContainerName, true) then;
 
-          if GuiAllowed then
-            Dialog.Close;
+            if GuiAllowed then
+                Dialog.Close;
         end;
 
         if GuiAllowed then
-          Dialog.Open(UploadMsgCaption);
+            Dialog.Open(UploadMsgCaption);
 
         repeat
-          AzureStorageOverview.SetRange("File Name", DirectoryName);
-          AzureStorageOverview.SetRange(Name, File.Name);
-          if AzureStorageOverview.IsEmpty or Reupload then begin
-            TempBlob.Blob.Import(File.Path + '/' + File.Name);
+            AzureStorageOverview.SetRange("File Name", DirectoryName);
+            AzureStorageOverview.SetRange(Name, File.Name);
+            if AzureStorageOverview.IsEmpty or Reupload then begin
+                TempBlobMgt.ImportFromFile(TempBlob, File.Path + '/' + File.Name);
 
-            AzureStoageAPIMgt.UploadToAzureStorage(TempBlob, AzureStorageAPISetup."Account Name", '', ContainerName,
-                                                  DirectoryName + '/' + File.Name, '', false);
+                AzureStoageAPIMgt.UploadToAzureStorage(TempBlob, AzureStorageAPISetup."Account Name", '', ContainerName,
+                                                      DirectoryName + '/' + File.Name, '', false);
 
-            Commit;
-          end;
+                Commit;
+            end;
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / File.Count * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / File.Count * 10000) div 1);
+                i += 1;
+            end;
         until File.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure AzureStorageDownload(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure AzureStorageDownload(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         AzureStorageOverview: Record "Azure Storage Overview";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         AzureStorageAPISetup: Record "Azure Storage API Setup";
         FileManagement: Codeunit "File Management";
         AzureStoageAPIMgt: Codeunit "Azure Storage API Mgt.";
@@ -556,6 +559,7 @@ codeunit 6184866 "External Storage Interface"
         ContainerName: Text;
         DirectoryFileName: Text;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   directory [and file name] on the Azure storage server
         //TempStorageOperationParameter[second]:  container name on the Azure storage server
@@ -564,60 +568,60 @@ codeunit 6184866 "External Storage Interface"
         DirectoryFileName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          ContainerName := TempStorageOperationParameter."Parameter Value";
+            ContainerName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          DataExchangeType := TempStorageOperationParameter."Parameter Value";
+            DataExchangeType := TempStorageOperationParameter."Parameter Value";
 
         if (DirectoryFileName = '') or
           (ContainerName = '')
         then begin
-          if not AzureStorageOverviewRun(AccountCode, AzureStorageOverview) then
-            exit;
+            if not AzureStorageOverviewRun(AccountCode, AzureStorageOverview) then
+                exit;
 
-          AzureStorageOverview.SetRecFilter;
+            AzureStorageOverview.SetRecFilter;
         end else begin
-          StorageServerFileName := FileManagement.GetFileName(DirectoryFileName);
-          StorageServerFilePath := CopyStr(DirectoryFileName, 1, StrLen(DirectoryFileName) - StrLen(StorageServerFileName) - 1);
+            StorageServerFileName := FileManagement.GetFileName(DirectoryFileName);
+            StorageServerFilePath := CopyStr(DirectoryFileName, 1, StrLen(DirectoryFileName) - StrLen(StorageServerFileName) - 1);
 
-          AzureStorageOverview.SetRange("Account name", AccountCode);
-          AzureStorageOverview.SetRange("Container Name", ContainerName);
-          AzureStorageOverview.SetRange("File Name", StorageServerFilePath);
-          if StorageServerFileName > '' then
-            AzureStorageOverview.SetRange(Name, StorageServerFileName);
+            AzureStorageOverview.SetRange("Account name", AccountCode);
+            AzureStorageOverview.SetRange("Container Name", ContainerName);
+            AzureStorageOverview.SetRange("File Name", StorageServerFilePath);
+            if StorageServerFileName > '' then
+                AzureStorageOverview.SetRange(Name, StorageServerFileName);
         end;
 
         if not AzureStorageOverview.FindSet then
-          exit;
+            exit;
 
         AzureStorageAPISetup.Get(AccountCode);
 
         if DataExchangeType = '' then
-          if not FileManagement.ServerDirectoryExists(AzureStorageAPISetup."Storage On Server") then
-            Error(BadDirErr, AzureStorageAPISetup."Storage On Server", AzureStorageAPISetup.TableCaption);
+            if not FileManagement.ServerDirectoryExists(AzureStorageAPISetup."Storage On Server") then
+                Error(BadDirErr, AzureStorageAPISetup."Storage On Server", AzureStorageAPISetup.TableCaption);
 
         if GuiAllowed then
-          Dialog.Open(DownloadingCaption);
+            Dialog.Open(DownloadingCaption);
 
         repeat
-          AzureStoageAPIMgt.DownloadFromAzureStorage(TempBlob, AccountCode, '', AzureStorageOverview."Container Name", AzureStorageOverview."File Name" + '/' + AzureStorageOverview.Name, false);
+            AzureStoageAPIMgt.DownloadFromAzureStorage(TempBlob, AccountCode, '', AzureStorageOverview."Container Name", AzureStorageOverview."File Name" + '/' + AzureStorageOverview.Name, false);
 
-          if DataExchangeType > '' then
-            CreateIncomingDocument(TempBlob, AzureStorageOverview.Name, DataExchangeType)
-          else
-            TempBlob.Blob.Export(AzureStorageAPISetup."Storage On Server" + AzureStorageOverview.Name);
+            if DataExchangeType > '' then
+                CreateIncomingDocument(TempBlob, AzureStorageOverview.Name, DataExchangeType)
+            else
+                TempBlobMgt.ExportToFile(TempBlob, AzureStorageAPISetup."Storage On Server" + AzureStorageOverview.Name);
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / AzureStorageOverview.Count * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / AzureStorageOverview.Count * 10000) div 1);
+                i += 1;
+            end;
         until AzureStorageOverview.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure AzureStorageDelete(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure AzureStorageDelete(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         AzureStorageOverview: Record "Azure Storage Overview";
         AzureStoageAPIMgt: Codeunit "Azure Storage API Mgt.";
@@ -636,55 +640,55 @@ codeunit 6184866 "External Storage Interface"
         DirectoryFileName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          ContainerName := TempStorageOperationParameter."Parameter Value";
+            ContainerName := TempStorageOperationParameter."Parameter Value";
 
         if (DirectoryFileName = '') or
           (ContainerName = '')
         then begin
-          if not AzureStorageOverviewRun(AccountCode, AzureStorageOverview) then
-            exit;
+            if not AzureStorageOverviewRun(AccountCode, AzureStorageOverview) then
+                exit;
 
-          AzureStorageOverview.SetRecFilter;
+            AzureStorageOverview.SetRecFilter;
         end else begin
-          StorageServerFileName := FileManagement.GetFileName(DirectoryFileName);
-          StorageServerFilePath := CopyStr(DirectoryFileName, 1, StrLen(DirectoryFileName) - StrLen(StorageServerFileName) - 1);
+            StorageServerFileName := FileManagement.GetFileName(DirectoryFileName);
+            StorageServerFilePath := CopyStr(DirectoryFileName, 1, StrLen(DirectoryFileName) - StrLen(StorageServerFileName) - 1);
 
-          AzureStorageOverview.SetRange("Account name", AccountCode);
-          AzureStorageOverview.SetRange("Container Name", ContainerName);
-          AzureStorageOverview.SetRange("File Name", StorageServerFilePath);
-          if StorageServerFileName > '' then
-            AzureStorageOverview.SetRange(Name, StorageServerFileName);
+            AzureStorageOverview.SetRange("Account name", AccountCode);
+            AzureStorageOverview.SetRange("Container Name", ContainerName);
+            AzureStorageOverview.SetRange("File Name", StorageServerFilePath);
+            if StorageServerFileName > '' then
+                AzureStorageOverview.SetRange(Name, StorageServerFileName);
         end;
 
         if not AzureStorageOverview.FindSet then
-          exit;
+            exit;
 
         if GuiAllowed then
-          Dialog.Open(DeletingCaption);
+            Dialog.Open(DeletingCaption);
 
         repeat
-          OverviewCount := AzureStorageOverview.Count;
+            OverviewCount := AzureStorageOverview.Count;
 
-          AzureStoageAPIMgt.DeleteFromAzureStorage(AccountCode, '', AzureStorageOverview."Container Name", AzureStorageOverview."File Name" + '/' + AzureStorageOverview.Name, false);
+            AzureStoageAPIMgt.DeleteFromAzureStorage(AccountCode, '', AzureStorageOverview."Container Name", AzureStorageOverview."File Name" + '/' + AzureStorageOverview.Name, false);
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / OverviewCount * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / OverviewCount * 10000) div 1);
+                i += 1;
+            end;
         until AzureStorageOverview.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure AzureStorageOverviewRun(AccountName: Text;var AzureStorageOverview: Record "Azure Storage Overview"): Boolean
+    procedure AzureStorageOverviewRun(AccountName: Text; var AzureStorageOverview: Record "Azure Storage Overview"): Boolean
     begin
         AzureStorageOverview.SetRange("Account name", AccountName);
 
         exit(PAGE.RunModal(PAGE::"Azure Storage Overview", AzureStorageOverview) = ACTION::LookupOK);
     end;
 
-    procedure FTPUpdateRefresh(AccountCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure FTPUpdateRefresh(AccountCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         FTPManagement: Codeunit "FTP Management";
         Dialog: Dialog;
@@ -695,20 +699,20 @@ codeunit 6184866 "External Storage Interface"
         //TempStorageOperationParameter: boolean used to call refresh or simply to update
 
         if TempStorageOperationParameter."Parameter Value" > '' then
-          Evaluate(Refresh, TempStorageOperationParameter."Parameter Value");
+            Evaluate(Refresh, TempStorageOperationParameter."Parameter Value");
 
         if GuiAllowed then
-          Dialog.Open(ProcessingCaption);
+            Dialog.Open(ProcessingCaption);
 
         FTPManagement.ListFTP(AccountCode, 0, CurrentPathDepth, '', false, Refresh, true, false, Directories, false);
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure FTPUpload(HostCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure FTPUpload(HostCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         FTPSetup: Record "FTP Setup";
         FTPOverview: Record "FTP Overview";
         TempFTPOverview: Record "FTP Overview" temporary;
@@ -724,6 +728,7 @@ codeunit 6184866 "External Storage Interface"
         Directories: DotNet npNetXmlDocument;
         Directory: DotNet npNetXmlNode;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on FTP server
@@ -732,102 +737,102 @@ codeunit 6184866 "External Storage Interface"
         FTPSetup.Get(HostCode);
 
         if not FileManagement.ServerDirectoryExists(FTPSetup."Storage On Server") then
-          Error(BadDirErr, FTPSetup."Storage On Server", FTPSetup.TableCaption);
+            Error(BadDirErr, FTPSetup."Storage On Server", FTPSetup.TableCaption);
 
         ServerFileName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          DirectoryName := TempStorageOperationParameter."Parameter Value";
+            DirectoryName := TempStorageOperationParameter."Parameter Value";
 
         if not (TempStorageOperationParameter.Next = 0) then
-          if TempStorageOperationParameter."Parameter Value" > '' then
-            Evaluate(Reupload, TempStorageOperationParameter."Parameter Value");
+            if TempStorageOperationParameter."Parameter Value" > '' then
+                Evaluate(Reupload, TempStorageOperationParameter."Parameter Value");
 
         if ServerFileName = '' then begin
-          File.SetRange(Path, FTPSetup."Storage On Server");
-          File.SetRange("Is a file", true);
-          ServerOverview.SetTableView(File);
-          ServerOverview.Editable := false;
-          ServerOverview.LookupMode := true;
-          if ServerOverview.RunModal <> ACTION::LookupOK then
-            exit;
+            File.SetRange(Path, FTPSetup."Storage On Server");
+            File.SetRange("Is a file", true);
+            ServerOverview.SetTableView(File);
+            ServerOverview.Editable := false;
+            ServerOverview.LookupMode := true;
+            if ServerOverview.RunModal <> ACTION::LookupOK then
+                exit;
 
-          ServerOverview.GetRecord(File);
+            ServerOverview.GetRecord(File);
 
-          File.SetRecFilter;
+            File.SetRecFilter;
         end else begin
-          File.SetRange(Path, FileManagement.GetDirectoryName(ServerFileName));
+            File.SetRange(Path, FileManagement.GetDirectoryName(ServerFileName));
 
-          File.Name := FileManagement.GetFileName(ServerFileName);
-          if File.Name > '' then
-            File.SetRange(Name, File.Name);
+            File.Name := FileManagement.GetFileName(ServerFileName);
+            if File.Name > '' then
+                File.SetRange(Name, File.Name);
 
-          File.SetRange("Is a file", true);
+            File.SetRange("Is a file", true);
         end;
 
         if not File.FindSet then
-          exit;
-
-        if StrPos(UpperCase(File.Path), UpperCase(FileManagement.GetDirectoryName(FTPSetup."Storage On Server"))) = 0 then
-          Error(DirectoryNotAllowedErr, FTPSetup."Storage On Server");
-
-        if DirectoryName = '' then begin
-          if GuiAllowed then
-            Dialog.Open(DirectoryListCaption);
-
-          FTPManagement.ListFTP(FTPSetup.Code, 0, CurrentPathDepth, '', false, false, false, false, Directories, false);
-
-          foreach Directory in Directories.SelectNodes('/root/*') do begin
-            TempFTPOverview.SetRange("File Name", Directory.InnerText);
-            if TempFTPOverview.IsEmpty then begin
-              TempFTPOverview."Host Code" := FTPSetup.Code;
-              TempFTPOverview."File Name" := Directory.InnerText;
-
-              TempFTPOverview.Insert;
-            end;
-          end;
-
-          TempFTPOverview.Reset;
-
-          Commit;
-
-          if GuiAllowed then
-            Dialog.Close;
-
-          if not (PAGE.RunModal(PAGE::"FTP Dir. Select", TempFTPOverview) = ACTION::LookupOK) then
             exit;
 
-          DirectoryName := '/' + TempFTPOverview."File Name";
+        if StrPos(UpperCase(File.Path), UpperCase(FileManagement.GetDirectoryName(FTPSetup."Storage On Server"))) = 0 then
+            Error(DirectoryNotAllowedErr, FTPSetup."Storage On Server");
+
+        if DirectoryName = '' then begin
+            if GuiAllowed then
+                Dialog.Open(DirectoryListCaption);
+
+            FTPManagement.ListFTP(FTPSetup.Code, 0, CurrentPathDepth, '', false, false, false, false, Directories, false);
+
+            foreach Directory in Directories.SelectNodes('/root/*') do begin
+                TempFTPOverview.SetRange("File Name", Directory.InnerText);
+                if TempFTPOverview.IsEmpty then begin
+                    TempFTPOverview."Host Code" := FTPSetup.Code;
+                    TempFTPOverview."File Name" := Directory.InnerText;
+
+                    TempFTPOverview.Insert;
+                end;
+            end;
+
+            TempFTPOverview.Reset;
+
+            Commit;
+
+            if GuiAllowed then
+                Dialog.Close;
+
+            if not (PAGE.RunModal(PAGE::"FTP Dir. Select", TempFTPOverview) = ACTION::LookupOK) then
+                exit;
+
+            DirectoryName := '/' + TempFTPOverview."File Name";
         end;
 
         if GuiAllowed then
-          Dialog.Open(UploadCaption);
+            Dialog.Open(UploadCaption);
 
         repeat
-          FTPOverview.SetRange("Host Code", HostCode);
-          FTPOverview.SetRange("File Name", DirectoryName);
-          FTPOverview.SetRange(Name, File.Name);
-          if FTPOverview.IsEmpty or Reupload then begin
-            TempBlob.Blob.Import(File.Path + '\' + File.Name);
+            FTPOverview.SetRange("Host Code", HostCode);
+            FTPOverview.SetRange("File Name", DirectoryName);
+            FTPOverview.SetRange(Name, File.Name);
+            if FTPOverview.IsEmpty or Reupload then begin
+                TempBlobMgt.ImportFromFile(TempBlob, File.Path + '\' + File.Name);
 
-            FTPManagement.UploadToFTP(TempBlob, FTPSetup.Code, DirectoryName, File.Name, false, false);
+                FTPManagement.UploadToFTP(TempBlob, FTPSetup.Code, DirectoryName, File.Name, false, false);
 
-            Commit;
-          end;
+                Commit;
+            end;
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / File.Count * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / File.Count * 10000) div 1);
+                i += 1;
+            end;
         until File.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure FTPDownload(HostCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure FTPDownload(HostCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         FTPSetup: Record "FTP Setup";
         FTPOverview: Record "FTP Overview";
         FTPManagement: Codeunit "FTP Management";
@@ -837,60 +842,61 @@ codeunit 6184866 "External Storage Interface"
         StorageServerFilePath: Text;
         StorageServerFileName: Text;
         i: Integer;
+        TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]: file path [and name] on the FTP storage server
         //TempStorageOperationParameter[second]: data exchange type used to import incoming document
 
         if TempStorageOperationParameter."Parameter Value" = '' then begin
-          if not FTPOverviewRun(HostCode, FTPOverview) then
-            exit;
+            if not FTPOverviewRun(HostCode, FTPOverview) then
+                exit;
 
-          FTPOverview.SetRecFilter;
+            FTPOverview.SetRecFilter;
         end else begin
-          StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
-          StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName));
+            StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
+            StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName));
 
-          FTPOverview.SetRange("Host Code", HostCode);
-          FTPOverview.SetRange("File Name", StorageServerFilePath);
+            FTPOverview.SetRange("Host Code", HostCode);
+            FTPOverview.SetRange("File Name", StorageServerFilePath);
 
-          if StorageServerFileName > '' then
-            FTPOverview.SetRange(Name, StorageServerFileName);
+            if StorageServerFileName > '' then
+                FTPOverview.SetRange(Name, StorageServerFileName);
         end;
 
         if not (TempStorageOperationParameter.Next = 0) then
-          DataExchangeType := TempStorageOperationParameter."Parameter Value";
+            DataExchangeType := TempStorageOperationParameter."Parameter Value";
 
         if not FTPOverview.FindSet then
-          exit;
+            exit;
 
         FTPSetup.Get(HostCode);
 
         if DataExchangeType = '' then
-          if not FileManagement.ServerDirectoryExists(FTPSetup."Storage On Server") then
-            Error(BadDirErr, FTPSetup."Storage On Server", FTPSetup.TableCaption);
+            if not FileManagement.ServerDirectoryExists(FTPSetup."Storage On Server") then
+                Error(BadDirErr, FTPSetup."Storage On Server", FTPSetup.TableCaption);
 
         if GuiAllowed then
-          Dialog.Open(DownloadingCaption);
+            Dialog.Open(DownloadingCaption);
 
         repeat
-          FTPManagement.DownloadFromFTP(TempBlob, HostCode, FTPOverview."File Name", FTPOverview.Name, false, false);
+            FTPManagement.DownloadFromFTP(TempBlob, HostCode, FTPOverview."File Name", FTPOverview.Name, false, false);
 
-          if DataExchangeType > '' then
-            CreateIncomingDocument(TempBlob, FTPOverview.Name, DataExchangeType)
-          else
-            TempBlob.Blob.Export(FTPSetup."Storage On Server" + FTPOverview.Name);
+            if DataExchangeType > '' then
+                CreateIncomingDocument(TempBlob, FTPOverview.Name, DataExchangeType)
+            else
+                TempBlobMgt.ExportToFile(TempBlob, FTPSetup."Storage On Server" + FTPOverview.Name);
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / FTPOverview.Count * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / FTPOverview.Count * 10000) div 1);
+                i += 1;
+            end;
         until FTPOverview.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure FTPDelete(HostCode: Text;var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
+    procedure FTPDelete(HostCode: Text; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary)
     var
         FTPOverview: Record "FTP Overview";
         FTPManagement: Codeunit "FTP Management";
@@ -905,77 +911,83 @@ codeunit 6184866 "External Storage Interface"
         //TempStorageOperationParameter: file path + name on the FTP storage server
 
         if TempStorageOperationParameter."Parameter Value" = '' then begin
-          if not FTPOverviewRun(HostCode, FTPOverview) then
-            exit;
+            if not FTPOverviewRun(HostCode, FTPOverview) then
+                exit;
 
-          FTPOverview.SetRecFilter;
+            FTPOverview.SetRecFilter;
         end else begin
-          StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
-          StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName));
+            StorageServerFileName := FileManagement.GetFileName(TempStorageOperationParameter."Parameter Value");
+            StorageServerFilePath := CopyStr(TempStorageOperationParameter."Parameter Value", 1, StrLen(TempStorageOperationParameter."Parameter Value") - StrLen(StorageServerFileName));
 
-          FTPOverview.SetRange("Host Code", HostCode);
-          FTPOverview.SetRange("File Name", StorageServerFilePath);
+            FTPOverview.SetRange("Host Code", HostCode);
+            FTPOverview.SetRange("File Name", StorageServerFilePath);
 
-          if StorageServerFileName > '' then
-            FTPOverview.SetRange(Name, StorageServerFileName);
+            if StorageServerFileName > '' then
+                FTPOverview.SetRange(Name, StorageServerFileName);
         end;
 
         if not FTPOverview.FindSet then
-          exit;
+            exit;
 
         if GuiAllowed then
-          Dialog.Open(DeletingCaption);
+            Dialog.Open(DeletingCaption);
 
         repeat
-          OverviewCount := FTPOverview.Count;
+            OverviewCount := FTPOverview.Count;
 
-          FTPManagement.DeleteFromFTP(HostCode, FTPOverview."File Name", FTPOverview.Name, false, false);
+            FTPManagement.DeleteFromFTP(HostCode, FTPOverview."File Name", FTPOverview.Name, false, false);
 
-          if GuiAllowed then begin
-            Dialog.Update(1, (i / OverviewCount * 10000) div 1);
-            i += 1;
-          end;
+            if GuiAllowed then begin
+                Dialog.Update(1, (i / OverviewCount * 10000) div 1);
+                i += 1;
+            end;
         until FTPOverview.Next = 0;
 
         if GuiAllowed then
-          Dialog.Close;
+            Dialog.Close;
     end;
 
-    procedure FTPOverviewRun(HostCode: Text;var FTPOverview: Record "FTP Overview"): Boolean
+    procedure FTPOverviewRun(HostCode: Text; var FTPOverview: Record "FTP Overview"): Boolean
     begin
         FTPOverview.SetRange("Host Code", HostCode);
 
         exit(PAGE.RunModal(PAGE::"FTP Overview", FTPOverview) = ACTION::LookupOK);
     end;
 
-    procedure CreateIncomingDocument(var TempBlob: Record TempBlob;FileName: Text;DataExhangeType: Code[20])
+    procedure CreateIncomingDocument(var TempBlob: Codeunit "Temp Blob"; FileName: Text; DataExhangeType: Code[20])
     var
         IncomingDocument: Record "Incoming Document";
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
         FileManagement: Codeunit "File Management";
+        RecRef: RecordRef;
     begin
         IncomingDocument.Init;
-        IncomingDocument.CreateIncomingDocument(FileName,'');
+        IncomingDocument.CreateIncomingDocument(FileName, '');
 
         IncomingDocument."Data Exchange Type" := DataExhangeType;
 
         IncomingDocument.Modify(true);
 
         with IncomingDocumentAttachment do begin
-          Init;
+            Init;
 
-          "Incoming Document Entry No." := IncomingDocument."Entry No.";
-          "Line No." := 10000;
-          Content := TempBlob.Blob;
-          Validate("File Extension",LowerCase(CopyStr(FileManagement.GetExtension(FileName),1,MaxStrLen("File Extension"))));
-          Name := CopyStr(FileManagement.GetFileNameWithoutExtension(FileName),1,MaxStrLen(Name));
-          "Document No." := IncomingDocument."Document No.";
-          "Posting Date" := IncomingDocument."Posting Date";
+            "Incoming Document Entry No." := IncomingDocument."Entry No.";
+            "Line No." := 10000;
 
-          Insert(true);
 
-          if Type in [Type::Image,Type::PDF] then
-            OnAttachBinaryFile;
+            RecRef.GetTable(IncomingDocumentAttachment);
+            TempBlob.ToRecordRef(RecRef, IncomingDocumentAttachment.FieldNo(Content));
+            RecRef.SetTable(IncomingDocumentAttachment);
+
+            Validate("File Extension", LowerCase(CopyStr(FileManagement.GetExtension(FileName), 1, MaxStrLen("File Extension"))));
+            Name := CopyStr(FileManagement.GetFileNameWithoutExtension(FileName), 1, MaxStrLen(Name));
+            "Document No." := IncomingDocument."Document No.";
+            "Posting Date" := IncomingDocument."Posting Date";
+
+            Insert(true);
+
+            if Type in [Type::Image, Type::PDF] then
+                OnAttachBinaryFile;
         end;
     end;
 }

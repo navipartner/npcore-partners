@@ -552,11 +552,11 @@ dotnet
         {
         }
 
-        type("System.Security.Cryptography.KeyedHashAlgorithm";"npNetKeyedHashAlgorithm")
+        type("System.Security.Cryptography.KeyedHashAlgorithm"; "npNetKeyedHashAlgorithm")
         {
         }
 
-        type("System.IO.TextReader";"npNetTextReader")
+        type("System.IO.TextReader"; "npNetTextReader")
         {
         }
 
@@ -575,7 +575,7 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.SMTP")
     {
-        Version = '14.0.0.0';
+        Version = '16.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1252,23 +1252,23 @@ dotnet
         {
         }
 
-        type("System.Windows.Forms.Form";"npNetForm")
+        type("System.Windows.Forms.Form"; "npNetForm")
         {
         }
 
-        type("System.Windows.Forms.TextBox";"npNetTextBox")
+        type("System.Windows.Forms.TextBox"; "npNetTextBox")
         {
         }
 
-        type("System.Windows.Forms.DockStyle";"npNetDockStyle")
+        type("System.Windows.Forms.DockStyle"; "npNetDockStyle")
         {
         }
 
-        type("System.Windows.Forms.WebBrowser";"npNetWebBrowser")
+        type("System.Windows.Forms.WebBrowser"; "npNetWebBrowser")
         {
         }
 
-        type("System.Windows.Forms.FormWindowState";"npNetFormWindowState")
+        type("System.Windows.Forms.FormWindowState"; "npNetFormWindowState")
         {
         }
     }
@@ -1869,7 +1869,7 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.Integration.Office")
     {
-        Version = '14.0.0.0';
+        Version = '16.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1884,7 +1884,7 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.DocumentReport")
     {
-        Version = '14.0.0.0';
+        Version = '16.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1895,7 +1895,7 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.PdfWriter")
     {
-        Version = '14.0.0.0';
+        Version = '16.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1906,7 +1906,7 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.EwsWrapper")
     {
-        Version = '14.0.0.0';
+        Version = '16.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -2510,62 +2510,62 @@ dotnet
 
     assembly("NaviPartner.Retail.Stargate.Messaging.NETSBAXI")
     {
-        Version='5.0.1917.4';
-        Culture='neutral';
-        PublicKeyToken='909fa1bba7619e33';
+        Version = '5.0.1917.4';
+        Culture = 'neutral';
+        PublicKeyToken = '909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Transaction.TransactionRequest";"npNetTransactionRequest3")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Transaction.TransactionRequest"; "npNetTransactionRequest3")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Open.OpenParameters";"npNetOpenParameters")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Open.OpenParameters"; "npNetOpenParameters")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Open.OpenRequest";"npNetOpenRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Open.OpenRequest"; "npNetOpenRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Close.CloseRequest";"npNetCloseRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Close.CloseRequest"; "npNetCloseRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Administration.AdministrationRequest";"npNetAdministrationRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Administration.AdministrationRequest"; "npNetAdministrationRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.GetLastResult.GetLastRequest";"npNetGetLastRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.GetLastResult.GetLastRequest"; "npNetGetLastRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Open.OpenResponse";"npNetOpenResponse")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Open.OpenResponse"; "npNetOpenResponse")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Close.CloseResponse";"npNetCloseResponse")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Close.CloseResponse"; "npNetCloseResponse")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Transaction.TransactionResponse";"npNetTransactionResponse2")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Transaction.TransactionResponse"; "npNetTransactionResponse2")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Administration.AdministrationResponse";"npNetAdministrationResponse")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.Administration.AdministrationResponse"; "npNetAdministrationResponse")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.GetLastResult.GetLastResponse";"npNetGetLastResponse")
+        type("NaviPartner.Retail.Stargate.Messaging.NETSBAXI.Requests.GetLastResult.GetLastResponse"; "npNetGetLastResponse")
         {
         }
     }
 
     assembly("PresentationCore")
     {
-        Version='4.0.0.0';
-        Culture='neutral';
-        PublicKeyToken='31bf3856ad364e35';
+        Version = '4.0.0.0';
+        Culture = 'neutral';
+        PublicKeyToken = '31bf3856ad364e35';
 
-        type("System.Windows.Clipboard";"npNetClipboard")
+        type("System.Windows.Clipboard"; "npNetClipboard")
         {
         }
     }
@@ -2583,7 +2583,7 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.Client.BusinessChart.Model")
     {
-        Version = '14.0.0.0';
+        Version = '16.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -2594,7 +2594,7 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.ClientExtensions")
     {
-        Version = '14.0.0.0';
+        Version = '16.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 

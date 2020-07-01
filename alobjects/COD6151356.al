@@ -24,35 +24,35 @@ codeunit 6151356 "CS Post - Enqueue"
     begin
         CSSetup.Get;
         with CSPostingBuffer do begin
-          if GuiAllowed then
-            if not ("Job Queue Status" in ["Job Queue Status"::" ","Job Queue Status"::Error]) then
-              Error(WrongJobQueueStatus,Id);
-          "Job Queue Status" := "Job Queue Status"::"Scheduled for Posting";
-          "Job Queue Entry ID" := CreateGuid;
-          Modify;
-          RecRef.GetTable(CSPostingBuffer);
-          JobQueueEntry.ID := "Job Queue Entry ID";
-          JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-          JobQueueEntry."Object ID to Run" := CODEUNIT::"CS Post via Job Queue";
-          JobQueueEntry."Record ID to Process" := RecRef.RecordId;
-          JobQueueEntry."Job Queue Category Code" := CSSetup."Job Queue Category Code";
-          //-NPR5.54 [391080]
-          //JobQueueEntry."Timeout (sec.)" := 600;
-          //+NPR5.54 [391080]
-          JobQueueEntry.Priority := CSSetup."Job Queue Priority for Post" + "Job Queue Priority for Post";
-          //-NPR5.53 [379973]
-          if "Job Type" = "Job Type"::"Approve Counting" then begin
-            //-NPR5.54 [392901]
-            //IF CSSetup."Earliest Start Date/Time" <> 0DT THEN
-            //  JobQueueEntry."Earliest Start Date/Time" := CSSetup."Earliest Start Date/Time";
-            JobQueueEntry."Earliest Start Date/Time" := CreateDateTime(Today,230000T);
-            //+NPR5.54 [392901]
-          end;
-          //+NPR5.53 [379973]
-          JobQueueEntry.Insert(true);
-          CODEUNIT.Run(CODEUNIT::"Job Queue - Enqueue",JobQueueEntry);
-          if GuiAllowed then
-            Message(Confirmation,Id);
+            if GuiAllowed then
+                if not ("Job Queue Status" in ["Job Queue Status"::" ", "Job Queue Status"::Error]) then
+                    Error(WrongJobQueueStatus, Id);
+            "Job Queue Status" := "Job Queue Status"::"Scheduled for Posting";
+            "Job Queue Entry ID" := CreateGuid;
+            Modify;
+            RecRef.GetTable(CSPostingBuffer);
+            JobQueueEntry.ID := "Job Queue Entry ID";
+            JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+            JobQueueEntry."Object ID to Run" := CODEUNIT::"CS Post via Job Queue";
+            JobQueueEntry."Record ID to Process" := RecRef.RecordId;
+            JobQueueEntry."Job Queue Category Code" := CSSetup."Job Queue Category Code";
+            //-NPR5.54 [391080]
+            //JobQueueEntry."Timeout (sec.)" := 600;
+            //+NPR5.54 [391080]
+            //JobQueueEntry.Priority := CSSetup."Job Queue Priority for Post" + "Job Queue Priority for Post";
+            //-NPR5.53 [379973]
+            if "Job Type" = "Job Type"::"Approve Counting" then begin
+                //-NPR5.54 [392901]
+                //IF CSSetup."Earliest Start Date/Time" <> 0DT THEN
+                //  JobQueueEntry."Earliest Start Date/Time" := CSSetup."Earliest Start Date/Time";
+                JobQueueEntry."Earliest Start Date/Time" := CreateDateTime(Today, 230000T);
+                //+NPR5.54 [392901]
+            end;
+            //+NPR5.53 [379973]
+            JobQueueEntry.Insert(true);
+            CODEUNIT.Run(CODEUNIT::"Job Queue - Enqueue", JobQueueEntry);
+            if GuiAllowed then
+                Message(Confirmation, Id);
         end;
     end;
 }

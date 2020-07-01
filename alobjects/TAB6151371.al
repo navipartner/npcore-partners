@@ -19,11 +19,11 @@ table 6151371 "CS Setup"
 
     fields
     {
-        field(1;"Primary Key";Code[10])
+        field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
         }
-        field(11;"Enable Capture Service";Boolean)
+        field(11; "Enable Capture Service"; Boolean)
         {
             Caption = 'Enable Capture Service';
 
@@ -34,43 +34,43 @@ table 6151371 "CS Setup"
                 CSHelperFunctions.PublishWebService(Rec."Enable Capture Service");
             end;
         }
-        field(12;"Log Communication";Boolean)
+        field(12; "Log Communication"; Boolean)
         {
             Caption = 'Log Communication';
         }
-        field(13;"Web Service Is Published";Boolean)
+        field(13; "Web Service Is Published"; Boolean)
         {
-            CalcFormula = Exist("Web Service" WHERE ("Object Type"=CONST(Codeunit),
-                                                     "Service Name"=CONST('cs_service')));
+            CalcFormula = Exist ("Web Service" WHERE("Object Type" = CONST(Codeunit),
+                                                     "Service Name" = CONST('cs_service')));
             Caption = 'Web Service Is Published';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(14;"Filter Worksheets by Location";Boolean)
+        field(14; "Filter Worksheets by Location"; Boolean)
         {
             Caption = 'Filter Worksheets by Location';
             Description = 'Filtering Worksheets by User Location';
         }
-        field(15;"Error On Invalid Barcode";Boolean)
+        field(15; "Error On Invalid Barcode"; Boolean)
         {
             Caption = 'Error On Invalid Barcode';
             Description = 'Show alert on IOS if barcode is invalid';
         }
-        field(16;"Price Calc. Customer No.";Code[20])
+        field(16; "Price Calc. Customer No."; Code[20])
         {
             Caption = 'Price Calc. Customer No.';
             TableRelation = Customer;
         }
-        field(17;"Max Records In Search Result";Integer)
+        field(17; "Max Records In Search Result"; Integer)
         {
             Caption = 'Max Records In Search Result';
             InitValue = 100;
         }
-        field(18;"Aggregate Stock-Take Summarize";Boolean)
+        field(18; "Aggregate Stock-Take Summarize"; Boolean)
         {
             Caption = 'Aggregate Stock-Take Summarize';
         }
-        field(19;"Warehouse Type";Option)
+        field(19; "Warehouse Type"; Option)
         {
             Caption = 'Warehouse Type';
             OptionCaption = 'Basic,Advanced,Advanced (Bins)';
@@ -81,87 +81,81 @@ table 6151371 "CS Setup"
                 CSUIHeader: Record "CS UI Header";
             begin
                 if "Warehouse Type" <> xRec."Warehouse Type" then
-                  if Confirm(TXT001,true) then
-                    CSUIHeader.ModifyAll("Warehouse Type","Warehouse Type",true);
+                    if Confirm(TXT001, true) then
+                        CSUIHeader.ModifyAll("Warehouse Type", "Warehouse Type", true);
             end;
         }
-        field(20;"Media Library";Option)
+        field(20; "Media Library"; Option)
         {
             Caption = 'Media Library';
             OptionCaption = 'Dynamics NAV,Magento';
             OptionMembers = "Dynamics NAV",Magento;
         }
-        field(22;"Stock-Take Template";Code[10])
+        field(22; "Stock-Take Template"; Code[10])
         {
             Caption = 'Stock-Take Template';
             TableRelation = "Stock-Take Template";
         }
-        field(23;"Zero Def. Qty. to Handle";Boolean)
+        field(23; "Zero Def. Qty. to Handle"; Boolean)
         {
             Caption = 'Zero Def. Qty. to Handle';
         }
-        field(24;"Item Reclass. Jour Temp Name";Code[10])
+        field(24; "Item Reclass. Jour Temp Name"; Code[10])
         {
             Caption = 'Item Reclass. Jour Temp Name';
             TableRelation = "Item Journal Template";
         }
-        field(25;"Item Reclass. Jour Batch Name";Code[10])
+        field(25; "Item Reclass. Jour Batch Name"; Code[10])
         {
             Caption = 'Item Reclass. Jour Batch Name';
-            TableRelation = "Item Journal Batch".Name WHERE ("Journal Template Name"=FIELD("Item Reclass. Jour Temp Name"));
+            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Item Reclass. Jour Temp Name"));
         }
-        field(26;"Create Worksheet after Trans.";Boolean)
+        field(26; "Create Worksheet after Trans."; Boolean)
         {
             Caption = 'Create Worksheet after Trans.';
         }
-        field(27;"Phys. Inv Jour Temp Name";Code[10])
+        field(27; "Phys. Inv Jour Temp Name"; Code[10])
         {
             Caption = 'Phys. Inv Jour Temp Name';
             TableRelation = "Item Journal Template";
         }
-        field(28;"Phys. Inv Jour No. Series";Code[10])
+        field(28; "Phys. Inv Jour No. Series"; Code[10])
         {
             Caption = 'Phys. Inv Jour No. Series';
             TableRelation = "No. Series";
         }
-        field(29;"Sum Qty. to Handle";Boolean)
+        field(29; "Sum Qty. to Handle"; Boolean)
         {
             Caption = 'Sum Qty. to Handle';
         }
-        field(38;"Post with Job Queue";Boolean)
+        field(38; "Post with Job Queue"; Boolean)
         {
             Caption = 'Post with Job Queue';
         }
-        field(39;"Job Queue Category Code";Code[10])
+        field(39; "Job Queue Category Code"; Code[10])
         {
             Caption = 'Job Queue Category Code';
             TableRelation = "Job Queue Category";
         }
-        field(40;"Job Queue Priority for Post";Integer)
+        field(40; "Job Queue Priority for Post"; Integer)
         {
             Caption = 'Job Queue Priority for Post';
-            InitValue = 1000;
-            MinValue = 0;
-
-            trigger OnValidate()
-            begin
-                if "Job Queue Priority for Post" < 0 then
-                  Error(TXT002);
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Target field Prioriti on Job Queue Entry is removed!';
         }
-        field(41;"Notify On Success";Boolean)
+        field(41; "Notify On Success"; Boolean)
         {
             Caption = 'Notify On Success';
         }
-        field(42;"Run in User Session";Boolean)
+        field(42; "Run in User Session"; Boolean)
         {
             Caption = 'Run in User Session';
         }
-        field(43;"Earliest Start Date/Time";DateTime)
+        field(43; "Earliest Start Date/Time"; DateTime)
         {
             Caption = 'Earliest Start Date/Time';
         }
-        field(44;"Batch Size";Integer)
+        field(44; "Batch Size"; Integer)
         {
             Caption = 'Batch Size';
             MaxValue = 1000;
@@ -171,7 +165,7 @@ table 6151371 "CS Setup"
 
     keys
     {
-        key(Key1;"Primary Key")
+        key(Key1; "Primary Key")
         {
         }
     }

@@ -215,7 +215,7 @@ codeunit 6059955 "MCS Face Service API"
         ServerFileName: Text;
         FileManagement: Codeunit "File Management";
         MemberName: Text;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         MCSPersonBusinessEntities: Record "MCS Person Business Entities";
         RecRef: RecordRef;
         MCSAPISetup: Record "MCS API Setup";
@@ -229,6 +229,7 @@ codeunit 6059955 "MCS Face Service API"
         StreamDotNet3: DotNet npNetStream;
         UserData: Text;
         PersonId: Text;
+        RecRefBlob: RecordRef;
     begin
         RecRef := MMMember.RecordId.GetRecord;
 
@@ -311,7 +312,11 @@ codeunit 6059955 "MCS Face Service API"
                     MCSFaces.Glasses := FaceEntity.Glasses;
                     MCSFaces.Identified := FaceEntity.Identified;
                     MCSFaces.Action := MCSFaces.Action::CaptureAndIdentifyFaces;
-                    MCSFaces.Picture := TempBlob.Blob;
+
+                    RecRefBlob.GetTable(MCSFaces);
+                    TempBlob.ToRecordRef(RecRefBlob, MCSFaces.FieldNo(Picture));
+                    RecRefBlob.SetTable(MCSFaces);
+
                     MCSFaces.Insert(true);
 
                     if not MCSPerson.Get(MCSFaces.PersonId) then begin
@@ -338,7 +343,10 @@ codeunit 6059955 "MCS Face Service API"
                     end;
                 end;
 
-                MMMember.Picture := TempBlob.Blob;
+                RecRefBlob.GetTable(MMMember);
+                TempBlob.ToRecordRef(RecRefBlob, MMMember.FieldNo(Picture));
+                RecRefBlob.SetTable(MMMember);
+
                 MMMember.Modify;
                 if FILE.Erase(ServerFileName) then;
             end;

@@ -12,75 +12,75 @@ report 6014564 "Credit Voucher A5"
 
     dataset
     {
-        dataitem(Loop;"Integer")
+        dataitem(Loop; "Integer")
         {
-            dataitem("Credit Voucher";"Credit Voucher")
+            dataitem("Credit Voucher"; "Credit Voucher")
             {
-                column(CopyText;CopyText)
+                column(CopyText; CopyText)
                 {
                 }
-                column(No_CreditVoucher;"Credit Voucher"."No.")
+                column(No_CreditVoucher; "Credit Voucher"."No.")
                 {
                 }
-                column(Amount_CreditVoucher;"Credit Voucher".Amount)
+                column(Amount_CreditVoucher; "Credit Voucher".Amount)
                 {
                     IncludeCaption = true;
                 }
-                column(Name_CreditVoucher;"Credit Voucher".Name)
+                column(Name_CreditVoucher; "Credit Voucher".Name)
                 {
                 }
-                column(Address_CreditVoucher;"Credit Voucher".Address)
+                column(Address_CreditVoucher; "Credit Voucher".Address)
                 {
                 }
-                column(IssueDate_CreditVoucher;"Credit Voucher"."Issue Date")
+                column(IssueDate_CreditVoucher; "Credit Voucher"."Issue Date")
                 {
                 }
-                column(RegisterNo_CreditVoucher;"Credit Voucher"."Register No.")
+                column(RegisterNo_CreditVoucher; "Credit Voucher"."Register No.")
                 {
                 }
-                column(SalesTicketNo_CreditVoucher;"Credit Voucher"."Sales Ticket No.")
+                column(SalesTicketNo_CreditVoucher; "Credit Voucher"."Sales Ticket No.")
                 {
                 }
-                column(ZipCodeCityText;ZipCodeCityText)
+                column(ZipCodeCityText; ZipCodeCityText)
                 {
                 }
-                column(DetailsText;DetailsText)
+                column(DetailsText; DetailsText)
                 {
                 }
-                column(Barcode;TempBlob.Blob)
+                column(Barcode; BlobBuffer."Buffer 1")
                 {
                 }
-                column(SalesPersonText;SalespersonText)
+                column(SalesPersonText; SalespersonText)
                 {
                 }
-                dataitem(Register;Register)
+                dataitem(Register; Register)
                 {
-                    DataItemLink = "Register No."=FIELD("Register No.");
-                    column(Name_Register;Register.Name)
+                    DataItemLink = "Register No." = FIELD("Register No.");
+                    column(Name_Register; Register.Name)
                     {
                     }
-                    column(Address_Register;Register.Address)
+                    column(Address_Register; Register.Address)
                     {
                     }
-                    column(Email_Register;Register."E-mail")
+                    column(Email_Register; Register."E-mail")
                     {
                     }
-                    column(Wwwaddress_Register;Register.Website)
+                    column(Wwwaddress_Register; Register.Website)
                     {
                     }
-                    column(RegisterPhoneText;RegisterPhoneText)
+                    column(RegisterPhoneText; RegisterPhoneText)
                     {
                     }
-                    column(RegisterPostCodeAndCityText;RegisterPostCodeAndCityText)
+                    column(RegisterPostCodeAndCityText; RegisterPostCodeAndCityText)
                     {
                     }
-                    column(RegisterVatNoText;RegisterVatNoText)
+                    column(RegisterVatNoText; RegisterVatNoText)
                     {
                     }
-                    dataitem(Period;Period)
+                    dataitem(Period; Period)
                     {
-                        DataItemLink = "Register No."=FIELD("Register No.");
-                        column(Comment_Period;Period.Comment)
+                        DataItemLink = "Register No." = FIELD("Register No.");
+                        column(Comment_Period; Period.Comment)
                         {
                         }
                     }
@@ -99,29 +99,30 @@ report 6014564 "Credit Voucher A5"
                     "Credit Voucher".Modify(false);
 
                     if ("Credit Voucher"."No. Printed" > 1) and (RetailSetup."Copy No. on Sales Ticket") then
-                      CopyText := Text1001;
+                        CopyText := Text1001;
 
                     DetailsText := Format("Issue Date") + ' ' + "Register No." + ' ' + "Sales Ticket No." + ' - ' + "No." + ' - ' + Format(Time);
                     //+NPR5.38
                     ZipCodeCityText := "Post Code";
                     if ZipCodeCityText <> '' then
-                      ZipCodeCityText += ', ' + City
+                        ZipCodeCityText += ', ' + City
                     else
-                      ZipCodeCityText += City;
+                        ZipCodeCityText += City;
                     //-NPR5.38
 
                     BarcodeLib.GenerateBarcode("Credit Voucher"."No.", TempBlob);
+                    BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
                     if Get("Credit Voucher".Salesperson) then
-                      if RetailSetup."Salesperson on Sales Ticket" then
-                        SalespersonText := StrSubstNo('%1 %2', "Credit Voucher".FieldCaption(Salesperson), Name);
+                        if RetailSetup."Salesperson on Sales Ticket" then
+                            SalespersonText := StrSubstNo('%1 %2', "Credit Voucher".FieldCaption(Salesperson), Name);
                 end;
             }
 
             trigger OnAfterGetRecord()
             begin
                 if LoopCounter > 0 then
-                  CurrReport.Break;
+                    CurrReport.Break;
                 LoopCounter += 1;
             end;
         }
@@ -169,6 +170,7 @@ report 6014564 "Credit Voucher A5"
         RegisterPostCodeAndCityText: Text;
         RegisterVatNoText: Text;
         ZipCodeCityText: Text;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
+        BlobBuffer: Record "BLOB Buffer" temporary;
 }
 

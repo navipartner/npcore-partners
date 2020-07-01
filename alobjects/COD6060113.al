@@ -40,25 +40,25 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     begin
 
         //-TM90.1.46 [387138]
-        if (not Ticket.Get (TicketNo)) then
-          exit (false);
+        if (not Ticket.Get(TicketNo)) then
+            exit(false);
 
-        TicketBOM.SetFilter ("Item No.", '=%1', Ticket."Item No.");
-        TicketBOM.SetFilter ("Publish Ticket URL", '>=%1', TicketBOM."Publish Ticket URL"::PUBLISH);
-        exit (not TicketBOM.IsEmpty);
+        TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBOM.SetFilter("Publish Ticket URL", '>=%1', TicketBOM."Publish Ticket URL"::PUBLISH);
+        exit(not TicketBOM.IsEmpty);
         //+TM90.1.46 [387138]
     end;
 
-    procedure PublishTicketUrl(TicketNo: Code[20];var ResponseMessage: Text): Boolean
+    procedure PublishTicketUrl(TicketNo: Code[20]; var ResponseMessage: Text): Boolean
     var
         Ticket: Record "TM Ticket";
     begin
 
         //-TM90.1.46 [387138]
-        if (not Ticket.Get (TicketNo)) then
-          exit (false);
+        if (not Ticket.Get(TicketNo)) then
+            exit(false);
 
-        exit (GenerateTicketPrint (Ticket."Ticket Reservation Entry No.", true, ResponseMessage));
+        exit(GenerateTicketPrint(Ticket."Ticket Reservation Entry No.", true, ResponseMessage));
         //+TM90.1.46 [387138]
     end;
 
@@ -69,34 +69,34 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     begin
 
         //-TM90.1.46 [387138]
-        if (not Ticket.Get (TicketNo)) then
-          exit (false);
+        if (not Ticket.Get(TicketNo)) then
+            exit(false);
 
-        TicketBOM.SetFilter ("Item No.", '=%1', Ticket."Item No.");
-        TicketBOM.SetFilter ("Publish Ticket URL", '=%1', TicketBOM."Publish Ticket URL"::SEND);
-        exit (not TicketBOM.IsEmpty);
+        TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBOM.SetFilter("Publish Ticket URL", '=%1', TicketBOM."Publish Ticket URL"::SEND);
+        exit(not TicketBOM.IsEmpty);
         //+TM90.1.46 [387138]
     end;
 
-    procedure SendTicketUrl(TicketNo: Code[20];var ResponseMessage: Text): Boolean
+    procedure SendTicketUrl(TicketNo: Code[20]; var ResponseMessage: Text): Boolean
     var
         TicketNotificationEntry: Record "TM Ticket Notification Entry";
         NotifyParticipant: Codeunit "TM Ticket Notify Participant";
         EntryNo: Integer;
     begin
 
-        EntryNo := NotifyParticipant.CreateDiyPrintNotification (TicketNo);
+        EntryNo := NotifyParticipant.CreateDiyPrintNotification(TicketNo);
         if (EntryNo = 0) then begin
-          ResponseMessage := GEN_NOT_ISSUE;
-          exit (false);
+            ResponseMessage := GEN_NOT_ISSUE;
+            exit(false);
         end;
 
-        TicketNotificationEntry.SetFilter ("Entry No.", '=%1', EntryNo);
-        NotifyParticipant.SendGeneralNotification (TicketNotificationEntry);
+        TicketNotificationEntry.SetFilter("Entry No.", '=%1', EntryNo);
+        NotifyParticipant.SendGeneralNotification(TicketNotificationEntry);
 
-        if (TicketNotificationEntry.Get (EntryNo)) then ;
+        if (TicketNotificationEntry.Get(EntryNo)) then;
         ResponseMessage := TicketNotificationEntry."Failed With Message";
-        exit (ResponseMessage = '');
+        exit(ResponseMessage = '');
     end;
 
     procedure GenerateTicketPrint(EntryNo: Integer; MarkTicketAsPrinted: Boolean; var FailReasonText: Text): Boolean
@@ -114,8 +114,8 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
 
         //-TM1.43 [367471]
         //CreatTicketPrintOrderXml (TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted);
-        if (not CreatTicketPrintOrderXml (TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then
-          exit (false);
+        if (not CreatTicketPrintOrderXml(TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then
+            exit(false);
         //+TM1.43 [367471]
 
         if (WebServiceApi(FailReasonText, TicketRequestXml, ServiceResponse)) then begin
@@ -350,7 +350,7 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
 
     local procedure ToBase64(StringToEncode: Text) B64String: Text
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         BinaryReader: DotNet npNetBinaryReader;
         MemoryStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;
@@ -359,10 +359,10 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     begin
 
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(Outstr);
+        TempBlob.CreateOutStream(Outstr);
         Outstr.WriteText(StringToEncode);
 
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
         MemoryStream := InStr;
         BinaryReader := BinaryReader.BinaryReader(InStr);
 
@@ -377,43 +377,39 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     begin
     end;
 
-    local procedure CreatTicketPrintOrderXml(var XmlDoc: DotNet npNetXmlDocument;var Token: Text[100];MarkTicketAsPrinted: Boolean;var FailureReason: Text): Boolean
+    local procedure CreatTicketPrintOrderXml(var XmlDoc: DotNet npNetXmlDocument; var Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
     var
         XmlText: Text;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
         TicketTicketServerRequest: XMLport "TM Ticket TicketServer Request";
         InStr: InStream;
     begin
-
-        TempBlob.Insert();
-        TempBlob.Blob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        TempBlob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
 
         //-TM1.43 [367471]
         //TicketTicketServerRequest.SetRequestEntryNo (Token, MarkTicketAsPrinted);
-        if (not TicketTicketServerRequest.SetRequestEntryNo (Token, MarkTicketAsPrinted, FailureReason)) then
-          exit (false);
+        if (not TicketTicketServerRequest.SetRequestEntryNo(Token, MarkTicketAsPrinted, FailureReason)) then
+            exit(false);
         //+TM1.43 [367471]
 
         TicketTicketServerRequest.SetDestination(OutStr);
         TicketTicketServerRequest.Export;
-        TempBlob.Modify();
 
-        TempBlob.CalcFields(Blob);
-        if (not TempBlob.Blob.HasValue()) then
+        if (not TempBlob.HasValue()) then
             Error('XML generation failed for token %1', Token);
 
-        TempBlob.Blob.CreateInStream (InStr, TEXTENCODING::UTF8);
-        InStr.Read (XmlText);
+        TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
+        InStr.Read(XmlText);
 
         Clear(XmlDoc);
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.LoadXml(XmlText);
 
-        if (UserId = 'TSA') then Message (CopyStr (XmlText,1,1024));
+        if (UserId = 'TSA') then Message(CopyStr(XmlText, 1, 1024));
 
         //-TM1.43 [367471]
-        exit (true);
+        exit(true);
         //+TM1.43 [367471]
     end;
 

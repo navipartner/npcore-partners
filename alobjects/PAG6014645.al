@@ -17,50 +17,50 @@ page 6014645 "Tax Free Requests"
         {
             repeater(Group)
             {
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
                 }
-                field("Handler ID";"Handler ID")
+                field("Handler ID"; "Handler ID")
                 {
                 }
-                field("Date Start";"Date Start")
+                field("Date Start"; "Date Start")
                 {
                 }
-                field("Time Start";"Time Start")
+                field("Time Start"; "Time Start")
                 {
                 }
-                field("Date End";"Date End")
+                field("Date End"; "Date End")
                 {
                 }
-                field("Time End";"Time End")
+                field("Time End"; "Time End")
                 {
                 }
-                field(Mode;Mode)
+                field(Mode; Mode)
                 {
                 }
-                field("Request Type";"Request Type")
+                field("Request Type"; "Request Type")
                 {
                 }
-                field("Error Code";"Error Code")
+                field("Error Code"; "Error Code")
                 {
                 }
-                field("Error Message";"Error Message")
+                field("Error Message"; "Error Message")
                 {
                 }
-                field(Success;Success)
+                field(Success; Success)
                 {
                 }
-                field("Request.HASVALUE";Request.HasValue)
+                field("Request.HASVALUE"; Request.HasValue)
                 {
                     Caption = 'Request Stored';
                 }
-                field("Response.HASVALUE";Response.HasValue)
+                field("Response.HASVALUE"; Response.HasValue)
                 {
                     Caption = 'Response Stored';
                 }
@@ -82,15 +82,15 @@ page 6014645 "Tax Free Requests"
 
                 trigger OnAction()
                 var
-                    TempBlob: Record TempBlob temporary;
+                    TempBlob: Codeunit "Temp Blob";
                     InStream: InStream;
                     Filename: Variant;
                 begin
                     if not Request.HasValue then
-                      exit;
+                        exit;
                     CalcFields(Request);
-                    TempBlob.Blob := Request;
-                    TempBlob.Blob.CreateInStream(InStream);
+                    TempBLOB.FromRecord(Rec, FieldNo(Request));
+                    TempBlob.CreateInStream(InStream);
                     Filename := 'Request';
                     DownloadFromStream(InStream, 'Download', '', 'All Files (*.*)|*.*', Filename);
                 end;
@@ -105,15 +105,15 @@ page 6014645 "Tax Free Requests"
 
                 trigger OnAction()
                 var
-                    TempBlob: Record TempBlob temporary;
+                    TempBlob: Codeunit "Temp Blob";
                     InStream: InStream;
                     Filename: Variant;
                 begin
                     if not Response.HasValue then
-                      exit;
+                        exit;
                     CalcFields(Response);
-                    TempBlob.Blob := Response;
-                    TempBlob.Blob.CreateInStream(InStream);
+                    TempBlob.FromRecord(Rec, FieldNo(Response));
+                    TempBlob.CreateInStream(InStream);
                     Filename := 'Response';
                     DownloadFromStream(InStream, 'Download', '', 'All Files (*.*)|*.*', Filename);
                 end;

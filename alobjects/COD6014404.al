@@ -349,8 +349,8 @@ codeunit 6014404 "NPR Event Subscriber"
             "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
             "Document Time" := ItemJournalLine."Document Time";
             //-NPR5.52 [371446]
-          "Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date","Document Time");
-          //+NPR5.52 [371446]
+            "Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date", "Document Time");
+            //+NPR5.52 [371446]
             //-NPR5.33 [264324]
             //  IF ("Vendor No." = '') OR ("Item Group No." = '') THEN
             //    IF Item.GET("Item No.") THEN BEGIN
@@ -382,9 +382,9 @@ codeunit 6014404 "NPR Event Subscriber"
             "Register No." := ItemJournalLine."Register Number";
             "Group Sale" := ItemJournalLine."Group Sale";
             "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
-          //-NPR5.52 [371446]
-          "Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date",ItemJournalLine."Document Time");
-          //+NPR5.52 [371446]
+            //-NPR5.52 [371446]
+            "Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date", ItemJournalLine."Document Time");
+            //+NPR5.52 [371446]
             //- NPR5.43 [312575]
             "Item Category Code" := ItemJournalLine."Item Category Code";
 
@@ -804,7 +804,7 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 9506, 'OnAfterActionEvent', 'Kill Session', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Concurrent Session List", 'OnAfterActionEvent', 'Kill Session', false, false)]
     local procedure P956OnAfterActionEventKillSession(var Rec: Record "Active Session")
     var
         Text6014400: Label 'Kill Session   ?';
