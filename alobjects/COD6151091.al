@@ -163,7 +163,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
     begin
         //-NC2.17 [335927]
         //-NC2.22 [358239]
-        FieldValue := Format(FieldRef.Value,0,9);
+        FieldValue := Format(FieldRef.Value, 0, 9);
         //+NC2.22 [358239]
         exit(FieldValue);
         //+NC2.17 [335927]
@@ -220,11 +220,12 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
 
     local procedure CommitResponse(Response: Text; var NcTask: Record "Nc Task"; var NcTaskOutput: Record "Nc Task Output")
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
+        RecRef: RecordRef;
     begin
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
         OutStream.WriteText(Response);
 
         //-NC2.15 [326704]
@@ -236,15 +237,22 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
             CopyStream(OutStream, InStream);
         end;
 
-        NcTask.Response := TempBlob.Blob;
+        RecRef.GetTable(NcTask);
+        TempBlob.ToRecordRef(RecRef, NcTask.FieldNo(Response));
+        RecRef.SetTable(NcTask);
+
         NcTask.Modify(true);
 
-        Clear(TempBlob.Blob);
-        TempBlob.Blob.CreateOutStream(OutStream);
+        Clear(TempBlob);
+        TempBlob.CreateOutStream(OutStream);
         OutStream.WriteText(Response);
 
         NcTaskOutput.Find;
-        NcTaskOutput.Response := TempBlob.Blob;
+
+        RecRef.GetTable(NcTaskOutput);
+        TempBlob.ToRecordRef(RecRef, NcTaskOutput.FieldNo(Response));
+        RecRef.SetTable(NcTaskOutput);
+
         NcTaskOutput.Modify(true);
         Commit;
     end;
@@ -392,7 +400,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
             NewUniqueTaskBuffer."Processing Code" := TempExportTrigger."Setup Code";
             if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
                 IsUnique := true;
-            //+NC2.14 [320762]
+        //+NC2.14 [320762]
         until TempExportTrigger.Next = 0;
     end;
 
@@ -435,7 +443,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         RecRef2.FilterGroup(40);
         //+NC2.24 [374375]
         //-NC14.00.2.22 [361941]
-        ConfigXMLExchange.ApplyPackageFilter(ConfigPackageTable,RecRef2);
+        ConfigXMLExchange.ApplyPackageFilter(ConfigPackageTable, RecRef2);
         //+NC14.00.2.22 [361941]
         exit(RecRef2.FindFirst);
     end;

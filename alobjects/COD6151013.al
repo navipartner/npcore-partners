@@ -17,13 +17,13 @@ codeunit 6151013 "NpRv Module Send - Default"
         //-NPR5.48 [341711]
         Commit;
         if NpRvVoucher."Send via Print" then
-          SendVoucherViaPrint(NpRvVoucher);
+            SendVoucherViaPrint(NpRvVoucher);
         Commit;
         if NpRvVoucher."Send via E-mail" then
-          SendVoucherViaEmail(NpRvVoucher);
+            SendVoucherViaEmail(NpRvVoucher);
         Commit;
         if NpRvVoucher."Send via SMS" then
-          SendVoucherViaSMS(NpRvVoucher);
+            SendVoucherViaSMS(NpRvVoucher);
         //+NPR5.48 [341711]
     end;
 
@@ -32,39 +32,43 @@ codeunit 6151013 "NpRv Module Send - Default"
         RPTemplateMgt: Codeunit "RP Template Mgt.";
     begin
         if Voucher."Print Template Code" = '' then
-          exit;
+            exit;
 
         //-NPR5.43 [307022]
         Voucher.SetRecFilter;
         //+NPR5.43 [307022]
-        RPTemplateMgt.PrintTemplate(Voucher."Print Template Code",Voucher,0);
+        RPTemplateMgt.PrintTemplate(Voucher."Print Template Code", Voucher, 0);
     end;
 
     procedure SendVoucherViaEmail(Voucher: Record "NpRv Voucher")
     var
         EmailTemplateHeader: Record "E-mail Template Header";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         BarcodeLibrary: Codeunit "Barcode Library";
         EmailManagement: Codeunit "E-mail Management";
         RecRef: RecordRef;
     begin
         //-NPR5.48 [341711]
         if Voucher."E-mail Template Code" <> '' then begin
-          if EmailTemplateHeader.Get(Voucher."E-mail Template Code") then
-            EmailTemplateHeader.SetRecFilter;
+            if EmailTemplateHeader.Get(Voucher."E-mail Template Code") then
+                EmailTemplateHeader.SetRecFilter;
         end;
 
         if not Voucher.Barcode.HasValue then begin
-          BarcodeLibrary.GenerateBarcode(Voucher."Reference No.",TempBlob);
-          Voucher.Barcode := TempBlob.Blob;
-          Voucher.Modify;
+            BarcodeLibrary.GenerateBarcode(Voucher."Reference No.", TempBlob);
+
+            RecRef.GetTable(Voucher);
+            TempBlob.ToRecordRef(RecRef, Voucher.FieldNo(Barcode));
+            RecRef.SetTable(Voucher);
+
+            Voucher.Modify;
         end;
         RecRef.GetTable(Voucher);
         RecRef.SetRecFilter;
         if EmailTemplateHeader."Report ID" > 0 then
-          EmailManagement.SendReportTemplate(EmailTemplateHeader."Report ID",RecRef,EmailTemplateHeader,Voucher."E-mail",true)
+            EmailManagement.SendReportTemplate(EmailTemplateHeader."Report ID", RecRef, EmailTemplateHeader, Voucher."E-mail", true)
         else
-          EmailManagement.SendEmailTemplate(RecRef,EmailTemplateHeader,Voucher."E-mail",true);
+            EmailManagement.SendEmailTemplate(RecRef, EmailTemplateHeader, Voucher."E-mail", true);
         //+NPR5.48 [341711]
     end;
 
@@ -77,12 +81,12 @@ codeunit 6151013 "NpRv Module Send - Default"
     begin
         //-NPR5.48 [341711]
         if (Voucher."SMS Template Code" = '') or (not SMSTemplateHeader.Get(Voucher."SMS Template Code")) then begin
-          if not SMSManagement.FindTemplate(Voucher,SMSTemplateHeader) then
-            exit;
+            if not SMSManagement.FindTemplate(Voucher, SMSTemplateHeader) then
+                exit;
         end;
 
-        SMSMessage := SMSManagement.MakeMessage(SMSTemplateHeader,Voucher);
-        SMSManagement.SendSMS(Voucher."Phone No.",SMSTemplateHeader."Alt. Sender",SMSMessage);
+        SMSMessage := SMSManagement.MakeMessage(SMSTemplateHeader, Voucher);
+        SMSManagement.SendSMS(Voucher."Phone No.", SMSTemplateHeader."Alt. Sender", SMSMessage);
         //+NPR5.48 [341711]
     end;
 
@@ -93,8 +97,8 @@ codeunit 6151013 "NpRv Module Send - Default"
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NpRv Voucher Module")
     begin
-        if VoucherModule.Get(VoucherModule.Type::"Send Voucher",ModuleCode()) then
-          exit;
+        if VoucherModule.Get(VoucherModule.Type::"Send Voucher", ModuleCode()) then
+            exit;
 
         VoucherModule.Init;
         VoucherModule.Type := VoucherModule.Type::"Send Voucher";
@@ -105,10 +109,10 @@ codeunit 6151013 "NpRv Module Send - Default"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnHasSendVoucherSetup', '', true, true)]
-    local procedure OnHasSendVoucherSetup(VoucherType: Record "NpRv Voucher Type";var HasSendSetup: Boolean)
+    local procedure OnHasSendVoucherSetup(VoucherType: Record "NpRv Voucher Type"; var HasSendSetup: Boolean)
     begin
         if not IsSubscriber(VoucherType) then
-          exit;
+            exit;
 
         HasSendSetup := true;
     end;
@@ -122,7 +126,7 @@ codeunit 6151013 "NpRv Module Send - Default"
         Selection: Integer;
     begin
         if not IsSubscriber(VoucherType) then
-          exit;
+            exit;
 
         //-NPR5.48 [341711]
         // VoucherType.TESTFIELD("Print Template Code");
@@ -130,38 +134,38 @@ codeunit 6151013 "NpRv Module Send - Default"
         // PAGE.RUN(PAGE::"RP Template Card",RPTemplateHeader);
         Selection := VoucherType."Send Method via POS";
         if Selection = VoucherType."Send Method via POS"::Ask then
-          Selection := SelectSendMethod(VoucherType);
+            Selection := SelectSendMethod(VoucherType);
 
         case Selection of
-          VoucherType."Send Method via POS"::Print:
-            begin
-              VoucherType.TestField("Print Template Code");
-              RPTemplateHeader.Get(VoucherType."Print Template Code");
-              PAGE.Run(PAGE::"RP Template Card",RPTemplateHeader);
-            end;
-          VoucherType."Send Method via POS"::"E-mail":
-            begin
-              VoucherType.TestField("E-mail Template Code");
-              EmailTemplateHeader.Get(VoucherType."E-mail Template Code");
-              PAGE.Run(PAGE::"E-mail Template",EmailTemplateHeader);
-            end;
-          VoucherType."Send Method via POS"::SMS:
-            begin
-              VoucherType.TestField("SMS Template Code");
-              SMSTemplateHeader.Get(VoucherType."SMS Template Code");
-              PAGE.Run(PAGE::"SMS Template Card",SMSTemplateHeader);
-            end;
+            VoucherType."Send Method via POS"::Print:
+                begin
+                    VoucherType.TestField("Print Template Code");
+                    RPTemplateHeader.Get(VoucherType."Print Template Code");
+                    PAGE.Run(PAGE::"RP Template Card", RPTemplateHeader);
+                end;
+            VoucherType."Send Method via POS"::"E-mail":
+                begin
+                    VoucherType.TestField("E-mail Template Code");
+                    EmailTemplateHeader.Get(VoucherType."E-mail Template Code");
+                    PAGE.Run(PAGE::"E-mail Template", EmailTemplateHeader);
+                end;
+            VoucherType."Send Method via POS"::SMS:
+                begin
+                    VoucherType.TestField("SMS Template Code");
+                    SMSTemplateHeader.Get(VoucherType."SMS Template Code");
+                    PAGE.Run(PAGE::"SMS Template Card", SMSTemplateHeader);
+                end;
         end;
         //+NPR5.48 [341711]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunSendVoucher', '', true, true)]
-    local procedure OnRunSendVoucher(Voucher: Record "NpRv Voucher";VoucherType: Record "NpRv Voucher Type";var Handled: Boolean)
+    local procedure OnRunSendVoucher(Voucher: Record "NpRv Voucher"; VoucherType: Record "NpRv Voucher Type"; var Handled: Boolean)
     begin
         if Handled then
-          exit;
+            exit;
         if not IsSubscriber(VoucherType) then
-          exit;
+            exit;
 
         Handled := true;
 
@@ -197,35 +201,35 @@ codeunit 6151013 "NpRv Module Send - Default"
         //-NPR5.48 [341711]
         Selection := VoucherType."Send Method via POS";
         if VoucherType."Send Method via POS" = VoucherType."Send Method via POS"::Ask then begin
-          SelectionStr := GetSendMethodSelectionStr(VoucherType,Selection);
-          if Selection > 0 then
-            Selection := StrMenu(SelectionStr,Selection,VoucherType.FieldCaption("Send Method via POS"));
-          Selection -= 1;
+            SelectionStr := GetSendMethodSelectionStr(VoucherType, Selection);
+            if Selection > 0 then
+                Selection := StrMenu(SelectionStr, Selection, VoucherType.FieldCaption("Send Method via POS"));
+            Selection -= 1;
         end;
 
         exit(Selection);
         //+NPR5.48 [341711]
     end;
 
-    local procedure GetSendMethodSelectionStr(VoucherType: Record "NpRv Voucher Type";var Selection: Integer) SelectionStr: Text
+    local procedure GetSendMethodSelectionStr(VoucherType: Record "NpRv Voucher Type"; var Selection: Integer) SelectionStr: Text
     begin
         //-NPR5.48 [341711]
         Selection := 0;
         if VoucherType."Print Template Code" <> '' then begin
-          SelectionStr := Format(VoucherType."Send Method via POS"::Print);
-          Selection := 1;
+            SelectionStr := Format(VoucherType."Send Method via POS"::Print);
+            Selection := 1;
         end;
 
         SelectionStr += ',';
         if VoucherType."E-mail Template Code" <> '' then begin
-          SelectionStr += Format(VoucherType."Send Method via POS"::"E-mail");
-          Selection := 2;
+            SelectionStr += Format(VoucherType."Send Method via POS"::"E-mail");
+            Selection := 2;
         end;
 
         SelectionStr += ',';
         if VoucherType."SMS Template Code" <> '' then begin
-          SelectionStr += Format(VoucherType."Send Method via POS"::SMS);
-          Selection := 3;
+            SelectionStr += Format(VoucherType."Send Method via POS"::SMS);
+            Selection := 3;
         end;
 
         exit(SelectionStr);

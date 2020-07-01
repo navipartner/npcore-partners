@@ -73,12 +73,12 @@ codeunit 6184511 "EFT Mock Client Integration"
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
         EFTTypePOSUnitBLOBParam: Record "EFT Type POS Unit BLOB Param.";
-        Blob1: Record TempBlob temporary;
-        Blob2: Record TempBlob temporary;
+        Blob1: Codeunit "Temp Blob";
+        Blob2: Codeunit "Temp Blob";
         EFTInterface: Codeunit "EFT Interface";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         //Getting values will initialize them in case this is first time setup or some of them was added in a new release.
         GetConnectionMethod(EFTSetup);
@@ -96,11 +96,11 @@ codeunit 6184511 "EFT Mock Client Integration"
     var
         EFTTypePaymentBLOBParam: Record "EFT Type Payment BLOB Param.";
         EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
-        Blob1: Record TempBlob temporary;
-        Blob2: Record TempBlob temporary;
+        Blob1: Codeunit "Temp Blob";
+        Blob2: Codeunit "Temp Blob";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         //Getting values will initialize them in case this is first time setup or some of them was added in a new release.
         GetPaymentParam1(EFTSetup);
@@ -113,10 +113,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateBeginWorkshiftRequest', '', false, false)]
-    local procedure OnCreateBeginWorkshiftRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateBeginWorkshiftRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -124,10 +124,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateEndWorkshiftRequest', '', false, false)]
-    local procedure OnCreateEndWorkshiftRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateEndWorkshiftRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -135,10 +135,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
-    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -150,10 +150,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
-    local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -165,10 +165,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVoidRequest', '', false, false)]
-    local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -177,10 +177,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVerifySetupRequest', '', false, false)]
-    local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -188,10 +188,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
-    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -199,10 +199,10 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateAuxRequest', '', false, false)]
-    local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -210,11 +210,11 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateGiftCardLoadRequest', '', false, false)]
-    local procedure OnCreateGiftCardLoadRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateGiftCardLoadRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         //-NPR5.51 [359385]
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //Fill any type specific information onto the request record before the request is fired.
@@ -230,26 +230,26 @@ codeunit 6184511 "EFT Mock Client Integration"
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "EFT Transaction Request")
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         //This function is after transaction result & payment line commit - best place for terminal print.
         EftTransactionRequest.PrintReceipts(false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
-    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         EFTMockClientProtocol: Codeunit "EFT Mock Client Protocol";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         EFTMockClientProtocol.SendEftDeviceRequest(EftTransactionRequest);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
-    local procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "POS Session";var tmpEFTSetup: Record "EFT Setup" temporary)
+    local procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "POS Session"; var tmpEFTSetup: Record "EFT Setup" temporary)
     var
         POSSetup: Codeunit "POS Setup";
         EFTSetup: Record "EFT Setup";
@@ -259,9 +259,9 @@ codeunit 6184511 "EFT Mock Client Integration"
         EFTSetup.SetFilter("POS Unit No.", POSSetup.Register());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
         if not EFTSetup.FindFirst then begin
-          EFTSetup.SetRange("POS Unit No.", '');
-          if not EFTSetup.FindFirst then
-            exit;
+            EFTSetup.SetRange("POS Unit No.", '');
+            if not EFTSetup.FindFirst then
+                exit;
         end;
 
         tmpEFTSetup := EFTSetup;
@@ -285,26 +285,30 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Table, 6184481, 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnSetPaymentBlobParameterName(Parameter: Record "EFT Type Payment BLOB Param.";var Caption: Text)
+    local procedure OnSetPaymentBlobParameterName(Parameter: Record "EFT Type Payment BLOB Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Payment wide BLOB Parameter' : Caption := CompBlobCaption1;
-          'Payment wide BLOB Parameter 2' : Caption := CompBlobCaption2;
+            'Payment wide BLOB Parameter':
+                Caption := CompBlobCaption1;
+            'Payment wide BLOB Parameter 2':
+                Caption := CompBlobCaption2;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184481, 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnSetPaymentBlobParameterDescription(Parameter: Record "EFT Type Payment BLOB Param.";var Caption: Text)
+    local procedure OnSetPaymentBlobParameterDescription(Parameter: Record "EFT Type Payment BLOB Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Payment wide BLOB Parameter' : Caption := CompBlobDesc1;
-          'Payment wide BLOB Parameter 2' : Caption := CompBlobDesc2;
+            'Payment wide BLOB Parameter':
+                Caption := CompBlobDesc1;
+            'Payment wide BLOB Parameter 2':
+                Caption := CompBlobDesc2;
         end;
     end;
 
@@ -319,36 +323,40 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Table, 6184483, 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnSetPaymentGenParameterName(Parameter: Record "EFT Type Payment Gen. Param.";var Caption: Text)
+    local procedure OnSetPaymentGenParameterName(Parameter: Record "EFT Type Payment Gen. Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Payment wide Parameter' : Caption := CompGenCaption1;
-          'Payment wide Parameter 2' : Caption := CompGenCaption2;
+            'Payment wide Parameter':
+                Caption := CompGenCaption1;
+            'Payment wide Parameter 2':
+                Caption := CompGenCaption2;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184483, 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnSetPaymentGenParameterDescription(Parameter: Record "EFT Type Payment Gen. Param.";var Caption: Text)
+    local procedure OnSetPaymentGenParameterDescription(Parameter: Record "EFT Type Payment Gen. Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Payment wide Parameter' : Caption := CompGenDesc1;
-          'Payment wide Parameter 2' : Caption := CompGenDesc2;
+            'Payment wide Parameter':
+                Caption := CompGenDesc1;
+            'Payment wide Parameter 2':
+                Caption := CompGenDesc2;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184483, 'OnGetParameterOptionStringCaption', '', false, false)]
-    local procedure OnSetPaymentGenParameterOptionCaption(Parameter: Record "EFT Type Payment Gen. Param.";var Caption: Text)
+    local procedure OnSetPaymentGenParameterOptionCaption(Parameter: Record "EFT Type Payment Gen. Param."; var Caption: Text)
     begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6184483, 'OnLookupParameterValue', '', false, false)]
-    local procedure OnLookupPaymentGenParameterValue(var Parameter: Record "EFT Type Payment Gen. Param.";var Handled: Boolean)
+    local procedure OnLookupPaymentGenParameterValue(var Parameter: Record "EFT Type Payment Gen. Param."; var Handled: Boolean)
     begin
     end;
 
@@ -358,26 +366,28 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Table, 6184482, 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnSetUnitBlobParameterName(Parameter: Record "EFT Type POS Unit BLOB Param.";var Caption: Text)
+    local procedure OnSetUnitBlobParameterName(Parameter: Record "EFT Type POS Unit BLOB Param."; var Caption: Text)
     var
         EFTSetup: Record "EFT Setup";
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Editable Binary Parameter' : Caption := UnitBlobCap;
+            'Editable Binary Parameter':
+                Caption := UnitBlobCap;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184482, 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnSetUnitBlobParameterDescription(Parameter: Record "EFT Type POS Unit BLOB Param.";var Caption: Text)
+    local procedure OnSetUnitBlobParameterDescription(Parameter: Record "EFT Type POS Unit BLOB Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Editable Binary Parameter' : Caption := UnitBlobDesc;
+            'Editable Binary Parameter':
+                Caption := UnitBlobDesc;
         end;
     end;
 
@@ -392,60 +402,67 @@ codeunit 6184511 "EFT Mock Client Integration"
     end;
 
     [EventSubscriber(ObjectType::Table, 6184484, 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnSetUnitGenParameterName(Parameter: Record "EFT Type POS Unit Gen. Param.";var Caption: Text)
+    local procedure OnSetUnitGenParameterName(Parameter: Record "EFT Type POS Unit Gen. Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Connection Method' : Caption := UnitConnMethodCaption;
-          'LAN IP' : Caption := UnitIPCaption;
-          'Virtual COM Port' : Caption := UnitVirtualComCaption;
+            'Connection Method':
+                Caption := UnitConnMethodCaption;
+            'LAN IP':
+                Caption := UnitIPCaption;
+            'Virtual COM Port':
+                Caption := UnitVirtualComCaption;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184484, 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnSetUnitGenParameterDescription(Parameter: Record "EFT Type POS Unit Gen. Param.";var Caption: Text)
+    local procedure OnSetUnitGenParameterDescription(Parameter: Record "EFT Type POS Unit Gen. Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Connection Method' : Caption := UnitConnMethodDesc;
-          'LAN IP' : Caption := UnitIPDesc;
-          'Virtual COM Port' : Caption := UnitVirtualComDesc;
+            'Connection Method':
+                Caption := UnitConnMethodDesc;
+            'LAN IP':
+                Caption := UnitIPDesc;
+            'Virtual COM Port':
+                Caption := UnitVirtualComDesc;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184484, 'OnGetParameterOptionStringCaption', '', false, false)]
-    local procedure OnSetUnitGenParameterOptionCaption(Parameter: Record "EFT Type POS Unit Gen. Param.";var Caption: Text)
+    local procedure OnSetUnitGenParameterOptionCaption(Parameter: Record "EFT Type POS Unit Gen. Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'Connection Method' : Caption := UnitConnMethodOptionString;
+            'Connection Method':
+                Caption := UnitConnMethodOptionString;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184484, 'OnLookupParameterValue', '', false, false)]
-    local procedure OnLookupUnitGenParameterValue(var Parameter: Record "EFT Type POS Unit Gen. Param.";var Handled: Boolean)
+    local procedure OnLookupUnitGenParameterValue(var Parameter: Record "EFT Type POS Unit Gen. Param."; var Handled: Boolean)
     begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6184484, 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidateUnitGenParameterValue(var Parameter: Record "EFT Type POS Unit Gen. Param.")
     var
-        TypeHelper: Codeunit "Type Helper";
+        RegEx: Codeunit DotNet_Regex;
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'LAN IP' :
-            if Parameter.Value <> '' then
-              if not TypeHelper.IsMatch(Parameter.Value, '^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\.(?!$)|$)){4}$') then
-                Parameter.FieldError(Value);
+            'LAN IP':
+                if Parameter.Value <> '' then
+                    if not RegEx.IsMatch(Parameter.Value, '^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\.(?!$)|$)){4}$') then
+                        Parameter.FieldError(Value);
         end;
     end;
 
@@ -474,14 +491,14 @@ codeunit 6184511 "EFT Mock Client Integration"
         exit(EFTTypePOSUnitGenParam.GetIntegerParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'Virtual COM Port', 40, true));
     end;
 
-    local procedure GetPOSUnitBlob1(EFTSetup: Record "EFT Setup";var TempBlob: Record TempBlob temporary)
+    local procedure GetPOSUnitBlob1(EFTSetup: Record "EFT Setup"; var TempBlob: Codeunit "Temp Blob")
     var
         EFTTypePOSUnitBLOBParam: Record "EFT Type POS Unit BLOB Param.";
     begin
         EFTTypePOSUnitBLOBParam.GetParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'Editable Binary Parameter', true, TempBlob);
     end;
 
-    local procedure GetPOSUnitBlob2(EFTSetup: Record "EFT Setup";var TempBlob: Record TempBlob temporary)
+    local procedure GetPOSUnitBlob2(EFTSetup: Record "EFT Setup"; var TempBlob: Codeunit "Temp Blob")
     var
         EFTTypePOSUnitBLOBParam: Record "EFT Type POS Unit BLOB Param.";
     begin
@@ -502,14 +519,14 @@ codeunit 6184511 "EFT Mock Client Integration"
         exit(EFTTypePaymentGenParam.GetTextParameterValue(IntegrationType(), EFTSetup."Payment Type POS", 'Payment wide Parameter 2', 'DefaultValue', true));
     end;
 
-    local procedure GetPaymentBlob1(EFTSetup: Record "EFT Setup";var TempBlob: Record TempBlob temporary)
+    local procedure GetPaymentBlob1(EFTSetup: Record "EFT Setup"; var TempBlob: Codeunit "Temp Blob")
     var
         EFTTypePaymentBLOBParam: Record "EFT Type Payment BLOB Param.";
     begin
         EFTTypePaymentBLOBParam.GetParameterValue(IntegrationType(), EFTSetup."Payment Type POS", 'Payment wide BLOB Parameter', true, TempBlob);
     end;
 
-    local procedure GetPaymentBlob2(EFTSetup: Record "EFT Setup";var TempBlob: Record TempBlob temporary)
+    local procedure GetPaymentBlob2(EFTSetup: Record "EFT Setup"; var TempBlob: Codeunit "Temp Blob")
     var
         EFTTypePaymentBLOBParam: Record "EFT Type Payment BLOB Param.";
     begin

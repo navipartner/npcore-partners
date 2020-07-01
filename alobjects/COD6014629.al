@@ -112,7 +112,7 @@ codeunit 6014629 "Managed Package Builder"
         DownloadFromStream(MemoryStream, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
     end;
 
-    procedure ExportToBlob(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer; var TempBlobOut: Record TempBlob temporary)
+    procedure ExportToBlob(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer; var TempBlobOut: Codeunit "Temp Blob")
     var
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
         JObject: DotNet JObject;
@@ -125,10 +125,9 @@ codeunit 6014629 "Managed Package Builder"
 
         //-NPR5.27 [252131]
         //TempBlobOut.Blob.CREATEOUTSTREAM(OutStream);
-        TempBlobOut.Blob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
+        TempBlobOut.CreateOutStream(OutStream, TEXTENCODING::UTF8);
         //+NPR5.27 [252131]
         OutStream.Write(CreateManifest(Name, Version, Description, PrimaryPackageTable));
-        TempBlobOut.Insert;
     end;
 
     local procedure CreateManifest(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer): Text

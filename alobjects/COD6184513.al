@@ -77,12 +77,10 @@ codeunit 6184513 "EFT MobilePay Integration"
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
         EFTTypePOSUnitBLOBParam: Record "EFT Type POS Unit BLOB Param.";
-        Blob1: Record TempBlob temporary;
-        Blob2: Record TempBlob temporary;
         EFTInterface: Codeunit "EFT Interface";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         GetLocationID(EFTSetup);
         GetPoSID(EFTSetup);
@@ -98,11 +96,9 @@ codeunit 6184513 "EFT MobilePay Integration"
     var
         EFTTypePaymentBLOBParam: Record "EFT Type Payment BLOB Param.";
         EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
-        Blob1: Record TempBlob temporary;
-        Blob2: Record TempBlob temporary;
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         GetAPIKey(EFTSetup);
         GetMerchantID(EFTSetup);
@@ -112,19 +108,19 @@ codeunit 6184513 "EFT MobilePay Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
-    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         InitializeGlobals(EftTransactionRequest."POS Payment Type Code", EftTransactionRequest."Register No.");
 
         if (EftTransactionRequest."Cashback Amount" > 0) then
-          Error(NoCashback);
+            Error(NoCashback);
 
         if (PoSID = '') or (PoSUnitID = '') then
-          Error(MissingPOSUnitSetup, POSUnit.TableCaption, EftTransactionRequest."Register No.", IntegrationType());
+            Error(MissingPOSUnitSetup, POSUnit.TableCaption, EftTransactionRequest."Register No.", IntegrationType());
 
         EftTransactionRequest."Hardware ID" := StrSubstNo('%1_%2_%3', MerchantID, LocationID, PoSID);
         EftTransactionRequest."Integration Version Code" := 'V06';
@@ -132,21 +128,21 @@ codeunit 6184513 "EFT MobilePay Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
-    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         //TODO: Implement API request looking up transaction results so lost results can be recovered later in case of error.
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
-    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         EFTMobilePayProtocol: Codeunit "EFT MobilePay Protocol";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         EFTMobilePayProtocol.SendEftDeviceRequest(EftTransactionRequest);
@@ -174,54 +170,55 @@ codeunit 6184513 "EFT MobilePay Integration"
         EFTMobilePayIntegration: Codeunit "EFT MobilePay Integration";
     begin
         if Parameter."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Parameter.Name of
-          'PoS Unit ID' : Parameter.Value := EFTMobilePayIntegration.ResolvePoSUnitId(Parameter.Value);
+            'PoS Unit ID':
+                Parameter.Value := EFTMobilePayIntegration.ResolvePoSUnitId(Parameter.Value);
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184484, 'OnAfterModifyEvent', '', false, false)]
-    local procedure OnAfterModifyPOSUnitGenParameter(var Rec: Record "EFT Type POS Unit Gen. Param.";var xRec: Record "EFT Type POS Unit Gen. Param.";RunTrigger: Boolean)
+    local procedure OnAfterModifyPOSUnitGenParameter(var Rec: Record "EFT Type POS Unit Gen. Param."; var xRec: Record "EFT Type POS Unit Gen. Param."; RunTrigger: Boolean)
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
     begin
         //-NPR5.48 [341674]
         if not RunTrigger then
-          exit;
+            exit;
         //+NPR5.48 [341674]
         if Rec."Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         case Rec.Name of
-          'PoS Unit ID' :
-            begin
-              if xRec.Value <> '' then
-        //-NPR5.51 [352248]
-                if EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), Rec."POS Unit No.", 'PoS Unit Assigned', false, true) then
-        //+NPR5.51 [352248]
-                  Error('Unregister PoS Unit before adding new');
-            end;
+            'PoS Unit ID':
+                begin
+                    if xRec.Value <> '' then
+                        //-NPR5.51 [352248]
+                        if EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), Rec."POS Unit No.", 'PoS Unit Assigned', false, true) then
+                            //+NPR5.51 [352248]
+                            Error('Unregister PoS Unit before adding new');
+                end;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6184485, 'OnAfterInsertEvent', '', false, false)]
-    local procedure OnAfterInsertEFTSetup(var Rec: Record "EFT Setup";RunTrigger: Boolean)
+    local procedure OnAfterInsertEFTSetup(var Rec: Record "EFT Setup"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary or (not RunTrigger) then
-          exit;
+            exit;
         if Rec."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
         Rec.TestField("POS Unit No.");
     end;
 
     [EventSubscriber(ObjectType::Table, 6184485, 'OnAfterRenameEvent', '', false, false)]
-    local procedure OnAfterRenameEFTSetup(var Rec: Record "EFT Setup";var xRec: Record "EFT Setup";RunTrigger: Boolean)
+    local procedure OnAfterRenameEFTSetup(var Rec: Record "EFT Setup"; var xRec: Record "EFT Setup"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary or (not RunTrigger) then
-          exit;
+            exit;
         if Rec."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
         Rec.TestField("POS Unit No.");
     end;
 
@@ -229,7 +226,7 @@ codeunit 6184513 "EFT MobilePay Integration"
     begin
     end;
 
-    procedure InitializeGlobals(PaymentType: Code[10];RegisterNo: Code[10])
+    procedure InitializeGlobals(PaymentType: Code[10]; RegisterNo: Code[10])
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
         EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
@@ -237,7 +234,7 @@ codeunit 6184513 "EFT MobilePay Integration"
     begin
         EFTSetupIn.FindSetup(RegisterNo, PaymentType);
         if Format(EFTSetupIn.RecordId) = Format(EFTSetup.RecordId) then
-          exit;
+            exit;
         EFTSetupIn.TestField("EFT Integration Type", IntegrationType());
 
         EFTSetup := EFTSetupIn;
@@ -258,22 +255,22 @@ codeunit 6184513 "EFT MobilePay Integration"
         //+NPR5.46.01 [333953]
 
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, RegisterNo, 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, RegisterNo, 'Location ID');
         if APIKey = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'API Key');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'API Key');
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
 
         if Demo then begin
-        //-NPR5.54 [388507]
-        //  ServiceHost := 'mobilepaypos-extest.cloudapp.net';
-        //  ServiceBaseURL := 'http://mobilepaypos-extest.cloudapp.net/API/V06/';
-          ServiceHost := 'sandprod-pos2.mobilepay.dk';
-          ServiceBaseURL := 'https://sandprod-pos2.mobilepay.dk/API/V06/';
-        //+NPR5.54 [388507]
+            //-NPR5.54 [388507]
+            //  ServiceHost := 'mobilepaypos-extest.cloudapp.net';
+            //  ServiceBaseURL := 'http://mobilepaypos-extest.cloudapp.net/API/V06/';
+            ServiceHost := 'sandprod-pos2.mobilepay.dk';
+            ServiceBaseURL := 'https://sandprod-pos2.mobilepay.dk/API/V06/';
+            //+NPR5.54 [388507]
         end else begin
-          ServiceHost := 'mobilepaypos2.danskebank.dk';
-          ServiceBaseURL := 'https://mobilepaypos2.danskebank.dk/API/V06/';
+            ServiceHost := 'mobilepaypos2.danskebank.dk';
+            ServiceBaseURL := 'https://mobilepaypos2.danskebank.dk/API/V06/';
         end;
     end;
 
@@ -288,12 +285,12 @@ codeunit 6184513 "EFT MobilePay Integration"
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
         if InvokeRegisterPoS(PoSID) then begin
-          EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS ID', PoSID);
-          EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Registered', true);
-          PoSRegistered := true;
-          Message(Text6014517,EFTSetup."POS Unit No.",PoSID);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS ID', PoSID);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Registered', true);
+            PoSRegistered := true;
+            Message(Text6014517, EFTSetup."POS Unit No.", PoSID);
         end else
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     procedure UpdateRegisteredPoSName(EFTSetupIn: Record "EFT Setup")
@@ -305,12 +302,12 @@ codeunit 6184513 "EFT MobilePay Integration"
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
         if not PoSRegistered then
-          Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
+            Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
 
         if InvokeUpdateRegisteredPoSName() then
-          Message(Text6014518,EFTSetup."POS Unit No.",Register.Description)
+            Message(Text6014518, EFTSetup."POS Unit No.", Register.Description)
         else
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     procedure UnRegisterPoS(EFTSetupIn: Record "EFT Setup")
@@ -322,14 +319,14 @@ codeunit 6184513 "EFT MobilePay Integration"
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
         if not PoSRegistered then
-          Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
+            Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
 
         if InvokeUnRegisterPoS() then begin
-          EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Registered', false);
-          PoSRegistered := false;
-          Message(Text6014519,EFTSetup."POS Unit No.");
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Registered', false);
+            PoSRegistered := false;
+            Message(Text6014519, EFTSetup."POS Unit No.");
         end else
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     procedure AssignPoSUnitIdToPoS(EFTSetupIn: Record "EFT Setup")
@@ -342,19 +339,19 @@ codeunit 6184513 "EFT MobilePay Integration"
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
         if not PoSRegistered then
-          Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
+            Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
         if PoSUnitAssigned then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit Assigned');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit Assigned');
         if PoSUnitID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
 
         if InvokeAssignPoSUnitIdToPoS(PoSUnitID) then begin
-          EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Unit ID', PoSUnitID);
-          EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Unit Assigned', true);
-          PoSUnitAssigned := true;
-          Message(Text6014521,PoSUnitID,EFTSetup."POS Unit No.");
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Unit ID', PoSUnitID);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Unit Assigned', true);
+            PoSUnitAssigned := true;
+            Message(Text6014521, PoSUnitID, EFTSetup."POS Unit No.");
         end else
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     procedure UnAssignPoSUnitIdToPoS(EFTSetupIn: Record "EFT Setup")
@@ -368,18 +365,18 @@ codeunit 6184513 "EFT MobilePay Integration"
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
         if not PoSRegistered then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Registered');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Registered');
         if not PoSUnitAssigned then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit Assigned');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit Assigned');
         if PoSUnitID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
 
         if InvokeUnAssignPoSUnitIdToPoS(PoSUnitID) then begin
-          EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit Assigned', false);
-          PoSUnitAssigned := false;
-          Message(Text6014522);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit Assigned', false);
+            PoSUnitAssigned := false;
+            Message(Text6014522);
         end else
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     procedure ReadPoSAssignPoSUnitId(EFTSetupIn: Record "EFT Setup")
@@ -392,18 +389,18 @@ codeunit 6184513 "EFT MobilePay Integration"
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
         if InvokeReadPoSAssignPoSUnitId(RegisteredPoSUnitId) then begin
-          if PoSUnitID = RegisteredPoSUnitId then
-            Message(Text6014523)
-          else begin
-            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit ID', RegisteredPoSUnitId);
-        //-NPR5.54 [388507]
-            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit Assigned', true);
-        //+NPR5.54 [388507]
-            PoSUnitID := RegisteredPoSUnitId;
-            Message(Text6014520, PoSUnitID, EFTSetup."POS Unit No.");
-          end;
+            if PoSUnitID = RegisteredPoSUnitId then
+                Message(Text6014523)
+            else begin
+                EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit ID', RegisteredPoSUnitId);
+                //-NPR5.54 [388507]
+                EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit Assigned', true);
+                //+NPR5.54 [388507]
+                PoSUnitID := RegisteredPoSUnitId;
+                Message(Text6014520, PoSUnitID, EFTSetup."POS Unit No.");
+            end;
         end else
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     procedure ReadPoSUnitAssignedPoSId(EFTSetupIn: Record "EFT Setup")
@@ -422,21 +419,21 @@ codeunit 6184513 "EFT MobilePay Integration"
         //RegisterPoSUnitId := ResolvePoSUnitId(RegisterPoSUnitId);
         RegisterPoSUnitId := ResolvePoSUnitId(PoSUnitID);
         //+NPR5.54 [388507]
-        if InvokeReadPoSUnitAssignedPoSId(RegisterPoSUnitId,RegisterPoSId) then begin
-          if RegisterPoSId <> '' then begin
-            EFTTypePOSUnitGenParam.SetRange("Integration Type", IntegrationType());
-            EFTTypePOSUnitGenParam.SetRange(Name, 'PoS ID');
-            EFTTypePOSUnitGenParam.SetRange(Value, RegisterPoSId);
-            Found := EFTTypePOSUnitGenParam.FindFirst;
-          end;
-          if Found then
-            Message(Text6014524,RegisterPoSUnitId,EFTTypePOSUnitGenParam."POS Unit No.",RegisterPoSId)
-        //-NPR5.54 [388507]
-          else
-            Message(INCORRECT_POS_ID, RegisterPoSUnitId, RegisterPoSId);
-        //+NPR5.54 [388507]
+        if InvokeReadPoSUnitAssignedPoSId(RegisterPoSUnitId, RegisterPoSId) then begin
+            if RegisterPoSId <> '' then begin
+                EFTTypePOSUnitGenParam.SetRange("Integration Type", IntegrationType());
+                EFTTypePOSUnitGenParam.SetRange(Name, 'PoS ID');
+                EFTTypePOSUnitGenParam.SetRange(Value, RegisterPoSId);
+                Found := EFTTypePOSUnitGenParam.FindFirst;
+            end;
+            if Found then
+                Message(Text6014524, RegisterPoSUnitId, EFTTypePOSUnitGenParam."POS Unit No.", RegisterPoSId)
+            //-NPR5.54 [388507]
+            else
+                Message(INCORRECT_POS_ID, RegisterPoSUnitId, RegisterPoSId);
+            //+NPR5.54 [388507]
         end else
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     procedure PaymentStart(var EftTransactionRequest: Record "EFT Transaction Request"): Boolean
@@ -448,13 +445,13 @@ codeunit 6184513 "EFT MobilePay Integration"
         EftTransactionRequest.Modify;
 
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
         if PoSUnitID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
 
         exit(InvokePaymentStart(EftTransactionRequest));
     end;
@@ -468,31 +465,31 @@ codeunit 6184513 "EFT MobilePay Integration"
     begin
         ClearLastError();
         if InvokeGetPaymentStatus(EFTTransReq, PaymentStatus, CustomerID, TransactionID) then begin
-          if PaymentStatus <> EFTTransReq."Result Code" then begin
-            EFTTransReq."Result Code" := PaymentStatus;
-        //-NPR5.47 [334510]
-            //EFTTransReq."Result Description" := GetPaymentStatusText(PaymentStatus);
-            EFTTransReq."Result Description" := CopyStr(GetPaymentStatusText(PaymentStatus), 1, MaxStrLen(EFTTransReq."Result Description"));
-        //+NPR5.47 [334510]
-          end;
+            if PaymentStatus <> EFTTransReq."Result Code" then begin
+                EFTTransReq."Result Code" := PaymentStatus;
+                //-NPR5.47 [334510]
+                //EFTTransReq."Result Description" := GetPaymentStatusText(PaymentStatus);
+                EFTTransReq."Result Description" := CopyStr(GetPaymentStatusText(PaymentStatus), 1, MaxStrLen(EFTTransReq."Result Description"));
+                //+NPR5.47 [334510]
+            end;
 
-          if not (CustomerID in ['', 'null']) then
-            EFTTransReq."External Customer ID" := CustomerID;
+            if not (CustomerID in ['', 'null']) then
+                EFTTransReq."External Customer ID" := CustomerID;
 
-          if TransactionID <> '' then begin
-            EFTTransReq."External Transaction ID" := TransactionID;
-            EFTTransReq."Reference Number Output" := TransactionID;
-          end;
+            if TransactionID <> '' then begin
+                EFTTransReq."External Transaction ID" := TransactionID;
+                EFTTransReq."Reference Number Output" := TransactionID;
+            end;
 
-          if EFTTransReq."Result Code" = 100 then begin //Success
-            EFTTransReq.Successful := true;
-            EFTTransReq."Amount Output" := EFTTransReq."Amount Input";
-            EFTTransReq."Result Amount" := EFTTransReq."Amount Input";
-          end;
+            if EFTTransReq."Result Code" = 100 then begin //Success
+                EFTTransReq.Successful := true;
+                EFTTransReq."Amount Output" := EFTTransReq."Amount Input";
+                EFTTransReq."Result Amount" := EFTTransReq."Amount Input";
+            end;
 
-          EFTTransReq.Modify; //Persist changes across multiple status checks.
+            EFTTransReq.Modify; //Persist changes across multiple status checks.
 
-          exit(true);
+            exit(true);
         end;
 
         exit(false);
@@ -516,18 +513,18 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         Register.TestField(Description);
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody := RequestBody + StrSubstNo('"PosId":"%1",',PoSIdIn);
-        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}',Register.Description);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody := RequestBody + StrSubstNo('"PosId":"%1",', PoSIdIn);
+        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', Register.Description);
 
-        InvokeRESTHTTPRequest(RequestBody,'RegisterPoS',ResponseText);
-        ReadJSONValue(ResponseText,'PoSId',PoSIdIn);
+        InvokeRESTHTTPRequest(RequestBody, 'RegisterPoS', ResponseText);
+        ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
     end;
 
     [TryFunction]
@@ -537,19 +534,19 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
         Register.TestField(Description);
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody := RequestBody + StrSubstNo('"PosId":"%1",',PoSID);
-        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}',Register.Description);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody := RequestBody + StrSubstNo('"PosId":"%1",', PoSID);
+        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', Register.Description);
 
-        InvokeRESTHTTPRequest(RequestBody,'UpdateRegisteredPoSName',ResponseText);
+        InvokeRESTHTTPRequest(RequestBody, 'UpdateRegisteredPoSName', ResponseText);
     end;
 
     [TryFunction]
@@ -559,17 +556,17 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody := RequestBody + StrSubstNo('"PosId":"%1"}',PoSID);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody := RequestBody + StrSubstNo('"PosId":"%1"}', PoSID);
 
-        InvokeRESTHTTPRequest(RequestBody,'UnRegisterPoS',ResponseText);
+        InvokeRESTHTTPRequest(RequestBody, 'UnRegisterPoS', ResponseText);
     end;
 
     [TryFunction]
@@ -579,15 +576,15 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
 
         //-NPR5.54 [388507]
         //RequestBody := STRSUBSTNO('{"MerchantId":"%1"}',PaymentTypePOS."MobilePay Merchant ID");
-        RequestBody := StrSubstNo('{"MerchantId":"%1"}',MerchantID);
+        RequestBody := StrSubstNo('{"MerchantId":"%1"}', MerchantID);
         //+NPR5.54 [388507]
 
-        InvokeRESTHTTPRequest(RequestBody,'GetUniquePoSId',ResponseText);
-        ReadJSONValue(ResponseText,'PoSId',PoSIdIn);
+        InvokeRESTHTTPRequest(RequestBody, 'GetUniquePoSId', ResponseText);
+        ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
     end;
 
     [TryFunction]
@@ -597,18 +594,18 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",',PoSID);
-        RequestBody += StrSubstNo('"PoSUnitId":"%1"}',PoSUnitIdIn);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
+        RequestBody += StrSubstNo('"PoSUnitId":"%1"}', PoSUnitIdIn);
 
-        InvokeRESTHTTPRequest(RequestBody,'AssignPoSUnitIdToPoS',ResponseText);
+        InvokeRESTHTTPRequest(RequestBody, 'AssignPoSUnitIdToPoS', ResponseText);
     end;
 
     [TryFunction]
@@ -618,20 +615,20 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
         if PoSUnitID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",',PoSID);
-        RequestBody += StrSubstNo('"PoSUnitId":"%1"}',PoSUnitID);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
+        RequestBody += StrSubstNo('"PoSUnitId":"%1"}', PoSUnitID);
 
-        InvokeRESTHTTPRequest(RequestBody,'UnAssignPoSUnitIdToPoS',ResponseText);
+        InvokeRESTHTTPRequest(RequestBody, 'UnAssignPoSUnitIdToPoS', ResponseText);
     end;
 
     [TryFunction]
@@ -641,37 +638,37 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1"}',PoSID);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody += StrSubstNo('"PosId":"%1"}', PoSID);
 
-        InvokeRESTHTTPRequest(RequestBody,'ReadPoSAssignPoSUnitId',ResponseText);
-        ReadJSONValue(ResponseText,'PoSUnitId',PoSUnitIdIn);
+        InvokeRESTHTTPRequest(RequestBody, 'ReadPoSAssignPoSUnitId', ResponseText);
+        ReadJSONValue(ResponseText, 'PoSUnitId', PoSUnitIdIn);
     end;
 
     [TryFunction]
-    local procedure InvokeReadPoSUnitAssignedPoSId(PoSUnitIdIn: Text[30];var PoSIdIn: Text[50])
+    local procedure InvokeReadPoSUnitAssignedPoSId(PoSUnitIdIn: Text[30]; var PoSIdIn: Text[50])
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
-          Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
+            Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody += StrSubstNo('"PosUnitId":"%1"}',PoSUnitIdIn);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody += StrSubstNo('"PosUnitId":"%1"}', PoSUnitIdIn);
 
-        InvokeRESTHTTPRequest(RequestBody,'ReadPoSUnitAssignedPoSId',ResponseText);
-        ReadJSONValue(ResponseText,'PoSId',PoSIdIn);
+        InvokeRESTHTTPRequest(RequestBody, 'ReadPoSUnitAssignedPoSId', ResponseText);
+        ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
     end;
 
     [TryFunction]
@@ -681,39 +678,39 @@ codeunit 6184513 "EFT MobilePay Integration"
         ResponseText: Text[1024];
         CustToken: Integer;
     begin
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",',PoSID);
-        RequestBody += StrSubstNo('"OrderId":"%1",',EFTTransReq."Reference Number Input");
-        RequestBody += StrSubstNo('"Amount":"%1",',Format(EFTTransReq."Amount Input",0,'<Precision,2:2><Standard Format,9>'));
-        RequestBody += StrSubstNo('"BulkRef":"%1",','');
-        RequestBody += StrSubstNo('"ReceiptText":"%1",','');
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
+        RequestBody += StrSubstNo('"OrderId":"%1",', EFTTransReq."Reference Number Input");
+        RequestBody += StrSubstNo('"Amount":"%1",', Format(EFTTransReq."Amount Input", 0, '<Precision,2:2><Standard Format,9>'));
+        RequestBody += StrSubstNo('"BulkRef":"%1",', '');
+        RequestBody += StrSubstNo('"ReceiptText":"%1",', '');
         RequestBody += '"Action":"Start",';
-        RequestBody += StrSubstNo('"CustomerTokenCalc":%1,',Format(false,0,2));
-        RequestBody += StrSubstNo('"HMAC":"%1"}',CalcPaymentHMAC(EFTTransReq));
+        RequestBody += StrSubstNo('"CustomerTokenCalc":%1,', Format(false, 0, 2));
+        RequestBody += StrSubstNo('"HMAC":"%1"}', CalcPaymentHMAC(EFTTransReq));
 
-        InvokeRESTHTTPRequest(RequestBody,'PaymentStart',ResponseText);
+        InvokeRESTHTTPRequest(RequestBody, 'PaymentStart', ResponseText);
     end;
 
     [TryFunction]
-    local procedure InvokeGetPaymentStatus(EFTTransReq: Record "EFT Transaction Request";var PaymentStatus: Integer;var CustomerID: Text;var TransactionID: Text)
+    local procedure InvokeGetPaymentStatus(EFTTransReq: Record "EFT Transaction Request"; var PaymentStatus: Integer; var CustomerID: Text; var TransactionID: Text)
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
         PaymentStatusText: Text;
     begin
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",',PoSID);
-        RequestBody += StrSubstNo('"OrderId":"%1"}',EFTTransReq."Reference Number Input");
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
+        RequestBody += StrSubstNo('"OrderId":"%1"}', EFTTransReq."Reference Number Input");
 
-        InvokeRESTHTTPRequest(RequestBody,'GetPaymentStatus',ResponseText);
-        if ReadJSONValue(ResponseText,'PaymentStatus',PaymentStatusText) then begin
-          Evaluate(PaymentStatus, PaymentStatusText);
-          if PaymentStatus <> EFTTransReq."Result Code" then begin
-            ReadJSONValue(ResponseText,'CustomerId',CustomerID);
-            ReadJSONValue(ResponseText,'TransactionId',TransactionID);
-          end;
+        InvokeRESTHTTPRequest(RequestBody, 'GetPaymentStatus', ResponseText);
+        if ReadJSONValue(ResponseText, 'PaymentStatus', PaymentStatusText) then begin
+            Evaluate(PaymentStatus, PaymentStatusText);
+            if PaymentStatus <> EFTTransReq."Result Code" then begin
+                ReadJSONValue(ResponseText, 'CustomerId', CustomerID);
+                ReadJSONValue(ResponseText, 'TransactionId', TransactionID);
+            end;
         end;
     end;
 
@@ -726,14 +723,14 @@ codeunit 6184513 "EFT MobilePay Integration"
         TransactionCustomerID: Text[30];
         TransactionPaymentID: Text[30];
     begin
-        RequestBody := StrSubstNo('{"MerchantId":"%1",',MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",',LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1"}',PoSID);
+        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
+        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
+        RequestBody += StrSubstNo('"PosId":"%1"}', PoSID);
 
-        InvokeRESTHTTPRequest(RequestBody,'PaymentCancel',ResponseText);
+        InvokeRESTHTTPRequest(RequestBody, 'PaymentCancel', ResponseText);
     end;
 
-    local procedure InvokeRESTHTTPRequest(var JSONRequestBody: Text[1024];ServiceName: Text[30];var JSONResponseText: Text[1024]): Boolean
+    local procedure InvokeRESTHTTPRequest(var JSONRequestBody: Text[1024]; ServiceName: Text[30]; var JSONResponseText: Text[1024]): Boolean
     var
         HttpWebRequest: DotNet npNetHttpWebRequest;
         ReqStream: DotNet npNetStream;
@@ -745,12 +742,12 @@ codeunit 6184513 "EFT MobilePay Integration"
         AuthHeader: Text[100];
     begin
         ServiceURL := ServiceBaseURL + ServiceName;
-        AuthHeader := CalcAuthHeader(ServiceURL,JSONRequestBody);
+        AuthHeader := CalcAuthHeader(ServiceURL, JSONRequestBody);
 
         HttpWebRequest := HttpWebRequest.Create(ServiceURL);
         HttpWebRequest.Host(ServiceHost);
         HttpWebRequest.ContentType('application/json');
-        HttpWebRequest.Headers.Add('Authorization',AuthHeader);
+        HttpWebRequest.Headers.Add('Authorization', AuthHeader);
         HttpWebRequest.Method('POST');
 
         ReqStream := HttpWebRequest.GetRequestStream;
@@ -771,7 +768,7 @@ codeunit 6184513 "EFT MobilePay Integration"
     begin
     end;
 
-    local procedure CalcAuthHeader(RequestUrl: Text[100];ContentBody: Text[1024]): Text[100]
+    local procedure CalcAuthHeader(RequestUrl: Text[100]; ContentBody: Text[1024]): Text[100]
     var
         Encoding: DotNet npNetEncoding;
         AuthString: Text[1024];
@@ -779,14 +776,14 @@ codeunit 6184513 "EFT MobilePay Integration"
         UnixTimeStamp: Integer;
     begin
         if APIKey = '' then
-          Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'API Key');
+            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'API Key');
 
         UnixTimeStamp := GetUnixTime(CurrentDateTime);
 
-        AuthString := StrSubstNo('%1 %2 %3',RequestUrl,ContentBody,UnixTimeStamp);
-        HashValue := GetHmacSha256Hash(APIKey,AuthString,Encoding.UTF8);
+        AuthString := StrSubstNo('%1 %2 %3', RequestUrl, ContentBody, UnixTimeStamp);
+        HashValue := GetHmacSha256Hash(APIKey, AuthString, Encoding.UTF8);
 
-        exit(StrSubstNo('%1 %2',HashValue,UnixTimeStamp));
+        exit(StrSubstNo('%1 %2', HashValue, UnixTimeStamp));
     end;
 
     local procedure CalcPaymentHMAC(EftTransactionRequest: Record "EFT Transaction Request"): Text[100]
@@ -797,17 +794,17 @@ codeunit 6184513 "EFT MobilePay Integration"
         HashValue: Text[100];
         CharSet: Text[30];
     begin
-        HMACString := StrSubstNo('%1%2#%3#%4#%5#%6#%7',MerchantID,
+        HMACString := StrSubstNo('%1%2#%3#%4#%5#%6#%7', MerchantID,
                                                        LocationID,
                                                        PoSID,
                                                        EftTransactionRequest."Reference Number Input",
-                                                       Format(EftTransactionRequest."Amount Input",0,'<Precision,2:2><Standard Format,9>'),
+                                                       Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,9>'),
                                                        '', //BulkRef
                                                        ''); //Receipt Text
 
         Encoding := Encoding.GetEncoding('iso-8859-1');
-        MerchantKey := CopyStr(MerchantID,4,6);
-        HashValue := GetHmacSha256Hash(GetSha256Hash(MerchantKey,Encoding),HMACString,Encoding);
+        MerchantKey := CopyStr(MerchantID, 4, 6);
+        HashValue := GetHmacSha256Hash(GetSha256Hash(MerchantKey, Encoding), HMACString, Encoding);
 
         exit(HashValue);
     end;
@@ -823,14 +820,14 @@ codeunit 6184513 "EFT MobilePay Integration"
         PoSUnitIdString := LowerCase(PoSUnitIdString);
         StartDelim := 'id=';
         EndDelim := '&';
-        if StrPos(PoSUnitIdString,'mobilepaypos://') = 1 then begin  //Scanned from QR code
-          PoSUnitId := CopyStr(PoSUnitIdString,StrPos(PoSUnitIdString,StartDelim)+StrLen(StartDelim));
-          PoSUnitId := CopyStr(PoSUnitId,1,StrPos(PoSUnitId,EndDelim)-1);
+        if StrPos(PoSUnitIdString, 'mobilepaypos://') = 1 then begin  //Scanned from QR code
+            PoSUnitId := CopyStr(PoSUnitIdString, StrPos(PoSUnitIdString, StartDelim) + StrLen(StartDelim));
+            PoSUnitId := CopyStr(PoSUnitId, 1, StrPos(PoSUnitId, EndDelim) - 1);
         end else
-          PoSUnitId := PoSUnitIdString;
+            PoSUnitId := PoSUnitIdString;
     end;
 
-    local procedure ReadJSONValue(var JSONObject: Text[1024];ValueName: Text[100];var ValueAsText: Text[100]): Boolean
+    local procedure ReadJSONValue(var JSONObject: Text[1024]; ValueName: Text[100]; var ValueAsText: Text[100]): Boolean
     var
         Buffer: Text[1024];
         ValuePos: Integer;
@@ -841,46 +838,46 @@ codeunit 6184513 "EFT MobilePay Integration"
         IsStringValue: Boolean;
         EndOfValue: Boolean;
     begin
-        ValueName := StrSubstNo('"%1":',ValueName);
-        ValuePos := StrPos(JSONObject,ValueName);
+        ValueName := StrSubstNo('"%1":', ValueName);
+        ValuePos := StrPos(JSONObject, ValueName);
         if ValuePos = 0 then
-          exit(false);
+            exit(false);
 
         ValuePos += StrLen(ValueName);
         ValueAsText := '';
-        Buffer := CopyStr(JSONObject,ValuePos);
+        Buffer := CopyStr(JSONObject, ValuePos);
 
         //Trim prefixing white spaces
         TAB := 9;
         LF := 10;
         CR := 13;
         i := 1;
-        while(CopyStr(Buffer,i,1) in [' ',Format(TAB),Format(LF),Format(CR)]) do
-          i += 1;
+        while (CopyStr(Buffer, i, 1) in [' ', Format(TAB), Format(LF), Format(CR)]) do
+            i += 1;
 
-        if CopyStr(Buffer,i,1) = '"' then begin//String
-          IsStringValue := true;
-          i += 1;
+        if CopyStr(Buffer, i, 1) = '"' then begin//String
+            IsStringValue := true;
+            i += 1;
         end else
-          IsStringValue := false;
+            IsStringValue := false;
 
 
         if IsStringValue then
-          EndOfValue := (CopyStr(Buffer,i,1) = '"')
+            EndOfValue := (CopyStr(Buffer, i, 1) = '"')
         else
-          EndOfValue := (CopyStr(Buffer,i,1) in [',','}']);
+            EndOfValue := (CopyStr(Buffer, i, 1) in [',', '}']);
         while not EndOfValue do begin
-          if CopyStr(Buffer,i,1) = '\' then begin
-            ValueAsText := ValueAsText + CopyStr(Buffer,i+1,1);
-            i += 2;
-          end else begin
-            ValueAsText := ValueAsText + CopyStr(Buffer,i,1);
-            i += 1;
-          end;
-          if IsStringValue then
-            EndOfValue := (CopyStr(Buffer,i,1) = '"')
-          else
-            EndOfValue := (CopyStr(Buffer,i,1) in [',','}']);
+            if CopyStr(Buffer, i, 1) = '\' then begin
+                ValueAsText := ValueAsText + CopyStr(Buffer, i + 1, 1);
+                i += 2;
+            end else begin
+                ValueAsText := ValueAsText + CopyStr(Buffer, i, 1);
+                i += 1;
+            end;
+            if IsStringValue then
+                EndOfValue := (CopyStr(Buffer, i, 1) = '"')
+            else
+                EndOfValue := (CopyStr(Buffer, i, 1) in [',', '}']);
         end;
         exit(true);
     end;
@@ -913,7 +910,7 @@ codeunit 6184513 "EFT MobilePay Integration"
         //+NPR5.51 [363895]
     end;
 
-    local procedure GetHmacSha256Hash("Key": Text;Value: Text;Encoding: DotNet npNetEncoding): Text
+    local procedure GetHmacSha256Hash("Key": Text; Value: Text; Encoding: DotNet npNetEncoding): Text
     var
         HmacSha256: DotNet npNetHMACSHA256;
         Convert: DotNet npNetConvert;
@@ -922,7 +919,7 @@ codeunit 6184513 "EFT MobilePay Integration"
         exit(Convert.ToBase64String(HmacSha256.ComputeHash(Encoding.GetBytes(Value))));
     end;
 
-    local procedure GetSha256Hash(Value: Text;Encoding: DotNet npNetEncoding): Text
+    local procedure GetSha256Hash(Value: Text; Encoding: DotNet npNetEncoding): Text
     var
         Sha256: DotNet npNetSHA256Managed;
         Convert: DotNet npNetConvert;
@@ -933,30 +930,30 @@ codeunit 6184513 "EFT MobilePay Integration"
 
     procedure GetQRUri(): Text
     begin
-        exit(StrSubstNo('mobilepaypos://pos?id=%1&source=qr',PoSUnitID));
+        exit(StrSubstNo('mobilepaypos://pos?id=%1&source=qr', PoSUnitID));
     end;
 
     local procedure GetPaymentStatusText(PaymentStatus: Integer): Text
     begin
         case PaymentStatus of
-          0,10:
-            exit(Text10);
-          20:
-            exit(Text20);
-          30:
-            exit(Text30);
-          40:
-            exit(Text40);
-          50:
-            exit(Text50);
-          60:
-            exit(Text60);
-          70:
-            exit(Text70);
-          80:
-            exit(Text80);
-          100:
-            exit(Text100);
+            0, 10:
+                exit(Text10);
+            20:
+                exit(Text20);
+            30:
+                exit(Text30);
+            40:
+                exit(Text40);
+            50:
+                exit(Text50);
+            60:
+                exit(Text60);
+            70:
+                exit(Text70);
+            80:
+                exit(Text80);
+            100:
+                exit(Text100);
         end;
     end;
 

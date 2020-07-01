@@ -10,44 +10,47 @@ table 6014458 "E-mail Attachment"
 
     fields
     {
-        field(1;"Table No.";Integer)
+        field(1; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(10;"Primary Key";Text[200])
+        field(10; "Primary Key"; Text[200])
         {
             Caption = 'Primary Key';
         }
-        field(20;"Line No.";Integer)
+        field(20; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(30;"Attached File";BLOB)
+        field(30; "Attached File"; BLOB)
         {
             Caption = 'Attached data';
 
             trigger OnLookup()
             var
-                TempBlob: Record TempBlob temporary;
+                TempBlob: Codeunit "Temp Blob";
                 FileName: Text[1024];
+                RecRef: RecordRef;
             begin
                 CalcFields("Attached File");
                 if "Attached File".HasValue then
-                  if not Confirm(Text001,false) then
-                    exit;
+                    if not Confirm(Text001, false) then
+                        exit;
 
-                FileName := FileMgt.BLOBImport(TempBlob,'*.*');
+                FileName := FileMgt.BLOBImport(TempBlob, '*.*');
                 if FileName = '' then
-                  exit;
-                "Attached File" := TempBlob.Blob;
+                    exit;
+                RecRef.GetTable(Rec);
+                TempBlob.ToRecordRef(RecRef, FieldNo("Attached File"));
+                RecRef.SetTable(Rec);
 
-                while StrPos(FileName,'\') <> 0 do
-                  FileName := CopyStr(FileName,StrPos(FileName,'\') + 1,StrLen(FileName) - StrPos(FileName,'\'));
+                while StrPos(FileName, '\') <> 0 do
+                    FileName := CopyStr(FileName, StrPos(FileName, '\') + 1, StrLen(FileName) - StrPos(FileName, '\'));
                 Description := FileName;
             end;
         }
-        field(40;Description;Text[250])
+        field(40; Description; Text[250])
         {
             Caption = 'Description';
         }
@@ -55,7 +58,7 @@ table 6014458 "E-mail Attachment"
 
     keys
     {
-        key(Key1;"Table No.","Primary Key","Line No.")
+        key(Key1; "Table No.", "Primary Key", "Line No.")
         {
         }
     }

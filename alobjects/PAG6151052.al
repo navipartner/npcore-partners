@@ -14,50 +14,50 @@ page 6151052 "Item Hierarchy Listpart"
         {
             repeater(Group)
             {
-                field(Level;Level)
+                field(Level; Level)
                 {
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
                     Caption = 'Table No.';
                 }
-                field("Primary Field No.";"Primary Field No.")
+                field("Primary Field No."; "Primary Field No.")
                 {
-                    LookupPageID = "Field List";
+                    LookupPageID = "Field Lookup";
                 }
-                field("Description Field No.";"Description Field No.")
+                field("Description Field No."; "Description Field No.")
                 {
-                    LookupPageID = "Field List";
+                    LookupPageID = "Field Lookup";
                 }
-                field("Level Link Table No.";"Level Link Table No.")
-                {
-                }
-                field("Level Link Field No.";"Level Link Field No.")
-                {
-                    LookupPageID = "Field List";
-                }
-                field("Level Link Filter";"Level Link Filter")
+                field("Level Link Table No."; "Level Link Table No.")
                 {
                 }
-                field("Second Level Primary Field No.";"Second Level Primary Field No.")
+                field("Level Link Field No."; "Level Link Field No.")
                 {
-                    Visible = false;
+                    LookupPageID = "Field Lookup";
                 }
-                field("Second Level Link Table No.";"Second Level Link Table No.")
+                field("Level Link Filter"; "Level Link Filter")
+                {
+                }
+                field("Second Level Primary Field No."; "Second Level Primary Field No.")
                 {
                     Visible = false;
                 }
-                field("Second Level Link Field No.";"Second Level Link Field No.")
+                field("Second Level Link Table No."; "Second Level Link Table No.")
                 {
                     Visible = false;
                 }
-                field("Second Level Link Filter";"Second Level Link Filter")
+                field("Second Level Link Field No."; "Second Level Link Field No.")
+                {
+                    Visible = false;
+                }
+                field("Second Level Link Filter"; "Second Level Link Filter")
                 {
                     Visible = false;
                 }
@@ -69,4 +69,3 @@ page 6151052 "Item Hierarchy Listpart"
     {
     }
 }
-

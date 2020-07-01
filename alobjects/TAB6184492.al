@@ -13,21 +13,21 @@ table 6184492 "Pepper Terminal"
     // NPR5.30/TJ/20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
 
     Caption = 'Pepper Terminal';
-    DataCaptionFields = "Code",Description;
+    DataCaptionFields = "Code", Description;
     DrillDownPageID = "Pepper Terminal List";
     LookupPageID = "Pepper Terminal List";
 
     fields
     {
-        field(10;"Code";Code[10])
+        field(10; "Code"; Code[10])
         {
             Caption = 'Code';
         }
-        field(20;Description;Text[30])
+        field(20; Description; Text[30])
         {
             Caption = 'Description';
         }
-        field(30;"Instance ID";Integer)
+        field(30; "Instance ID"; Integer)
         {
             Caption = 'Instance ID';
             TableRelation = "Pepper Instance";
@@ -37,18 +37,18 @@ table 6184492 "Pepper Terminal"
                 Instance: Record "Pepper Instance";
             begin
                 if Instance.Get("Instance ID") then
-                  Instance.TestField(Instance."Configuration Code");
+                    Instance.TestField(Instance."Configuration Code");
             end;
         }
-        field(40;"Configuration Code";Code[10])
+        field(40; "Configuration Code"; Code[10])
         {
-            CalcFormula = Lookup("Pepper Instance"."Configuration Code" WHERE (ID=FIELD("Instance ID")));
+            CalcFormula = Lookup ("Pepper Instance"."Configuration Code" WHERE(ID = FIELD("Instance ID")));
             Caption = 'Configuration Code';
             Editable = false;
             FieldClass = FlowField;
             TableRelation = "Pepper Configuration";
         }
-        field(50;"Register No.";Code[10])
+        field(50; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
             TableRelation = Register;
@@ -56,38 +56,38 @@ table 6184492 "Pepper Terminal"
             trigger OnValidate()
             begin
                 if ("Register No." <> '') and GuiAllowed then
-                  if xRec."Register No." <> "Register No." then
-                    CheckDuplicateRegister;
+                    if xRec."Register No." <> "Register No." then
+                        CheckDuplicateRegister;
             end;
         }
-        field(60;"Open Automatically";Boolean)
+        field(60; "Open Automatically"; Boolean)
         {
             Caption = 'Open Automatically';
         }
-        field(70;"Close Automatically";Boolean)
+        field(70; "Close Automatically"; Boolean)
         {
             Caption = 'Close Automatically';
             Description = 'CASE255131';
         }
-        field(100;"Com Port";Integer)
+        field(100; "Com Port"; Integer)
         {
             Caption = 'Com Port';
             InitValue = 1;
             MaxValue = 10;
             MinValue = 1;
         }
-        field(110;Language;Option)
+        field(110; Language; Option)
         {
             Caption = 'Language';
             OptionCaption = 'English,German,French,Italian,Slovene,Dutch,Czech,Spanish,Polish,Slovakian,Danish,Norwegian,Swedish,Finnish,Romanian,15,16,17,18,19,20,21,22,23,24,25';
             OptionMembers = English,German,French,Italian,Slovene,Dutch,Czech,Spanish,Polish,Slovakian,Danish,Norwegian,Swedish,Finnish,Romanian,"15","16","17","18","19","20","21","22","23","24","25";
         }
-        field(120;"IP Address";Text[30])
+        field(120; "IP Address"; Text[30])
         {
             Caption = 'IP Address';
             CharAllowed = '09::..';
         }
-        field(130;"Terminal Type Code";Integer)
+        field(130; "Terminal Type Code"; Integer)
         {
             Caption = 'Terminal Type Code';
             MinValue = 0;
@@ -98,96 +98,96 @@ table 6184492 "Pepper Terminal"
                 TerminalType: Record "Pepper Terminal Type";
             begin
                 if TerminalType.Get("Terminal Type Code") then
-                  TerminalType.TestField(Active);
+                    TerminalType.TestField(Active);
             end;
         }
-        field(140;"Receipt Format";Integer)
+        field(140; "Receipt Format"; Integer)
         {
             Caption = 'Receipt Format';
             InitValue = 40;
             MaxValue = 99;
             MinValue = 20;
         }
-        field(150;"Pepper Receipt Encoding";Option)
+        field(150; "Pepper Receipt Encoding"; Option)
         {
             Caption = 'Pepper Receipt Encoding';
             OptionCaption = 'Default,utf-8,iso-8859-1,iso-8859-2,iso-8859-3,iso-8859-4,iso-8859-5,iso-8859-6,iso-8859-7,iso-8859-8,iso-8859-9,iso-8859-13,iso-8859-15';
             OptionMembers = Default,"utf-8","iso-8859-1","iso-8859-2","iso-8859-3","iso-8859-4","iso-8859-5","iso-8859-6","iso-8859-7","iso-8859-8","iso-8859-9","iso-8859-13","iso-8859-15";
         }
-        field(151;"NAV Receipt Encoding";Option)
+        field(151; "NAV Receipt Encoding"; Option)
         {
             Caption = 'NAV Receipt Encoding';
             OptionCaption = 'Default,utf-8,iso-8859-1,iso-8859-2,iso-8859-3,iso-8859-4,iso-8859-5,iso-8859-6,iso-8859-7,iso-8859-8,iso-8859-9,iso-8859-13,iso-8859-15';
             OptionMembers = Default,"utf-8","iso-8859-1","iso-8859-2","iso-8859-3","iso-8859-4","iso-8859-5","iso-8859-6","iso-8859-7","iso-8859-8","iso-8859-9","iso-8859-13","iso-8859-15";
         }
-        field(160;"Add Customer Signature Space";Boolean)
+        field(160; "Add Customer Signature Space"; Boolean)
         {
             Caption = 'Add Customer Signature Space';
         }
-        field(170;"Cancel at Wrong Signature";Boolean)
+        field(170; "Cancel at Wrong Signature"; Boolean)
         {
             Caption = 'Cancel at Wrong Signature';
             Description = 'NPR5.29';
         }
-        field(200;"Matchbox Files";Option)
+        field(200; "Matchbox Files"; Option)
         {
             Caption = 'Matchbox Files';
             OptionCaption = 'No Matchbox output,Succesful transactions only,All succesful operactions,All operations';
             OptionMembers = "0","1","2","3";
         }
-        field(210;"Matchbox Company ID";Code[10])
+        field(210; "Matchbox Company ID"; Code[10])
         {
             Caption = 'Matchbox Company ID';
         }
-        field(220;"Matchbox Shop ID";Code[10])
+        field(220; "Matchbox Shop ID"; Code[10])
         {
             Caption = 'Matchbox Shop ID';
         }
-        field(230;"Matchbox POS ID";Code[10])
+        field(230; "Matchbox POS ID"; Code[10])
         {
             Caption = 'Matchbox POS ID';
         }
-        field(240;"Matchbox File Name";Text[250])
+        field(240; "Matchbox File Name"; Text[250])
         {
             Caption = 'Matchbox File Name';
         }
-        field(300;"Print File Open";Text[250])
+        field(300; "Print File Open"; Text[250])
         {
             Caption = 'Print File Open';
         }
-        field(310;"Print File Close";Text[250])
+        field(310; "Print File Close"; Text[250])
         {
             Caption = 'Print File Close';
         }
-        field(320;"Print File Transaction";Text[250])
+        field(320; "Print File Transaction"; Text[250])
         {
             Caption = 'Print File Transaction';
         }
-        field(330;"Print File CC Transaction";Text[250])
+        field(330; "Print File CC Transaction"; Text[250])
         {
             Caption = 'Print File CC Transaction';
         }
-        field(340;"Print File Difference";Text[250])
+        field(340; "Print File Difference"; Text[250])
         {
             Caption = 'Print File Difference';
         }
-        field(350;"Print File End of Day";Text[250])
+        field(350; "Print File End of Day"; Text[250])
         {
             Caption = 'Print File End of Day';
         }
-        field(360;"Print File Journal";Text[250])
+        field(360; "Print File Journal"; Text[250])
         {
             Caption = 'Print File Journal';
         }
-        field(370;"Print File Initialisation";Text[250])
+        field(370; "Print File Initialisation"; Text[250])
         {
             Caption = 'Print File Initialisation';
         }
-        field(500;"Additional Parameters File";BLOB)
+        field(500; "Additional Parameters File"; BLOB)
         {
             Caption = 'Additional Parameters File';
         }
-        field(600;Status;Option)
+        field(600; Status; Option)
         {
             Caption = 'Status';
             OptionCaption = 'Unknown,Open,Closed,ActiveOffline';
@@ -199,12 +199,12 @@ table 6184492 "Pepper Terminal"
             begin
                 //-NPR5.22
                 if Rec.Status = Rec.Status::ActiveOffline then
-                  if not GetOfflineAllowed then
-                    Error(TxtOfflineDisabled);
+                    if not GetOfflineAllowed then
+                        Error(TxtOfflineDisabled);
                 //+NPR5.22
             end;
         }
-        field(650;"Fixed Currency Code";Code[10])
+        field(650; "Fixed Currency Code"; Code[10])
         {
             Caption = 'Fixed Currency Code';
             TableRelation = Currency;
@@ -212,15 +212,15 @@ table 6184492 "Pepper Terminal"
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(700;"Customer ID";Text[8])
+        field(700; "Customer ID"; Text[8])
         {
             Caption = 'Customer ID';
         }
-        field(710;"License ID";Text[8])
+        field(710; "License ID"; Text[8])
         {
             Caption = 'License ID';
         }
-        field(900;"License File";BLOB)
+        field(900; "License File"; BLOB)
         {
             Caption = 'License File';
         }
@@ -228,7 +228,7 @@ table 6184492 "Pepper Terminal"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -245,7 +245,7 @@ table 6184492 "Pepper Terminal"
     procedure UploadFile(FileType: Option License,AdditionalParameters)
     var
         FileManagement: Codeunit "File Management";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         UploadResult: Text[250];
         TxtNotUploaded: Label 'File was not uploaded.';
         TxtSuccess: Label 'File %1 was uploaded.';
@@ -260,70 +260,79 @@ table 6184492 "Pepper Terminal"
         PepperLibrary: Codeunit "Pepper Library";
         PepperConfigManagement: Codeunit "Pepper Config. Management";
         LicensedTerminalType: Integer;
+        RecRef: RecordRef;
     begin
         //-NPR5.22
         //UploadResult := FileManagement.BLOBImport(TempBlob,'');
         //-NPR5.26 [248685]
         //UploadResult := FileManagement.BLOBImportWithFilter(TempBlob,TxtCaptionAdditionalParameters,'',TxtXMLfileDescription,TxtXMLfilefilter);
         case FileType of
-          FileType :: AdditionalParameters :
-            CaptionText := TxtCaptionAdditionalParameters;
-          FileType :: License :
-            CaptionText := TxtCaptionLicense;
+            FileType::AdditionalParameters:
+                CaptionText := TxtCaptionAdditionalParameters;
+            FileType::License:
+                CaptionText := TxtCaptionLicense;
         end;
-        UploadResult := FileManagement.BLOBImportWithFilter(TempBlob,CaptionText,'',TxtXMLfileDescription,TxtXMLfilefilter);
+        UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, CaptionText, '', TxtXMLfileDescription, TxtXMLfilefilter);
         //+NPR5.26 [248685]
         //+NPR5.22
         if UploadResult = '' then
-          Error(TxtNotUploaded);
-        Message(StrSubstNo(TxtSuccess,UploadResult));
+            Error(TxtNotUploaded);
+        Message(StrSubstNo(TxtSuccess, UploadResult));
         case FileType of
-          FileType :: AdditionalParameters :
-            begin
-              CalcFields("Additional Parameters File");
-              Clear("Additional Parameters File");
-              //-NPR5.22
-              //"Additional Parameters File" := TempBlob.Blob;
-              Modify;
-              CalcFields("Additional Parameters File");
-              "Additional Parameters File" := TempBlob.Blob;
-              Modify;
-              //-NPR5.22
-              if not "Additional Parameters File".HasValue then
-                Error(TxtNotStored);
-            end;
-           //-NPR5.25 [231481]
-           FileType :: License :
-            begin
-              CalcFields("License File");
-              Clear("License File");
-              Modify;
-              CalcFields("License File");
-              "License File" := TempBlob.Blob;
-              //-NPR5.29 [262269]
-              "License ID" := PepperLibrary.GetKeyFromLicenseText(PepperConfigManagement.GetTerminalText(Rec,0));
-              LicensedTerminalType := PepperLibrary.GetTerminalTypeFromLicenseText(PepperConfigManagement.GetTerminalText(Rec,0));
-              if LicensedTerminalType <> 0 then begin
-                if ("Terminal Type Code" = 0) then
-                  Validate("Terminal Type Code",LicensedTerminalType)
-                else
-                  if GuiAllowed then
-                    if LicensedTerminalType <> "Terminal Type Code" then
-                      Message(TxtTerminalTypeNotLicensed,LicensedTerminalType);
-              end;
-              //+NPR5.29 [262269]
-              Modify;
-              if not "License File".HasValue then
-                Error(TxtNotStored);
-            end;
-            //+NPR5.25 [231481]
+            FileType::AdditionalParameters:
+                begin
+                    CalcFields("Additional Parameters File");
+                    Clear("Additional Parameters File");
+                    //-NPR5.22
+                    //"Additional Parameters File" := TempBlob.Blob;
+                    Modify;
+                    CalcFields("Additional Parameters File");
+
+                    RecRef.GetTable(Rec);
+                    TempBlob.ToRecordRef(RecRef, FieldNo("Additional Parameters File"));
+                    RecRef.SetTable(Rec);
+
+                    Modify;
+                    //-NPR5.22
+                    if not "Additional Parameters File".HasValue then
+                        Error(TxtNotStored);
+                end;
+            //-NPR5.25 [231481]
+            FileType::License:
+                begin
+                    CalcFields("License File");
+                    Clear("License File");
+                    Modify;
+                    CalcFields("License File");
+
+                    RecRef.GetTable(Rec);
+                    TempBlob.ToRecordRef(RecRef, FieldNo("License File"));
+                    RecRef.SetTable(Rec);
+
+                    //-NPR5.29 [262269]
+                    "License ID" := PepperLibrary.GetKeyFromLicenseText(PepperConfigManagement.GetTerminalText(Rec, 0));
+                    LicensedTerminalType := PepperLibrary.GetTerminalTypeFromLicenseText(PepperConfigManagement.GetTerminalText(Rec, 0));
+                    if LicensedTerminalType <> 0 then begin
+                        if ("Terminal Type Code" = 0) then
+                            Validate("Terminal Type Code", LicensedTerminalType)
+                        else
+                            if GuiAllowed then
+                                if LicensedTerminalType <> "Terminal Type Code" then
+                                    Message(TxtTerminalTypeNotLicensed, LicensedTerminalType);
+                    end;
+                    //+NPR5.29 [262269]
+                    Modify;
+                    if not "License File".HasValue then
+                        Error(TxtNotStored);
+                end;
+        //+NPR5.25 [231481]
         end;
     end;
 
     procedure ClearFile(FileType: Option License,AdditionalParameters)
     var
         FileManagement: Codeunit "File Management";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         UploadResult: Text[250];
         TxtNoLicense: Label 'Are you sure you want to delete the additional parameters?';
         TxtNoAdditionalParameters: Label 'No addtional parameters are configured.';
@@ -334,28 +343,28 @@ table 6184492 "Pepper Terminal"
     begin
         //-NPR5.25 [231481]
         case FileType of
-          FileType :: License :
-            begin
-              CalcFields("License File");
-              if not "License File".HasValue then
-                Error(TxtNoLicense);
-              if not Confirm(TxtConfirmClearLicense) then
-                exit;
-              Clear("License File");
-              Modify;
-              Message(TxtLicenseCleared);
-            end;
-            FileType :: AdditionalParameters :
-            begin
-              CalcFields("Additional Parameters File");
-              if not "Additional Parameters File".HasValue then
-                Error(TxtNoAdditionalParameters);
-              if not Confirm(TxtConfirmClearAdditionalParameters) then
-                exit;
-              Clear("Additional Parameters File");
-              Modify;
-              Message(TxtAdditionalParametersCleared);
-            end;
+            FileType::License:
+                begin
+                    CalcFields("License File");
+                    if not "License File".HasValue then
+                        Error(TxtNoLicense);
+                    if not Confirm(TxtConfirmClearLicense) then
+                        exit;
+                    Clear("License File");
+                    Modify;
+                    Message(TxtLicenseCleared);
+                end;
+            FileType::AdditionalParameters:
+                begin
+                    CalcFields("Additional Parameters File");
+                    if not "Additional Parameters File".HasValue then
+                        Error(TxtNoAdditionalParameters);
+                    if not Confirm(TxtConfirmClearAdditionalParameters) then
+                        exit;
+                    Clear("Additional Parameters File");
+                    Modify;
+                    Message(TxtAdditionalParametersCleared);
+                end;
         end;
         //+NPR5.25 [231481]
     end;
@@ -368,26 +377,26 @@ table 6184492 "Pepper Terminal"
     begin
         //-NPR5.25 [231481]
         case OptFileType of
-          OptFileType :: AdditionalParameters :
-            begin
-        //+NPR5.25 [231481]
-              CalcFields("Additional Parameters File");
-              if not "Additional Parameters File".HasValue then
-                Message(TxtNoAddParam,"Configuration Code");
-              Message(PepperConfigManagement.GetTerminalText(Rec,OptFileType));
-        //-NPR5.25 [231481]
-            end;
-          OptFileType :: License :
-            begin
-              //-NPR5.26 [248685]
-              //CALCFIELDS("Additional Parameters File");
-              //IF NOT "Additional Parameters File".HASVALUE THEN
-              CalcFields("License File");
-              if not "License File".HasValue then
-              //+NPR5.26 [248685]
-                Message(TxtNoLicense,"Configuration Code");
-              Message(PepperConfigManagement.GetTerminalText(Rec,OptFileType));
-             end;
+            OptFileType::AdditionalParameters:
+                begin
+                    //+NPR5.25 [231481]
+                    CalcFields("Additional Parameters File");
+                    if not "Additional Parameters File".HasValue then
+                        Message(TxtNoAddParam, "Configuration Code");
+                    Message(PepperConfigManagement.GetTerminalText(Rec, OptFileType));
+                    //-NPR5.25 [231481]
+                end;
+            OptFileType::License:
+                begin
+                    //-NPR5.26 [248685]
+                    //CALCFIELDS("Additional Parameters File");
+                    //IF NOT "Additional Parameters File".HASVALUE THEN
+                    CalcFields("License File");
+                    if not "License File".HasValue then
+                        //+NPR5.26 [248685]
+                        Message(TxtNoLicense, "Configuration Code");
+                    Message(PepperConfigManagement.GetTerminalText(Rec, OptFileType));
+                end;
         end;
         //+NPR5.25 [231481]
     end;
@@ -406,26 +415,26 @@ table 6184492 "Pepper Terminal"
     begin
         //-NPR5.25 [231481]
         case OptFileType of
-          OptFileType :: License :
-            begin
-              CalcFields("License File");
-              if not "License File".HasValue then
-                //-NPR5.29 [262269]
-                //ERROR(TxtNoLicense);
-                Error(TxtNoLicenseToExport);
-                //-NPR5.29 [262269]
-              ExportName := TxtFileNameLicense;
-              "License File".CreateInStream(StreamIn);
-              DownloadFromStream(StreamIn,TxtTitle,'',TxtXMLFileFilter,ExportName);
-            end;
-          OptFileType :: AdditionalParameters :
-            if not "Additional Parameters File".HasValue then begin
-              Message(TxtNoAddParam,"Configuration Code");
-            end else begin
-              ExportName := TxtFileName;
-              "Additional Parameters File".CreateInStream(StreamIn);
-              DownloadFromStream(StreamIn,TxtTitle,'',TxtXMLFileFilter,ExportName);
-            end;
+            OptFileType::License:
+                begin
+                    CalcFields("License File");
+                    if not "License File".HasValue then
+                        //-NPR5.29 [262269]
+                        //ERROR(TxtNoLicense);
+                        Error(TxtNoLicenseToExport);
+                    //-NPR5.29 [262269]
+                    ExportName := TxtFileNameLicense;
+                    "License File".CreateInStream(StreamIn);
+                    DownloadFromStream(StreamIn, TxtTitle, '', TxtXMLFileFilter, ExportName);
+                end;
+            OptFileType::AdditionalParameters:
+                if not "Additional Parameters File".HasValue then begin
+                    Message(TxtNoAddParam, "Configuration Code");
+                end else begin
+                    ExportName := TxtFileName;
+                    "Additional Parameters File".CreateInStream(StreamIn);
+                    DownloadFromStream(StreamIn, TxtTitle, '', TxtXMLFileFilter, ExportName);
+                end;
         end;
         //+NPR5.25 [231481]
     end;
@@ -439,19 +448,19 @@ table 6184492 "Pepper Terminal"
         NotLinked: Label 'Terminal not linked to Register.';
     begin
         PepperTerminal.Reset;
-        PepperTerminal.SetRange("Register No.","Register No.");
-        PepperTerminal.SetFilter(Code,'<>%1',Code);
+        PepperTerminal.SetRange("Register No.", "Register No.");
+        PepperTerminal.SetFilter(Code, '<>%1', Code);
         NoOtherTerminalsLinkedtoRegister := PepperTerminal.Count;
         if NoOtherTerminalsLinkedtoRegister = 0 then
-          exit;
+            exit;
         if NoOtherTerminalsLinkedtoRegister = 1 then begin
-          PepperTerminal.FindFirst;
-          if not Confirm(TerminalLinked,true,PepperTerminal.Code,"Register No.") then
-            Error(NotLinked);
-          exit;
+            PepperTerminal.FindFirst;
+            if not Confirm(TerminalLinked, true, PepperTerminal.Code, "Register No.") then
+                Error(NotLinked);
+            exit;
         end;
-        if not Confirm(TerminalsLinked,true,Format(NoOtherTerminalsLinkedtoRegister),PepperTerminal.Code,"Register No.") then
-          Error(NotLinked);
+        if not Confirm(TerminalsLinked, true, Format(NoOtherTerminalsLinkedtoRegister), PepperTerminal.Code, "Register No.") then
+            Error(NotLinked);
     end;
 
     local procedure FillDefaultPrintFileNames()
@@ -466,23 +475,23 @@ table 6184492 "Pepper Terminal"
         DefaultPrintFileInit: Label 'ini_nav_%1.txt';
         StrippedCode: Code[20];
     begin
-        StrippedCode := DelChr(Code,'=',' ');
+        StrippedCode := DelChr(Code, '=', ' ');
         if "Print File Open" = '' then
-          "Print File Open" := StrSubstNo(DefaultPrintFileOpen,StrippedCode);
+            "Print File Open" := StrSubstNo(DefaultPrintFileOpen, StrippedCode);
         if "Print File Close" = '' then
-          "Print File Close":= StrSubstNo(DefaultPrintFileClose,StrippedCode);
+            "Print File Close" := StrSubstNo(DefaultPrintFileClose, StrippedCode);
         if "Print File Transaction" = '' then
-          "Print File Transaction" := StrSubstNo(DefaultPrintFileTransaction,StrippedCode);
+            "Print File Transaction" := StrSubstNo(DefaultPrintFileTransaction, StrippedCode);
         if "Print File CC Transaction" = '' then
-          "Print File CC Transaction" := StrSubstNo(DefaultPrintFileCCTransaction,StrippedCode);
+            "Print File CC Transaction" := StrSubstNo(DefaultPrintFileCCTransaction, StrippedCode);
         if "Print File Difference" = '' then
-          "Print File Difference" := StrSubstNo(DefaultPrintFileDifference,StrippedCode);
+            "Print File Difference" := StrSubstNo(DefaultPrintFileDifference, StrippedCode);
         if "Print File End of Day" = '' then
-          "Print File End of Day" := StrSubstNo(DefaultPrintFileEOD,StrippedCode);
+            "Print File End of Day" := StrSubstNo(DefaultPrintFileEOD, StrippedCode);
         if "Print File Journal" = '' then
-          "Print File Journal" := StrSubstNo(DefaultPrintFileJournal,StrippedCode);
+            "Print File Journal" := StrSubstNo(DefaultPrintFileJournal, StrippedCode);
         if "Print File Initialisation" = '' then
-          "Print File Initialisation" := StrSubstNo(DefaultPrintFileInit,StrippedCode);
+            "Print File Initialisation" := StrSubstNo(DefaultPrintFileInit, StrippedCode);
     end;
 
     local procedure GetOfflineAllowed(): Boolean
@@ -504,7 +513,7 @@ table 6184492 "Pepper Terminal"
     begin
         //-NPR5.25 [231481]
         if (LicenseString = '') then
-          exit(false);
+            exit(false);
         CalcFields("License File");
         Clear("License File");
         Modify;

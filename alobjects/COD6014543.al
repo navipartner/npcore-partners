@@ -125,7 +125,7 @@ codeunit 6014543 "RP Epson V Device Library"
         SETTING_ENCODING: Label 'Text encoding.';
         Error_InvalidDeviceSetting: Label 'Invalid device setting: %1';
         Encoding: Option "Windows-1252","Windows-1256";
-        PrintBuffer: Record TempBlob temporary;
+        PrintBuffer: Codeunit "Temp Blob";
         PrintBufferOutStream: OutStream;
 
     local procedure "// Interface implementation"()
@@ -158,29 +158,29 @@ codeunit 6014543 "RP Epson V Device Library"
     local procedure OnPrintData(var POSPrintBuffer: Record "RP Print Buffer" temporary)
     begin
         with POSPrintBuffer do
-          PrintData(Text, Font, Bold, Underline, DoubleStrike, Align, Width);
+            PrintData(Text, Font, Bold, Underline, DoubleStrike, Align, Width);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupFont', '', false, false)]
-    local procedure OnLookupFont(var LookupOK: Boolean;var Value: Text)
+    local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
     begin
         LookupOK := SelectFont(Value);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupCommand', '', false, false)]
-    local procedure OnLookupCommand(var LookupOK: Boolean;var Value: Text)
+    local procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
     begin
         LookupOK := SelectCommand(Value);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupDeviceSetting', '', false, false)]
-    local procedure OnLookupDeviceSetting(var LookupOK: Boolean;var tmpDeviceSetting: Record "RP Device Settings" temporary)
+    local procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "RP Device Settings" temporary)
     begin
         LookupOK := SelectDeviceSetting(tmpDeviceSetting);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetPageWidth', '', false, false)]
-    local procedure OnGetPageWidth(FontFace: Text[30];var Width: Integer)
+    local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
     begin
         Width := GetPageWidth(FontFace);
     end;
@@ -191,18 +191,18 @@ codeunit 6014543 "RP Epson V Device Library"
         //-NPR5.37 [290904]
         //TargetEncoding := 'iso-8859-1';
         case Encoding of
-          Encoding::"Windows-1252" :
-            //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
-            //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
-            TargetEncoding := 'iso-8859-1';
-          Encoding::"Windows-1256" :
-            TargetEncoding := 'Windows-1256';
+            Encoding::"Windows-1252":
+                //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
+                //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
+                TargetEncoding := 'iso-8859-1';
+            Encoding::"Windows-1256":
+                TargetEncoding := 'Windows-1256';
         end;
         //+NPR5.37 [290904]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrepareJobForHTTP', '', false, false)]
-    local procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text;var HTTPEndpoint: Text;var Supported: Boolean)
+    local procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text; var HTTPEndpoint: Text; var Supported: Boolean)
     begin
         FormattedTargetEncoding := 'utf-8';
         HTTPEndpoint := '/cgi-bin/epos/service.cgi?devid=local_printer&timeout=15000';
@@ -214,17 +214,17 @@ codeunit 6014543 "RP Epson V Device Library"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrepareJobForBluetooth', '', false, false)]
-    local procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text;var Supported: Boolean)
+    local procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text; var Supported: Boolean)
     begin
         //-NPR5.37 [290904]
         //FormattedTargetEncoding := 'iso-8859-1';
         case Encoding of
-          Encoding::"Windows-1252" :
-            //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
-            //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
-            FormattedTargetEncoding := 'iso-8859-1';
-          Encoding::"Windows-1256" :
-            FormattedTargetEncoding := 'Windows-1256';
+            Encoding::"Windows-1252":
+                //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
+                //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
+                FormattedTargetEncoding := 'iso-8859-1';
+            Encoding::"Windows-1256":
+                FormattedTargetEncoding := 'Windows-1256';
         end;
         //+NPR5.37 [290904]
         Supported := true;
@@ -269,85 +269,98 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
         Clear(MediaWidth);
 
-        if DeviceSettings.FindSet then repeat
-          case DeviceSettings.Name of
-            'MEDIA_WIDTH' :
-              if DeviceSettings.Value = '58mm' then
-                MediaWidth := MediaWidth::"58mm";
-            'ENCODING' :
-              if DeviceSettings.Value = 'Windows-1256' then
-                Encoding := Encoding::"Windows-1256";
-            else
-              Error(Error_InvalidDeviceSetting, DeviceSettings.Value);
-          end;
-        until DeviceSettings.Next = 0;
+        if DeviceSettings.FindSet then
+            repeat
+                case DeviceSettings.Name of
+                    'MEDIA_WIDTH':
+                        if DeviceSettings.Value = '58mm' then
+                            MediaWidth := MediaWidth::"58mm";
+                    'ENCODING':
+                        if DeviceSettings.Value = 'Windows-1256' then
+                            Encoding := Encoding::"Windows-1256";
+                    else
+                        Error(Error_InvalidDeviceSetting, DeviceSettings.Value);
+                end;
+            until DeviceSettings.Next = 0;
 
         InitializePrinter;
         case Encoding of
-          Encoding::"Windows-1252" : SelectCharacterCodeTable(16);
-          Encoding::"Windows-1256" : SelectCharacterCodeTable(50);
+            Encoding::"Windows-1252":
+                SelectCharacterCodeTable(16);
+            Encoding::"Windows-1256":
+                SelectCharacterCodeTable(50);
         end;
     end;
 
-    procedure PrintData(Data: Text[100];FontType: Text[10];Bold: Boolean;UnderLine: Boolean;DoubleStrike: Boolean;Align: Integer;Width: Integer)
+    procedure PrintData(Data: Text[100]; FontType: Text[10]; Bold: Boolean; UnderLine: Boolean; DoubleStrike: Boolean; Align: Integer; Width: Integer)
     var
         BarcodeNo: Integer;
     begin
         if UpperCase(FontType) = 'CONTROL' then
-          PrintControlChar(CopyStr(Data,1,1))
-        else if UpperCase(FontType) = 'COMMAND' then
-          SendCommand(Data)
-        else if IsBarcodeFont(FontType) then
-          PrintBarcode(FontType, Data, Width, 40)
-        else if FontType = 'Logo' then
-          PrintBitmapFromKeyword(Data, '')
-        else begin
-          SelectJustification(Align);
-          if Bold         then TurnExphasizedModeOnOff(1);
-          if UnderLine    then TurnUnderlineModeOnOff(1);
-          if DoubleStrike then TurnDoubleStrikeModeOnOff(1);
+            PrintControlChar(CopyStr(Data, 1, 1))
+        else
+            if UpperCase(FontType) = 'COMMAND' then
+                SendCommand(Data)
+            else
+                if IsBarcodeFont(FontType) then
+                    PrintBarcode(FontType, Data, Width, 40)
+                else
+                    if FontType = 'Logo' then
+                        PrintBitmapFromKeyword(Data, '')
+                    else begin
+                        SelectJustification(Align);
+                        if Bold then TurnExphasizedModeOnOff(1);
+                        if UnderLine then TurnUnderlineModeOnOff(1);
+                        if DoubleStrike then TurnDoubleStrikeModeOnOff(1);
 
-          SetFontFace(FontType);
-          AddTextToBuffer(Data);
+                        SetFontFace(FontType);
+                        AddTextToBuffer(Data);
 
-          if Bold         then TurnExphasizedModeOnOff(0);
-          if UnderLine    then TurnUnderlineModeOnOff(0);
-          if DoubleStrike then TurnDoubleStrikeModeOnOff(0);
-        end;
+                        if Bold then TurnExphasizedModeOnOff(0);
+                        if UnderLine then TurnUnderlineModeOnOff(0);
+                        if DoubleStrike then TurnDoubleStrikeModeOnOff(0);
+                    end;
     end;
 
-    procedure PrintBarcode(BarcodeType: Text[30];Text: Text;Width: Integer;Height: Integer)
+    procedure PrintBarcode(BarcodeType: Text[30]; Text: Text; Width: Integer; Height: Integer)
     var
         Int: Integer;
         Code128: Text;
     begin
         if BarcodeType in ['CODE39', 'Barcode4'] then
-          Width := 1;
+            Width := 1;
 
         if BarcodeType = 'Code39' then
-          Width := 2;
+            Width := 2;
 
         if BarcodeType = 'EAN13' then
-          Width := 3;
+            Width := 3;
 
         BarcodeType := UpperCase(BarcodeType);
 
         if CopyStr(BarcodeType, 1, 7) = 'BARCODE' then begin
-          Evaluate(Int, Format(BarcodeType[8]));
-          case Int of
-            1 : BarcodeType := 'UPC-A';
-            2 : BarcodeType := 'UPC-E';
-            3 : BarcodeType := 'EAN13';
-            4 : BarcodeType := 'CODE39';
-            5 : BarcodeType := 'EAN8';
-            6 : BarcodeType := 'ITF';
-            7 : BarcodeType := 'CODABAR';
-          end;
+            Evaluate(Int, Format(BarcodeType[8]));
+            case Int of
+                1:
+                    BarcodeType := 'UPC-A';
+                2:
+                    BarcodeType := 'UPC-E';
+                3:
+                    BarcodeType := 'EAN13';
+                4:
+                    BarcodeType := 'CODE39';
+                5:
+                    BarcodeType := 'EAN8';
+                6:
+                    BarcodeType := 'ITF';
+                7:
+                    BarcodeType := 'CODABAR';
+            end;
 
-          if Int = 4 then
-            Height := 60
-          else
-            Height := 40;
+            if Int = 4 then
+                Height := 60
+            else
+                Height := 40;
         end;
         //REMOVE EVERYTHING ABOVE THIS LINE WHEN HARDCODED PRINTS ARE DEPRECATED
 
@@ -356,23 +369,30 @@ codeunit 6014543 "RP Epson V Device Library"
         SetBarCodeHeight(Height);
 
         case BarcodeType of
-          'UPC-A' : PrintBarCodeA(0,Text);
-          'UPC-E' : PrintBarCodeA(1,Text);
-          'EAN13' : PrintBarCodeA(2,Text);
-          'EAN8' : PrintBarCodeA(3,Text);
-          'CODE39' : PrintBarCodeA(4,Text);
-          'ITF' : PrintBarCodeA(5,Text);
-          'CODABAR' : PrintBarCodeA(6,Text);
-          'CODE128' :
-            begin
-              Code128 := BuildCommandC128(Text);
-              if StrLen(Code128) > 0 then
-                PrintBarCodeB(73, StrLen(Code128), Code128);
-            end;
-          'QR' :
-            begin
-              Error('Not implemented');
-            end;
+            'UPC-A':
+                PrintBarCodeA(0, Text);
+            'UPC-E':
+                PrintBarCodeA(1, Text);
+            'EAN13':
+                PrintBarCodeA(2, Text);
+            'EAN8':
+                PrintBarCodeA(3, Text);
+            'CODE39':
+                PrintBarCodeA(4, Text);
+            'ITF':
+                PrintBarCodeA(5, Text);
+            'CODABAR':
+                PrintBarCodeA(6, Text);
+            'CODE128':
+                begin
+                    Code128 := BuildCommandC128(Text);
+                    if StrLen(Code128) > 0 then
+                        PrintBarCodeB(73, StrLen(Code128), Code128);
+                end;
+            'QR':
+                begin
+                    Error('Not implemented');
+                end;
         end;
 
         AddTextToBuffer(Text);
@@ -396,7 +416,7 @@ codeunit 6014543 "RP Epson V Device Library"
 
     procedure PrintDefaultLogo()
     begin
-        PrintNVGraphicsData(1,0);
+        PrintNVGraphicsData(1, 0);
     end;
 
     procedure PrintAltDefaultLogo()
@@ -406,50 +426,68 @@ codeunit 6014543 "RP Epson V Device Library"
     begin
         Register.Get(RetailFormCode.FetchRegisterNumber);
         if Register."Send Receipt Logo from NAV" then
-          PrintBitmapFromKeyword('RECEIPT',Register."Register No.")
+            PrintBitmapFromKeyword('RECEIPT', Register."Register No.")
         else
-          PrintNVGraphicsDataNew(6,0,48,69,48,48,1,1);
+            PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
     end;
 
     local procedure PrintControlChar(Char: Text[1])
     begin
         case Char of
-          'G' : PrintDefaultLogo;
-          'P' : SelectCutModeAndCutPaper(66,3);//papercut
-          'A' : GeneratePulse(0,25,25);
-          'B' : GeneratePulse(0,50,50);
-          'C' : GeneratePulse(0,75,75);
-          'D' : GeneratePulse(0,100,100);
-          'E' : GeneratePulse(0,125,125);
-          'a' : GeneratePulse(1,25,25);
-          'b' : GeneratePulse(1,50,50);
-          'c' : GeneratePulse(1,75,75);
-          'd' : GeneratePulse(1,100,100);
-          'e' : GeneratePulse(1,125,125);
-          'h' : PrintAltDefaultLogo;
-          'm' : PrintBitmapFromKeyword('TAXFREE','');
+            'G':
+                PrintDefaultLogo;
+            'P':
+                SelectCutModeAndCutPaper(66, 3);//papercut
+            'A':
+                GeneratePulse(0, 25, 25);
+            'B':
+                GeneratePulse(0, 50, 50);
+            'C':
+                GeneratePulse(0, 75, 75);
+            'D':
+                GeneratePulse(0, 100, 100);
+            'E':
+                GeneratePulse(0, 125, 125);
+            'a':
+                GeneratePulse(1, 25, 25);
+            'b':
+                GeneratePulse(1, 50, 50);
+            'c':
+                GeneratePulse(1, 75, 75);
+            'd':
+                GeneratePulse(1, 100, 100);
+            'e':
+                GeneratePulse(1, 125, 125);
+            'h':
+                PrintAltDefaultLogo;
+            'm':
+                PrintBitmapFromKeyword('TAXFREE', '');
         end;
     end;
 
     local procedure SendCommand(Command: Text)
     begin
         case UpperCase(Command) of
-          'OPENDRAWER' : GeneratePulse(0,25,25);
-          'PAPERCUT' : SelectCutModeAndCutPaper(66,3);
-          'STOREDLOGO_1' : PrintNVGraphicsDataNew(6,0,48,69,48,48,1,1);
-          'STOREDLOGO_2' : PrintNVGraphicsData(1,0);
+            'OPENDRAWER':
+                GeneratePulse(0, 25, 25);
+            'PAPERCUT':
+                SelectCutModeAndCutPaper(66, 3);
+            'STOREDLOGO_1':
+                PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
+            'STOREDLOGO_2':
+                PrintNVGraphicsData(1, 0);
         end;
     end;
 
-    procedure SetFontStretch(Height: Integer;Width: Integer)
+    procedure SetFontStretch(Height: Integer; Width: Integer)
     begin
         //-NPR5.54 [389961]
         if (Height > 7) or (Height < 0) then
-          Height := 0;
+            Height := 0;
         if (Width > 7) or (Width < 0) then
-          Width := 0;
+            Width := 0;
 
-        SelectCharacterSize(Power(2,4) * Width + Height); //Width is packed into upper half of 8-bit byte.
+        SelectCharacterSize(Power(2, 4) * Width + Height); //Width is packed into upper half of 8-bit byte.
         //+NPR5.54 [389961]
     end;
 
@@ -460,14 +498,16 @@ codeunit 6014543 "RP Epson V Device Library"
         FontHeight: Integer;
     begin
         case FontFace[1] of
-          'A' : FontType := 48;
-          'B' : FontType := 49;
+            'A':
+                FontType := 48;
+            'B':
+                FontType := 49;
         end;
 
-        Evaluate(FontWidth,Format(FontFace[2]));
-        Evaluate(FontHeight,Format(FontFace[3]));
+        Evaluate(FontWidth, Format(FontFace[2]));
+        Evaluate(FontHeight, Format(FontFace[3]));
 
-        SetFontStretch(FontHeight-1,FontWidth-1);
+        SetFontStretch(FontHeight - 1, FontWidth - 1);
         SelectCharacterFont(FontType);
     end;
 
@@ -491,7 +531,7 @@ codeunit 6014543 "RP Epson V Device Library"
     begin
         //-NPR5.40 [284505]
         //EXIT(PrintBuffer);
-        PrintBuffer.Blob.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
+        PrintBuffer.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
         MemoryStream := PrintBufferInStream;
         MemoryStream.Position := 0;
         StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
@@ -562,7 +602,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure DefineUserDefindCharacters(y: Char;c1: Char;c2: Char)
+    local procedure DefineUserDefindCharacters(y: Char; c1: Char; c2: Char)
     begin
         // Ref sheet 112
         //-NPR5.40 [284505]
@@ -572,7 +612,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure ExecuteTestPrint(pL: Char;pH: Char;n: Integer;m: Integer)
+    local procedure ExecuteTestPrint(pL: Char; pH: Char; n: Integer; m: Integer)
     begin
         // Ref sheet 135
         //-NPR5.40 [284505]
@@ -592,7 +632,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    procedure GeneratePulse(m: Integer;t1: Char;t2: Char)
+    procedure GeneratePulse(m: Integer; t1: Char; t2: Char)
     begin
         // Ref sheet 124
         //-NPR5.40 [284505]
@@ -622,7 +662,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure PrintBarCodeA(m: Char;"d1..dk": Text[30])
+    local procedure PrintBarCodeA(m: Char; "d1..dk": Text[30])
     begin
         // Ref sheet 190 m in [0-6]
         // 0; UPC-A, 1: UPC-1, 2; EAN13, 3; JAN8, 4; CODE39
@@ -634,7 +674,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure PrintBarCodeB(m: Char;n: Char;"d1..dn": Text)
+    local procedure PrintBarCodeB(m: Char; n: Char; "d1..dn": Text)
     begin
         // Ref sheet 191 m in [A-N]
         //
@@ -647,7 +687,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure PrintBitmapFromKeyword(Keyword: Code[20];RegisterNo: Code[10])
+    local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
     var
         RetailLogoMgt: Codeunit "Retail Logo Mgt.";
         ESCPOS: Text;
@@ -660,28 +700,28 @@ codeunit 6014543 "RP Epson V Device Library"
         RetailLogo.SetAutoCalcFields(ESCPOSLogo);
 
         if RetailLogoMgt.GetRetailLogo(Keyword, RegisterNo, RetailLogo) then
-          repeat
-            if RetailLogo.ESCPOSLogo.HasValue then begin
-              RetailLogo.ESCPOSLogo.CreateInStream(InStream);
-              //-NPR5.40 [248505]
-        //      MemoryStream := MemoryStream.MemoryStream;
-        //      COPYSTREAM(MemoryStream, InStream);
-        //      ByteArray := MemoryStream.ToArray;
-        //      Encoding := Encoding.GetEncoding('utf-8');
-        //      ESCPOS := Encoding.GetString(ByteArray);
-        //
-        //      PrintBitmapFromESCPOS(ESCPOS, RetailLogo.Height);
-              MemoryStream := InStream;
-              MemoryStream.Position := 0;
-              StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
-              ESCPOS := StreamReader.ReadToEnd();
-              PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
-              //+NPR5.40 [284505]
-            end;
-          until RetailLogo.Next = 0;
+            repeat
+                if RetailLogo.ESCPOSLogo.HasValue then begin
+                    RetailLogo.ESCPOSLogo.CreateInStream(InStream);
+                    //-NPR5.40 [248505]
+                    //      MemoryStream := MemoryStream.MemoryStream;
+                    //      COPYSTREAM(MemoryStream, InStream);
+                    //      ByteArray := MemoryStream.ToArray;
+                    //      Encoding := Encoding.GetEncoding('utf-8');
+                    //      ESCPOS := Encoding.GetString(ByteArray);
+                    //
+                    //      PrintBitmapFromESCPOS(ESCPOS, RetailLogo.Height);
+                    MemoryStream := InStream;
+                    MemoryStream.Position := 0;
+                    StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
+                    ESCPOS := StreamReader.ReadToEnd();
+                    PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
+                    //+NPR5.40 [284505]
+                end;
+            until RetailLogo.Next = 0;
     end;
 
-    procedure PrintBitmapFromESCPOS(ESCPOS: Text;hL: Integer;hH: Integer;cmdL: Integer;cmdH: Integer)
+    procedure PrintBitmapFromESCPOS(ESCPOS: Text; hL: Integer; hH: Integer; cmdL: Integer; cmdH: Integer)
     var
         HeightLowByte: Integer;
         HeightHighByte: Integer;
@@ -690,7 +730,7 @@ codeunit 6014543 "RP Epson V Device Library"
         RetailLogo: Record "Retail Logo";
     begin
         if ESCPOS = '' then
-          exit;
+            exit;
 
         //-NPR5.40 [284505]
         // ByteArray      := BitConverter.GetBytes(Height);
@@ -738,7 +778,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    procedure PrintNVGraphicsData(n: Char;m: Char)
+    procedure PrintNVGraphicsData(n: Char; m: Char)
     begin
         // Ref sheet 198 n in [1-255], m in [0-3]
         //-NPR5.40 [284505]
@@ -748,7 +788,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    procedure PrintNVGraphicsDataNew(pL: Char;pH: Char;m: Char;fn: Char;kc1: Char;kc2: Char;x: Char;y: Char)
+    procedure PrintNVGraphicsDataNew(pL: Char; pH: Char; m: Char; fn: Char; kc1: Char; kc2: Char; x: Char; y: Char)
     begin
         // Ref sheet 191 m in [A-N]
         //-NPR5.40 [284505]
@@ -758,7 +798,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SelectBitImageMode(m: Char;nL: Char;nH: Char;"d1..dk": Text)
+    local procedure SelectBitImageMode(m: Char; nL: Char; nH: Char; "d1..dk": Text)
     begin
         // Ref sheet 115
         //-NPR5.40 [284505]
@@ -823,7 +863,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SelectCutModeAndCutPaper(m: Char;n: Char)
+    local procedure SelectCutModeAndCutPaper(m: Char; n: Char)
     begin
         // Ref sheet 184
         //-NPR5.40 [284505]
@@ -892,7 +932,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SelectPrintSpeed(K: Char;pL: Char;pH: Char;fn: Char;m: Char)
+    local procedure SelectPrintSpeed(K: Char; pL: Char; pH: Char; fn: Char; m: Char)
     begin
         // Ref sheet 149, pL + pH x 256 = 2
         //-NPR5.40 [284505]
@@ -922,7 +962,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetAbsolutePrintPosition(nL: Char;nH: Char)
+    local procedure SetAbsolutePrintPosition(nL: Char; nH: Char)
     begin
         // Ref sheet 111
         //-NPR5.40 [284505]
@@ -932,7 +972,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetAbsVerticalPrintPos(nL: Char;nH: Char)
+    local procedure SetAbsVerticalPrintPos(nL: Char; nH: Char)
     begin
         // Ref sheet 134 LSB of   0 <= nL, nH <= 255
         //-NPR5.40 [284505]
@@ -962,7 +1002,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetHorzAndVertMotionUnits(x: Char;y: Char)
+    local procedure SetHorzAndVertMotionUnits(x: Char; y: Char)
     begin
         // Ref sheet 183
         //-NPR5.40 [284505]
@@ -982,7 +1022,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetLeftMargin(nL: Char;nH: Char)
+    local procedure SetLeftMargin(nL: Char; nH: Char)
     begin
         // Ref sheet 183
         //-NPR5.40 [284505]
@@ -1002,7 +1042,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetPrintAreaInPageMode(W: Char;xl: Char;xH: Char;yL: Char;yH: Char;dxL: Char;dxH: Char;dyL: Char;dyH: Char)
+    local procedure SetPrintAreaInPageMode(W: Char; xl: Char; xH: Char; yL: Char; yH: Char; dxL: Char; dxH: Char; dyL: Char; dyH: Char)
     begin
         // Ref sheet 121
         //-NPR5.40 [284505]
@@ -1015,7 +1055,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetPrintAreaWidth(nL: Char;nH: Char)
+    local procedure SetPrintAreaWidth(nL: Char; nH: Char)
     begin
         // Ref sheet 184
         //-NPR5.40 [284505]
@@ -1025,7 +1065,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetRelativePrintPosition(nL: Char;nH: Char)
+    local procedure SetRelativePrintPosition(nL: Char; nH: Char)
     begin
         // Ref sheet 121
         //-NPR5.40 [284505]
@@ -1035,7 +1075,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure SetRelativeVerticalPrintPos(nL: Char;nH: Char)
+    local procedure SetRelativeVerticalPrintPos(nL: Char; nH: Char)
     begin
         // Ref sheet 184
         //-NPR5.40 [284505]
@@ -1055,7 +1095,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.40 [284505]
     end;
 
-    local procedure StoreGraphicsInBuffer(pL: Char;pH: Char;m: Char;fn: Char;a: Char;bx: Char;by: Char;c: Char;xL: Char;xH: Char;yL: Char;yH: Char;Image: Text)
+    local procedure StoreGraphicsInBuffer(pL: Char; pH: Char; m: Char; fn: Char; a: Char; bx: Char; by: Char; c: Char; xL: Char; xH: Char; yL: Char; yH: Char; Image: Text)
     var
         TempPattern: Text;
     begin
@@ -1124,59 +1164,91 @@ codeunit 6014543 "RP Epson V Device Library"
     procedure GetPageWidth(FontFace: Text[30]) Width: Integer
     begin
         case MediaWidth of
-          MediaWidth::"80mm" :
-            case FontFace[1] of
-              'A' :
-                case FontFace[2] of
-                  '1' : exit(42);
-                  '2' : exit(21);
-                  '3' : exit(14);
-                  '4' : exit(10);
-                  '5' : exit(8);
-                  '6' : exit(7);
-                  '7' : exit(6);
-                  '8' : exit(5);
+            MediaWidth::"80mm":
+                case FontFace[1] of
+                    'A':
+                        case FontFace[2] of
+                            '1':
+                                exit(42);
+                            '2':
+                                exit(21);
+                            '3':
+                                exit(14);
+                            '4':
+                                exit(10);
+                            '5':
+                                exit(8);
+                            '6':
+                                exit(7);
+                            '7':
+                                exit(6);
+                            '8':
+                                exit(5);
+                        end;
+                    'B':
+                        case FontFace[2] of
+                            '1':
+                                exit(56);
+                            '2':
+                                exit(28);
+                            '3':
+                                exit(18);
+                            '4':
+                                exit(14);
+                            '5':
+                                exit(11);
+                            '6':
+                                exit(9);
+                            '7':
+                                exit(8);
+                            '8':
+                                exit(7);
+                        end;
                 end;
-              'B' :
-                case FontFace[2] of
-                  '1' : exit(56);
-                  '2' : exit(28);
-                  '3' : exit(18);
-                  '4' : exit(14);
-                  '5' : exit(11);
-                  '6' : exit(9);
-                  '7' : exit(8);
-                  '8' : exit(7);
+            //-NPR5.37 [291769]
+            MediaWidth::"58mm":
+                case FontFace[1] of
+                    'A':
+                        case FontFace[2] of
+                            '1':
+                                exit(32);
+                            '2':
+                                exit(16);
+                            '3':
+                                exit(10);
+                            '4':
+                                exit(8);
+                            '5':
+                                exit(6);
+                            '6':
+                                exit(5);
+                            '7':
+                                exit(4);
+                            '8':
+                                exit(4);
+                        end;
+                    'B':
+                        case FontFace[2] of
+                            '1':
+                                exit(42);
+                            '2':
+                                exit(21);
+                            '3':
+                                exit(14);
+                            '4':
+                                exit(10);
+                            '5':
+                                exit(8);
+                            '6':
+                                exit(7);
+                            '7':
+                                exit(6);
+                            '8':
+                                exit(5);
+                        end;
                 end;
-            end;
-          //-NPR5.37 [291769]
-          MediaWidth::"58mm" :
-            case FontFace[1] of
-              'A' :
-                case FontFace[2] of
-                  '1' : exit(32);
-                  '2' : exit(16);
-                  '3' : exit(10);
-                  '4' : exit(8);
-                  '5' : exit(6);
-                  '6' : exit(5);
-                  '7' : exit(4);
-                  '8' : exit(4);
-                end;
-              'B' :
-                case FontFace[2] of
-                  '1' : exit(42);
-                  '2' : exit(21);
-                  '3' : exit(14);
-                  '4' : exit(10);
-                  '5' : exit(8);
-                  '6' : exit(7);
-                  '7' : exit(6);
-                  '8' : exit(5);
-                end;
-            end;
-          //MediaWidth::"58mm" : ERROR('Not implemented');
-          //+NPR5.37 [291769]
+        //MediaWidth::"58mm" : ERROR('Not implemented');
+        //+NPR5.37 [291769]
         end;
     end;
 
@@ -1184,11 +1256,11 @@ codeunit 6014543 "RP Epson V Device Library"
     begin
         Font := UpperCase(Font);
 
-        if CopyStr(Font,1,7) = 'BARCODE' then //Legacy syntax support - Remove this when the hardcoded receipts are deprecated.
-          exit(true);
+        if CopyStr(Font, 1, 7) = 'BARCODE' then //Legacy syntax support - Remove this when the hardcoded receipts are deprecated.
+            exit(true);
 
-        if Font in ['UPC-A','UPC-E','EAN13','EAN8','CODE39','ITF','CODABAR','CODE128','QR'] then
-          exit(true);
+        if Font in ['UPC-A', 'UPC-E', 'EAN13', 'EAN8', 'CODE39', 'ITF', 'CODABAR', 'CODE128', 'QR'] then
+            exit(true);
     end;
 
     local procedure "// Aux Functions"()
@@ -1200,8 +1272,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //-NPR5.40 [284505]
         Clear(PrintBufferOutStream);
         Clear(PrintBuffer);
-        PrintBuffer.Init;
-        PrintBuffer.Blob.CreateOutStream(PrintBufferOutStream,TEXTENCODING::UTF8);
+        PrintBuffer.CreateOutStream(PrintBufferOutStream, TEXTENCODING::UTF8);
         //+NPR5.40 [284505]
     end;
 
@@ -1225,12 +1296,12 @@ codeunit 6014543 "RP Epson V Device Library"
         //https://reference.epson-biz.com/modules/ref_epos_print_xml_en/index.php?content_id=1
 
         case Encoding of
-          Encoding::"Windows-1252" :
-            //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
-            //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
-            DotNetEncoding := DotNetEncoding.GetEncoding('iso-8859-1');
-          Encoding::"Windows-1256" :
-            DotNetEncoding := DotNetEncoding.GetEncoding('Windows-1256');
+            Encoding::"Windows-1252":
+                //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
+                //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
+                DotNetEncoding := DotNetEncoding.GetEncoding('iso-8859-1');
+            Encoding::"Windows-1256":
+                DotNetEncoding := DotNetEncoding.GetEncoding('Windows-1256');
         end;
 
         //-NPR5.40 [284505]
@@ -1257,14 +1328,22 @@ codeunit 6014543 "RP Epson V Device Library"
     begin
         //-NPR5.40 [284505]
         case Int of
-          0 : exit('000');
-          1 : exit('001');
-          2 : exit('010');
-          3 : exit('011');
-          4 : exit('100');
-          5 : exit('101');
-          6 : exit('110');
-          7 : exit('111');
+            0:
+                exit('000');
+            1:
+                exit('001');
+            2:
+                exit('010');
+            3:
+                exit('011');
+            4:
+                exit('100');
+            5:
+                exit('101');
+            6:
+                exit('110');
+            7:
+                exit('111');
         end;
         exit('000');
         //+NPR5.40 [284505]
@@ -1279,9 +1358,9 @@ codeunit 6014543 "RP Epson V Device Library"
         RetailList: Record "Retail List" temporary;
     begin
         ConstructFontSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"Retail List",RetailList) = ACTION::LookupOK then begin
-          Value := RetailList.Choice;
-          exit(true);
+        if PAGE.RunModal(PAGE::"Retail List", RetailList) = ACTION::LookupOK then begin
+            Value := RetailList.Choice;
+            exit(true);
         end;
     end;
 
@@ -1290,9 +1369,9 @@ codeunit 6014543 "RP Epson V Device Library"
         RetailList: Record "Retail List" temporary;
     begin
         ConstructCommandSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"Retail List",RetailList) = ACTION::LookupOK then begin
-          Value := RetailList.Choice;
-          exit(true);
+        if PAGE.RunModal(PAGE::"Retail List", RetailList) = ACTION::LookupOK then begin
+            Value := RetailList.Choice;
+            exit(true);
         end;
     end;
 
@@ -1306,23 +1385,23 @@ codeunit 6014543 "RP Epson V Device Library"
         RetailList.SetRec(tmpRetailList);
         RetailList.LookupMode(true);
         if RetailList.RunModal = ACTION::LookupOK then begin
-          RetailList.GetRec(tmpRetailList);
-          tmpDeviceSetting.Name := tmpRetailList.Value;
-          case tmpDeviceSetting.Name of
-            'MEDIA_WIDTH' :
-              begin
-                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
-                tmpDeviceSetting.Options := '80mm,58mm';
-              end;
-            //-NPR5.37 [290904]
-            'ENCODING' :
-              begin
-                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
-                tmpDeviceSetting.Options := 'Windows-1252,Windows-1256';
-              end;
+            RetailList.GetRec(tmpRetailList);
+            tmpDeviceSetting.Name := tmpRetailList.Value;
+            case tmpDeviceSetting.Name of
+                'MEDIA_WIDTH':
+                    begin
+                        tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                        tmpDeviceSetting.Options := '80mm,58mm';
+                    end;
+                //-NPR5.37 [290904]
+                'ENCODING':
+                    begin
+                        tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                        tmpDeviceSetting.Options := 'Windows-1252,Windows-1256';
+                    end;
             //+NPR5.37 [290904]
-          end;
-          exit(tmpDeviceSetting.Insert);
+            end;
+            exit(tmpDeviceSetting.Insert);
         end;
     end;
 
@@ -1355,7 +1434,7 @@ codeunit 6014543 "RP Epson V Device Library"
         //+NPR5.37 [290904]
     end;
 
-    procedure AddOption(var RetailList: Record "Retail List" temporary;Choice: Text;Value: Text)
+    procedure AddOption(var RetailList: Record "Retail List" temporary; Choice: Text; Value: Text)
     begin
         RetailList.Number += 1;
         RetailList.Choice := Choice;
@@ -1388,34 +1467,34 @@ codeunit 6014543 "RP Epson V Device Library"
         Length := StrLen(Value);
 
         if Length = 0 then
-          exit('');
+            exit('');
 
         for i := 1 to Length do begin
-          Numeric := Char.IsNumber(Value[i]);
+            Numeric := Char.IsNumber(Value[i]);
 
-          if (not Numeric) and (ConsecutiveNumbers > 4) then
-            if (StrLen(Code128) = 0) or (ConsecutiveNumbers > 6) then
-              Code128 += PrepareNumericDataC128 (Buffer, CurrentMode, (StrLen(Code128) = 0));
+            if (not Numeric) and (ConsecutiveNumbers > 4) then
+                if (StrLen(Code128) = 0) or (ConsecutiveNumbers > 6) then
+                    Code128 += PrepareNumericDataC128(Buffer, CurrentMode, (StrLen(Code128) = 0));
 
-          Buffer += Format(Value[i]);
+            Buffer += Format(Value[i]);
 
-          if Numeric then begin
-            ConsecutiveNumbers += 1;
-            if i = Length then
-              if ConsecutiveNumbers > 4 then
-                Code128 += PrepareNumericDataC128 (Buffer, CurrentMode, (StrLen(Code128) = 0))
-              else
-                Code128 += PrepareDataC128 (Buffer, CurrentMode);
-          end else begin
-            ConsecutiveNumbers := 0;
-            Code128 += PrepareDataC128 (Buffer, CurrentMode);
-          end;
+            if Numeric then begin
+                ConsecutiveNumbers += 1;
+                if i = Length then
+                    if ConsecutiveNumbers > 4 then
+                        Code128 += PrepareNumericDataC128(Buffer, CurrentMode, (StrLen(Code128) = 0))
+                    else
+                        Code128 += PrepareDataC128(Buffer, CurrentMode);
+            end else begin
+                ConsecutiveNumbers := 0;
+                Code128 += PrepareDataC128(Buffer, CurrentMode);
+            end;
         end;
 
         exit(Code128);
     end;
 
-    local procedure PrepareNumericDataC128(var Data: Text;var CurrentMode: Option " ",CodeA,CodeB,CodeC;First: Boolean) ReturnValue: Text
+    local procedure PrepareNumericDataC128(var Data: Text; var CurrentMode: Option " ",CodeA,CodeB,CodeC; First: Boolean) ReturnValue: Text
     var
         i: Integer;
         Char: Char;
@@ -1426,68 +1505,72 @@ codeunit 6014543 "RP Epson V Device Library"
         Length := StrLen(Data);
 
         if (Length mod 2 <> 0) then begin
-          //If start of total C128 command then we handle last digit as non-numeric. Otherwise we handle first digit this way.
-          if First then begin
-            OddChar := Format(Data[Length]);
-            Data := CopyStr(Data, 1, Length-1);
-          end else begin
-            OddChar := Format(Data[1]);
-            ReturnValue += PrepareDataC128(OddChar, CurrentMode);
-            Data := CopyStr(Data, 2);
-          end;
+            //If start of total C128 command then we handle last digit as non-numeric. Otherwise we handle first digit this way.
+            if First then begin
+                OddChar := Format(Data[Length]);
+                Data := CopyStr(Data, 1, Length - 1);
+            end else begin
+                OddChar := Format(Data[1]);
+                ReturnValue += PrepareDataC128(OddChar, CurrentMode);
+                Data := CopyStr(Data, 2);
+            end;
 
-          Length -= 1;
+            Length -= 1;
         end;
 
         ReturnValue += SwitchModeC128(CurrentMode::CodeC, CurrentMode);
 
         i := 1;
-        while(i < Length) do begin
-          Evaluate(Int, Format(Data[i]) + Format(Data[i+1]));
-          Char := Int;
-          ReturnValue += Format(Char);
-          i += 2;
+        while (i < Length) do begin
+            Evaluate(Int, Format(Data[i]) + Format(Data[i + 1]));
+            Char := Int;
+            ReturnValue += Format(Char);
+            i += 2;
         end;
 
         if First and (OddChar <> '') then
-          ReturnValue += PrepareDataC128(OddChar, CurrentMode);
+            ReturnValue += PrepareDataC128(OddChar, CurrentMode);
 
         Clear(Data);
     end;
 
-    local procedure PrepareDataC128(var Data: Text;var CurrentMode: Option " ",CodeA,CodeB,CodeC) ReturnValue: Text
+    local procedure PrepareDataC128(var Data: Text; var CurrentMode: Option " ",CodeA,CodeB,CodeC) ReturnValue: Text
     var
         i: Integer;
         Char: Char;
     begin
         for i := 1 to StrLen(Data) do begin
-          Char := Data[i];
+            Char := Data[i];
 
-          if Char < 32 then
-            ReturnValue += SwitchModeC128(CurrentMode::CodeA, CurrentMode)
-          else if (Char > 95) or (CurrentMode in [CurrentMode::CodeC, CurrentMode::" "]) then
-            ReturnValue += SwitchModeC128(CurrentMode::CodeB, CurrentMode);
+            if Char < 32 then
+                ReturnValue += SwitchModeC128(CurrentMode::CodeA, CurrentMode)
+            else
+                if (Char > 95) or (CurrentMode in [CurrentMode::CodeC, CurrentMode::" "]) then
+                    ReturnValue += SwitchModeC128(CurrentMode::CodeB, CurrentMode);
 
-          ReturnValue += Format(Char);
+            ReturnValue += Format(Char);
         end;
 
         Clear(Data);
     end;
 
-    local procedure SwitchModeC128(SwitchTo: Option " ",CodeA,CodeB,CodeC;var CurrentMode: Option " ",CodeA,CodeB,CodeC) Command: Text
+    local procedure SwitchModeC128(SwitchTo: Option " ",CodeA,CodeB,CodeC; var CurrentMode: Option " ",CodeA,CodeB,CodeC) Command: Text
     var
         Char: Char;
     begin
         if CurrentMode = SwitchTo then
-          exit('');
+            exit('');
 
         Char := 123;
         Command := Format(Char);
 
         case SwitchTo of
-          SwitchTo::CodeA : Char := 65;
-          SwitchTo::CodeB : Char := 66;
-          SwitchTo::CodeC : Char := 67;
+            SwitchTo::CodeA:
+                Char := 65;
+            SwitchTo::CodeB:
+                Char := 66;
+            SwitchTo::CodeC:
+                Char := 67;
         end;
 
         Command += Format(Char);

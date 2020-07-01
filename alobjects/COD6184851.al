@@ -20,14 +20,14 @@ codeunit 6184851 "FR Audit Archive Workshifts"
         POSWorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
         //+NPR5.51 [356076]
         if POSWorkshiftCheckpoint.FindSet then
-          repeat
-            FRCertificationSetup."Last Auto Archived Workshift" := POSWorkshiftCheckpoint."Entry No.";
-            FRCertificationSetup.Modify;
+            repeat
+                FRCertificationSetup."Last Auto Archived Workshift" := POSWorkshiftCheckpoint."Entry No.";
+                FRCertificationSetup.Modify;
 
-            ArchiveWorkshift(POSWorkshiftCheckpoint);
+                ArchiveWorkshift(POSWorkshiftCheckpoint);
 
-            Commit;
-          until POSWorkshiftCheckpoint.Next = 0;
+                Commit;
+            until POSWorkshiftCheckpoint.Next = 0;
     end;
 
     var
@@ -47,7 +47,7 @@ codeunit 6184851 "FR Audit Archive Workshifts"
     local procedure ArchiveWorkshift(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint")
     var
         FRPeriodArchive: XMLport "FR Audit Archive";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
         HttpClient: DotNet npNetHttpClient;
@@ -61,15 +61,15 @@ codeunit 6184851 "FR Audit Archive Workshifts"
         GUID: Guid;
     begin
         POSWorkshiftCheckpoint.SetRecFilter;
-        TempBlob.Blob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
+        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
         FRPeriodArchive.SetDestination(OutStream);
         FRPeriodArchive.SetTableView(POSWorkshiftCheckpoint);
         FRPeriodArchive.Export();
-        TempBlob.Blob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
 
         while (not InStream.EOS) do begin
-          InStream.ReadText(XmlLine);
-          XmlFile += XmlLine;
+            InStream.ReadText(XmlLine);
+            XmlFile += XmlLine;
         end;
 
         HttpClient := HttpClient.HttpClient();
@@ -84,7 +84,7 @@ codeunit 6184851 "FR Audit Archive Workshifts"
         StringContent.Headers.Add('x-ms-meta-WorkshiftPOSUnitNo', Format(POSWorkshiftCheckpoint."POS Unit No."));
         StringContent.Headers.Add('x-ms-meta-WorkshiftDateTime', Format(POSWorkshiftCheckpoint."Created At"));
         StringContent.Headers.Add('Ocp-Apim-Subscription-Key', FRCertificationSetup."Auto Archive API Key");
-        HttpResponseMessage := HttpClient.PutAsync(StrSubstNo('%1/%2?%3',FRCertificationSetup."Auto Archive URL", Format(GUID), FRCertificationSetup."Auto Archive SAS"), StringContent).Result();
+        HttpResponseMessage := HttpClient.PutAsync(StrSubstNo('%1/%2?%3', FRCertificationSetup."Auto Archive URL", Format(GUID), FRCertificationSetup."Auto Archive SAS"), StringContent).Result();
         HttpResponseMessage.EnsureSuccessStatusCode();
     end;
 }

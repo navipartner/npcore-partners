@@ -20,7 +20,7 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         TextFileExported: Label 'The file was exported to %1.';
         TextFileNotExported: Label 'The file could not be exported to %1.';
 
-    local procedure ProcessNcEndpoints(NcTriggerCode: Code[20];Output: Text;var NcTask: Record "Nc Task";Filename: Text)
+    local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "Nc Task"; Filename: Text)
     var
         NcTrigger: Record "Nc Trigger";
         NcEndpoint: Record "Nc Endpoint";
@@ -28,53 +28,54 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         NcEndpointTriggerLink: Record "Nc Endpoint Trigger Link";
     begin
         case NcTask."Table No." of
-          DATABASE :: "Nc Trigger" :
-            begin
-              NcEndpointTriggerLink.Reset;
-              NcEndpointTriggerLink.SetRange("Trigger Code",NcTriggerCode);
-              if NcEndpointTriggerLink.FindSet then repeat
-                if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
-                  if NcEndpoint."Endpoint Type" = NcEndpointFile.GetEndpointTypeCode then begin
-                    if NcEndpointFile.Get(NcEndpointTriggerLink."Endpoint Code") then begin
-                      ProcessNcEndpointTrigger(NcTriggerCode,Output,Filename,NcTask,NcEndpointFile);
-                    end;
-                  end;
+            DATABASE::"Nc Trigger":
+                begin
+                    NcEndpointTriggerLink.Reset;
+                    NcEndpointTriggerLink.SetRange("Trigger Code", NcTriggerCode);
+                    if NcEndpointTriggerLink.FindSet then
+                        repeat
+                            if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
+                                if NcEndpoint."Endpoint Type" = NcEndpointFile.GetEndpointTypeCode then begin
+                                    if NcEndpointFile.Get(NcEndpointTriggerLink."Endpoint Code") then begin
+                                        ProcessNcEndpointTrigger(NcTriggerCode, Output, Filename, NcTask, NcEndpointFile);
+                                    end;
+                                end;
+                            end;
+                        until NcEndpointTriggerLink.Next = 0;
                 end;
-              until NcEndpointTriggerLink.Next = 0;
-            end;
-          DATABASE :: "Nc Endpoint File":
-            begin
-              //Process Endpoint Task
-              NcEndpointFile.SetPosition(NcTask."Record Position");
-              NcEndpointFile.SetRange(Code,NcEndpointFile.Code);
-              NcEndpointFile.SetRange(Enabled,true);
-              if NcEndpointFile.FindFirst then begin
-                ProcessEndPointTask(NcEndpointFile,NcTask,Output,Filename);
-                NcTask.Modify;
-              end;
-            end;
+            DATABASE::"Nc Endpoint File":
+                begin
+                    //Process Endpoint Task
+                    NcEndpointFile.SetPosition(NcTask."Record Position");
+                    NcEndpointFile.SetRange(Code, NcEndpointFile.Code);
+                    NcEndpointFile.SetRange(Enabled, true);
+                    if NcEndpointFile.FindFirst then begin
+                        ProcessEndPointTask(NcEndpointFile, NcTask, Output, Filename);
+                        NcTask.Modify;
+                    end;
+                end;
         end;
     end;
 
-    procedure ProcessNcEndpointTrigger(NcTriggerCode: Code[20];Output: Text;Filename: Text;var NcTask: Record "Nc Task";NcEndpointFile: Record "Nc Endpoint File")
+    procedure ProcessNcEndpointTrigger(NcTriggerCode: Code[20]; Output: Text; Filename: Text; var NcTask: Record "Nc Task"; NcEndpointFile: Record "Nc Endpoint File")
     var
         NcTrigger: Record "Nc Trigger";
     begin
         if not NcEndpointFile.Enabled then
-          exit;
+            exit;
         NcTrigger.Get(NcTriggerCode);
         if not NcTrigger."Split Trigger and Endpoint" then begin
-          //Process Trigger Task Directly
-          FileProcess (NcTask,NcEndpointFile,Output,Filename);
-          NcTask.Modify;
+            //Process Trigger Task Directly
+            FileProcess(NcTask, NcEndpointFile, Output, Filename);
+            NcTask.Modify;
         end else begin
-          //Insert New Task per Endpoint
-          InsertEndpointTask(NcEndpointFile,NcTask,Filename);
-          NcTask.Modify;
+            //Insert New Task per Endpoint
+            InsertEndpointTask(NcEndpointFile, NcTask, Filename);
+            NcTask.Modify;
         end;
     end;
 
-    local procedure InsertEndpointTask(var NcEndpointFile: Record "Nc Endpoint File";var NcTask: Record "Nc Task";Filename: Text)
+    local procedure InsertEndpointTask(var NcEndpointFile: Record "Nc Endpoint File"; var NcTask: Record "Nc Task"; Filename: Text)
     var
         NcTriggerSyncMgt: Codeunit "Nc Trigger Sync. Mgt.";
         NewTask: Record "Nc Task";
@@ -84,34 +85,34 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         TaskEntryNo: BigInteger;
     begin
         RecRef.Get(NcEndpointFile.RecordId);
-        NcTriggerSyncMgt.InsertTask(RecRef,TaskEntryNo);
+        NcTriggerSyncMgt.InsertTask(RecRef, TaskEntryNo);
         NewTask.Get(TaskEntryNo);
         TempNcEndPointFile.Init;
         TempNcEndPointFile.Copy(NcEndpointFile);
         TempNcEndPointFile."Output Nc Task Entry No." := NcTask."Entry No.";
         if Filename <> '' then
-          TempNcEndPointFile.Filename:= Filename;
-        NcTriggerSyncMgt.FillFields(NewTask,TempNcEndPointFile);
-        NcTriggerSyncMgt.AddResponse(NcTask,StrSubstNo(TextTaskInserted,NcEndpointFile.Code,NcEndpointFile.Description,NcEndpointFile.Filename,NcEndpointFile.Path,NewTask."Entry No."));
+            TempNcEndPointFile.Filename := Filename;
+        NcTriggerSyncMgt.FillFields(NewTask, TempNcEndPointFile);
+        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInserted, NcEndpointFile.Code, NcEndpointFile.Description, NcEndpointFile.Filename, NcEndpointFile.Path, NewTask."Entry No."));
     end;
 
-    procedure ProcessEndPointTask(var NcEndpointFile: Record "Nc Endpoint File";var NcTask: Record "Nc Task";Output: Text;Filename: Text)
+    procedure ProcessEndPointTask(var NcEndpointFile: Record "Nc Endpoint File"; var NcTask: Record "Nc Task"; Output: Text; Filename: Text)
     var
         NcTaskMgt: Codeunit "Nc Task Mgt.";
         RecRef: RecordRef;
         FldRef: FieldRef;
         TextNoOutput: Label 'FTP Task not executed because there was no output to send.';
     begin
-        NcTaskMgt.RestoreRecord(NcTask."Entry No.",RecRef);
+        NcTaskMgt.RestoreRecord(NcTask."Entry No.", RecRef);
         if Output = '' then
-          Error(TextNoOutput);
+            Error(TextNoOutput);
         FldRef := RecRef.Field(NcEndpointFile.FieldNo(Filename));
         if Format(FldRef.Value) <> '' then
-          Filename := Format(FldRef.Value);
-        FileProcess(NcTask,NcEndpointFile,Output,Filename);
+            Filename := Format(FldRef.Value);
+        FileProcess(NcTask, NcEndpointFile, Output, Filename);
     end;
 
-    local procedure FileProcess(var NcTask: Record "Nc Task";NcEndpointFile: Record "Nc Endpoint File";OutputText: Text;Filename: Text)
+    local procedure FileProcess(var NcTask: Record "Nc Task"; NcEndpointFile: Record "Nc Endpoint File"; OutputText: Text; Filename: Text)
     var
         NcTriggerSyncMgt: Codeunit "Nc Trigger Sync. Mgt.";
         FileMgt: Codeunit "File Management";
@@ -143,49 +144,52 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         //  END;
         // END;
         if NcEndpointFile."Client Path" then begin
-          Tempfile.CreateTempFile();
-          FullName := Tempfile.Name;
-          Tempfile.Close();
+            Tempfile.CreateTempFile();
+            FullName := Tempfile.Name;
+            Tempfile.Close();
         end else begin
-          FullName := StrSubstNo('%1\%2',DelChr(NcEndpointFile.Path,'>','\'),Filename);
-          if StrLen(Filename) = (StrLen(DelChr(Filename,'=','\')) + 1) then begin
-            DirectoryPathfromFile := NcEndpointFile.Path + '\' + CopyStr(Filename,1,StrPos(Filename,'\')-1);
-            if not FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) then
-              FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
-          end;
+            FullName := StrSubstNo('%1\%2', DelChr(NcEndpointFile.Path, '>', '\'), Filename);
+            if StrLen(Filename) = (StrLen(DelChr(Filename, '=', '\')) + 1) then begin
+                DirectoryPathfromFile := NcEndpointFile.Path + '\' + CopyStr(Filename, 1, StrPos(Filename, '\') - 1);
+                if not FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) then
+                    FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
+            end;
         end;
         //+NC2.12 [313362]
 
         if Exists(FullName) then begin
-          case NcEndpointFile."Handle Exiting File" of
-            NcEndpointFile."Handle Exiting File"  :: KeepExisting :
-              begin
-                NcTriggerSyncMgt.AddResponse(NcTask,ConvertStr(StrSubstNo(TextFileExistsSkipped,FullName),'\','/'));
-                exit;
-              end;
-            NcEndpointFile."Handle Exiting File"  :: AddSuffix :
-              begin
-                FullName := AddSuffixToFileName(FullName);
-                NcTriggerSyncMgt.AddResponse(NcTask,ConvertStr(StrSubstNo(TextFileExistsAppendedSuffix,FullName),'\','/'));
-              end;
-            NcEndpointFile."Handle Exiting File"  :: Replace :
-              begin
-                Erase(FullName);
-                NcTriggerSyncMgt.AddResponse(NcTask,ConvertStr(StrSubstNo(TextFileExistsOverwitten,FullName),'\','/'));
-              end;
-          end;
+            case NcEndpointFile."Handle Exiting File" of
+                NcEndpointFile."Handle Exiting File"::KeepExisting:
+                    begin
+                        NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExistsSkipped, FullName), '\', '/'));
+                        exit;
+                    end;
+                NcEndpointFile."Handle Exiting File"::AddSuffix:
+                    begin
+                        FullName := AddSuffixToFileName(FullName);
+                        NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExistsAppendedSuffix, FullName), '\', '/'));
+                    end;
+                NcEndpointFile."Handle Exiting File"::Replace:
+                    begin
+                        Erase(FullName);
+                        NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExistsOverwitten, FullName), '\', '/'));
+                    end;
+            end;
         end else begin
-          NcTriggerSyncMgt.AddResponse(NcTask,ConvertStr(StrSubstNo(TextFileExported,FullName),'\','/'));
+            NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExported, FullName), '\', '/'));
         end;
         ExportFile.Create(FullName);
         ExportFile.Close;
         //-NC2.12 [#254072]
         case NcEndpointFile."File Encoding" of
-          NcEndpointFile."File Encoding"::ANSI: Encoding := Encoding.GetEncoding('windows-1252');
-          NcEndpointFile."File Encoding"::Unicode: Encoding := Encoding.Unicode;
-          NcEndpointFile."File Encoding"::UTF8: Encoding := Encoding.UTF8;
+            NcEndpointFile."File Encoding"::ANSI:
+                Encoding := Encoding.GetEncoding('windows-1252');
+            NcEndpointFile."File Encoding"::Unicode:
+                Encoding := Encoding.Unicode;
+            NcEndpointFile."File Encoding"::UTF8:
+                Encoding := Encoding.UTF8;
         end;
-        StreamWriter := StreamWriter.StreamWriter(FullName,true,Encoding);
+        StreamWriter := StreamWriter.StreamWriter(FullName, true, Encoding);
         StreamWriter.Write(OutputText);
         StreamWriter.Flush;
         StreamWriter.Close;
@@ -208,20 +212,20 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         // END;
         // //+NC2.01 [#254997]
         if NcEndpointFile."Client Path" then begin
-          ToFile := NcEndpointFile.Path + Filename;
-          FileMgt.CopyServerFile(FullName,FullName+'.file',true);
-          ExportFile.Open(FullName);
-          FileMgt.DownloadToFile(ExportFile.Name +'.file',ToFile);
-          ExportFile.Close;
-          Erase(FullName);
-          NcTriggerSyncMgt.AddResponse(NcTask,NewLine() + StrSubstNo(TextFileDownloaded,ConvertStr(ToFile,'\','/')));
+            ToFile := NcEndpointFile.Path + Filename;
+            FileMgt.CopyServerFile(FullName, FullName + '.file', true);
+            ExportFile.Open(FullName);
+            FileMgt.DownloadToFile(ExportFile.Name + '.file', ToFile);
+            ExportFile.Close;
+            Erase(FullName);
+            NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + StrSubstNo(TextFileDownloaded, ConvertStr(ToFile, '\', '/')));
         end;
         //+NC2.12 [313362]
     end;
 
-    local procedure FileProcessOutput(NcTaskOutput: Record "Nc Task Output";NcEndpointFile: Record "Nc Endpoint File")
+    local procedure FileProcessOutput(NcTaskOutput: Record "Nc Task Output"; NcEndpointFile: Record "Nc Endpoint File")
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         Encoding: DotNet npNetEncoding;
         StreamReader: DotNet npNetStreamReader;
@@ -251,28 +255,28 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         //  END;
         // END;
         if NcEndpointFile."Client Path" then begin
-          Tempfile.CreateTempFile();
-          FullName := Tempfile.Name;
-          Tempfile.Close();
+            Tempfile.CreateTempFile();
+            FullName := Tempfile.Name;
+            Tempfile.Close();
         end else begin
-          FullName := StrSubstNo('%1\%2',DelChr(NcEndpointFile.Path,'>','\'),NcTaskOutput.Name);
-          if StrLen(NcTaskOutput.Name) = (StrLen(DelChr(NcTaskOutput.Name,'=','\')) + 1) then begin
-            DirectoryPathfromFile := NcEndpointFile.Path + '\' + CopyStr(NcTaskOutput.Name,1,StrPos(NcTaskOutput.Name,'\')-1);
-            if not FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) then
-              FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
-          end;
+            FullName := StrSubstNo('%1\%2', DelChr(NcEndpointFile.Path, '>', '\'), NcTaskOutput.Name);
+            if StrLen(NcTaskOutput.Name) = (StrLen(DelChr(NcTaskOutput.Name, '=', '\')) + 1) then begin
+                DirectoryPathfromFile := NcEndpointFile.Path + '\' + CopyStr(NcTaskOutput.Name, 1, StrPos(NcTaskOutput.Name, '\') - 1);
+                if not FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) then
+                    FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
+            end;
         end;
         //+NC2.12 [313362]
 
         if Exists(FullName) then begin
-          case NcEndpointFile."Handle Exiting File" of
-            NcEndpointFile."Handle Exiting File"::KeepExisting:
-              exit;
-            NcEndpointFile."Handle Exiting File"::AddSuffix:
-              FullName := AddSuffixToFileName(FullName);
-            NcEndpointFile."Handle Exiting File"::Replace:
-              Erase(FullName);
-          end;
+            case NcEndpointFile."Handle Exiting File" of
+                NcEndpointFile."Handle Exiting File"::KeepExisting:
+                    exit;
+                NcEndpointFile."Handle Exiting File"::AddSuffix:
+                    FullName := AddSuffixToFileName(FullName);
+                NcEndpointFile."Handle Exiting File"::Replace:
+                    Erase(FullName);
+            end;
         end;
 
         //-NC2.12 [313362]
@@ -291,22 +295,25 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         ExportFile.Create(FullName);
         ExportFile.Close;
         case NcEndpointFile."File Encoding" of
-          NcEndpointFile."File Encoding"::ANSI: Encoding := Encoding.GetEncoding('windows-1252');
-          NcEndpointFile."File Encoding"::Unicode: Encoding := Encoding.Unicode;
-          NcEndpointFile."File Encoding"::UTF8: Encoding := Encoding.UTF8;
+            NcEndpointFile."File Encoding"::ANSI:
+                Encoding := Encoding.GetEncoding('windows-1252');
+            NcEndpointFile."File Encoding"::Unicode:
+                Encoding := Encoding.Unicode;
+            NcEndpointFile."File Encoding"::UTF8:
+                Encoding := Encoding.UTF8;
         end;
-        StreamWriter := StreamWriter.StreamWriter(FullName,true,Encoding);
-        CopyStream(StreamWriter.BaseStream,InStream);
+        StreamWriter := StreamWriter.StreamWriter(FullName, true, Encoding);
+        CopyStream(StreamWriter.BaseStream, InStream);
         StreamWriter.Flush;
         StreamWriter.Close;
 
         if NcEndpointFile."Client Path" then begin
-          ToFile := NcEndpointFile.Path + NcTaskOutput.Name;
-          FileMgt.CopyServerFile(FullName,FullName+'.file', true);
-          ExportFile.Open(FullName);
-          FileMgt.DownloadToFile(ExportFile.Name +'.file', ToFile);
-          ExportFile.Close;
-          Erase(FullName);
+            ToFile := NcEndpointFile.Path + NcTaskOutput.Name;
+            FileMgt.CopyServerFile(FullName, FullName + '.file', true);
+            ExportFile.Open(FullName);
+            FileMgt.DownloadToFile(ExportFile.Name + '.file', ToFile);
+            ExportFile.Close;
+            Erase(FullName);
         end;
         //+NC2.12 [313362]
         //+NC2.12 [308107]
@@ -317,7 +324,7 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         Suffix: Text;
         FileMgt: Codeunit "File Management";
     begin
-        Suffix := Format(CurrentDateTime,0,'<Year4><Month,2><Day,2>-<Hours24,2><Minutes,2><Seconds,2>');
+        Suffix := Format(CurrentDateTime, 0, '<Year4><Month,2><Day,2>-<Hours24,2><Minutes,2><Seconds,2>');
         exit(FileMgt.GetDirectoryName(FilePath) +
               '\' + FileMgt.GetFileNameWithoutExtension(FilePath) +
              Suffix + '.' + FileMgt.GetExtension(FilePath));
@@ -328,9 +335,9 @@ codeunit 6151526 "Nc Endpoint File Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
-    local procedure OnAfterGetOutputTriggerTaskFileOutput(NcTriggerCode: Code[20];Output: Text;var NcTask: Record "Nc Task";Filename: Text;Subject: Text;Body: Text)
+    local procedure OnAfterGetOutputTriggerTaskFileOutput(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "Nc Task"; Filename: Text; Subject: Text; Body: Text)
     begin
-        ProcessNcEndpoints(NcTriggerCode,Output,NcTask,Filename);
+        ProcessNcEndpoints(NcTriggerCode, Output, NcTask, Filename);
     end;
 
     [EventSubscriber(ObjectType::Table, 6151531, 'OnSetupEndpointTypes', '', false, false)]
@@ -340,57 +347,57 @@ codeunit 6151526 "Nc Endpoint File Mgt."
         NcEndpointType: Record "Nc Endpoint Type";
     begin
         if not NcEndpointType.Get(NcEndpointFile.GetEndpointTypeCode) then begin
-          NcEndpointType.Init;
-          NcEndpointType.Code := NcEndpointFile.GetEndpointTypeCode;
-          NcEndpointType.Insert;
+            NcEndpointType.Init;
+            NcEndpointType.Code := NcEndpointFile.GetEndpointTypeCode;
+            NcEndpointType.Insert;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6151533, 'OnOpenEndpointSetup', '', false, false)]
-    local procedure OnOpenEndpointSetupOpenPage(var Sender: Record "Nc Endpoint";var Handled: Boolean)
+    local procedure OnOpenEndpointSetupOpenPage(var Sender: Record "Nc Endpoint"; var Handled: Boolean)
     var
         NcEndpointFile: Record "Nc Endpoint File";
     begin
         if Handled then
-          exit;
+            exit;
         if Sender."Endpoint Type" <> NcEndpointFile.GetEndpointTypeCode then
-          exit;
+            exit;
         if not NcEndpointFile.Get(Sender.Code) then begin
-          NcEndpointFile.Init;
-          NcEndpointFile.Validate(Code,Sender.Code);
-          NcEndpointFile.Description := Sender.Description;
-          NcEndpointFile.Insert;
-        end else begin
-          if NcEndpointFile.Description <> Sender.Description then begin
+            NcEndpointFile.Init;
+            NcEndpointFile.Validate(Code, Sender.Code);
             NcEndpointFile.Description := Sender.Description;
-            NcEndpointFile.Modify(true);
-          end;
+            NcEndpointFile.Insert;
+        end else begin
+            if NcEndpointFile.Description <> Sender.Description then begin
+                NcEndpointFile.Description := Sender.Description;
+                NcEndpointFile.Modify(true);
+            end;
         end;
         PAGE.Run(PAGE::"Nc Endpoint File Card", NcEndpointFile);
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Table, 6151533, 'OnAfterDeleteEvent', '', false, false)]
-    local procedure OnDeleteEndpoint(var Rec: Record "Nc Endpoint";RunTrigger: Boolean)
+    local procedure OnDeleteEndpoint(var Rec: Record "Nc Endpoint"; RunTrigger: Boolean)
     var
         NcEndpointFile: Record "Nc Endpoint File";
     begin
         if NcEndpointFile.Get(Rec.Code) then
-          NcEndpointFile.Delete(true);
+            NcEndpointFile.Delete(true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151519, 'OnRunEndpoint', '', true, true)]
-    local procedure OnRunEndpoint(NcTaskOutput: Record "Nc Task Output";NcEndpoint: Record "Nc Endpoint")
+    local procedure OnRunEndpoint(NcTaskOutput: Record "Nc Task Output"; NcEndpoint: Record "Nc Endpoint")
     var
         NcEndpointFile: Record "Nc Endpoint File";
     begin
         //-NC2.12 [308107]
         if NcEndpoint."Endpoint Type" <> NcEndpointFile.GetEndpointTypeCode() then
-          exit;
+            exit;
         if not NcEndpointFile.Get(NcEndpoint.Code) then
-          exit;
+            exit;
 
-        FileProcessOutput(NcTaskOutput,NcEndpointFile);
+        FileProcessOutput(NcTaskOutput, NcEndpointFile);
         //+NC2.12 [308107]
     end;
 

@@ -7,15 +7,15 @@ table 6184481 "EFT Type Payment BLOB Param."
 
     fields
     {
-        field(1;"Integration Type";Code[20])
+        field(1; "Integration Type"; Code[20])
         {
             Caption = 'Integration Type';
         }
-        field(2;Name;Text[30])
+        field(2; Name; Text[30])
         {
             Caption = 'Name';
         }
-        field(3;Value;BLOB)
+        field(3; Value; BLOB)
         {
             Caption = 'Value';
 
@@ -29,11 +29,11 @@ table 6184481 "EFT Type Payment BLOB Param."
                 ValidateValue();
             end;
         }
-        field(4;"User Configurable";Boolean)
+        field(4; "User Configurable"; Boolean)
         {
             Caption = 'User Configurable';
         }
-        field(5;"Payment Type POS";Code[10])
+        field(5; "Payment Type POS"; Code[10])
         {
             Caption = 'Payment Type POS';
             TableRelation = "Payment Type POS"."No.";
@@ -42,7 +42,7 @@ table 6184481 "EFT Type Payment BLOB Param."
 
     keys
     {
-        key(Key1;"Integration Type","Payment Type POS",Name)
+        key(Key1; "Integration Type", "Payment Type POS", Name)
         {
         }
     }
@@ -51,21 +51,21 @@ table 6184481 "EFT Type Payment BLOB Param."
     {
     }
 
-    procedure GetParameterValue(IntegrationType: Code[20];PaymentTypePOS: Code[10];NameIn: Text;UserConfigurable: Boolean;var TempBlobOut: Record TempBlob temporary)
+    procedure GetParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; UserConfigurable: Boolean; var TempBlobOut: Codeunit "Temp Blob")
     var
         InvokeParameter: Record "POS Payment Bin Eject Param.";
     begin
         SetAutoCalcFields(Value);
         if not Get(IntegrationType, PaymentTypePOS, NameIn) then begin
-          Init;
-          "Integration Type" := IntegrationType;
-          "Payment Type POS" := PaymentTypePOS;
-          Name := NameIn;
-          "User Configurable" := UserConfigurable;
-          Insert;
+            Init;
+            "Integration Type" := IntegrationType;
+            "Payment Type POS" := PaymentTypePOS;
+            Name := NameIn;
+            "User Configurable" := UserConfigurable;
+            Insert;
         end;
 
-        TempBlobOut.Blob := Value;
+        TempBlobOut.FromRecord(Rec, FieldNo(Value));
     end;
 
     procedure LookupValue()
@@ -84,23 +84,29 @@ table 6184481 "EFT Type Payment BLOB Param."
         OnValidateParameterValue(Rec);
     end;
 
-    procedure UpdateParameterValue(SetupID: Guid;PaymentTypePOS: Code[10];NameIn: Text;var TempBlob: Record TempBlob)
+    procedure UpdateParameterValue(SetupID: Guid; PaymentTypePOS: Code[10]; NameIn: Text; var TempBlob: Codeunit "Temp Blob")
+    var
+        RecRef: RecordRef;
     begin
-        Get (SetupID, PaymentTypePOS, NameIn);
+        Get(SetupID, PaymentTypePOS, NameIn);
         //-NPR5.48 [334105]
         //VALIDATE(Value, ValueIn);
-        Value := TempBlob.Blob;
+
+        RecRef.GetTable(Rec);
+        TempBlob.ToRecordRef(RecRef, FieldNo("Value"));
+        RecRef.SetTable(Rec);
+
         //+NPR5.48 [334105]
         Modify;
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterNameCaption(Parameter: Record "EFT Type Payment BLOB Param.";var Caption: Text)
+    procedure OnGetParameterNameCaption(Parameter: Record "EFT Type Payment BLOB Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterDescriptionCaption(Parameter: Record "EFT Type Payment BLOB Param.";var Caption: Text)
+    procedure OnGetParameterDescriptionCaption(Parameter: Record "EFT Type Payment BLOB Param."; var Caption: Text)
     begin
     end;
 

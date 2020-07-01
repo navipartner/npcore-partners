@@ -19,24 +19,24 @@ page 6014658 ".NET Assemblies"
         {
             repeater(Group)
             {
-                field("Assembly Name";"Assembly Name")
+                field("Assembly Name"; "Assembly Name")
                 {
                     Editable = false;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
                 }
-                field("Assembly.HASVALUE";Assembly.HasValue)
+                field("Assembly.HASVALUE"; Assembly.HasValue)
                 {
                     Caption = 'DLL Imported';
                     Editable = false;
                 }
-                field("""Debug Information"".HASVALUE";"Debug Information".HasValue)
+                field("""Debug Information"".HASVALUE"; "Debug Information".HasValue)
                 {
                     Caption = 'PDB Imported';
                     Editable = false;
                 }
-                field("MD5 Hash";"MD5 Hash")
+                field("MD5 Hash"; "MD5 Hash")
                 {
                     Editable = false;
                 }
@@ -102,7 +102,7 @@ page 6014658 ".NET Assemblies"
 
     procedure ImportAssembly()
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
         Asm: DotNet npNetAssembly;
         Path: DotNet npNetPath;
@@ -114,55 +114,55 @@ page 6014658 ".NET Assemblies"
         PDBFileName: Text;
     begin
         FileName := FileManagement.BLOBImportWithFilter(
-          TempBlob,ImportTitleTxt,'',
-          ImportFileTxt + ' (*.dll)|*.dll|' + AllFilesTxt + ' (*.*)|*.*','*.*');
+          TempBlob, ImportTitleTxt, '',
+          ImportFileTxt + ' (*.dll)|*.dll|' + AllFilesTxt + ' (*.*)|*.*', '*.*');
 
         if FileName <> '' then begin
-          PDBFileName := Path.Combine(
-            Path.GetDirectoryName(FileName),
-            Path.GetFileNameWithoutExtension(FileName) + '.pdb');
+            PDBFileName := Path.Combine(
+              Path.GetDirectoryName(FileName),
+              Path.GetFileNameWithoutExtension(FileName) + '.pdb');
 
-          TempBlob.Blob.CreateInStream(InStr);
-          InstallAssembly(InStr,Asm,'',PDBFileName);
-          CurrPage.Update(false);
+            TempBlob.CreateInStream(InStr);
+            InstallAssembly(InStr, Asm, '', PDBFileName);
+            CurrPage.Update(false);
         end;
     end;
 
     local procedure ExportAssembly()
     var
         NETAssembly: Record ".NET Assembly";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
         In_Stream: InStream;
         Out_Stream: OutStream;
         FileName: Text;
     begin
 
-        CurrPage.SetSelectionFilter (NETAssembly);
-        if (NETAssembly.FindSet ()) then begin
-          repeat
+        CurrPage.SetSelectionFilter(NETAssembly);
+        if (NETAssembly.FindSet()) then begin
+            repeat
 
-            NETAssembly.CalcFields (Assembly);
-            if NETAssembly.Assembly.HasValue () then begin
-              TempBlob.Blob.CreateOutStream (Out_Stream);
-              NETAssembly.Assembly.CreateInStream (In_Stream);
-              CopyStream (Out_Stream, In_Stream);
+                NETAssembly.CalcFields(Assembly);
+                if NETAssembly.Assembly.HasValue() then begin
+                    TempBlob.CreateOutStream(Out_Stream);
+                    NETAssembly.Assembly.CreateInStream(In_Stream);
+                    CopyStream(Out_Stream, In_Stream);
 
-              FileManagement.BLOBExport (TempBlob, MakeNiceFilename (NETAssembly."Assembly Name"), true);
-            end;
-          until (NETAssembly.Next()=0);
+                    FileManagement.BLOBExport(TempBlob, MakeNiceFilename(NETAssembly."Assembly Name"), true);
+                end;
+            until (NETAssembly.Next() = 0);
         end;
     end;
 
     local procedure MakeNiceFilename(Name: Text) Filename: Text
     begin
 
-        Filename := Name+'.dll';
-        if (StrPos (Name, ', Culture')-1 > 2) then
-          Filename := CopyStr (Name, 1, StrPos (Name, ', Culture')-1)+'.dll';
+        Filename := Name + '.dll';
+        if (StrPos(Name, ', Culture') - 1 > 2) then
+            Filename := CopyStr(Name, 1, StrPos(Name, ', Culture') - 1) + '.dll';
 
-        Filename := DelChr (Filename, '=', ',=');
-        Filename := ConvertStr (Filename, ' ', '_');
+        Filename := DelChr(Filename, '=', ',=');
+        Filename := ConvertStr(Filename, ' ', '_');
     end;
 }
 

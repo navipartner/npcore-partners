@@ -463,7 +463,7 @@ codeunit 6014627 "Managed Dependency Mgt."
     [TryFunction]
     procedure TextToFieldRef(Value: Text; FieldRef: FieldRef)
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         MemStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;
         OutStream: OutStream;
@@ -518,9 +518,9 @@ codeunit 6014627 "Managed Dependency Mgt."
                 begin
                     ValueText := Value;
                     MemStream := MemStream.MemoryStream(Convert.FromBase64String(ValueText));
-                    TempBlob.Blob.CreateOutStream(OutStream);
+                    TempBlob.CreateOutStream(OutStream);
                     CopyStream(OutStream, MemStream);
-                    FieldRef.Value := TempBlob.Blob;
+                    TempBlob.ToFieldRef(FieldRef);
                 end;
             'DATEFORMULA':
                 begin
@@ -549,16 +549,16 @@ codeunit 6014627 "Managed Dependency Mgt."
 
     local procedure BLOBToBase64String(FieldRef: FieldRef) Value: Text
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         MemStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;
         InStream: InStream;
     begin
         Value := '';
         FieldRef.CalcField;
-        TempBlob.Blob := FieldRef.Value;
-        if TempBlob.Blob.HasValue then begin
-            TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.FromFieldRef(FieldRef);
+        if TempBlob.HasValue then begin
+            TempBlob.CreateInStream(InStream);
             MemStream := MemStream.MemoryStream();
             CopyStream(MemStream, InStream);
             Value := Convert.ToBase64String(MemStream.ToArray);

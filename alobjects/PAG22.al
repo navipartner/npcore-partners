@@ -1,4 +1,4 @@
-pageextension 6014423 pageextension6014423 extends "Customer List" 
+pageextension 6014423 pageextension6014423 extends "Customer List"
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // PN1.08/TTH/10122015 CASE 229069 Added Customer Statement Sending
@@ -20,43 +20,39 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
     {
         addafter(Name)
         {
-            field("Name 2";"Name 2")
+            field("E-Mail"; "E-Mail")
+            {
+            }
+            field(Address; Address)
             {
                 Visible = false;
             }
-            field("E-Mail";"E-Mail")
-            {
-            }
-            field(Address;Address)
-            {
-                Visible = false;
-            }
-            field("Address 2";"Address 2")
+            field("Address 2"; "Address 2")
             {
                 Visible = false;
             }
         }
         addafter("Post Code")
         {
-            field(City;City)
+            field(City; City)
             {
                 Visible = false;
             }
         }
         addafter(Contact)
         {
-            field("Global Dimension 1 Code";"Global Dimension 1 Code")
+            field("Global Dimension 1 Code"; "Global Dimension 1 Code")
             {
                 Visible = false;
             }
-            field("Global Dimension 2 Code";"Global Dimension 2 Code")
+            field("Global Dimension 2 Code"; "Global Dimension 2 Code")
             {
                 Visible = false;
             }
         }
         addafter("Base Calendar Code")
         {
-            field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+            field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
                 CaptionClass = '6014555,18,1,2';
                 Editable = NPRAttrEditable;
@@ -64,10 +60,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 1, "No.", NPRAttrTextArray[1]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 1, "No.", NPRAttrTextArray[1]);
                 end;
             }
-            field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+            field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
                 CaptionClass = '6014555,18,2,2';
                 Editable = NPRAttrEditable;
@@ -75,10 +71,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 2, "No.", NPRAttrTextArray[2]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 2, "No.", NPRAttrTextArray[2]);
                 end;
             }
-            field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+            field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
                 CaptionClass = '6014555,18,3,2';
                 Editable = NPRAttrEditable;
@@ -86,10 +82,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 3, "No.", NPRAttrTextArray[3]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 3, "No.", NPRAttrTextArray[3]);
                 end;
             }
-            field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+            field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
                 CaptionClass = '6014555,18,4,2';
                 Editable = NPRAttrEditable;
@@ -97,10 +93,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 4, "No.", NPRAttrTextArray[4]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 4, "No.", NPRAttrTextArray[4]);
                 end;
             }
-            field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+            field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
                 CaptionClass = '6014555,18,5,2';
                 Editable = NPRAttrEditable;
@@ -108,10 +104,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 5, "No.", NPRAttrTextArray[5]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 5, "No.", NPRAttrTextArray[5]);
                 end;
             }
-            field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+            field(NPRAttrTextArray_06; NPRAttrTextArray[6])
             {
                 CaptionClass = '6014555,18,6,2';
                 Editable = NPRAttrEditable;
@@ -119,10 +115,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 6, "No.", NPRAttrTextArray[6]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 6, "No.", NPRAttrTextArray[6]);
                 end;
             }
-            field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+            field(NPRAttrTextArray_07; NPRAttrTextArray[7])
             {
                 CaptionClass = '6014555,18,7,2';
                 Editable = NPRAttrEditable;
@@ -130,10 +126,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 7, "No.", NPRAttrTextArray[7]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 7, "No.", NPRAttrTextArray[7]);
                 end;
             }
-            field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+            field(NPRAttrTextArray_08; NPRAttrTextArray[8])
             {
                 CaptionClass = '6014555,18,8,2';
                 Editable = NPRAttrEditable;
@@ -141,10 +137,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 8, "No.", NPRAttrTextArray[8]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 8, "No.", NPRAttrTextArray[8]);
                 end;
             }
-            field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+            field(NPRAttrTextArray_09; NPRAttrTextArray[9])
             {
                 CaptionClass = '6014555,18,9,2';
                 Editable = NPRAttrEditable;
@@ -152,10 +148,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 9, "No.", NPRAttrTextArray[9]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 9, "No.", NPRAttrTextArray[9]);
                 end;
             }
-            field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+            field(NPRAttrTextArray_10; NPRAttrTextArray[10])
             {
                 CaptionClass = '6014555,18,10,2';
                 Editable = NPRAttrEditable;
@@ -163,7 +159,7 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 10, "No.", NPRAttrTextArray[10]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 10, "No.", NPRAttrTextArray[10]);
                 end;
             }
         }
@@ -236,10 +232,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
                 begin
                     //+NPR5.54 [358656]
                     CurrPage.SetSelectionFilter(Cust);
-                    Cust.TestField(Anonymized,false);
-                    if (GDPRManagement.DoAnonymization(Cust."No.",ReasonText)) then
-                      if (not Confirm(Text000,false) )then
-                        Error('');
+                    Cust.TestField(Anonymized, false);
+                    if (GDPRManagement.DoAnonymization(Cust."No.", ReasonText)) then
+                        if (not Confirm(Text000, false)) then
+                            Error('');
 
                     Message(ReasonText);
                     //+NPR5.54 [358656]
@@ -249,10 +245,10 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
     }
 
     var
-        NPRAttrTextArray: array [40] of Text[100];
+        NPRAttrTextArray: array[40] of Text[100];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -273,12 +269,12 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
 
     //trigger OnAfterGetRecord()
     //begin
-        /*
-        //-NPR4.11
-        NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Customer, "No.");
-        NPRAttrEditable := CurrPage.Editable ();
-        //+NPR4.11
-        */
+    /*
+    //-NPR4.11
+    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Customer, "No.");
+    NPRAttrEditable := CurrPage.Editable ();
+    //+NPR4.11
+    */
     //end;
 
 
@@ -287,33 +283,33 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
     //trigger OnOpenPage()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
-        with SocialListeningSetup do
-          SocialListeningSetupVisible := Get and "Show on Customers" and "Accept License Agreement" and ("Solution ID" <> '');
-        SetWorkflowManagementEnabledState;
-        SetFilter("Date Filter",'..%1',WorkDate);
-        */
+    /*
+    CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
+    with SocialListeningSetup do
+      SocialListeningSetupVisible := Get and "Show on Customers" and "Accept License Agreement" and ("Solution ID" <> '');
+    SetWorkflowManagementEnabledState;
+    SetFilter("Date Filter",'..%1',WorkDate);
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        //-NPR4.11
-        NPRAttrManagement.GetAttributeVisibility (DATABASE::Customer, NPRAttrVisibleArray);
-        NPRAttrVisible01 := NPRAttrVisibleArray[1];
-        NPRAttrVisible02 := NPRAttrVisibleArray[2];
-        NPRAttrVisible03 := NPRAttrVisibleArray[3];
-        NPRAttrVisible04 := NPRAttrVisibleArray[4];
-        NPRAttrVisible05 := NPRAttrVisibleArray[5];
-        NPRAttrVisible06 := NPRAttrVisibleArray[6];
-        NPRAttrVisible07 := NPRAttrVisibleArray[7];
-        NPRAttrVisible08 := NPRAttrVisibleArray[8];
-        NPRAttrVisible09 := NPRAttrVisibleArray[9];
-        NPRAttrVisible10 := NPRAttrVisibleArray[10];
-        //+NPR4.11
+    /*
+    //-NPR4.11
+    NPRAttrManagement.GetAttributeVisibility (DATABASE::Customer, NPRAttrVisibleArray);
+    NPRAttrVisible01 := NPRAttrVisibleArray[1];
+    NPRAttrVisible02 := NPRAttrVisibleArray[2];
+    NPRAttrVisible03 := NPRAttrVisibleArray[3];
+    NPRAttrVisible04 := NPRAttrVisibleArray[4];
+    NPRAttrVisible05 := NPRAttrVisibleArray[5];
+    NPRAttrVisible06 := NPRAttrVisibleArray[6];
+    NPRAttrVisible07 := NPRAttrVisibleArray[7];
+    NPRAttrVisible08 := NPRAttrVisibleArray[8];
+    NPRAttrVisible09 := NPRAttrVisibleArray[9];
+    NPRAttrVisible10 := NPRAttrVisibleArray[10];
+    //+NPR4.11
 
-        #1..5
-        */
+    #1..5
+    */
     //end;
 }
 

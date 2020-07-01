@@ -60,35 +60,35 @@ codeunit 6184862 "FTP Management"
         FTPOverview: Record "FTP Overview";
     begin
         with TempStorageOperationtypes do begin
-          Init;
-          "Storage Type" := StorageType();
-          Description := UploadDescriptionCaption;
-          "Operation Code" := UploadCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := UploadDescriptionCaption;
+            "Operation Code" := UploadCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := DownloadDescriptionCaption;
-          "Operation Code" := DownloadCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := DownloadDescriptionCaption;
+            "Operation Code" := DownloadCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := DeleteDescriptionCaption;
-          "Operation Code" := DeleteCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := DeleteDescriptionCaption;
+            "Operation Code" := DeleteCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := ListDescriptionCaption;
-          "Operation Code" := ListCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := ListDescriptionCaption;
+            "Operation Code" := ListCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := StrSubstNo(OverviewDescriptionCaption, FTPOverview.TableCaption);
-          "Operation Code" := OverviewCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := StrSubstNo(OverviewDescriptionCaption, FTPOverview.TableCaption);
+            "Operation Code" := OverviewCaption;
+            Insert;
         end;
     end;
 
@@ -98,65 +98,65 @@ codeunit 6184862 "FTP Management"
         FTPOverview: Record "FTP Overview";
     begin
         with TempStorageOperationParameter do begin
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := ListCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := RefreshCaption;
-          Description := StrSubstNo(ListParamDescriptionCaption, FTPOverview.TableCaption);
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := ListCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := RefreshCaption;
+            Description := StrSubstNo(ListParamDescriptionCaption, FTPOverview.TableCaption);
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := UploadFromCaption;
-          Description := UploadFromDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := UploadFromCaption;
+            Description := UploadFromDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 200;
-          "Parameter Name" := UploadLocationCaption;
-          Description := LocationOnStorageDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := UploadLocationCaption;
+            Description := LocationOnStorageDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 300;
-          "Parameter Name" := UploadAllCaption;
-          Description := UploadAllDescCaption;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 300;
+            "Parameter Name" := UploadAllCaption;
+            Description := UploadAllDescCaption;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DownloadCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := DownloadFileCaption;
-          Description := FileDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := DownloadFileCaption;
+            Description := FileDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DownloadCaption;
-          "Parameter Key" := 200;
-          "Parameter Name" := DataExchTypeCaption;
-          Description := DataExchTypeDescCaption;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := DataExchTypeCaption;
+            Description := DataExchTypeDescCaption;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DeleteCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := DeleteFileCaption;
-          Description := FileDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DeleteCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := DeleteFileCaption;
+            Description := FileDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
         end;
     end;
 
@@ -166,18 +166,18 @@ codeunit 6184862 "FTP Management"
         FTPSetup: Record "FTP Setup";
     begin
         if StorageSetup."Storage Type" <> StorageType() then
-          exit;
+            exit;
 
         if PAGE.RunModal(PAGE::"FTP Setup", FTPSetup) <> ACTION::LookupOK then
-          exit;
+            exit;
 
         StorageSetup."Storage ID" := FTPSetup.Code;
         StorageSetup.Description := FTPSetup.Description;
     end;
 
-    procedure FindOnFTP(var XMLDocument: DotNet npNetXmlDocument;FTPCode: Code[10];StartParsingPosition: Integer;var CurrentPathDepth: Text;StartingDirectory: Text;FileName: Text;RecursiveSearch: Boolean;Secure: Boolean;Silent: Boolean): Boolean
+    procedure FindOnFTP(var XMLDocument: DotNet npNetXmlDocument; FTPCode: Code[10]; StartParsingPosition: Integer; var CurrentPathDepth: Text; StartingDirectory: Text; FileName: Text; RecursiveSearch: Boolean; Secure: Boolean; Silent: Boolean): Boolean
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
         ValidName: Boolean;
@@ -200,85 +200,85 @@ codeunit 6184862 "FTP Management"
         FTPSetup.Get(FTPCode);
 
         if StartingDirectory > '' then begin
-          if CopyStr(StartingDirectory, StrLen(StartingDirectory)) <> '/' then
-            StartingDirectory += '/';
+            if CopyStr(StartingDirectory, StrLen(StartingDirectory)) <> '/' then
+                StartingDirectory += '/';
         end else
-          StartingDirectory += '/';
+            StartingDirectory += '/';
 
         if RecursiveSearch then
-          Method := 'LIST'
+            Method := 'LIST'
         else
-          Method := 'NLST';
+            Method := 'NLST';
 
         RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, Method, Secure);
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
-          if not Silent then
-            RequestManagement.HandleURLWebException()
-          else
-            exit;
+            if not Silent then
+                RequestManagement.HandleURLWebException()
+            else
+                exit;
 
         if IsNull(XMLDocument) then begin
-          XMLDocument := XMLDocument.XmlDocument();
-          XMLRoot := XMLDocument.CreateElement('root');
-          XMLDocument.AppendChild(XMLRoot);
+            XMLDocument := XMLDocument.XmlDocument();
+            XMLRoot := XMLDocument.CreateElement('root');
+            XMLDocument.AppendChild(XMLRoot);
         end;
 
         if not RecursiveSearch then begin
-          CR := 11;
-          LF := 10;
-          CRLF := Format(CR) + Format(LF);
+            CR := 11;
+            LF := 10;
+            CRLF := Format(CR) + Format(LF);
 
-          exit(StrPos(DelChr(Response, '=', CRLF), FileName) > 0);
+            exit(StrPos(DelChr(Response, '=', CRLF), FileName) > 0);
         end;
 
         if Response = '' then
-          Error(EmptyResponsSearchErr);
+            Error(EmptyResponsSearchErr);
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Response);
 
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
 
         while (StartParsingPosition = 0) and not InStr.EOS do begin
-          InStr.ReadText(Line);
-          StartParsingPosition := StrPos(Line, '..');
+            InStr.ReadText(Line);
+            StartParsingPosition := StrPos(Line, '..');
         end;
 
         if StartParsingPosition = 0 then
-          Error(CannotParseResponseErr);
+            Error(CannotParseResponseErr);
 
         while not InStr.EOS do begin
-          InStr.ReadText(Line);
-          Name := CopyStr(Line, StartParsingPosition);
-          ValidName := not (DelChr(Name,'=',' ') in ['.', '..', '']);
+            InStr.ReadText(Line);
+            Name := CopyStr(Line, StartParsingPosition);
+            ValidName := not (DelChr(Name, '=', ' ') in ['.', '..', '']);
 
-          if Path.HasExtension(Name) then begin
-            if Name = FileName then begin
-              XMLRoot := XMLDocument.FirstChild();
+            if Path.HasExtension(Name) then begin
+                if Name = FileName then begin
+                    XMLRoot := XMLDocument.FirstChild();
 
-              XMLElement := XMLDocument.CreateElement(Format(DelChr(CreateGuid,'=','{-}')));
-              XMLElement.InnerText := CurrentPathDepth + FileName;
-              XMLRoot.AppendChild(XMLElement);
-            end;
-          end else
-            if ValidName then begin
-              CurrentPathDepth += Name + '/';
+                    XMLElement := XMLDocument.CreateElement(Format(DelChr(CreateGuid, '=', '{-}')));
+                    XMLElement.InnerText := CurrentPathDepth + FileName;
+                    XMLRoot.AppendChild(XMLElement);
+                end;
+            end else
+                if ValidName then begin
+                    CurrentPathDepth += Name + '/';
 
-              FindOnFTP(XMLDocument, FTPCode, StartParsingPosition, CurrentPathDepth, StartingDirectory, FileName, true, Secure, Silent);
-            end;
+                    FindOnFTP(XMLDocument, FTPCode, StartParsingPosition, CurrentPathDepth, StartingDirectory, FileName, true, Secure, Silent);
+                end;
         end;
 
         if CurrentPathDepth > '' then
-          CurrentPathDepth := CopyStr(CurrentPathDepth, 1, RequestManagement.FindLastOccuranceInString(CopyStr(CurrentPathDepth, 1, StrLen(CurrentPathDepth) - 1), '/'));
+            CurrentPathDepth := CopyStr(CurrentPathDepth, 1, RequestManagement.FindLastOccuranceInString(CopyStr(CurrentPathDepth, 1, StrLen(CurrentPathDepth) - 1), '/'));
 
         if IsNull(XMLRoot) then
-          exit(false);
+            exit(false);
 
         exit(XMLRoot.ChildNodes.Count() > 0);
     end;
 
-    procedure UploadToFTP(var TempBlob: Record TempBlob;FTPCode: Code[10];PathInDirectory: Text;FileName: Text;Secure: Boolean;Silent: Boolean): Boolean
+    procedure UploadToFTP(var TempBlob: Codeunit "Temp Blob"; FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Boolean; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -293,17 +293,17 @@ codeunit 6184862 "FTP Management"
         RequestManagement.StreamToFTPRequest(FTPWebRequest, TempBlob, RequestManagement.BlobLenght(TempBlob));
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
-          if not Silent then
-            RequestManagement.HandleURLWebException()
-          else
-            exit;
+            if not Silent then
+                RequestManagement.HandleURLWebException()
+            else
+                exit;
 
         InsertFTPOverview(FTPCode, PathInDirectory, FileName);
 
         exit(true);
     end;
 
-    procedure DownloadFromFTP(var TempBlob: Record TempBlob;FTPCode: Code[10];PathInDirectory: Text;FileName: Text;Secure: Boolean;Silent: Boolean): Boolean
+    procedure DownloadFromFTP(var TempBlob: Codeunit "Temp Blob"; FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Boolean; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -319,20 +319,20 @@ codeunit 6184862 "FTP Management"
         RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, 'RETR', Secure);
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
-          if not Silent then
-            RequestManagement.HandleURLWebException()
-          else
-            exit;
+            if not Silent then
+                RequestManagement.HandleURLWebException()
+            else
+                exit;
 
         MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(Response));
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         MemoryStream.CopyTo(OutStr);
 
         exit(true);
     end;
 
-    procedure DeleteFromFTP(FTPCode: Code[10];PathInDirectory: Text;FileName: Text;Secure: Boolean;Silent: Boolean): Boolean
+    procedure DeleteFromFTP(FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Boolean; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -344,24 +344,24 @@ codeunit 6184862 "FTP Management"
         FTPSetup.Get(FTPCode);
 
         if FileName = '' then
-          Method := 'RMD'
+            Method := 'RMD'
         else
-          Method := 'DELE';
+            Method := 'DELE';
 
         RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, Method, Secure);
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
-          if not Silent then
-            RequestManagement.HandleURLWebException()
-          else
-            exit;
+            if not Silent then
+                RequestManagement.HandleURLWebException()
+            else
+                exit;
 
         DeleteFromFTPOverview(FTPCode, PathInDirectory, FileName, false);
 
         exit(true);
     end;
 
-    procedure CreateDirectoryInFTP(FTPCode: Code[10];DirectoryPath: Text;Secure: Boolean;Silent: Boolean): Boolean
+    procedure CreateDirectoryInFTP(FTPCode: Code[10]; DirectoryPath: Text; Secure: Boolean; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -374,18 +374,18 @@ codeunit 6184862 "FTP Management"
         RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + DirectoryPath, FTPCode, 'MKD', Secure);
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
-          if not Silent then
-            RequestManagement.HandleURLWebException()
-          else
-            exit;
+            if not Silent then
+                RequestManagement.HandleURLWebException()
+            else
+                exit;
 
         exit(true);
     end;
 
-    procedure ListFTP(FTPCode: Code[10];StartParsingPosition: Integer;var CurrentPathDepth: Text;StartingDirectory: Text;SingleDirectory: Boolean;Refresh: Boolean;DBInsert: Boolean;Secure: Boolean;var Directories: DotNet npNetXmlDocument;Silent: Boolean): Boolean
+    procedure ListFTP(FTPCode: Code[10]; StartParsingPosition: Integer; var CurrentPathDepth: Text; StartingDirectory: Text; SingleDirectory: Boolean; Refresh: Boolean; DBInsert: Boolean; Secure: Boolean; var Directories: DotNet npNetXmlDocument; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         ValidName: Boolean;
         Name: Text;
@@ -403,74 +403,74 @@ codeunit 6184862 "FTP Management"
         FTPSetup.Get(FTPCode);
 
         if IsNull(Directories) then begin
-          Directories := Directories.XmlDocument();
-          Root := Directories.CreateElement('root');
-          Directories.AppendChild(Root);
+            Directories := Directories.XmlDocument();
+            Root := Directories.CreateElement('root');
+            Directories.AppendChild(Root);
         end;
 
         if StartingDirectory > '' then begin
-          if CopyStr(StartingDirectory, 1, 1) <> '/' then
-            StartingDirectory := '/' + StartingDirectory;
+            if CopyStr(StartingDirectory, 1, 1) <> '/' then
+                StartingDirectory := '/' + StartingDirectory;
 
-          if CopyStr(StartingDirectory, StrLen(StartingDirectory)) <> '/' then
-            StartingDirectory += '/';
+            if CopyStr(StartingDirectory, StrLen(StartingDirectory)) <> '/' then
+                StartingDirectory += '/';
         end else
-          StartingDirectory += '/';
+            StartingDirectory += '/';
 
         if Refresh then
-          DeleteFromFTPOverview(FTPCode, StartingDirectory, '', SingleDirectory);
+            DeleteFromFTPOverview(FTPCode, StartingDirectory, '', SingleDirectory);
 
         RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, 'LIST', Secure);
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
-          if not Silent then
-            RequestManagement.HandleURLWebException()
-          else
-            exit;
+            if not Silent then
+                RequestManagement.HandleURLWebException()
+            else
+                exit;
 
         if Response = '' then
-          Error(EmptyResponsListErr);
+            Error(EmptyResponsListErr);
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Response);
 
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
 
         while (StartParsingPosition = 0) and not InStr.EOS do begin
-          InStr.ReadText(Line);
-          StartParsingPosition := StrPos(Line, '..');
+            InStr.ReadText(Line);
+            StartParsingPosition := StrPos(Line, '..');
         end;
 
         if StartParsingPosition = 0 then
-          Error(CannotParseResponseErr);
+            Error(CannotParseResponseErr);
 
         while not InStr.EOS do begin
-          InStr.ReadText(Line);
-          Name := CopyStr(Line, StartParsingPosition);
-          ValidName := not (DelChr(Name,'=',' ') in ['.', '..', '']);
+            InStr.ReadText(Line);
+            Name := CopyStr(Line, StartParsingPosition);
+            ValidName := not (DelChr(Name, '=', ' ') in ['.', '..', '']);
 
-          if Path.HasExtension(Name) then begin
-            if DBInsert then
-              InsertFTPOverview(FTPCode, StartingDirectory + CurrentPathDepth, Name)
-          end else
-            if not SingleDirectory and ValidName then begin
-              CurrentPathDepth += Name + '/';
+            if Path.HasExtension(Name) then begin
+                if DBInsert then
+                    InsertFTPOverview(FTPCode, StartingDirectory + CurrentPathDepth, Name)
+            end else
+                if not SingleDirectory and ValidName then begin
+                    CurrentPathDepth += Name + '/';
 
-              Directory := Directories.CreateElement(Format(DelChr(CreateGuid,'=','{-}')));
-              Directory.InnerText := CurrentPathDepth;
-              Directories.FirstChild.AppendChild(Directory);
+                    Directory := Directories.CreateElement(Format(DelChr(CreateGuid, '=', '{-}')));
+                    Directory.InnerText := CurrentPathDepth;
+                    Directories.FirstChild.AppendChild(Directory);
 
-              ListFTP(FTPCode, StartParsingPosition, CurrentPathDepth, StartingDirectory, false, false, DBInsert, Secure, Directories, Silent);
-            end;
+                    ListFTP(FTPCode, StartParsingPosition, CurrentPathDepth, StartingDirectory, false, false, DBInsert, Secure, Directories, Silent);
+                end;
         end;
 
         if CurrentPathDepth > '' then
-          CurrentPathDepth := CopyStr(CurrentPathDepth, 1, RequestManagement.FindLastOccuranceInString(CopyStr(CurrentPathDepth, 1, StrLen(CurrentPathDepth) - 1), '/'));
+            CurrentPathDepth := CopyStr(CurrentPathDepth, 1, RequestManagement.FindLastOccuranceInString(CopyStr(CurrentPathDepth, 1, StrLen(CurrentPathDepth) - 1), '/'));
 
         exit(true);
     end;
 
-    local procedure InsertFTPOverview(FTPCode: Code[10];FilePath: Text;FileName: Text)
+    local procedure InsertFTPOverview(FTPCode: Code[10]; FilePath: Text; FileName: Text)
     var
         FTPOverview: Record "FTP Overview";
     begin
@@ -480,37 +480,37 @@ codeunit 6184862 "FTP Management"
 
         FTPOverview.SetRecFilter;
         if FTPOverview.IsEmpty then begin
-          FTPOverview.Insert;
+            FTPOverview.Insert;
 
-          Commit;
+            Commit;
         end;
     end;
 
-    local procedure DeleteFromFTPOverview(FTPCode: Code[10];DirectoryName: Text;Name: Text;IsSingleDirectory: Boolean)
+    local procedure DeleteFromFTPOverview(FTPCode: Code[10]; DirectoryName: Text; Name: Text; IsSingleDirectory: Boolean)
     var
         FTPOverview: Record "FTP Overview";
     begin
         FTPOverview.SetRange("Host Code", FTPCode);
 
         if Name > '' then begin
-          FTPOverview.SetRange("File Name", DirectoryName);
-          FTPOverview.SetRange(Name, Name);
-
-          if FTPOverview.FindFirst then
-            FTPOverview.Delete;
-        end else begin
-          if IsSingleDirectory then begin
             FTPOverview.SetRange("File Name", DirectoryName);
-            FTPOverview.DeleteAll;
+            FTPOverview.SetRange(Name, Name);
 
-            exit;
-          end;
+            if FTPOverview.FindFirst then
+                FTPOverview.Delete;
+        end else begin
+            if IsSingleDirectory then begin
+                FTPOverview.SetRange("File Name", DirectoryName);
+                FTPOverview.DeleteAll;
 
-          FTPOverview.FindSet;
-          repeat
-            if StrPos(FTPOverview."File Name", DirectoryName) > 0 then
-              FTPOverview.Delete;
-          until FTPOverview.Next = 0;
+                exit;
+            end;
+
+            FTPOverview.FindSet;
+            repeat
+                if StrPos(FTPOverview."File Name", DirectoryName) > 0 then
+                    FTPOverview.Delete;
+            until FTPOverview.Next = 0;
         end;
     end;
 }

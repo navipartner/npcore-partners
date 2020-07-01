@@ -23,7 +23,7 @@ codeunit 6151409 "Magento Barcode Library"
         RotateAngle: Integer;
         BarcodeTypeText: Code[10];
 
-    procedure GenerateBarcode(BarCode: Code[20];var TempBlob: Record TempBlob)
+    procedure GenerateBarcode(BarCode: Code[20]; var TempBlob: Codeunit "Temp Blob")
     var
         MemoryStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
@@ -38,12 +38,12 @@ codeunit 6151409 "Magento Barcode Library"
         //-NC
         //Image.Save(Path);
         //CLEAR(TempBlob);
-        //TempBlob.Blob.IMPORT(FileMgt.UploadFileSilent(Path));
+        //TempBlob.IMPORT(FileMgt.UploadFileSilent(Path));
         MemoryStream := MemoryStream.MemoryStream;
-        Image.Save(MemoryStream,ImageFormat.Png);
+        Image.Save(MemoryStream, ImageFormat.Png);
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStream);
-        CopyStream(OutStream,MemoryStream);
+        TempBlob.CreateOutStream(OutStream);
+        CopyStream(OutStream, MemoryStream);
         //+NC
     end;
 
@@ -59,16 +59,16 @@ codeunit 6151409 "Magento Barcode Library"
         if RotateAngle <> 0 then BarCodeSettings.Rotate := RotateAngle;
 
         case UpperCase(BarcodeTypeText) of
-          'EAN13':
-            BarCodeSettings.Type := BarCodeType.EAN13;
-          'CODE39':
-            BarCodeSettings.Type := BarCodeType.Code39;
-          else begin
-            if StrLen(BarCode) = 13 then
-              BarCodeSettings.Type := BarCodeType.EAN13
-            else
-              BarCodeSettings.Type := BarCodeType.Code39;
-          end;
+            'EAN13':
+                BarCodeSettings.Type := BarCodeType.EAN13;
+            'CODE39':
+                BarCodeSettings.Type := BarCodeType.Code39;
+            else begin
+                    if StrLen(BarCode) = 13 then
+                        BarCodeSettings.Type := BarCodeType.EAN13
+                    else
+                        BarCodeSettings.Type := BarCodeType.Code39;
+                end;
         end;
     end;
 

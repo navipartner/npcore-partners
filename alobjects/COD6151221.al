@@ -99,7 +99,7 @@ codeunit 6151221 "PrintNode Mgt."
         // GetOutput
         if ErrorMessage = '' then begin
             //TempBlob.INIT;
-            //TempBlob.Blob.CREATEOUTSTREAM(DataStream);
+            //TempBlob.CREATEOUTSTREAM(DataStream);
             RecRef.SetRecFilter;
             SetCustomReportLayout(RecRef, ReportID);
             OutPDFStream := OutPDFStream.MemoryStream();

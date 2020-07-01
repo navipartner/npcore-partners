@@ -41,11 +41,11 @@ codeunit 6014587 "Hardware Connector Mgt."
         Commit;
 
         if not TrySendGenericRequest('RawPrint', Content, PRINT_CAPTION) then
-        //+NPR5.53 [375532]
+            //+NPR5.53 [375532]
             Message(GetLastErrorText);
     end;
 
-    procedure SendRawBytesPrintRequest(PrinterName: Text;var TempBlob: Record TempBlob)
+    procedure SendRawBytesPrintRequest(PrinterName: Text; var TempBlob: Codeunit "Temp Blob")
     var
         Content: Text;
         Success: Boolean;
@@ -55,14 +55,14 @@ codeunit 6014587 "Hardware Connector Mgt."
         Convert: DotNet npNetConvert;
     begin
         //-NPR5.53 [349793]
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         Stream := InStream;
         PrintBytes := Convert.ToBase64String(Stream.ToArray());
 
         Content := '{ "PrinterName": "' + EscapeJSON(PrinterName) + '", "PrintJob": "' + PrintBytes + '" }';
 
         if not TrySendGenericRequest('RawPrint', Content, PRINT_CAPTION) then
-          Message(GetLastErrorText);
+            Message(GetLastErrorText);
         //+NPR5.53 [349793]
     end;
 
@@ -71,7 +71,7 @@ codeunit 6014587 "Hardware Connector Mgt."
     end;
 
     [TryFunction]
-    local procedure TrySendGenericRequest(Handler: Text;Content: Text;Caption: Text)
+    local procedure TrySendGenericRequest(Handler: Text; Content: Text; Caption: Text)
     var
         POSSession: Codeunit "POS Session";
         POSActionHardwareConnect: Codeunit "POS Action - Hardware Connect";
@@ -81,13 +81,13 @@ codeunit 6014587 "Hardware Connector Mgt."
             POSActionHardwareConnect.QueueRequest(Handler, Content);
         end else begin
             //Open modal page to run JS outside POS, synchronously.
-        //-NPR5.53 [375532]
-          SendRequestOutsidePOS(Handler, Content, Caption);
-        //+NPR5.53 [375532]
+            //-NPR5.53 [375532]
+            SendRequestOutsidePOS(Handler, Content, Caption);
+            //+NPR5.53 [375532]
         end;
     end;
 
-    local procedure SendRequestOutsidePOS(Handler: Text;Content: Text;Caption: Text)
+    local procedure SendRequestOutsidePOS(Handler: Text; Content: Text; Caption: Text)
     var
         HardwareConnector: Page "Hardware Connector";
         ResponseMethod: Text;
@@ -118,10 +118,10 @@ codeunit 6014587 "Hardware Connector Mgt."
             HardwareConnector.GetResponse(ResponseMethod, ResponseOut);
 
             if ResponseMethod = 'error' then
-          //-NPR5.53 [375532]
-            Error(SOCKET_ERROR);
+                //-NPR5.53 [375532]
+                Error(SOCKET_ERROR);
             //ERROR(ResponseOut.ToString());
-          //+NPR5.53 [375532]
+            //+NPR5.53 [375532]
         end else begin
             Error(PAGE_CLOSED);
         end;

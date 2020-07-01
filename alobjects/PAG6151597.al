@@ -10,8 +10,8 @@ page 6151597 "NpDc Coupon List Items"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NpDc Coupon List Item";
-    SourceTableView = SORTING("Coupon Type","Line No.")
-                      WHERE("Line No."=FILTER(>=0));
+    SourceTableView = SORTING("Coupon Type", "Line No.")
+                      WHERE("Line No." = FILTER(>= 0));
 
     layout
     {
@@ -20,11 +20,11 @@ page 6151597 "NpDc Coupon List Items"
             group(Total)
             {
                 Caption = 'Total';
-                field(TotalMaxQty;MaxQty)
+                field(TotalMaxQty; MaxQty)
                 {
                     BlankZero = true;
                     Caption = 'Max. Quantity per Coupon';
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Importance = Promoted;
                     Visible = (NOT ValidationView);
 
@@ -35,7 +35,7 @@ page 6151597 "NpDc Coupon List Items"
                         //+NPR5.45 [312991]
                     end;
                 }
-                field(LotValidation;LotValidation)
+                field(LotValidation; LotValidation)
                 {
                     Caption = 'Lot Validation';
                     Visible = ValidationView;
@@ -51,7 +51,7 @@ page 6151597 "NpDc Coupon List Items"
                 {
                     ShowCaption = false;
                     Visible = (NOT LotValidation);
-                    field(TotalValidQty;ValidQty)
+                    field(TotalValidQty; ValidQty)
                     {
                         BlankZero = true;
                         Caption = 'Validation Quantity';
@@ -68,37 +68,37 @@ page 6151597 "NpDc Coupon List Items"
             }
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                 }
-                field(Description;Description)
-                {
-                    Editable = false;
-                }
-                field("Unit Price";"Unit Price")
+                field(Description; Description)
                 {
                     Editable = false;
                 }
-                field("Profit %";"Profit %")
+                field("Unit Price"; "Unit Price")
                 {
                     Editable = false;
                 }
-                field("Max. Discount Amount";"Max. Discount Amount")
+                field("Profit %"; "Profit %")
+                {
+                    Editable = false;
+                }
+                field("Max. Discount Amount"; "Max. Discount Amount")
                 {
                     Visible = (NOT ValidationView);
                 }
-                field("Max. Quantity";"Max. Quantity")
+                field("Max. Quantity"; "Max. Quantity")
                 {
                     Visible = (NOT ValidationView);
                 }
-                field("Validation Quantity";"Validation Quantity")
+                field("Validation Quantity"; "Validation Quantity")
                 {
                     Visible = (LotValidation);
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
                 }
             }
@@ -165,16 +165,16 @@ page 6151597 "NpDc Coupon List Items"
     begin
         //-NPR5.36 [291016]
         if not RunDynamicRequestPage(Item) then
-          exit;
+            exit;
         if not NpDcRequestPriority.RequestPriority(NewPriority) then
-          exit;
+            exit;
 
-        InsertItems(Item,NewPriority);
+        InsertItems(Item, NewPriority);
         CurrPage.Update(false);
         //+NPR5.36 [291016]
     end;
 
-    local procedure InsertItems(var Item: Record Item;NewPriority: Integer)
+    local procedure InsertItems(var Item: Record Item; NewPriority: Integer)
     var
         NpDcCouponListItem: Record "NpDc Coupon List Item";
         CouponType: Code[20];
@@ -183,27 +183,27 @@ page 6151597 "NpDc Coupon List Items"
         //-NPR5.36 [291016]
         CouponType := GetRangeMax("Coupon Type");
         if CouponType = '' then
-          exit;
+            exit;
 
-        NpDcCouponListItem.SetRange("Coupon Type",CouponType);
+        NpDcCouponListItem.SetRange("Coupon Type", CouponType);
         if NpDcCouponListItem.FindLast then;
         LineNo := NpDcCouponListItem."Line No.";
 
         Item.FindSet;
         repeat
-          NpDcCouponListItem.SetRange("Coupon Type",CouponType);
-          NpDcCouponListItem.SetRange(Type,NpDcCouponListItem.Type::Item);
-          NpDcCouponListItem.SetRange("No.",Item."No.");
-          if NpDcCouponListItem.IsEmpty then begin
-            LineNo += 10000;
-            NpDcCouponListItem.Init;
-            NpDcCouponListItem."Coupon Type" := CouponType;
-            NpDcCouponListItem."Line No." := LineNo;
-            NpDcCouponListItem.Type := NpDcCouponListItem.Type::Item;
-            NpDcCouponListItem.Validate("No.",Item."No.");
-            NpDcCouponListItem.Priority := NewPriority;
-            NpDcCouponListItem.Insert(true);
-          end;
+            NpDcCouponListItem.SetRange("Coupon Type", CouponType);
+            NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::Item);
+            NpDcCouponListItem.SetRange("No.", Item."No.");
+            if NpDcCouponListItem.IsEmpty then begin
+                LineNo += 10000;
+                NpDcCouponListItem.Init;
+                NpDcCouponListItem."Coupon Type" := CouponType;
+                NpDcCouponListItem."Line No." := LineNo;
+                NpDcCouponListItem.Type := NpDcCouponListItem.Type::Item;
+                NpDcCouponListItem.Validate("No.", Item."No.");
+                NpDcCouponListItem.Priority := NewPriority;
+                NpDcCouponListItem.Insert(true);
+            end;
         until Item.Next = 0;
         //+NPR5.36 [291016]
     end;
@@ -212,7 +212,7 @@ page 6151597 "NpDc Coupon List Items"
     var
         RecRef: RecordRef;
         TableMetadata: Record "Table Metadata";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
         OutStream: OutStream;
@@ -223,28 +223,28 @@ page 6151597 "NpDc Coupon List Items"
         Clear(Item);
         RecRef.GetTable(Item);
         TableMetadata.Get(RecRef.Number);
-        EntityID := CopyStr(Text000,1,20);
-        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number) then
-          exit(false);
+        EntityID := CopyStr(Text000, 1, 20);
+        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
+            exit(false);
 
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("No."));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Vendor No."));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Item Group"));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Item Disc. Group"));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Search Description"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("No."));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Vendor No."));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Group"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Disc. Group"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Search Description"));
         FilterPageBuilder.PageCaption := Text000;
         if not FilterPageBuilder.RunModal then
-          exit(false);
+            exit(false);
 
-        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number);
+        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number);
 
         RecRef.Reset;
         if ReturnFilters <> '' then begin
-          Clear(TempBlob);
-          TempBlob.Blob.CreateOutStream(OutStream);
-          OutStream.WriteText(ReturnFilters);
-          if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef,TempBlob) then
-            exit(false);
+            Clear(TempBlob);
+            TempBlob.CreateOutStream(OutStream);
+            OutStream.WriteText(ReturnFilters);
+            if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
+                exit(false);
         end;
 
         RecRef.SetTable(Item);
@@ -261,16 +261,16 @@ page 6151597 "NpDc Coupon List Items"
     begin
         //-NPR5.36 [291016]
         if not NpDcRequestPriority.RequestPriority(NewPriority) then
-          exit;
+            exit;
 
         CurrPage.SetSelectionFilter(NpDcCouponListItem);
-        NpDcCouponListItem.SetFilter(Priority,'<>%1',NewPriority);
+        NpDcCouponListItem.SetFilter(Priority, '<>%1', NewPriority);
         if not NpDcCouponListItem.FindSet then
-          exit;
+            exit;
 
         repeat
-          NpDcCouponListItem.Priority := NewPriority;
-          NpDcCouponListItem.Modify(true);
+            NpDcCouponListItem.Priority := NewPriority;
+            NpDcCouponListItem.Modify(true);
         until NpDcCouponListItem.Next = 0;
 
         CurrPage.Update(false);
@@ -286,33 +286,33 @@ page 6151597 "NpDc Coupon List Items"
         //-NPR5.45 [312991]
         CouponType := "Coupon Type";
         if CouponType = '' then begin
-          FilterGroup(2);
-          CouponType := GetRangeMax("Coupon Type");
-          FilterGroup(0);
+            FilterGroup(2);
+            CouponType := GetRangeMax("Coupon Type");
+            FilterGroup(0);
         end;
 
         //-NPR5.46 [327366]
         //IF MaxQty <= 0 THEN BEGIN
         if (MaxQty <= 0) and (ValidQty <= 0) and (not LotValidation) then begin
-        //+NPR5.46 [327366]
-          if NpDcCouponListItem.Get(CouponType,-1) then
-            NpDcCouponListItem.Delete(true);
+            //+NPR5.46 [327366]
+            if NpDcCouponListItem.Get(CouponType, -1) then
+                NpDcCouponListItem.Delete(true);
 
-          CurrPage.Update(false);
-          exit;
+            CurrPage.Update(false);
+            exit;
         end;
 
-        if not NpDcCouponListItem.Get(CouponType,-1) then begin
-          NpDcCouponListItem.Init;
-          NpDcCouponListItem."Coupon Type" := CouponType;
-          NpDcCouponListItem."Line No." := -1;
-          NpDcCouponListItem."Max. Discount Amount" := MaxDiscountAmt;
-          NpDcCouponListItem."Max. Quantity" := MaxQty;
-          //-NPR5.46 [327366]
-          NpDcCouponListItem."Validation Quantity" := ValidQty;
-          NpDcCouponListItem."Lot Validation" := LotValidation;
-          //+NPR5.46 [327366]
-          NpDcCouponListItem.Insert(true);
+        if not NpDcCouponListItem.Get(CouponType, -1) then begin
+            NpDcCouponListItem.Init;
+            NpDcCouponListItem."Coupon Type" := CouponType;
+            NpDcCouponListItem."Line No." := -1;
+            NpDcCouponListItem."Max. Discount Amount" := MaxDiscountAmt;
+            NpDcCouponListItem."Max. Quantity" := MaxQty;
+            //-NPR5.46 [327366]
+            NpDcCouponListItem."Validation Quantity" := ValidQty;
+            NpDcCouponListItem."Lot Validation" := LotValidation;
+            //+NPR5.46 [327366]
+            NpDcCouponListItem.Insert(true);
         end;
 
         PrevRec := Format(NpDcCouponListItem);
@@ -324,7 +324,7 @@ page 6151597 "NpDc Coupon List Items"
         //+NPR5.46 [327366]
 
         if PrevRec <> Format(NpDcCouponListItem) then
-          NpDcCouponListItem.Modify(true);
+            NpDcCouponListItem.Modify(true);
 
         CurrPage.Update(false);
         //+NPR5.45 [312991]
@@ -338,9 +338,9 @@ page 6151597 "NpDc Coupon List Items"
         //-NPR5.45 [312991]
         CouponType := "Coupon Type";
         if CouponType = '' then begin
-          FilterGroup(2);
-          CouponType := GetRangeMax("Coupon Type");
-          FilterGroup(0);
+            FilterGroup(2);
+            CouponType := GetRangeMax("Coupon Type");
+            FilterGroup(0);
         end;
         MaxDiscountAmt := 0;
         MaxQty := 0;
@@ -352,8 +352,8 @@ page 6151597 "NpDc Coupon List Items"
         //-NPR5.46 [327366]
         //IF NpDcCouponListItem.GET(CouponType,-1) THEN
         //  MaxQty := NpDcCouponListItem."Max. Quantity";
-        if not NpDcCouponListItem.Get(CouponType,-1) then
-          exit;
+        if not NpDcCouponListItem.Get(CouponType, -1) then
+            exit;
 
         MaxQty := NpDcCouponListItem."Max. Quantity";
         ValidQty := NpDcCouponListItem."Validation Quantity";

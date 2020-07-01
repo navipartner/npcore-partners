@@ -4,7 +4,6 @@ page 6184880 "FTP Setup"
 
     Caption = 'FTP Setup';
     PageType = List;
-    Permissions = TableData "Service Password"=rimd;
     SourceTable = "FTP Setup";
 
     layout
@@ -13,23 +12,23 @@ page 6184880 "FTP Setup"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field("FTP Host";"FTP Host")
+                field("FTP Host"; "FTP Host")
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field(Timeout;Timeout)
+                field(Timeout; Timeout)
                 {
                     ToolTip = 'Miliseconds';
                 }
-                field(User;User)
+                field(User; User)
                 {
                 }
-                field(Password;Password)
+                field(Password; Password)
                 {
                     Caption = 'Password';
                     ExtendedDatatype = Masked;
@@ -39,7 +38,7 @@ page 6184880 "FTP Setup"
                         HandlePassword(Password);
                     end;
                 }
-                field("Storage On Server";"Storage On Server")
+                field("Storage On Server"; "Storage On Server")
                 {
                 }
             }
@@ -51,13 +50,9 @@ page 6184880 "FTP Setup"
     }
 
     trigger OnAfterGetRecord()
-    var
-        ServicePassword: Record "Service Password";
     begin
         if not IsNullGuid("Service Password") then begin
-          ServicePassword.SetRange(Key,"Service Password");
-          ServicePassword.FindFirst;
-          Password := ServicePassword.GetPassword();
+            IsolatedStorage.Get("Service Password", DataScope::Company, Password);
         end;
     end;
 

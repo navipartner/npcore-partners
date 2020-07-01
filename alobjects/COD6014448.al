@@ -141,7 +141,7 @@ codeunit 6014448 "Table Export Library"
         ReplaceCharString: Text[30];
         UseXmlDataFormat: Boolean;
         "-- Dialog": Integer;
-        DialogValues: array [3] of Integer;
+        DialogValues: array[3] of Integer;
         ProgressDialog: Dialog;
         TxtProgess: Label 'Exporting ##1######\@@2@@@@@@@@@@@@@@@@@\@@3@@@@@@@@@@@@@@@@@';
         IsDialogOpen: Boolean;
@@ -170,22 +170,23 @@ codeunit 6014448 "Table Export Library"
         Total := TempTablesToExport.Count;
 
         if WriteTableInformation then
-          WriteTableExportInformation;
+            WriteTableExportInformation;
 
-        if TempTablesToExport.FindSet then repeat
-          Itt += 1;
-          UpdateProgessDialog(2,Itt,Total);
-          IsProcessingBatch := true;
+        if TempTablesToExport.FindSet then
+            repeat
+                Itt += 1;
+                UpdateProgessDialog(2, Itt, Total);
+                IsProcessingBatch := true;
 
-          if ExportCompanyName <> '' then
-            RecRef.Open(TempTablesToExport."Object ID", false, ExportCompanyName)
-          else
-            RecRef.Open(TempTablesToExport."Object ID");
+                if ExportCompanyName <> '' then
+                    RecRef.Open(TempTablesToExport."Object ID", false, ExportCompanyName)
+                else
+                    RecRef.Open(TempTablesToExport."Object ID");
 
-          ExportTableFromRecRef(RecRef);
-          WriteDataItemSeparator;
-          RecRef.Close;
-        until TempTablesToExport.Next = 0;
+                ExportTableFromRecRef(RecRef);
+                WriteDataItemSeparator;
+                RecRef.Close;
+            until TempTablesToExport.Next = 0;
 
         IsProcessingBatch := false;
 
@@ -194,7 +195,7 @@ codeunit 6014448 "Table Export Library"
         CloseDialog;
     end;
 
-    procedure ExportTableFromRecRefWithDef(var RecRef: RecordRef;FieldDefinitions: Record "Field" temporary)
+    procedure ExportTableFromRecRefWithDef(var RecRef: RecordRef; FieldDefinitions: Record "Field" temporary)
     begin
         SetFieldsToExport(FieldDefinitions);
         ExportTableFromRecRef(RecRef);
@@ -211,30 +212,31 @@ codeunit 6014448 "Table Export Library"
         OpenDialog;
 
         Clear(TempFieldsToExport);
-        TempFieldsToExport.SetRange(TableNo,RecRef.Number);
-        if ( not TempFieldsToExport.FindFirst ) then
-          ConstructRDefFromTableNo(RecRef.Number);
+        TempFieldsToExport.SetRange(TableNo, RecRef.Number);
+        if (not TempFieldsToExport.FindFirst) then
+            ConstructRDefFromTableNo(RecRef.Number);
 
         ApplyFilters(RecRef);
 
         if WriteTableInformation then
-          WriteTableInfoFromRecRef(RecRef);
+            WriteTableInfoFromRecRef(RecRef);
 
         if WriteFieldHeader then
-          WriteRecordHeaderFromTableNo(RecRef.Number);
+            WriteRecordHeaderFromTableNo(RecRef.Number);
 
         Total := RecRef.Count;
 
-        UpdateDialog(1,RecRef.Number);
+        UpdateDialog(1, RecRef.Number);
 
-        if RecRef.FindSet then repeat
-          Itt += 1;
-          UpdateProgessDialog(3,Itt,Total);
-          ExportRow(RecRef);
-        until RecRef.Next = 0;
+        if RecRef.FindSet then
+            repeat
+                Itt += 1;
+                UpdateProgessDialog(3, Itt, Total);
+                ExportRow(RecRef);
+            until RecRef.Next = 0;
 
         if not IsProcessingBatch then
-          CloseFileForExport;
+            CloseFileForExport;
     end;
 
     local procedure "-- Locals"()
@@ -247,35 +249,42 @@ codeunit 6014448 "Table Export Library"
     begin
         TempFieldsToExport.Init;
 
-        Fields.SetRange(TableNo,"Table No.");
+        Fields.SetRange(TableNo, "Table No.");
 
-        Fields.SetRange(Class,Fields.Class::Normal,Fields.Class::FlowField);
+        Fields.SetRange(Class, Fields.Class::Normal, Fields.Class::FlowField);
 
         if SkipFlowFields then begin
-          Fields.SetRange(Class,Fields.Class::Normal);
-        //-NPR5.41 [308570]
-        //  Fields.SETFILTER(Type,'<>%1',Fields.Type::BLOB);
-        //+NPR5.41 [308570]
+            Fields.SetRange(Class, Fields.Class::Normal);
+            //-NPR5.41 [308570]
+            //  Fields.SETFILTER(Type,'<>%1',Fields.Type::BLOB);
+            //+NPR5.41 [308570]
         end;
 
-        if Fields.FindSet then repeat
-          TempFieldsToExport.TableNo   := Fields.TableNo;
-          TempFieldsToExport."No."     := Fields."No.";
-          TempFieldsToExport.Enabled   := Fields.Enabled;
-          if TempFieldsToExport.Enabled then
-            TempFieldsToExport.Insert;
-        until Fields.Next = 0;
+        if Fields.FindSet then
+            repeat
+                TempFieldsToExport.TableNo := Fields.TableNo;
+                TempFieldsToExport."No." := Fields."No.";
+                TempFieldsToExport.Enabled := Fields.Enabled;
+                if TempFieldsToExport.Enabled then
+                    TempFieldsToExport.Insert;
+            until Fields.Next = 0;
     end;
 
     local procedure ResolveDelimeter(DelimeterCode: Text[30]): Text[2]
     begin
         case DelimeterCode of
-          '<NEWLINE>' : exit(NEWLINE);
-          '<TAB>'     : exit(TAB);
-          '<EOF>'     : exit(EOF);
-          '<SPACE>'   : exit(SPACE);
-          '<CR>'      : exit(CR);
-          '<LF>'      : exit(LF);
+            '<NEWLINE>':
+                exit(NEWLINE);
+            '<TAB>':
+                exit(TAB);
+            '<EOF>':
+                exit(EOF);
+            '<SPACE>':
+                exit(SPACE);
+            '<CR>':
+                exit(CR);
+            '<LF>':
+                exit(LF);
         end;
     end;
 
@@ -300,27 +309,27 @@ codeunit 6014448 "Table Export Library"
     begin
         //-NPR5.48 [340086]
         if EscapeCharacter <> '' then begin
-          String := Value;
-          if StrPos(Value, '\') <> 0 then
-            String := String.Replace('\', '\\');
+            String := Value;
+            if StrPos(Value, '\') <> 0 then
+                String := String.Replace('\', '\\');
 
-          if StrPos(Value, FieldSeparator) <> 0 then
-            String := String.Replace(FieldSeparator, '\' + FieldSeparator);
+            if StrPos(Value, FieldSeparator) <> 0 then
+                String := String.Replace(FieldSeparator, '\' + FieldSeparator);
 
-          Value := String;
+            Value := String;
         end;
         //+NPR5.48 [340086]
-        Write( FieldStartDelimeter + Value + FieldEndDelimeter );
+        Write(FieldStartDelimeter + Value + FieldEndDelimeter);
     end;
 
     procedure WriteFieldType(var "Field": Record "Field")
     begin
         case Field.Type of
-          Field.Type::OemCode,
-          Field.Type::OemText :
-            WriteFieldValue(Format(Field.Type) + ':[' + Format(Field.Len) + ']');
-          else
-            WriteFieldValue(Format(Field.Type));
+            Field.Type::OemCode,
+          Field.Type::OemText:
+                WriteFieldValue(Format(Field.Type) + ':[' + Format(Field.Len) + ']');
+            else
+                WriteFieldValue(Format(Field.Type));
         end;
     end;
 
@@ -335,11 +344,13 @@ codeunit 6014448 "Table Export Library"
         if IsFileOpen then exit;
 
         case FileMode of
-          //-NPR5.38 [301053]
-          //FileMode::ADO        : OpenADOStreamForExport;
-          //+NPR5.38 [301053]
-          FileMode::OStream    : OpenOStreamForExport;
-          FileMode::DotNet     : OpenDotNetStream;
+            //-NPR5.38 [301053]
+            //FileMode::ADO        : OpenADOStreamForExport;
+            //+NPR5.38 [301053]
+            FileMode::OStream:
+                OpenOStreamForExport;
+            FileMode::DotNet:
+                OpenDotNetStream;
         end;
 
         IsFileOpen := true;
@@ -379,7 +390,7 @@ codeunit 6014448 "Table Export Library"
 
         SetDefaultValues;
 
-        DotNetEncoding :=  DotNetEncoding.GetEncoding(OutputEncoding);
+        DotNetEncoding := DotNetEncoding.GetEncoding(OutputEncoding);
 
         DotNetStream := DotNetStream.StreamWriter(DotNetFilePath, false, DotNetEncoding);
 
@@ -393,11 +404,13 @@ codeunit 6014448 "Table Export Library"
     local procedure CloseFileForExport()
     begin
         case FileMode of
-          //-NPR5.38 [301053]
-          //FileMode::ADO     : CloseAdoStreamForExport;
-          //-NPR5.38 [301053]
-          FileMode::OStream : CloseOStreamForExport;
-          FileMode::DotNet  : CloseDotNetStreamForExport;
+            //-NPR5.38 [301053]
+            //FileMode::ADO     : CloseAdoStreamForExport;
+            //-NPR5.38 [301053]
+            FileMode::OStream:
+                CloseOStreamForExport;
+            FileMode::DotNet:
+                CloseDotNetStreamForExport;
         end;
 
         IsFileOpen := false;
@@ -418,9 +431,9 @@ codeunit 6014448 "Table Export Library"
         DotNetStream.Close;
 
         if GuiAllowed then
-          FileManagement.DownloadToFile(DotNetFilePath,FileName)
+            FileManagement.DownloadToFile(DotNetFilePath, FileName)
         else
-          DotNetFileServer.Copy(DotNetFilePath,FileName);
+            DotNetFileServer.Copy(DotNetFilePath, FileName);
     end;
 
     local procedure TestFileName()
@@ -428,7 +441,7 @@ codeunit 6014448 "Table Export Library"
         FileMgt: Codeunit "File Management";
     begin
         if FileName = '' then begin
-          FileName := FileMgt.SaveFileDialog('Choose File For Export','','Text Files (*.txt)|*.txt');
+            FileName := FileMgt.SaveFileDialog('Choose File For Export', '', 'Text Files (*.txt)|*.txt');
         end;
 
         if FileName = '' then Error('');
@@ -437,11 +450,13 @@ codeunit 6014448 "Table Export Library"
     local procedure Write(Text: Text)
     begin
         case FileMode of
-          //-NPR5.38 [301053]
-          //FileMode::ADO     : ADOStream.WriteText(Text);
-          //+NPR5.38 [301053]
-          FileMode::OStream : OStream.WriteText(Text);
-          FileMode::DotNet  : DotNetStream.Write(Text);
+            //-NPR5.38 [301053]
+            //FileMode::ADO     : ADOStream.WriteText(Text);
+            //+NPR5.38 [301053]
+            FileMode::OStream:
+                OStream.WriteText(Text);
+            FileMode::DotNet:
+                DotNetStream.Write(Text);
         end;
     end;
 
@@ -452,33 +467,33 @@ codeunit 6014448 "Table Export Library"
     local procedure OpenDialog()
     begin
         if GuiAllowed and ShowStatus then
-          if not IsDialogOpen then begin
-            ProgressDialog.Open(TxtProgess);
-            IsDialogOpen := true;
-          end;
+            if not IsDialogOpen then begin
+                ProgressDialog.Open(TxtProgess);
+                IsDialogOpen := true;
+            end;
     end;
 
-    local procedure UpdateDialog(ValueNo: Integer;Value: Integer)
+    local procedure UpdateDialog(ValueNo: Integer; Value: Integer)
     begin
         if GuiAllowed and ShowStatus then
-          ProgressDialog.Update(ValueNo,Value);
+            ProgressDialog.Update(ValueNo, Value);
     end;
 
-    local procedure UpdateProgessDialog(ValueNo: Integer;Progress: Integer;Total: Integer)
+    local procedure UpdateProgessDialog(ValueNo: Integer; Progress: Integer; Total: Integer)
     begin
         if GuiAllowed and ShowStatus then begin
-          Progress := Round(Progress/Total *10000,1,'>');
-          if Progress <> DialogValues[ValueNo] then begin
-            DialogValues[ValueNo] := Progress;
-            ProgressDialog.Update(ValueNo, DialogValues[ValueNo]);
-          end;
+            Progress := Round(Progress / Total * 10000, 1, '>');
+            if Progress <> DialogValues[ValueNo] then begin
+                DialogValues[ValueNo] := Progress;
+                ProgressDialog.Update(ValueNo, DialogValues[ValueNo]);
+            end;
         end;
     end;
 
     local procedure CloseDialog()
     begin
         if GuiAllowed and ShowStatus then
-          ProgressDialog.Close;
+            ProgressDialog.Close;
 
         IsDialogOpen := false;
     end;
@@ -492,39 +507,40 @@ codeunit 6014448 "Table Export Library"
         Tables: Record AllObj;
     begin
         TempTablesToExport."Object Type" := TempTablesToExport."Object Type"::Table;
-        TempTablesToExport."Object ID"   := TableNo;
-        if Tables.Get(Tables."Object Type"::Table,TableNo) then begin
-          if TempTablesToExport.Insert then;
+        TempTablesToExport."Object ID" := TableNo;
+        if Tables.Get(Tables."Object Type"::Table, TableNo) then begin
+            if TempTablesToExport.Insert then;
         end else
-          if RaiseErrors then Tables.Get(Tables."Object Type"::Table,TableNo);
+            if RaiseErrors then Tables.Get(Tables."Object Type"::Table, TableNo);
     end;
 
-    procedure AddFieldForExport(TableNo: Integer;FieldNo: Integer)
+    procedure AddFieldForExport(TableNo: Integer; FieldNo: Integer)
     var
         "Fields": Record "Field";
     begin
         TempFieldsToExport.TableNo := TableNo;
-        TempFieldsToExport."No."   := FieldNo;
-        if Fields.Get(TableNo,FieldNo) then begin
-          if TempFieldsToExport.Insert then;
+        TempFieldsToExport."No." := FieldNo;
+        if Fields.Get(TableNo, FieldNo) then begin
+            if TempFieldsToExport.Insert then;
         end else
-          if RaiseErrors then Fields.Get(TableNo,FieldNo);
+            if RaiseErrors then Fields.Get(TableNo, FieldNo);
     end;
 
     procedure SetFieldsToExport(var TempFieldsToExportIn: Record "Field" temporary)
     begin
         TempFieldsToExport.DeleteAll;
-        if TempFieldsToExportIn.FindSet then repeat
-          TempFieldsToExport.Init;
-          TempFieldsToExport.TransferFields(TempFieldsToExportIn);
-          TempFieldsToExport.Insert;
-        until TempFieldsToExportIn.Next = 0;
+        if TempFieldsToExportIn.FindSet then
+            repeat
+                TempFieldsToExport.Init;
+                TempFieldsToExport.TransferFields(TempFieldsToExportIn);
+                TempFieldsToExport.Insert;
+            until TempFieldsToExportIn.Next = 0;
     end;
 
-    procedure SetTableView(TableNo: Integer;FilterString: Text[250])
+    procedure SetTableView(TableNo: Integer; FilterString: Text[250])
     begin
         TempFiltersForTablesToExport."Link ID" := TableNo;
-        TempFiltersForTablesToExport.URL1      := FilterString;
+        TempFiltersForTablesToExport.URL1 := FilterString;
         TempFiltersForTablesToExport.Insert;
     end;
 
@@ -534,11 +550,11 @@ codeunit 6014448 "Table Export Library"
         TempTableFiltersForExport.Reset;
         TempTableFiltersForExport.DeleteAll;
         if TempTableFilter.FindSet then
-          repeat
-            TempTableFiltersForExport.Init;
-            TempTableFiltersForExport.TransferFields(TempTableFilter);
-            TempTableFiltersForExport.Insert;
-          until TempTableFilter.Next = 0;
+            repeat
+                TempTableFiltersForExport.Init;
+                TempTableFiltersForExport.TransferFields(TempTableFilter);
+                TempTableFiltersForExport.Insert;
+            until TempTableFilter.Next = 0;
         //+NPR5.23
     end;
 
@@ -551,17 +567,17 @@ codeunit 6014448 "Table Export Library"
         FldRef: FieldRef;
     begin
         if TempFiltersForTablesToExport.Get(RecRef.Number) then begin
-          RecRef.SetView(TempFiltersForTablesToExport.URL1)
+            RecRef.SetView(TempFiltersForTablesToExport.URL1)
         end;
         //-NPR5.23
-        TempTableFiltersForExport.SetRange("Table Number",RecRef.Number);
+        TempTableFiltersForExport.SetRange("Table Number", RecRef.Number);
         if TempTableFiltersForExport.FindSet then
-          repeat
-            if (TempTableFiltersForExport."Field Number" <> 0) and (TempTableFiltersForExport."Field Filter" <> '') then begin
-              FldRef := RecRef.Field(TempTableFiltersForExport."Field Number");
-              FldRef.SetFilter(TempTableFiltersForExport."Field Filter");
-            end;
-          until TempTableFiltersForExport.Next = 0;
+            repeat
+                if (TempTableFiltersForExport."Field Number" <> 0) and (TempTableFiltersForExport."Field Filter" <> '') then begin
+                    FldRef := RecRef.Field(TempTableFiltersForExport."Field Number");
+                    FldRef.SetFilter(TempTableFiltersForExport."Field Filter");
+                end;
+            until TempTableFiltersForExport.Next = 0;
         TempTableFiltersForExport.SetRange("Table Number");
         //+NPR5.23
     end;
@@ -578,11 +594,11 @@ codeunit 6014448 "Table Export Library"
         TempFieldsToExport.SetRange(TableNo, RecRef.Number);
         TempFieldsToExport.FindSet;
         repeat
-          if FieldNo > 0 then
-            WriteFieldSeparator;
-          FieldRef := RecRef.Field(TempFieldsToExport."No.");
-          ExportField(FieldRef);
-          FieldNo += 1;
+            if FieldNo > 0 then
+                WriteFieldSeparator;
+            FieldRef := RecRef.Field(TempFieldsToExport."No.");
+            ExportField(FieldRef);
+            FieldNo += 1;
         until TempFieldsToExport.Next = 0;
 
         WriteRecordSeparator;
@@ -594,7 +610,7 @@ codeunit 6014448 "Table Export Library"
 
     local procedure ExportField(var FieldRef: FieldRef)
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         Encoding: DotNet npNetEncoding;
         BinaryReader: DotNet npNetBinaryReader;
         Stream: DotNet npNetStream;
@@ -608,71 +624,72 @@ codeunit 6014448 "Table Export Library"
         "Count": Integer;
         i: Integer;
     begin
-        if (Format(FieldRef.Class) = 'FlowField') or  (Format(FieldRef.Type) = 'BLOB') then begin
-          FieldRef.CalcField;
+        if (Format(FieldRef.Class) = 'FlowField') or (Format(FieldRef.Type) = 'BLOB') then begin
+            FieldRef.CalcField;
         end;
 
         //-NPR5.41 [308570]
         if UseXmlDataFormat then
-          Value := Format(FieldRef.Value,0,9)
+            Value := Format(FieldRef.Value, 0, 9)
         else
-        //+NPR5.41 [308570]
-          Value := Format(FieldRef.Value);
+            //+NPR5.41 [308570]
+            Value := Format(FieldRef.Value);
 
         if (Format(FieldRef.Type) = 'Text') and TrimSpecialChars then
-          RemoveSpeacialChars(Value);
+            RemoveSpeacialChars(Value);
         if (Format(FieldRef.Type) = 'Boolean') then
-          FormatBoolean(Value);
+            FormatBoolean(Value);
         //-NPR5.41 [308570]
         if not UseXmlDataFormat then
-        //+NPR5.41 [308570]
-          if (Format(FieldRef.Type) = 'Date') then begin
-            DateVal := FieldRef.Value;
-            Value   := FormatDate(DateVal);
-          end;
+            //+NPR5.41 [308570]
+            if (Format(FieldRef.Type) = 'Date') then begin
+                DateVal := FieldRef.Value;
+                Value := FormatDate(DateVal);
+            end;
         if (Format(FieldRef.Type) = 'Option') then begin
-          IntVal := FieldRef.Value;
-          Value  := Format(IntVal);
+            IntVal := FieldRef.Value;
+            Value := Format(IntVal);
         end;
         if (Format(FieldRef.Type) = 'BLOB') then begin
-          TempBlob.Blob := FieldRef.Value;
-          TempBlob.Blob := FieldRef.Value;
-          TempBlob.Blob.CreateInStream(InStream);
-          Stream        := InStream;
-          BinaryReader  := BinaryReader.BinaryReader(Stream);
-          Value         := Convert.ToBase64String(BinaryReader.ReadBytes(Stream.Length));
-          Value         := StrSubstNo('%1:%2',StrLen(Value),Value);
-          WriteFieldValue(Value);
-        //-NPR5.48 [342396]
-        end else if (UpperCase(Format(FieldRef.Type)) = 'MEDIA') then begin
-          OnHandleExportMedia(FieldRef, TempBlob);
-          TempBlob.Blob.CreateInStream(InStream);
-          Stream        := InStream;
-          BinaryReader  := BinaryReader.BinaryReader(Stream);
-          Base64 := Convert.ToBase64String(BinaryReader.ReadBytes(Stream.Length));
-          Value := StrSubstNo('%1:%2',StrLen(Base64),Base64);
-          WriteFieldValue(Value);
-        end else if (UpperCase(Format(FieldRef.Type)) = 'MEDIASET') then begin
-          Value := '';
-          OnGetMediaSetCount(FieldRef, Count);
-          if Count > 0 then begin
-            for i := 1 to Count do begin
-              OnHandleExportMediaSet(FieldRef, TempBlob, i);
-              TempBlob.Blob.CreateInStream(InStream);
-              Stream        := InStream;
-              BinaryReader  := BinaryReader.BinaryReader(Stream);
-              Base64 := Convert.ToBase64String(BinaryReader.ReadBytes(Stream.Length));
-              if i > 1 then
-                Value += '^'; //Separator between multiple media values.
-              Value += StrSubstNo('%1:%2',StrLen(Base64),Base64);
-            end;
-          end else
-            Value := '0:';
-
-          WriteFieldValue(Value);
-        //+NPR5.48 [342396]
+            TempBlob.FromFieldRef(FieldRef);
+            TempBlob.CreateInStream(InStream);
+            Stream := InStream;
+            BinaryReader := BinaryReader.BinaryReader(Stream);
+            Value := Convert.ToBase64String(BinaryReader.ReadBytes(Stream.Length));
+            Value := StrSubstNo('%1:%2', StrLen(Value), Value);
+            WriteFieldValue(Value);
+            //-NPR5.48 [342396]
         end else
-          WriteFieldValue(Value);
+            if (UpperCase(Format(FieldRef.Type)) = 'MEDIA') then begin
+                OnHandleExportMedia(FieldRef, TempBlob);
+                TempBlob.CreateInStream(InStream);
+                Stream := InStream;
+                BinaryReader := BinaryReader.BinaryReader(Stream);
+                Base64 := Convert.ToBase64String(BinaryReader.ReadBytes(Stream.Length));
+                Value := StrSubstNo('%1:%2', StrLen(Base64), Base64);
+                WriteFieldValue(Value);
+            end else
+                if (UpperCase(Format(FieldRef.Type)) = 'MEDIASET') then begin
+                    Value := '';
+                    OnGetMediaSetCount(FieldRef, Count);
+                    if Count > 0 then begin
+                        for i := 1 to Count do begin
+                            OnHandleExportMediaSet(FieldRef, TempBlob, i);
+                            TempBlob.CreateInStream(InStream);
+                            Stream := InStream;
+                            BinaryReader := BinaryReader.BinaryReader(Stream);
+                            Base64 := Convert.ToBase64String(BinaryReader.ReadBytes(Stream.Length));
+                            if i > 1 then
+                                Value += '^'; //Separator between multiple media values.
+                            Value += StrSubstNo('%1:%2', StrLen(Base64), Base64);
+                        end;
+                    end else
+                        Value := '0:';
+
+                    WriteFieldValue(Value);
+                    //+NPR5.48 [342396]
+                end else
+                    WriteFieldValue(Value);
     end;
 
     local procedure "-- ExportFunctionality"()
@@ -684,17 +701,18 @@ codeunit 6014448 "Table Export Library"
         "Fields": Record "Field";
         FieldNo: Integer;
     begin
-        TempFieldsToExport.SetRange(TableNo,"TableNo.");
+        TempFieldsToExport.SetRange(TableNo, "TableNo.");
 
-        if TempFieldsToExport.FindSet then repeat
-          Fields.Get(TempFieldsToExport.TableNo,TempFieldsToExport."No.");
-          if not SkipFlowFields or (Fields.Class = Fields.Class::Normal) then begin
-            if FieldNo > 0 then
-              WriteFieldSeparator;
-            WriteFieldValue(ConvertStr(Fields.FieldName,'.','_'));
-          end;
-          FieldNo += 1;
-        until TempFieldsToExport.Next = 0;
+        if TempFieldsToExport.FindSet then
+            repeat
+                Fields.Get(TempFieldsToExport.TableNo, TempFieldsToExport."No.");
+                if not SkipFlowFields or (Fields.Class = Fields.Class::Normal) then begin
+                    if FieldNo > 0 then
+                        WriteFieldSeparator;
+                    WriteFieldValue(ConvertStr(Fields.FieldName, '.', '_'));
+                end;
+                FieldNo += 1;
+            until TempFieldsToExport.Next = 0;
 
         WriteRecordSeparator;
     end;
@@ -709,31 +727,33 @@ codeunit 6014448 "Table Export Library"
         Write('Records:' + Format(RecRef.Count));
         WriteRecordSeparator;
 
-        TempFieldsToExport.SetRange(TableNo,RecRef.Number);
+        TempFieldsToExport.SetRange(TableNo, RecRef.Number);
 
-        if TempFieldsToExport.FindSet then repeat
-          Fields.Get(TempFieldsToExport.TableNo,TempFieldsToExport."No.");
-          if not SkipFlowFields or (Fields.Class = Fields.Class::Normal) then begin
-            if FieldNo > 0 then
-              WriteFieldSeparator;
-            WriteFieldValue(Format(Fields."No."));
-          end;
-          FieldNo += 1;
-        until TempFieldsToExport.Next = 0;
+        if TempFieldsToExport.FindSet then
+            repeat
+                Fields.Get(TempFieldsToExport.TableNo, TempFieldsToExport."No.");
+                if not SkipFlowFields or (Fields.Class = Fields.Class::Normal) then begin
+                    if FieldNo > 0 then
+                        WriteFieldSeparator;
+                    WriteFieldValue(Format(Fields."No."));
+                end;
+                FieldNo += 1;
+            until TempFieldsToExport.Next = 0;
 
         WriteRecordSeparator;
 
         FieldNo := 0;
 
-        if TempFieldsToExport.FindSet then repeat
-          Fields.Get(TempFieldsToExport.TableNo,TempFieldsToExport."No.");
-          if not SkipFlowFields or (Fields.Class = Fields.Class::Normal) then begin
-            if FieldNo > 0 then
-              WriteFieldSeparator;
-            WriteFieldType(Fields);
-          end;
-          FieldNo += 1;
-        until TempFieldsToExport.Next = 0;
+        if TempFieldsToExport.FindSet then
+            repeat
+                Fields.Get(TempFieldsToExport.TableNo, TempFieldsToExport."No.");
+                if not SkipFlowFields or (Fields.Class = Fields.Class::Normal) then begin
+                    if FieldNo > 0 then
+                        WriteFieldSeparator;
+                    WriteFieldType(Fields);
+                end;
+                FieldNo += 1;
+            until TempFieldsToExport.Next = 0;
 
         WriteRecordSeparator;
     end;
@@ -766,16 +786,16 @@ codeunit 6014448 "Table Export Library"
     begin
         //-NPR5.48 [340086]
         if not FieldStartDelimiterSet then
-        //+NPR5.48 [340086]
-          TestAndSet(FieldStartDelimeter, '"');
+            //+NPR5.48 [340086]
+            TestAndSet(FieldStartDelimeter, '"');
         //-NPR5.48 [340086]
         if not FieldEndDelimiterSet then
-        //+NPR5.48 [340086]
-          TestAndSet(FieldEndDelimeter,   '"');
-        TestAndSet(FieldSeparator,      ';');
-        TestAndSet(RecordSeparator,     NEWLINE);
-        TestAndSet(DataItemSeparator,   NEWLINE + NEWLINE);
-        TestAndSet(OutputEncoding,      'utf-8')
+            //+NPR5.48 [340086]
+            TestAndSet(FieldEndDelimeter, '"');
+        TestAndSet(FieldSeparator, ';');
+        TestAndSet(RecordSeparator, NEWLINE);
+        TestAndSet(DataItemSeparator, NEWLINE + NEWLINE);
+        TestAndSet(OutputEncoding, 'utf-8')
     end;
 
     procedure "-- Properties"()
@@ -789,7 +809,7 @@ codeunit 6014448 "Table Export Library"
 
     procedure SetFileName(FileNameIn: Text[250])
     begin
-        FileName            := FileNameIn;
+        FileName := FileNameIn;
     end;
 
     procedure SetFieldStartDelimeter(FieldStartDelimeterIn: Text[30])
@@ -805,12 +825,12 @@ codeunit 6014448 "Table Export Library"
         //-NPR5.48 [340086]
         FieldEndDelimiterSet := true;
         //+NPR5.48 [340086]
-        FieldEndDelimeter   := ResolveDelimeters(FieldEndDelimeterIn);
+        FieldEndDelimeter := ResolveDelimeters(FieldEndDelimeterIn);
     end;
 
     procedure SetFieldSeparator(FieldSeparatorIn: Text[30])
     begin
-        FieldSeparator      := ResolveDelimeters(FieldSeparatorIn);
+        FieldSeparator := ResolveDelimeters(FieldSeparatorIn);
     end;
 
     procedure SetRaiseErrors(RaiseErrorsIn: Boolean)
@@ -820,22 +840,22 @@ codeunit 6014448 "Table Export Library"
 
     procedure SetRecordSeparator(RecordSeparatorIn: Text[30])
     begin
-        RecordSeparator     := ResolveDelimeters(RecordSeparatorIn);
+        RecordSeparator := ResolveDelimeters(RecordSeparatorIn);
     end;
 
     procedure SetDataItemSeparator(DataItemSeparatorIn: Text[30])
     begin
-        DataItemSeparator   := ResolveDelimeters(DataItemSeparatorIn);
+        DataItemSeparator := ResolveDelimeters(DataItemSeparatorIn);
     end;
 
     procedure SetShowStatus(ShowStatusIn: Boolean)
     begin
-        ShowStatus          := ShowStatusIn;
+        ShowStatus := ShowStatusIn;
     end;
 
     procedure SetWriteFieldHeader(WriteFieldHeaderIn: Boolean)
     begin
-        WriteFieldHeader    := WriteFieldHeaderIn;
+        WriteFieldHeader := WriteFieldHeaderIn;
     end;
 
     procedure SetWriteTableInformation(WriteTableInformationIn: Boolean)
@@ -889,13 +909,15 @@ codeunit 6014448 "Table Export Library"
     var
         TestBool: Boolean;
     begin
-        if not Evaluate(TestBool,Value) then begin
-          Value := '0';
-          exit;
+        if not Evaluate(TestBool, Value) then begin
+            Value := '0';
+            exit;
         end;
 
-        if TestBool then Value := '1'
-        else Value := '0';
+        if TestBool then
+            Value := '1'
+        else
+            Value := '0';
     end;
 
     procedure FormatDate(DateVal: Date): Text[20]
@@ -905,11 +927,11 @@ codeunit 6014448 "Table Export Library"
         Month: Text[2];
         Year: Text[4];
     begin
-        if DateVal = 0D then exit ('');
+        if DateVal = 0D then exit('');
 
-        Day   := String.PadStrLeft(Format(Date2DMY(DateVal,1)),2,'0',false);
-        Month := String.PadStrLeft(Format(Date2DMY(DateVal,2)),2,'0',false);
-        Year  := Format(Date2DMY(DateVal,3));
+        Day := String.PadStrLeft(Format(Date2DMY(DateVal, 1)), 2, '0', false);
+        Month := String.PadStrLeft(Format(Date2DMY(DateVal, 2)), 2, '0', false);
+        Year := Format(Date2DMY(DateVal, 3));
 
         exit(Day + Month + Year);
     end;
@@ -924,12 +946,12 @@ codeunit 6014448 "Table Export Library"
         Ch13 := 13;
 
         if SpecialCharString = '' then begin
-          SpecialCharString := Format(Ch10) + Format(Ch13) + FieldStartDelimeter + FieldEndDelimeter + FieldSeparator;
-          for Itt := 1 to StrLen (SpecialCharString) do
-            ReplaceCharString += ' ';
+            SpecialCharString := Format(Ch10) + Format(Ch13) + FieldStartDelimeter + FieldEndDelimeter + FieldSeparator;
+            for Itt := 1 to StrLen(SpecialCharString) do
+                ReplaceCharString += ' ';
         end;
 
-        Text := ConvertStr(Text,SpecialCharString,ReplaceCharString);
+        Text := ConvertStr(Text, SpecialCharString, ReplaceCharString);
     end;
 
     local procedure ResolveDelimeters(ConvertString: Text[30]): Text[30]
@@ -938,15 +960,15 @@ codeunit 6014448 "Table Export Library"
     begin
         String.Construct(ConvertString);
         String.Replace('<NEWLINE>', NEWLINE);
-        String.Replace('<TAB>',     TAB);
-        String.Replace('<SPACE>',   SPACE);
+        String.Replace('<TAB>', TAB);
+        String.Replace('<SPACE>', SPACE);
         exit(String.Text);
     end;
 
-    local procedure TestAndSet(var ToSetAndTest: Text[30];Value: Text[30])
+    local procedure TestAndSet(var ToSetAndTest: Text[30]; Value: Text[30])
     begin
         if ToSetAndTest = '' then
-          ToSetAndTest := Value;
+            ToSetAndTest := Value;
     end;
 
     local procedure "-- Char Contants"()
@@ -979,7 +1001,7 @@ codeunit 6014448 "Table Export Library"
 
     local procedure NEWLINE(): Text[2]
     begin
-        exit (CR + LF);
+        exit(CR + LF);
     end;
 
     local procedure SPACE(): Text[1]
@@ -999,17 +1021,17 @@ codeunit 6014448 "Table Export Library"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnHandleExportMedia(var FieldRef: FieldRef;var TempBlob: Record TempBlob temporary)
+    local procedure OnHandleExportMedia(var FieldRef: FieldRef; var TempBlob: Codeunit "Temp Blob")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnHandleExportMediaSet(var FieldRef: FieldRef;var TempBlob: Record TempBlob temporary;Index: Integer)
+    local procedure OnHandleExportMediaSet(var FieldRef: FieldRef; var TempBlob: Codeunit "Temp Blob"; Index: Integer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetMediaSetCount(var FieldRef: FieldRef;var "Count": Integer)
+    local procedure OnGetMediaSetCount(var FieldRef: FieldRef; var "Count": Integer)
     begin
     end;
 }

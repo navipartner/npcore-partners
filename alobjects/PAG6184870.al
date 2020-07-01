@@ -4,7 +4,6 @@ page 6184870 "DropBox Setup"
 
     Caption = 'DropBox Setup';
     PageType = List;
-    Permissions = TableData "Service Password"=rimd;
     SourceTable = "DropBox API Setup";
 
     layout
@@ -13,13 +12,13 @@ page 6184870 "DropBox Setup"
         {
             repeater(Group)
             {
-                field("Account Code";"Account Code")
+                field("Account Code"; "Account Code")
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field(DropBoxToken;DropBoxToken)
+                field(DropBoxToken; DropBoxToken)
                 {
                     Caption = 'DropBox Access Token';
                     ExtendedDatatype = Masked;
@@ -30,11 +29,11 @@ page 6184870 "DropBox Setup"
                         HandleToken(DropBoxToken);
                     end;
                 }
-                field(Timeout;Timeout)
+                field(Timeout; Timeout)
                 {
                     ToolTip = 'Miliseconds';
                 }
-                field("Storage On Server";"Storage On Server")
+                field("Storage On Server"; "Storage On Server")
                 {
                 }
             }
@@ -46,13 +45,9 @@ page 6184870 "DropBox Setup"
     }
 
     trigger OnAfterGetRecord()
-    var
-        ServicePassword: Record "Service Password";
     begin
         if not IsNullGuid(Token) then begin
-          ServicePassword.SetRange(Key,Token);
-          ServicePassword.FindFirst;
-          DropBoxToken := ServicePassword.GetPassword();
+            IsolatedStorage.Get(Token, DataScope::Company, DropBoxToken);
         end;
     end;
 

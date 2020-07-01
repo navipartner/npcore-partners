@@ -23,27 +23,27 @@ page 6014622 "POS Web Fonts"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
                 }
-                field("Font Face";"Font Face")
+                field("Font Face"; "Font Face")
                 {
                 }
-                field(Prefix;Prefix)
+                field(Prefix; Prefix)
                 {
                 }
-                field("FORMAT(WoffHasValue)";Format(WoffHasValue))
+                field("FORMAT(WoffHasValue)"; Format(WoffHasValue))
                 {
                     Caption = 'Woff Exists';
                     Editable = false;
                 }
-                field("FORMAT(CssHasValue)";Format(CssHasValue))
+                field("FORMAT(CssHasValue)"; Format(CssHasValue))
                 {
                     Caption = 'Css Exists';
                     Editable = false;
@@ -236,21 +236,24 @@ page 6014622 "POS Web Fonts"
 
     local procedure ImportFont()
     var
-        TempBLOB: Record TempBlob;
+        TempBLOB: Codeunit "Temp Blob";
+        RecRef: RecordRef;
     begin
-        TempBLOB.Blob := Woff;
-        if ImportWithDialog(TempBLOB,Woff.HasValue,FieldCaption(Woff),Text004,'woff') then begin
-          Woff := TempBLOB.Blob;
-          CurrPage.Update(true);
+        TempBLOB.FromRecord(Rec, FieldNo(Woff));
+        if ImportWithDialog(TempBLOB, Woff.HasValue, FieldCaption(Woff), Text004, 'woff') then begin
+            RecRef.GetTable(Rec);
+            TempBlob.ToRecordRef(RecRef, FieldNo(Woff));
+            RecRef.SetTable(Rec);
+            CurrPage.Update(true);
         end;
     end;
 
     local procedure ExportFont()
     var
-        TempBLOB: Record TempBlob;
+        TempBLOB: Codeunit "Temp Blob";
     begin
-        TempBLOB.Blob := Woff;
-        ExportWithDialog(TempBLOB,Woff.HasValue,FieldCaption(Woff),'woff');
+        TempBLOB.FromRecord(Rec, FieldNo(Woff));
+        ExportWithDialog(TempBLOB, Woff.HasValue, FieldCaption(Woff), 'woff');
     end;
 
     local procedure RemoveFont()
@@ -261,21 +264,24 @@ page 6014622 "POS Web Fonts"
 
     local procedure ImportCss()
     var
-        TempBLOB: Record TempBlob;
+        TempBLOB: Codeunit "Temp Blob";
+        RecRef: RecordRef;
     begin
-        TempBLOB.Blob := Css;
-        if ImportWithDialog(TempBLOB,Css.HasValue,FieldCaption(Css),Text005,'css') then begin
-          Css := TempBLOB.Blob;
-          CurrPage.Update(true);
+        TempBLOB.FromRecord(Rec, FieldNo(Css));
+        if ImportWithDialog(TempBLOB, Css.HasValue, FieldCaption(Css), Text005, 'css') then begin
+            RecRef.GetTable(Rec);
+            TempBlob.ToRecordRef(RecRef, FieldNo(Css));
+            RecRef.SetTable(Rec);
+            CurrPage.Update(true);
         end;
     end;
 
     local procedure ExportCss()
     var
-        TempBLOB: Record TempBlob;
+        TempBLOB: Codeunit "Temp Blob";
     begin
-        TempBLOB.Blob := Css;
-        ExportWithDialog(TempBLOB,Css.HasValue,FieldCaption(Css),'css');
+        TempBLOB.FromRecord(Rec, FieldNo(Css));
+        ExportWithDialog(TempBLOB, Css.HasValue, FieldCaption(Css), 'css');
     end;
 
     local procedure RemoveCss()
@@ -286,7 +292,7 @@ page 6014622 "POS Web Fonts"
 
     local procedure ExportConfiguration()
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         Font: DotNet npNetFont;
         JsonSerializer: DotNet npNetDataContractJsonSerializer;
         OutStr: OutStream;
@@ -294,101 +300,101 @@ page 6014622 "POS Web Fonts"
         GetFontDotNet_Obsolete(Font);
         JsonSerializer := JsonSerializer.DataContractJsonSerializer(GetDotNetType(Font));
 
-        TempBlob.Blob.CreateOutStream(OutStr);
-        JsonSerializer.WriteObject(OutStr,Font);
+        TempBlob.CreateOutStream(OutStr);
+        JsonSerializer.WriteObject(OutStr, Font);
 
-        ExportWithDialog(TempBlob,true,Text008,'npfont');
+        ExportWithDialog(TempBlob, true, Text008, 'npfont');
     end;
 
     local procedure ImportConfiguration()
     var
         WebFont: Record "POS Web Font";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         Font: DotNet npNetFont;
         JsonSerializer: DotNet npNetDataContractJsonSerializer;
         InStr: InStream;
         Choice: Integer;
     begin
-        if ImportWithDialog(TempBlob,Css.HasValue or Woff.HasValue,TableCaption,Text008,'npfont') then begin
-          JsonSerializer := JsonSerializer.DataContractJsonSerializer(GetDotNetType(Font));
+        if ImportWithDialog(TempBlob, Css.HasValue or Woff.HasValue, TableCaption, Text008, 'npfont') then begin
+            JsonSerializer := JsonSerializer.DataContractJsonSerializer(GetDotNetType(Font));
 
-          TempBlob.Blob.CreateInStream(InStr);
-          Font := JsonSerializer.ReadObject(InStr);
+            TempBlob.CreateInStream(InStr);
+            Font := JsonSerializer.ReadObject(InStr);
 
-          case true of
-            not Find():
-              begin
-                Init;
-                Code := Font.Code;
-                Insert(true);
-              end;
-            (Code = '') and (Font.Code = ''):
-              FieldError(Code);
-            (Code = '') and (Font.Code <> ''):
-              Code := Font.Code;
-            (Code <> '') and (Font.Code <> '') and (Font.Code <> Code):
-              begin
-                Choice := StrMenu(StrSubstNo(Text010,Font.Code,Font.Name,Code,Name),1,Text009);
-                if Choice <= 1 then
-                  exit;
-                if Choice = 2 then begin
-                  WebFont.Code := Font.Code;
-                  WebFont.Insert(true);
-                  SaveFontConfiguration(WebFont,Font);
-                  CurrPage.Update(false);
-                  exit;
-                end;
-              end;
-          end;
+            case true of
+                not Find():
+                    begin
+                        Init;
+                        Code := Font.Code;
+                        Insert(true);
+                    end;
+                (Code = '') and (Font.Code = ''):
+                    FieldError(Code);
+                (Code = '') and (Font.Code <> ''):
+                    Code := Font.Code;
+                (Code <> '') and (Font.Code <> '') and (Font.Code <> Code):
+                    begin
+                        Choice := StrMenu(StrSubstNo(Text010, Font.Code, Font.Name, Code, Name), 1, Text009);
+                        if Choice <= 1 then
+                            exit;
+                        if Choice = 2 then begin
+                            WebFont.Code := Font.Code;
+                            WebFont.Insert(true);
+                            SaveFontConfiguration(WebFont, Font);
+                            CurrPage.Update(false);
+                            exit;
+                        end;
+                    end;
+            end;
 
-          SaveFontConfiguration(Rec,Font);
-          CurrPage.Update(false);
+            SaveFontConfiguration(Rec, Font);
+            CurrPage.Update(false);
         end;
     end;
 
-    local procedure SaveFontConfiguration(WebFont: Record "POS Web Font";Font: DotNet npNetFont)
+    local procedure SaveFontConfiguration(WebFont: Record "POS Web Font"; Font: DotNet npNetFont)
     var
         OutStr: OutStream;
     begin
         with WebFont do begin
-          Name := Font.Name;
-          "Font Face" := Font.FontFace;
-          Prefix := Font.Prefix;
+            Name := Font.Name;
+            "Font Face" := Font.FontFace;
+            Prefix := Font.Prefix;
 
-          Woff.CreateOutStream(OutStr);
-          Font.CopyWoffToStream(OutStr);
-          Css.CreateOutStream(OutStr);
-          Font.CopyCssToStream(OutStr);
-          Modify(true);
+            Woff.CreateOutStream(OutStr);
+            Font.CopyWoffToStream(OutStr);
+            Css.CreateOutStream(OutStr);
+            Font.CopyCssToStream(OutStr);
+            Modify(true);
         end;
     end;
 
-    local procedure ImportWithDialog(var TempBLOB: Record TempBlob;HasValue: Boolean;"Field": Text;FileType: Text;FileExt: Text): Boolean
+    local procedure ImportWithDialog(var TempBLOB: Codeunit "Temp Blob"; HasValue: Boolean; "Field": Text; FileType: Text; FileExt: Text): Boolean
     var
         FileManagement: Codeunit "File Management";
         ResourceName: Text;
     begin
         if HasValue then
-          if not Confirm(Text001,false,Field) then
-            exit;
+            if not Confirm(Text001, false, Field) then
+                exit;
 
         ResourceName := FileManagement.BLOBImportWithFilter(
-          TempBLOB,StrSubstNo(Text002,Field),'',
-          FileType + ' (*.' + FileExt + ')|*.' + FileExt + '|' + Text006 + ' (*.*)|*.*','*.*');
+          TempBLOB, StrSubstNo(Text002, Field), '',
+          FileType + ' (*.' + FileExt + ')|*.' + FileExt + '|' + Text006 + ' (*.*)|*.*', '*.*');
 
         exit(ResourceName <> '');
     end;
 
-    local procedure ExportWithDialog(var TempBLOB: Record TempBlob;HasValue: Boolean;"Field": Text;FileExt: Text)
+    local procedure ExportWithDialog(var TempBLOB: Codeunit "Temp Blob"; HasValue: Boolean; "Field": Text; FileExt: Text)
     var
         FileManagement: Codeunit "File Management";
     begin
         if not HasValue then begin
-          Message(Text007,Field);
-          exit;
+            Message(Text007, Field);
+            exit;
         end;
 
-        FileManagement.BLOBExport(TempBLOB,Name + '.' + FileExt,true);
+        FileManagement.BLOBExport(TempBLOB, Name + '.' + FileExt, true);
     end;
 }
 

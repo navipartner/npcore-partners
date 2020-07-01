@@ -43,7 +43,7 @@ codeunit 6014589 "GCP Mgt."
     begin
     end;
 
-    procedure PrintFile(PrinterID: Text;var Content: DotNet npNetMemoryStream;ContentType: Text;TicketCJT: Text;Title: Text;Tag: Text) Success: Boolean
+    procedure PrintFile(PrinterID: Text; var Content: DotNet npNetMemoryStream; ContentType: Text; TicketCJT: Text; Title: Text; Tag: Text) Success: Boolean
     var
         AccessTokenValue: Text;
         RefreshTokenValue: Text;
@@ -57,25 +57,25 @@ codeunit 6014589 "GCP Mgt."
         API.SetRefreshTokenValue(RefreshTokenValue);
 
         if TicketCJT = '' then
-          TicketCJT := BuildCJT('"1.0"','', '', '', '', '', '', '', '', '', '', '', '');  //Use default printer settings
+            TicketCJT := BuildCJT('"1.0"', '', '', '', '', '', '', '', '', '', '', '', '');  //Use default printer settings
 
         if Title = '' then
-          Title := 'NaviPartner Document Print';
+            Title := 'NaviPartner Document Print';
 
         Success := API.SubmitJob(PrinterID, Title, TicketCJT, Content, ContentType, Tag, true);
 
         if API.GetAccessTokenValue() <> AccessTokenValue then
-          Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn());
+            Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn());
 
         //-NPR5.51 [358889]
         Commit; //In case access token was refreshed manually or as part of job ping-pong.
         //+NPR5.51 [358889]
 
         if not Success then begin
-          if GetLastErrorText() <> '' then
-            Error(GetLastErrorText)
-          else
-            Error(Text000003)
+            if GetLastErrorText() <> '' then
+                Error(GetLastErrorText)
+            else
+                Error(Text000003)
         end;
 
         exit(Success);
@@ -88,26 +88,26 @@ codeunit 6014589 "GCP Mgt."
         Token: Record "OAuth Token";
     begin
         if AuthCode = '' then
-          Error(Text000001);
+            Error(Text000001);
 
         if Token.Get('GOOGLE_PRINT_ACCESS') or Token.Get('GOOGLE_PRINT_REFRESH') then
-          if not Confirm(Text000005) then
-            exit;
+            if not Confirm(Text000005) then
+                exit;
 
         ClearLastError();
 
         if API.AuthenticateUser(AuthCode) then
-          if Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn())
-             and Token.AddOrUpdate('GOOGLE_PRINT_REFRESH', API.GetRefreshTokenValue(), API.GetRefreshTokenTimeStamp(), API.GetRefreshTokenExpiresIn())
-            then begin
-              Message(Text000006);
-              exit;
+            if Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn())
+               and Token.AddOrUpdate('GOOGLE_PRINT_REFRESH', API.GetRefreshTokenValue(), API.GetRefreshTokenTimeStamp(), API.GetRefreshTokenExpiresIn())
+              then begin
+                Message(Text000006);
+                exit;
             end;
 
         if GetLastErrorText() <> '' then
-          ErrorMsg := GetLastErrorText()
+            ErrorMsg := GetLastErrorText()
         else
-          ErrorMsg := Text000004;
+            ErrorMsg := Text000004;
         Error(ErrorMsg);
     end;
 
@@ -129,33 +129,33 @@ codeunit 6014589 "GCP Mgt."
         Success := API.GetPrinters(JObject, true);
 
         if Success then begin
-          JObject := JObject.SelectToken('printers');
-          if JObject.Count > 0 then begin
-            for i := 0 to JObject.Count-1 do begin
-              TempRetailList.Number += 1;
-              TempRetailList.Choice := Format(JObject.Item(i).Item('displayName'));
-              TempRetailList.Value  := Format(JObject.Item(i).Item('id'));
-              TempRetailList.Insert;
-            end;
+            JObject := JObject.SelectToken('printers');
+            if JObject.Count > 0 then begin
+                for i := 0 to JObject.Count - 1 do begin
+                    TempRetailList.Number += 1;
+                    TempRetailList.Choice := Format(JObject.Item(i).Item('displayName'));
+                    TempRetailList.Value := Format(JObject.Item(i).Item('id'));
+                    TempRetailList.Insert;
+                end;
 
-            RetailList.SetRec(TempRetailList);
-            RetailList.SetShowValue(true);
-            RetailList.LookupMode(true);
-            if RetailList.RunModal = ACTION::LookupOK then begin
-              RetailList.GetRecord(TempRetailList);
-              PrinterIDOut := TempRetailList.Value;
-            end else
-              Success := false;
-          end;
+                RetailList.SetRec(TempRetailList);
+                RetailList.SetShowValue(true);
+                RetailList.LookupMode(true);
+                if RetailList.RunModal = ACTION::LookupOK then begin
+                    RetailList.GetRecord(TempRetailList);
+                    PrinterIDOut := TempRetailList.Value;
+                end else
+                    Success := false;
+            end;
         end;
 
         if API.GetAccessTokenValue() <> AccessTokenValue then
-          Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn());
+            Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn());
 
         exit(Success);
     end;
 
-    procedure GetPrinterInfo(ID: Text;var JObject: DotNet JObject) Success: Boolean
+    procedure GetPrinterInfo(ID: Text; var JObject: DotNet JObject) Success: Boolean
     var
         API: Codeunit "GCP API";
         AccessTokenValue: Text;
@@ -169,7 +169,7 @@ codeunit 6014589 "GCP Mgt."
         Success := API.LookupPrinter(ID, JObject, true);
 
         if API.GetAccessTokenValue() <> AccessTokenValue then
-          Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn());
+            Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn());
 
         exit(Success);
     end;
@@ -178,7 +178,7 @@ codeunit 6014589 "GCP Mgt."
     begin
     end;
 
-    procedure BuildCJT(Version: Text;Color: Text;Copies: Text;VendorTicketItem: Text;PageOrientation: Text;Duplex: Text;DPI: Text;MediaSize: Text;Collate: Text;Margins: Text;FitToPage: Text;PageRange: Text;ReverseOrder: Text): Text
+    procedure BuildCJT(Version: Text; Color: Text; Copies: Text; VendorTicketItem: Text; PageOrientation: Text; Duplex: Text; DPI: Text; MediaSize: Text; Collate: Text; Margins: Text; FitToPage: Text; PageRange: Text; ReverseOrder: Text): Text
     var
         CJT: Text;
         PrintSettings: Text;
@@ -195,44 +195,44 @@ codeunit 6014589 "GCP Mgt."
         //Optional fields
 
         if VendorTicketItem <> '' then
-          PrintSettings += '"vendor_ticket_item":' + VendorTicketItem + ',';
+            PrintSettings += '"vendor_ticket_item":' + VendorTicketItem + ',';
 
         if Color <> '' then
-          PrintSettings += '"color":' + Color + ',';
+            PrintSettings += '"color":' + Color + ',';
 
         if Duplex <> '' then
-          PrintSettings += '"duplex":' + Duplex + ',';
+            PrintSettings += '"duplex":' + Duplex + ',';
 
         if PageOrientation <> '' then
-          PrintSettings += '"page_orientation":' + PageOrientation + ',';
+            PrintSettings += '"page_orientation":' + PageOrientation + ',';
 
         if Copies <> '' then
-          PrintSettings += '"copies":' + Copies + ',';
+            PrintSettings += '"copies":' + Copies + ',';
 
         if Margins <> '' then
-          PrintSettings += '"margins":' + Margins + ',';
+            PrintSettings += '"margins":' + Margins + ',';
 
         if DPI <> '' then
-          PrintSettings += '"dpi":' + DPI + ',';
+            PrintSettings += '"dpi":' + DPI + ',';
 
         if FitToPage <> '' then
-          PrintSettings += '"fit_to_page":' + FitToPage + ',';
+            PrintSettings += '"fit_to_page":' + FitToPage + ',';
 
         if PageRange <> '' then
-          PrintSettings += '"page_range":' + PageRange + ',';
+            PrintSettings += '"page_range":' + PageRange + ',';
 
         if MediaSize <> '' then
-          PrintSettings += '"media_size":' + MediaSize + ',';
+            PrintSettings += '"media_size":' + MediaSize + ',';
 
         if Collate <> '' then
-          PrintSettings += '"collate":' + Collate + ',';
+            PrintSettings += '"collate":' + Collate + ',';
 
         if ReverseOrder <> '' then
-          PrintSettings += '"reverse_order":' + ReverseOrder + ',';
+            PrintSettings += '"reverse_order":' + ReverseOrder + ',';
 
         if PrintSettings <> '' then begin
-          PrintSettings := CopyStr(PrintSettings, 1, StrLen(PrintSettings)-1);
-          CJT += PrintSettings;
+            PrintSettings := CopyStr(PrintSettings, 1, StrLen(PrintSettings) - 1);
+            CJT += PrintSettings;
         end;
 
         CJT += '}}';
@@ -240,19 +240,19 @@ codeunit 6014589 "GCP Mgt."
         exit(CJT)
     end;
 
-    procedure GetCustomCJT(PrinterID: Text;ObjectType: Option "Report","Codeunit";ObjectID: Integer): Text
+    procedure GetCustomCJT(PrinterID: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer): Text
     var
         GCPSetup: Record "GCP Setup";
         InStream: InStream;
         JSON: Text;
     begin
         GCPSetup.SetAutoCalcFields("Cloud Job Ticket");
-        if not GCPSetup.Get(PrinterID,ObjectType,ObjectID) then
-          if not GCPSetup.Get(PrinterID,ObjectType,0) then
-            exit('');
+        if not GCPSetup.Get(PrinterID, ObjectType, ObjectID) then
+            if not GCPSetup.Get(PrinterID, ObjectType, 0) then
+                exit('');
 
         if not GCPSetup."Cloud Job Ticket".HasValue then
-          exit('');
+            exit('');
 
         GCPSetup."Cloud Job Ticket".CreateInStream(InStream, TEXTENCODING::UTF8);
         InStream.Read(JSON);
@@ -292,71 +292,71 @@ codeunit 6014589 "GCP Mgt."
     begin
         GCPSetup.SetAutoCalcFields("Cloud Job Ticket");
         if not GCPSetup.FindFirst then
-          exit;
+            exit;
 
         if not GetPrinterInfo(GCPSetup."Printer ID", JObject) then
-          exit;
+            exit;
 
         JObject := JObject.SelectToken('printers[0].capabilities.printer');
         if not (JObject.Count > 0) then
-          exit;
+            exit;
 
         if GCPSetup."Cloud Job Ticket".HasValue then begin
-          //Load existing blob into page view
-          GCPSetup."Cloud Job Ticket".CreateInStream(InStream);
-          InStream.Read(TicketJson);
-          GCPTicketOptions.LoadExistingTicketJSON(TicketJson);
+            //Load existing blob into page view
+            GCPSetup."Cloud Job Ticket".CreateInStream(InStream);
+            InStream.Read(TicketJson);
+            GCPTicketOptions.LoadExistingTicketJSON(TicketJson);
         end;
 
         GCPTicketOptions.LookupMode(true);
         GCPTicketOptions.SetPrinterJSON(JObject.ToString());
         if GCPTicketOptions.RunModal = ACTION::LookupOK then begin
-          TicketJson := GCPTicketOptions.BuildNewTicketJSON();
-          if TicketJson <> '' then begin
-            if GCPSetup."Cloud Job Ticket".HasValue then
-              if not Confirm(Text000007) then
-                exit;
+            TicketJson := GCPTicketOptions.BuildNewTicketJSON();
+            if TicketJson <> '' then begin
+                if GCPSetup."Cloud Job Ticket".HasValue then
+                    if not Confirm(Text000007) then
+                        exit;
 
-            GCPSetup."Cloud Job Ticket".CreateOutStream(OutStream, TEXTENCODING::UTF8);
-            OutStream.Write(TicketJson);
-            GCPSetup.Modify;
-          end;
+                GCPSetup."Cloud Job Ticket".CreateOutStream(OutStream, TEXTENCODING::UTF8);
+                OutStream.Write(TicketJson);
+                GCPSetup.Modify;
+            end;
         end;
     end;
 
     procedure ViewPrinterInfo(PrinterID: Text)
     var
         JSON: Text;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;
         InStream: InStream;
         FileName: Variant;
         JObject: DotNet JObject;
     begin
         if not GetPrinterInfo(PrinterID, JObject) then
-          exit;
+            exit;
 
-        TempBlob.Blob.CreateOutStream(OutStream);
-        OutStream.Write(JObject.ToString() );
-        if not TempBlob.Blob.HasValue then
-          exit;
+        TempBlob.CreateOutStream(OutStream);
+        OutStream.Write(JObject.ToString());
+        if not TempBlob.HasValue then
+            exit;
 
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         FileName := StrSubstNo('%1 Config.json', PrinterID);
         DownloadFromStream(InStream, 'Printer Config', '', 'JSON File (*.json)|*.json', FileName);
     end;
 
     [TryFunction]
-    procedure TryParseJSON(JSON: Text;Path: Text;var JObjectOut: DotNet JObject)
+    procedure TryParseJSON(JSON: Text; Path: Text; var JObjectOut: DotNet JObject)
     begin
         Clear(JObjectOut);
         JObjectOut := JObjectOut.Parse(JSON);
         JObjectOut := JObjectOut.SelectToken(Path);
         if not (JObjectOut.Count > 0) then
-          Error('');
+            Error('');
     end;
 
-    local procedure GetTokens(var OutAccessTokenValue: Text;var OutRefreshTokenValue: Text)
+    local procedure GetTokens(var OutAccessTokenValue: Text; var OutRefreshTokenValue: Text)
     var
         Token: Record "OAuth Token";
         API: Codeunit "GCP API";
@@ -365,26 +365,26 @@ codeunit 6014589 "GCP Mgt."
         Clear(OutRefreshTokenValue);
 
         if Token.Get('GOOGLE_PRINT_REFRESH') then
-          OutRefreshTokenValue := Token.GetValue();
+            OutRefreshTokenValue := Token.GetValue();
 
         //-NPR5.51 [358889]
         Token.LockTable;
         //+NPR5.51 [358889]
         if Token.Get('GOOGLE_PRINT_ACCESS') then begin
-          if Token.IsExpired then begin
-            API.SetRefreshTokenValue(OutRefreshTokenValue);
-            API.RefreshAccessToken();
-            Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue, API.GetAccessTokenTimeStamp, API.GetAccessTokenExpiresIn);
-            OutAccessTokenValue := API.GetAccessTokenValue;
-        //-NPR5.53 [374501]
-        //    COMMIT;
-        //+NPR5.53 [374501]
-          end else
-            OutAccessTokenValue := Token.GetValue();
+            if Token.IsExpired then begin
+                API.SetRefreshTokenValue(OutRefreshTokenValue);
+                API.RefreshAccessToken();
+                Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue, API.GetAccessTokenTimeStamp, API.GetAccessTokenExpiresIn);
+                OutAccessTokenValue := API.GetAccessTokenValue;
+                //-NPR5.53 [374501]
+                //    COMMIT;
+                //+NPR5.53 [374501]
+            end else
+                OutAccessTokenValue := Token.GetValue();
         end;
 
         if (StrLen(OutAccessTokenValue) = 0) or (StrLen(OutRefreshTokenValue) = 0) then
-          Error(Text000002);
+            Error(Text000002);
 
         //-NPR5.53 [374501]
         Commit;

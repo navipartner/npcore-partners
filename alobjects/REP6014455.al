@@ -9,25 +9,25 @@ report 6014455 "Item Barcode Status Sheet"
 
     dataset
     {
-        dataitem(Item;Item)
+        dataitem(Item; Item)
         {
             CalcFields = "Has Variants";
-            column(CompanyName;CompanyName)
+            column(CompanyName; CompanyName)
             {
             }
-            column(ItemFilter;ItemFilter)
+            column(ItemFilter; ItemFilter)
             {
             }
-            column(ItemVariantFilter;ItemVariantFilter)
+            column(ItemVariantFilter; ItemVariantFilter)
             {
             }
-            column(ShowInventory;ShowInventory)
+            column(ShowInventory; ShowInventory)
             {
             }
-            dataitem(ItemVariant;"Item Variant")
+            dataitem(ItemVariant; "Item Variant")
             {
-                DataItemLink = "Item No."=FIELD("No.");
-                DataItemTableView = WHERE(Blocked=CONST(false));
+                DataItemLink = "Item No." = FIELD("No.");
+                DataItemTableView = WHERE(Blocked = CONST(false));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -39,100 +39,103 @@ report 6014455 "Item Barcode Status Sheet"
             trigger OnAfterGetRecord()
             begin
                 if not "Has Variants" then
-                  AddToBuffer("No.", '');
+                    AddToBuffer("No.", '');
             end;
         }
-        dataitem(TMPRetail_Journal_Line_Col1;"Retail Journal Line")
+        dataitem(TMPRetail_Journal_Line_Col1; "Retail Journal Line")
         {
-            DataItemTableView = SORTING("No.","Line No.");
+            DataItemTableView = SORTING("No.", "Line No.");
             UseTemporary = true;
-            column(ItemNo_TMPRetailJournalLineCol1;TMPRetail_Journal_Line_Col1."Item No.")
+            column(ItemNo_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Item No.")
             {
             }
-            column(Description_TMPRetailJournalLineCol1;TMPRetail_Journal_Line_Col1.Description)
+            column(Description_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1.Description)
             {
             }
-            column(Description2_TMPRetailJournalLineCol1;TMPRetail_Journal_Line_Col1."Description 2")
+            column(Description2_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Description 2")
             {
             }
-            column(Inventory_TMPRetailJournalLineCol1;TMPRetail_Journal_Line_Col1."Quantity to Print")
+            column(Inventory_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Quantity to Print")
             {
             }
-            column(VariantCode_TMPRetailJournalLineCol1;TMPRetail_Journal_Line_Col1."Variant Code")
+            column(VariantCode_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Variant Code")
             {
             }
-            column(ShowVariantInfo_TMPRetailJournalLineCol1;ShowVariantInfo)
+            column(ShowVariantInfo_TMPRetailJournalLineCol1; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol1;TempBlobCol1.Blob)
+            column(BarCodeTempBlobCol1; BlobBuffer."Buffer 1")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
+                BlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
             end;
         }
-        dataitem(TMPRetail_Journal_Line_Col2;"Retail Journal Line")
+        dataitem(TMPRetail_Journal_Line_Col2; "Retail Journal Line")
         {
-            DataItemTableView = SORTING("No.","Line No.");
+            DataItemTableView = SORTING("No.", "Line No.");
             UseTemporary = true;
-            column(ItemNo_TMPRetailJournalLineCol2;TMPRetail_Journal_Line_Col2."Item No.")
+            column(ItemNo_TMPRetailJournalLineCol2; TMPRetail_Journal_Line_Col2."Item No.")
             {
             }
-            column(Description_TMPRetailJournalLineCol2;TMPRetail_Journal_Line_Col2.Description)
+            column(Description_TMPRetailJournalLineCol2; TMPRetail_Journal_Line_Col2.Description)
             {
             }
-            column(Description2_TMPRetailJournalLineCol2;TMPRetail_Journal_Line_Col2."Description 2")
+            column(Description2_TMPRetailJournalLineCol2; TMPRetail_Journal_Line_Col2."Description 2")
             {
             }
-            column(Inventory_TMPRetailJournalLineCol2;TMPRetail_Journal_Line_Col2."Quantity to Print")
+            column(Inventory_TMPRetailJournalLineCol2; TMPRetail_Journal_Line_Col2."Quantity to Print")
             {
             }
-            column(VariantCode_TMPRetailJournalLineCol2;TMPRetail_Journal_Line_Col2."Variant Code")
+            column(VariantCode_TMPRetailJournalLineCol2; TMPRetail_Journal_Line_Col2."Variant Code")
             {
             }
-            column(ShowVariantInfo_TMPRetailJournalLineCol2;ShowVariantInfo)
+            column(ShowVariantInfo_TMPRetailJournalLineCol2; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol2;TempBlobCol2.Blob)
+            column(BarCodeTempBlobCol2; BlobBuffer."Buffer 2")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol2);
+                BlobBuffer.GetFromTempBlob(TempBlobCol2, 2);
             end;
         }
-        dataitem(TMPRetail_Journal_Line_Col3;"Retail Journal Line")
+        dataitem(TMPRetail_Journal_Line_Col3; "Retail Journal Line")
         {
-            DataItemTableView = SORTING("No.","Line No.");
+            DataItemTableView = SORTING("No.", "Line No.");
             UseTemporary = true;
-            column(ItemNo_TMPRetailJournalLineCol3;TMPRetail_Journal_Line_Col3."Item No.")
+            column(ItemNo_TMPRetailJournalLineCol3; TMPRetail_Journal_Line_Col3."Item No.")
             {
             }
-            column(Description_TMPRetailJournalLineCol3;TMPRetail_Journal_Line_Col3.Description)
+            column(Description_TMPRetailJournalLineCol3; TMPRetail_Journal_Line_Col3.Description)
             {
             }
-            column(Description2_TMPRetailJournalLineCol3;TMPRetail_Journal_Line_Col3."Description 2")
+            column(Description2_TMPRetailJournalLineCol3; TMPRetail_Journal_Line_Col3."Description 2")
             {
             }
-            column(Inventory_TMPRetailJournalLineCol3;TMPRetail_Journal_Line_Col3."Quantity to Print")
+            column(Inventory_TMPRetailJournalLineCol3; TMPRetail_Journal_Line_Col3."Quantity to Print")
             {
             }
-            column(VariantCode_TMPRetailJournalLineCol3;TMPRetail_Journal_Line_Col3."Variant Code")
+            column(VariantCode_TMPRetailJournalLineCol3; TMPRetail_Journal_Line_Col3."Variant Code")
             {
             }
-            column(ShowVariantInfo_TMPRetailJournalLineCol3;ShowVariantInfo)
+            column(ShowVariantInfo_TMPRetailJournalLineCol3; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol3;TempBlobCol3.Blob)
+            column(BarCodeTempBlobCol3; BlobBuffer."Buffer 3")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol3);
+                BlobBuffer.GetFromTempBlob(TempBlobCol3, 3);
             end;
         }
     }
@@ -144,7 +147,7 @@ report 6014455 "Item Barcode Status Sheet"
         {
             area(content)
             {
-                field(ShowInventory;ShowInventory)
+                field(ShowInventory; ShowInventory)
                 {
                     Caption = 'Show Inventory';
                 }
@@ -177,72 +180,73 @@ report 6014455 "Item Barcode Status Sheet"
         ItemVariantFilter := StrSubstNo('%1: %2', ItemVariant.TableCaption, ItemVariant.GetFilters());
 
         if ShowInventory then
-          Item.SetAutoCalcFields(Inventory);
+            Item.SetAutoCalcFields(Inventory);
     end;
 
     var
         ShowInventory: Boolean;
         ShowVariantInfo: Integer;
         BarcodeLib: Codeunit "Barcode Library";
-        TempBlobCol1: Record TempBlob;
-        TempBlobCol2: Record TempBlob;
-        TempBlobCol3: Record TempBlob;
+        TempBlobCol1: Codeunit "Temp Blob";
+        TempBlobCol2: Codeunit "Temp Blob";
+        TempBlobCol3: Codeunit "Temp Blob";
         i: Integer;
         LineNo: Integer;
         ItemFilter: Text;
         ItemVariantFilter: Text;
+        BlobBuffer: Record "BLOB buffer" temporary;
 
-    local procedure AddToBuffer(ItemNo: Code[20];VariantCode: Code[10])
+    local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])
     begin
         //Quantity field in RJL is used to store the inventory value.
 
         case i of
-          1 :
-            begin
-              TMPRetail_Journal_Line_Col1.Init;
-              TMPRetail_Journal_Line_Col1."No." := 'temp';
-              TMPRetail_Journal_Line_Col1."Line No." := LineNo;
-              TMPRetail_Journal_Line_Col1.Validate("Item No.", ItemNo);
-              if StrLen(VariantCode) > 0 then begin
-                TMPRetail_Journal_Line_Col1.Validate("Variant Code", VariantCode);
-                if ShowInventory then
-                  TMPRetail_Journal_Line_Col1."Quantity to Print" := CalcVariantInventory(VariantCode);
-              end else
-                TMPRetail_Journal_Line_Col1."Quantity to Print" := Item.Inventory;
+            1:
+                begin
+                    TMPRetail_Journal_Line_Col1.Init;
+                    TMPRetail_Journal_Line_Col1."No." := 'temp';
+                    TMPRetail_Journal_Line_Col1."Line No." := LineNo;
+                    TMPRetail_Journal_Line_Col1.Validate("Item No.", ItemNo);
+                    if StrLen(VariantCode) > 0 then begin
+                        TMPRetail_Journal_Line_Col1.Validate("Variant Code", VariantCode);
+                        if ShowInventory then
+                            TMPRetail_Journal_Line_Col1."Quantity to Print" := CalcVariantInventory(VariantCode);
+                    end else
+                        TMPRetail_Journal_Line_Col1."Quantity to Print" := Item.Inventory;
 
-              TMPRetail_Journal_Line_Col1.Insert;
-            end;
-          2 :
-            begin
-              TMPRetail_Journal_Line_Col2.Init;
-              TMPRetail_Journal_Line_Col2."No." := 'temp';
-              TMPRetail_Journal_Line_Col2."Line No." := LineNo;
-              TMPRetail_Journal_Line_Col2.Validate("Item No.", ItemNo);
-              if StrLen(VariantCode) > 0 then begin
-                TMPRetail_Journal_Line_Col2.Validate("Variant Code", VariantCode);
-                if ShowInventory then
-                  TMPRetail_Journal_Line_Col2."Quantity to Print" := CalcVariantInventory(VariantCode);
-              end else
-                TMPRetail_Journal_Line_Col2."Quantity to Print" := Item.Inventory;
+                    TMPRetail_Journal_Line_Col1.Insert;
+                end;
+            2:
+                begin
+                    TMPRetail_Journal_Line_Col2.Init;
+                    TMPRetail_Journal_Line_Col2."No." := 'temp';
+                    TMPRetail_Journal_Line_Col2."Line No." := LineNo;
+                    TMPRetail_Journal_Line_Col2.Validate("Item No.", ItemNo);
+                    if StrLen(VariantCode) > 0 then begin
+                        TMPRetail_Journal_Line_Col2.Validate("Variant Code", VariantCode);
+                        if ShowInventory then
+                            TMPRetail_Journal_Line_Col2."Quantity to Print" := CalcVariantInventory(VariantCode);
+                    end else
+                        TMPRetail_Journal_Line_Col2."Quantity to Print" := Item.Inventory;
 
-              TMPRetail_Journal_Line_Col2.Insert;
-            end;
-          3 :
-            begin
-              TMPRetail_Journal_Line_Col3.Init;
-              TMPRetail_Journal_Line_Col3."No." := 'temp';
-              TMPRetail_Journal_Line_Col3."Line No." := LineNo;
-              TMPRetail_Journal_Line_Col3.Validate("Item No.", ItemNo);
-              if StrLen(VariantCode) > 0 then begin
-                TMPRetail_Journal_Line_Col3.Validate("Variant Code", VariantCode);
-                if ShowInventory then
-                  TMPRetail_Journal_Line_Col3."Quantity to Print" := CalcVariantInventory(VariantCode);
-              end else
-                TMPRetail_Journal_Line_Col3."Quantity to Print" := Item.Inventory;
+                    TMPRetail_Journal_Line_Col2.Insert;
+                end;
+            3:
+                begin
+                    TMPRetail_Journal_Line_Col3.Init;
+                    TMPRetail_Journal_Line_Col3."No." := 'temp';
+                    TMPRetail_Journal_Line_Col3."Line No." := LineNo;
+                    TMPRetail_Journal_Line_Col3.Validate("Item No.", ItemNo);
+                    if StrLen(VariantCode) > 0 then begin
+                        TMPRetail_Journal_Line_Col3.Validate("Variant Code", VariantCode);
+                        if ShowInventory then
+                            TMPRetail_Journal_Line_Col3."Quantity to Print" := CalcVariantInventory(VariantCode);
+                    end else
+                        TMPRetail_Journal_Line_Col3."Quantity to Print" := Item.Inventory;
 
-              TMPRetail_Journal_Line_Col3.Insert;
-              i := 0;
-            end;
+                    TMPRetail_Journal_Line_Col3.Insert;
+                    i := 0;
+                end;
         end;
         i += 1;
         LineNo += 1;

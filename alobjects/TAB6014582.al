@@ -11,19 +11,19 @@ table 6014582 "OAuth Token"
 
     fields
     {
-        field(1;"Token Name";Code[20])
+        field(1; "Token Name"; Code[20])
         {
             Caption = 'Token Name';
         }
-        field(2;"Token Value";BLOB)
+        field(2; "Token Value"; BLOB)
         {
             Caption = 'Token Value';
         }
-        field(3;"Time Stamp";DateTime)
+        field(3; "Time Stamp"; DateTime)
         {
             Caption = 'Time Stamp';
         }
-        field(4;"Expires In (Seconds)";Integer)
+        field(4; "Expires In (Seconds)"; Integer)
         {
             Caption = 'Expires In (Seconds)';
         }
@@ -31,7 +31,7 @@ table 6014582 "OAuth Token"
 
     keys
     {
-        key(Key1;"Token Name")
+        key(Key1; "Token Name")
         {
         }
     }
@@ -40,41 +40,48 @@ table 6014582 "OAuth Token"
     {
     }
 
-    procedure AddOrUpdate(TokenName: Text;TokenValue: Text;TimeStamp: DateTime;ExpiresInSeconds: Integer) Result: Boolean
+    procedure AddOrUpdate(TokenName: Text; TokenValue: Text; TimeStamp: DateTime; ExpiresInSeconds: Integer) Result: Boolean
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;
+        RecRef: RecordRef;
     begin
         //-NPR5.51 [358889]
         //LOCKTABLE;
         //+NPR5.51 [358889]
 
-        TempBlob.Blob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
+        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
         OutStream.WriteText(TokenValue);
-        TempBlob.Insert;
 
         if Get(TokenName) then begin
-          "Token Value" := TempBlob.Blob;
-          //-NPR5.30 [261964]
-          "Expires In (Seconds)" := ExpiresInSeconds;
-          if TimeStamp <> 0DT then
-            "Time Stamp" := TimeStamp
-          else
-          //+NPR5.30 [261964]
-            "Time Stamp"  := CreateDateTime(Today, Time);
-          Result := Modify;
+            RecRef.GetTable(Rec);
+            TempBlob.ToRecordRef(RecRef, FieldNo("Token Value"));
+            RecRef.SetTable(Rec);
+
+            //-NPR5.30 [261964]
+            "Expires In (Seconds)" := ExpiresInSeconds;
+            if TimeStamp <> 0DT then
+                "Time Stamp" := TimeStamp
+            else
+                //+NPR5.30 [261964]
+                "Time Stamp" := CreateDateTime(Today, Time);
+            Result := Modify;
         end else begin
-          Init;
-          "Token Name"  := TokenName;
-          "Token Value" := TempBlob.Blob;
-          //-NPR5.30 [261964]
-          "Expires In (Seconds)" := ExpiresInSeconds;
-          if TimeStamp <> 0DT then
-            "Time Stamp" := TimeStamp
-          else
-          //+NPR5.30 [261964]
-            "Time Stamp"  := CreateDateTime(Today, Time);
-          Result := Insert;
+            Init;
+            "Token Name" := TokenName;
+
+            RecRef.GetTable(Rec);
+            TempBlob.ToRecordRef(RecRef, FieldNo("Token Value"));
+            RecRef.SetTable(Rec);
+
+            //-NPR5.30 [261964]
+            "Expires In (Seconds)" := ExpiresInSeconds;
+            if TimeStamp <> 0DT then
+                "Time Stamp" := TimeStamp
+            else
+                //+NPR5.30 [261964]
+                "Time Stamp" := CreateDateTime(Today, Time);
+            Result := Insert;
         end;
 
         //-NPR5.51 [358889]
@@ -89,7 +96,7 @@ table 6014582 "OAuth Token"
     begin
         //-NPR5.30 [261964]
         if not "Token Value".HasValue then
-          exit('');
+            exit('');
 
         CalcFields("Token Value");
         "Token Value".CreateInStream(InStream, TEXTENCODING::UTF8);
@@ -105,7 +112,7 @@ table 6014582 "OAuth Token"
     begin
         //-NPR5.30 [261964]
         if ("Time Stamp" = 0DT) or ("Expires In (Seconds)" = 0) then
-          exit(false);
+            exit(false);
 
         Deadline := "Time Stamp" + ("Expires In (Seconds)" * 1000);
         exit(Deadline < CreateDateTime(Today, Time));

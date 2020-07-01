@@ -12,17 +12,17 @@ table 6014446 "RP Template Header"
 
     fields
     {
-        field(10;"Code";Code[20])
+        field(10; "Code"; Code[20])
         {
             Caption = 'Code';
         }
-        field(40;"Printer Type";Option)
+        field(40; "Printer Type"; Option)
         {
             Caption = 'Printer Type';
             OptionCaption = 'Matrix,Line';
             OptionMembers = Matrix,Line;
         }
-        field(41;"Printer Device";Text[30])
+        field(41; "Printer Device"; Text[30])
         {
             Caption = 'Printer Device';
 
@@ -36,23 +36,23 @@ table 6014446 "RP Template Header"
                 DeviceSettings: Record "RP Device Settings";
             begin
                 if "Printer Device" <> xRec."Printer Device" then begin
-                  DeviceSettings.SetRange(Template, Code);
-                  if DeviceSettings.IsEmpty then
-                    exit;
+                    DeviceSettings.SetRange(Template, Code);
+                    if DeviceSettings.IsEmpty then
+                        exit;
 
-                  if not Confirm(Caption_DeviceSettingsOverwrite) then
-                    Error('');
+                    if not Confirm(Caption_DeviceSettingsOverwrite) then
+                        Error('');
 
-                  TemplateModified();
-                  DeviceSettings.DeleteAll;
+                    TemplateModified();
+                    DeviceSettings.DeleteAll;
                 end;
             end;
         }
-        field(50;Description;Text[128])
+        field(50; Description; Text[128])
         {
             Caption = 'Comments';
         }
-        field(60;Archived;Boolean)
+        field(60; Archived; Boolean)
         {
             Caption = 'Archived';
 
@@ -61,108 +61,109 @@ table 6014446 "RP Template Header"
                 ArchiveTemplate();
             end;
         }
-        field(61;Version;Code[50])
+        field(61; Version; Code[50])
         {
             Caption = 'Version';
         }
-        field(62;"Version Comments";Text[128])
+        field(62; "Version Comments"; Text[128])
         {
             Caption = 'Version Comments';
         }
-        field(63;"Last Modified At";DateTime)
+        field(63; "Last Modified At"; DateTime)
         {
             Caption = 'Last Modified At';
         }
-        field(64;"Last Modified By";Code[50])
+        field(64; "Last Modified By"; Code[50])
         {
             Caption = 'Last Modified By';
         }
-        field(70;"Pre Processing Codeunit";Integer)
+        field(70; "Pre Processing Codeunit"; Integer)
         {
             Caption = 'Pre Processing Codeunit';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=FILTER(Codeunit));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
         }
-        field(71;"Print Processing Object Type";Option)
+        field(71; "Print Processing Object Type"; Option)
         {
             Caption = 'Print Processing Object Type';
             OptionCaption = 'Codeunit,Report';
             OptionMembers = "Codeunit","Report";
         }
-        field(72;"Print Processing Object ID";Integer)
+        field(72; "Print Processing Object ID"; Integer)
         {
             Caption = 'Print Processing Object ID';
-            TableRelation = IF ("Print Processing Object Type"=CONST(Codeunit)) AllObj."Object ID" WHERE ("Object Type"=FILTER(Codeunit))
-                            ELSE IF ("Print Processing Object Type"=CONST(Report)) AllObj."Object ID" WHERE ("Object Type"=FILTER(Report));
+            TableRelation = IF ("Print Processing Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit))
+            ELSE
+            IF ("Print Processing Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = FILTER(Report));
 
             trigger OnValidate()
             begin
                 if ("Print Processing Object ID" > 0) and (xRec."Print Processing Object ID" = 0) then begin
-                  if GuiAllowed then
-                    if not Confirm(Caption_PrintOverwrite) then
-                      Error('');
+                    if GuiAllowed then
+                        if not Confirm(Caption_PrintOverwrite) then
+                            Error('');
                 end;
             end;
         }
-        field(73;"Post Processing Codeunit";Integer)
+        field(73; "Post Processing Codeunit"; Integer)
         {
             Caption = 'Post Processing Codeunit';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=FILTER(Codeunit));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
         }
-        field(78;"Two Column Width 1";Decimal)
+        field(78; "Two Column Width 1"; Decimal)
         {
             Caption = 'Two Column Width 1';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(79;"Two Column Width 2";Decimal)
+        field(79; "Two Column Width 2"; Decimal)
         {
             Caption = 'Two Column Width 2';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(80;"Three Column Width 1";Decimal)
+        field(80; "Three Column Width 1"; Decimal)
         {
             Caption = 'Three Column Width 1';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(81;"Three Column Width 2";Decimal)
+        field(81; "Three Column Width 2"; Decimal)
         {
             Caption = 'Three Column Width 2';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(82;"Three Column Width 3";Decimal)
+        field(82; "Three Column Width 3"; Decimal)
         {
             Caption = 'Three Column Width 3';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(84;"Four Column Width 1";Decimal)
+        field(84; "Four Column Width 1"; Decimal)
         {
             Caption = 'Four Column Width 1';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(85;"Four Column Width 2";Decimal)
+        field(85; "Four Column Width 2"; Decimal)
         {
             Caption = 'Four Column Width 2';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(86;"Four Column Width 3";Decimal)
+        field(86; "Four Column Width 3"; Decimal)
         {
             Caption = 'Four Column Width 3';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(87;"Four Column Width 4";Decimal)
+        field(87; "Four Column Width 4"; Decimal)
         {
             Caption = 'Four Column Width 4';
-            DecimalPlaces = 0:3;
+            DecimalPlaces = 0 : 3;
         }
-        field(90;"Default Decimal Rounding";Option)
+        field(90; "Default Decimal Rounding"; Option)
         {
             Caption = 'Default Decimal Rounding';
             OptionCaption = '2,3,4,5';
             OptionMembers = "2","3","4","5";
         }
-        field(1000;"Table ID";Integer)
+        field(1000; "Table ID"; Integer)
         {
-            CalcFormula = Lookup("RP Data Items"."Table ID" WHERE (Code=FIELD(Code),
-                                                                   Level=CONST(0)));
+            CalcFormula = Lookup ("RP Data Items"."Table ID" WHERE(Code = FIELD(Code),
+                                                                   Level = CONST(0)));
             Caption = 'Table ID';
             Description = 'NPR5.34';
             Editable = false;
@@ -172,14 +173,14 @@ table 6014446 "RP Template Header"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
 
     fieldgroups
     {
-        fieldgroup(DropDown;"Code","Printer Type","Printer Device",Description)
+        fieldgroup(DropDown; "Code", "Printer Type", "Printer Device", Description)
         {
         }
     }
@@ -195,9 +196,9 @@ table 6014446 "RP Template Header"
         MediaInfo: Record "RP Template Media Info";
     begin
         if IsTemporary then
-          exit;
+            exit;
 
-        TemplateLine.SetRange("Template Code",Code);
+        TemplateLine.SetRange("Template Code", Code);
         TemplateLine.DeleteAll;
 
         DataItem.SetRange(Code, Code);
@@ -226,7 +227,7 @@ table 6014446 "RP Template Header"
         TemplateModified();
 
         if StrLen(Version) = 0 then
-          Version := TemplateMgt.GetNextVersionNumber(Rec);
+            Version := TemplateMgt.GetNextVersionNumber(Rec);
     end;
 
     trigger OnModify()
@@ -248,10 +249,10 @@ table 6014446 "RP Template Header"
     procedure TemplateModified()
     begin
         if IsTemporary then
-          exit;
+            exit;
 
         if Archived and xRec.Archived then
-          Error(Error_Archived);
+            Error(Error_Archived);
 
         TestField(Code);
         "Last Modified At" := CreateDateTime(Today, Time);
@@ -262,22 +263,23 @@ table 6014446 "RP Template Header"
     var
         TemplateHeader: Record "RP Template Header";
         PackageHandler: Codeunit "RP Package Handler";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         TemplateArchive: Record "RP Template Archive";
         PrintTemplateMgt: Codeunit "RP Template Mgt.";
+        RecRef: RecordRef;
     begin
         if IsTemporary then
-          exit;
+            exit;
         if not Archived then
-          exit;
+            exit;
         if xRec.Archived then
-          exit;
+            exit;
 
         if "Version Comments" = '' then
-          Error(Error_MissingVersionDesc);
+            Error(Error_MissingVersionDesc);
 
         if StrLen(Version) = 0 then
-          Version := PrintTemplateMgt.GetNextVersionNumber(Rec);
+            Version := PrintTemplateMgt.GetNextVersionNumber(Rec);
 
         Modify;
 
@@ -291,7 +293,11 @@ table 6014446 "RP Template Header"
         TemplateArchive."Archived at" := CreateDateTime(Today, Time);
         TemplateArchive."Archived by" := UserId;
         TemplateArchive."Version Comments" := TemplateHeader."Version Comments";
-        TemplateArchive.Template := TempBlob.Blob;
+
+        RecRef.GetTable(TemplateArchive);
+        TempBlob.ToRecordRef(RecRef, TemplateArchive.FieldNo(Template));
+        RecRef.SetTable(TemplateArchive);
+
         TemplateArchive.Insert;
     end;
 
@@ -302,15 +308,17 @@ table 6014446 "RP Template Header"
         TmpRetailList: Record "Retail List" temporary;
     begin
         case "Printer Type" of
-          "Printer Type"::Line : LinePrinterInterface.GetDeviceList(TmpRetailList);
-          "Printer Type"::Matrix : MatrixPrinterInterface.GetDeviceList(TmpRetailList);
+            "Printer Type"::Line:
+                LinePrinterInterface.GetDeviceList(TmpRetailList);
+            "Printer Type"::Matrix:
+                MatrixPrinterInterface.GetDeviceList(TmpRetailList);
         end;
 
         if TmpRetailList.IsEmpty then
-          exit;
+            exit;
 
         if PAGE.RunModal(PAGE::"Retail List", TmpRetailList) = ACTION::LookupOK then
-          Validate("Printer Device",TmpRetailList.Choice);
+            Validate("Printer Device", TmpRetailList.Choice);
     end;
 }
 

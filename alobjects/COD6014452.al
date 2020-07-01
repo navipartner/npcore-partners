@@ -17,7 +17,7 @@ codeunit 6014452 "E-mail Template Mgt."
     begin
     end;
 
-    procedure MergeMailContent(var RecRef: RecordRef;Line: Text;StartTag: Text[10];EndTag: Text[10]) NewLine: Text
+    procedure MergeMailContent(var RecRef: RecordRef; Line: Text; StartTag: Text[10]; EndTag: Text[10]) NewLine: Text
     var
         EndPos: Integer;
         EndLength: Integer;
@@ -27,38 +27,38 @@ codeunit 6014452 "E-mail Template Mgt."
         FieldValue: Text;
     begin
         if StartTag = '' then
-          StartTag := '{';
+            StartTag := '{';
         if EndTag = '' then
-          EndTag := '}';
+            EndTag := '}';
         StartLength := StrLen(StartTag);
         EndLength := StrLen(EndTag);
 
         NewLine := Line;
-        while (StrPos(NewLine,StartTag) > 0) do begin
-          StartPos := StrPos(NewLine,StartTag);
-          EndPos := StrPos(NewLine,EndTag);
-          if EndPos = 0 then
-            Error(StrSubstNo(Text003,EndTag,StartTag,Line));
-          Evaluate(FieldNo,CopyStr(NewLine,StartPos + StartLength,EndPos - StartPos - StartLength));
+        while (StrPos(NewLine, StartTag) > 0) do begin
+            StartPos := StrPos(NewLine, StartTag);
+            EndPos := StrPos(NewLine, EndTag);
+            if EndPos = 0 then
+                Error(StrSubstNo(Text003, EndTag, StartTag, Line));
+            Evaluate(FieldNo, CopyStr(NewLine, StartPos + StartLength, EndPos - StartPos - StartLength));
 
-          NewLine := DelStr(NewLine,StartPos,EndPos - StartPos + EndLength);
-          FieldValue := GetFieldValue(RecRef,FieldNo);
-          NewLine := InsStr(NewLine,FieldValue,StartPos);
+            NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + EndLength);
+            FieldValue := GetFieldValue(RecRef, FieldNo);
+            NewLine := InsStr(NewLine, FieldValue, StartPos);
         end;
 
         exit(NewLine);
     end;
 
-    local procedure GetFieldValue(var RecRef: RecordRef;FieldNo: Integer) FieldValue: Text
+    local procedure GetFieldValue(var RecRef: RecordRef; FieldNo: Integer) FieldValue: Text
     var
         "Field": Record "Field";
         FRef: FieldRef;
     begin
-        Field.Get(RecRef.Number,FieldNo);
+        Field.Get(RecRef.Number, FieldNo);
         FRef := RecRef.Field(FieldNo);
 
         if Field.Class = Field.Class::FlowField then
-          FRef.CalcField;
+            FRef.CalcField;
 
         FieldValue := Format(FRef.Value);
     end;
@@ -75,50 +75,50 @@ codeunit 6014452 "E-mail Template Mgt."
         EmailTemplateFilterFrom: Record "E-mail Template Filter";
         EmailTemplateFilterTo: Record "E-mail Template Filter";
     begin
-        if ACTION::LookupOK <> PAGE.RunModal(0,EmailTemplateHeaderFrom) then
-          exit;
+        if ACTION::LookupOK <> PAGE.RunModal(0, EmailTemplateHeaderFrom) then
+            exit;
 
-        if not Confirm(Text001,true,EmailTemplateHeaderTo.Code,EmailTemplateHeaderFrom.Code) then
-          exit;
+        if not Confirm(Text001, true, EmailTemplateHeaderTo.Code, EmailTemplateHeaderFrom.Code) then
+            exit;
 
         EmailTemplateHeaderFrom.CalcFields("HTML Template");
-        EmailTemplateHeaderTo.TransferFields(EmailTemplateHeaderFrom,false);
+        EmailTemplateHeaderTo.TransferFields(EmailTemplateHeaderFrom, false);
         EmailTemplateHeaderTo.Modify(true);
 
-        EmailTemplateLineTo.SetRange("E-mail Template Code",EmailTemplateHeaderTo.Code);
+        EmailTemplateLineTo.SetRange("E-mail Template Code", EmailTemplateHeaderTo.Code);
         if EmailTemplateLineTo.FindFirst then
-          EmailTemplateLineTo.DeleteAll;
+            EmailTemplateLineTo.DeleteAll;
 
-        EmailTemplateLineFrom.SetRange("E-mail Template Code",EmailTemplateHeaderFrom.Code);
+        EmailTemplateLineFrom.SetRange("E-mail Template Code", EmailTemplateHeaderFrom.Code);
         if EmailTemplateLineFrom.FindSet then
-          repeat
-            EmailTemplateLineTo.Init;
-            EmailTemplateLineTo.TransferFields(EmailTemplateLineFrom,true);
-            EmailTemplateLineTo."E-mail Template Code" := EmailTemplateHeaderTo.Code;
-            EmailTemplateLineTo.Insert(true);
-          until EmailTemplateLineFrom.Next = 0;
+            repeat
+                EmailTemplateLineTo.Init;
+                EmailTemplateLineTo.TransferFields(EmailTemplateLineFrom, true);
+                EmailTemplateLineTo."E-mail Template Code" := EmailTemplateHeaderTo.Code;
+                EmailTemplateLineTo.Insert(true);
+            until EmailTemplateLineFrom.Next = 0;
 
-        EmailTemplateFilterTo.SetRange("E-mail Template Code",EmailTemplateHeaderTo.Code);
+        EmailTemplateFilterTo.SetRange("E-mail Template Code", EmailTemplateHeaderTo.Code);
         if EmailTemplateFilterTo.FindFirst then
-          EmailTemplateFilterTo.DeleteAll;
+            EmailTemplateFilterTo.DeleteAll;
 
-        EmailTemplateFilterFrom.SetRange("E-mail Template Code",EmailTemplateHeaderFrom.Code);
+        EmailTemplateFilterFrom.SetRange("E-mail Template Code", EmailTemplateHeaderFrom.Code);
         if EmailTemplateFilterFrom.FindSet then
-          repeat
-            EmailTemplateLineTo.Init;
-            EmailTemplateFilterTo.TransferFields(EmailTemplateFilterFrom,true);
-            EmailTemplateFilterTo."E-mail Template Code" := EmailTemplateHeaderTo.Code;
-            EmailTemplateFilterTo.Insert(true);
-          until EmailTemplateFilterFrom.Next = 0;
+            repeat
+                EmailTemplateLineTo.Init;
+                EmailTemplateFilterTo.TransferFields(EmailTemplateFilterFrom, true);
+                EmailTemplateFilterTo."E-mail Template Code" := EmailTemplateHeaderTo.Code;
+                EmailTemplateFilterTo.Insert(true);
+            until EmailTemplateFilterFrom.Next = 0;
     end;
 
     procedure DeleteHtmlTemplate(var EmailTemplateHeader: Record "E-mail Template Header")
     begin
         if not EmailTemplateHeader."HTML Template".HasValue then
-          exit;
+            exit;
 
-        if not Confirm(Text002,false) then
-          exit;
+        if not Confirm(Text002, false) then
+            exit;
 
         Clear(EmailTemplateHeader."HTML Template");
         EmailTemplateHeader.Modify(true);
@@ -129,14 +129,14 @@ codeunit 6014452 "E-mail Template Mgt."
         FileManagement: Codeunit "File Management";
         Path: Text[1024];
     begin
-        Path := ExportHtmlTemplate(EmailTemplateHeader,false);
-        RunProcess('notepad.exe',Path,true);
-        ImportHtmlTemplate(Path,false,EmailTemplateHeader);
+        Path := ExportHtmlTemplate(EmailTemplateHeader, false);
+        RunProcess('notepad.exe', Path, true);
+        ImportHtmlTemplate(Path, false, EmailTemplateHeader);
 
         FileManagement.DeleteClientFile(Path);
     end;
 
-    procedure ExportHtmlTemplate(var EmailTemplateHeader: Record "E-mail Template Header";UseDialog: Boolean) Path: Text[1024]
+    procedure ExportHtmlTemplate(var EmailTemplateHeader: Record "E-mail Template Header"; UseDialog: Boolean) Path: Text[1024]
     var
         FileManagement: Codeunit "File Management";
         InStr: InStream;
@@ -146,31 +146,31 @@ codeunit 6014452 "E-mail Template Mgt."
         EmailTemplateHeader."HTML Template".CreateInStream(InStr);
 
         if UseDialog then
-          ToFile := 'template.html'
+            ToFile := 'template.html'
         else
-          ToFile :=  FileManagement.ClientTempFileName('html');
+            ToFile := FileManagement.ClientTempFileName('html');
 
-        if DownloadFromStream(InStr,'Export','','',ToFile) then
-          exit(ToFile);
+        if DownloadFromStream(InStr, 'Export', '', '', ToFile) then
+            exit(ToFile);
 
         Error(Text000);
     end;
 
-    procedure ImportHtmlTemplate(Path: Text[1024];UseDialog: Boolean;var EmailTemplateHeader: Record "E-mail Template Header")
+    procedure ImportHtmlTemplate(Path: Text[1024]; UseDialog: Boolean; var EmailTemplateHeader: Record "E-mail Template Header")
     var
         FileManagement: Codeunit "File Management";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
         InStr: InStream;
     begin
         if UseDialog then
-          FileManagement.BLOBImport(TempBlob,'*.html')
+            FileManagement.BLOBImport(TempBlob, '*.html')
         else
-          FileManagement.BLOBImport(TempBlob,Path);
+            FileManagement.BLOBImport(TempBlob, Path);
 
-        TempBlob.Blob.CreateInStream(InStr);
-        EmailTemplateHeader."HTML Template".CreateOutStream(OutStr,TEXTENCODING::UTF8);
-        CopyStream(OutStr,InStr);
+        TempBlob.CreateInStream(InStr);
+        EmailTemplateHeader."HTML Template".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        CopyStream(OutStr, InStr);
         EmailTemplateHeader.Modify(true);
     end;
 
@@ -178,7 +178,7 @@ codeunit 6014452 "E-mail Template Mgt."
     var
         Path: Text[1024];
     begin
-        Path := ExportHtmlTemplate(EmailTemplateHeader,false);
+        Path := ExportHtmlTemplate(EmailTemplateHeader, false);
         HyperLink(Path);
     end;
 
@@ -186,17 +186,17 @@ codeunit 6014452 "E-mail Template Mgt."
     begin
     end;
 
-    local procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
+    local procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
     var
         [RunOnClient]
         Process: DotNet npNetProcess;
         [RunOnClient]
         ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
+        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
         Process := Process.Start(ProcessStartInfo);
         if Modal then
-          Process.WaitForExit();
+            Process.WaitForExit();
     end;
 }
 

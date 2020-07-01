@@ -111,7 +111,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
         SETTING_DPI: Label 'DPI of device.';
         Error_InvalidDeviceSetting: Label 'Invalid device setting: %1';
         Encoding: Option ibm850;
-        PrintBuffer: Record TempBlob temporary;
+        PrintBuffer: Codeunit "Temp Blob";
         PrintBufferOutStream: OutStream;
         PrintMethodMgt: Codeunit "Print Method Mgt.";
         "---": Integer;
@@ -160,7 +160,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
     local procedure OnPrintData(var POSPrintBuffer: Record "RP Print Buffer" temporary)
     begin
         with POSPrintBuffer do
-          PrintData(Text, Font, Bold, Underline, DoubleStrike, Align, Width, Height, "Column No.");
+            PrintData(Text, Font, Bold, Underline, DoubleStrike, Align, Width, Height, "Column No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnEndJob', '', false, false)]
@@ -170,25 +170,25 @@ codeunit 6014601 "RP Boca FGL Device Library"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupFont', '', false, false)]
-    local procedure OnLookupFont(var LookupOK: Boolean;var Value: Text)
+    local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
     begin
         LookupOK := SelectFont(Value);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupCommand', '', false, false)]
-    local procedure OnLookupCommand(var LookupOK: Boolean;var Value: Text)
+    local procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
     begin
         LookupOK := SelectCommand(Value);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupDeviceSetting', '', false, false)]
-    local procedure OnLookupDeviceSetting(var LookupOK: Boolean;var tmpDeviceSetting: Record "RP Device Settings" temporary)
+    local procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "RP Device Settings" temporary)
     begin
         LookupOK := SelectDeviceSetting(tmpDeviceSetting);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetPageWidth', '', false, false)]
-    local procedure OnGetPageWidth(FontFace: Text[30];var Width: Integer)
+    local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
     begin
         Width := GetPageWidth(FontFace);
     end;
@@ -234,46 +234,57 @@ codeunit 6014601 "RP Boca FGL Device Library"
         Clear(Encoding);
         Clear(DPI);
 
-        if DeviceSettings.FindSet then repeat
-          case DeviceSettings.Name of
-            'MEDIA_WIDTH':
-              case DeviceSettings.Value of
-                '80mm' : MediaWidth := MediaWidth::"80mm";
-                '58mm' : MediaWidth := MediaWidth::"58mm";
-              end;
-            'ENCODING' :
-              Encoding := Encoding::ibm850;
-            'DPI' :
-              case DeviceSettings.Value of
-                '200' : DPI := DPI::"200";
-                '300' : DPI := DPI::"300";
-                '600' : DPI := DPI::"600";
-              end;
-            else
-              Error(Error_InvalidDeviceSetting, DeviceSettings.Value);
-          end;
-        until DeviceSettings.Next = 0;
+        if DeviceSettings.FindSet then
+            repeat
+                case DeviceSettings.Name of
+                    'MEDIA_WIDTH':
+                        case DeviceSettings.Value of
+                            '80mm':
+                                MediaWidth := MediaWidth::"80mm";
+                            '58mm':
+                                MediaWidth := MediaWidth::"58mm";
+                        end;
+                    'ENCODING':
+                        Encoding := Encoding::ibm850;
+                    'DPI':
+                        case DeviceSettings.Value of
+                            '200':
+                                DPI := DPI::"200";
+                            '300':
+                                DPI := DPI::"300";
+                            '600':
+                                DPI := DPI::"600";
+                        end;
+                    else
+                        Error(Error_InvalidDeviceSetting, DeviceSettings.Value);
+                end;
+            until DeviceSettings.Next = 0;
 
         //InitializePrinter;
         case DPI of
-          DPI::"200" : DotSize := 0.00492;
-          DPI::"300" : DotSize := 0.00328;
-          DPI::"600" : DotSize := 0.0015;
+            DPI::"200":
+                DotSize := 0.00492;
+            DPI::"300":
+                DotSize := 0.00328;
+            DPI::"600":
+                DotSize := 0.0015;
         end;
 
         PrintMargin := Mm2In(1.25) div DotSize;
 
         case MediaWidth of
-          //MediaWidth::"80mm" : PageWidth := (Mm2In(79) DIV DotSize) - PrintMargin;
-          MediaWidth::"80mm" : PageWidth := (Mm2In(78) div DotSize) - PrintMargin; // this looks nicer, due to added margin
-          MediaWidth::"58mm" : PageWidth := (Mm2In(57) div DotSize) - PrintMargin;
+            //MediaWidth::"80mm" : PageWidth := (Mm2In(79) DIV DotSize) - PrintMargin;
+            MediaWidth::"80mm":
+                PageWidth := (Mm2In(78) div DotSize) - PrintMargin; // this looks nicer, due to added margin
+            MediaWidth::"58mm":
+                PageWidth := (Mm2In(57) div DotSize) - PrintMargin;
         end;
 
 
         yCoord := 0; // start position
     end;
 
-    procedure PrintData(Data: Text[100];FontType: Text[30];Bold: Boolean;UnderLine: Boolean;DoubleStrike: Boolean;Align: Integer;Width: Integer;Height: Integer;Column: Integer)
+    procedure PrintData(Data: Text[100]; FontType: Text[30]; Bold: Boolean; UnderLine: Boolean; DoubleStrike: Boolean; Align: Integer; Width: Integer; Height: Integer; Column: Integer)
     var
         BarcodeNo: Integer;
         StringLib: Codeunit "String Library";
@@ -281,46 +292,49 @@ codeunit 6014601 "RP Boca FGL Device Library"
         /**IF UPPERCASE(FontType) = 'CONTROL' THEN
           PrintControlChar(COPYSTR(Data,1,1))**/
         if UpperCase(FontType) = 'COMMAND' then
-          SendCommand(Data)
-        else if IsBarcodeFont(FontType) then
-          PrintBarcode(FontType, Data, Width, 10)
-        /**ELSE IF FontType = 'Logo' THEN
-          PrintBitmapFromKeyword(Data, '')**/
-        else begin
-          if Column = 1 then begin
-            AddTextToBuffer(StrSubstNo('<RC%1,%2>', PageWidth, yCoord));
-            AddTextToBuffer('<RL>'); // Orientation, perhaps set this as an option later?
-          end;
-          StringLib.Construct(FontType);
-          AddTextToBuffer('<' + StringLib.SelectStringSep(1,' ') + '>');
-        
-          AddTextToBuffer(StrSubstNo('<HW%1,%2>',HeightModifier,WidthModifier)); // text modifier
-        
-          if Column = 1 then begin
-            case Align of
-              1 : AddTextToBuffer(StrSubstNo('<CTR%1>~', PageWidth));
-              //2 : AddTextToBuffer(STRSUBSTNO('<RTJ%1>~', PageWidth));
+            SendCommand(Data)
+        else
+            if IsBarcodeFont(FontType) then
+                PrintBarcode(FontType, Data, Width, 10)
+            /**ELSE IF FontType = 'Logo' THEN
+              PrintBitmapFromKeyword(Data, '')**/
+            else begin
+                if Column = 1 then begin
+                    AddTextToBuffer(StrSubstNo('<RC%1,%2>', PageWidth, yCoord));
+                    AddTextToBuffer('<RL>'); // Orientation, perhaps set this as an option later?
+                end;
+                StringLib.Construct(FontType);
+                AddTextToBuffer('<' + StringLib.SelectStringSep(1, ' ') + '>');
+
+                AddTextToBuffer(StrSubstNo('<HW%1,%2>', HeightModifier, WidthModifier)); // text modifier
+
+                if Column = 1 then begin
+                    case Align of
+                        1:
+                            AddTextToBuffer(StrSubstNo('<CTR%1>~', PageWidth));
+                    //2 : AddTextToBuffer(STRSUBSTNO('<RTJ%1>~', PageWidth));
+                    end;
+                end;
+
+                AddTextToBuffer(Data);
+
+                if Column = 1 then begin
+                    case Align of
+                        1:
+                            AddTextToBuffer('~');
+                    //2 : AddTextToBuffer('~');
+                    end;
+                end;
+
+                if Data <> '' then
+                    ySpace := FontHeight
+                else
+                    ySpace := 0;
             end;
-          end;
-        
-          AddTextToBuffer(Data);
-        
-          if Column = 1 then begin
-            case Align of
-              1 : AddTextToBuffer('~');
-              //2 : AddTextToBuffer('~');
-            end;
-          end;
-        
-          if Data <> '' then
-            ySpace := FontHeight
-          else
-            ySpace := 0;
-        end;
 
     end;
 
-    procedure PrintBarcode(BarcodeType: Text[30];Text: Text;Width: Integer;Height: Integer)
+    procedure PrintBarcode(BarcodeType: Text[30]; Text: Text; Width: Integer; Height: Integer)
     var
         Int: Integer;
         Code128: Text;
@@ -330,60 +344,60 @@ codeunit 6014601 "RP Boca FGL Device Library"
         StringLib.Construct(BarcodeType);
 
         if StringLib.CountOccurences(' ') = 1 then begin
-          BarcodeType := StringLib.SelectStringSep(1,' ');
-          if Evaluate(BarcodeXCoord, StringLib.SelectStringSep(2,' ')) then;
+            BarcodeType := StringLib.SelectStringSep(1, ' ');
+            if Evaluate(BarcodeXCoord, StringLib.SelectStringSep(2, ' ')) then;
         end;
 
         // Probably need to check if negative
         if PageWidth > BarcodeXCoord then
-          BarcodeXCoord := PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
+            BarcodeXCoord := PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
         else
-          BarcodeXCoord := PageWidth;
+            BarcodeXCoord := PageWidth;
 
         // TEMP
         AddTextToBuffer(StrSubstNo('<RC%1,%2>', BarcodeXCoord, yCoord));
         AddTextToBuffer('<BI>');
 
         if Width > 1 then
-          AddTextToBuffer(StrSubstNo('<X%1>',Width)); // set after DPI?
+            AddTextToBuffer(StrSubstNo('<X%1>', Width)); // set after DPI?
 
         AddTextToBuffer('<RL>'); // Orientation
 
         case BarcodeType of
-          'EAN13'   :
-            begin
-              if Height > 1 then
-                AddTextToBuffer(StrSubstNo('<eL%1>',Height))
-              else
-                AddTextToBuffer('<eL>');
-              AddTextToBuffer(StrSubstNo('%1J%2K%3L',CopyStr(Text,1,1), CopyStr(Text,2,6), CopyStr(Text,8,6)));
-            end;
-          'CODE128' :
-            begin
-              if Height > 1 then
-                AddTextToBuffer(StrSubstNo('<oL%1>',Height))
-              else
-                AddTextToBuffer('<oL>');
-              AddTextToBuffer(StrSubstNo('^%1^',Text));
-            end;
+            'EAN13':
+                begin
+                    if Height > 1 then
+                        AddTextToBuffer(StrSubstNo('<eL%1>', Height))
+                    else
+                        AddTextToBuffer('<eL>');
+                    AddTextToBuffer(StrSubstNo('%1J%2K%3L', CopyStr(Text, 1, 1), CopyStr(Text, 2, 6), CopyStr(Text, 8, 6)));
+                end;
+            'CODE128':
+                begin
+                    if Height > 1 then
+                        AddTextToBuffer(StrSubstNo('<oL%1>', Height))
+                    else
+                        AddTextToBuffer('<oL>');
+                    AddTextToBuffer(StrSubstNo('^%1^', Text));
+                end;
         end;
 
         if Height > 1 then
-          ySpace := Height * 10
+            ySpace := Height * 10
         else
-          ySpace := 40;
+            ySpace := 40;
     end;
 
-    local procedure PrintStoredLogo(ID: Integer;Height: Integer)
+    local procedure PrintStoredLogo(ID: Integer; Height: Integer)
     begin
         // 200dpi
-        AddTextToBuffer(StrSubstNo('<SP%1,%2>',570,yCoord));
+        AddTextToBuffer(StrSubstNo('<SP%1,%2>', 570, yCoord));
         AddTextToBuffer('<RL>');
-        AddTextToBuffer(StrSubstNo('<LD%1>',ID));
+        AddTextToBuffer(StrSubstNo('<LD%1>', ID));
         if Height > 0 then
-          ySpace := Height
+            ySpace := Height
         else
-          ySpace := 100;
+            ySpace := 100;
     end;
 
     local procedure PrintVerticalSpace(Height: Integer)
@@ -403,20 +417,23 @@ codeunit 6014601 "RP Boca FGL Device Library"
         StringLib.Construct(Command);
 
         if StringLib.CountOccurences(' ') = 1 then begin
-          Command := StringLib.SelectStringSep(1,' ');
-          if Evaluate(Height, StringLib.SelectStringSep(2,' ')) then;
+            Command := StringLib.SelectStringSep(1, ' ');
+            if Evaluate(Height, StringLib.SelectStringSep(2, ' ')) then;
         end;
 
         case UpperCase(Command) of
-          //'OPENDRAWER' : GeneratePulse(0,25,25);
-          //'PAPERCUT' : SelectCutModeAndCutPaper(66,3);
-          'STOREDLOGO_1'   : PrintStoredLogo(1, Height);
-          'STOREDLOGO_2'   : PrintStoredLogo(2, Height);
-          'VERTICAL_SPACE' : PrintVerticalSpace(Height);
+            //'OPENDRAWER' : GeneratePulse(0,25,25);
+            //'PAPERCUT' : SelectCutModeAndCutPaper(66,3);
+            'STOREDLOGO_1':
+                PrintStoredLogo(1, Height);
+            'STOREDLOGO_2':
+                PrintStoredLogo(2, Height);
+            'VERTICAL_SPACE':
+                PrintVerticalSpace(Height);
         end;
     end;
 
-    procedure SetFontStretch(Height: Integer;Width: Integer)
+    procedure SetFontStretch(Height: Integer; Width: Integer)
     var
         Int: Integer;
         n: Char;
@@ -424,10 +441,10 @@ codeunit 6014601 "RP Boca FGL Device Library"
         Convert: DotNet npNetConvert;
     begin
         if Height > 16 then
-          Height := 16;
+            Height := 16;
 
         if Width > 16 then
-          Width := 16;
+            Width := 16;
 
         HeightModifier := Height;
         WidthModifier := Width;
@@ -455,7 +472,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
         StreamReader: DotNet npNetStreamReader;
         Encoding: DotNet npNetEncoding;
     begin
-        PrintBuffer.Blob.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
+        PrintBuffer.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
         MemoryStream := PrintBufferInStream;
         MemoryStream.Position := 0;
         StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
@@ -467,7 +484,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
         yCoord += ySpace;
     end;
 
-    local procedure PrintBitmapFromKeyword(Keyword: Code[20];RegisterNo: Code[10])
+    local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
     var
         RetailLogoMgt: Codeunit "Retail Logo Mgt.";
         ESCPOS: Text;
@@ -480,28 +497,28 @@ codeunit 6014601 "RP Boca FGL Device Library"
         RetailLogo.SetAutoCalcFields(ESCPOSLogo);
 
         if RetailLogoMgt.GetRetailLogo(Keyword, RegisterNo, RetailLogo) then
-          repeat
-            if RetailLogo.ESCPOSLogo.HasValue then begin
-              RetailLogo.ESCPOSLogo.CreateInStream(InStream);
-              //-NPR5.40 [248505]
-        //      MemoryStream := MemoryStream.MemoryStream;
-        //      COPYSTREAM(MemoryStream, InStream);
-        //      ByteArray := MemoryStream.ToArray;
-        //      Encoding := Encoding.GetEncoding('utf-8');
-        //      ESCPOS := Encoding.GetString(ByteArray);
-        //
-        //      PrintBitmapFromESCPOS(ESCPOS, RetailLogo.Height);
-              MemoryStream := InStream;
-              MemoryStream.Position := 0;
-              StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
-              ESCPOS := StreamReader.ReadToEnd();
-              PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
-              //+NPR5.40 [284505]
-            end;
-          until RetailLogo.Next = 0;
+            repeat
+                if RetailLogo.ESCPOSLogo.HasValue then begin
+                    RetailLogo.ESCPOSLogo.CreateInStream(InStream);
+                    //-NPR5.40 [248505]
+                    //      MemoryStream := MemoryStream.MemoryStream;
+                    //      COPYSTREAM(MemoryStream, InStream);
+                    //      ByteArray := MemoryStream.ToArray;
+                    //      Encoding := Encoding.GetEncoding('utf-8');
+                    //      ESCPOS := Encoding.GetString(ByteArray);
+                    //
+                    //      PrintBitmapFromESCPOS(ESCPOS, RetailLogo.Height);
+                    MemoryStream := InStream;
+                    MemoryStream.Position := 0;
+                    StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
+                    ESCPOS := StreamReader.ReadToEnd();
+                    PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
+                    //+NPR5.40 [284505]
+                end;
+            until RetailLogo.Next = 0;
     end;
 
-    procedure PrintBitmapFromESCPOS(ESCPOS: Text;hL: Integer;hH: Integer;cmdL: Integer;cmdH: Integer)
+    procedure PrintBitmapFromESCPOS(ESCPOS: Text; hL: Integer; hH: Integer; cmdL: Integer; cmdH: Integer)
     var
         HeightLowByte: Integer;
         HeightHighByte: Integer;
@@ -510,7 +527,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
         RetailLogo: Record "Retail Logo";
     begin
         if ESCPOS = '' then
-          exit;
+            exit;
 
         //-NPR5.40 [284505]
         // ByteArray      := BitConverter.GetBytes(Height);
@@ -561,34 +578,34 @@ codeunit 6014601 "RP Boca FGL Device Library"
         SpaceCount: Integer;
     begin
         // Set default font modifier
-        SetFontStretch(1,1);
+        SetFontStretch(1, 1);
 
         // Check if a font modifier has been added
         StringLib.Construct(FontFace);
         if StringLib.CountOccurences(' ') > 0 then begin
-          FontFace := StringLib.SelectStringSep(1,' ');
-          StringLib.Construct(StringLib.SelectStringSep(2,' '));
-          if StringLib.CountOccurences(',') > 0 then begin
-            if (Evaluate(TextModifierH,StringLib.SelectStringSep(1,',')) and Evaluate(TextModifierW,StringLib.SelectStringSep(2,','))) then
-              SetFontStretch(TextModifierH, TextModifierW);
-          end;
+            FontFace := StringLib.SelectStringSep(1, ' ');
+            StringLib.Construct(StringLib.SelectStringSep(2, ' '));
+            if StringLib.CountOccurences(',') > 0 then begin
+                if (Evaluate(TextModifierH, StringLib.SelectStringSep(1, ',')) and Evaluate(TextModifierW, StringLib.SelectStringSep(2, ','))) then
+                    SetFontStretch(TextModifierH, TextModifierW);
+            end;
         end;
 
         // Calculate receipt width
         case FontFace of
-          'F8':
-            begin
-              FontHeight := 30 * HeightModifier;
-              FontWidth  := 20 * WidthModifier;
-              exit(PageWidth div FontWidth);
-            end;
-          'F13':
-            begin
-              FontHeight := 42 * HeightModifier;
-              FontWidth  := 20 * WidthModifier;
-              exit(PageWidth div FontWidth);
-            end;
-          end;
+            'F8':
+                begin
+                    FontHeight := 30 * HeightModifier;
+                    FontWidth := 20 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F13':
+                begin
+                    FontHeight := 42 * HeightModifier;
+                    FontWidth := 20 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+        end;
     end;
 
     local procedure IsBarcodeFont(Font: Text): Boolean
@@ -598,10 +615,10 @@ codeunit 6014601 "RP Boca FGL Device Library"
         Font := UpperCase(Font);
 
         StringLib.Construct(Font);
-        Font := StringLib.SelectStringSep(1,' ');
+        Font := StringLib.SelectStringSep(1, ' ');
 
-        if Font in ['EAN13','CODE128'] then
-          exit(true);
+        if Font in ['EAN13', 'CODE128'] then
+            exit(true);
     end;
 
     local procedure "// Aux Functions"()
@@ -613,8 +630,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
         //-NPR5.40 [284505]
         Clear(PrintBufferOutStream);
         Clear(PrintBuffer);
-        PrintBuffer.Init;
-        PrintBuffer.Blob.CreateOutStream(PrintBufferOutStream,TEXTENCODING::UTF8);
+        PrintBuffer.CreateOutStream(PrintBufferOutStream, TEXTENCODING::UTF8);
         //+NPR5.40 [284505]
     end;
 
@@ -635,9 +651,9 @@ codeunit 6014601 "RP Boca FGL Device Library"
         RetailList: Record "Retail List" temporary;
     begin
         ConstructFontSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"Retail List",RetailList) = ACTION::LookupOK then begin
-          Value := RetailList.Choice;
-          exit(true);
+        if PAGE.RunModal(PAGE::"Retail List", RetailList) = ACTION::LookupOK then begin
+            Value := RetailList.Choice;
+            exit(true);
         end;
     end;
 
@@ -646,9 +662,9 @@ codeunit 6014601 "RP Boca FGL Device Library"
         RetailList: Record "Retail List" temporary;
     begin
         ConstructCommandSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"Retail List",RetailList) = ACTION::LookupOK then begin
-          Value := RetailList.Choice;
-          exit(true);
+        if PAGE.RunModal(PAGE::"Retail List", RetailList) = ACTION::LookupOK then begin
+            Value := RetailList.Choice;
+            exit(true);
         end;
     end;
 
@@ -662,26 +678,26 @@ codeunit 6014601 "RP Boca FGL Device Library"
         RetailList.SetRec(tmpRetailList);
         RetailList.LookupMode(true);
         if RetailList.RunModal = ACTION::LookupOK then begin
-          RetailList.GetRec(tmpRetailList);
-          tmpDeviceSetting.Name := tmpRetailList.Value;
-          case tmpDeviceSetting.Name of
-            'MEDIA_WIDTH' :
-              begin
-                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
-                tmpDeviceSetting.Options := '80mm,58mm';
-              end;
-            'ENCODING' :
-              begin
-                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
-                tmpDeviceSetting.Options := 'ibm850';
-              end;
-            'DPI' :
-              begin
-                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
-                tmpDeviceSetting.Options := '200,300,600';
-              end;
-          end;
-          exit(tmpDeviceSetting.Insert);
+            RetailList.GetRec(tmpRetailList);
+            tmpDeviceSetting.Name := tmpRetailList.Value;
+            case tmpDeviceSetting.Name of
+                'MEDIA_WIDTH':
+                    begin
+                        tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                        tmpDeviceSetting.Options := '80mm,58mm';
+                    end;
+                'ENCODING':
+                    begin
+                        tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                        tmpDeviceSetting.Options := 'ibm850';
+                    end;
+                'DPI':
+                    begin
+                        tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                        tmpDeviceSetting.Options := '200,300,600';
+                    end;
+            end;
+            exit(tmpDeviceSetting.Insert);
         end;
     end;
 
@@ -731,7 +747,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
         AddOption(tmpRetailList, SETTING_DPI, 'DPI');
     end;
 
-    procedure AddOption(var RetailList: Record "Retail List" temporary;Choice: Text;Value: Text)
+    procedure AddOption(var RetailList: Record "Retail List" temporary; Choice: Text; Value: Text)
     begin
         RetailList.Number += 1;
         RetailList.Choice := Choice;

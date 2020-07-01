@@ -45,16 +45,16 @@ codeunit 6014610 "Tax Free Handler Mgt."
 
         HashSetEnumerator := HashSet.GetEnumerator();
         while (HashSetEnumerator.MoveNext()) do begin
-          tmpRetailList.Number += 1;
-          tmpRetailList.Choice := HashSetEnumerator.Current();
-          tmpRetailList.Insert;
+            tmpRetailList.Number += 1;
+            tmpRetailList.Choice := HashSetEnumerator.Current();
+            tmpRetailList.Insert;
         end;
 
         if tmpRetailList.IsEmpty then
-          exit(false);
+            exit(false);
 
         if PAGE.RunModal(PAGE::"Retail List", tmpRetailList) <> ACTION::LookupOK then
-          exit(false);
+            exit(false);
 
         HandlerID := tmpRetailList.Choice;
         exit(true);
@@ -69,18 +69,18 @@ codeunit 6014610 "Tax Free Handler Mgt."
     begin
         OnLookupHandlerParameters(TaxFreeUnit, Handled, tmpHandlerParameter);
         if not Handled then
-          Error(Error_MissingHandler, TaxFreeUnit."Handler ID");
+            Error(Error_MissingHandler, TaxFreeUnit."Handler ID");
 
         if tmpHandlerParameter.IsEmpty then
-          exit;
+            exit;
 
         if TaxFreeUnit."Handler Parameters".HasValue then
-          tmpHandlerParameter.DeserializeParameterBLOB(TaxFreeUnit);
+            tmpHandlerParameter.DeserializeParameterBLOB(TaxFreeUnit);
 
         TaxFreeHandlerParameters.Editable(true);
         TaxFreeHandlerParameters.SetRec(tmpHandlerParameter);
         if TaxFreeHandlerParameters.RunModal <> ACTION::OK then
-          exit;
+            exit;
 
         TaxFreeHandlerParameters.GetRec(tmpHandlerParameter);
 
@@ -99,10 +99,10 @@ codeunit 6014610 "Tax Free Handler Mgt."
         OnSetUnitParameters(TaxFreeUnit, Handled);
 
         if not Handled then
-          Error(Error_MissingHandler, TaxFreeUnit."Handler ID");
+            Error(Error_MissingHandler, TaxFreeUnit."Handler ID");
     end;
 
-    procedure UnitAutoConfigure(TaxFreeUnit: Record "Tax Free POS Unit";Silent: Boolean)
+    procedure UnitAutoConfigure(TaxFreeUnit: Record "Tax Free POS Unit"; Silent: Boolean)
     var
         TaxFreeRequest: Record "Tax Free Request";
         Handled: Boolean;
@@ -110,17 +110,18 @@ codeunit 6014610 "Tax Free Handler Mgt."
         CreateRequest('UNIT_AUTO_CONFIGURE', TaxFreeUnit, TaxFreeRequest);
 
         ClearLastError();
-        asserterror begin
-          OnUnitAutoConfigure(TaxFreeRequest, Silent, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnUnitAutoConfigure(TaxFreeRequest, Silent, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if (TaxFreeRequest.Success and Handled and (not Silent)) then
-          Message(Caption_UnitConfigured);
+            Message(Caption_UnitConfigured);
     end;
 
     procedure UnitTestConnection(TaxFreeUnit: Record "Tax Free POS Unit")
@@ -131,17 +132,18 @@ codeunit 6014610 "Tax Free Handler Mgt."
         CreateRequest('UNIT_TEST_CONN', TaxFreeUnit, TaxFreeRequest);
 
         ClearLastError();
-        asserterror begin
-          OnUnitTestConnection(TaxFreeRequest, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnUnitTestConnection(TaxFreeRequest, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if (TaxFreeRequest.Success and Handled) then
-          Message(Caption_TestSuccess);
+            Message(Caption_TestSuccess);
     end;
 
     procedure VoucherIssueFromPOSSale(ReceiptNo: Text)
@@ -162,42 +164,45 @@ codeunit 6014610 "Tax Free Handler Mgt."
         TaxFreeUnit.Get(AuditRoll."Register No.");
 
         if not CheckEnvironment(TaxFreeUnit) then
-          exit;
+            exit;
 
         CreateRequest('VOUCHER_ISSUE', TaxFreeUnit, TaxFreeRequest);
 
         if TryGetActiveVoucherFromReceiptNo(ReceiptNo, TaxFreeVoucher) then begin //Another voucher is already linked to this receipt, we can't issue a new one.
-          Action := StrMenu(StrSubstNo('%1,%2,%3', Caption_Reissue, Caption_Void, Caption_Cancel), 3, Caption_ExistingVoucherFound);
-          case Action of
-            1 : VoucherReissue(TaxFreeVoucher);
-            2 : VoucherVoid(TaxFreeVoucher);
-          end;
-          exit;
+            Action := StrMenu(StrSubstNo('%1,%2,%3', Caption_Reissue, Caption_Void, Caption_Cancel), 3, Caption_ExistingVoucherFound);
+            case Action of
+                1:
+                    VoucherReissue(TaxFreeVoucher);
+                2:
+                    VoucherVoid(TaxFreeVoucher);
+            end;
+            exit;
         end;
 
         if not IsStoredSaleEligible(TaxFreeUnit, ReceiptNo) then begin
-          TaxFreeRequest."Error Message" := Error_NotEligible;
-          LogEvent(TaxFreeUnit, TaxFreeRequest);
-          ShowError(Error_NotEligible);
-          exit;
+            TaxFreeRequest."Error Message" := Error_NotEligible;
+            LogEvent(TaxFreeUnit, TaxFreeRequest);
+            ShowError(Error_NotEligible);
+            exit;
         end;
 
         ClearLastError();
-        asserterror begin
-          OnVoucherIssueFromPOSSale(TaxFreeRequest, ReceiptNo, Handled, SkipRecordHandling);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnVoucherIssueFromPOSSale(TaxFreeRequest, ReceiptNo, Handled, SkipRecordHandling);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if TaxFreeRequest.Success and (not SkipRecordHandling) then begin
-          tmpTaxFreeVoucherSaleLink.Init;
-          tmpTaxFreeVoucherSaleLink."Sales Ticket No." := ReceiptNo;
-          tmpTaxFreeVoucherSaleLink.Insert;
+            tmpTaxFreeVoucherSaleLink.Init;
+            tmpTaxFreeVoucherSaleLink."Sales Ticket No." := ReceiptNo;
+            tmpTaxFreeVoucherSaleLink.Insert;
 
-          CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
+            CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
         end;
     end;
 
@@ -209,7 +214,7 @@ codeunit 6014610 "Tax Free Handler Mgt."
     begin
         TaxFreeUnit.Get(TaxFreeVoucher."POS Unit No.");
         if not CheckEnvironment(TaxFreeUnit) then
-          exit;
+            exit;
 
         CreateRequest('VOUCHER_VOID', TaxFreeUnit, TaxFreeRequest);
 
@@ -217,24 +222,25 @@ codeunit 6014610 "Tax Free Handler Mgt."
         TaxFreeRequest."External Voucher No." := TaxFreeVoucher."External Voucher No.";
 
         if TaxFreeVoucher.Void then begin
-          TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
-          LogEvent(TaxFreeUnit, TaxFreeRequest);
-          ShowError(Error_VoucherIsVoided);
-          exit;
+            TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
+            LogEvent(TaxFreeUnit, TaxFreeRequest);
+            ShowError(Error_VoucherIsVoided);
+            exit;
         end;
 
         ClearLastError();
-        asserterror begin
-          OnVoucherVoid(TaxFreeRequest, TaxFreeVoucher, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnVoucherVoid(TaxFreeRequest, TaxFreeVoucher, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if (TaxFreeRequest.Success and Handled) then
-          VoidVoucher(TaxFreeVoucher, false);
+            VoidVoucher(TaxFreeVoucher, false);
     end;
 
     procedure VoucherReissue(var TaxFreeVoucher: Record "Tax Free Voucher")
@@ -247,14 +253,14 @@ codeunit 6014610 "Tax Free Handler Mgt."
     begin
         TaxFreeUnit.Get(TaxFreeVoucher."POS Unit No.");
         if not CheckEnvironment(TaxFreeUnit) then
-          exit;
+            exit;
 
         TaxFreeVoucherSaleLink.SetRange("Voucher Entry No.", TaxFreeVoucher."Entry No.");
         TaxFreeVoucherSaleLink.FindSet;
         repeat
-          tmpTaxFreeVoucherSaleLink.Init;
-          tmpTaxFreeVoucherSaleLink.TransferFields(TaxFreeVoucherSaleLink);
-          tmpTaxFreeVoucherSaleLink.Insert;
+            tmpTaxFreeVoucherSaleLink.Init;
+            tmpTaxFreeVoucherSaleLink.TransferFields(TaxFreeVoucherSaleLink);
+            tmpTaxFreeVoucherSaleLink.Insert;
         until TaxFreeVoucherSaleLink.Next = 0;
 
         CreateRequest('VOUCHER_REISSUE', TaxFreeUnit, TaxFreeRequest);
@@ -263,29 +269,30 @@ codeunit 6014610 "Tax Free Handler Mgt."
         TaxFreeRequest."External Voucher No." := TaxFreeVoucher."External Voucher No.";
 
         if TaxFreeVoucher.Void then begin
-          TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
-          LogEvent(TaxFreeUnit, TaxFreeRequest);
-          ShowError(Error_VoucherIsVoided);
-          exit;
+            TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
+            LogEvent(TaxFreeUnit, TaxFreeRequest);
+            ShowError(Error_VoucherIsVoided);
+            exit;
         end;
 
         ClearLastError();
-        asserterror begin
-          OnVoucherReissue(TaxFreeRequest, TaxFreeVoucher, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnVoucherReissue(TaxFreeRequest, TaxFreeVoucher, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if (TaxFreeRequest.Success and Handled) then begin
-          VoidVoucher(TaxFreeVoucher, true); //Void old
-          CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink); //Create & print new
+            VoidVoucher(TaxFreeVoucher, true); //Void old
+            CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink); //Create & print new
         end;
     end;
 
-    procedure VoucherLookup(TaxFreeUnit: Record "Tax Free POS Unit";VoucherNo: Text)
+    procedure VoucherLookup(TaxFreeUnit: Record "Tax Free POS Unit"; VoucherNo: Text)
     var
         Handled: Boolean;
         TaxFreeRequest: Record "Tax Free Request";
@@ -293,11 +300,12 @@ codeunit 6014610 "Tax Free Handler Mgt."
         CreateRequest('VOUCHER_LOOKUP', TaxFreeUnit, TaxFreeRequest);
 
         ClearLastError();
-        asserterror begin
-          OnVoucherLookup(TaxFreeRequest, VoucherNo, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnVoucherLookup(TaxFreeRequest, VoucherNo, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
@@ -313,10 +321,10 @@ codeunit 6014610 "Tax Free Handler Mgt."
         CreateRequest('VOUCHER_PRINT', TaxFreeUnit, TaxFreeRequest);
 
         if TaxFreeVoucher.Void then begin
-          TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
-          LogEvent(TaxFreeUnit, TaxFreeRequest);
-          ShowError(Error_VoucherIsVoided);
-          exit;
+            TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
+            LogEvent(TaxFreeUnit, TaxFreeRequest);
+            ShowError(Error_VoucherIsVoided);
+            exit;
         end;
 
         TaxFreeVoucher.CalcFields(Print);
@@ -324,11 +332,12 @@ codeunit 6014610 "Tax Free Handler Mgt."
         TaxFreeRequest."Print Type" := TaxFreeVoucher."Print Type";
 
         ClearLastError();
-        asserterror begin
-          OnVoucherPrint(TaxFreeRequest, TaxFreeVoucher, false, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnVoucherPrint(TaxFreeRequest, TaxFreeVoucher, false, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
@@ -338,7 +347,7 @@ codeunit 6014610 "Tax Free Handler Mgt."
     var
         TaxFreeLastPrint: Codeunit "Tax Free Last Voucher Print";
         VoucherEntryNo: Integer;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         PrintType: Integer;
         Handled: Boolean;
         TaxFreeRequest: Record "Tax Free Request";
@@ -347,10 +356,11 @@ codeunit 6014610 "Tax Free Handler Mgt."
         POSSession: Codeunit "POS Session";
         POSFrontEndManagement: Codeunit "POS Front End Management";
         POSSetup: Codeunit "POS Setup";
+        RecRef: RecordRef;
     begin
         //Single instance codeunit contains the last tax free voucher from this user session - for integrations where you should not always be able to re-print any voucher, only the recent last.
         if not TaxFreeLastPrint.GetVoucher(VoucherEntryNo, TempBlob, PrintType) then
-          Error(Error_NoVoucherInSession);
+            Error(Error_NoVoucherInSession);
 
         TaxFreeVoucher.Get(VoucherEntryNo);
         TaxFreeUnit.Get(TaxFreeVoucher."POS Unit No.");
@@ -358,27 +368,31 @@ codeunit 6014610 "Tax Free Handler Mgt."
         CreateRequest('VOUCHER_PRINT_LAST', TaxFreeUnit, TaxFreeRequest);
 
         if TaxFreeVoucher.Void then begin
-          TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
-          LogEvent(TaxFreeUnit, TaxFreeRequest);
-          ShowError(Error_VoucherIsVoided);
-          exit;
+            TaxFreeRequest."Error Message" := Error_VoucherIsVoided;
+            LogEvent(TaxFreeUnit, TaxFreeRequest);
+            ShowError(Error_VoucherIsVoided);
+            exit;
         end;
 
-        TaxFreeRequest.Print := TempBlob.Blob;
+        RecRef.GetTable(TaxFreeRequest);
+        TempBlob.ToRecordRef(RecRef, TaxFreeRequest.FieldNo(Print));
+        RecRef.SetTable(TaxFreeRequest);
+
         TaxFreeRequest."Print Type" := PrintType;
 
         ClearLastError();
-        asserterror begin
-          OnVoucherPrint(TaxFreeRequest, TaxFreeVoucher, true, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnVoucherPrint(TaxFreeRequest, TaxFreeVoucher, true, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
     end;
 
-    procedure VoucherConsolidate(TaxFreeUnit: Record "Tax Free POS Unit";var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary)
+    procedure VoucherConsolidate(TaxFreeUnit: Record "Tax Free POS Unit"; var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary)
     var
         Handled: Boolean;
         Success: Boolean;
@@ -386,42 +400,43 @@ codeunit 6014610 "Tax Free Handler Mgt."
         tmpTaxFreeVoucherSaleLink: Record "Tax Free Voucher Sale Link" temporary;
     begin
         if not CheckEnvironment(TaxFreeUnit) then
-          exit;
+            exit;
 
         CreateRequest('VOUCHER_CONSOLIDATE', TaxFreeUnit, TaxFreeRequest);
 
         if not tmpTaxFreeConsolidation.FindSet then
-          exit;
+            exit;
 
         if tmpTaxFreeConsolidation.Count = 1 then begin //Normal voucher issue flow instead.
-          VoucherIssueFromPOSSale(tmpTaxFreeConsolidation."Sales Ticket No.");
-          exit;
+            VoucherIssueFromPOSSale(tmpTaxFreeConsolidation."Sales Ticket No.");
+            exit;
         end;
 
-        asserterror begin
-          OnVoucherConsolidate(TaxFreeRequest, tmpTaxFreeConsolidation, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnVoucherConsolidate(TaxFreeRequest, tmpTaxFreeConsolidation, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if TaxFreeRequest.Success then begin
-          tmpTaxFreeConsolidation.FindSet;
-          repeat
-            tmpTaxFreeVoucherSaleLink.Init;
-            tmpTaxFreeVoucherSaleLink."Sales Ticket No." := tmpTaxFreeConsolidation."Sales Ticket No.";
-            tmpTaxFreeVoucherSaleLink."Sales Header No." := tmpTaxFreeConsolidation."Sales Header No.";
-            tmpTaxFreeVoucherSaleLink."Sales Header Type" := tmpTaxFreeConsolidation."Sales Header Type";
-            tmpTaxFreeVoucherSaleLink.Insert;
-          until tmpTaxFreeConsolidation.Next = 0;
+            tmpTaxFreeConsolidation.FindSet;
+            repeat
+                tmpTaxFreeVoucherSaleLink.Init;
+                tmpTaxFreeVoucherSaleLink."Sales Ticket No." := tmpTaxFreeConsolidation."Sales Ticket No.";
+                tmpTaxFreeVoucherSaleLink."Sales Header No." := tmpTaxFreeConsolidation."Sales Header No.";
+                tmpTaxFreeVoucherSaleLink."Sales Header Type" := tmpTaxFreeConsolidation."Sales Header Type";
+                tmpTaxFreeVoucherSaleLink.Insert;
+            until tmpTaxFreeConsolidation.Next = 0;
 
-          CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
+            CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
         end;
     end;
 
-    procedure IsValidTerminalIIN(TaxFreeUnit: Record "Tax Free POS Unit";MaskedCardNo: Text): Boolean
+    procedure IsValidTerminalIIN(TaxFreeUnit: Record "Tax Free POS Unit"; MaskedCardNo: Text): Boolean
     var
         SaleLinePOS: Record "Sale Line POS";
         Handled: Boolean;
@@ -429,16 +444,17 @@ codeunit 6014610 "Tax Free Handler Mgt."
         TaxFreeRequest: Record "Tax Free Request";
     begin
         if not TaxFreeUnit."Check POS Terminal IIN" then
-          exit(false);
+            exit(false);
 
         CreateRequest('TERMINAL_IIN_CHECK', TaxFreeUnit, TaxFreeRequest);
 
         ClearLastError;
-        asserterror begin
-          OnIsValidTerminalIIN(TaxFreeRequest, MaskedCardNo, Valid, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnIsValidTerminalIIN(TaxFreeRequest, MaskedCardNo, Valid, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, true);
@@ -446,7 +462,7 @@ codeunit 6014610 "Tax Free Handler Mgt."
         exit(Valid);
     end;
 
-    procedure IsActiveSaleEligible(TaxFreeUnit: Record "Tax Free POS Unit";SalesTicketNo: Code[20]): Boolean
+    procedure IsActiveSaleEligible(TaxFreeUnit: Record "Tax Free POS Unit"; SalesTicketNo: Code[20]): Boolean
     var
         SaleLinePOS: Record "Sale Line POS";
         TaxFreeRequest: Record "Tax Free Request";
@@ -456,11 +472,12 @@ codeunit 6014610 "Tax Free Handler Mgt."
         CreateRequest('ELIGIBLE_CHECK_CURRENT', TaxFreeUnit, TaxFreeRequest);
 
         ClearLastError();
-        asserterror begin
-          OnIsActiveSaleEligible(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnIsActiveSaleEligible(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, true);
@@ -468,7 +485,7 @@ codeunit 6014610 "Tax Free Handler Mgt."
         exit(Eligible);
     end;
 
-    procedure IsStoredSaleEligible(TaxFreeUnit: Record "Tax Free POS Unit";SalesTicketNo: Code[20]): Boolean
+    procedure IsStoredSaleEligible(TaxFreeUnit: Record "Tax Free POS Unit"; SalesTicketNo: Code[20]): Boolean
     var
         AuditRoll: Record "Audit Roll";
         TaxFreeRequest: Record "Tax Free Request";
@@ -478,11 +495,12 @@ codeunit 6014610 "Tax Free Handler Mgt."
         CreateRequest('ELIGIBLE_CHECK_STORED', TaxFreeUnit, TaxFreeRequest);
 
         ClearLastError();
-        asserterror begin
-          OnIsStoredSaleEligible(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
-          TaxFreeRequest.Success := true;
-          Commit;
-          Error('');
+        asserterror
+        begin
+            OnIsStoredSaleEligible(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
+            TaxFreeRequest.Success := true;
+            Commit;
+            Error('');
         end;
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, true);
@@ -490,7 +508,7 @@ codeunit 6014610 "Tax Free Handler Mgt."
         exit(Eligible);
     end;
 
-    procedure TryGetActiveVoucherFromReceiptNo(ReceiptNo: Text;var TaxFreeVoucher: Record "Tax Free Voucher"): Boolean
+    procedure TryGetActiveVoucherFromReceiptNo(ReceiptNo: Text; var TaxFreeVoucher: Record "Tax Free Voucher"): Boolean
     var
         TaxFreeVoucherSaleLink: Record "Tax Free Voucher Sale Link";
         Result: Boolean;
@@ -499,10 +517,11 @@ codeunit 6014610 "Tax Free Handler Mgt."
         TaxFreeVoucher.SetRange(Void, false);
         TaxFreeVoucherSaleLink.SetCurrentKey("Sales Ticket No.");
         TaxFreeVoucherSaleLink.SetRange("Sales Ticket No.", ReceiptNo);
-        if TaxFreeVoucherSaleLink.FindSet then repeat
-          TaxFreeVoucher.SetRange("Entry No.", TaxFreeVoucherSaleLink."Voucher Entry No.");
-          Result := TaxFreeVoucher.FindFirst;
-        until (TaxFreeVoucherSaleLink.Next = 0) or Result;
+        if TaxFreeVoucherSaleLink.FindSet then
+            repeat
+                TaxFreeVoucher.SetRange("Entry No.", TaxFreeVoucherSaleLink."Voucher Entry No.");
+                Result := TaxFreeVoucher.FindFirst;
+            until (TaxFreeVoucherSaleLink.Next = 0) or Result;
         exit(Result);
     end;
 
@@ -520,12 +539,12 @@ codeunit 6014610 "Tax Free Handler Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnLookupHandlerParameters(TaxFreeUnit: Record "Tax Free POS Unit";var Handled: Boolean;var tmpHandlerParameters: Record "Tax Free Handler Parameters" temporary)
+    local procedure OnLookupHandlerParameters(TaxFreeUnit: Record "Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "Tax Free Handler Parameters" temporary)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetUnitParameters(TaxFreeUnit: Record "Tax Free POS Unit";var Handled: Boolean)
+    local procedure OnSetUnitParameters(TaxFreeUnit: Record "Tax Free POS Unit"; var Handled: Boolean)
     begin
     end;
 
@@ -534,57 +553,57 @@ codeunit 6014610 "Tax Free Handler Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "Tax Free Request";Silent: Boolean;var Handled: Boolean)
+    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "Tax Free Request"; Silent: Boolean; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "Tax Free Request";var Handled: Boolean)
+    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "Tax Free Request"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "Tax Free Request";SalesReceiptNo: Code[20];var Handled: Boolean;var SkipRecordHandling: Boolean)
+    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "Tax Free Request"; SalesReceiptNo: Code[20]; var Handled: Boolean; var SkipRecordHandling: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnVoucherVoid(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";var Handled: Boolean)
+    local procedure OnVoucherVoid(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnVoucherReissue(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";var Handled: Boolean)
+    local procedure OnVoucherReissue(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnVoucherLookup(var TaxFreeRequest: Record "Tax Free Request";VoucherNo: Text;var Handled: Boolean)
+    local procedure OnVoucherLookup(var TaxFreeRequest: Record "Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnVoucherPrint(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";IsRecentVoucher: Boolean;var Handled: Boolean)
+    local procedure OnVoucherPrint(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; IsRecentVoucher: Boolean; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "Tax Free Request";var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;var Handled: Boolean)
+    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "Tax Free Request"; var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request";MaskedCardNo: Text;var IsForeignIIN: Boolean;var Handled: Boolean)
+    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "Tax Free Request";SalesTicketNo: Code[20];var Eligible: Boolean;var Handled: Boolean)
+    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "Tax Free Request";SalesTicketNo: Code[20];var Eligible: Boolean;var Handled: Boolean)
+    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     begin
     end;
 
@@ -599,8 +618,8 @@ codeunit 6014610 "Tax Free Handler Mgt."
         Arr: DotNet npNetArray;
         String: DotNet npNetString;
     begin
-        Arr := Arr.CreateInstance(GetDotNetType(Type),1);
-        Arr.SetValue(GetDotNetType(String),0);
+        Arr := Arr.CreateInstance(GetDotNetType(Type), 1);
+        Arr.SetValue(GetDotNetType(String), 0);
 
         Type := GetDotNetType(HashSet);
         Type := Type.MakeGenericType(Arr);
@@ -608,52 +627,52 @@ codeunit 6014610 "Tax Free Handler Mgt."
         HashSet := Activator.CreateInstance(Type);
     end;
 
-    local procedure CreateAndPrintVoucher(TaxFreeRequest: Record "Tax Free Request";var tmpTaxFreeVoucherSaleLink: Record "Tax Free Voucher Sale Link")
+    local procedure CreateAndPrintVoucher(TaxFreeRequest: Record "Tax Free Request"; var tmpTaxFreeVoucherSaleLink: Record "Tax Free Voucher Sale Link")
     var
         TaxFreeVoucher: Record "Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "Tax Free Voucher Sale Link";
         TaxFreeLastVoucher: Codeunit "Tax Free Last Voucher Print";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         TaxFreeUnit: Record "Tax Free POS Unit";
     begin
         TaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
 
         with TaxFreeVoucher do begin
-          Init;
-          "External Voucher Barcode" := TaxFreeRequest."External Voucher Barcode";
-          "External Voucher No." := TaxFreeRequest."External Voucher No.";
-          "Issued Date" := Today;
-          "Issued Time" := Time;
-          "Issued By User" := UserId;
-          "Print Type" := TaxFreeRequest."Print Type";
-          "Total Amount Incl. VAT" := TaxFreeRequest."Total Amount Incl. VAT";
-          "Refund Amount" := TaxFreeRequest."Refund Amount";
-          "Salesperson Code" := TaxFreeRequest."Salesperson Code";
-          "POS Unit No." := TaxFreeRequest."POS Unit No.";
-          "Handler ID" := TaxFreeRequest."Handler ID";
-          Mode := TaxFreeRequest.Mode;
-          "Service ID" := TaxFreeRequest."Service ID";
-          if TaxFreeUnit."Store Voucher Prints" then
-            Print := TaxFreeRequest.Print;
-          Insert(true);
+            Init;
+            "External Voucher Barcode" := TaxFreeRequest."External Voucher Barcode";
+            "External Voucher No." := TaxFreeRequest."External Voucher No.";
+            "Issued Date" := Today;
+            "Issued Time" := Time;
+            "Issued By User" := UserId;
+            "Print Type" := TaxFreeRequest."Print Type";
+            "Total Amount Incl. VAT" := TaxFreeRequest."Total Amount Incl. VAT";
+            "Refund Amount" := TaxFreeRequest."Refund Amount";
+            "Salesperson Code" := TaxFreeRequest."Salesperson Code";
+            "POS Unit No." := TaxFreeRequest."POS Unit No.";
+            "Handler ID" := TaxFreeRequest."Handler ID";
+            Mode := TaxFreeRequest.Mode;
+            "Service ID" := TaxFreeRequest."Service ID";
+            if TaxFreeUnit."Store Voucher Prints" then
+                Print := TaxFreeRequest.Print;
+            Insert(true);
         end;
 
         tmpTaxFreeVoucherSaleLink.FindSet;
         repeat
-          TaxFreeVoucherSaleLink.Init;
-          TaxFreeVoucherSaleLink.TransferFields(tmpTaxFreeVoucherSaleLink);
-          TaxFreeVoucherSaleLink.Validate("Voucher Entry No.", TaxFreeVoucher."Entry No.");
-          TaxFreeVoucherSaleLink.Insert(true);
+            TaxFreeVoucherSaleLink.Init;
+            TaxFreeVoucherSaleLink.TransferFields(tmpTaxFreeVoucherSaleLink);
+            TaxFreeVoucherSaleLink.Validate("Voucher Entry No.", TaxFreeVoucher."Entry No.");
+            TaxFreeVoucherSaleLink.Insert(true);
         until tmpTaxFreeVoucherSaleLink.Next = 0;
 
         Commit;  //COMMIT data before print is attempted in case of error.
 
-        TempBlob.Blob := TaxFreeRequest.Print;
+        TempBlob.FromRecord(TaxFreeRequest, TaxFreeRequest.FieldNo(Print));
         TaxFreeLastVoucher.SetVoucher(TaxFreeVoucher."Entry No.", TempBlob, TaxFreeRequest."Print Type");
         VoucherPrintLast();
     end;
 
-    local procedure VoidVoucher(var TaxFreeVoucher: Record "Tax Free Voucher";Silent: Boolean)
+    local procedure VoidVoucher(var TaxFreeVoucher: Record "Tax Free Voucher"; Silent: Boolean)
     begin
         TaxFreeVoucher.Void := true;
         TaxFreeVoucher."Voided By User" := UserId;
@@ -663,10 +682,10 @@ codeunit 6014610 "Tax Free Handler Mgt."
         Commit;
 
         if not Silent then
-          Message(Caption_VoidSucces, TaxFreeVoucher."External Voucher No.");
+            Message(Caption_VoidSucces, TaxFreeVoucher."External Voucher No.");
     end;
 
-    local procedure CreateRequest(RequestType: Text;TaxFreeUnit: Record "Tax Free POS Unit";var Request: Record "Tax Free Request"): Boolean
+    local procedure CreateRequest(RequestType: Text; TaxFreeUnit: Record "Tax Free POS Unit"; var Request: Record "Tax Free Request"): Boolean
     var
         POSSession: Codeunit "POS Session";
         POSFrontEndManagement: Codeunit "POS Front End Management";
@@ -683,38 +702,39 @@ codeunit 6014610 "Tax Free Handler Mgt."
         Request."POS Unit No." := TaxFreeUnit."POS Unit No.";
 
         if POSSession.IsActiveSession(POSFrontEndManagement) then begin //If the request is being created while logged into POS
-          POSFrontEndManagement.GetSession(POSSession);
-          POSSession.GetSetup(POSSetup);
-          Request."Salesperson Code" := POSSetup.Salesperson;
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            Request."Salesperson Code" := POSSetup.Salesperson;
         end;
     end;
 
-    local procedure HandleEventResponse(EventWasHandled: Boolean;TaxFreeUnit: Record "Tax Free POS Unit";TaxFreeRequest: Record "Tax Free Request";Silent: Boolean)
+    local procedure HandleEventResponse(EventWasHandled: Boolean; TaxFreeUnit: Record "Tax Free POS Unit"; TaxFreeRequest: Record "Tax Free Request"; Silent: Boolean)
     var
         ErrorNo: Text;
     begin
         if not EventWasHandled then begin
-          TaxFreeRequest."Error Message" := StrSubstNo(Error_MissingHandler, TaxFreeUnit."Handler ID");
-          TaxFreeRequest.Success := false;
-        end else if not TaxFreeRequest.Success then
-          TaxFreeRequest."Error Message" := CopyStr(GetLastErrorText, 1, 250);
+            TaxFreeRequest."Error Message" := StrSubstNo(Error_MissingHandler, TaxFreeUnit."Handler ID");
+            TaxFreeRequest.Success := false;
+        end else
+            if not TaxFreeRequest.Success then
+                TaxFreeRequest."Error Message" := CopyStr(GetLastErrorText, 1, 250);
 
         LogEvent(TaxFreeUnit, TaxFreeRequest);
 
         if (not TaxFreeRequest.Success) and (not Silent) then begin
-          if TaxFreeRequest."Error Code" <> '' then
-            ErrorNo := StrSubstNo(' - %1: %2', Caption_Code, TaxFreeRequest."Error Code");
-          ShowError(TaxFreeRequest."Error Message" + ErrorNo);
+            if TaxFreeRequest."Error Code" <> '' then
+                ErrorNo := StrSubstNo(' - %1: %2', Caption_Code, TaxFreeRequest."Error Code");
+            ShowError(TaxFreeRequest."Error Message" + ErrorNo);
         end;
     end;
 
-    local procedure LogEvent(TaxFreeUnit: Record "Tax Free POS Unit";var TaxFreeRequest: Record "Tax Free Request")
+    local procedure LogEvent(TaxFreeUnit: Record "Tax Free POS Unit"; var TaxFreeRequest: Record "Tax Free Request")
     begin
         if TaxFreeUnit."Log Level" = TaxFreeUnit."Log Level"::NONE then
-          exit;
+            exit;
 
         if (TaxFreeUnit."Log Level" = TaxFreeUnit."Log Level"::ERROR) and TaxFreeRequest.Success then
-          exit;
+            exit;
 
         TaxFreeRequest."Date End" := Today;
         TaxFreeRequest."Time End" := Time;
@@ -726,9 +746,9 @@ codeunit 6014610 "Tax Free Handler Mgt."
     local procedure ShowError(ErrorMessage: Text)
     begin
         if StrLen(ErrorMessage) > 0 then
-          Message(Error_TaxFreeProcessing + ':\' + ErrorMessage)
+            Message(Error_TaxFreeProcessing + ':\' + ErrorMessage)
         else
-          Message(Error_TaxFreeProcessing);
+            Message(Error_TaxFreeProcessing);
     end;
 
     local procedure CheckEnvironment(TaxFreeUnit: Record "Tax Free POS Unit"): Boolean
@@ -736,9 +756,9 @@ codeunit 6014610 "Tax Free Handler Mgt."
         NPRetailSetup: Record "NP Retail Setup";
     begin
         if TaxFreeUnit.Mode = TaxFreeUnit.Mode::PROD then
-          if NPRetailSetup.Get then
-            if NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD then
-              exit(Confirm(Caption_EnvironmentWarning, false));
+            if NPRetailSetup.Get then
+                if NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD then
+                    exit(Confirm(Caption_EnvironmentWarning, false));
 
         exit(true);
     end;
@@ -748,13 +768,13 @@ codeunit 6014610 "Tax Free Handler Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step";RunTrigger: Boolean)
+    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         //-NPR5.39 [302779]
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
-        if Rec."Subscriber Function" <>  'IssueTaxFreeVoucherOnSale' then
-          exit;
+            exit;
+        if Rec."Subscriber Function" <> 'IssueTaxFreeVoucherOnSale' then
+            exit;
 
         Rec.Description := Caption_Workflow;
         Rec."Sequence No." := 60;
@@ -769,7 +789,7 @@ codeunit 6014610 "Tax Free Handler Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure IssueTaxFreeVoucherOnSale(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SalePOS: Record "Sale POS")
+    local procedure IssueTaxFreeVoucherOnSale(POSSalesWorkflowStep: Record "POS Sales Workflow Step"; SalePOS: Record "Sale POS")
     var
         AuditRoll: Record "Audit Roll";
         TaxFreeUnit: Record "Tax Free POS Unit";
@@ -777,20 +797,20 @@ codeunit 6014610 "Tax Free Handler Mgt."
     begin
         //-NPR5.39 [302779]
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'IssueTaxFreeVoucherOnSale' then
-          exit;
+            exit;
 
-        AuditRoll.SetRange("Register No.",SalePOS."Register No.");
-        AuditRoll.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
+        AuditRoll.SetRange("Register No.", SalePOS."Register No.");
+        AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if not AuditRoll.FindFirst then
-          exit;
+            exit;
 
         if not SalePOS."Issue Tax Free Voucher" then
-          exit;
+            exit;
 
         if not TaxFreeUnit.Get(SalePOS."Register No.") then
-          exit;
+            exit;
 
         Commit;
 

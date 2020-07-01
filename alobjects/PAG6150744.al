@@ -13,61 +13,61 @@ page 6150744 "Archive POS Sale"
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
                 }
-                field(Date;Date)
+                field(Date; Date)
                 {
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
                     Visible = false;
                 }
-                field("Customer Name";"Customer Name")
+                field("Customer Name"; "Customer Name")
                 {
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
                 }
-                field("Payment Amount";"Payment Amount")
+                field("Payment Amount"; "Payment Amount")
                 {
                 }
-                field("POS Sale ID";"POS Sale ID")
+                field("POS Sale ID"; "POS Sale ID")
                 {
                 }
-                field("Retail ID";"Retail ID")
+                field("Retail ID"; "Retail ID")
                 {
                     Visible = false;
                 }
             }
-            part(SaleLines;"Archive POS Sale Lines Subpage")
+            part(SaleLines; "Archive POS Sale Lines Subpage")
             {
                 Caption = 'POS Sale Lines';
-                SubPageLink = "Register No."=FIELD("Register No."),
-                              "Sales Ticket No."=FIELD("Sales Ticket No.");
+                SubPageLink = "Register No." = FIELD("Register No."),
+                              "Sales Ticket No." = FIELD("Sales Ticket No.");
             }
         }
         area(factboxes)
         {
-            systempart(Control6014414;Notes)
+            systempart(Control6014414; Notes)
             {
                 Visible = false;
             }
@@ -95,7 +95,7 @@ page 6150744 "Archive POS Sale"
 
     procedure ViewPOSSalesData(ArchiveSalePOS: Record "Archive Sale POS")
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         StreamReader: DotNet npNetStreamReader;
@@ -104,20 +104,20 @@ page 6150744 "Archive POS Sale"
         POSSalesData: Text;
     begin
         if not ArchiveSalePOS."POS Sales Data".HasValue then
-          exit;
+            exit;
 
         ArchiveSalePOS.CalcFields("POS Sales Data");
         if IsWebClient() then begin
-          ArchiveSalePOS."POS Sales Data".CreateInStream(InStr);
-          StreamReader := StreamReader.StreamReader(InStr);
-          POSSalesData := StreamReader.ReadToEnd();
-          POSSalesData := NpXmlDomMgt.PrettyPrintXml(POSSalesData);
-          Message(POSSalesData);
-          exit;
+            ArchiveSalePOS."POS Sales Data".CreateInStream(InStr);
+            StreamReader := StreamReader.StreamReader(InStr);
+            POSSalesData := StreamReader.ReadToEnd();
+            POSSalesData := NpXmlDomMgt.PrettyPrintXml(POSSalesData);
+            Message(POSSalesData);
+            exit;
         end;
 
-        TempBlob.Blob := ArchiveSalePOS."POS Sales Data";
-        Path := FileMgt.BLOBExport(TempBlob,TemporaryPath + ArchiveSalePOS."Sales Ticket No." + '.xml',false);
+        TempBlob.FromRecord(ArchiveSalePOS, ArchiveSalePOS.FieldNo("POS Sales Data"));
+        Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + ArchiveSalePOS."Sales Ticket No." + '.xml', false);
         HyperLink(Path);
     end;
 
@@ -125,8 +125,8 @@ page 6150744 "Archive POS Sale"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId,SessionId) then
-          exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
+        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;
 }

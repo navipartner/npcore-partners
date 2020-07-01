@@ -75,35 +75,35 @@ codeunit 6184861 "Azure Storage API Mgt."
         AzureStorageOverview: Page "Azure Storage Overview";
     begin
         with TempStorageOperationtypes do begin
-          Init;
-          "Storage Type" := StorageType();
-          Description := UploadDescriptionCaption;
-          "Operation Code" := UploadCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := UploadDescriptionCaption;
+            "Operation Code" := UploadCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := DownloadDescriptionCaption;
-          "Operation Code" := DownloadCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := DownloadDescriptionCaption;
+            "Operation Code" := DownloadCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := DeleteDescriptionCaption;
-          "Operation Code" := DeleteCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := DeleteDescriptionCaption;
+            "Operation Code" := DeleteCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := ListDescriptionCaption;
-          "Operation Code" := ListCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := ListDescriptionCaption;
+            "Operation Code" := ListCaption;
+            Insert;
 
-          Init;
-          "Storage Type" := StorageType();
-          Description := StrSubstNo(OverviewDescriptionCaption, AzureStorageOverview.Caption);
-          "Operation Code" := OverviewCaption;
-          Insert;
+            Init;
+            "Storage Type" := StorageType();
+            Description := StrSubstNo(OverviewDescriptionCaption, AzureStorageOverview.Caption);
+            "Operation Code" := OverviewCaption;
+            Insert;
         end;
     end;
 
@@ -113,92 +113,92 @@ codeunit 6184861 "Azure Storage API Mgt."
         AzureStorageOverview: Record "Azure Storage Overview";
     begin
         with TempStorageOperationParameter do begin
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := ListCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := RefreshCaption;
-          Description := StrSubstNo(ListParamDescriptionCaption, AzureStorageOverview.TableCaption);
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := ListCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := RefreshCaption;
+            Description := StrSubstNo(ListParamDescriptionCaption, AzureStorageOverview.TableCaption);
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := UploadFromCaption;
-          Description := UploadFromDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := UploadFromCaption;
+            Description := UploadFromDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 200;
-          "Parameter Name" := UploadLocationCaption;
-          Description := LocationOnStorageDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := UploadLocationCaption;
+            Description := LocationOnStorageDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 300;
-          "Parameter Name" := ContainerNameCaption;
-          Description := ContainerParamDescriptionCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 300;
+            "Parameter Name" := ContainerNameCaption;
+            Description := ContainerParamDescriptionCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := UploadCaption;
-          "Parameter Key" := 400;
-          "Parameter Name" := UploadAllCaption;
-          Description := UploadAllDescCaption;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 400;
+            "Parameter Name" := UploadAllCaption;
+            Description := UploadAllDescCaption;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DownloadCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := DownloadFileCaption;
-          Description := FileDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := DownloadFileCaption;
+            Description := FileDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DownloadCaption;
-          "Parameter Key" := 200;
-          "Parameter Name" := ContainerNameCaption;
-          Description := ContainerParamDescriptionCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := ContainerNameCaption;
+            Description := ContainerParamDescriptionCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DownloadCaption;
-          "Parameter Key" := 300;
-          "Parameter Name" := DataExchTypeCaption;
-          Description := DataExchTypeDescCaption;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 300;
+            "Parameter Name" := DataExchTypeCaption;
+            Description := DataExchTypeDescCaption;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DeleteCaption;
-          "Parameter Key" := 100;
-          "Parameter Name" := DeleteFileCaption;
-          Description := FileDescCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DeleteCaption;
+            "Parameter Key" := 100;
+            "Parameter Name" := DeleteFileCaption;
+            Description := FileDescCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
 
-          Init;
-          "Storage Type" := StorageType();
-          "Operation Code" := DeleteCaption;
-          "Parameter Key" := 200;
-          "Parameter Name" := ContainerNameCaption;
-          Description := ContainerParamDescriptionCaption;
-          "Mandatory For Job Queue" := true;
-          if Insert then;
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DeleteCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := ContainerNameCaption;
+            Description := ContainerParamDescriptionCaption;
+            "Mandatory For Job Queue" := true;
+            if Insert then;
         end;
     end;
 
@@ -208,16 +208,16 @@ codeunit 6184861 "Azure Storage API Mgt."
         AzureStorageAPISetup: Record "Azure Storage API Setup";
     begin
         if StorageSetup."Storage Type" <> StorageType() then
-          exit;
+            exit;
 
         if PAGE.RunModal(PAGE::"Azure Storage Setup", AzureStorageAPISetup) <> ACTION::LookupOK then
-          exit;
+            exit;
 
         StorageSetup."Storage ID" := AzureStorageAPISetup."Account Name";
         StorageSetup.Description := AzureStorageAPISetup."Account Description";
     end;
 
-    procedure ListAzureStorage(StorageAccountName: Text;StorageConatainerName: Text;StoregeServiceVersion: Text;FullRefresh: Boolean;DBInsert: Boolean;Silent: Boolean;var ResponseXMLStack: Text): Boolean
+    procedure ListAzureStorage(StorageAccountName: Text; StorageConatainerName: Text; StoregeServiceVersion: Text; FullRefresh: Boolean; DBInsert: Boolean; Silent: Boolean; var ResponseXMLStack: Text): Boolean
     var
         AzureStorageAPISetup: Record "Azure Storage API Setup";
         RequestManagement: Codeunit "Request Management";
@@ -236,21 +236,21 @@ codeunit 6184861 "Azure Storage API Mgt."
         XMLNode: DotNet npNetXmlNode;
     begin
         if StorageAccountName = '' then
-          Error(MissingStorageAccNameErr);
+            Error(MissingStorageAccNameErr);
 
         LF := 10;
         LineFeed := Format(LF);
         UTCNow := RequestManagement.UTCDateTimeNowText('R');
 
         if StorageConatainerName > '' then begin
-          UriParameter := '?restype=container&comp=list';
-          RestType := LineFeed + 'restype:container';
+            UriParameter := '?restype=container&comp=list';
+            RestType := LineFeed + 'restype:container';
         end else
-          UriParameter := '?comp=list';
+            UriParameter := '?comp=list';
 
         AzureStorageAPISetup.Get(StorageAccountName);
         if StoregeServiceVersion = '' then
-          StoregeServiceVersion := '2019-02-02';
+            StoregeServiceVersion := '2019-02-02';
 
         HttpWebRequest := HttpWebRequest.Create('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + UriParameter);
         HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
@@ -277,40 +277,40 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         AppendResponse(Response, ResponseXMLStack);
 
         if StorageConatainerName = '' then begin
-          if not RequestManagement.GetNodesFromXmlText(Response, '//Containers/Container/Name', XMLNodeList) then
-            exit;
+            if not RequestManagement.GetNodesFromXmlText(Response, '//Containers/Container/Name', XMLNodeList) then
+                exit;
 
-          if FullRefresh then begin
-            if XMLNodeList.Count() = 0 then begin
-              DeleteAzureStorageOverview(StorageAccountName, '', '');
+            if FullRefresh then begin
+                if XMLNodeList.Count() = 0 then begin
+                    DeleteAzureStorageOverview(StorageAccountName, '', '');
 
-              exit;
+                    exit;
+                end;
+
+                CleanResidueContainers(StorageAccountName, XMLNodeList);
             end;
 
-            CleanResidueContainers(StorageAccountName, XMLNodeList);
-          end;
+            foreach XMLNode in XMLNodeList do
+                ListAzureStorage(AzureStorageAPISetup."Account Name", XMLNode.InnerText, '', FullRefresh, DBInsert, Silent, ResponseXMLStack);
 
-          foreach XMLNode in XMLNodeList do
-            ListAzureStorage(AzureStorageAPISetup."Account Name", XMLNode.InnerText, '', FullRefresh, DBInsert, Silent, ResponseXMLStack);
-
-          exit(true);
+            exit(true);
         end;
 
         if DBInsert then
-          ImportStorageList(StorageAccountName, StorageConatainerName, Response, FullRefresh);
+            ImportStorageList(StorageAccountName, StorageConatainerName, Response, FullRefresh);
 
         exit(true);
     end;
 
-    procedure SearchAzureStorage(var Paths: DotNet npNetXmlDocument;StorageAccountName: Text;StorageServiceName: Text;StoregeApiVersion: Text;IndexName: Text;FolderOrFileName: Text;Silent: Boolean): Boolean
+    procedure SearchAzureStorage(var Paths: DotNet npNetXmlDocument; StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; IndexName: Text; FolderOrFileName: Text; Silent: Boolean): Boolean
     var
         AzureStorageAPISetup: Record "Azure Storage API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Response: Text;
         Arguments: Text;
@@ -323,21 +323,21 @@ codeunit 6184861 "Azure Storage API Mgt."
         //FolderOrFileName has to be the full name of the file or folder, not a partial string
 
         case '' of
-          StorageServiceName:
-            Error(MissingStorageAccServiceErr);
-          IndexName:
-            Error(MissingIndexErr);
+            StorageServiceName:
+                Error(MissingStorageAccServiceErr);
+            IndexName:
+                Error(MissingIndexErr);
         end;
 
         with RequestManagement do begin
-          JsonAdd(Arguments, 'search', '*', false);
-          JsonAdd(Arguments, 'filter', 'search.ismatch(''' + FolderOrFileName + ''')', false);
-          JsonAdd(Arguments, 'select', 'path', false);
+            JsonAdd(Arguments, 'search', '*', false);
+            JsonAdd(Arguments, 'filter', 'search.ismatch(''' + FolderOrFileName + ''')', false);
+            JsonAdd(Arguments, 'select', 'path', false);
         end;
 
         AzureStorageAPISetup.Get(StorageAccountName);
         if StoregeApiVersion = '' then
-          StoregeApiVersion := '2019-05-06';
+            StoregeApiVersion := '2019-05-06';
 
         HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexes/' + IndexName + '/docs/search?api-version=' + StoregeApiVersion);
         HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
@@ -345,18 +345,18 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.ContentType('application/json');
         HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         exit(RequestManagement.GetXMLFromJsonArray(StreamReader.StreamReader(MemoryStream.MemoryStream(Convert.FromBase64String(Response))).ReadToEnd(), Paths, 'value', '$..path', '', ''));
     end;
 
-    procedure UploadToAzureStorage(var TempBlob: Record TempBlob;StorageAccountName: Text;StoregeServiceVersion: Text;StorageConatainerName: Text;FileName: Text;MIMEType: Text;Silent: Boolean): Boolean
+    procedure UploadToAzureStorage(var TempBlob: Codeunit "Temp Blob"; StorageAccountName: Text; StoregeServiceVersion: Text; StorageConatainerName: Text; FileName: Text; MIMEType: Text; Silent: Boolean): Boolean
     var
         AzureStorageOverview: Record "Azure Storage Overview";
         AzureStorageAPISetup: Record "Azure Storage API Setup";
@@ -371,23 +371,23 @@ codeunit 6184861 "Azure Storage API Mgt."
         Uri: DotNet npNetUri;
     begin
         if MIMEType = '' then
-          if RequestManagement.TryGetMIMEType(FileName, MIMEType) then;
+            if RequestManagement.TryGetMIMEType(FileName, MIMEType) then;
 
         case '' of
-          StorageAccountName:
-            Error(MissingStorageAccNameErr);
-          StorageConatainerName:
-            Error(MissingStorageConatainerNameErr);
-          FileName:
-            Error(MissingFileNameErr);
-          MIMEType:
-            Error(MissingMIMETypeErr);
+            StorageAccountName:
+                Error(MissingStorageAccNameErr);
+            StorageConatainerName:
+                Error(MissingStorageConatainerNameErr);
+            FileName:
+                Error(MissingFileNameErr);
+            MIMEType:
+                Error(MissingMIMETypeErr);
         end;
 
         FileName := Uri.EscapeUriString(FileName);
 
         if StoregeServiceVersion = '' then
-          StoregeServiceVersion := '2019-02-02';
+            StoregeServiceVersion := '2019-02-02';
 
         AzureStorageAPISetup.Get(StorageAccountName);
         LF := 10;
@@ -424,14 +424,14 @@ codeunit 6184861 "Azure Storage API Mgt."
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength);
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         exit(InsertAzureStorageOverview(StorageAccountName, StorageConatainerName, Uri.UnescapeDataString(FileName)));
     end;
 
-    procedure CreateContainerAzureStorage(StorageAccountName: Text;StoregeServiceVersion: Text;StorageConatainerName: Text;Silent: Boolean): Boolean
+    procedure CreateContainerAzureStorage(StorageAccountName: Text; StoregeServiceVersion: Text; StorageConatainerName: Text; Silent: Boolean): Boolean
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         AzureStorageAPISetup: Record "Azure Storage API Setup";
         RequestManagement: Codeunit "Request Management";
         StringToSign: Text;
@@ -445,14 +445,14 @@ codeunit 6184861 "Azure Storage API Mgt."
         Stream: DotNet npNetStream;
     begin
         case '' of
-          StorageAccountName:
-            Error(MissingStorageAccNameErr);
-          StorageConatainerName:
-            Error(MissingStorageConatainerNameErr);
+            StorageAccountName:
+                Error(MissingStorageAccNameErr);
+            StorageConatainerName:
+                Error(MissingStorageConatainerNameErr);
         end;
 
         if StoregeServiceVersion = '' then
-          StoregeServiceVersion := '2019-02-02';
+            StoregeServiceVersion := '2019-02-02';
 
         AzureStorageAPISetup.Get(StorageAccountName);
         LF := 10;
@@ -483,7 +483,7 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.Headers.Add('x-ms-date', UTCNow);
         HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write('');
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength); // request must be chunked for this call
@@ -491,7 +491,7 @@ codeunit 6184861 "Azure Storage API Mgt."
         exit(RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent));
     end;
 
-    procedure DownloadFromAzureStorage(var TempBlob: Record TempBlob;StorageAccountName: Text;StoregeServiceVersion: Text;StorageConatainerName: Text;FileName: Text;Silent: Boolean): Boolean
+    procedure DownloadFromAzureStorage(var TempBlob: Codeunit "Temp Blob"; StorageAccountName: Text; StoregeServiceVersion: Text; StorageConatainerName: Text; FileName: Text; Silent: Boolean): Boolean
     var
         AzureStorageAPISetup: Record "Azure Storage API Setup";
         RequestManagement: Codeunit "Request Management";
@@ -508,17 +508,17 @@ codeunit 6184861 "Azure Storage API Mgt."
         Uri: DotNet npNetUri;
     begin
         case '' of
-          StorageAccountName:
-            Error(MissingStorageAccNameErr);
-          StorageConatainerName:
-            Error(MissingStorageConatainerNameErr);
+            StorageAccountName:
+                Error(MissingStorageAccNameErr);
+            StorageConatainerName:
+                Error(MissingStorageConatainerNameErr);
         end;
 
         FileName := Uri.EscapeUriString(FileName);
 
         AzureStorageAPISetup.Get(StorageAccountName);
         if StoregeServiceVersion = '' then
-          StoregeServiceVersion := '2019-02-02';
+            StoregeServiceVersion := '2019-02-02';
 
         LF := 10;
         LineFeed := Format(LF);
@@ -545,17 +545,17 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(Response));
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         MemoryStream.CopyTo(OutStr);
 
-        exit(TempBlob.Blob.HasValue);
+        exit(TempBlob.HasValue);
     end;
 
-    procedure DeleteFromAzureStorage(StorageAccountName: Text;StoregeServiceVersion: Text;StorageConatainerName: Text;FileName: Text;Silent: Boolean): Boolean
+    procedure DeleteFromAzureStorage(StorageAccountName: Text; StoregeServiceVersion: Text; StorageConatainerName: Text; FileName: Text; Silent: Boolean): Boolean
     var
         AzureStorageOverview: Record "Azure Storage Overview";
         AzureStorageAPISetup: Record "Azure Storage API Setup";
@@ -570,15 +570,15 @@ codeunit 6184861 "Azure Storage API Mgt."
         Uri: DotNet npNetUri;
     begin
         case '' of
-          StorageAccountName:
-            Error(MissingStorageAccNameErr);
-          StorageConatainerName:
-            Error(MissingStorageConatainerNameErr);
+            StorageAccountName:
+                Error(MissingStorageAccNameErr);
+            StorageConatainerName:
+                Error(MissingStorageConatainerNameErr);
         end;
 
         AzureStorageAPISetup.Get(StorageAccountName);
         if StoregeServiceVersion = '' then
-          StoregeServiceVersion := '2019-02-02';
+            StoregeServiceVersion := '2019-02-02';
 
         FileName := Uri.EscapeUriString(FileName);
 
@@ -607,17 +607,17 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         DeleteAzureStorageOverview(StorageAccountName, StorageConatainerName, Uri.UnescapeDataString(FileName));
 
         exit(true);
     end;
 
-    procedure CopyFileOnAzureStorage(ContainerFrom: Text;ContainerTo: Text;StorageAccountName: Text;StorageApiVersion: Text;FromFileName: Text;ToFileName: Text;Silent: Boolean): Boolean
+    procedure CopyFileOnAzureStorage(ContainerFrom: Text; ContainerTo: Text; StorageAccountName: Text; StorageApiVersion: Text; FromFileName: Text; ToFileName: Text; Silent: Boolean): Boolean
     var
         AzureStorageAPISetup: Record "Azure Storage API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         StringToSign: Text;
         UTCNow: Text;
@@ -630,16 +630,16 @@ codeunit 6184861 "Azure Storage API Mgt."
         Uri: DotNet npNetUri;
     begin
         case '' of
-          StorageAccountName:
-            Error(MissingStorageAccNameErr);
-          ContainerFrom, ContainerTo:
-            Error(MissingStorageConatainerNameErr);
-          FromFileName, ToFileName:
-            Error(MiissingToFromErr);
+            StorageAccountName:
+                Error(MissingStorageAccNameErr);
+            ContainerFrom, ContainerTo:
+                Error(MissingStorageConatainerNameErr);
+            FromFileName, ToFileName:
+                Error(MiissingToFromErr);
         end;
 
         if StorageApiVersion = '' then
-          StorageApiVersion := '2019-02-02';
+            StorageApiVersion := '2019-02-02';
 
         ToFileName := Uri.EscapeUriString(ToFileName);
         FromFileName := Uri.EscapeUriString(FromFileName);
@@ -674,21 +674,21 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.Headers.Add('x-ms-version', StorageApiVersion);
         HttpWebRequest.Headers.Add('x-ms-copy-source', 'https://' + StorageAccountName + '.blob.core.windows.net/' + ContainerFrom + '/' + FromFileName);
 
-        TempBlob.Blob.CreateOutStream(Outstr);
+        TempBlob.CreateOutStream(Outstr);
         Outstr.Write('');
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength); // request must be chunked for this call
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         exit(InsertAzureStorageOverview(StorageAccountName, ContainerTo, Uri.UnescapeDataString(ToFileName)));
     end;
 
-    procedure InitializeAzureDataSource(StorageContainerName: Text;StorageAccountName: Text;StorageServiceName: Text;StoregeApiVersion: Text;DataSourceName: Text;Silent: Boolean): Boolean
+    procedure InitializeAzureDataSource(StorageContainerName: Text; StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; DataSourceName: Text; Silent: Boolean): Boolean
     var
         AzureStorageAPISetup: Record "Azure Storage API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Arguments: Text;
         Creds: Text;
@@ -698,27 +698,27 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest: DotNet npNetHttpWebRequest;
     begin
         case '' of
-          StorageAccountName:
-            Error(MissingStorageAccNameErr);
-          StorageServiceName:
-            Error(MissingStorageAccServiceErr);
-          DataSourceName:
-            Error(MissingStorageAccDataSourceErr);
-          StorageContainerName:
-            Error(MissingStorageConatainerNameErr);
+            StorageAccountName:
+                Error(MissingStorageAccNameErr);
+            StorageServiceName:
+                Error(MissingStorageAccServiceErr);
+            DataSourceName:
+                Error(MissingStorageAccDataSourceErr);
+            StorageContainerName:
+                Error(MissingStorageConatainerNameErr);
         end;
 
         AzureStorageAPISetup.Get(StorageAccountName);
 
         if StoregeApiVersion = '' then
-          StoregeApiVersion := '2019-05-06';
+            StoregeApiVersion := '2019-05-06';
 
         with RequestManagement do begin
-          JsonAdd(Arguments, 'type', 'azureblob', false);
-          JsonAdd(Creds, 'connectionString', StrSubstNo('DefaultEndpointsProtocol=https;AccountName=%1;AccountKey=%2', StorageAccountName, AzureStorageAPISetup.GetAccessKey()), false);
-          JsonAdd(Arguments, 'credentials', Creds, true);
-          JsonAdd(Container, 'name', StorageContainerName, false);
-          JsonAdd(Arguments, 'container', Container, true);
+            JsonAdd(Arguments, 'type', 'azureblob', false);
+            JsonAdd(Creds, 'connectionString', StrSubstNo('DefaultEndpointsProtocol=https;AccountName=%1;AccountKey=%2', StorageAccountName, AzureStorageAPISetup.GetAccessKey()), false);
+            JsonAdd(Arguments, 'credentials', Creds, true);
+            JsonAdd(Container, 'name', StorageContainerName, false);
+            JsonAdd(Arguments, 'container', Container, true);
         end;
 
         HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/datasources/' + DataSourceName + '?api-version=' + StoregeApiVersion);
@@ -727,7 +727,7 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.ContentType := 'application/json';
         HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
@@ -735,11 +735,11 @@ codeunit 6184861 "Azure Storage API Mgt."
         exit(RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent));
     end;
 
-    procedure InitializeAzureIndex(StorageAccountName: Text;StorageServiceName: Text;StoregeApiVersion: Text;StorageIndexName: Text;Reinitialize: Boolean;Silent: Boolean): Boolean
+    procedure InitializeAzureIndex(StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; StorageIndexName: Text; Reinitialize: Boolean; Silent: Boolean): Boolean
     var
         AzureStorageCognitiveSearch: Record "Azure Storage Cognitive Search";
         AzureStorageAPISetup: Record "Azure Storage API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Response: Text;
         Arguments: Text;
@@ -751,34 +751,34 @@ codeunit 6184861 "Azure Storage API Mgt."
         // indexer must run a reload cycle for a new index to be in effect
 
         case '' of
-          StorageServiceName:
-            Error(MissingStorageAccServiceErr);
-          StorageIndexName:
-            Error(MissingIndexErr);
+            StorageServiceName:
+                Error(MissingStorageAccServiceErr);
+            StorageIndexName:
+                Error(MissingIndexErr);
         end;
 
         AzureStorageAPISetup.Get(StorageAccountName);
 
         if Reinitialize then
-          DropAzureIndex(StorageAccountName, StorageServiceName, StoregeApiVersion, StorageIndexName, true);
+            DropAzureIndex(StorageAccountName, StorageServiceName, StoregeApiVersion, StorageIndexName, true);
 
         if StoregeApiVersion = '' then
-          StoregeApiVersion := '2019-05-06';
+            StoregeApiVersion := '2019-05-06';
 
         with RequestManagement do begin
-          JsonAdd(IndexID, 'name', 'id', false);
-          JsonAdd(IndexID, 'type', 'Edm.String', false);
-          JsonAdd(IndexID, 'key', true, false);
-          JsonAdd(IndexID, 'searchable', false, false);
+            JsonAdd(IndexID, 'name', 'id', false);
+            JsonAdd(IndexID, 'type', 'Edm.String', false);
+            JsonAdd(IndexID, 'key', true, false);
+            JsonAdd(IndexID, 'searchable', false, false);
 
-          JsonAdd(IndexContent, 'name', 'path', false);
-          JsonAdd(IndexContent, 'type', 'Edm.String', false);
-          JsonAdd(IndexContent, 'searchable', true, false);
-          JsonAdd(IndexContent, 'filterable', true, false);
-          JsonAdd(IndexContent, 'sortable', false, false);
-          JsonAdd(IndexContent, 'facetable', false, false);
+            JsonAdd(IndexContent, 'name', 'path', false);
+            JsonAdd(IndexContent, 'type', 'Edm.String', false);
+            JsonAdd(IndexContent, 'searchable', true, false);
+            JsonAdd(IndexContent, 'filterable', true, false);
+            JsonAdd(IndexContent, 'sortable', false, false);
+            JsonAdd(IndexContent, 'facetable', false, false);
 
-          JsonAdd(Arguments, 'fields' , '[' + IndexID + ',' + IndexContent + ']', true);
+            JsonAdd(Arguments, 'fields', '[' + IndexID + ',' + IndexContent + ']', true);
         end;
 
         HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
@@ -787,13 +787,13 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.ContentType := 'application/json';
         HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         AzureStorageCognitiveSearch."Account Name" := StorageAccountName;
         AzureStorageCognitiveSearch."Search Service Name" := StorageServiceName;
@@ -801,12 +801,12 @@ codeunit 6184861 "Azure Storage API Mgt."
         AzureStorageCognitiveSearch.Description := 'FIELDS - "id": Edm.String, key, nonsearchable; "path": Edm.String, searchable, filterable, nonsortable; ';
         AzureStorageCognitiveSearch.SetRecFilter;
         if AzureStorageCognitiveSearch.IsEmpty then
-          AzureStorageCognitiveSearch.Insert;
+            AzureStorageCognitiveSearch.Insert;
 
         exit(true);
     end;
 
-    procedure DropAzureIndex(StorageAccountName: Text;StorageServiceName: Text;StoregeApiVersion: Text;StorageIndexName: Text;Silent: Boolean): Boolean
+    procedure DropAzureIndex(StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; StorageIndexName: Text; Silent: Boolean): Boolean
     var
         AzureStorageCognitiveSearch: Record "Azure Storage Cognitive Search";
         AzureStorageAPISetup: Record "Azure Storage API Setup";
@@ -815,20 +815,20 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest: DotNet npNetHttpWebRequest;
     begin
         case '' of
-          StorageServiceName:
-            Error(MissingStorageAccServiceErr);
-          StorageIndexName:
-            Error(MissingIndexErr);
+            StorageServiceName:
+                Error(MissingStorageAccServiceErr);
+            StorageIndexName:
+                Error(MissingIndexErr);
         end;
 
         AzureStorageAPISetup.Get(StorageAccountName);
 
         if not Silent then
-          if not Confirm(StrSubstNo(DeleteIndexCaption, StorageIndexName), false) then
-            exit;
+            if not Confirm(StrSubstNo(DeleteIndexCaption, StorageIndexName), false) then
+                exit;
 
         if StoregeApiVersion = '' then
-          StoregeApiVersion := '2019-05-06';
+            StoregeApiVersion := '2019-05-06';
 
         HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
         HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
@@ -837,7 +837,7 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
 
         if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-          exit;
+            exit;
 
         AzureStorageCognitiveSearch.SetRange("Account Name", StorageAccountName);
         AzureStorageCognitiveSearch.SetRange("Search Service Name", StorageServiceName);
@@ -847,10 +847,10 @@ codeunit 6184861 "Azure Storage API Mgt."
         exit(true);
     end;
 
-    procedure InitializeAzureIndexer(StorageAccountName: Text;StorageServiceName: Text;StoregeApiVersion: Text;StorageIndexerName: Text;StorageIndexName: Text;DataSourceName: Text;RefreshInterval: Text;Silent: Boolean): Boolean
+    procedure InitializeAzureIndexer(StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; StorageIndexerName: Text; StorageIndexName: Text; DataSourceName: Text; RefreshInterval: Text; Silent: Boolean): Boolean
     var
         AzureStorageAPISetup: Record "Azure Storage API Setup";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "Request Management";
         Arguments: Text;
         UnsupportedContentType: Text;
@@ -864,28 +864,28 @@ codeunit 6184861 "Azure Storage API Mgt."
         //API call may take a long time (timeout does not necessarily mean failure for this call)
 
         case '' of
-          StorageServiceName:
-            Error(MissingStorageAccServiceErr);
-          StorageIndexName:
-            Error(MissingIndexErr);
+            StorageServiceName:
+                Error(MissingStorageAccServiceErr);
+            StorageIndexName:
+                Error(MissingIndexErr);
         end;
 
         AzureStorageAPISetup.Get(StorageAccountName);
 
         if StoregeApiVersion = '' then
-          StoregeApiVersion := '2019-05-06';
+            StoregeApiVersion := '2019-05-06';
 
         with RequestManagement do begin
-          JsonAdd(Arguments, 'dataSourceName', DataSourceName, false);
-          JsonAdd(Arguments, 'targetIndexName', StorageIndexName, false);
-          JsonAdd(Schedule, 'interval', RefreshInterval, false);
-          JsonAdd(Arguments, 'schedule', Schedule, true);
-          JsonAdd(UnsupportedContentType, 'failOnUnsupportedContentType', false, false);
-          JsonAdd(Config, 'configuration', UnsupportedContentType, true);
-          JsonAdd(Arguments, 'parameters', Config, true);
-          JsonAdd(Mappings, 'sourceFieldName' , 'metadata_storage_path', false);
-          JsonAdd(Mappings, 'targetFieldName', 'path', false);
-          JsonAdd(Arguments, 'fieldMappings' , '[' + Mappings +']', true);
+            JsonAdd(Arguments, 'dataSourceName', DataSourceName, false);
+            JsonAdd(Arguments, 'targetIndexName', StorageIndexName, false);
+            JsonAdd(Schedule, 'interval', RefreshInterval, false);
+            JsonAdd(Arguments, 'schedule', Schedule, true);
+            JsonAdd(UnsupportedContentType, 'failOnUnsupportedContentType', false, false);
+            JsonAdd(Config, 'configuration', UnsupportedContentType, true);
+            JsonAdd(Arguments, 'parameters', Config, true);
+            JsonAdd(Mappings, 'sourceFieldName', 'metadata_storage_path', false);
+            JsonAdd(Mappings, 'targetFieldName', 'path', false);
+            JsonAdd(Arguments, 'fieldMappings', '[' + Mappings + ']', true);
         end;
 
         HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexers/' + StorageIndexerName + '?api-version=' + StoregeApiVersion);
@@ -894,7 +894,7 @@ codeunit 6184861 "Azure Storage API Mgt."
         HttpWebRequest.ContentType := 'application/json';
         HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
         RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
@@ -902,7 +902,7 @@ codeunit 6184861 "Azure Storage API Mgt."
         exit(RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent));
     end;
 
-    local procedure ImportStorageList(StorageAccountName: Text;StorageConatainerName: Text;ListXML: Text;FullRefresh: Boolean)
+    local procedure ImportStorageList(StorageAccountName: Text; StorageConatainerName: Text; ListXML: Text; FullRefresh: Boolean)
     var
         RequestManagement: Codeunit "Request Management";
         XMLNodeList: DotNet npNetXmlNodeList;
@@ -911,13 +911,13 @@ codeunit 6184861 "Azure Storage API Mgt."
         RequestManagement.GetNodesFromXmlText(ListXML, '//Blobs/Blob/Name', XMLNodeList);
 
         if FullRefresh then
-          DeleteAzureStorageOverview(StorageAccountName, StorageConatainerName, '');
+            DeleteAzureStorageOverview(StorageAccountName, StorageConatainerName, '');
 
         foreach XMLNode in XMLNodeList do
-          InsertAzureStorageOverview(StorageAccountName, StorageConatainerName, XMLNode.InnerText);
+            InsertAzureStorageOverview(StorageAccountName, StorageConatainerName, XMLNode.InnerText);
     end;
 
-    local procedure InsertAzureStorageOverview(StorageAccountName: Text;StorageConatainerName: Text;FileName: Text): Boolean
+    local procedure InsertAzureStorageOverview(StorageAccountName: Text; StorageConatainerName: Text; FileName: Text): Boolean
     var
         AzureStorageOverview: Record "Azure Storage Overview";
         FileManagement: Codeunit "File Management";
@@ -929,28 +929,28 @@ codeunit 6184861 "Azure Storage API Mgt."
 
         AzureStorageOverview.SetRecFilter;
         if AzureStorageOverview.IsEmpty then
-          exit(AzureStorageOverview.Insert);
+            exit(AzureStorageOverview.Insert);
     end;
 
-    local procedure DeleteAzureStorageOverview(StorageAccountName: Text;StorageConatainerName: Text;FileName: Text)
+    local procedure DeleteAzureStorageOverview(StorageAccountName: Text; StorageConatainerName: Text; FileName: Text)
     var
         AzureStorageOverview: Record "Azure Storage Overview";
         FileManagement: Codeunit "File Management";
     begin
         AzureStorageOverview.SetRange("Account name", StorageAccountName);
 
-        if StorageConatainerName > ''  then
-          AzureStorageOverview.SetRange("Container Name", StorageConatainerName);
+        if StorageConatainerName > '' then
+            AzureStorageOverview.SetRange("Container Name", StorageConatainerName);
 
         if FileName > '' then begin
-          AzureStorageOverview.SetRange("File Name", ConvertStr(FileManagement.GetDirectoryName(FileName), '\', '/'));
-          AzureStorageOverview.SetRange(Name, FileManagement.GetFileName(FileName));
+            AzureStorageOverview.SetRange("File Name", ConvertStr(FileManagement.GetDirectoryName(FileName), '\', '/'));
+            AzureStorageOverview.SetRange(Name, FileManagement.GetFileName(FileName));
         end;
 
         AzureStorageOverview.DeleteAll;
     end;
 
-    local procedure AppendResponse(Input: Text;var Response: Text)
+    local procedure AppendResponse(Input: Text; var Response: Text)
     var
         RequestManagement: Codeunit "Request Management";
         XMLNodeList: DotNet npNetXmlNodeList;
@@ -960,9 +960,9 @@ codeunit 6184861 "Azure Storage API Mgt."
         XMLNodeParent: DotNet npNetXmlNode;
     begin
         if Response = '' then begin
-          Response := Input;
+            Response := Input;
 
-          exit;
+            exit;
         end;
 
         ResponseXMLDocument := ResponseXMLDocument.XmlDocument();
@@ -977,7 +977,7 @@ codeunit 6184861 "Azure Storage API Mgt."
         Response := ResponseXMLDocument.OuterXml();
     end;
 
-    procedure GetAzureStorageFromXml(var TempAzureStorageOverview: Record "Azure Storage Overview" temporary;XmlNodeList: DotNet npNetXmlNodeList;IsContainerList: Boolean)
+    procedure GetAzureStorageFromXml(var TempAzureStorageOverview: Record "Azure Storage Overview" temporary; XmlNodeList: DotNet npNetXmlNodeList; IsContainerList: Boolean)
     var
         RequestManagement: Codeunit "Request Management";
         AzureDirectory: Text;
@@ -989,25 +989,25 @@ codeunit 6184861 "Azure Storage API Mgt."
         SlashChar := 47;
 
         foreach XMLNode in XmlNodeList do begin
-          if IsContainerList then
-            ContainerName := XMLNode.InnerXml
-          else begin
-            AzureDirectory := DelStr(XMLNode.InnerText, RequestManagement.FindLastOccuranceInString(XMLNode.InnerText, SlashChar));
-            XMLElement := XMLNode.ParentNode().ParentNode().ParentNode();
-            ContainerName := XMLElement.GetAttribute('ContainerName');
-          end;
+            if IsContainerList then
+                ContainerName := XMLNode.InnerXml
+            else begin
+                AzureDirectory := DelStr(XMLNode.InnerText, RequestManagement.FindLastOccuranceInString(XMLNode.InnerText, SlashChar));
+                XMLElement := XMLNode.ParentNode().ParentNode().ParentNode();
+                ContainerName := XMLElement.GetAttribute('ContainerName');
+            end;
 
-          TempAzureStorageOverview.SetRange("File Name", AzureDirectory);
-          TempAzureStorageOverview.SetRange("Container Name", ContainerName);
-          if TempAzureStorageOverview.IsEmpty then begin
-            TempAzureStorageOverview."Container Name" := ContainerName;
-            TempAzureStorageOverview."File Name" := AzureDirectory;
-            TempAzureStorageOverview.Insert;
-          end;
+            TempAzureStorageOverview.SetRange("File Name", AzureDirectory);
+            TempAzureStorageOverview.SetRange("Container Name", ContainerName);
+            if TempAzureStorageOverview.IsEmpty then begin
+                TempAzureStorageOverview."Container Name" := ContainerName;
+                TempAzureStorageOverview."File Name" := AzureDirectory;
+                TempAzureStorageOverview.Insert;
+            end;
         end;
     end;
 
-    local procedure CleanResidueContainers(StorageAccountName: Text;XMLNodeList: DotNet npNetXmlNodeList)
+    local procedure CleanResidueContainers(StorageAccountName: Text; XMLNodeList: DotNet npNetXmlNodeList)
     var
         AzureStorageOverview: Record "Azure Storage Overview";
         NodeValues: Text;
@@ -1015,19 +1015,19 @@ codeunit 6184861 "Azure Storage API Mgt."
     begin
         AzureStorageOverview.SetRange("Account name", StorageAccountName);
         if not AzureStorageOverview.FindFirst then
-          exit;
+            exit;
 
         foreach XMLNode in XMLNodeList do
-          NodeValues += XMLNode.InnerText + ' '; //API does not allow space characters in container names
+            NodeValues += XMLNode.InnerText + ' '; //API does not allow space characters in container names
 
         repeat
-          AzureStorageOverview.SetRange("Container Name", AzureStorageOverview."Container Name");
-          AzureStorageOverview.FindLast;
+            AzureStorageOverview.SetRange("Container Name", AzureStorageOverview."Container Name");
+            AzureStorageOverview.FindLast;
 
-          if StrPos(NodeValues, AzureStorageOverview."Container Name") = 0 then
-            DeleteAzureStorageOverview(StorageAccountName, AzureStorageOverview."Container Name", '');
+            if StrPos(NodeValues, AzureStorageOverview."Container Name") = 0 then
+                DeleteAzureStorageOverview(StorageAccountName, AzureStorageOverview."Container Name", '');
 
-          AzureStorageOverview.SetRange("Container Name");
+            AzureStorageOverview.SetRange("Container Name");
         until AzureStorageOverview.Next = 0;
     end;
 }

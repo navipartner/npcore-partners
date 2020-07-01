@@ -18,16 +18,16 @@ page 6014659 "Web Client Dependencies"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("BLOB.HASVALUE";BLOB.HasValue)
+                field("BLOB.HASVALUE"; BLOB.HasValue)
                 {
                     Caption = 'BLOB Imported';
                 }
@@ -95,7 +95,7 @@ page 6014659 "Web Client Dependencies"
 
     procedure ImportFile()
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
         Asm: DotNet npNetAssembly;
         InStr: InStream;
@@ -110,29 +110,34 @@ page 6014659 "Web Client Dependencies"
         ImportFilter: Text;
     begin
         case Type of
-          Type::JavaScript: ImportFilter := JavaScriptFilesTxt + ' (*.js)|*.js|';
-          Type::CSS:        ImportFilter := StyleSheetFilesTxt + ' (*.css)|*.css|';
-          Type::HTML:       ImportFilter := HtmlFilesTxt + ' (*.html)|*.html|';
-          Type::SVG:        ImportFilter := SvgFilesTxt + ' (*.svg)|*.svg|';
+            Type::JavaScript:
+                ImportFilter := JavaScriptFilesTxt + ' (*.js)|*.js|';
+            Type::CSS:
+                ImportFilter := StyleSheetFilesTxt + ' (*.css)|*.css|';
+            Type::HTML:
+                ImportFilter := HtmlFilesTxt + ' (*.html)|*.html|';
+            Type::SVG:
+                ImportFilter := SvgFilesTxt + ' (*.svg)|*.svg|';
         end;
 
         FileName := FileManagement.BLOBImportWithFilter(
-          TempBlob,ImportTitleTxt,'',
-          ImportFilter + AllFilesTxt + ' (*.*)|*.*','*.*');
+          TempBlob, ImportTitleTxt, '',
+          ImportFilter + AllFilesTxt + ' (*.*)|*.*', '*.*');
 
         if FileName <> '' then begin
-          TempBlob.Blob.CreateInStream(InStr);
-          BLOB.CreateOutStream(OutStr);
-          if Type = Type::DataUri then
-            ConvertImgToDataUri(InStr,OutStr)
-          //-NPR5.25
-          else if Type = Type::SVG then begin
-            ConvertSVGToDataUri(InStr,OutStr);
-          end
-          //+NPR5.25
-          else
-            CopyStream(OutStr,InStr);
-          CurrPage.Update(true);
+            TempBlob.CreateInStream(InStr);
+            BLOB.CreateOutStream(OutStr);
+            if Type = Type::DataUri then
+                ConvertImgToDataUri(InStr, OutStr)
+            //-NPR5.25
+            else
+                if Type = Type::SVG then begin
+                    ConvertSVGToDataUri(InStr, OutStr);
+                end
+                //+NPR5.25
+                else
+                    CopyStream(OutStr, InStr);
+            CurrPage.Update(true);
         end;
     end;
 
@@ -140,26 +145,30 @@ page 6014659 "Web Client Dependencies"
     var
         FileManagement: Codeunit "File Management";
         fPath: Text[1024];
-        FileBlob: Record TempBlob;
+        FileBlob: Codeunit "Temp Blob";
     begin
         //-NPR5.38
         if BLOB.HasValue then begin
             CalcFields(BLOB);
 
             case Type of
-              Type::JavaScript: fPath := Code + '.js';
-              Type::CSS:        fPath := Code + '.css';
-              Type::HTML:       fPath := Code + '.html';
-              Type::SVG:        fPath := Code + '.svg';
+                Type::JavaScript:
+                    fPath := Code + '.js';
+                Type::CSS:
+                    fPath := Code + '.css';
+                Type::HTML:
+                    fPath := Code + '.html';
+                Type::SVG:
+                    fPath := Code + '.svg';
             end;
 
-            FileBlob.Blob := BLOB;
-            FileManagement.BLOBExport(FileBlob,fPath,true);
+            FileBlob.FromRecord(Rec, FieldNo(BLOB));
+            FileManagement.BLOBExport(FileBlob, fPath, true);
         end;
         //+NPR5.38
     end;
 
-    procedure ConvertImgToDataUri(InStr: InStream;var OutStr: OutStream)
+    procedure ConvertImgToDataUri(InStr: InStream; var OutStr: OutStream)
     var
         Convert: DotNet npNetConvert;
         Image: DotNet npNetImage;
@@ -173,23 +182,26 @@ page 6014659 "Web Client Dependencies"
 
         CalcFields(BLOB);
         MemStrIn := MemStrIn.MemoryStream();
-        CopyStream(MemStrIn,InStr);
+        CopyStream(MemStrIn, InStr);
         Image := Image.FromStream(MemStrIn);
         ImageFormat := Image.RawFormat;
         case true of
-          ImageFormat.Equals(ImageFormat.Gif): DataUri += 'gif';
-          ImageFormat.Equals(ImageFormat.Jpeg): DataUri += 'jpg';
-          ImageFormat.Equals(ImageFormat.Png): DataUri += 'png';
-          else
-            Error(TextUnsupportedFormat);
+            ImageFormat.Equals(ImageFormat.Gif):
+                DataUri += 'gif';
+            ImageFormat.Equals(ImageFormat.Jpeg):
+                DataUri += 'jpg';
+            ImageFormat.Equals(ImageFormat.Png):
+                DataUri += 'png';
+            else
+                Error(TextUnsupportedFormat);
         end;
         DataUri += ';base64,' + Convert.ToBase64String(MemStrIn.ToArray());
 
         MemStrOut := MemStrOut.MemoryStream(Encoding.UTF8.GetBytes(DataUri));
-        CopyStream(OutStr,MemStrOut);
+        CopyStream(OutStr, MemStrOut);
     end;
 
-    procedure ConvertSVGToDataUri(InStr: InStream;var OutStr: OutStream)
+    procedure ConvertSVGToDataUri(InStr: InStream; var OutStr: OutStream)
     var
         Convert: DotNet npNetConvert;
         Image: DotNet npNetImage;
@@ -204,19 +216,19 @@ page 6014659 "Web Client Dependencies"
 
         CalcFields(BLOB);
         MemStrIn := MemStrIn.MemoryStream();
-        CopyStream(MemStrIn,InStr);
+        CopyStream(MemStrIn, InStr);
         SVGText := CheckNamespaces(Encoding.UTF8.GetString(MemStrIn.ToArray()));
         DataUri += Convert.ToBase64String(Encoding.UTF8.GetBytes(SVGText));
         MemStrOut := MemStrOut.MemoryStream(Encoding.UTF8.GetBytes(DataUri));
-        CopyStream(OutStr,MemStrOut);
+        CopyStream(OutStr, MemStrOut);
     end;
 
     local procedure CheckNamespaces(SVGText: Text): Text
     begin
         if StrPos(SVGText, 'xmlns=') = 0 then
-          SVGText := InsStr(SVGText, 'xmlns="http://www.w3.org/2000/svg" ', StrPos(SVGText, '<svg')+5);
+            SVGText := InsStr(SVGText, 'xmlns="http://www.w3.org/2000/svg" ', StrPos(SVGText, '<svg') + 5);
         if StrPos(SVGText, 'xlink') <> 0 then
-          SVGText := InsStr(SVGText, 'xmlns:xlink="http://www.w3.org/1999/xlink" ', StrPos(SVGText, '<svg')+5);
+            SVGText := InsStr(SVGText, 'xmlns:xlink="http://www.w3.org/1999/xlink" ', StrPos(SVGText, '<svg') + 5);
         exit(SVGText);
     end;
 }

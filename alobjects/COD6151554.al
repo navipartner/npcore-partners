@@ -27,8 +27,8 @@ codeunit 6151554 "NpXml Dom Mgt."
 
     var
         NpXmlTemplate2: Record "NpXml Template";
-        OutputTempBlob: Record TempBlob temporary;
-        ResponseTempBlob: Record TempBlob temporary;
+        OutputTempBlob: Codeunit "Temp Blob";
+        ResponseTempBlob: Codeunit "Temp Blob";
         Error003: Label 'Xml element %1 is missing in %2';
         Error004: Label 'Xml attribute %1 is missing in %2';
         RecRef: RecordRef;
@@ -229,17 +229,17 @@ codeunit 6151554 "NpXml Dom Mgt."
     var
         StreamReader: DotNet npNetStreamReader;
         XmlDoc: DotNet npNetXmlDocument;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if not TryLoadXml(XmlString, XmlDoc) then
             exit(XmlString);
 
-        TempBlob.Blob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
+        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
         XmlDoc.Save(OutStream);
 
-        TempBlob.Blob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
         StreamReader := StreamReader.StreamReader(InStream);
         PrettyXml := StreamReader.ReadToEnd;
     end;

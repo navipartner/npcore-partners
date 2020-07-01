@@ -104,7 +104,7 @@ codeunit 6059966 "MPOS Payment API"
         mPOSNetsTransactions: Record "MPOS Nets Transactions";
         mPOSNetsTransactionsResponse: Record "MPOS Nets Transactions";
         Cancelled: Boolean;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         CreditCardProtocolHelper: Codeunit "Credit Card Protocol Helper";
         PaymentTypePOS: Record "Payment Type POS";
         PaymentTypeFounded: Boolean;
@@ -223,10 +223,10 @@ codeunit 6059966 "MPOS Payment API"
                     ParseAdyenJson(mPOSAdyenTransactionsResponse);
 
                     if (mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED') and (mPOSAdyenTransactionsResponse.Handled) then begin
-              SaleLinePOS."EFT Approved" := true;
+                        SaleLinePOS."EFT Approved" := true;
                         SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
                     end else
-              SaleLinePOS."EFT Approved" := false;
+                        SaleLinePOS."EFT Approved" := false;
                     SaleLinePOS.Modify;
                     Commit;
                 end;
@@ -250,7 +250,7 @@ codeunit 6059966 "MPOS Payment API"
 
                         if mPOSNetsTransactionsResponse."Callback Receipt 2".HasValue then begin
                             if Confirm(ValidateSignature, true) then begin
-                  SaleLinePOS."EFT Approved" := true;
+                                SaleLinePOS."EFT Approved" := true;
                                 //-NPR5.38
                                 if PaymentTypeFounded then begin
                                     SaleLinePOS."No." := PaymentTypePOS."No.";
@@ -261,10 +261,10 @@ codeunit 6059966 "MPOS Payment API"
                                 //+NPR5.38
                             end else begin
                                 Cancelled := CallCancelStart(SaleLinePOS);
-                  SaleLinePOS."EFT Approved" := false;
+                                SaleLinePOS."EFT Approved" := false;
                             end;
                         end else begin
-                SaleLinePOS."EFT Approved" := true;
+                            SaleLinePOS."EFT Approved" := true;
                             //-NPR5.38
                             if PaymentTypeFounded then begin
                                 SaleLinePOS."No." := PaymentTypePOS."No.";
@@ -275,7 +275,7 @@ codeunit 6059966 "MPOS Payment API"
                             //+NPR5.38
                         end;
                     end else
-              SaleLinePOS."EFT Approved" := false;
+                        SaleLinePOS."EFT Approved" := false;
                     SaleLinePOS.Modify;
                     Commit;
                 end;
@@ -562,10 +562,10 @@ codeunit 6059966 "MPOS Payment API"
                     ParseAdyenJson(mPOSAdyenTransactionsResponse);
 
                     if mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED' then begin
-              SaleLinePOS."EFT Approved" := true;
+                        SaleLinePOS."EFT Approved" := true;
                         SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
                     end else
-              SaleLinePOS."EFT Approved" := false;
+                        SaleLinePOS."EFT Approved" := false;
                     SaleLinePOS.Modify;
                     Commit;
                 end;
@@ -590,23 +590,21 @@ codeunit 6059966 "MPOS Payment API"
     local procedure HandlePrint(var mPOSNetsTransactionsResponse: Record "MPOS Nets Transactions")
     var
         CreditCardTransaction: Record "EFT Receipt";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         MPOSAppSetup: Record "MPOS App Setup";
     begin
         //-NPR5.36 [291652]
         //Quick fix for getting terminal print data into print table before full EFT hook implementation:
         if mPOSNetsTransactionsResponse."Callback Receipt 1".HasValue then begin
-            TempBlob.Init;
-            TempBlob.Blob := mPOSNetsTransactionsResponse."Callback Receipt 1";
+            Clear(TempBlob);
+            TempBlob.FromRecord(mPOSNetsTransactionsResponse, mPOSNetsTransactionsResponse.FieldNo("Callback Receipt 1"));
             CreateReceiptData(mPOSNetsTransactionsResponse."Register No.", mPOSNetsTransactionsResponse."Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Line No.", TempBlob);
-            TempBlob.Reset;
         end;
 
         if mPOSNetsTransactionsResponse."Callback Receipt 2".HasValue then begin
-            TempBlob.Init;
-            TempBlob.Blob := mPOSNetsTransactionsResponse."Callback Receipt 2";
+            Clear(TempBlob);
+            TempBlob.FromRecord(mPOSNetsTransactionsResponse, mPOSNetsTransactionsResponse.FieldNo("Callback Receipt 2"));
             CreateReceiptData(mPOSNetsTransactionsResponse."Register No.", mPOSNetsTransactionsResponse."Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Line No.", TempBlob);
-            TempBlob.Reset;
         end;
 
         if MPOSAppSetup.Get(mPOSNetsTransactionsResponse."Register No.") then
@@ -624,7 +622,7 @@ codeunit 6059966 "MPOS Payment API"
         //+NPR5.36 [291652]
     end;
 
-    local procedure CreateReceiptData(RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer; var TempBlob: Record TempBlob temporary)
+    local procedure CreateReceiptData(RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer; var TempBlob: Codeunit "Temp Blob")
     var
         CreditCardTransaction: Record "EFT Receipt";
         ReceiptNo: Integer;
@@ -649,7 +647,7 @@ codeunit 6059966 "MPOS Payment API"
         CreditCardTransaction.Type := 0;
         CreditCardTransaction."Receipt No." := ReceiptNo;
 
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         while (not InStream.EOS) do begin
             InStream.ReadText(Line);
 

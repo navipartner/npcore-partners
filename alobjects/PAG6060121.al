@@ -33,70 +33,70 @@ page 6060121 "TM Ticket BOM"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
                 }
-                field(Default;Default)
+                field(Default; Default)
                 {
                 }
-                field("Sales From Date";"Sales From Date")
+                field("Sales From Date"; "Sales From Date")
                 {
                 }
-                field("Sales Until Date";"Sales Until Date")
+                field("Sales Until Date"; "Sales Until Date")
                 {
                 }
-                field("Enforce Schedule Sales Limits";"Enforce Schedule Sales Limits")
+                field("Enforce Schedule Sales Limits"; "Enforce Schedule Sales Limits")
                 {
                 }
-                field("Admission Entry Validation";"Admission Entry Validation")
+                field("Admission Entry Validation"; "Admission Entry Validation")
                 {
                 }
-                field("Activation Method";"Activation Method")
-                {
-                    Visible = false;
-                }
-                field("Max No. Of Entries";"Max No. Of Entries")
-                {
-                }
-                field("Revisit Condition (Statistics)";"Revisit Condition (Statistics)")
-                {
-                }
-                field("Duration Formula";"Duration Formula")
-                {
-                }
-                field("Allow Rescan Within (Sec.)";"Allow Rescan Within (Sec.)")
-                {
-                }
-                field("Prefered Sales Display Method";"Prefered Sales Display Method")
+                field("Activation Method"; "Activation Method")
                 {
                     Visible = false;
                 }
-                field(Quantity;Quantity)
+                field("Max No. Of Entries"; "Max No. Of Entries")
+                {
+                }
+                field("Revisit Condition (Statistics)"; "Revisit Condition (Statistics)")
+                {
+                }
+                field("Duration Formula"; "Duration Formula")
+                {
+                }
+                field("Allow Rescan Within (Sec.)"; "Allow Rescan Within (Sec.)")
+                {
+                }
+                field("Prefered Sales Display Method"; "Prefered Sales Display Method")
                 {
                     Visible = false;
                 }
-                field(Description;Description)
+                field(Quantity; Quantity)
+                {
+                    Visible = false;
+                }
+                field(Description; Description)
                 {
                 }
-                field("Admission Description";"Admission Description")
+                field("Admission Description"; "Admission Description")
                 {
                 }
-                field("Revoke Policy";"Revoke Policy")
+                field("Revoke Policy"; "Revoke Policy")
                 {
                 }
-                field("Refund Price %";"Refund Price %")
+                field("Refund Price %"; "Refund Price %")
                 {
                 }
-                field("Ticket Base Calendar Code";"Ticket Base Calendar Code")
+                field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
                 }
-                field("Ticket Customized Calendar";CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Service,"Admission Code",'',"Ticket Base Calendar Code"))
+                field("Ticket Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
                 {
                     Caption = 'Customized Calendar';
                     Editable = false;
@@ -105,16 +105,16 @@ page 6060121 "TM Ticket BOM"
                     begin
                         CurrPage.SaveRecord;
                         TestField("Ticket Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Service,"Admission Code","Item No.","Ticket Base Calendar Code");
+                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;
                 }
-                field("Publish As eTicket";"Publish As eTicket")
+                field("Publish As eTicket"; "Publish As eTicket")
                 {
                 }
-                field("eTicket Type Code";"eTicket Type Code")
+                field("eTicket Type Code"; "eTicket Type Code")
                 {
                 }
-                field("Publish Ticket URL";"Publish Ticket URL")
+                field("Publish Ticket URL"; "Publish Ticket URL")
                 {
                 }
             }
@@ -153,7 +153,7 @@ page 6060121 "TM Ticket BOM"
 
                 trigger OnAction()
                 begin
-                    MakeTickets (TicketPaymentType::PREPAID);
+                    MakeTickets(TicketPaymentType::PREPAID);
                 end;
             }
             action("Create Postpaid Tickets")
@@ -163,11 +163,20 @@ page 6060121 "TM Ticket BOM"
 
                 trigger OnAction()
                 begin
-                    MakeTickets (TicketPaymentType::POSTPAID);
+                    MakeTickets(TicketPaymentType::POSTPAID);
                 end;
             }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        Clear(CustomizedCalendarChangeTemp);
+        CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Service;
+        CustomizedCalendarChangeTemp."Source Code" := "Admission Code";
+        CustomizedCalendarChangeTemp."Base Calendar Code" := "Ticket Base Calendar Code";
+        CustomizedCalendarChangeTemp.Insert();
+    end;
 
     var
         TicketPaymentType: Option DIRECT,PREPAID,POSTPAID;
@@ -175,7 +184,7 @@ page 6060121 "TM Ticket BOM"
         EXPORT_TO_EXCEL: Label 'Do you want to export generated tickets to excel?';
         OFFLINE_VALIDATION: Label 'Do you want to create offline ticket validation entries to be able to create admissions.';
         CustomizedCalEntry: Record "Customized Calendar Entry";
-        CustomizedCalendar: Record "Customized Calendar Change";
+        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 
     local procedure MakeTickets(PaymentType: Option)
@@ -195,64 +204,64 @@ page 6060121 "TM Ticket BOM"
 
         //-#308962 [308962] Refactored
 
-        Token := TicketRequestManager.GetNewToken ();
+        Token := TicketRequestManager.GetNewToken();
 
-        if (not FinalizeReservation (CreateTicketRequest (PaymentType, Token, "Item No.", "Variant Code"), "Item No.", "Variant Code")) then begin
-          TicketRequestManager.DeleteReservationRequest (Token, true);
-          exit;
+        if (not FinalizeReservation(CreateTicketRequest(PaymentType, Token, "Item No.", "Variant Code"), "Item No.", "Variant Code")) then begin
+            TicketRequestManager.DeleteReservationRequest(Token, true);
+            exit;
         end;
 
-        if (not TicketRequestManager.ConfirmReservationRequest (Token, ResponseMessage)) then begin
-          TicketRequestManager.DeleteReservationRequest (Token, true);
-          Error (ResponseMessage);
+        if (not TicketRequestManager.ConfirmReservationRequest(Token, ResponseMessage)) then begin
+            TicketRequestManager.DeleteReservationRequest(Token, true);
+            Error(ResponseMessage);
         end;
 
-        if (ExportToTicketServer (PaymentType)) then begin
-          if (DIYTicketPrint.ValidateSetup ()) then begin
-            TicketReservationRequest.Reset ();
-            TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-            TicketReservationRequest.SetFilter ("Admission Created", '=%1', true);
-            if (TicketReservationRequest.FindFirst ()) then
-              if (not DIYTicketPrint.GenerateTicketPrint (TicketReservationRequest."Entry No.", false, ResponseMessage)) then
-                Error (ResponseMessage);
-          end;
+        if (ExportToTicketServer(PaymentType)) then begin
+            if (DIYTicketPrint.ValidateSetup()) then begin
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequest.SetFilter("Admission Created", '=%1', true);
+                if (TicketReservationRequest.FindFirst()) then
+                    if (not DIYTicketPrint.GenerateTicketPrint(TicketReservationRequest."Entry No.", false, ResponseMessage)) then
+                        Error(ResponseMessage);
+            end;
         end;
 
-        if (ShowExcelExportPrompt (PaymentType)) then begin
-          if (Confirm (EXPORT_TO_EXCEL, true)) then begin
-            TicketReservationRequest.Reset ();
-            TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-            TicketReservationRequest.FindFirst ();
-            TicketRequestManager.ExportTicketRequestListToClientExcel (TicketReservationRequest);
-          end;
+        if (ShowExcelExportPrompt(PaymentType)) then begin
+            if (Confirm(EXPORT_TO_EXCEL, true)) then begin
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequest.FindFirst();
+                TicketRequestManager.ExportTicketRequestListToClientExcel(TicketReservationRequest);
+            end;
         end;
 
-        if (ShowOfflineValidationPrompt (PaymentType)) then begin
-          TicketReservationRequest.Reset ();
-          TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-          TicketReservationRequest.FindFirst ();
+        if (ShowOfflineValidationPrompt(PaymentType)) then begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest.FindFirst();
 
-          if (Confirm (OFFLINE_VALIDATION)) then begin
-            ImportReferenceNo := OfflineTicketValidationMgr.AddRequestToOfflineValidation (TicketReservationRequest);
-            OfflineTicketValidation.SetFilter ("Import Reference No.", '=%1', ImportReferenceNo);
+            if (Confirm(OFFLINE_VALIDATION)) then begin
+                ImportReferenceNo := OfflineTicketValidationMgr.AddRequestToOfflineValidation(TicketReservationRequest);
+                OfflineTicketValidation.SetFilter("Import Reference No.", '=%1', ImportReferenceNo);
+                Commit;
+                PAGE.RunModal(PAGE::"TM Offline Ticket Validation", OfflineTicketValidation);
+            end;
+        end;
+
+        if (ShowTicketResultList(PaymentType)) then begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest.FindFirst();
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             Commit;
-            PAGE.RunModal (PAGE::"TM Offline Ticket Validation", OfflineTicketValidation);
-          end;
-        end;
-
-        if (ShowTicketResultList (PaymentType)) then begin
-          TicketReservationRequest.Reset ();
-          TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-          TicketReservationRequest.FindFirst ();
-          Ticket.SetFilter ("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-          Commit;
-          PAGE.Run (PAGE::"TM Ticket List", Ticket);
+            PAGE.Run(PAGE::"TM Ticket List", Ticket);
         end;
 
         //+#308962 [308962] end refactor
     end;
 
-    local procedure CreateTicketRequest(PaymentType: Option;Token: Text;ItemNo: Code[20];VariantCode: Code[10]): Text
+    local procedure CreateTicketRequest(PaymentType: Option; Token: Text; ItemNo: Code[20]; VariantCode: Code[10]): Text
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         TicketSetup: Record "TM Ticket Setup";
@@ -261,39 +270,39 @@ page 6060121 "TM Ticket BOM"
         Admission: Record "TM Admission";
     begin
 
-        TicketAdmissionBOM.SetFilter ("Item No.", '=%1', ItemNo);
-        TicketAdmissionBOM.SetFilter ("Variant Code", '=%1', VariantCode);
-        TicketAdmissionBOM.FindSet ();
+        TicketAdmissionBOM.SetFilter("Item No.", '=%1', ItemNo);
+        TicketAdmissionBOM.SetFilter("Variant Code", '=%1', VariantCode);
+        TicketAdmissionBOM.FindSet();
         repeat
-          Admission.Get (TicketAdmissionBOM."Admission Code");
-          TicketReservationRequest."Entry No." := 0;
-          TicketReservationRequest."Session Token ID" := Token;
+            Admission.Get(TicketAdmissionBOM."Admission Code");
+            TicketReservationRequest."Entry No." := 0;
+            TicketReservationRequest."Session Token ID" := Token;
 
-          //-#308962 [308962]
-          // TicketReservationRequest.Quantity := 1;
-          TicketReservationRequest.Quantity := GetDefaultQuantity (PaymentType);
-          //+#308962 [308962]
+            //-#308962 [308962]
+            // TicketReservationRequest.Quantity := 1;
+            TicketReservationRequest.Quantity := GetDefaultQuantity(PaymentType);
+            //+#308962 [308962]
 
-          TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo (ItemNo, VariantCode);
-          //-TM1.43 [368043]
-          TicketReservationRequest."Item No." := ItemNo;
-          TicketReservationRequest."Variant Code" := VariantCode;
-          //+TM1.43 [368043]
+            TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo(ItemNo, VariantCode);
+            //-TM1.43 [368043]
+            TicketReservationRequest."Item No." := ItemNo;
+            TicketReservationRequest."Variant Code" := VariantCode;
+            //+TM1.43 [368043]
 
-          TicketReservationRequest."Admission Code" := TicketAdmissionBOM."Admission Code";
-          TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
-          if (TicketReservationRequest."Admission Description" = '') then
-            TicketReservationRequest."Admission Description" := Admission.Description;
-          TicketReservationRequest."Payment Option" := PaymentType;
-          TicketReservationRequest."Created Date Time" := CurrentDateTime;
-          TicketReservationRequest.Insert ();
-        until (TicketAdmissionBOM.Next () = 0);
+            TicketReservationRequest."Admission Code" := TicketAdmissionBOM."Admission Code";
+            TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
+            if (TicketReservationRequest."Admission Description" = '') then
+                TicketReservationRequest."Admission Description" := Admission.Description;
+            TicketReservationRequest."Payment Option" := PaymentType;
+            TicketReservationRequest."Created Date Time" := CurrentDateTime;
+            TicketReservationRequest.Insert();
+        until (TicketAdmissionBOM.Next() = 0);
         Commit;
 
-        exit (Token);
+        exit(Token);
     end;
 
-    local procedure FinalizeReservation(Token: Text;ItemNo: Code[20];VariantCode: Code[10]): Boolean
+    local procedure FinalizeReservation(Token: Text; ItemNo: Code[20]; VariantCode: Code[10]): Boolean
     var
         DisplayTicketeservationRequest: Page "TM Ticket Make Reservation";
         ResponseMessage: Text;
@@ -302,28 +311,28 @@ page 6060121 "TM Ticket BOM"
     begin
 
         repeat
-          Clear (DisplayTicketeservationRequest);
-          DisplayTicketeservationRequest.LoadTicketRequest (Token);
-          DisplayTicketeservationRequest.SetTicketItem (ItemNo, VariantCode);
-          //-TM90.1.46 [386850]
-          DisplayTicketeservationRequest.SetIgnoreScheduleSelectionFilter (true);
-          //+TM90.1.46 [386850]
+            Clear(DisplayTicketeservationRequest);
+            DisplayTicketeservationRequest.LoadTicketRequest(Token);
+            DisplayTicketeservationRequest.SetTicketItem(ItemNo, VariantCode);
+            //-TM90.1.46 [386850]
+            DisplayTicketeservationRequest.SetIgnoreScheduleSelectionFilter(true);
+            //+TM90.1.46 [386850]
 
-          DisplayTicketeservationRequest.AllowQuantityChange (true);
-          DisplayTicketeservationRequest.LookupMode(true);
-          DisplayTicketeservationRequest.Editable(true);
+            DisplayTicketeservationRequest.AllowQuantityChange(true);
+            DisplayTicketeservationRequest.LookupMode(true);
+            DisplayTicketeservationRequest.Editable(true);
 
-          if (ResponseMessage <> '') then
-            if (not Confirm (SCHEDULE_ERROR, true, ResponseMessage)) then
-              exit (false);
+            if (ResponseMessage <> '') then
+                if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
+                    exit(false);
 
-          PageAction := DisplayTicketeservationRequest.RunModal ();
-          if (PageAction <> ACTION::LookupOK) then
-             exit (false);
+            PageAction := DisplayTicketeservationRequest.RunModal();
+            if (PageAction <> ACTION::LookupOK) then
+                exit(false);
 
-        until (DisplayTicketeservationRequest.FinalizeReservationRequest (false, ResponseMessage) = 0);
+        until (DisplayTicketeservationRequest.FinalizeReservationRequest(false, ResponseMessage) = 0);
 
-        exit (true);
+        exit(true);
     end;
 
     local procedure ShowExcelExportPrompt(PaymentType: Option) ShowPrompt: Boolean
@@ -331,21 +340,27 @@ page 6060121 "TM Ticket BOM"
         TicketSetup: Record "TM Ticket Setup";
     begin
         //-#308962 [308962]
-        if (not TicketSetup.Get ()) then ;
+        if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
-          case TicketSetup."Prepaid Excel Export Prompt" of
-            TicketSetup."Prepaid Excel Export Prompt"::SHOW : ShowPrompt := true;
-            TicketSetup."Prepaid Excel Export Prompt"::HIDE : ShowPrompt := false;
-            else ShowPrompt := true;
-          end;
+            case TicketSetup."Prepaid Excel Export Prompt" of
+                TicketSetup."Prepaid Excel Export Prompt"::SHOW:
+                    ShowPrompt := true;
+                TicketSetup."Prepaid Excel Export Prompt"::HIDE:
+                    ShowPrompt := false;
+                else
+                    ShowPrompt := true;
+            end;
 
         if (PaymentType = TicketPaymentType::POSTPAID) then
-          case TicketSetup."Postpaid Excel Export Prompt" of
-            TicketSetup."Postpaid Excel Export Prompt"::SHOW : ShowPrompt := true;
-            TicketSetup."Postpaid Excel Export Prompt"::HIDE : ShowPrompt := false;
-            else ShowPrompt := true;
-          end;
+            case TicketSetup."Postpaid Excel Export Prompt" of
+                TicketSetup."Postpaid Excel Export Prompt"::SHOW:
+                    ShowPrompt := true;
+                TicketSetup."Postpaid Excel Export Prompt"::HIDE:
+                    ShowPrompt := false;
+                else
+                    ShowPrompt := true;
+            end;
 
         //+#308962 [308962]
     end;
@@ -356,17 +371,20 @@ page 6060121 "TM Ticket BOM"
     begin
 
         //-#308962 [308962]
-        if (not TicketSetup.Get ()) then ;
+        if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
-          case TicketSetup."Prepaid Offline Valid. Prompt" of
-            TicketSetup."Prepaid Offline Valid. Prompt"::SHOW : ShowPrompt := true;
-            TicketSetup."Prepaid Offline Valid. Prompt"::HIDE : ShowPrompt := false;
-            else ShowPrompt := true;
-          end;
+            case TicketSetup."Prepaid Offline Valid. Prompt" of
+                TicketSetup."Prepaid Offline Valid. Prompt"::SHOW:
+                    ShowPrompt := true;
+                TicketSetup."Prepaid Offline Valid. Prompt"::HIDE:
+                    ShowPrompt := false;
+                else
+                    ShowPrompt := true;
+            end;
 
         if (PaymentType = TicketPaymentType::POSTPAID) then
-          ShowPrompt := false;
+            ShowPrompt := false;
 
         //+#308962 [308962]
     end;
@@ -377,21 +395,27 @@ page 6060121 "TM Ticket BOM"
     begin
 
         //-#308962 [308962]
-        if (not TicketSetup.Get ()) then ;
+        if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
-          case TicketSetup."Prepaid Ticket Result List" of
-            TicketSetup."Prepaid Ticket Result List"::SHOW : ShowPrompt := true;
-            TicketSetup."Prepaid Ticket Result List"::HIDE : ShowPrompt := false;
-            else ShowPrompt := true;
-          end;
+            case TicketSetup."Prepaid Ticket Result List" of
+                TicketSetup."Prepaid Ticket Result List"::SHOW:
+                    ShowPrompt := true;
+                TicketSetup."Prepaid Ticket Result List"::HIDE:
+                    ShowPrompt := false;
+                else
+                    ShowPrompt := true;
+            end;
 
         if (PaymentType = TicketPaymentType::POSTPAID) then
-          case TicketSetup."Postpaid Ticket Result List" of
-            TicketSetup."Postpaid Ticket Result List"::SHOW : ShowPrompt := true;
-            TicketSetup."Postpaid Ticket Result List"::HIDE : ShowPrompt := false;
-            else ShowPrompt := true;
-          end;
+            case TicketSetup."Postpaid Ticket Result List" of
+                TicketSetup."Postpaid Ticket Result List"::SHOW:
+                    ShowPrompt := true;
+                TicketSetup."Postpaid Ticket Result List"::HIDE:
+                    ShowPrompt := false;
+                else
+                    ShowPrompt := true;
+            end;
 
         //+#308962 [308962]
     end;
@@ -402,21 +426,27 @@ page 6060121 "TM Ticket BOM"
     begin
 
         //-#308962 [308962]
-        if (not TicketSetup.Get ()) then ;
+        if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
-          case TicketSetup."Prepaid Ticket Server Export" of
-            TicketSetup."Prepaid Ticket Server Export"::YES : DoExport := true;
-            TicketSetup."Prepaid Ticket Server Export"::NO : DoExport := false;
-            else DoExport := true;
-          end;
+            case TicketSetup."Prepaid Ticket Server Export" of
+                TicketSetup."Prepaid Ticket Server Export"::YES:
+                    DoExport := true;
+                TicketSetup."Prepaid Ticket Server Export"::NO:
+                    DoExport := false;
+                else
+                    DoExport := true;
+            end;
 
         if (PaymentType = TicketPaymentType::POSTPAID) then
-          case TicketSetup."Postpaid Ticket Server Export" of
-            TicketSetup."Postpaid Ticket Server Export"::YES : DoExport := true;
-            TicketSetup."Postpaid Ticket Server Export"::NO : DoExport := false;
-            else DoExport := true;
-          end;
+            case TicketSetup."Postpaid Ticket Server Export" of
+                TicketSetup."Postpaid Ticket Server Export"::YES:
+                    DoExport := true;
+                TicketSetup."Postpaid Ticket Server Export"::NO:
+                    DoExport := false;
+                else
+                    DoExport := true;
+            end;
 
         //+#308962 [308962]
     end;
@@ -427,15 +457,17 @@ page 6060121 "TM Ticket BOM"
     begin
 
         //-#308962 [308962]
-        if (not TicketSetup.Get ()) then
-          exit (1);
+        if (not TicketSetup.Get()) then
+            exit(1);
 
         case PaymentType of
-          TicketPaymentType::PREPAID : exit (TicketSetup."Prepaid Default Quantity");
-          TicketPaymentType::POSTPAID : exit (TicketSetup."Postpaid Default Quantity");
+            TicketPaymentType::PREPAID:
+                exit(TicketSetup."Prepaid Default Quantity");
+            TicketPaymentType::POSTPAID:
+                exit(TicketSetup."Postpaid Default Quantity");
         end;
 
-        exit (1);
+        exit(1);
     end;
 }
 

@@ -30,18 +30,27 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         // The reason is that NETS API requires concurrent requests which a single user session does not support in pure C/AL.
 
         case EftTransactionRequest."Processing Type" of
-          EftTransactionRequest."Processing Type"::CLOSE : Reconciliation(EftTransactionRequest);
-          EftTransactionRequest."Processing Type"::PAYMENT : StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
-          EftTransactionRequest."Processing Type"::REFUND : StartRefundTransaction(EftTransactionRequest); //Via async dialog & background session
-          EftTransactionRequest."Processing Type"::VOID : VoidTransaction(EftTransactionRequest); //Via blocking ws invoke
-          EftTransactionRequest."Processing Type"::LOOK_UP : LookupLastTransaction(EftTransactionRequest); //Via blocking ws invoke
-          EftTransactionRequest."Processing Type"::AUXILIARY :
-            case EftTransactionRequest."Auxiliary Operation ID" of
-              1 : CancelAction(EftTransactionRequest); //Via blocking ws invoke
-              2 : BalanceEnquiry(EftTransactionRequest); //Via blocking ws invoke
-              3 : DownloadDataset(EftTransactionRequest); //Via blocking ws invoke
-              4 : DownloadSoftware(EftTransactionRequest); //Via blocking ws invoke
-            end;
+            EftTransactionRequest."Processing Type"::CLOSE:
+                Reconciliation(EftTransactionRequest);
+            EftTransactionRequest."Processing Type"::PAYMENT:
+                StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
+            EftTransactionRequest."Processing Type"::REFUND:
+                StartRefundTransaction(EftTransactionRequest); //Via async dialog & background session
+            EftTransactionRequest."Processing Type"::VOID:
+                VoidTransaction(EftTransactionRequest); //Via blocking ws invoke
+            EftTransactionRequest."Processing Type"::LOOK_UP:
+                LookupLastTransaction(EftTransactionRequest); //Via blocking ws invoke
+            EftTransactionRequest."Processing Type"::AUXILIARY:
+                case EftTransactionRequest."Auxiliary Operation ID" of
+                    1:
+                        CancelAction(EftTransactionRequest); //Via blocking ws invoke
+                    2:
+                        BalanceEnquiry(EftTransactionRequest); //Via blocking ws invoke
+                    3:
+                        DownloadDataset(EftTransactionRequest); //Via blocking ws invoke
+                    4:
+                        DownloadSoftware(EftTransactionRequest); //Via blocking ws invoke
+                end;
         end;
     end;
 
@@ -59,11 +68,11 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
         if not InvokeReconciliation(EftTransactionRequest, EFTSetup, Response) then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
-          HandleProtocolResponse(EftTransactionRequest);
-          WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
-          exit;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
+            HandleProtocolResponse(EftTransactionRequest);
+            WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
+            exit;
         end;
 
         EFTNETSResponseParser.SetResponseData('Reconciliation', Response, EftTransactionRequest."Entry No.");
@@ -72,8 +81,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -106,7 +115,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTNETSCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
     end;
 
-    local procedure EndPaymentTransaction(var EftTransactionRequest: Record "EFT Transaction Request";Response: Text)
+    local procedure EndPaymentTransaction(var EftTransactionRequest: Record "EFT Transaction Request"; Response: Text)
     var
         EFTNETSResponseParser: Codeunit "EFT NETSCloud Response Parser";
         ParseSuccess: Boolean;
@@ -117,14 +126,14 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
         end;
 
         HandleProtocolResponse(EftTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
         end;
     end;
 
@@ -153,7 +162,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTNETSCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
     end;
 
-    local procedure EndRefundTransaction(var EftTransactionRequest: Record "EFT Transaction Request";Response: Text)
+    local procedure EndRefundTransaction(var EftTransactionRequest: Record "EFT Transaction Request"; Response: Text)
     var
         EFTNETSCloudResponseParser: Codeunit "EFT NETSCloud Response Parser";
         ParseError: Text;
@@ -165,14 +174,14 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
         end;
 
         HandleProtocolResponse(EftTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
         end;
     end;
 
@@ -189,14 +198,14 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         OriginalEFTTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
 
         if OriginalEFTTransactionRequest.Recovered then
-          OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Recovered by Entry No.");
+            OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Recovered by Entry No.");
 
         if not InvokeVoid(EftTransactionRequest, EFTSetup, OriginalEFTTransactionRequest, Response) then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
-          HandleProtocolResponse(EftTransactionRequest);
-          WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
-          exit;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
+            HandleProtocolResponse(EftTransactionRequest);
+            WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
+            exit;
         end;
 
         EFTNETSCloudResponseParser.SetResponseData('VoidLast', Response, EftTransactionRequest."Entry No.");
@@ -205,8 +214,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -214,7 +223,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         HandleProtocolResponse(EftTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
         end;
     end;
 
@@ -232,11 +241,11 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
         if not InvokeLookupLastTransaction(EftTransactionRequest, EFTSetup, OriginalEFTTransactionRequest, 1000 * 60, Response) then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
-          HandleProtocolResponse(EftTransactionRequest);
-          WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
-          exit;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
+            HandleProtocolResponse(EftTransactionRequest);
+            WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
+            exit;
         end;
 
         EFTNETSCloudResponseParser.SetResponseData('LookupLast', Response, EftTransactionRequest."Entry No.");
@@ -245,8 +254,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EftTransactionRequest, GetLastErrorText);
-          EftTransactionRequest.Modify;
+            HandleError(EftTransactionRequest, GetLastErrorText);
+            EftTransactionRequest.Modify;
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -254,7 +263,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         HandleProtocolResponse(EftTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EftTransactionRequest, Response);
         end;
     end;
 
@@ -270,11 +279,11 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTSetup.FindSetup(OriginalEFTTransactionRequest."Register No.", OriginalEFTTransactionRequest."Original POS Payment Type Code");
 
         if not InvokeCancelAction(EFTTransactionRequest, EFTSetup, Response) then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
-          HandleProtocolResponse(EFTTransactionRequest);
-          WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
-          exit;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
+            HandleProtocolResponse(EFTTransactionRequest);
+            WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
+            exit;
         end;
 
         EFTNETSCloudResponseParser.SetResponseData('Cancel', Response, EFTTransactionRequest."Entry No.");
@@ -283,8 +292,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -292,7 +301,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         HandleProtocolResponse(EFTTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
         end;
     end;
 
@@ -306,11 +315,11 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
         if not InvokeBalanceEnquiry(EFTTransactionRequest, EFTSetup, Response) then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
-          HandleProtocolResponse(EFTTransactionRequest);
-          WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
-          exit;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
+            HandleProtocolResponse(EFTTransactionRequest);
+            WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
+            exit;
         end;
 
         EFTNETSCloudResponseParser.SetResponseData('BalanceEnquiry', Response, EFTTransactionRequest."Entry No.");
@@ -319,8 +328,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -328,7 +337,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         HandleProtocolResponse(EFTTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
         end;
     end;
 
@@ -342,11 +351,11 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
         if not InvokeDownloadDataset(EFTTransactionRequest, EFTSetup, Response) then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
-          HandleProtocolResponse(EFTTransactionRequest);
-          WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
-          exit;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
+            HandleProtocolResponse(EFTTransactionRequest);
+            WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
+            exit;
         end;
 
         EFTNETSCloudResponseParser.SetResponseData('TerminalDataset', Response, EFTTransactionRequest."Entry No.");
@@ -355,8 +364,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -364,7 +373,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         HandleProtocolResponse(EFTTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
         end;
     end;
 
@@ -378,11 +387,11 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
         if not InvokeDownloadSoftware(EFTTransactionRequest, EFTSetup, Response) then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
-          HandleProtocolResponse(EFTTransactionRequest);
-          WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
-          exit;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
+            HandleProtocolResponse(EFTTransactionRequest);
+            WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
+            exit;
         end;
 
         EFTNETSCloudResponseParser.SetResponseData('TerminalSoftware', Response, EFTTransactionRequest."Entry No.");
@@ -391,8 +400,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
 
         if not ParseSuccess then begin
-          HandleError(EFTTransactionRequest, GetLastErrorText);
-          EFTTransactionRequest.Modify;
+            HandleError(EFTTransactionRequest, GetLastErrorText);
+            EFTTransactionRequest.Modify;
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -400,7 +409,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         HandleProtocolResponse(EFTTransactionRequest);
 
         if ParseSuccess then begin
-          CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
+            CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest, Response);
         end;
     end;
 
@@ -414,7 +423,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest."Integration Type" := EFTNETSCloudIntegration.IntegrationType();
         EFTTransactionRequest."Hardware ID" := EFTNETSCloudIntegration.GetTerminalID(EFTSetup);
         if EFTNETSCloudIntegration.GetEnvironment(EFTSetup) <> 0 then
-          EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
+            EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
 
         InvokeTerminalList(EFTTransactionRequest, EFTSetup, Response);
         exit(Response);
@@ -430,7 +439,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest."Integration Type" := EFTNETSCloudIntegration.IntegrationType();
         EFTTransactionRequest."Hardware ID" := EFTNETSCloudIntegration.GetTerminalID(EFTSetup);
         if EFTNETSCloudIntegration.GetEnvironment(EFTSetup) <> 0 then
-          EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
+            EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
 
         InvokeTerminalSettings(EFTTransactionRequest, EFTSetup, Response);
         exit(Response);
@@ -446,7 +455,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest."Integration Type" := EFTNETSCloudIntegration.IntegrationType();
         EFTTransactionRequest."Hardware ID" := EFTNETSCloudIntegration.GetTerminalID(EFTSetup);
         if EFTNETSCloudIntegration.GetEnvironment(EFTSetup) <> 0 then
-          EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
+            EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
 
         InvokeLogin(EFTTransactionRequest, EFTSetup, Response);
         exit(Response);
@@ -478,25 +487,27 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTrxBackgroundSessionMgt.TryGetResponseRecord(TransactionEntryNo, EFTTransactionAsyncResponse);
 
         if EFTTransactionAsyncResponse.Error then begin
-          EFTTransactionRequest.LockTable;
-          EFTTransactionRequest.Get(TransactionEntryNo);
-          EFTTransactionRequest."NST Error" := EFTTransactionAsyncResponse."Error Text";
-          HandleProtocolResponse(EFTTransactionRequest);
+            EFTTransactionRequest.LockTable;
+            EFTTransactionRequest.Get(TransactionEntryNo);
+            EFTTransactionRequest."NST Error" := EFTTransactionAsyncResponse."Error Text";
+            HandleProtocolResponse(EFTTransactionRequest);
         end else begin
-          EFTTransactionAsyncResponse.Response.CreateInStream(InStream, TEXTENCODING::UTF8);
-          while (not InStream.EOS) do begin
-            InStream.ReadText(Text);
-            Response += Text;
-          end;
+            EFTTransactionAsyncResponse.Response.CreateInStream(InStream, TEXTENCODING::UTF8);
+            while (not InStream.EOS) do begin
+                InStream.ReadText(Text);
+                Response += Text;
+            end;
 
-          EFTTransactionAsyncResponse.Delete;
-          Commit;
-          EFTTransactionRequest.Get(TransactionEntryNo);
+            EFTTransactionAsyncResponse.Delete;
+            Commit;
+            EFTTransactionRequest.Get(TransactionEntryNo);
 
-          case EFTTransactionRequest."Processing Type" of
-            EFTTransactionRequest."Processing Type"::PAYMENT : EndPaymentTransaction(EFTTransactionRequest, Response);
-            EFTTransactionRequest."Processing Type"::REFUND : EndRefundTransaction(EFTTransactionRequest, Response);
-          end;
+            case EFTTransactionRequest."Processing Type" of
+                EFTTransactionRequest."Processing Type"::PAYMENT:
+                    EndPaymentTransaction(EFTTransactionRequest, Response);
+                EFTTransactionRequest."Processing Type"::REFUND:
+                    EndRefundTransaction(EFTTransactionRequest, Response);
+            end;
         end;
     end;
 
@@ -505,7 +516,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeLogin(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeLogin(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         Body: Text;
         JsonConvert: DotNet npNetJsonConvert;
@@ -523,7 +534,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeReconciliation(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeReconciliation(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         Body: Text;
         JsonConvert: DotNet npNetJsonConvert;
@@ -539,7 +550,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    procedure InvokePayment(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    procedure InvokePayment(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         Body: Text;
         JsonConvert: DotNet npNetJsonConvert;
@@ -556,7 +567,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    procedure InvokeRefund(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    procedure InvokeRefund(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -573,7 +584,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeVoid(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";OriginalEFTTransactionRequest: Record "EFT Transaction Request";var Response: Text)
+    local procedure InvokeVoid(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; OriginalEFTTransactionRequest: Record "EFT Transaction Request"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -589,7 +600,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    procedure InvokeLookupLastTransaction(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";OriginalEftTransactionRequest: Record "EFT Transaction Request";TimeoutMs: Integer;var Response: Text)
+    procedure InvokeLookupLastTransaction(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; OriginalEftTransactionRequest: Record "EFT Transaction Request"; TimeoutMs: Integer; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -603,7 +614,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeCancelAction(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeCancelAction(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -619,7 +630,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeDownloadDataset(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeDownloadDataset(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -635,7 +646,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeDownloadSoftware(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeDownloadSoftware(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -651,7 +662,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeBalanceEnquiry(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeBalanceEnquiry(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -667,7 +678,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeTerminalSettings(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeTerminalSettings(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -681,7 +692,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
     end;
 
     [TryFunction]
-    local procedure InvokeTerminalList(EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
+    local procedure InvokeTerminalList(EftTransactionRequest: Record "EFT Transaction Request"; EFTSetup: Record "EFT Setup"; var Response: Text)
     var
         JsonConvert: DotNet npNetJsonConvert;
         Body: Text;
@@ -694,7 +705,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         Response := InvokeAPI(Body, GetToken(EFTSetup), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, 10 * 1000, EftTransactionRequest, false);
     end;
 
-    local procedure InvokeAPI(Body: Text;Token: Text;URL: Text;Method: Text;Endpoint: Text;TimeoutMs: Integer;EFTTransactionRequest: Record "EFT Transaction Request";AllowBadRequest: Boolean): Text
+    local procedure InvokeAPI(Body: Text; Token: Text; URL: Text; Method: Text; Endpoint: Text; TimeoutMs: Integer; EFTTransactionRequest: Record "EFT Transaction Request"; AllowBadRequest: Boolean): Text
     var
         HttpWebRequest: DotNet npNetHttpWebRequest;
         ReqStream: DotNet npNetStream;
@@ -708,7 +719,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         ResponseHeaders: DotNet npNetNameValueCollection;
         WebException: DotNet npNetWebException;
         WebExceptionStatus: DotNet npNetWebExceptionStatus;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         ResponseText: Text;
     begin
         ClearRequestResponseBuffer();
@@ -719,48 +730,48 @@ codeunit 6184534 "EFT NETSCloud Protocol"
 
         HttpWebRequest := HttpWebRequest.Create(URL + Endpoint);
         if Token <> '' then begin
-          HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + Token);
+            HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + Token);
         end;
         HttpWebRequest.Method(Method);
         HttpWebRequest.Timeout(TimeoutMs);
         HttpWebRequest.KeepAlive(false);
 
         if Method <> 'GET' then begin
-          HttpWebRequest.ContentType('application/json');
+            HttpWebRequest.ContentType('application/json');
 
-          ReqStream := HttpWebRequest.GetRequestStream;
-          ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
-          ReqStreamWriter.Write(Body);
-          ReqStreamWriter.Flush;
-          ReqStreamWriter.Close;
+            ReqStream := HttpWebRequest.GetRequestStream;
+            ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
+            ReqStreamWriter.Write(Body);
+            ReqStreamWriter.Flush;
+            ReqStreamWriter.Close;
         end;
 
-        TempBlob.Blob.CreateInStream(ResponseNavStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(ResponseNavStream, TEXTENCODING::UTF8);
 
         if WebRequestHelper.GetWebResponse(HttpWebRequest, HttpWebResponse, ResponseNavStream, HttpStatusCode, ResponseHeaders, false) then begin
-          while (not ResponseNavStream.EOS) do begin
-            ResponseNavStream.Read(ResponseText);
-            Response += ResponseText;
-          end;
-          ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
-          AppendRequestResponseBuffer(StrSubstNo('(%1)   \\%2', ResponseStatusCodeBuffer, Response), 'Response');
-          HttpWebResponse.Close();
-        end else begin
-          ResponseErrorBodyBuffer := WebRequestHelper.GetWebResponseError(WebException, URL);
-          if WebException.Status.Equals(WebExceptionStatus.ProtocolError) then begin
-            HttpWebResponse := WebException.Response;
-            ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
-            HttpWebResponse.GetResponseStream.CopyTo(ResponseNavStream);
             while (not ResponseNavStream.EOS) do begin
-              ResponseNavStream.Read(ResponseText);
-              Response += ResponseText;
+                ResponseNavStream.Read(ResponseText);
+                Response += ResponseText;
             end;
-          end;
-          AppendRequestResponseBuffer(StrSubstNo('(%1) %2   \\%3', ResponseStatusCodeBuffer, ResponseErrorBodyBuffer, Response), 'Response');
+            ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
+            AppendRequestResponseBuffer(StrSubstNo('(%1)   \\%2', ResponseStatusCodeBuffer, Response), 'Response');
+            HttpWebResponse.Close();
+        end else begin
+            ResponseErrorBodyBuffer := WebRequestHelper.GetWebResponseError(WebException, URL);
+            if WebException.Status.Equals(WebExceptionStatus.ProtocolError) then begin
+                HttpWebResponse := WebException.Response;
+                ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
+                HttpWebResponse.GetResponseStream.CopyTo(ResponseNavStream);
+                while (not ResponseNavStream.EOS) do begin
+                    ResponseNavStream.Read(ResponseText);
+                    Response += ResponseText;
+                end;
+            end;
+            AppendRequestResponseBuffer(StrSubstNo('(%1) %2   \\%3', ResponseStatusCodeBuffer, ResponseErrorBodyBuffer, Response), 'Response');
         end;
 
         if not ((ResponseStatusCodeBuffer in [200, 201]) or (AllowBadRequest and (ResponseStatusCodeBuffer = 400))) then begin
-          Error(ERROR_INVOKE, URL, Format(ResponseStatusCodeBuffer));
+            Error(ERROR_INVOKE, URL, Format(ResponseStatusCodeBuffer));
         end;
 
         exit(Response);
@@ -779,7 +790,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         JObject: DotNet npNetJObject;
     begin
         if EFTNETSCloudToken.TryGetToken(Token) then
-          exit(Token);
+            exit(Token);
 
         JSON := LoginAndGetToken(EFTSetup);
         JObject := JObject.Parse(JSON);
@@ -798,8 +809,8 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTTransactionRequest.CalcFields("Access Token");
         EFTTransactionRequest."Access Token".CreateInStream(InStream, TEXTENCODING::UTF8);
         while (not InStream.EOS) do begin
-          InStream.ReadText(TextBuffer);
-          Token += TextBuffer;
+            InStream.ReadText(TextBuffer);
+            Token += TextBuffer;
         end;
         exit(Token);
     end;
@@ -809,54 +820,57 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         EFTAdyenCloudIntegration: Codeunit "EFT Adyen Cloud Integration";
     begin
         case EFTTransactionRequest.Mode of
-          EFTTransactionRequest.Mode::Production : exit('https://api1.cloudconnect.nets.eu');
-          EFTTransactionRequest.Mode::"TEST Remote" : exit('https://testapi.cloudconnect.ml:8080');
-          EFTTransactionRequest.Mode::"TEST Local" : EFTTransactionRequest.FieldError(Mode);
+            EFTTransactionRequest.Mode::Production:
+                exit('https://api1.cloudconnect.nets.eu');
+            EFTTransactionRequest.Mode::"TEST Remote":
+                exit('https://testapi.cloudconnect.ml:8080');
+            EFTTransactionRequest.Mode::"TEST Local":
+                EFTTransactionRequest.FieldError(Mode);
         end;
     end;
 
     local procedure GetDateTime(): Text
     begin
-        exit(Format(CurrentDateTime,0,9));
+        exit(Format(CurrentDateTime, 0, 9));
     end;
 
     local procedure GetAmount(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     begin
-        exit(DelChr(Format(Abs(EFTTransactionRequest."Amount Input"),0,'<Precision,2:2><Standard Format,9>'),'=','.'));
+        exit(DelChr(Format(Abs(EFTTransactionRequest."Amount Input"), 0, '<Precision,2:2><Standard Format,9>'), '=', '.'));
     end;
 
     local procedure GetCashbackAmount(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     begin
-        exit(DelChr(Format(EFTTransactionRequest."Cashback Amount",0,'<Precision,2:2><Standard Format,9>'),'=','.'));
+        exit(DelChr(Format(EFTTransactionRequest."Cashback Amount", 0, '<Precision,2:2><Standard Format,9>'), '=', '.'));
     end;
 
-    procedure CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest: Record "EFT Transaction Request";Response: Text)
+    procedure CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest: Record "EFT Transaction Request"; Response: Text)
     begin
         //This is not required for this integratipn type. Terminal will auto cancel if hit with a new request while another is active.
     end;
 
-    local procedure WriteLogEntry(EFTSetup: Record "EFT Setup";IsError: Boolean;EntryNo: Integer;Description: Text;LogContents: Text)
+    local procedure WriteLogEntry(EFTSetup: Record "EFT Setup"; IsError: Boolean; EntryNo: Integer; Description: Text; LogContents: Text)
     var
         EFTNETSCloudIntegration: Codeunit "EFT NETSCloud Integration";
         EFTNETSCloudPaymentSetup: Record "EFT NETS Cloud Payment Setup";
         EFTTransactionLoggingMgt: Codeunit "EFT Transaction Logging Mgt.";
     begin
         case EFTNETSCloudIntegration.GetLogLevel(EFTSetup) of
-          EFTNETSCloudPaymentSetup."Log Level"::ERROR :
-            if IsError then
-              EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, LogContents)
-            else
-              EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, '');
+            EFTNETSCloudPaymentSetup."Log Level"::ERROR:
+                if IsError then
+                    EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, LogContents)
+                else
+                    EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, '');
 
-          EFTNETSCloudPaymentSetup."Log Level"::FULL :
-            EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, LogContents);
+            EFTNETSCloudPaymentSetup."Log Level"::FULL:
+                EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, LogContents);
 
-          EFTNETSCloudPaymentSetup."Log Level"::NONE :
-            EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, '');
+            EFTNETSCloudPaymentSetup."Log Level"::NONE:
+                EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, '');
         end;
     end;
 
-    local procedure AppendRequestResponseBuffer(Text: Text;Header: Text)
+    local procedure AppendRequestResponseBuffer(Text: Text; Header: Text)
     var
         LF: Char;
         CR: Char;
@@ -867,7 +881,7 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         CR := 13;
         LF := 10;
 
-        RequestResponseBuffer += (Format(CR) + Format(LF) + Format(CR) + Format(LF) + '===' + Header + ' (' + Format(CreateDateTime(Today,Time),0,9) + ')===' + Format(CR) + Format(LF) + Text);
+        RequestResponseBuffer += (Format(CR) + Format(LF) + Format(CR) + Format(LF) + '===' + Header + ' (' + Format(CreateDateTime(Today, Time), 0, 9) + ')===' + Format(CR) + Format(LF) + Text);
     end;
 
     procedure ClearRequestResponseBuffer()
@@ -900,13 +914,13 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         exit(ResponseErrorBodyBuffer);
     end;
 
-    local procedure HandleError(var EFTTransactionRequest: Record "EFT Transaction Request";ErrorText: Text)
+    local procedure HandleError(var EFTTransactionRequest: Record "EFT Transaction Request"; ErrorText: Text)
     begin
         EFTTransactionRequest.Successful := false;
         EFTTransactionRequest."External Result Known" := false; //Could not parse response correctly - needs to go to lookup.
         EFTTransactionRequest."Amount Output" := 0;
         EFTTransactionRequest."Result Amount" := 0;
-        EFTTransactionRequest."NST Error" := CopyStr(ErrorText,1,MaxStrLen(EFTTransactionRequest."NST Error"));
+        EFTTransactionRequest."NST Error" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));
     end;
 
     local procedure HandleProtocolResponse(var EftTransactionRequest: Record "EFT Transaction Request")

@@ -21,51 +21,51 @@ page 6014427 "Item Group Tree"
             repeater(Group)
             {
                 IndentationColumn = Level;
-                IndentationControls = "No.",Description;
+                IndentationControls = "No.", Description;
                 ShowAsTree = true;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
                 }
-                field("Parent Item Group No.";"Parent Item Group No.")
-                {
-                    Visible = false;
-                }
-                field("No. Series";"No. Series")
-                {
-                }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
-                {
-                }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
-                {
-                }
-                field("Inventory Posting Group";"Inventory Posting Group")
-                {
-                }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
-                {
-                }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
-                {
-                }
-                field(Blocked;Blocked)
+                field("Parent Item Group No."; "Parent Item Group No.")
                 {
                     Visible = false;
                 }
-                field(Level;Level)
+                field("No. Series"; "No. Series")
+                {
+                }
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                {
+                }
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                {
+                }
+                field("Inventory Posting Group"; "Inventory Posting Group")
+                {
+                }
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
+                {
+                }
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
+                {
+                }
+                field(Blocked; Blocked)
                 {
                     Visible = false;
                 }
-                field("Sorting-Key";"Sorting-Key")
+                field(Level; Level)
+                {
+                    Visible = false;
+                }
+                field("Sorting-Key"; "Sorting-Key")
                 {
                     Visible = false;
                 }
@@ -86,8 +86,8 @@ page 6014427 "Item Group Tree"
                     Caption = 'Dimensions-Single';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014410),
-                                  "No."=FIELD("No.");
+                    RunPageLink = "Table ID" = CONST(6014410),
+                                  "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                 }
                 action("Dimensions-Mulitple")
@@ -125,21 +125,21 @@ page 6014427 "Item Group Tree"
 
                     trigger OnAction()
                     var
-                        TempBlob: Record TempBlob;
+                        TempBlob: Codeunit "Temp Blob";
                         FileManagement: Codeunit "File Management";
                         PictureExists: Boolean;
                         Name: Text[100];
                         i: Integer;
                     begin
                         PictureExists := Picture.HasValue;
-                        Name := FileManagement.BLOBImport(TempBlob,'*.BMP');
+                        Name := FileManagement.BLOBImport(TempBlob, '*.BMP');
 
                         if Name = '' then
-                          exit;
+                            exit;
 
-                        while(StrPos(Name,'.') > 0 ) do begin
-                          i := StrPos(Name,'.');
-                          Name := CopyStr(Name,i+1);
+                        while (StrPos(Name, '.') > 0) do begin
+                            i := StrPos(Name, '.');
+                            Name := CopyStr(Name, i + 1);
                         end;
 
                         "Picture Extention" := Name;
@@ -159,7 +159,7 @@ page 6014427 "Item Group Tree"
                         FilterText: Text;
                     begin
                         CurrPage.SetSelectionFilter(ItemGroupSelected);
-                        REPORT.Run(6014610,true,false,ItemGroupSelected);
+                        REPORT.Run(6014610, true, false, ItemGroupSelected);
                     end;
                 }
             }

@@ -9,11 +9,11 @@ codeunit 6014427 "System Event Wrapper"
     begin
     end;
 
-    procedure MakeDateFilter(var DateFilterText: Text): Integer
+    procedure MakeDateFilter(var DateFilterText: Text)
     var
-        TextManagement: Codeunit TextManagement;
+        FilterTokens: Codeunit "Filter Tokens";
     begin
-        exit(TextManagement.MakeDateFilter(DateFilterText));
+        FilterTokens.MakeDateFilter(DateFilterText);
     end;
 
     procedure ApplicationVersion() ApplicationVersion: Text[248]
@@ -51,17 +51,17 @@ codeunit 6014427 "System Event Wrapper"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCaptionClassTranslate(Language: Integer;CaptionExpression: Text[1024];var Caption: Text[1024])
+    local procedure OnAfterCaptionClassTranslate(Language: Integer; CaptionExpression: Text[1024]; var Caption: Text[1024])
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterFindPrinter(ReportID: Integer;var PrinterName: Text[250])
+    local procedure OnAfterFindPrinter(ReportID: Integer; var PrinterName: Text[250])
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetDatabaseTableTriggerSetup(TableId: Integer;var OnDatabaseInsert: Boolean;var OnDatabaseModify: Boolean;var OnDatabaseDelete: Boolean;var OnDatabaseRename: Boolean)
+    local procedure OnAfterGetDatabaseTableTriggerSetup(TableId: Integer; var OnDatabaseInsert: Boolean; var OnDatabaseModify: Boolean; var OnDatabaseDelete: Boolean; var OnDatabaseRename: Boolean)
     begin
     end;
 
@@ -81,7 +81,7 @@ codeunit 6014427 "System Event Wrapper"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterOnDatabaseRename(RecRef: RecordRef;xRecRef: RecordRef)
+    local procedure OnAfterOnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
     begin
     end;
 
@@ -118,22 +118,22 @@ codeunit 6014427 "System Event Wrapper"
         OnAfterCompanyClose();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 42, 'OnAfterCaptionClassTranslate', '', true, true)]
-    local procedure C42OnAfterCaptionClassTranslate(Language: Integer;CaptionExpression: Text[1024];var Caption: Text[1024])
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Caption Class", 'OnAfterCaptionClassResolve', '', true, true)]
+    local procedure C42OnAfterCaptionClassTranslate(Language: Integer; CaptionExpression: Text[1024]; var Caption: Text[1024])
     begin
-        OnAfterCaptionClassTranslate(Language,CaptionExpression,Caption);
+        OnAfterCaptionClassTranslate(Language, CaptionExpression, Caption);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 44, 'OnAfterGetPrinterName', '', true, true)]
-    local procedure C44OnAfterFindPrinter(ReportID: Integer;var PrinterName: Text[250])
+    local procedure C44OnAfterFindPrinter(ReportID: Integer; var PrinterName: Text[250])
     begin
-        OnAfterFindPrinter(ReportID,PrinterName);
+        OnAfterFindPrinter(ReportID, PrinterName);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 49, 'OnAfterGetDatabaseTableTriggerSetup', '', true, true)]
-    local procedure C49OnAfterGetDatabaseTableTriggerSetup(TableId: Integer;var OnDatabaseInsert: Boolean;var OnDatabaseModify: Boolean;var OnDatabaseDelete: Boolean;var OnDatabaseRename: Boolean)
+    local procedure C49OnAfterGetDatabaseTableTriggerSetup(TableId: Integer; var OnDatabaseInsert: Boolean; var OnDatabaseModify: Boolean; var OnDatabaseDelete: Boolean; var OnDatabaseRename: Boolean)
     begin
-        OnAfterGetDatabaseTableTriggerSetup(TableId,OnDatabaseInsert,OnDatabaseModify,OnDatabaseDelete,OnDatabaseRename);
+        OnAfterGetDatabaseTableTriggerSetup(TableId, OnDatabaseInsert, OnDatabaseModify, OnDatabaseDelete, OnDatabaseRename);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 49, 'OnAfterOnDatabaseInsert', '', true, true)]
@@ -155,9 +155,9 @@ codeunit 6014427 "System Event Wrapper"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 49, 'OnAfterOnDatabaseRename', '', true, true)]
-    local procedure C49OnAfterOnDatabaseRename(RecRef: RecordRef;xRecRef: RecordRef)
+    local procedure C49OnAfterOnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
     begin
-        OnAfterOnDatabaseRename(RecRef,xRecRef);
+        OnAfterOnDatabaseRename(RecRef, xRecRef);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 9015, 'OnAfterGetApplicationVersion', '', true, true)]

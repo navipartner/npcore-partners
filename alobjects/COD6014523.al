@@ -72,7 +72,7 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
         Encoding: DotNet npNetEncoding;
         BinaryReader: DotNet npNetBinaryReader;
         Stream: DotNet npNetStream;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         BigText: BigText;
         Tempint: Integer;
@@ -131,8 +131,8 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
                                 DataRow.Item(Itt2 - 1, Format(FieldRef.Value, 0, '<Precision,2:2><Standard Format,2>'))
                             else
                                 if Format(FieldRef.Type) = 'BLOB' then begin
-                                    TempBlob.Blob := FieldRef.Value;
-                                    TempBlob.Blob.CreateInStream(InStream);
+                                    TempBlob.FromFieldRef(FieldRef);
+                                    TempBlob.CreateInStream(InStream);
                                     Stream := InStream;
                                     BinaryReader := BinaryReader.BinaryReader(Stream);
                                     DataRow.Item(Itt2 - 1, Encoding.Default.GetString(BinaryReader.ReadBytes(Stream.Length)));

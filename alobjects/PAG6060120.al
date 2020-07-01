@@ -26,70 +26,70 @@ page 6060120 "TM Ticket Admissions"
         {
             repeater(Group)
             {
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Location Admission Code";"Location Admission Code")
-                {
-                    Visible = false;
-                }
-                field("Capacity Limits By";"Capacity Limits By")
-                {
-                }
-                field("Default Schedule";"Default Schedule")
-                {
-                }
-                field("Prebook Is Required";"Prebook Is Required")
-                {
-                }
-                field("Max Capacity Per Sch. Entry";"Max Capacity Per Sch. Entry")
-                {
-                }
-                field("Reserved For Web";"Reserved For Web")
+                field("Location Admission Code"; "Location Admission Code")
                 {
                     Visible = false;
                 }
-                field("Reserved For Members";"Reserved For Members")
+                field("Capacity Limits By"; "Capacity Limits By")
+                {
+                }
+                field("Default Schedule"; "Default Schedule")
+                {
+                }
+                field("Prebook Is Required"; "Prebook Is Required")
+                {
+                }
+                field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
+                {
+                }
+                field("Reserved For Web"; "Reserved For Web")
                 {
                     Visible = false;
                 }
-                field("Capacity Control";"Capacity Control")
-                {
-                }
-                field("Prebook From";"Prebook From")
-                {
-                }
-                field("Ticketholder Notification Type";"Ticketholder Notification Type")
-                {
-                }
-                field("Stakeholder (E-Mail/Phone No.)";"Stakeholder (E-Mail/Phone No.)")
-                {
-                }
-                field("Dependent Admission Code";"Dependent Admission Code")
+                field("Reserved For Members"; "Reserved For Members")
                 {
                     Visible = false;
                 }
-                field("Dependency Type";"Dependency Type")
+                field("Capacity Control"; "Capacity Control")
+                {
+                }
+                field("Prebook From"; "Prebook From")
+                {
+                }
+                field("Ticketholder Notification Type"; "Ticketholder Notification Type")
+                {
+                }
+                field("Stakeholder (E-Mail/Phone No.)"; "Stakeholder (E-Mail/Phone No.)")
+                {
+                }
+                field("Dependent Admission Code"; "Dependent Admission Code")
                 {
                     Visible = false;
                 }
-                field("Dependency Timeframe";"Dependency Timeframe")
+                field("Dependency Type"; "Dependency Type")
                 {
                     Visible = false;
                 }
-                field("POS Schedule Selection Date F.";"POS Schedule Selection Date F.")
+                field("Dependency Timeframe"; "Dependency Timeframe")
+                {
+                    Visible = false;
+                }
+                field("POS Schedule Selection Date F."; "POS Schedule Selection Date F.")
                 {
                 }
-                field("Admission Base Calendar Code";"Admission Base Calendar Code")
+                field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
                 }
-                field("AdmissionCustomized Calendar";CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Location,"Admission Code",'',"Admission Base Calendar Code"))
+                field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeAdmissionTemp))
                 {
                     Caption = 'Admission Customized Calendar';
                     Editable = false;
@@ -98,13 +98,13 @@ page 6060120 "TM Ticket Admissions"
                     begin
                         CurrPage.SaveRecord;
                         TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Location,"Admission Code",'',"Admission Base Calendar Code");
+                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeAdmissionTemp);
                     end;
                 }
-                field("Ticket Base Calendar Code";"Ticket Base Calendar Code")
+                field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
                 }
-                field("TicketCustomized Calendar";CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Service,"Admission Code",'',"Ticket Base Calendar Code"))
+                field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTicketTemp))
                 {
                     Caption = 'Ticket Customized Calendar';
                     Editable = false;
@@ -113,14 +113,14 @@ page 6060120 "TM Ticket Admissions"
                     begin
                         CurrPage.SaveRecord;
                         TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Service,"Admission Code",'',"Ticket Base Calendar Code");
+                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTicketTemp);
                     end;
                 }
-                field("eTicket Type Code";"eTicket Type Code")
+                field("eTicket Type Code"; "eTicket Type Code")
                 {
                     Visible = false;
                 }
-                field("Waiting List Setup Code";"Waiting List Setup Code")
+                field("Waiting List Setup Code"; "Waiting List Setup Code")
                 {
                 }
             }
@@ -138,7 +138,7 @@ page 6060120 "TM Ticket Admissions"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "TM Ticket BOM";
-                RunPageLink = "Admission Code"=FIELD("Admission Code");
+                RunPageLink = "Admission Code" = FIELD("Admission Code");
             }
             action(Schedules)
             {
@@ -156,7 +156,7 @@ page 6060120 "TM Ticket Admissions"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "TM Admission Schedule Lines";
-                RunPageLink = "Admission Code"=FIELD("Admission Code");
+                RunPageLink = "Admission Code" = FIELD("Admission Code");
             }
             action("Event List")
             {
@@ -171,7 +171,7 @@ page 6060120 "TM Ticket Admissions"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "TM Seating Setup";
-                RunPageLink = "Admission Code"=FIELD("Admission Code");
+                RunPageLink = "Admission Code" = FIELD("Admission Code");
             }
             action("Waiting List Setup")
             {
@@ -203,16 +203,31 @@ page 6060120 "TM Ticket Admissions"
 
                     //-TM1.45 [380754]
                     if ("Waiting List Setup Code" <> '') then
-                      TicketWaitingListMgr.ProcessAdmission (Rec, Today, true);
+                        TicketWaitingListMgr.ProcessAdmission(Rec, Today, true);
                     //+TM1.45 [380754]
                 end;
             }
         }
     }
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        Clear(CustomizedCalendarChangeAdmissionTemp);
+        CustomizedCalendarChangeAdmissionTemp."Source Type" := CustomizedCalendarChangeAdmissionTemp."Source Type"::Location;
+        CustomizedCalendarChangeAdmissionTemp."Source Code" := "Admission Code";
+        CustomizedCalendarChangeAdmissionTemp."Base Calendar Code" := "Admission Base Calendar Code";
+        CustomizedCalendarChangeAdmissionTemp.Insert();
+
+        Clear(CustomizedCalendarChangeTicketTemp);
+        CustomizedCalendarChangeTicketTemp."Source Type" := CustomizedCalendarChangeTicketTemp."Source Type"::Service;
+        CustomizedCalendarChangeTicketTemp."Source Code" := "Admission Code";
+        CustomizedCalendarChangeTicketTemp."Base Calendar Code" := "Ticket Base Calendar Code";
+        CustomizedCalendarChangeTicketTemp.Insert();
+    end;
+
     var
-        CustomizedCalEntry: Record "Customized Calendar Entry";
-        CustomizedCalendar: Record "Customized Calendar Change";
+        CustomizedCalendarChangeAdmissionTemp: Record "Customized Calendar Change" temporary;
+        CustomizedCalendarChangeTicketTemp: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 }
 

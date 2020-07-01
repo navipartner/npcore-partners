@@ -5,7 +5,37 @@
         {
             "id": "AS0016",
             "action": "Warning",
-            "justification": "Since we're targeting internal, ApplicationArea is not yet mandatory. "
+            "justification": "Since we're targeting OnPrem, DataClassification is not yet mandatory."
+        },
+        {
+            "id": "AS0053",
+            "action":"Hidden",
+            "justification": "We want to use some of the AppSourceCop checks while we're OnPrem."
+        },
+        {
+            "id": "AS0054",
+            "action":"Warning",
+            "justification": "TEMPORARY! Remove after rename!"
+        },
+        {
+            "id": "AS0058",
+            "action":"Warning",
+            "justification": "We need to find a better solution for code that is using AssertError!"
+        },  
+        {
+            "id": "AS0059",
+            "action":"Warning",
+            "justification": "Rework adding permissions!"
+        },                 
+        {
+            "id": "AS0061",
+            "action": "Warning",
+            "justification": "Since we're targeting OnPrem, OnBeforeCompanyOpen & OnAfterCompanyOpen are still valid events to use."
+        },
+        {
+            "id": "AS0062",
+            "action": "Warning",
+            "justification": "Since we're targeting OnPrem, ApplicationArea is not yet mandatory."
         }
     ]
 }
