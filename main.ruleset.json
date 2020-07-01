@@ -5,12 +5,17 @@
         {
             "id": "AS0016",
             "action": "Warning",
-            "justification": "Since we're targeting OnPrem, DataClassification is not yet mandatory. "
+            "justification": "Since we're targeting OnPrem, DataClassification is not yet mandatory."
         },
+        {
+            "id": "AS0053",
+            "action":"Hidden",
+            "justification": "We want to use some of the AppSourceCop checks while we're OnPrem."
+        },       
         {
             "id": "AS0062",
             "action": "Warning",
-            "justification": "Since we're targeting OnPrem, ApplicationArea is not yet mandatory. "
+            "justification": "Since we're targeting OnPrem, ApplicationArea is not yet mandatory."
         }
     ]
 }
