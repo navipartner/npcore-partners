@@ -12,6 +12,9 @@ trigger:
   branches:
     include:
     - masters/NPR_BC16_W1
+  paths:
+    include:
+    - Translations/NP Retail.g.xlf
 
 pool:
   name: NP Deployment
