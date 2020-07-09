@@ -264,6 +264,7 @@ dotnet
 
     assembly("mscorlib")
     {
+        Version = '4.0.0.0';
         type("System.String"; "npNetString")
         {
         }
