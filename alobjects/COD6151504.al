@@ -20,7 +20,7 @@ codeunit 6151504 "Nc Import Mgt."
         Text000: Label 'Test Error E-mail sent to:\  %1';
         Text001: Label 'Error during Ftp Backup (%1):\\%2';
 
-    procedure InsertImportEntries(ImportType: Code[10];documents: XMLport "Nc Import Entry";var NewImportEntry: Record "Nc Import Entry" temporary)
+    procedure InsertImportEntries(ImportType: Code[10]; documents: XMLport "Nc Import Entry"; var NewImportEntry: Record "Nc Import Entry" temporary)
     var
         ImportEntry: Record "Nc Import Entry";
         TempNcImportEntry: Record "Nc Import Entry" temporary;
@@ -31,35 +31,35 @@ codeunit 6151504 "Nc Import Mgt."
         NewRecIsTemp := RecRef.IsTemporary();
 
         if NewRecIsTemp then
-          NewImportEntry.DeleteAll
+            NewImportEntry.DeleteAll
         else
-          Clear(NewImportEntry);
+            Clear(NewImportEntry);
 
         documents.Import;
         documents.CopySourceTable(TempNcImportEntry);
         if not TempNcImportEntry.FindSet then
-          exit;
+            exit;
 
         repeat
-          ImportEntry.Init;
-          ImportEntry := TempNcImportEntry;
-          ImportEntry."Entry No." := 0;
-          ImportEntry."Import Type" := ImportType;
-          ImportEntry.Insert(true);
+            ImportEntry.Init;
+            ImportEntry := TempNcImportEntry;
+            ImportEntry."Entry No." := 0;
+            ImportEntry."Import Type" := ImportType;
+            ImportEntry.Insert(true);
 
-          if NewRecIsTemp then begin
-            NewImportEntry.Init;
-            NewImportEntry := ImportEntry;
-            NewImportEntry.Insert;
-          end else begin
-            NewImportEntry.Get(ImportEntry."Entry No.");
-            NewImportEntry.Mark(true);
-          end;
+            if NewRecIsTemp then begin
+                NewImportEntry.Init;
+                NewImportEntry := ImportEntry;
+                NewImportEntry.Insert;
+            end else begin
+                NewImportEntry.Get(ImportEntry."Entry No.");
+                NewImportEntry.Mark(true);
+            end;
         until TempNcImportEntry.Next = 0;
         Commit;
 
         if not NewRecIsTemp then
-          NewImportEntry.MarkedOnly(true);
+            NewImportEntry.MarkedOnly(true);
     end;
 
     local procedure ProcessImportEntry(var ImportEntry: Record "Nc Import Entry"): Boolean
@@ -79,7 +79,7 @@ codeunit 6151504 "Nc Import Mgt."
         //+NC2.01 [255397]
 
         ImportType.TestField("Import Codeunit ID");
-        CODEUNIT.Run(ImportType."Import Codeunit ID",ImportEntry);
+        CODEUNIT.Run(ImportType."Import Codeunit ID", ImportEntry);
     end;
 
     local procedure "--- Cleanup"()
@@ -92,14 +92,14 @@ codeunit 6151504 "Nc Import Mgt."
     begin
         //-NC2.01 [255397]
         if not ImportType.FindSet then
-          exit;
+            exit;
 
         repeat
-          //-NC2.06 [290771]
-          //IF CleanupImportType(ImportType) THEN
-          CleanupImportType(ImportType);
-          //+NC2.06 [290771]
-          Commit;
+            //-NC2.06 [290771]
+            //IF CleanupImportType(ImportType) THEN
+            CleanupImportType(ImportType);
+            //+NC2.06 [290771]
+            Commit;
         until ImportType.Next = 0;
         //+NC2.01 [255397]
     end;
@@ -112,17 +112,17 @@ codeunit 6151504 "Nc Import Mgt."
     begin
         //-NC2.01 [255397]
         if ImportType."Keep Import Entries for" = 0 then begin
-          ImportType."Keep Import Entries for" := 1000 * 60 * 60 * 24;
-          ImportType."Keep Import Entries for" := ImportType."Keep Import Entries for" * 30;
+            ImportType."Keep Import Entries for" := 1000 * 60 * 60 * 24;
+            ImportType."Keep Import Entries for" := ImportType."Keep Import Entries for" * 30;
         end;
-        CleanupDate := CreateDateTime(Today,Time) - ImportType."Keep Import Entries for";
+        CleanupDate := CreateDateTime(Today, Time) - ImportType."Keep Import Entries for";
 
-        ImportEntry.SetCurrentKey("Import Type",Date,Imported);
-        ImportEntry.SetRange("Import Type",ImportType.Code);
-        ImportEntry.SetFilter(Date,'<%1',CleanupDate);
-        ImportEntry.SetRange(Imported,true);
+        ImportEntry.SetCurrentKey("Import Type", Date, Imported);
+        ImportEntry.SetRange("Import Type", ImportType.Code);
+        ImportEntry.SetFilter(Date, '<%1', CleanupDate);
+        ImportEntry.SetRange(Imported, true);
         if not ImportEntry.FindSet then
-          exit;
+            exit;
 
         ImportEntry.DeleteAll;
         //+NC2.01 [255397]
@@ -132,7 +132,7 @@ codeunit 6151504 "Nc Import Mgt."
     begin
     end;
 
-    procedure GetErrorMessage(NcImportEntry: Record "Nc Import Entry";HtmlFormat: Boolean) ErrorText: Text
+    procedure GetErrorMessage(NcImportEntry: Record "Nc Import Entry"; HtmlFormat: Boolean) ErrorText: Text
     var
         InStream: InStream;
         StreamReader: DotNet npNetStreamReader;
@@ -141,17 +141,17 @@ codeunit 6151504 "Nc Import Mgt."
         //-NC2.02 [262318]
         ErrorText := '';
         if not NcImportEntry."Last Error Message".HasValue then
-          exit('');
+            exit('');
 
         NcImportEntry.CalcFields("Last Error Message");
         NcImportEntry."Last Error Message".CreateInStream(InStream);
         StreamReader := StreamReader.StreamReader(InStream);
         ErrorText := StreamReader.ReadToEnd();
         if not HtmlFormat then
-          exit(ErrorText);
+            exit(ErrorText);
 
         String := ErrorText;
-        ErrorText := String.Replace(NewLine(),'<br />');
+        ErrorText := String.Replace(NewLine(), '<br />');
 
         exit(ErrorText);
         //+NC2.02 [262318]
@@ -164,7 +164,7 @@ codeunit 6151504 "Nc Import Mgt."
         ErrorMessage: Text;
     begin
         //-NC2.02 [262318]
-        ErrorMessage := GetErrorMessage(NcImportEntry,true);
+        ErrorMessage := GetErrorMessage(NcImportEntry, true);
 
         Body := '<h3>Nc Import Error</h3><br />' +
                 '<dl>' +
@@ -172,11 +172,11 @@ codeunit 6151504 "Nc Import Mgt."
                 '    <dd>' + NcImportEntry."Document Name" + '</dd><br />' +
                 '    <dt><b>- Import Type:</b></dt>' +
                 '    <dd>' + NcImportEntry."Import Type" + '</dd><br />';
-        if ActiveSession.Get(ServiceInstanceId,SessionId) then begin
-          Body += '    <dt><b>- Server Instance Name:</b></dt>' +
-                  '    <dd>' + ActiveSession."Server Instance Name" + '</dd><br />' +
-                  '    <dt><b>- Database Name:</b></dt>' +
-                  '    <dd>' + ActiveSession."Database Name" + '</dd><br />';
+        if ActiveSession.Get(ServiceInstanceId, SessionId) then begin
+            Body += '    <dt><b>- Server Instance Name:</b></dt>' +
+                    '    <dd>' + ActiveSession."Server Instance Name" + '</dd><br />' +
+                    '    <dt><b>- Database Name:</b></dt>' +
+                    '    <dd>' + ActiveSession."Database Name" + '</dd><br />';
         end;
         Body += '    <dt><b>- Company Name:</b></dt>' +
                 '    <dd>' + CompanyName + '</dd><br />' +
@@ -229,7 +229,11 @@ codeunit 6151504 "Nc Import Mgt."
         Body: Text;
         SenderAddress: Text;
         Subject: Text;
+        Separators: List of [Text];
     begin
+        Separators.Add(';');
+        Separators.Add(',');
+
         //-NC2.02 [262318]
         NcImportType.Get(NcImportEntry."Import Type");
         NcImportType.TestField("Send e-mail on Error");
@@ -244,15 +248,15 @@ codeunit 6151504 "Nc Import Mgt."
         SMTPMail.CreateMessage(
           '',
           SenderAddress,
-          NcImportType."E-mail address on Error",
+          NcImportType."E-mail address on Error".Split(Separators),
           Subject,
           Body,
           true);
 
         if NcImportEntry."Document Source".HasValue then begin
-          NcImportEntry.CalcFields("Document Source");
-          NcImportEntry."Document Source".CreateInStream(InStream);
-          SMTPMail.AddAttachmentStream(InStream,NcImportEntry."Document Name");
+            NcImportEntry.CalcFields("Document Source");
+            NcImportEntry."Document Source".CreateInStream(InStream);
+            SMTPMail.AddAttachmentStream(InStream, NcImportEntry."Document Name");
         end;
         SMTPMail.Send;
 
@@ -278,7 +282,7 @@ codeunit 6151504 "Nc Import Mgt."
         TempNcImportEntry.Insert;
 
         SendErrorMail(TempNcImportEntry);
-        Message(Text000,NcImportType."E-mail address on Error");
+        Message(Text000, NcImportType."E-mail address on Error");
         //+NC2.02 [262318]
     end;
 }

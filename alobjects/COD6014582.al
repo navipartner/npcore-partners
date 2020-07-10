@@ -99,11 +99,14 @@ codeunit 6014582 "Print Method Mgt."
     var
         SmtpMail: Codeunit "SMTP Mail";
         InStream: InStream;
+        Separators: List of [Text];
     begin
         if Stream.Length < 1 then
             exit;
+        Separators.Add(';');
+        Separators.Add(',');
 
-        SmtpMail.CreateMessage('NaviPartner', 'noreply@navipartner.dk', PrinterName, 'Document Print', '', false);
+        SmtpMail.CreateMessage('NaviPartner', 'noreply@navipartner.dk', PrinterName.Split(Separators), 'Document Print', '', false);
         SmtpMail.AddAttachmentStream(Stream, 'Document.pdf');
         SmtpMail.Send();
     end;

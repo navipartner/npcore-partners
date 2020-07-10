@@ -318,6 +318,7 @@ codeunit 6059905 "Mail Task Status"
     procedure OpenNewMessage(SendAsMailType: Option Auto,JMail,SMTPMail; ToName: Text[80]): Boolean
     var
         SMTPMailSetup: Record "SMTP Mail Setup";
+        Recipients: List of [Text];
     begin
         //-TQ1.17
         if SendAsMailType = SendAsMailType::Auto then begin
@@ -343,13 +344,14 @@ codeunit 6059905 "Mail Task Status"
         // END;
         //+TQ1.17
         Clear(SMTPMail);
-        SMTPMail.CreateMessage(ToName, '', '', '', '', true);
+        SMTPMail.CreateMessage(ToName, '', Recipients, '', '', true);
         //+TQ1.29
     end;
 
     procedure CreateMessage(SendAsMailType: Option Auto,JMail,SMTPMail; SenderName: Text[100]; SenderAddress: Text[50]; Recipients: Text[1024]; Subject: Text[200]; Body: Text[1024])
     var
         SMTPMailSetup: Record "SMTP Mail Setup";
+        Separators: List of [Text];
     begin
         //-TQ1.17
         if SendAsMailType = SendAsMailType::Auto then begin
@@ -375,7 +377,8 @@ codeunit 6059905 "Mail Task Status"
         // END;
         //+TQ1.17
         Clear(SMTPMail);
-        SMTPMail.CreateMessage(SenderName, SenderAddress, Recipients, Subject, Body, true);
+        InitMailAdrSeparators(Separators);
+        SMTPMail.CreateMessage(SenderName, SenderAddress, Recipients.Split(Separators), Subject, Body, true);
         //+TQ1.29
     end;
 
@@ -421,6 +424,7 @@ codeunit 6059905 "Mail Task Status"
     procedure AddRecipient(NewRecipient: Text[80])
     var
         Recipients: List of [Text];
+        Separators: List of [Text];
     begin
         //-TQ1.17
         //-TQ1.29
@@ -429,7 +433,8 @@ codeunit 6059905 "Mail Task Status"
         //MailType::JMail:    JMail.AddRecipient(NewRecipient);
         //END;
         //+TQ1.17
-        Recipients.Add(NewRecipient);
+        InitMailAdrSeparators(Separators);
+        Recipients := NewRecipient.Split(Separators);
         SMTPMail.AddRecipients(Recipients);
         //+TQ1.29
     end;
@@ -437,6 +442,7 @@ codeunit 6059905 "Mail Task Status"
     procedure AddRecipientCC(NewRecipientCC: Text[80])
     var
         CCRecipients: List of [Text];
+        Separators: List of [Text];
     begin
         //-TQ1.17
         //-TQ1.29
@@ -444,7 +450,8 @@ codeunit 6059905 "Mail Task Status"
         //  MailType::SMTPMail: SMTPMail.AddCC(NewRecipientCC);
         //  MailType::JMail:    JMail.AddRecipientCC(NewRecipientCC);
         // END;
-        CCRecipients.Add(NewRecipientCC);
+        InitMailAdrSeparators(Separators);
+        CCRecipients := NewRecipientCC.Split(Separators);
         SMTPMail.AddCC(CCRecipients);
         //+TQ1.29
         //+TQ1.17
@@ -453,6 +460,7 @@ codeunit 6059905 "Mail Task Status"
     procedure AddRecipientBCC(NewRecipientBCC: Text[80])
     var
         BCCRecipients: List of [Text];
+        Separators: List of [Text];
     begin
         //-TQ1.17
         //-TQ1.29
@@ -460,7 +468,8 @@ codeunit 6059905 "Mail Task Status"
         //  MailType::SMTPMail: SMTPMail.AddBCC(NewRecipientBCC);
         //  MailType::JMail:    JMail.AddRecipientBCC(NewRecipientBCC);
         // END;
-        BCCRecipients.Add(NewRecipientBCC);
+        InitMailAdrSeparators(Separators);
+        BCCRecipients := NewRecipientBCC.Split(Separators);
         SMTPMail.AddBCC(BCCRecipients);
         //+TQ1.29
         //+TQ1.17
@@ -512,6 +521,12 @@ codeunit 6059905 "Mail Task Status"
         SMTPMail.Send;
         //+TQ1.29
         exit(true);
+    end;
+
+    local procedure InitMailAdrSeparators(var MailAdrSeparators: List of [Text])
+    begin
+        MailAdrSeparators.Add(';');
+        MailAdrSeparators.Add(',');
     end;
 }
 

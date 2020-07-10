@@ -125,8 +125,11 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         Recipients: List of [Text];
         CCRecipients: List of [Text];
         BCCRecipients: List of [Text];
+        Separators: List of [Text];
     begin
-        Recipients.Add(NcEndpointEmail."Recipient E-Mail Address");
+        Separators.Add(';');
+        Separators.Add(',');
+        Recipients := NcEndpointEmail."Recipient E-Mail Address".Split(Separators);
         SMTPMail.CreateMessage(NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address", Recipients, Subject, Body, true);
         TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
         OStream.WriteText(OutputText);
@@ -134,12 +137,12 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         SMTPMail.AddAttachmentStream(IStream, Filename);
 
         if NcEndpointEmail."CC E-Mail Address" <> '' then begin
-            CCRecipients.Add(NcEndpointEmail."CC E-Mail Address");
+            CCRecipients := NcEndpointEmail."CC E-Mail Address".Split(Separators);
             SMTPMail.AddCC(CCRecipients);
         end;
 
         if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
-            BCCRecipients.Add(NcEndpointEmail."BCC E-Mail Address");
+            BCCRecipients := NcEndpointEmail."BCC E-Mail Address".Split(Separators);
             SMTPMail.AddBCC(BCCRecipients);
         end;
 
@@ -160,10 +163,14 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         InStream: InStream;
         Recipients: List of [Text];
         CCRecipients: List of [Text];
-        BCCRecipients: List of [Text];        
+        BCCRecipients: List of [Text];
+        Separators: List of [Text];
     begin
+        Separators.Add(';');
+        Separators.Add(',');
+
         //-NC2.12 [308107]
-        Recipients.Add(NcEndpointEmail."Recipient E-Mail Address");
+        Recipients := NcEndpointEmail."Recipient E-Mail Address".Split(Separators);
         SMTPMail.CreateMessage(
           NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address",
           Recipients, NcEndpointEmail."Subject Text", NcEndpointEmail."Body Text", true);
@@ -172,12 +179,12 @@ codeunit 6151525 "Nc Endpoint Email Mgt."
         SMTPMail.AddAttachmentStream(InStream, NcTaskOutput.Name);
 
         if NcEndpointEmail."CC E-Mail Address" <> '' then begin
-            CCRecipients.Add(NcEndpointEmail."CC E-Mail Address");
+            CCRecipients := NcEndpointEmail."CC E-Mail Address".Split(Separators);
             SMTPMail.AddCC(CCRecipients);
         end;
 
         if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
-            BCCRecipients.Add(NcEndpointEmail."BCC E-Mail Address");
+            BCCRecipients := NcEndpointEmail."BCC E-Mail Address".Split(Separators);
             SMTPMail.AddBCC(BCCRecipients);
         end;
 
