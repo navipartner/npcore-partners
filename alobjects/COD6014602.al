@@ -2,22 +2,19 @@ codeunit 6014602 "Import Base NPR Data"
 {
     trigger OnRun()
     begin
-        ImportData();
+        ImportRapidPackageFromFeed('MINIMAL-NPR.rapidstart');
     end;
 
-    local procedure ImportData()
+    procedure ImportRapidPackageFromFeed(package: Text)
     var
         rapidStartBaseDataMgt: Codeunit "RapidStart Base Data Mgt.";
         packageName: Text;
-        package: Text;
     begin
         if GuiAllowed then begin
             if not Confirm('WARNING:\This will import test data in all base & NPR tables.\Are you sure you want to continue?') then
                 exit;
         end;
 
-
-        package := 'BASIC-NPR.rapidstart';
         packageName := package.Replace('.rapidstart', '');
 
         rapidStartBaseDataMgt.ImportPackage(
