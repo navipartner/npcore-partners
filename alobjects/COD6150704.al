@@ -219,11 +219,11 @@ codeunit 6150704 "POS Front End Management"
     begin
         //-NPR5.54 [364340]
         if IsMock then
-          exit(true);
+            exit(true);
         //+NPR5.54 [364340]
 
-            if IsActiveSession() then
-                exit(true);
+        if IsActiveSession() then
+            exit(true);
 
         if Initialized then
             exit(true);
@@ -238,7 +238,7 @@ codeunit 6150704 "POS Front End Management"
     begin
         //-NPR5.54 [364340]
         if IsMock then
-          exit(true);
+            exit(true);
         //+NPR5.54 [364340]
 
         if WorkflowID = 0 then begin
@@ -253,11 +253,10 @@ codeunit 6150704 "POS Front End Management"
 
     local procedure MakeSureFrameworkfIsInitialized()
     begin
-        //-NPR5.54 [364340]
         if IsMock then
-          exit;
-        //+NPR5.54 [364340]
+            exit;
 
+        if (not Initialized) THEN
             ReportBug(Text013);
     end;
 
@@ -343,7 +342,7 @@ codeunit 6150704 "POS Front End Management"
     begin
         //-NPR5.54 [364340]
         if IsMock then
-          exit;
+            exit;
         //+NPR5.54 [364340]
 
         DebugTrace := POSSession.DebugFlush();
@@ -498,8 +497,8 @@ codeunit 6150704 "POS Front End Management"
         MakeSureFrameworkIsAvailable(true);
         Request := Request.JsonRequest();
         Request.Method := 'ApplyAdministrativeTemplates';
-        Request.Content.Add('version','1.0');
-        Request.Content.Add('templates',Templates);
+        Request.Content.Add('version', '1.0');
+        Request.Content.Add('templates', Templates);
         InvokeFrontEndAsync(Request);
         //+NPR5.51 [352582]
     end;
@@ -516,7 +515,7 @@ codeunit 6150704 "POS Front End Management"
         Sequence.SetActionsForValidation(TempSessionAction);
         Sequence.RunActionSequenceDiscovery();
         if not Sequence.FindSet() then
-          exit;
+            exit;
 
         MakeSureFrameworkIsAvailable(true);
 
@@ -524,14 +523,14 @@ codeunit 6150704 "POS Front End Management"
         Request.Method := 'ConfigureActionSequences';
         SequenceContent := SequenceContent.List();
         repeat
-          SequenceEntry := SequenceEntry.Dictionary();
-          SequenceEntry.Add('referenceAction',Sequence."Reference POS Action Code");
-          SequenceEntry.Add('referenceType',LowerCase(Format(Sequence."Reference Type")));
-          SequenceEntry.Add('action',Sequence."POS Action Code");
-          SequenceEntry.Add('priority',Sequence."Sequence No.");
-          SequenceContent.Add(SequenceEntry);
+            SequenceEntry := SequenceEntry.Dictionary();
+            SequenceEntry.Add('referenceAction', Sequence."Reference POS Action Code");
+            SequenceEntry.Add('referenceType', LowerCase(Format(Sequence."Reference Type")));
+            SequenceEntry.Add('action', Sequence."POS Action Code");
+            SequenceEntry.Add('priority', Sequence."Sequence No.");
+            SequenceContent.Add(SequenceEntry);
         until Sequence.Next = 0;
-        Request.Content.Add('sequences',SequenceContent);
+        Request.Content.Add('sequences', SequenceContent);
         InvokeFrontEndAsync(Request);
         //+NPR5.53 [362777]
     end;
@@ -1058,7 +1057,7 @@ codeunit 6150704 "POS Front End Management"
                     Request.View.Type := 11;
                     DefaultView.Type := DefaultView.Type::Locked;
                 end;
-                //+NPR5.37 [293905]
+        //+NPR5.37 [293905]
         end;
 
         if IsNull(Request) then
@@ -1070,8 +1069,8 @@ codeunit 6150704 "POS Front End Management"
         case true of
             ViewType.Equals(ViewType.Login):
                 OnBeforeChangeToLoginView(POSSession);
-                //-NPR5.49 [343617]
-                //ViewType.Equals(ViewType.Sale)           : OnBeforeChangeToSaleView (POSSession);
+            //-NPR5.49 [343617]
+            //ViewType.Equals(ViewType.Sale)           : OnBeforeChangeToSaleView (POSSession);
             ViewType.Equals(ViewType.Sale):
                 begin
                     if CurrView.Type.Equals(CurrViewType.Login) then
