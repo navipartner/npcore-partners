@@ -40,6 +40,11 @@ codeunit 6014594 "RapidStart Base Data Mgt."
         httpRequestMessage: HttpRequestMessage;
         httpResponseMessage: HttpResponseMessage;
     begin
+        if GuiAllowed then begin
+            if not Confirm('WARNING:\This will import test data in base & NPR tables.\Are you sure you want to continue?') then
+                exit;
+        end;
+
         IF configPackage.GET(PackageCode) THEN BEGIN
             configPackage.DELETE(TRUE);
         END;
