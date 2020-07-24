@@ -1,5 +1,4 @@
 <!-- Workaround to retrieving nuget packages inside an AL project. There is no actual .NET core project -->
-<!-- Use the NPDev extension action "NPDev: Download Dependencies" to trigger AL dependency download -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>    
     <TargetFramework>netcoreapp3.0</TargetFramework>
