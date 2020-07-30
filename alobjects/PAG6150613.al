@@ -114,7 +114,7 @@ page 6150613 "NP Retail Setup"
                 field("Item Price Function"; "Item Price Function")
                 {
                 }
-                field("Default POS Posting Profile";"Default POS Posting Profile")
+                field("Default POS Posting Profile"; "Default POS Posting Profile")
                 {
                 }
             }
@@ -189,6 +189,18 @@ page 6150613 "NP Retail Setup"
                     field("Enable Client Diagnostics"; "Enable Client Diagnostics")
                     {
                     }
+                }
+            }
+            group(Legal)
+            {
+                field("Standard Conditions"; "Standard Conditions")
+                {
+                }
+                field(Privacy; Privacy)
+                {
+                }
+                field("License Agreement"; "License Agreement")
+                {
                 }
             }
         }

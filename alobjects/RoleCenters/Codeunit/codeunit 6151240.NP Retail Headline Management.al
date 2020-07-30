@@ -1,0 +1,474 @@
+codeunit 6151240 "NP Retail Headline Management"
+{
+
+    trigger OnRun()
+    begin
+        DrillDownSalesThisMonthLastYear;
+    end;
+
+    var
+        MorningGreetingTxt: Label 'Good morning, %1!', Comment = '%1 is the user name. This is displayed between 00:00 and 10:59.';
+        LateMorningGreetingTxt: Label 'Hi, %1!', Comment = '%1 is the user name.  This is displayed between 11:00 and 11:59.';
+        NoonGreetingTxt: Label 'Hi, %1!', Comment = '%1 is the user name.  This is displayed between 12:00 and 13:59.';
+        AfternoonGreetingTxt: Label 'Good afternoon, %1!', Comment = '%1 is the user name.  This is displayed between 14:00 and 18:59.';
+        EveningGreetingTxt: Label 'Good evening, %1!', Comment = '%1 is the user name.  This is displayed between 19:00 and 23:59.';
+        TimeOfDay: Option Morning,LateMorning,Noon,Afternoon,Evening;
+        SimpleMorningGreetingTxt: Label 'Good morning!', Comment = ' This is displayed between 00:00 and 10:59.';
+        SimpleLateMorningGreetingTxt: Label 'Hi!', Comment = ' This is displayed between 11:00 and 11:59.';
+        SimpleNoonGreetingTxt: Label 'Hi!', Comment = ' This is displayed between 12:00 and 13:59.';
+        SimpleAfternoonGreetingTxt: Label 'Good afternoon!', Comment = ' This is displayed between 14:00 and 18:59.';
+        SimpleEveningGreetingTxt: Label 'Good evening!', Comment = ' This is displayed between 19:00 and 23:59.';
+
+    [Scope('Personalization')]
+    procedure Truncate(TextToTruncate: Text; MaxLength: Integer): Text
+    begin
+        if StrLen(TextToTruncate) <= MaxLength then
+            exit(TextToTruncate);
+
+        if MaxLength <= 0 then
+            exit('');
+
+        if MaxLength <= 3 then
+            exit(CopyStr(TextToTruncate, 1, MaxLength));
+
+        exit(CopyStr(TextToTruncate, 1, MaxLength - 3) + '...');
+    end;
+
+    [Scope('Personalization')]
+    procedure Emphasize(TextToEmphasize: Text): Text
+    begin
+        if TextToEmphasize <> '' then
+            exit(StrSubstNo('<emphasize>%1</emphasize>', TextToEmphasize));
+    end;
+
+    [Scope('Personalization')]
+    procedure GetHeadlineText(Qualifier: Text; Payload: Text; var ResultText: Text[250]): Boolean
+    var
+        RegExMgt: Codeunit DotNet_Regex;
+        PayloadWithoutEmphasize: Text[158];
+        PayloadTagsLength: Integer;
+        QualifierTagsLength: Integer;
+    begin
+        QualifierTagsLength := 23;
+        PayloadTagsLength := 19;
+
+        if StrLen(Qualifier) + StrLen(Payload) > 250 - QualifierTagsLength - PayloadTagsLength then
+            exit(false); // this won't fit
+
+        if Payload = '' then
+            exit(false); // payload should not be empty
+
+        if StrLen(Qualifier) > GetMaxQualifierLength then
+            exit(false); // qualifier is too long to be a qualifier
+
+        PayloadWithoutEmphasize := RegExMgt.Replace(Payload, '<emphasize>|</emphasize>', '');
+        if StrLen(PayloadWithoutEmphasize) > GetMaxPayloadLength then
+            exit(false); // payload is too long for being a headline
+
+        ResultText := CopyStr(GetQualifierText(Qualifier) + GetPayloadText(Payload), 1, MaxStrLen(ResultText));
+        exit(true);
+    end;
+
+    local procedure GetPayloadText(PayloadText: Text): Text
+    begin
+        if PayloadText <> '' then
+            exit(StrSubstNo('<payload>%1</payload>', PayloadText));
+    end;
+
+    local procedure GetQualifierText(QualifierText: Text): Text
+    begin
+        if QualifierText <> '' then
+            exit(StrSubstNo('<qualifier>%1</qualifier>', QualifierText));
+    end;
+
+    [Scope('Personalization')]
+    procedure GetUserGreetingText(var GreetingText: Text[250])
+    var
+        User: Record User;
+    begin
+        if User.Get(UserSecurityId) then;
+        GetUserGreetingTextInternal(User."Full Name", GetTimeOfDay, GreetingText);
+    end;
+
+    [Scope('Personalization')]
+    procedure GetUserGreetingTextInternal(UserName: Text[80]; CurrentTimeOfDay: Option; var GreetingText: Text[250])
+    var
+        RegExMgt: Codeunit DotNet_Regex;
+        UserNameFound: Boolean;
+        CleanUserName: Text;
+    begin
+        if UserName <> '' then begin
+            CleanUserName := RegExMgt.Replace(UserName, '\s', '');
+            UserNameFound := CleanUserName <> '';
+        end;
+
+        case CurrentTimeOfDay of
+            TimeOfDay::Morning:
+                if UserNameFound then
+                    GreetingText := StrSubstNo(MorningGreetingTxt, UserName)
+                else
+                    GreetingText := SimpleMorningGreetingTxt;
+            TimeOfDay::LateMorning:
+                if UserNameFound then
+                    GreetingText := StrSubstNo(LateMorningGreetingTxt, UserName)
+                else
+                    GreetingText := SimpleLateMorningGreetingTxt;
+            TimeOfDay::Noon:
+                if UserNameFound then
+                    GreetingText := StrSubstNo(NoonGreetingTxt, UserName)
+                else
+                    GreetingText := SimpleNoonGreetingTxt;
+            TimeOfDay::Afternoon:
+                if UserNameFound then
+                    GreetingText := StrSubstNo(AfternoonGreetingTxt, UserName)
+                else
+                    GreetingText := SimpleAfternoonGreetingTxt;
+            TimeOfDay::Evening:
+                if UserNameFound then
+                    GreetingText := StrSubstNo(EveningGreetingTxt, UserName)
+                else
+                    GreetingText := SimpleEveningGreetingTxt;
+        end
+    end;
+
+    local procedure GetTimeOfDay(): Integer
+    var
+        TypeHelper: Codeunit "Type Helper";
+        TimezoneOffset: Duration;
+        Hour: Integer;
+    begin
+        if not TypeHelper.GetUserTimezoneOffset(TimezoneOffset) then
+            TimezoneOffset := 0;
+
+        Evaluate(Hour, TypeHelper.FormatUtcDateTime(TypeHelper.GetCurrUTCDateTime, 'HH', ''));
+        Hour += TimezoneOffset div (60 * 60 * 1000);
+
+        case Hour of
+            0 .. 10:
+                exit(TimeOfDay::Morning);
+            11:
+                exit(TimeOfDay::LateMorning);
+            12 .. 13:
+                exit(TimeOfDay::Noon);
+            14 .. 18:
+                exit(TimeOfDay::Afternoon);
+            19 .. 23:
+                exit(TimeOfDay::Evening);
+        end;
+    end;
+
+    [Scope('Personalization')]
+    procedure ShouldUserGreetingBeVisible(): Boolean
+    var
+        UserLoginTimeTracker: Codeunit "User Login Time Tracker";
+        LimitDateTime: DateTime;
+    begin
+        LimitDateTime := CreateDateTime(Today, Time - (10 * 60 * 1000)); // greet if login is in the last 10 minutes, then stop greeting
+        exit(UserLoginTimeTracker.UserLoggedInSinceDateTime(LimitDateTime));
+    end;
+
+    [Scope('Personalization')]
+    procedure GetMaxQualifierLength(): Integer
+    begin
+        exit(50);
+    end;
+
+    [Scope('Personalization')]
+    procedure GetMaxPayloadLength(): Integer
+    begin
+        exit(75);
+    end;
+
+    [Scope('Personalization')]
+    procedure ScheduleTask(CodeunitId: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        DummyRecordId: RecordID;
+    begin
+        OnBeforeScheduleTask(CodeunitId);
+        if not TASKSCHEDULER.CanCreateTask then
+            exit;
+        if not JobQueueEntry.WritePermission then
+            exit;
+
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", CodeunitId);
+        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
+        if not JobQueueEntry.IsEmpty then
+            exit;
+
+        JobQueueEntry.ScheduleJobQueueEntry(CodeunitId, DummyRecordId);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeScheduleTask(CodeunitId: Integer)
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Page, 9176, 'OnBeforeLanguageChange', '', true, true)]
+    local procedure OnBeforeUpdateLanguage(OldLanguageId: Integer; NewLanguageId: Integer)
+    begin
+        OnInvalidateHeadlines;
+    end;
+
+    [EventSubscriber(ObjectType::Page, 9176, 'OnBeforeWorkdateChange', '', true, true)]
+    local procedure OnBeforeUpdateWorkdate(OldWorkdate: Date; NewWorkdate: Date)
+    begin
+        OnInvalidateHeadlines;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInvalidateHeadlines()
+    begin
+    end;
+
+    [Scope('Personalization')]
+    procedure GetTopSalesToday(var HigestTodaySales: Text[250])
+    var
+        User: Record User;
+        POSEntry: Record "POS Entry";
+        SalesAmt: Decimal;
+    begin
+        //IF User.GET(USERSECURITYID) THEN;
+        //GetUserGreetingTextInternal(User."Full Name",GetTimeOfDay,GreetingText);
+
+        POSEntry.Reset;
+        POSEntry.SetFilter("Entry Date", '=%1', Today);
+        //POSEntry.cc("Sales Amount");
+        if POSEntry.FindSet then begin
+            SalesAmt := POSEntry."Item Sales (LCY)";
+            repeat
+                if SalesAmt < POSEntry."Item Sales (LCY)" then
+                    SalesAmt := POSEntry."Item Sales (LCY)";
+            until POSEntry.Next = 0;
+            HigestTodaySales := Format(SalesAmt);
+        end;
+
+    end;
+
+    [Scope('Personalization')]
+    procedure GetTopSalesPersonToday(var TopSalesPerson: Text[50])
+    var
+        User: Record User;
+        SalesPerson: Record "Salesperson/Purchaser";
+        SalesAmt: Decimal;
+    begin
+
+        SalesAmt := 0;
+        SalesPerson.Reset;
+        //SalesPerson.SETFILTER("Sales (Qty.)",'>%1',0);
+        if SalesPerson.FindSet then begin
+            SalesPerson.CalcFields("Sales (LCY)");
+            SalesAmt := SalesPerson."Sales (LCY)";
+            TopSalesPerson := SalesPerson.Name;
+            repeat
+                SalesPerson.CalcFields("Sales (LCY)");
+                if SalesAmt < SalesPerson."Sales (LCY)" then begin
+                    SalesAmt := SalesPerson."Sales (LCY)";
+                    TopSalesPerson := SalesPerson.Name;
+                end;
+            until SalesPerson.Next = 0;
+
+        end;
+    end;
+
+    [Scope('Personalization')]
+    procedure GetMyPickToday(var MyPickText: Text[250])
+    var
+        WarehouseActivityHdr: Record "Warehouse Activity Header";
+    begin
+        WarehouseActivityHdr.Reset;
+        WarehouseActivityHdr.SetRange(Type, WarehouseActivityHdr.Type::Pick);
+        MyPickText := Format(WarehouseActivityHdr.Count);
+    end;
+
+    [Scope('Personalization')]
+    procedure GetMyPutAwayToday(var AwayPickText: Text[50])
+    var
+        WarehouseActivityHdr: Record "Warehouse Activity Header";
+    begin
+        WarehouseActivityHdr.Reset;
+        WarehouseActivityHdr.SetRange(Type, WarehouseActivityHdr.Type::"Put-away");
+        AwayPickText := Format(WarehouseActivityHdr.Count)
+    end;
+
+
+    [Scope('Personalization')]
+    procedure GetHighestPOSSalesText(var highestPOSSales: Text)
+    var
+        User: Record User;
+        POSEntry: Record "POS Entry";
+        SalesAmt: Decimal;
+    begin
+        POSEntry.Reset;
+        POSEntry.SetFilter("Entry Type", '%1', POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.SetFilter("Entry Date", '%1', TODAY);
+        if POSEntry.FindSet then begin
+            SalesAmt := POSEntry."Amount Excl. Tax";
+            repeat
+                if SalesAmt < POSEntry."Amount Excl. Tax" then
+                    SalesAmt := POSEntry."Amount Excl. Tax";
+            until POSEntry.Next = 0;
+            highestPOSSales := Format(SalesAmt);
+        end else
+            highestPOSSales := '0.00';
+
+    end;
+
+
+    [Scope('Personalization')]
+    procedure GetHighestSalesInvText(var highestSalesInv: Text)
+    var
+        User: Record User;
+        SalesInvHdr: Record "Sales Invoice Header";
+        SalesAmt: Decimal;
+    begin
+        SalesInvHdr.Reset;
+        SalesInvHdr.SetFilter(SalesInvHdr."Posting Date", '=%1', TODAY);
+        if SalesInvHdr.FindSet then begin
+            SalesInvHdr.CalcFields(Amount);
+            SalesAmt := SalesInvHdr.Amount;
+            repeat
+                SalesInvHdr.CalcFields(Amount);
+                if SalesAmt < SalesInvHdr."Amount" then
+                    SalesAmt := SalesInvHdr."Amount";
+            until SalesInvHdr.Next = 0;
+            highestSalesInv := Format(SalesAmt);
+        end else
+            highestSalesInv := '0.00';
+
+    end;
+
+    [Scope('Personalization')]
+    procedure GetTopSalesPersonText(var TopSalesPersonText: Text)
+    var
+        User: Record User;
+        SalesPerson: Record "Salesperson/Purchaser";
+        SalesAmt: Decimal;
+        HighestSalesAmt: Decimal;
+        SalesPersonName: Text;
+        ValueEntry: Record "Value Entry";
+    begin
+        SalesAmt := 0;
+        HighestSalesAmt := 0;
+        SalesPerson.Reset;
+        if SalesPerson.FindSet then begin
+            repeat
+                ValueEntry.Reset();
+                ValueEntry.SetRange("Posting Date", Today);
+                ValueEntry.SetRange("Salespers./Purch. Code", SalesPerson.Code);
+                IF ValueEntry.FindSet then begin
+                    repeat
+                        SalesAmt += ValueEntry."Sales Amount (Actual)";
+                    until ValueEntry.Next = 0;
+                    if SalesAmt > HighestSalesAmt then begin
+                        HighestSalesAmt := SalesAmt;
+                        TopSalesPersonText := SalesPerson.Name;
+                    end;
+                end;
+
+            until SalesPerson.Next = 0;
+
+        end;
+    end;
+
+    [Scope('Personalization')]
+    procedure GetAverageBasket(var AvgBasket: decimal)
+    var
+        PosEntry: Record "POS Entry";
+        Turnover: Decimal;
+        TotalSum: Decimal;
+        TotalRoundingAmt: Decimal;
+        NoOfLines: Integer;
+
+
+    begin
+        PosEntry.Reset();
+        PosEntry.SetRange("Entry Date", Today);
+        PosEntry.SetRange("Post Item Entry Status", PosEntry."Post Item Entry Status"::Posted);
+        NoOfLines := PosEntry.Count;
+
+        IF PosEntry.FindSet THEN begin
+            repeat
+                TotalSum += PosEntry."Amount Excl. Tax";
+                TotalRoundingAmt += PosEntry."Rounding Amount (LCY)";
+            until PosEntry.Next = 0;
+        END;
+
+        IF NoOfLines > 0 THEN
+            AvgBasket := (TotalSum + TotalRoundingAmt) / NoOfLines
+        ELSE
+            AvgBasket := 0;
+
+    end;
+
+
+    [Scope('Personalization')]
+    procedure GetissuedTicketToday(var AvgIssued: Text[250])
+    var
+        TMTicketType: Record "TM Ticket";
+
+    begin
+
+        TMTicketType.Reset();
+        TMTicketType.SetRange("Document Date", Today);
+        AvgIssued := 'Ticket issued for today is ' + FORMAT(TMTicketType.Count);
+
+    end;
+
+    [Scope('Personalization')]
+    procedure GetTicketAdmissionToday(var AvgAdmission: Text[250])
+    var
+        TMAdmissionScheduleLines: Record "TM Admission Schedule Lines";
+
+    begin
+        TMAdmissionScheduleLines.Reset();
+        AvgAdmission := 'Ticket admission for day is ' + FORMAT(TMAdmissionScheduleLines.Count);
+
+    end;
+
+
+    [Scope('Personalization')]
+    procedure GetMembersCreatedToday(var AvgMember: Text[250])
+    var
+        MMMember: Record "MM Membership";
+    begin
+
+        MMMember.Reset();
+        MMMember.SetRange("Issued Date", Today);
+        AvgMember := 'No of new member for today is ' + FORMAT(MMMember.Count);
+    end;
+
+
+    procedure DrillDownSalesThisMonthLastYear()
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.SetFilter("Document Type", '%1|%2',
+          ItemLedgerEntry."Document Type"::"Sales Invoice", ItemLedgerEntry."Document Type"::"Sales Credit Memo");
+        ItemLedgerEntry.SetRange("Posting Date", CalcDate('<-CY>', Today), Today);
+        PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
+    end;
+
+    [Scope('Personalization')]
+    procedure CalcSalesThisMonthAmountLastYear(CalledFromWebService: Boolean) Amount: Decimal
+    var
+        ILE: Record "Item Ledger Entry";
+    begin
+        SetFilterForCalcSalesThisMonthAmountLastYear(ILE, CalledFromWebService);
+        ILE.CalcSums("Sales Amount (Actual)");
+        Amount := ILE."Sales Amount (Actual)";
+    end;
+
+    procedure SetFilterForCalcSalesThisMonthAmountLastYear(var ILE: Record "Item Ledger Entry"; CalledFromWebService: Boolean)
+    begin
+        ILE.SetFilter("Document Type", '%1|%2',
+          ILE."Document Type"::"Sales Invoice", ILE."Document Type"::"Sales Credit Memo");
+
+        ILE.SetRange("Posting Date", CalcDate('<-CY>', Today), Today)
+
+    end;
+
+
+}
+

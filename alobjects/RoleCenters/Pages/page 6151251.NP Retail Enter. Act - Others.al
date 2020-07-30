@@ -1,0 +1,43 @@
+page 6151251 "NP Retail Enter. Act - Others"
+{
+    // #343621/ZESO/20190725  CASE 343621 Object created.
+
+    Caption = 'Activities';
+    PageType = CardPart;
+    RefreshOnActivate = true;
+    SourceTable = "NP Retail Entertainment Cue";
+
+    layout
+    {
+        area(content)
+        {
+            cuegroup("Master Data")
+            {
+                Caption = 'Master Data';
+                field(Items; Items)
+                {
+                }
+                field(Contacts; Contacts)
+                {
+                }
+                field(Customers; Customers)
+                {
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+
+    trigger OnOpenPage()
+    begin
+        Reset;
+        if not Get then begin
+            Init;
+            Insert;
+        end;
+    end;
+}
+

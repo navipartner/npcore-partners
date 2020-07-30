@@ -84,6 +84,21 @@ table 6150613 "NP Retail Setup"
             Description = 'NPR5.52';
             TableRelation = "POS Posting Profile";
         }
+        field(231; "Standard Conditions"; Text[250])
+        {
+            Caption = 'Standard Conditions';
+            ExtendedDatatype = URL;
+        }
+        field(232; Privacy; Text[250])
+        {
+            Caption = 'Privacy';
+            ExtendedDatatype = URL;
+        }
+        field(233; "License Agreement"; Text[250])
+        {
+            Caption = 'License Agreement';
+            ExtendedDatatype = URL;
+        }
         field(300; "Item Price Codeunit ID"; Integer)
         {
             BlankZero = true;
