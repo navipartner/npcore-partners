@@ -17,7 +17,19 @@
   "idRanges": [
     {
       "from": 6014400,
-      "to": 6900000
+      "to": 6014699
+    },
+    {
+      "from": 6059767,
+      "to": 6060166
+    },
+    {
+      "from": 6150613,
+      "to": 6151612
+    },
+    {
+      "from": 6184471,
+      "to": 6185470
     }
   ],
   "contextSensitiveHelpUrl": "https://support.navipartner.com/",
