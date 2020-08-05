@@ -222,8 +222,9 @@ codeunit 6150704 "POS Front End Management"
             exit(true);
         //+NPR5.54 [364340]
 
-        if IsActiveSession() then
-            exit(true);
+        if not Initialized then
+            if IsActiveSession() then
+                exit(true);
 
         if Initialized then
             exit(true);
