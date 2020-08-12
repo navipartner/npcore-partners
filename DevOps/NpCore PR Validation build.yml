@@ -18,6 +18,7 @@ pool:
 jobs:
 - template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
   parameters:
+    timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/businesscentral/onprem:2004-w1-ltsc2019
     containerName: Build-$(Build.BuildId)
     serverInstanceName: BC

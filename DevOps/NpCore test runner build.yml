@@ -1,0 +1,84 @@
+trigger: none
+
+schedules:
+  - cron: "0 2 * * *"
+    displayName: Daily after-midnight test runner build
+    branches:
+      include:
+      - masters/NPR_BC16_W1
+    
+resources:
+  repositories:
+  - repository: scriptsRepo
+    type: git
+    name:  'NpCore/NpDevOps'
+    ref: 'refs/heads/master'  
+
+pool:
+  name: NP Deployment
+  demands: 
+  - docker
+  # Now only 2019 is available but in the future it will be every newer version.
+  # Then we will probably remove this requirement as it will alwyas TRUE.
+  - com.navipartner.docker.osversion -equals 2019
+
+variables:
+  varAdminPassword: $(adminPassword)
+
+jobs:
+- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+  parameters:
+    timeoutInMinutes: 480
+    containerImageName: mcr.microsoft.com/businesscentral/onprem:2004-w1-ltsc2019
+    containerName: Build-$(Build.BuildId)
+    serverInstanceName: BC
+    containerAdminUsername: admin
+    containerAdminPassword: $(varAdminPassword)
+    licenseSecureFileName: 'DEV_BC OP 16.flf'
+    scriptsRepo: ScriptsRepo
+    dependancyPackages:
+      - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+        id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+    AppsToPublishAndDeploy:
+      - appPath: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
+      - appPath: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
+      - appPath: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
+      - appPath: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Bank.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cash Flow.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cost Accounting.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-CRM integration.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Data Exchange.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Dimension.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-ERM.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Fixed Asset.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-General Journal.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Graph.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Integration.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Invoicing.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Job.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Local.app'
+      # - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Marketing.app' Microsoft.Dynamics.Nav.Integration.Office.Mock assembly missing
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Permissions.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Physical Inventory.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Prepayment.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Rapid Start.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Report.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Resource.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Reverse.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SCM.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SINGLESERVER.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMB.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMTP.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Upgrade.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-User.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-VAT.app'
+      - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Workflow.app'
+    TestsToRun:
+      - TestRunName: 'Microsoft Base App tests'
+        TestSuite: 'DEFAULT'
+        ExtensionId: ''
+        TestCodeunitsRange: '134000..134999' #Microsoft Test object range - at least one filter must be populated!
+        DisabledTests: ''
