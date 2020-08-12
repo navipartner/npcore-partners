@@ -1,4 +1,4 @@
-tableextension 6014427 tableextension6014427 extends Item 
+tableextension 6014427 tableextension6014427 extends Item
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields with Description starting NPR7.100.000
@@ -70,7 +70,7 @@ tableextension 6014427 tableextension6014427 extends Item
             Caption = 'Various item sales';
             Description = 'NPR7.100.000';
         }
-        field(6014408;Season;Code[10])
+        field(6014408; Season; Code[10])
         {
             Caption = 'Season';
             Description = 'NPR7.100.000';
@@ -87,15 +87,15 @@ tableextension 6014427 tableextension6014427 extends Item
         {
             Caption = 'Label barcode';
             Description = 'NPR7.100.000';
-            TableRelation = IF ("Create Alt. No. Automatic" = CONST (false)) "Item Cross Reference"."Cross-Reference No." WHERE ("Cross-Reference Type" = CONST ("Bar Code"),
-                                                                                                                              "Item No." = FIELD ("No."),
-                                                                                                                              "Cross-Reference No." = FILTER (<> ''),
-                                                                                                                              "Variant Code" = CONST (''))
+            TableRelation = IF ("Create Alt. No. Automatic" = CONST(false)) "Item Cross Reference"."Cross-Reference No." WHERE("Cross-Reference Type" = CONST("Bar Code"),
+                                                                                                                              "Item No." = FIELD("No."),
+                                                                                                                              "Cross-Reference No." = FILTER(<> ''),
+                                                                                                                              "Variant Code" = CONST(''))
             ELSE
-            IF ("Create Alt. No. Automatic" = CONST (true)) "Alternative No."."Alt. No." WHERE (Type = CONST (Item),
-                                                                                                                                                                                                                    Code = FIELD ("No."),
-                                                                                                                                                                                                                    "Alt. No." = FILTER (<> ''),
-                                                                                                                                                                                                                    "Variant Code" = CONST (''));
+            IF ("Create Alt. No. Automatic" = CONST(true)) "Alternative No."."Alt. No." WHERE(Type = CONST(Item),
+                                                                                                                                                                                                                    Code = FIELD("No."),
+                                                                                                                                                                                                                    "Alt. No." = FILTER(<> ''),
+                                                                                                                                                                                                                    "Variant Code" = CONST(''));
         }
         field(6014418; "Explode BOM auto"; Boolean)
         {
@@ -153,7 +153,7 @@ tableextension 6014427 tableextension6014427 extends Item
         }
         field(6014506; "Has Accessories"; Boolean)
         {
-            CalcFormula = Exist ("Accessory/Spare Part" WHERE (Code = FIELD ("No.")));
+            CalcFormula = Exist ("Accessory/Spare Part" WHERE(Code = FIELD("No.")));
             Caption = 'Has Accessories';
             Description = 'NPR5.40';
             FieldClass = FlowField;
@@ -180,7 +180,7 @@ tableextension 6014427 tableextension6014427 extends Item
         }
         field(6014609; "Has Variants"; Boolean)
         {
-            CalcFormula = Exist ("Item Variant" WHERE ("Item No." = FIELD ("No.")));
+            CalcFormula = Exist ("Item Variant" WHERE("Item No." = FIELD("No.")));
             Caption = 'Has Variants';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -210,7 +210,7 @@ tableextension 6014427 tableextension6014427 extends Item
             Caption = 'Custom Discount Blocked';
             Description = 'NPR5.42 [297569]';
         }
-        field(6014642;"Shelf Label Type";Code[50])
+        field(6014642; "Shelf Label Type"; Code[50])
         {
             Caption = 'Shelf Label Type';
             Description = 'NPR5.51';
@@ -231,7 +231,7 @@ tableextension 6014427 tableextension6014427 extends Item
         {
             Caption = 'Variety 1 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 1"));
+            TableRelation = "Variety Table".Code WHERE(Type = FIELD("Variety 1"));
         }
         field(6059973; "Variety 2"; Code[10])
         {
@@ -243,7 +243,7 @@ tableextension 6014427 tableextension6014427 extends Item
         {
             Caption = 'Variety 2 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 2"));
+            TableRelation = "Variety Table".Code WHERE(Type = FIELD("Variety 2"));
         }
         field(6059976; "Variety 3"; Code[10])
         {
@@ -255,7 +255,7 @@ tableextension 6014427 tableextension6014427 extends Item
         {
             Caption = 'Variety 3 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 3"));
+            TableRelation = "Variety Table".Code WHERE(Type = FIELD("Variety 3"));
         }
         field(6059979; "Variety 4"; Code[10])
         {
@@ -267,7 +267,7 @@ tableextension 6014427 tableextension6014427 extends Item
         {
             Caption = 'Variety 4 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 4"));
+            TableRelation = "Variety Table".Code WHERE(Type = FIELD("Variety 4"));
         }
         field(6059981; "Cross Variety No."; Option)
         {
@@ -397,19 +397,24 @@ tableextension 6014427 tableextension6014427 extends Item
         }
         field(6151495; "Custom Options"; Integer)
         {
-            CalcFormula = Count ("Magento Item Custom Option" WHERE ("Item No." = FIELD ("No."),
-                                                                    Enabled = CONST (true)));
+            CalcFormula = Count ("Magento Item Custom Option" WHERE("Item No." = FIELD("No."),
+                                                                    Enabled = CONST(true)));
             Caption = 'Custom Options';
             Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6151500;"Magento Picture Variety Type";Option)
+        field(6151500; "Magento Picture Variety Type"; Option)
         {
             Caption = 'Magento Picture Variety Type';
             Description = 'MAG2.22';
             OptionCaption = 'None,Variety 1,Variety 2,Variety 3,Variety 4';
             OptionMembers = "None","Variety 1","Variety 2","Variety 3","Variety 4";
+        }
+        field(6151501; "Display only Text"; text[250])
+        {
+            Caption = 'Display Only Text';
+            Description = 'MAG3.00';
         }
     }
     keys
