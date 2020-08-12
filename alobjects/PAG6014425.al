@@ -113,7 +113,7 @@ page 6014425 "Retail Item Card"
                 group(Control6150618)
                 {
                     ShowCaption = false;
-                    field(SearchNo;SearchNo)
+                    field(SearchNo; SearchNo)
                     {
                         Caption = 'Find Item Card';
 
@@ -126,12 +126,12 @@ page 6014425 "Retail Item Card"
                         begin
                             //-NPR5.36 [289871]
                             if Format(OriginalRec) <> Format(Rec) then
-                              Modify(true);
+                                Modify(true);
                             //+NPR5.36 [289871]
                             // CurrPage.UPDATE(TRUE);
                             if BarcodeLibrary.TranslateBarcodeToItemVariant(SearchNo, ItemNo, VariantCode, ResolvingTable, true) then begin
-                              SetRange("No.", ItemNo);
-                              FindFirst;
+                                SetRange("No.", ItemNo);
+                                FindFirst;
                             end;
 
                             Clear(SearchNo);
@@ -141,7 +141,7 @@ page 6014425 "Retail Item Card"
                 group(Control6150616)
                 {
                     ShowCaption = false;
-                    field(Barcode;Barcode)
+                    field(Barcode; Barcode)
                     {
                         Caption = 'Create barcode';
 
@@ -150,7 +150,7 @@ page 6014425 "Retail Item Card"
                             VarietyCloneData: Codeunit "Variety Clone Data";
                         begin
                             //-NPR5.29 [261631]
-                            VarietyCloneData.LookupBarcodes("No.",'');
+                            VarietyCloneData.LookupBarcodes("No.", '');
                             //Altnr := Utility.CreateEAN("No.", '');
                             //RetailFormCode.CreateNewAltItem(Rec,xRec,Altnr,'');
                             //Altnr := '';
@@ -174,49 +174,49 @@ page 6014425 "Retail Item Card"
             group(General)
             {
                 Caption = 'General';
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                     Importance = Promoted;
 
                     trigger OnAssistEdit()
                     begin
                         if AssistEdit then
-                          CurrPage.Update;
+                            CurrPage.Update;
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field("Item Status";"Item Status")
+                field("Item Status"; "Item Status")
                 {
                 }
-                field("Item Group";"Item Group")
+                field("Item Group"; "Item Group")
                 {
                 }
-                field("Base Unit of Measure";"Base Unit of Measure")
+                field("Base Unit of Measure"; "Base Unit of Measure")
                 {
                     Importance = Promoted;
                 }
-                field("Assembly BOM";"Assembly BOM")
+                field("Assembly BOM"; "Assembly BOM")
                 {
                 }
-                field("Shelf No.";"Shelf No.")
+                field("Shelf No."; "Shelf No.")
                 {
                 }
-                field(AverageCostLCY;AverageCostLCY)
+                field(AverageCostLCY; AverageCostLCY)
                 {
                     Caption = 'Average Cost (LCY)';
                     Editable = false;
 
                     trigger OnDrillDown()
                     begin
-                        CODEUNIT.Run(CODEUNIT::"Show Avg. Calc. - Item",Rec);
+                        CODEUNIT.Run(CODEUNIT::"Show Avg. Calc. - Item", Rec);
                     end;
 
                     trigger OnValidate()
@@ -227,13 +227,13 @@ page 6014425 "Retail Item Card"
                         //+NPR5.43 [314830]
                     end;
                 }
-                field("Automatic Ext. Texts";"Automatic Ext. Texts")
+                field("Automatic Ext. Texts"; "Automatic Ext. Texts")
                 {
                 }
-                field("Created From Nonstock Item";"Created From Nonstock Item")
+                field("Created From Nonstock Item"; "Created From Nonstock Item")
                 {
                 }
-                field("Item Category Code";"Item Category Code")
+                field("Item Category Code"; "Item Category Code")
                 {
 
                     trigger OnValidate()
@@ -241,16 +241,16 @@ page 6014425 "Retail Item Card"
                         EnableCostingControls;
                     end;
                 }
-                field("Price Includes VAT";"Price Includes VAT")
+                field("Price Includes VAT"; "Price Includes VAT")
                 {
                 }
-                field("Label Barcode";"Label Barcode")
+                field("Label Barcode"; "Label Barcode")
                 {
                 }
-                field("Service Item Group";"Service Item Group")
+                field("Service Item Group"; "Service Item Group")
                 {
                 }
-                field("Search Description";"Search Description")
+                field("Search Description"; "Search Description")
                 {
 
                     trigger OnValidate()
@@ -258,46 +258,46 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Inventory Value Zero";"Inventory Value Zero")
+                field("Inventory Value Zero"; "Inventory Value Zero")
                 {
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
                     Importance = Promoted;
                 }
-                field("Sales (Qty.)";"Sales (Qty.)")
+                field("Sales (Qty.)"; "Sales (Qty.)")
                 {
                 }
-                field("Qty. on Purch. Order";"Qty. on Purch. Order")
+                field("Qty. on Purch. Order"; "Qty. on Purch. Order")
                 {
                 }
-                field("Qty. on Prod. Order";"Qty. on Prod. Order")
+                field("Qty. on Prod. Order"; "Qty. on Prod. Order")
                 {
                 }
-                field("Qty. on Component Lines";"Qty. on Component Lines")
+                field("Qty. on Component Lines"; "Qty. on Component Lines")
                 {
                 }
-                field("Qty. on Sales Order";"Qty. on Sales Order")
+                field("Qty. on Sales Order"; "Qty. on Sales Order")
                 {
                 }
-                field("Qty. on Service Order";"Qty. on Service Order")
+                field("Qty. on Service Order"; "Qty. on Service Order")
                 {
                 }
-                field("Qty. on Job Order";"Qty. on Job Order")
+                field("Qty. on Job Order"; "Qty. on Job Order")
                 {
                 }
-                field("Qty. on Assembly Order";"Qty. on Assembly Order")
-                {
-                    Importance = Additional;
-                }
-                field("Qty. on Asm. Component";"Qty. on Asm. Component")
+                field("Qty. on Assembly Order"; "Qty. on Assembly Order")
                 {
                     Importance = Additional;
                 }
-                field("Group sale";"Group sale")
+                field("Qty. on Asm. Component"; "Qty. on Asm. Component")
+                {
+                    Importance = Additional;
+                }
+                field("Group sale"; "Group sale")
                 {
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
 
                     trigger OnValidate()
@@ -305,23 +305,23 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Blocked on Pos";"Blocked on Pos")
+                field("Blocked on Pos"; "Blocked on Pos")
                 {
                 }
-                field("Custom Discount Blocked";"Custom Discount Blocked")
+                field("Custom Discount Blocked"; "Custom Discount Blocked")
                 {
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
                 }
-                field("Vendor Item No.";"Vendor Item No.")
+                field("Vendor Item No."; "Vendor Item No.")
                 {
                     Visible = false;
                 }
-                field("Item Brand";"Item Brand")
+                field("Item Brand"; "Item Brand")
                 {
                 }
-                field("Statistics Group";"Statistics Group")
+                field("Statistics Group"; "Statistics Group")
                 {
 
                     trigger OnValidate()
@@ -329,7 +329,7 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field(NPRAttrTextArray_01_GEN;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01_GEN; NPRAttrTextArray[1])
                 {
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
@@ -338,16 +338,16 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.37
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
                         //+NPR5.37
                     end;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
                     end;
                 }
-                field(NPRAttrTextArray_02_GEN;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02_GEN; NPRAttrTextArray[2])
                 {
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
@@ -356,16 +356,16 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.37
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 2, "No.", NPRAttrTextArray[2] );
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
                         //+NPR5.37
                     end;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
                     end;
                 }
-                field(NPRAttrTextArray_03_GEN;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03_GEN; NPRAttrTextArray[3])
                 {
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
@@ -374,16 +374,16 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.37
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 3, "No.", NPRAttrTextArray[3] );
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
                         //+NPR5.37
                     end;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
                     end;
                 }
-                field(NPRAttrTextArray_04_GEN;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04_GEN; NPRAttrTextArray[4])
                 {
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
@@ -392,16 +392,16 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.37
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 4, "No.", NPRAttrTextArray[4] );
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
                         //+NPR5.37
                     end;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
                     end;
                 }
-                field(NPRAttrTextArray_05_GEN;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05_GEN; NPRAttrTextArray[5])
                 {
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
@@ -410,30 +410,30 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.37
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 5, "No.", NPRAttrTextArray[5] );
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
                         //+NPR5.37
                     end;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
                     end;
                 }
-                field(Condition;Condition)
+                field(Condition; Condition)
                 {
                 }
-                field(Season;Season)
+                field(Season; Season)
                 {
                     Importance = Additional;
                 }
-                field("Shelf Label Type";"Shelf Label Type")
+                field("Shelf Label Type"; "Shelf Label Type")
                 {
                 }
             }
             group("Extra Fields")
             {
                 Caption = 'Extra Fields';
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
@@ -442,18 +442,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
@@ -462,18 +462,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
@@ -482,18 +482,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
@@ -502,18 +502,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
@@ -522,18 +522,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
@@ -542,18 +542,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
@@ -562,18 +562,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
@@ -582,18 +582,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
@@ -602,18 +602,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
@@ -622,18 +622,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_11;NPRAttrTextArray[11])
+                field(NPRAttrTextArray_11; NPRAttrTextArray[11])
                 {
                     CaptionClass = '6014555,27,11,2';
                     Editable = NPRAttrEditable;
@@ -642,18 +642,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 11, "No.", NPRAttrTextArray[11]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 11, "No.", NPRAttrTextArray[11]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 11, "No.", NPRAttrTextArray[11]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 11, "No.", NPRAttrTextArray[11]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_12;NPRAttrTextArray[12])
+                field(NPRAttrTextArray_12; NPRAttrTextArray[12])
                 {
                     CaptionClass = '6014555,27,12,2';
                     Editable = NPRAttrEditable;
@@ -662,18 +662,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 12, "No.", NPRAttrTextArray[12]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 12, "No.", NPRAttrTextArray[12]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 12, "No.", NPRAttrTextArray[12]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 12, "No.", NPRAttrTextArray[12]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_13;NPRAttrTextArray[13])
+                field(NPRAttrTextArray_13; NPRAttrTextArray[13])
                 {
                     CaptionClass = '6014555,27,13,2';
                     Editable = NPRAttrEditable;
@@ -682,18 +682,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 13, "No.", NPRAttrTextArray[13]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 13, "No.", NPRAttrTextArray[13]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 13, "No.", NPRAttrTextArray[13]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 13, "No.", NPRAttrTextArray[13]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_14;NPRAttrTextArray[14])
+                field(NPRAttrTextArray_14; NPRAttrTextArray[14])
                 {
                     CaptionClass = '6014555,27,14,2';
                     Editable = NPRAttrEditable;
@@ -702,18 +702,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 14, "No.", NPRAttrTextArray[14]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 14, "No.", NPRAttrTextArray[14]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 14, "No.", NPRAttrTextArray[14]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 14, "No.", NPRAttrTextArray[14]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_15;NPRAttrTextArray[15])
+                field(NPRAttrTextArray_15; NPRAttrTextArray[15])
                 {
                     CaptionClass = '6014555,27,15,2';
                     Editable = NPRAttrEditable;
@@ -722,18 +722,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 15, "No.", NPRAttrTextArray[15]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 15, "No.", NPRAttrTextArray[15]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 15, "No.", NPRAttrTextArray[15]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 15, "No.", NPRAttrTextArray[15]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_16;NPRAttrTextArray[16])
+                field(NPRAttrTextArray_16; NPRAttrTextArray[16])
                 {
                     CaptionClass = '6014555,27,16,2';
                     Editable = NPRAttrEditable;
@@ -742,18 +742,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 16, "No.", NPRAttrTextArray[16]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 16, "No.", NPRAttrTextArray[16]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 16, "No.", NPRAttrTextArray[16]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 16, "No.", NPRAttrTextArray[16]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_17;NPRAttrTextArray[17])
+                field(NPRAttrTextArray_17; NPRAttrTextArray[17])
                 {
                     CaptionClass = '6014555,27,17,2';
                     Editable = NPRAttrEditable;
@@ -762,18 +762,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 17, "No.", NPRAttrTextArray[17]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 17, "No.", NPRAttrTextArray[17]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 17, "No.", NPRAttrTextArray[17]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 17, "No.", NPRAttrTextArray[17]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_18;NPRAttrTextArray[18])
+                field(NPRAttrTextArray_18; NPRAttrTextArray[18])
                 {
                     CaptionClass = '6014555,27,18,2';
                     Editable = NPRAttrEditable;
@@ -782,18 +782,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 18, "No.", NPRAttrTextArray[18]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 18, "No.", NPRAttrTextArray[18]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 18, "No.", NPRAttrTextArray[18]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 18, "No.", NPRAttrTextArray[18]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_19;NPRAttrTextArray[19])
+                field(NPRAttrTextArray_19; NPRAttrTextArray[19])
                 {
                     CaptionClass = '6014555,27,19,2';
                     Editable = NPRAttrEditable;
@@ -802,18 +802,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 19, "No.", NPRAttrTextArray[19]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 19, "No.", NPRAttrTextArray[19]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 19, "No.", NPRAttrTextArray[19]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 19, "No.", NPRAttrTextArray[19]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_20;NPRAttrTextArray[20])
+                field(NPRAttrTextArray_20; NPRAttrTextArray[20])
                 {
                     CaptionClass = '6014555,27,20,2';
                     Editable = NPRAttrEditable;
@@ -822,18 +822,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 20, "No.", NPRAttrTextArray[20]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 20, "No.", NPRAttrTextArray[20]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 20, "No.", NPRAttrTextArray[20]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 20, "No.", NPRAttrTextArray[20]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_21;NPRAttrTextArray[21])
+                field(NPRAttrTextArray_21; NPRAttrTextArray[21])
                 {
                     CaptionClass = '6014555,27,21,2';
                     Editable = NPRAttrEditable;
@@ -842,18 +842,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 21, "No.", NPRAttrTextArray[21]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 21, "No.", NPRAttrTextArray[21]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 21, "No.", NPRAttrTextArray[21]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 21, "No.", NPRAttrTextArray[21]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_22;NPRAttrTextArray[22])
+                field(NPRAttrTextArray_22; NPRAttrTextArray[22])
                 {
                     CaptionClass = '6014555,27,22,2';
                     Editable = NPRAttrEditable;
@@ -862,18 +862,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 22, "No.", NPRAttrTextArray[22]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 22, "No.", NPRAttrTextArray[22]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 22, "No.", NPRAttrTextArray[22]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 22, "No.", NPRAttrTextArray[22]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_23;NPRAttrTextArray[23])
+                field(NPRAttrTextArray_23; NPRAttrTextArray[23])
                 {
                     CaptionClass = '6014555,27,23,2';
                     Editable = NPRAttrEditable;
@@ -882,18 +882,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 23, "No.", NPRAttrTextArray[23]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 23, "No.", NPRAttrTextArray[23]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 23, "No.", NPRAttrTextArray[23]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 23, "No.", NPRAttrTextArray[23]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_24;NPRAttrTextArray[24])
+                field(NPRAttrTextArray_24; NPRAttrTextArray[24])
                 {
                     CaptionClass = '6014555,27,24,2';
                     Editable = NPRAttrEditable;
@@ -902,18 +902,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 24, "No.", NPRAttrTextArray[24]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 24, "No.", NPRAttrTextArray[24]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 24, "No.", NPRAttrTextArray[24]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 24, "No.", NPRAttrTextArray[24]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_25;NPRAttrTextArray[25])
+                field(NPRAttrTextArray_25; NPRAttrTextArray[25])
                 {
                     CaptionClass = '6014555,27,25,2';
                     Editable = NPRAttrEditable;
@@ -922,18 +922,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 25, "No.", NPRAttrTextArray[25]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 25, "No.", NPRAttrTextArray[25]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 25, "No.", NPRAttrTextArray[25]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 25, "No.", NPRAttrTextArray[25]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_26;NPRAttrTextArray[26])
+                field(NPRAttrTextArray_26; NPRAttrTextArray[26])
                 {
                     CaptionClass = '6014555,27,26,2';
                     Editable = NPRAttrEditable;
@@ -942,18 +942,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 26, "No.", NPRAttrTextArray[26]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 26, "No.", NPRAttrTextArray[26]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 26, "No.", NPRAttrTextArray[26]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 26, "No.", NPRAttrTextArray[26]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_27;NPRAttrTextArray[27])
+                field(NPRAttrTextArray_27; NPRAttrTextArray[27])
                 {
                     CaptionClass = '6014555,27,27,2';
                     Editable = NPRAttrEditable;
@@ -962,18 +962,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 27, "No.", NPRAttrTextArray[27]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 27, "No.", NPRAttrTextArray[27]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 27, "No.", NPRAttrTextArray[27]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 27, "No.", NPRAttrTextArray[27]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_28;NPRAttrTextArray[28])
+                field(NPRAttrTextArray_28; NPRAttrTextArray[28])
                 {
                     CaptionClass = '6014555,27,28,2';
                     Editable = NPRAttrEditable;
@@ -982,18 +982,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 28, "No.", NPRAttrTextArray[28]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 28, "No.", NPRAttrTextArray[28]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 28, "No.", NPRAttrTextArray[28]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 28, "No.", NPRAttrTextArray[28]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_29;NPRAttrTextArray[29])
+                field(NPRAttrTextArray_29; NPRAttrTextArray[29])
                 {
                     CaptionClass = '6014555,27,29,2';
                     Editable = NPRAttrEditable;
@@ -1002,18 +1002,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 29, "No.", NPRAttrTextArray[29]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 29, "No.", NPRAttrTextArray[29]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 29, "No.", NPRAttrTextArray[29]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 29, "No.", NPRAttrTextArray[29]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_30;NPRAttrTextArray[30])
+                field(NPRAttrTextArray_30; NPRAttrTextArray[30])
                 {
                     CaptionClass = '6014555,27,30,2';
                     Editable = NPRAttrEditable;
@@ -1022,18 +1022,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 30, "No.", NPRAttrTextArray[30]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 30, "No.", NPRAttrTextArray[30]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 30, "No.", NPRAttrTextArray[30]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 30, "No.", NPRAttrTextArray[30]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_31;NPRAttrTextArray[31])
+                field(NPRAttrTextArray_31; NPRAttrTextArray[31])
                 {
                     CaptionClass = '6014555,27,31,2';
                     Editable = NPRAttrEditable;
@@ -1042,18 +1042,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 31, "No.", NPRAttrTextArray[31]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 31, "No.", NPRAttrTextArray[31]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 31, "No.", NPRAttrTextArray[31]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 31, "No.", NPRAttrTextArray[31]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_32;NPRAttrTextArray[32])
+                field(NPRAttrTextArray_32; NPRAttrTextArray[32])
                 {
                     CaptionClass = '6014555,27,32,2';
                     Editable = NPRAttrEditable;
@@ -1062,18 +1062,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 32, "No.", NPRAttrTextArray[32]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 32, "No.", NPRAttrTextArray[32]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 32, "No.", NPRAttrTextArray[32]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 32, "No.", NPRAttrTextArray[32]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_33;NPRAttrTextArray[33])
+                field(NPRAttrTextArray_33; NPRAttrTextArray[33])
                 {
                     CaptionClass = '6014555,27,33,2';
                     Editable = NPRAttrEditable;
@@ -1082,18 +1082,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 33, "No.", NPRAttrTextArray[33]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 33, "No.", NPRAttrTextArray[33]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 33, "No.", NPRAttrTextArray[33]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 33, "No.", NPRAttrTextArray[33]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_34;NPRAttrTextArray[34])
+                field(NPRAttrTextArray_34; NPRAttrTextArray[34])
                 {
                     CaptionClass = '6014555,27,34,2';
                     Editable = NPRAttrEditable;
@@ -1102,18 +1102,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 34, "No.", NPRAttrTextArray[34]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 34, "No.", NPRAttrTextArray[34]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 34, "No.", NPRAttrTextArray[34]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 34, "No.", NPRAttrTextArray[34]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_35;NPRAttrTextArray[35])
+                field(NPRAttrTextArray_35; NPRAttrTextArray[35])
                 {
                     CaptionClass = '6014555,27,35,2';
                     Editable = NPRAttrEditable;
@@ -1122,18 +1122,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 35, "No.", NPRAttrTextArray[35]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 35, "No.", NPRAttrTextArray[35]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 35, "No.", NPRAttrTextArray[35]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 35, "No.", NPRAttrTextArray[35]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_36;NPRAttrTextArray[36])
+                field(NPRAttrTextArray_36; NPRAttrTextArray[36])
                 {
                     CaptionClass = '6014555,27,36,2';
                     Editable = NPRAttrEditable;
@@ -1142,18 +1142,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 36, "No.", NPRAttrTextArray[36]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 36, "No.", NPRAttrTextArray[36]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 36, "No.", NPRAttrTextArray[36]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 36, "No.", NPRAttrTextArray[36]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_37;NPRAttrTextArray[37])
+                field(NPRAttrTextArray_37; NPRAttrTextArray[37])
                 {
                     CaptionClass = '6014555,27,37,2';
                     Editable = NPRAttrEditable;
@@ -1162,18 +1162,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 37, "No.", NPRAttrTextArray[37]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 37, "No.", NPRAttrTextArray[37]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 37, "No.", NPRAttrTextArray[37]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 37, "No.", NPRAttrTextArray[37]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_38;NPRAttrTextArray[38])
+                field(NPRAttrTextArray_38; NPRAttrTextArray[38])
                 {
                     CaptionClass = '6014555,27,38,2';
                     Editable = NPRAttrEditable;
@@ -1182,18 +1182,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 38, "No.", NPRAttrTextArray[38]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 38, "No.", NPRAttrTextArray[38]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 38, "No.", NPRAttrTextArray[38]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 38, "No.", NPRAttrTextArray[38]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_39;NPRAttrTextArray[39])
+                field(NPRAttrTextArray_39; NPRAttrTextArray[39])
                 {
                     CaptionClass = '6014555,27,39,2';
                     Editable = NPRAttrEditable;
@@ -1202,18 +1202,18 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 39, "No.", NPRAttrTextArray[39]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 39, "No.", NPRAttrTextArray[39]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 39, "No.", NPRAttrTextArray[39]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 39, "No.", NPRAttrTextArray[39]);
                         //+NPR5.34 [284384]
                     end;
                 }
-                field(NPRAttrTextArray_40;NPRAttrTextArray[40])
+                field(NPRAttrTextArray_40; NPRAttrTextArray[40])
                 {
                     CaptionClass = '6014555,27,40,2';
                     Editable = NPRAttrEditable;
@@ -1222,14 +1222,14 @@ page 6014425 "Retail Item Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.35 [284384]
-                        NPRAttrManagement.OnPageLookUp( DATABASE::Item, 40, "No.", NPRAttrTextArray[40]);
+                        NPRAttrManagement.OnPageLookUp(DATABASE::Item, 40, "No.", NPRAttrTextArray[40]);
                         //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.34 [284384]
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 40, "No.", NPRAttrTextArray[40]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 40, "No.", NPRAttrTextArray[40]);
                         //+NPR5.34 [284384]
                     end;
                 }
@@ -1237,7 +1237,7 @@ page 6014425 "Retail Item Card"
             group(Invoicing)
             {
                 Caption = 'Invoicing';
-                field("Costing Method";"Costing Method")
+                field("Costing Method"; "Costing Method")
                 {
                     Importance = Promoted;
 
@@ -1247,13 +1247,13 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Cost is Adjusted";"Cost is Adjusted")
+                field("Cost is Adjusted"; "Cost is Adjusted")
                 {
                 }
-                field("Cost is Posted to G/L";"Cost is Posted to G/L")
+                field("Cost is Posted to G/L"; "Cost is Posted to G/L")
                 {
                 }
-                field("Standard Cost";"Standard Cost")
+                field("Standard Cost"; "Standard Cost")
                 {
                     Enabled = StandardCostEnable;
 
@@ -1269,7 +1269,7 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
                     Enabled = UnitCostEnable;
 
@@ -1280,21 +1280,13 @@ page 6014425 "Retail Item Card"
                         ShowAvgCalcItem.DrillDownAvgCostAdjmtPoint(Rec)
                     end;
                 }
-                field("Overhead Rate";"Overhead Rate")
+                field("Overhead Rate"; "Overhead Rate")
                 {
                 }
-                field("Indirect Cost %";"Indirect Cost %")
+                field("Indirect Cost %"; "Indirect Cost %")
                 {
                 }
-                field("Last Direct Cost";"Last Direct Cost")
-                {
-
-                    trigger OnValidate()
-                    begin
-                        CheckItemGroup();
-                    end;
-                }
-                field("Price/Profit Calculation";"Price/Profit Calculation")
+                field("Last Direct Cost"; "Last Direct Cost")
                 {
 
                     trigger OnValidate()
@@ -1302,7 +1294,7 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Profit %";"Profit %")
+                field("Price/Profit Calculation"; "Price/Profit Calculation")
                 {
 
                     trigger OnValidate()
@@ -1310,7 +1302,15 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Unit Price";"Unit Price")
+                field("Profit %"; "Profit %")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        CheckItemGroup();
+                    end;
+                }
+                field("Unit Price"; "Unit Price")
                 {
                     Importance = Promoted;
 
@@ -1319,10 +1319,10 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Unit List Price";"Unit List Price")
+                field("Unit List Price"; "Unit List Price")
                 {
                 }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
                     Importance = Promoted;
 
@@ -1331,7 +1331,7 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("VAT Prod. Posting Group";"VAT Prod. Posting Group")
+                field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
 
                     trigger OnValidate()
@@ -1339,27 +1339,27 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Tax Group Code";"Tax Group Code")
+                field("Tax Group Code"; "Tax Group Code")
                 {
                     Importance = Additional;
                 }
-                field("Inventory Posting Group";"Inventory Posting Group")
+                field("Inventory Posting Group"; "Inventory Posting Group")
                 {
                     Importance = Promoted;
                 }
-                field("VAT Bus. Posting Gr. (Price)";"VAT Bus. Posting Gr. (Price)")
+                field("VAT Bus. Posting Gr. (Price)"; "VAT Bus. Posting Gr. (Price)")
                 {
                 }
-                field("Net Invoiced Qty.";"Net Invoiced Qty.")
+                field("Net Invoiced Qty."; "Net Invoiced Qty.")
                 {
                 }
-                field("Allow Invoice Disc.";"Allow Invoice Disc.")
+                field("Allow Invoice Disc."; "Allow Invoice Disc.")
                 {
                 }
-                field("Item Disc. Group";"Item Disc. Group")
+                field("Item Disc. Group"; "Item Disc. Group")
                 {
                 }
-                field("Sales Unit of Measure";"Sales Unit of Measure")
+                field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
 
                     trigger OnValidate()
@@ -1367,37 +1367,37 @@ page 6014425 "Retail Item Card"
                         CheckItemGroup();
                     end;
                 }
-                field("Application Wksh. User ID";"Application Wksh. User ID")
+                field("Application Wksh. User ID"; "Application Wksh. User ID")
                 {
                     Visible = false;
                 }
-                field("Units per Parcel";"Units per Parcel")
+                field("Units per Parcel"; "Units per Parcel")
                 {
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                 }
-                field("Sale Blocked";"Sale Blocked")
+                field("Sale Blocked"; "Sale Blocked")
                 {
                 }
             }
             group(Replenishment)
             {
                 Caption = 'Replenishment';
-                field("Replenishment System";"Replenishment System")
+                field("Replenishment System"; "Replenishment System")
                 {
                     Importance = Promoted;
                 }
-                field("Lead Time Calculation";"Lead Time Calculation")
+                field("Lead Time Calculation"; "Lead Time Calculation")
                 {
                 }
                 group(Purchase)
                 {
                     Caption = 'Purchase';
-                    field("Vendor No.";"Vendor No.")
+                    field("Vendor No."; "Vendor No.")
                     {
 
                         trigger OnValidate()
@@ -1405,7 +1405,7 @@ page 6014425 "Retail Item Card"
                             CheckItemGroup();
                         end;
                     }
-                    field(VendorItemNo2;"Vendor Item No.")
+                    field(VendorItemNo2; "Vendor Item No.")
                     {
 
                         trigger OnValidate()
@@ -1413,7 +1413,7 @@ page 6014425 "Retail Item Card"
                             CheckItemGroup();
                         end;
                     }
-                    field("Purch. Unit of Measure";"Purch. Unit of Measure")
+                    field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                     {
 
                         trigger OnValidate()
@@ -1421,39 +1421,39 @@ page 6014425 "Retail Item Card"
                             CheckItemGroup();
                         end;
                     }
-                    field("Purchase Blocked";"Purchase Blocked")
+                    field("Purchase Blocked"; "Purchase Blocked")
                     {
                     }
                 }
                 group(Control230)
                 {
                     Caption = 'Production';
-                    field("Manufacturing Policy";"Manufacturing Policy")
+                    field("Manufacturing Policy"; "Manufacturing Policy")
                     {
                     }
-                    field("Routing No.";"Routing No.")
+                    field("Routing No."; "Routing No.")
                     {
                     }
-                    field("Production BOM No.";"Production BOM No.")
+                    field("Production BOM No."; "Production BOM No.")
                     {
                     }
-                    field("Rounding Precision";"Rounding Precision")
+                    field("Rounding Precision"; "Rounding Precision")
                     {
                     }
-                    field("Flushing Method";"Flushing Method")
+                    field("Flushing Method"; "Flushing Method")
                     {
                     }
-                    field("Scrap %";"Scrap %")
+                    field("Scrap %"; "Scrap %")
                     {
                     }
-                    field("Lot Size";"Lot Size")
+                    field("Lot Size"; "Lot Size")
                     {
                     }
                 }
                 group(Assembly)
                 {
                     Caption = 'Assembly';
-                    field("Assembly Policy";"Assembly Policy")
+                    field("Assembly Policy"; "Assembly Policy")
                     {
                     }
                 }
@@ -1461,7 +1461,7 @@ page 6014425 "Retail Item Card"
             group(Planning)
             {
                 Caption = 'Planning';
-                field("Reordering Policy";"Reordering Policy")
+                field("Reordering Policy"; "Reordering Policy")
                 {
                     Importance = Promoted;
 
@@ -1470,39 +1470,39 @@ page 6014425 "Retail Item Card"
                         EnablePlanningControls
                     end;
                 }
-                field(Reserve;Reserve)
+                field(Reserve; Reserve)
                 {
                     Importance = Promoted;
                 }
-                field("Order Tracking Policy";"Order Tracking Policy")
+                field("Order Tracking Policy"; "Order Tracking Policy")
                 {
                 }
-                field("Stockkeeping Unit Exists";"Stockkeeping Unit Exists")
+                field("Stockkeeping Unit Exists"; "Stockkeeping Unit Exists")
                 {
                 }
-                field("Dampener Period";"Dampener Period")
+                field("Dampener Period"; "Dampener Period")
                 {
                     Enabled = DampenerPeriodEnable;
                 }
-                field("Dampener Quantity";"Dampener Quantity")
+                field("Dampener Quantity"; "Dampener Quantity")
                 {
                     Enabled = DampenerQtyEnable;
                 }
-                field(Critical;Critical)
+                field(Critical; Critical)
                 {
                 }
-                field("Safety Lead Time";"Safety Lead Time")
+                field("Safety Lead Time"; "Safety Lead Time")
                 {
                     Enabled = SafetyLeadTimeEnable;
                 }
-                field("Safety Stock Quantity";"Safety Stock Quantity")
+                field("Safety Stock Quantity"; "Safety Stock Quantity")
                 {
                     Enabled = SafetyStockQtyEnable;
                 }
                 group("Lot-for-Lot Parameters")
                 {
                     Caption = 'Lot-for-Lot Parameters';
-                    field("Include Inventory";"Include Inventory")
+                    field("Include Inventory"; "Include Inventory")
                     {
                         Enabled = IncludeInventoryEnable;
 
@@ -1511,11 +1511,11 @@ page 6014425 "Retail Item Card"
                             EnablePlanningControls
                         end;
                     }
-                    field("Lot Accumulation Period";"Lot Accumulation Period")
+                    field("Lot Accumulation Period"; "Lot Accumulation Period")
                     {
                         Enabled = LotAccumulationPeriodEnable;
                     }
-                    field("Rescheduling Period";"Rescheduling Period")
+                    field("Rescheduling Period"; "Rescheduling Period")
                     {
                         Enabled = ReschedulingPeriodEnable;
                     }
@@ -1530,7 +1530,7 @@ page 6014425 "Retail Item Card"
                         group(Control64)
                         {
                             ShowCaption = false;
-                            field("Reorder Point";"Reorder Point")
+                            field("Reorder Point"; "Reorder Point")
                             {
                                 Enabled = ReorderPointEnable;
 
@@ -1539,11 +1539,11 @@ page 6014425 "Retail Item Card"
                                     CheckItemGroup();
                                 end;
                             }
-                            field("Reorder Quantity";"Reorder Quantity")
+                            field("Reorder Quantity"; "Reorder Quantity")
                             {
                                 Enabled = ReorderQtyEnable;
                             }
-                            field("Maximum Inventory";"Maximum Inventory")
+                            field("Maximum Inventory"; "Maximum Inventory")
                             {
                                 Enabled = MaximumInventoryEnable;
 
@@ -1554,12 +1554,12 @@ page 6014425 "Retail Item Card"
                             }
                         }
                     }
-                    field("Overflow Level";"Overflow Level")
+                    field("Overflow Level"; "Overflow Level")
                     {
                         Enabled = OverflowLevelEnable;
                         Importance = Additional;
                     }
-                    field("Time Bucket";"Time Bucket")
+                    field("Time Bucket"; "Time Bucket")
                     {
                         Enabled = TimeBucketEnable;
                         Importance = Additional;
@@ -1575,15 +1575,15 @@ page 6014425 "Retail Item Card"
                         group(Control61)
                         {
                             ShowCaption = false;
-                            field("Minimum Order Quantity";"Minimum Order Quantity")
+                            field("Minimum Order Quantity"; "Minimum Order Quantity")
                             {
                                 Enabled = MinimumOrderQtyEnable;
                             }
-                            field("Maximum Order Quantity";"Maximum Order Quantity")
+                            field("Maximum Order Quantity"; "Maximum Order Quantity")
                             {
                                 Enabled = MaximumOrderQtyEnable;
                             }
-                            field("Order Multiple";"Order Multiple")
+                            field("Order Multiple"; "Order Multiple")
                             {
                                 Enabled = OrderMultipleEnable;
                             }
@@ -1594,63 +1594,63 @@ page 6014425 "Retail Item Card"
             group("Foreign Trade")
             {
                 Caption = 'Foreign Trade';
-                field("Tariff No.";"Tariff No.")
+                field("Tariff No."; "Tariff No.")
                 {
                 }
-                field("Net Weight";"Net Weight")
+                field("Net Weight"; "Net Weight")
                 {
                 }
-                field("Gross Weight";"Gross Weight")
+                field("Gross Weight"; "Gross Weight")
                 {
                 }
-                field("Country/Region of Origin Code";"Country/Region of Origin Code")
+                field("Country/Region of Origin Code"; "Country/Region of Origin Code")
                 {
                 }
             }
             group("Item Tracking")
             {
                 Caption = 'Item Tracking';
-                field("Item Tracking Code";"Item Tracking Code")
+                field("Item Tracking Code"; "Item Tracking Code")
                 {
                     Importance = Promoted;
                 }
-                field("Serial Nos.";"Serial Nos.")
+                field("Serial Nos."; "Serial Nos.")
                 {
                 }
-                field("Lot Nos.";"Lot Nos.")
+                field("Lot Nos."; "Lot Nos.")
                 {
                 }
-                field("Expiration Calculation";"Expiration Calculation")
+                field("Expiration Calculation"; "Expiration Calculation")
                 {
                 }
             }
             group(Control1907509201)
             {
                 Caption = 'Warehouse';
-                field("Special Equipment Code";"Special Equipment Code")
+                field("Special Equipment Code"; "Special Equipment Code")
                 {
                 }
-                field("Put-away Template Code";"Put-away Template Code")
+                field("Put-away Template Code"; "Put-away Template Code")
                 {
                 }
-                field("Put-away Unit of Measure Code";"Put-away Unit of Measure Code")
-                {
-                    Importance = Promoted;
-                }
-                field("Phys Invt Counting Period Code";"Phys Invt Counting Period Code")
+                field("Put-away Unit of Measure Code"; "Put-away Unit of Measure Code")
                 {
                     Importance = Promoted;
                 }
-                field("Last Phys. Invt. Date";"Last Phys. Invt. Date")
+                field("Phys Invt Counting Period Code"; "Phys Invt Counting Period Code")
+                {
+                    Importance = Promoted;
+                }
+                field("Last Phys. Invt. Date"; "Last Phys. Invt. Date")
                 {
                 }
-                field("Last Counting Period Update";"Last Counting Period Update")
+                field("Last Counting Period Update"; "Last Counting Period Update")
                 {
                 }
-                field("Identifier Code";"Identifier Code")
+                field("Identifier Code"; "Identifier Code")
                 {
                 }
-                field("Use Cross-Docking";"Use Cross-Docking")
+                field("Use Cross-Docking"; "Use Cross-Docking")
                 {
                 }
             }
@@ -1660,38 +1660,38 @@ page 6014425 "Retail Item Card"
                 group(Control6150691)
                 {
                     ShowCaption = false;
-                    field("Has Variants";"Has Variants")
+                    field("Has Variants"; "Has Variants")
                     {
                         Editable = false;
                     }
-                    field("Variety Group";"Variety Group")
+                    field("Variety Group"; "Variety Group")
                     {
                     }
-                    field("Variety 1";"Variety 1")
+                    field("Variety 1"; "Variety 1")
                     {
                     }
-                    field("Variety 1 Table";"Variety 1 Table")
+                    field("Variety 1 Table"; "Variety 1 Table")
                     {
                     }
-                    field("Variety 2";"Variety 2")
+                    field("Variety 2"; "Variety 2")
                     {
                     }
-                    field("Variety 2 Table";"Variety 2 Table")
+                    field("Variety 2 Table"; "Variety 2 Table")
                     {
                     }
-                    field("Variety 3";"Variety 3")
+                    field("Variety 3"; "Variety 3")
                     {
                     }
-                    field("Variety 3 Table";"Variety 3 Table")
+                    field("Variety 3 Table"; "Variety 3 Table")
                     {
                     }
-                    field("Variety 4";"Variety 4")
+                    field("Variety 4"; "Variety 4")
                     {
                     }
-                    field("Variety 4 Table";"Variety 4 Table")
+                    field("Variety 4 Table"; "Variety 4 Table")
                     {
                     }
-                    field("Cross Variety No.";"Cross Variety No.")
+                    field("Cross Variety No."; "Cross Variety No.")
                     {
                     }
                 }
@@ -1702,13 +1702,13 @@ page 6014425 "Retail Item Card"
                 group(Control6150684)
                 {
                     ShowCaption = false;
-                    field("Item AddOn No.";"Item AddOn No.")
+                    field("Item AddOn No."; "Item AddOn No.")
                     {
                     }
-                    field("Guarantee Index";"Guarantee Index")
+                    field("Guarantee Index"; "Guarantee Index")
                     {
                     }
-                    field("Insurrance category";"Insurrance category")
+                    field("Insurrance category"; "Insurrance category")
                     {
                         Width = 30;
                     }
@@ -1716,19 +1716,19 @@ page 6014425 "Retail Item Card"
                 group(Control6150676)
                 {
                     ShowCaption = false;
-                    field("Explode BOM auto";"Explode BOM auto")
+                    field("Explode BOM auto"; "Explode BOM auto")
                     {
                     }
-                    field("Guarantee voucher";"Guarantee voucher")
+                    field("Guarantee voucher"; "Guarantee voucher")
                     {
                     }
-                    field("No Print on Reciept";"No Print on Reciept")
+                    field("No Print on Reciept"; "No Print on Reciept")
                     {
                     }
-                    field("Ticket Type";"Ticket Type")
+                    field("Ticket Type"; "Ticket Type")
                     {
                     }
-                    field(NPRAttrTextArray_06_GEN;NPRAttrTextArray[6])
+                    field(NPRAttrTextArray_06_GEN; NPRAttrTextArray[6])
                     {
                         CaptionClass = '6014555,27,6,2';
                         Editable = NPRAttrEditable;
@@ -1736,10 +1736,10 @@ page 6014425 "Retail Item Card"
 
                         trigger OnValidate()
                         begin
-                            NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
+                            NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
                         end;
                     }
-                    field(NPRAttrTextArray_07_GEN;NPRAttrTextArray[7])
+                    field(NPRAttrTextArray_07_GEN; NPRAttrTextArray[7])
                     {
                         CaptionClass = '6014555,27,7,2';
                         Editable = NPRAttrEditable;
@@ -1747,10 +1747,10 @@ page 6014425 "Retail Item Card"
 
                         trigger OnValidate()
                         begin
-                            NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
+                            NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
                         end;
                     }
-                    field(NPRAttrTextArray_08_GEN;NPRAttrTextArray[8])
+                    field(NPRAttrTextArray_08_GEN; NPRAttrTextArray[8])
                     {
                         CaptionClass = '6014555,27,8,2';
                         Editable = NPRAttrEditable;
@@ -1758,10 +1758,10 @@ page 6014425 "Retail Item Card"
 
                         trigger OnValidate()
                         begin
-                            NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
+                            NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
                         end;
                     }
-                    field(NPRAttrTextArray_09_GEN;NPRAttrTextArray[9])
+                    field(NPRAttrTextArray_09_GEN; NPRAttrTextArray[9])
                     {
                         CaptionClass = '6014555,27,9,2';
                         Editable = NPRAttrEditable;
@@ -1769,10 +1769,10 @@ page 6014425 "Retail Item Card"
 
                         trigger OnValidate()
                         begin
-                            NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
+                            NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
                         end;
                     }
-                    field(NPRAttrTextArray_10_GEN;NPRAttrTextArray[10])
+                    field(NPRAttrTextArray_10_GEN; NPRAttrTextArray[10])
                     {
                         CaptionClass = '6014555,27,10,2';
                         Editable = NPRAttrEditable;
@@ -1780,10 +1780,10 @@ page 6014425 "Retail Item Card"
 
                         trigger OnValidate()
                         begin
-                            NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
+                            NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
                         end;
                     }
-                    field("Print Tags";"Print Tags")
+                    field("Print Tags"; "Print Tags")
                     {
                         AssistEdit = true;
                         Editable = false;
@@ -1797,7 +1797,7 @@ page 6014425 "Retail Item Card"
 
                             PrintTagsPage.SetTagText("Print Tags");
                             if PrintTagsPage.RunModal = ACTION::OK then
-                              "Print Tags" := PrintTagsPage.ToText;
+                                "Print Tags" := PrintTagsPage.ToText;
                             //+NPR4.18
                         end;
                     }
@@ -1814,7 +1814,7 @@ page 6014425 "Retail Item Card"
                 group(Control6014404)
                 {
                     ShowCaption = false;
-                    field("Magento Item";"Magento Item")
+                    field("Magento Item"; "Magento Item")
                     {
                         Importance = Promoted;
 
@@ -1826,11 +1826,11 @@ page 6014425 "Retail Item Card"
                             //+MAG1.21
                         end;
                     }
-                    field("Magento Status";"Magento Status")
+                    field("Magento Status"; "Magento Status")
                     {
                         Importance = Promoted;
                     }
-                    field("Magento Name";"Magento Name")
+                    field("Magento Name"; "Magento Name")
                     {
 
                         trigger OnValidate()
@@ -1841,13 +1841,13 @@ page 6014425 "Retail Item Card"
                             //    EXIT;
                             //VALIDATE("Seo Link","Webshop Name");
                             if "Seo Link" <> '' then
-                              if not Confirm(Text6151400,false) then
-                                exit;
-                            Validate("Seo Link","Magento Name");
+                                if not Confirm(Text6151400, false) then
+                                    exit;
+                            Validate("Seo Link", "Magento Name");
                             //+MAG2.00
                         end;
                     }
-                    field("FORMAT(""Magento Description"".HASVALUE)";Format("Magento Description".HasValue))
+                    field("FORMAT(""Magento Description"".HASVALUE)"; Format("Magento Description".HasValue))
                     {
                         Caption = 'Magento Description';
 
@@ -1863,15 +1863,15 @@ page 6014425 "Retail Item Card"
                             FieldRef := RecRef.Field(FieldNo("Magento Description"));
                             //+MAG2.00
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                              RecRef.SetTable(Rec);
-                              Modify(true);
-                              //-MAG1.22
-                              //MagentoItemMgt.TestItem(Rec);
-                              //+MAG1.22
+                                RecRef.SetTable(Rec);
+                                Modify(true);
+                                //-MAG1.22
+                                //MagentoItemMgt.TestItem(Rec);
+                                //+MAG1.22
                             end;
                         end;
                     }
-                    field("FORMAT(""Magento Short Description"".HASVALUE)";Format("Magento Short Description".HasValue))
+                    field("FORMAT(""Magento Short Description"".HASVALUE)"; Format("Magento Short Description".HasValue))
                     {
                         Caption = 'Magento Short Description';
 
@@ -1887,49 +1887,49 @@ page 6014425 "Retail Item Card"
                             FieldRef := RecRef.Field(FieldNo("Magento Short Description"));
                             //+MAG2.00
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                              RecRef.SetTable(Rec);
-                              Modify(true);
-                              //-MAG1.22
-                              ////-MAG1.18
-                              //MagentoItemMgt.TestItem(Rec);
-                              ////+MAG1.18
-                              //+MAG1.22
+                                RecRef.SetTable(Rec);
+                                Modify(true);
+                                //-MAG1.22
+                                ////-MAG1.18
+                                //MagentoItemMgt.TestItem(Rec);
+                                ////+MAG1.18
+                                //+MAG1.22
                             end;
                         end;
                     }
-                    field("Magento Brand";"Magento Brand")
+                    field("Magento Brand"; "Magento Brand")
                     {
                         Visible = MagentoEnabledBrand;
                     }
-                    field(MagentoUnitPrice;"Unit Price")
+                    field(MagentoUnitPrice; "Unit Price")
                     {
                         Importance = Promoted;
                     }
-                    field("Product New From";"Product New From")
+                    field("Product New From"; "Product New From")
                     {
                     }
-                    field("Product New To";"Product New To")
+                    field("Product New To"; "Product New To")
                     {
                     }
-                    field("Featured From";"Featured From")
+                    field("Featured From"; "Featured From")
                     {
                     }
-                    field("Featured To";"Featured To")
+                    field("Featured To"; "Featured To")
                     {
                     }
-                    field("Special Price";"Special Price")
-                    {
-                        Visible = MagentoEnabledSpecialPrices;
-                    }
-                    field("Special Price From";"Special Price From")
+                    field("Special Price"; "Special Price")
                     {
                         Visible = MagentoEnabledSpecialPrices;
                     }
-                    field("Special Price To";"Special Price To")
+                    field("Special Price From"; "Special Price From")
                     {
                         Visible = MagentoEnabledSpecialPrices;
                     }
-                    field("Custom Options";"Custom Options")
+                    field("Special Price To"; "Special Price To")
+                    {
+                        Visible = MagentoEnabledSpecialPrices;
+                    }
+                    field("Custom Options"; "Custom Options")
                     {
                         Visible = MagentoEnabledCustomOptions;
 
@@ -1945,23 +1945,25 @@ page 6014425 "Retail Item Card"
                             //+MAG1.22
                         end;
                     }
-                    field(Backorder;Backorder)
+                    field(Backorder; Backorder)
                     {
                     }
-                    field("Display Only";"Display Only")
+                    field("Display Only"; "Display Only")
                     {
                         ToolTip = 'test';
                     }
-                    field("Seo Link";"Seo Link")
+                    field("Display only Text"; "Display only Text")
+                    { }
+                    field("Seo Link"; "Seo Link")
                     {
                     }
-                    field("Meta Title";"Meta Title")
+                    field("Meta Title"; "Meta Title")
                     {
                     }
-                    field("Meta Description";"Meta Description")
+                    field("Meta Description"; "Meta Description")
                     {
                     }
-                    field("Attribute Set ID";"Attribute Set ID")
+                    field("Attribute Set ID"; "Attribute Set ID")
                     {
                         AssistEdit = true;
                         Editable = NOT "Magento Item";
@@ -1972,11 +1974,11 @@ page 6014425 "Retail Item Card"
                             MagentoAttributeSetMgt: Codeunit "Magento Attribute Set Mgt.";
                         begin
                             if "Attribute Set ID" <> 0 then begin
-                              CurrPage.Update(true);
-                              //-MAG1.21
-                              //MagentoAttributeSetMgt.EditItemAttributes("No.",'',FALSE);
-                              MagentoAttributeSetMgt.EditItemAttributes("No.",'');
-                              //+MAG1.21
+                                CurrPage.Update(true);
+                                //-MAG1.21
+                                //MagentoAttributeSetMgt.EditItemAttributes("No.",'',FALSE);
+                                MagentoAttributeSetMgt.EditItemAttributes("No.", '');
+                                //+MAG1.21
                             end;
                         end;
                     }
@@ -1985,58 +1987,58 @@ page 6014425 "Retail Item Card"
                 {
                     ShowCaption = false;
                     Visible = MagentoPictureVarietyTypeVisible;
-                    field("Magento Picture Variety Type";"Magento Picture Variety Type")
+                    field("Magento Picture Variety Type"; "Magento Picture Variety Type")
                     {
                     }
                 }
-                part("Item Group Links";"Magento Item Group Link")
+                part("Item Group Links"; "Magento Item Group Link")
                 {
                     Caption = 'Item Group Links';
-                    SubPageLink = "Item No."=FIELD("No.");
+                    SubPageLink = "Item No." = FIELD("No.");
                     Visible = NOT MagentoEnabledMultiStore;
                 }
-                part("Product Relations";"Magento Product Relations")
+                part("Product Relations"; "Magento Product Relations")
                 {
                     Caption = 'Product Relations';
-                    SubPageLink = "From Item No."=FIELD("No.");
+                    SubPageLink = "From Item No." = FIELD("No.");
                     Visible = MagentoEnabledProductRelations;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6150614;Links)
+            systempart(Control6150614; Links)
             {
                 Visible = true;
             }
-            systempart(Control6150613;Notes)
+            systempart(Control6150613; Notes)
             {
                 Visible = true;
             }
-            part(ItemAttributesFactbox;"Item Attributes Factbox")
+            part(ItemAttributesFactbox; "Item Attributes Factbox")
             {
-                ApplicationArea = Basic,Suite;
+                ApplicationArea = Basic, Suite;
             }
-            part(MagentoPictureDragDropAddin;"Magento DragDropPic. Addin")
+            part(MagentoPictureDragDropAddin; "Magento DragDropPic. Addin")
             {
                 Caption = 'Magento Picture';
                 Visible = MagentoEnabled;
             }
-            part(Picture;"Magento Item Picture Factbox")
+            part(Picture; "Magento Item Picture Factbox")
             {
                 Caption = 'Picture';
                 ShowFilter = false;
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
                 Visible = MagentoEnabled;
             }
-            part("Discount FactBox";"Discount FactBox")
+            part("Discount FactBox"; "Discount FactBox")
             {
                 Caption = 'Discounts';
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
             }
-            part(NPAttributes;"NP Attributes FactBox")
+            part(NPAttributes; "NP Attributes FactBox")
             {
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
             }
         }
     }
@@ -2054,19 +2056,19 @@ page 6014425 "Retail Item Card"
                     Caption = '&Units of Measure';
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action("Va&riants")
                 {
                     Caption = 'Va&riants';
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action(Attributes)
                 {
-                    AccessByPermission = TableData "Item Attribute"=R;
-                    ApplicationArea = Basic,Suite;
+                    AccessByPermission = TableData "Item Attribute" = R;
+                    ApplicationArea = Basic, Suite;
                     Caption = 'Attributes';
                     Image = Category;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
@@ -2076,7 +2078,7 @@ page 6014425 "Retail Item Card"
                     trigger OnAction()
                     begin
                         //-#361229 [361229]
-                        PAGE.RunModal(PAGE::"Item Attribute Value Editor",Rec);
+                        PAGE.RunModal(PAGE::"Item Attribute Value Editor", Rec);
                         CurrPage.SaveRecord;
                         CurrPage.ItemAttributesFactbox.PAGE.LoadItemAttributesData("No.");
                         //+#361229 [361229]
@@ -2092,8 +2094,8 @@ page 6014425 "Retail Item Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(27),
-                                  "No."=FIELD("No.");
+                    RunPageLink = "Table ID" = CONST(27),
+                                  "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                 }
                 action("Substituti&ons")
@@ -2101,52 +2103,52 @@ page 6014425 "Retail Item Card"
                     Caption = 'Substituti&ons';
                     Image = ItemSubstitution;
                     RunObject = Page "Item Substitution Entry";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
                 }
                 action("Cross Re&ferences")
                 {
                     Caption = 'Cross Re&ferences';
                     Image = Change;
                     RunObject = Page "Item Cross Reference Entries";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action("E&xtended Texts")
                 {
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name"=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Table Name","No.","Language Code","All Language Codes","Starting Date","Ending Date");
+                    RunPageLink = "Table Name" = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                 }
                 action(Translations)
                 {
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Translations";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action("&Picture")
                 {
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Item Picture";
-                    RunPageLink = "No."=FIELD("No."),
-                                  "Date Filter"=FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                  "Location Filter"=FIELD("Location Filter"),
-                                  "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                  "Variant Filter"=FIELD("Variant Filter");
+                    RunPageLink = "No." = FIELD("No."),
+                                  "Date Filter" = FIELD("Date Filter"),
+                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                  "Location Filter" = FIELD("Location Filter"),
+                                  "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                  "Variant Filter" = FIELD("Variant Filter");
                 }
                 action(Identifiers)
                 {
                     Caption = 'Identifiers';
                     Image = BarCode;
                     RunObject = Page "Item Identifiers";
-                    RunPageLink = "Item No."=FIELD("No.");
-                    RunPageView = SORTING("Item No.","Variant Code","Unit of Measure Code");
+                    RunPageLink = "Item No." = FIELD("No.");
+                    RunPageView = SORTING("Item No.", "Variant Code", "Unit of Measure Code");
                 }
             }
             group(Availability)
@@ -2177,7 +2179,7 @@ page 6014425 "Retail Item Card"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByEvent);
+                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent);
                         end;
                     }
                     action(Period)
@@ -2185,36 +2187,36 @@ page 6014425 "Retail Item Card"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action(Action6150798)
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
                         RunObject = Page "Item Availability by Variant";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action(Location)
                     {
                         Caption = 'Location';
                         Image = Warehouse;
                         RunObject = Page "Item Availability by Location";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action("BOM Level")
                     {
@@ -2223,7 +2225,7 @@ page 6014425 "Retail Item Card"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByBOM);
+                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM);
                         end;
                     }
                     action(Timeline)
@@ -2254,7 +2256,7 @@ page 6014425 "Retail Item Card"
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                         ShortCutKey = 'Ctrl+F7';
                     }
@@ -2263,16 +2265,16 @@ page 6014425 "Retail Item Card"
                         Caption = '&Reservation Entries';
                         Image = ReservationLedger;
                         RunObject = Page "Reservation Entries";
-                        RunPageLink = "Reservation Status"=CONST(Reservation),
-                                      "Item No."=FIELD("No.");
-                        RunPageView = SORTING("Item No.","Variant Code","Location Code","Reservation Status");
+                        RunPageLink = "Reservation Status" = CONST(Reservation),
+                                      "Item No." = FIELD("No.");
+                        RunPageView = SORTING("Item No.", "Variant Code", "Location Code", "Reservation Status");
                     }
                     action("&Phys. Inventory Ledger Entries")
                     {
                         Caption = '&Phys. Inventory Ledger Entries';
                         Image = PhysicalInventoryLedger;
                         RunObject = Page "Phys. Inventory Ledger Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                     }
                     action("&Value Entries")
@@ -2280,7 +2282,7 @@ page 6014425 "Retail Item Card"
                         Caption = '&Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                     }
                     action("Item &Tracking Entries")
@@ -2294,7 +2296,7 @@ page 6014425 "Retail Item Card"
                         begin
                             //-NPR4.17
                             //ItemTrackingMgt.CallItemTrackingEntryForm(3,'',"No.",'','','','');
-                            ItemTrackingDocMgt.ShowItemTrackingForMasterData(3,'',"No.",'','','','');
+                            ItemTrackingDocMgt.ShowItemTrackingForMasterData(3, '', "No.", '', '', '', '');
                             //+NPR4.17
                         end;
                     }
@@ -2303,15 +2305,15 @@ page 6014425 "Retail Item Card"
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
-                        RunPageView = SORTING("Item No.","Bin Code","Location Code","Variant Code","Unit of Measure Code","Lot No.","Serial No.","Entry Type",Dedicated);
+                        RunPageLink = "Item No." = FIELD("No.");
+                        RunPageView = SORTING("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated);
                     }
                     action("Application Worksheet")
                     {
                         Caption = 'Application Worksheet';
                         Image = ApplicationWorksheet;
                         RunObject = Page "Application Worksheet";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                     }
                     action(POSSalesEntries)
                     {
@@ -2344,25 +2346,25 @@ page 6014425 "Retail Item Card"
                         Caption = 'Entry Statistics';
                         Image = EntryStatistics;
                         RunObject = Page "Item Entry Statistics";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Date Filter"=FIELD("Date Filter"),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Date Filter" = FIELD("Date Filter"),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action("T&urnover")
                     {
                         Caption = 'T&urnover';
                         Image = Turnover;
                         RunObject = Page "Item Turnover";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                 }
                 action("Co&mments")
@@ -2370,8 +2372,8 @@ page 6014425 "Retail Item Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name"=CONST(Item),
-                                  "No."=FIELD("No.");
+                    RunPageLink = "Table Name" = CONST(Item),
+                                  "No." = FIELD("No.");
                 }
             }
             group("&Purchases")
@@ -2383,7 +2385,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Ven&dors';
                     Image = Vendor;
                     RunObject = Page "Item Vendor Catalog";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action(Prices)
@@ -2391,7 +2393,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Prices';
                     Image = Price;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action("Line Discounts")
@@ -2399,14 +2401,14 @@ page 6014425 "Retail Item Card"
                     Caption = 'Line Discounts';
                     Image = LineDiscount;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action("Prepa&yment Percentages")
                 {
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 separator(Separator6150775)
                 {
@@ -2416,18 +2418,18 @@ page 6014425 "Retail Item Card"
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Purchase Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action("Return Orders")
                 {
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Purchase Return Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action("Nonstoc&k Items")
                 {
@@ -2445,7 +2447,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Prices';
                     Image = Price;
                     RunObject = Page "Sales Prices";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action(Action6150769)
@@ -2453,16 +2455,16 @@ page 6014425 "Retail Item Card"
                     Caption = 'Line Discounts';
                     Image = LineDiscount;
                     RunObject = Page "Sales Line Discounts";
-                    RunPageLink = Type=CONST(Item),
-                                  Code=FIELD("No.");
-                    RunPageView = SORTING(Type,Code);
+                    RunPageLink = Type = CONST(Item),
+                                  Code = FIELD("No.");
+                    RunPageView = SORTING(Type, Code);
                 }
                 action(Action6150768)
                 {
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 separator(Separator6150767)
                 {
@@ -2472,26 +2474,26 @@ page 6014425 "Retail Item Card"
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Sales Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action(Action6150765)
                 {
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Sales Return Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action("Recommended Items")
                 {
                     Caption = 'Recommended Items';
                     Image = SuggestLines;
                     RunObject = Page "MCS Recommendations Lines";
-                    RunPageLink = "Seed Item No."=FIELD("No."),
-                                  "Table No."=CONST(27);
+                    RunPageLink = "Seed Item No." = FIELD("No."),
+                                  "Table No." = CONST(27);
                 }
             }
             group("Assembly/Production")
@@ -2533,16 +2535,16 @@ page 6014425 "Retail Item Card"
                         Caption = 'Assembly BOM';
                         Image = BOM;
                         RunObject = Page "Assembly BOM";
-                        RunPageLink = "Parent Item No."=FIELD("No.");
+                        RunPageLink = "Parent Item No." = FIELD("No.");
                     }
                     action("Where-Used")
                     {
                         Caption = 'Where-Used';
                         Image = Track;
                         RunObject = Page "Where-Used List";
-                        RunPageLink = Type=CONST(Item),
-                                      "No."=FIELD("No.");
-                        RunPageView = SORTING(Type,"No.");
+                        RunPageLink = Type = CONST(Item),
+                                      "No." = FIELD("No.");
+                        RunPageView = SORTING(Type, "No.");
                     }
                     action("Calc. Stan&dard Cost")
                     {
@@ -2552,7 +2554,7 @@ page 6014425 "Retail Item Card"
                         trigger OnAction()
                         begin
                             Clear(CalculateStdCost);
-                            CalculateStdCost.CalcItem("No.",true);
+                            CalculateStdCost.CalcItem("No.", true);
                         end;
                     }
                     action("Calc. Unit Price")
@@ -2576,7 +2578,7 @@ page 6014425 "Retail Item Card"
                         Caption = 'Production BOM';
                         Image = BOM;
                         RunObject = Page "Production BOM";
-                        RunPageLink = "No."=FIELD("No.");
+                        RunPageLink = "No." = FIELD("No.");
                     }
                     action(Action6150754)
                     {
@@ -2587,7 +2589,7 @@ page 6014425 "Retail Item Card"
                         var
                             ProdBOMWhereUsed: Page "Prod. BOM Where-Used";
                         begin
-                            ProdBOMWhereUsed.SetItem(Rec,WorkDate);
+                            ProdBOMWhereUsed.SetItem(Rec, WorkDate);
                             ProdBOMWhereUsed.RunModal;
                         end;
                     }
@@ -2599,7 +2601,7 @@ page 6014425 "Retail Item Card"
                         trigger OnAction()
                         begin
                             Clear(CalculateStdCost);
-                            CalculateStdCost.CalcItem("No.",false);
+                            CalculateStdCost.CalcItem("No.", false);
                         end;
                     }
                 }
@@ -2613,7 +2615,7 @@ page 6014425 "Retail Item Card"
                     Caption = '&Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Item Bin Contents";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action("Stockkeepin&g Units")
@@ -2621,7 +2623,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Stockkeepin&g Units';
                     Image = SKU;
                     RunObject = Page "Stockkeeping Unit List";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
             }
@@ -2634,7 +2636,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Ser&vice Items';
                     Image = ServiceItem;
                     RunObject = Page "Service Items";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action(Troubleshooting)
@@ -2654,8 +2656,8 @@ page 6014425 "Retail Item Card"
                     Caption = 'Troubleshooting Setup';
                     Image = Troubleshoot;
                     RunObject = Page "Troubleshooting Setup";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
                 }
             }
             group(Resources)
@@ -2671,8 +2673,8 @@ page 6014425 "Retail Item Card"
                         Caption = 'Resource Skills';
                         Image = ResourceSkills;
                         RunObject = Page "Resource Skills";
-                        RunPageLink = Type=CONST(Item),
-                                      "No."=FIELD("No.");
+                        RunPageLink = Type = CONST(Item),
+                                      "No." = FIELD("No.");
                     }
                     action("Skilled Resources")
                     {
@@ -2684,7 +2686,7 @@ page 6014425 "Retail Item Card"
                             ResourceSkill: Record "Resource Skill";
                         begin
                             Clear(SkilledResourceList);
-                            SkilledResourceList.Initialize(ResourceSkill.Type::Item,"No.",Description);
+                            SkilledResourceList.Initialize(ResourceSkill.Type::Item, "No.", Description);
                             SkilledResourceList.RunModal;
                         end;
                     }
@@ -2723,7 +2725,7 @@ page 6014425 "Retail Item Card"
                     Promoted = true;
                     PromotedCategory = Category6;
                     RunObject = Page "Magento Video Links";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action(Webshops)
                 {
@@ -2741,9 +2743,9 @@ page 6014425 "Retail Item Card"
                         //-MAG1.21
                         MagentoItemMgt.SetupMultiStoreData(Rec);
                         MagentoStoreItem.FilterGroup(0);
-                        MagentoStoreItem.SetRange("Item No.","No.");
+                        MagentoStoreItem.SetRange("Item No.", "No.");
                         MagentoStoreItem.FilterGroup(2);
-                        PAGE.Run(PAGE::"Magento Store Items",MagentoStoreItem);
+                        PAGE.Run(PAGE::"Magento Store Items", MagentoStoreItem);
                         //+MAG1.21
                     end;
                 }
@@ -2761,8 +2763,8 @@ page 6014425 "Retail Item Card"
                         MagentoDisplayConfigPage: Page "Magento Display Config";
                     begin
                         //-MAG1.21
-                        MagentoDisplayConfig.SetRange("No.","No.");
-                        MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::Item);
+                        MagentoDisplayConfig.SetRange("No.", "No.");
+                        MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Item);
                         MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                         MagentoDisplayConfigPage.Run;
                         //+MAG1.21
@@ -2785,8 +2787,8 @@ page 6014425 "Retail Item Card"
                     var
                         Item: Record Item;
                     begin
-                        Item.SetRange("No.","No.");
-                        REPORT.RunModal(REPORT::"Create Stockkeeping Unit",true,false,Item);
+                        Item.SetRange("No.", "No.");
+                        REPORT.RunModal(REPORT::"Create Stockkeeping Unit", true, false, Item);
                     end;
                 }
                 action("C&alculate Counting Period")
@@ -2886,26 +2888,26 @@ page 6014425 "Retail Item Card"
                         t001: Label 'Quantity to be transfered to UPDATED?';
                     begin
                         if PAGE.RunModal(PAGE::"Retail Journal List", RetailJournalHeader) <> ACTION::LookupOK then
-                          exit;
+                            exit;
 
                         RetailJournalLine.Reset;
-                        RetailJournalLine.SetRange("No.",RetailJournalHeader."No.");
+                        RetailJournalLine.SetRange("No.", RetailJournalHeader."No.");
                         if RetailJournalLine.Find('+') then
-                          TempInt := RetailJournalLine."Line No." + 10000
+                            TempInt := RetailJournalLine."Line No." + 10000
                         else
-                          TempInt := 10000;
+                            TempInt := 10000;
 
                         TempQty := 1;
 
-                        InputDialog.SetInput(1,TempQty,t001);
+                        InputDialog.SetInput(1, TempQty, t001);
                         if InputDialog.RunModal = ACTION::OK then
-                          InputDialog.InputInteger(1,TempQty);
+                            InputDialog.InputInteger(1, TempQty);
 
                         RetailJournalLine.Init;
                         RetailJournalLine."No." := RetailJournalHeader."No.";
                         RetailJournalLine."Line No." := TempInt;
-                        RetailJournalLine.Validate("Item No.",Rec."No.");
-                        RetailJournalLine.Validate("Quantity to Print",TempQty);
+                        RetailJournalLine.Validate("Item No.", Rec."No.");
+                        RetailJournalLine.Validate("Quantity to Print", TempQty);
                         RetailJournalLine.Insert;
                         //+TS
                         //CurrForm.S�gkode.ACTIVATE;
@@ -2960,7 +2962,7 @@ page 6014425 "Retail Item Card"
                         VRTWrapper: Codeunit "Variety Wrapper";
                     begin
                         //-VRT1.00
-                        VRTWrapper.ShowVarietyMatrix(Rec,0);
+                        VRTWrapper.ShowVarietyMatrix(Rec, 0);
                         //+VRT1.00
                     end;
                 }
@@ -2977,7 +2979,7 @@ page 6014425 "Retail Item Card"
                         VRTWrapper: Codeunit "Variety Wrapper";
                     begin
                         //-VRT1.11
-                        VRTWrapper.ShowMaintainItemMatrix(Rec,0);
+                        VRTWrapper.ShowMaintainItemMatrix(Rec, 0);
                         //+VRT1.11
                     end;
                 }
@@ -3011,11 +3013,11 @@ page 6014425 "Retail Item Card"
                     begin
 
                         AccessorySparePart.FilterGroup := 2;
-                        AccessorySparePart.SetRange(Code,"No.");
-                        AccessorySparePart.SetRange(Type,AccessorySparePart.Type::Accessory);
+                        AccessorySparePart.SetRange(Code, "No.");
+                        AccessorySparePart.SetRange(Type, AccessorySparePart.Type::Accessory);
                         AccessorySparePart.FilterGroup := 2;
 
-                        PAGE.RunModal(PAGE::"Accessory List",AccessorySparePart);
+                        PAGE.RunModal(PAGE::"Accessory List", AccessorySparePart);
                     end;
                 }
                 separator(Separator6150694)
@@ -3026,8 +3028,8 @@ page 6014425 "Retail Item Card"
                     Caption = 'POS Info';
                     Image = Info;
                     RunObject = Page "POS Info Links";
-                    RunPageLink = "Table ID"=CONST(27),
-                                  "Primary Key"=FIELD("No.");
+                    RunPageLink = "Table ID" = CONST(27),
+                                  "Primary Key" = FIELD("No.");
                 }
             }
             group("Price Management")
@@ -3038,7 +3040,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Multiple Unit Prices';
                     Image = Price;
                     RunObject = Page "Quantity Discount Card";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageMode = Edit;
                 }
                 action("Period Discount")
@@ -3056,9 +3058,9 @@ page 6014425 "Retail Item Card"
                         CampaignDiscountLines.Editable(false);
                         PeriodDiscountLine.Reset;
                         //-NPR5.40
-                        PeriodDiscountLine.SetRange(Status,PeriodDiscountLine.Status::Active);
+                        PeriodDiscountLine.SetRange(Status, PeriodDiscountLine.Status::Active);
                         //+NPR5.40
-                        PeriodDiscountLine.SetRange("Item No.","No.");
+                        PeriodDiscountLine.SetRange("Item No.", "No.");
                         CampaignDiscountLines.SetTableView(PeriodDiscountLine);
                         CampaignDiscountLines.RunModal;
                     end;
@@ -3077,7 +3079,7 @@ page 6014425 "Retail Item Card"
                         Clear(MixedDiscountLines);
                         MixedDiscountLines.Editable(false);
                         MixedDiscountLine.Reset;
-                        MixedDiscountLine.SetRange("No.","No.");
+                        MixedDiscountLine.SetRange("No.", "No.");
                         MixedDiscountLines.SetTableView(MixedDiscountLine);
                         MixedDiscountLines.RunModal;
                     end;
@@ -3101,7 +3103,7 @@ page 6014425 "Retail Item Card"
         //+MAG1.21
         //+MAG1.14
         //-NPR5.43 [314830]
-        ItemCostMgt.CalculateAverageCost(Rec,AverageCostLCY,AverageCostACY)
+        ItemCostMgt.CalculateAverageCost(Rec, AverageCostLCY, AverageCostACY)
         //+NPR5.43 [314830]
     end;
 
@@ -3110,8 +3112,8 @@ page 6014425 "Retail Item Card"
         EnablePlanningControls;
         EnableCostingControls;
 
-        NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Item, "No.");
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, "No.");
+        NPRAttrEditable := CurrPage.Editable();
     end;
 
     trigger OnInit()
@@ -3152,7 +3154,7 @@ page 6014425 "Retail Item Card"
         //+MAG2.06 [286203]
 
         //-NPR4.11
-        NPRAttrManagement.GetAttributeVisibility (DATABASE::Item, NPRAttrVisibleArray);
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::Item, NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
         NPRAttrVisible03 := NPRAttrVisibleArray[3];
@@ -3200,7 +3202,7 @@ page 6014425 "Retail Item Card"
         //-NPR5.34 [284384]
 
         //-NPR4.11
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrEditable := CurrPage.Editable();
         //+NPR4.11
     end;
 
@@ -3250,10 +3252,10 @@ page 6014425 "Retail Item Card"
         Text10600005: Label '%1 does not exist as alt. item no. or as item no.!';
         Text10600012: Label 'Enter item number for new item';
         ErrItemGroup: Label 'Itemgroup does not exists!';
-        NPRAttrTextArray: array [40] of Text[250];
+        NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -3326,12 +3328,12 @@ page 6014425 "Retail Item Card"
         DampenerQtyEnabled: Boolean;
         OverflowLevelEnabled: Boolean;
     begin
-        PlanningGetParam.SetUpPlanningControls("Reordering Policy","Include Inventory",
-          TimeBucketEnabled,SafetyLeadTimeEnabled,SafetyStockQtyEnabled,
-          ReorderPointEnabled,ReorderQtyEnabled,MaximumInventoryEnabled,
-          MinimumOrderQtyEnabled,MaximumOrderQtyEnabled,OrderMultipleEnabled,IncludeInventoryEnabled,
-          ReschedulingPeriodEnabled,LotAccumulationPeriodEnabled,
-          DampenerPeriodEnabled,DampenerQtyEnabled,OverflowLevelEnabled);
+        PlanningGetParam.SetUpPlanningControls("Reordering Policy", "Include Inventory",
+          TimeBucketEnabled, SafetyLeadTimeEnabled, SafetyStockQtyEnabled,
+          ReorderPointEnabled, ReorderQtyEnabled, MaximumInventoryEnabled,
+          MinimumOrderQtyEnabled, MaximumOrderQtyEnabled, OrderMultipleEnabled, IncludeInventoryEnabled,
+          ReschedulingPeriodEnabled, LotAccumulationPeriodEnabled,
+          DampenerPeriodEnabled, DampenerQtyEnabled, OverflowLevelEnabled);
 
         TimeBucketEnable := TimeBucketEnabled;
         SafetyLeadTimeEnable := SafetyLeadTimeEnabled;
@@ -3359,7 +3361,7 @@ page 6014425 "Retail Item Card"
     procedure CheckItemGroup()
     begin
         if ("Item Group" = '') then
-          FieldError("Item Group");
+            FieldError("Item Group");
     end;
 
     procedure ReplicateItem()
@@ -3372,15 +3374,15 @@ page 6014425 "Retail Item Card"
     begin
         NewItemNo := '';
 
-        InputDialog.SetInput(1,NewItemNo,Text10600012);
+        InputDialog.SetInput(1, NewItemNo, Text10600012);
         if InputDialog.RunModal = ACTION::OK then
-          InputDialog.InputCode(1,NewItemNo)
+            InputDialog.InputCode(1, NewItemNo)
         else
-          Error('');
+            Error('');
 
         ItemCopy.Copy(Rec);
 
-        ItemCopy.Validate("No.",NewItemNo);
+        ItemCopy.Validate("No.", NewItemNo);
         ItemCopy."Vendor Item No." := '';
         ItemCopy."Search Description" := '';
         ItemCopy."Reorder Point" := 0;
@@ -3396,13 +3398,13 @@ page 6014425 "Retail Item Card"
         //+NPR5.43
         ItemCopy.Insert(true);
 
-        ItemUnitofMeasure.SetRange("Item No.","No.");
+        ItemUnitofMeasure.SetRange("Item No.", "No.");
         if ItemUnitofMeasure.Find('-') then begin
-          repeat
-            ItemUnitofMeasureNew.Copy(ItemUnitofMeasure);
-            ItemUnitofMeasureNew."Item No." := NewItemNo;
-            if ItemUnitofMeasureNew.Insert then;
-          until ItemUnitofMeasure.Next = 0;
+            repeat
+                ItemUnitofMeasureNew.Copy(ItemUnitofMeasure);
+                ItemUnitofMeasureNew."Item No." := NewItemNo;
+                if ItemUnitofMeasureNew.Insert then;
+            until ItemUnitofMeasure.Next = 0;
         end;
 
         Get(ItemCopy."No.");
@@ -3418,7 +3420,7 @@ page 6014425 "Retail Item Card"
     begin
         //-MAG1.21
         if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
-          exit;
+            exit;
 
         MagentoEnabled := true;
         MagentoEnabledBrand := MagentoSetup."Brands Enabled";
