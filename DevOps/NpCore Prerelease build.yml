@@ -1,0 +1,45 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - masters/*
+
+resources:
+  repositories:
+  - repository: scriptsRepo
+    type: git
+    name: 'NpCore/NpDevOps'
+    ref: 'refs/heads/master'
+  - repository: translations
+    type: git
+    name: 'NpCore/NpCore-Translations'
+    ref: 'refs/heads/master'
+
+pool:
+  name: NP Deployment
+  demands: 
+  - docker
+  # Now only 2019 is available but in the future it will be every newer version.
+  # Then we will probably remove this requirement as it will alwyas TRUE.
+  - com.navipartner.docker.osversion -equals 2019
+
+jobs:
+- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+  parameters:
+    containerImageName: mcr.microsoft.com/businesscentral/onprem:2004-w1-ltsc2019
+    containerName: Build-$(Build.BuildId)
+    serverInstanceName: BC
+    containerAdminUsername: admin
+    containerAdminPassword: P@ssword1
+    licenseSecureFileName: 'DEV_BC OP 16.flf'
+    scriptsRepo: ScriptsRepo
+    translationsRepo: translations
+    dependancyPackages:
+      - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+        id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+    appNuGetSource: 
+        source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
+        id: NaviPartner.NPCore.BC160
+    versionVariableName: 'LastUsedVerNo'
+    versionRevisionSeed: 9000
+    nuGetSuffix: Prerelease
