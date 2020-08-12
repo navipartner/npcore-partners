@@ -180,19 +180,28 @@ codeunit 6150703 "POS JSON Management"
         exit(true);
     end;
 
-    procedure GetString(Property: Text; WithError: Boolean): Text
+    procedure GetString(Property: Text; WithError: Boolean) Result: Text
     var
         JToken: JsonToken;
         JValue: JsonValue;
+        JObj: JsonObject;
     begin
         GetJToken(JToken, Property, WithError);
-        if (not JToken.IsValue) then
-            exit;
+        case true of
+            JToken.IsObject():
+                begin
+                    JObj := JToken.AsObject();
+                    JObj.WriteTo(Result);
+                    exit;
+                end;
+            JToken.IsValue():
+                begin
+                    JValue := JToken.AsValue();
 
-        JValue := JToken.AsValue();
-
-        if (not JValue.IsNull()) and (not JValue.IsUndefined()) then
-            exit(JValue.AsText());
+                    if (not JValue.IsNull()) and (not JValue.IsUndefined()) then
+                        exit(JValue.AsText());
+                end;
+        end;
     end;
 
     procedure GetBoolean(Property: Text; WithError: Boolean) Bool: Boolean
