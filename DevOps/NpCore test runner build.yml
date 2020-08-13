@@ -1,7 +1,7 @@
 trigger: none
 
 schedules:
-  - cron: "0 2 * * *"
+  - cron: "0 0 * * *" #UTC TIME!
     displayName: Daily after-midnight test runner build
     branches:
       include:
@@ -80,5 +80,5 @@ jobs:
       - TestRunName: 'Microsoft Base App tests'
         TestSuite: 'DEFAULT'
         ExtensionId: ''
-        TestCodeunitsRange: '134000..134999' #Microsoft Test object range - at least one filter must be populated!
+        TestCodeunitsRange: '130000..139999' #Microsoft Test object range - at least one filter must be populated!
         DisabledTests: ''
