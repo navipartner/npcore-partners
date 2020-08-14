@@ -10,22 +10,37 @@ page 6150711 "POS View Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field(View;View)
-                {
-                    Editable = Editable;
-                    MultiLine = true;
+            }
+            usercontrol(Editor; JsonEditor)
+            {
+                trigger OnControlReady();
+                begin
+                    CurrPage.Editor.Invoke('setJson', GetMarkup());
+                    Initialized := true;
+                end;
 
-                    trigger OnValidate()
-                    begin
-                        SetMarkup(View);
+                trigger OnEvent(Method: Text; EventContent: Text);
+                begin
+                    case Method of
+                        'save':
+                            begin
+                                if (format(EventContent) = '{}') then
+                                    eventContent := '';
+                                SetMarkup(EventContent);
+                                CurrPage.SaveRecord();
+                            end;
+                        'retrieve':
+                            begin
+                                RetrieveAutoCompleteOptions(EventContent);
+                            end;
                     end;
-                }
+                end;
             }
         }
     }
@@ -36,29 +51,60 @@ page 6150711 "POS View Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        View := GetMarkup();
-        SetEditable();
+        if not Initialized then
+            exit;
+
+        CurrPage.Editor.Invoke('setJson', GetMarkup());
     end;
 
     trigger OnAfterGetRecord()
     begin
-        View := '';
-        SetEditable();
+        if not Initialized then
+            exit;
+
+        CurrPage.Editor.Invoke('setJson', GetMarkup());
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        View := '';
-        SetEditable();
+        if not Initialized then
+            exit;
+
+        CurrPage.Editor.Invoke('setJson', '');
+    end;
+
+    procedure RetrieveAutoCompleteOptions(OptionsType: Text);
+    var
+        Menu: record "POS Menu";
+        DataSourceTemp: Record "POS Data Source (Discovery)" temporary;
+        Options: JsonArray;
+        OptionsText: Text;
+    begin
+        case OptionsType of
+            'menu':
+                begin
+                    if Menu.FindSet() then
+                        repeat
+                            Options.Add(Menu.Code);
+                        until Menu.Next() = 0;
+                end;
+
+            'dataSource':
+                begin
+                    DataSourceTemp.DiscoverDataSources();
+                    if DataSourceTemp.FindSet() then
+                        repeat
+                            Options.Add(DataSourceTemp.Name);
+                        until DataSourceTemp.Next() = 0;
+                end;
+        end;
+
+        Options.AsToken().WriteTo(OptionsText);
+
+        CurrPage.Editor.Invoke('autocomplete_' + OptionsType, OptionsText);
     end;
 
     var
-        View: Text;
-        Editable: Boolean;
-
-    local procedure SetEditable()
-    begin
-        Editable := CurrPage.Editable;
-    end;
+        Initialized: Boolean;
 }
 
