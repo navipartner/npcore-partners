@@ -9,7 +9,7 @@ page 6014560 "RP Template Designer"
     AutoSplitKey = true;
     Caption = 'Template Designer';
     DeleteAllowed = false;
-    PageType = Worksheet;
+    PageType = Document;
     PromotedActionCategories = 'New,Process,Prints,Data';
     SourceTable = "RP Template Header";
 
@@ -17,19 +17,19 @@ page 6014560 "RP Template Designer"
     {
         area(content)
         {
-            part(MatrixDesigner;"RP Template Matrix Designer")
+            part(MatrixDesigner; "RP Template Matrix Designer")
             {
                 Caption = 'Matrix Designer';
                 ShowFilter = false;
-                SubPageLink = "Template Code"=FIELD(Code);
-                Visible = "Printer Type"="Printer Type"::Matrix;
+                SubPageLink = "Template Code" = FIELD(Code);
+                Visible = "Printer Type" = "Printer Type"::Matrix;
             }
-            part(LineDesigner;"RP Template Line Designer")
+            part(LineDesigner; "RP Template Line Designer")
             {
                 Caption = 'Line Designer';
                 ShowFilter = false;
-                SubPageLink = "Template Code"=FIELD(Code);
-                Visible = "Printer Type"="Printer Type"::Line;
+                SubPageLink = "Template Code" = FIELD(Code);
+                Visible = "Printer Type" = "Printer Type"::Line;
             }
         }
     }
@@ -45,7 +45,7 @@ page 6014560 "RP Template Designer"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = "Printer Type"="Printer Type"::Line;
+                Visible = "Printer Type" = "Printer Type"::Line;
 
                 trigger OnAction()
                 begin
@@ -59,7 +59,7 @@ page 6014560 "RP Template Designer"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = "Printer Type"="Printer Type"::Line;
+                Visible = "Printer Type" = "Printer Type"::Line;
 
                 trigger OnAction()
                 begin
@@ -89,11 +89,11 @@ page 6014560 "RP Template Designer"
 
                     RecRef.Open(DataItem."Table ID");
                     if RecordView <> '' then begin
-                      RecRef.SetView(RecordView);
-                      RecRef.FindSet;
+                        RecRef.SetView(RecordView);
+                        RecRef.FindSet;
                     end else begin
-                      RecRef.FindFirst;
-                      RecRef.SetRecFilter;
+                        RecRef.FindFirst;
+                        RecRef.SetRecFilter;
                     end;
 
                     TemplateMgt.PrintTemplate(Code, RecRef, 0);
@@ -119,14 +119,14 @@ page 6014560 "RP Template Designer"
 
                     FilterPageBuilder.AddTable(DataItem."Data Source", DataItem."Table ID");
                     if (RecordView <> '') and (RecordTableNo = DataItem."Table ID") then
-                      FilterPageBuilder.SetView(DataItem."Data Source", RecordView); //Reapply previously set filter
+                        FilterPageBuilder.SetView(DataItem."Data Source", RecordView); //Reapply previously set filter
 
                     if FilterPageBuilder.RunModal then begin
-                    //-NPR5.33 [282372]
-                    //  RecordView    := FilterPageBuilder.GETVIEW(DataItem."Data Source");
-                      RecordView    := FilterPageBuilder.GetView(DataItem."Data Source", false);
-                    //+NPR5.33 [282372]
-                      RecordTableNo := DataItem."Table ID";
+                        //-NPR5.33 [282372]
+                        //  RecordView    := FilterPageBuilder.GETVIEW(DataItem."Data Source");
+                        RecordView := FilterPageBuilder.GetView(DataItem."Data Source", false);
+                        //+NPR5.33 [282372]
+                        RecordTableNo := DataItem."Table ID";
                     end;
                 end;
             }
