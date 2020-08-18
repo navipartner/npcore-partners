@@ -11,6 +11,8 @@ page 6014450 "Mixed Discount"
     // NPR5.46/JDH /20181002 CASE 294354 Changed how mix discount are send to Retail Journal
     // NPR5.52/ANPA/20191001  CASE 370260 Removed Assist Edit for the Customer Disc. Group filter, added group around start date, end date, start time and end time
     // NPR5.54/SARA/20200218  CASE 388008 Hide "Starting time" and "Ending time"
+    // NPR5.55/TJ  /20200421  CASE 400524 Changed Caption of action Default Dimensions to Dimensions
+    // NPR5.55/ALPO/20200714  CASE 412946 Mixed Discount enhancement: support for multiple discount amount levels
 
     Caption = 'Mix Discount';
     PageType = Card;
@@ -58,15 +60,20 @@ page 6014450 "Mixed Discount"
                     {
                         ShowCaption = false;
                         Visible = ("Mix Type" <> 1);
-                        field(Lot; Lot)
+                        group(Control6014428)
                         {
-                            ToolTip = 'Define Quantity on Lines - All items and quantity on lines must be bought';
+                            ShowCaption = false;
+                            Visible = ("Discount Type"<>4);
+                            field(Lot;Lot)
+                            {
+                                ToolTip = 'Define Quantity on Lines - All items and quantity on lines must be bought';
 
-                            trigger OnValidate()
-                            begin
-                                UpdateLineView();
-                                CurrPage.Update(true);
-                            end;
+                                trigger OnValidate()
+                                begin
+                                    UpdateLineView();
+                                    CurrPage.Update(true);
+                                end;
+                            }
                         }
                         group(Control6014413)
                         {
@@ -116,7 +123,7 @@ page 6014450 "Mixed Discount"
                         group(Control6014403)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type" = 0;
+                            Visible = ("Discount Type"=0);
                             field("Total Amount"; "Total Amount")
                             {
 
@@ -127,6 +134,20 @@ page 6014450 "Mixed Discount"
                             }
                             field("Total Amount Excl. VAT"; "Total Amount Excl. VAT")
                             {
+                            }
+                        }
+                        group(Control6014426)
+                        {
+                            ShowCaption = false;
+                            Visible = ("Discount Type"=4);
+                            field(DiscAmountExclVAT;"Total Amount Excl. VAT")
+                            {
+                                Caption = 'Discount Amount Excl. VAT';
+
+                                trigger OnValidate()
+                                begin
+                                    CurrPage.Update;  //NPR5.55 [412946]
+                                end;
                             }
                         }
                         group(Control6014404)
@@ -179,7 +200,7 @@ page 6014450 "Mixed Discount"
                         group(Control6014407)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type" <> 2) AND (NOT "Lot");
+                            Visible = ("Discount Type"<>2) AND ("Discount Type"<>4) AND (NOT "Lot");
                             field(MinimumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, false))
                             {
                                 Caption = 'Min. Discount Amount';
@@ -268,6 +289,11 @@ page 6014450 "Mixed Discount"
                     }
                 }
             }
+            part(DiscountLevels;"Mixed Discount Levels")
+            {
+                SubPageLink = "Mixed Discount Code"=FIELD(Code);
+                Visible = DiscountLevelsApplicable;
+            }
             part(SubForm; "Mixed Discount Lines")
             {
                 ShowFilter = false;
@@ -281,9 +307,9 @@ page 6014450 "Mixed Discount"
     {
         area(navigation)
         {
-            action("Default Dimensions")
+            action(Dimensions)
             {
-                Caption = 'Default Dimensions';
+                Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
                 RunPageLink = "Table ID" = CONST(6014411),
@@ -529,6 +555,7 @@ page 6014450 "Mixed Discount"
         MaxDiscount: Decimal;
         TxtCompressItems: Label 'Compressed to Item Discount Group';
         TxtCompChngeContinue: Label 'Compression will change one or more Item Disc. Group. Do you wish to continue?';
+        DiscountLevelsApplicable: Boolean;
 
     procedure TransferToMix()
     var
@@ -723,6 +750,7 @@ page 6014450 "Mixed Discount"
     local procedure UpdateLineView()
     begin
         CurrPage.SubForm.PAGE.UpdateMixedDiscountView(Rec);
+        DiscountLevelsApplicable := "Discount Type" = "Discount Type"::"Multiple Discount Levels";  //NPR5.55 [412946]
     end;
 }
 

@@ -21,6 +21,8 @@ table 6150615 "POS Unit"
     // NPR5.54/BHR /20200210 CASE 389444 Create field 'POS Unit Receipt Text Profile'
     // NPR5.54/TSA /20200219 CASE 391850 Added "POS Named Actions Profile"
     // NPR5.54/TSA /20200221 CASE 392247 Added "POS Type"
+    // NPR5.55/ZESO/20200603 CASE 407613 Added "POS Unit Serial No"
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
 
     Caption = 'POS Unit';
     DataCaptionFields = "No.",Name;
@@ -251,6 +253,17 @@ table 6150615 "POS Unit"
             Caption = 'POS Named Actions Profile';
             Description = 'NPR5.54';
             TableRelation = "POS Setup";
+        }
+        field(560;"POS Unit Serial No";Code[20])
+        {
+            Caption = 'POS Unit Serial No';
+            Description = 'NPR5.55';
+        }
+        field(570;"POS Restaurant Profile";Code[20])
+        {
+            Caption = 'POS Restaurant Profile';
+            Description = 'NPR5.55';
+            TableRelation = "POS NPRE Restaurant Profile";
         }
     }
 

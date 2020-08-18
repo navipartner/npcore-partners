@@ -2,7 +2,7 @@ codeunit 6014413 "Label Library"
 {
     // Print Library
     //  Work started by Various.
-    //  Ported to NPR4.000.000 by Mikkel J�nsson
+    //  Ported to NPR4.000.000 by Mikkel J¢nsson
     // 
     // NPR5.23/MMV/20160509 CASE 240211 Call retail journal print with all records at once.
     //                                  Changed PrintSelection() to send all records at once.
@@ -32,6 +32,7 @@ codeunit 6014413 "Label Library"
     // NPR5.51/MMV /20190906 CASE 367416 Skip obsolete fields in NAV2018+ when moving to temp buffer.
     // NPR5.52/SARA/20190906 CASE 366969 Added 'Shelf Label' and 'Price Label' for Item Worksheet line
     // NPR5.53/MHA /20191121 CASE 374290 Added function SetSelectionBuffer()
+    // NPR5.55/BHR /202020713 CASE 414268 Add retail print and Price label for warehouse activity line
 
 
     trigger OnRun()
@@ -268,6 +269,7 @@ codeunit 6014413 "Label Library"
         TransferReceiptLine: Record "Transfer Receipt Line";
         PurchInvLine: Record "Purch. Inv. Line";
         ItemWorksheetLine: Record "Item Worksheet Line";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
         if not SelectionBufferOpen then
           exit;
@@ -390,6 +392,18 @@ codeunit 6014413 "Label Library"
                   PrintItemWorksheetLine(ItemWorksheetLine,ReportType);
               end;
            //+NPR5.52 [366969]
+           //-NPR5.55 [414268]
+           DATABASE::"Warehouse Activity Line":
+              begin
+                repeat
+                  if WarehouseActivityLine.Get(TmpSelectionBuffer.RecordId) then
+                    WarehouseActivityLine.Mark(true);
+                until TmpSelectionBuffer.Next = 0;
+                WarehouseActivityLine.MarkedOnly(true);
+                if WarehouseActivityLine.FindSet then
+                  PrintWarehouseActivityLine(WarehouseActivityLine,ReportType);
+              end;
+           //-NPR5.55 [414268]
           end;
         end;
     end;
@@ -404,6 +418,7 @@ codeunit 6014413 "Label Library"
         RetailJournalMgt: Codeunit "Retail Journal Code";
         PeriodDiscountLine: Record "Period Discount Line";
         PurchInvLine: Record "Purch. Inv. Line";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
         //-NPR5.46 [294354]
         TmpRetailJnlCode := Format(CreateGuid);
@@ -473,6 +488,14 @@ codeunit 6014413 "Label Library"
                 RetailJournalMgt.PostedPurchaseInvoice2RetailJnl(PurchInvLine."Document No.", TmpRetailJnlCode);
             end;
           //+NPR5.51 [358287]
+          //-NPR5.55 [414268]
+            DATABASE::"Warehouse Activity Line"  :
+            begin
+              RecRef.SetTable(WarehouseActivityLine);
+              if WarehouseActivityLine.FindFirst then;
+                RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type",WarehouseActivityLine."No.", TmpRetailJnlCode);
+            end;
+          //+NPR5.55 [414268]
           else
             Error('table %1 is not supported for selected Printing', RecRef.Number);
           //+NPR5.46 [294354]
@@ -1009,6 +1032,19 @@ codeunit 6014413 "Label Library"
         end;
         RetailJnlLine.SetRange("No.", Format(GUID));
         //+NPR5.52 [366969]
+    end;
+
+    local procedure PrintWarehouseActivityLine(var WarehouseActivityLine: Record "Warehouse Activity Line";ReportType: Integer)
+    var
+        TempRetailJnlNo: Code[40];
+        RetailJournalCode: Codeunit "Retail Journal Code";
+    begin
+        //-NPR5.55 [414268]
+        Evaluate(TempRetailJnlNo, CreateGuid);
+        RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
+        RetailJournalCode.CopyInventoryPutAway2RetailJnlLines(WarehouseActivityLine, TempRetailJnlNo);
+        FlushJournalToPrinter(TempRetailJnlNo, ReportType);
+        //+NPR5.55 [414268]
     end;
 
     local procedure "// Event Publishers"()

@@ -42,6 +42,8 @@ codeunit 6060128 "MM Member WebService"
     // MM1.38/TSA /20190517 CASE 355234 Added ValidateNotificationToken(), ExpireNotificationToken(), GenerateNotificationToken()
     // MM1.39/TSA /20190529 CASE 350968 Added GetSetAutoRenew
     // MM1.42/TSA /20191231 CASE 382728 Added GetSetMemberCommunication service
+    // MM1.44/TSA /20200506 CASE 400429 Added BlockMember() action
+    // MM1.45/TSA/20200730  CASE 416671 Transport MM1.45 - 30 July 2020
 
 
     trigger OnRun()
@@ -567,7 +569,7 @@ codeunit 6060128 "MM Member WebService"
         member.Import ();
 
         InsertImportEntry ('BlockMembership', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo ('BlockMembershipMembers-%1.xml', Format (CurrentDateTime(), 0, 9) );
+        ImportEntry."Document Name" := StrSubstNo ('BlockMembership-%1.xml', Format (CurrentDateTime(), 0, 9) );
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -600,6 +602,52 @@ codeunit 6060128 "MM Member WebService"
     end;
 
     [Scope('Personalization')]
+    procedure BlockMember(var member: XMLport "MM Block Membership Member";ScannerStationId: Code[10])
+    var
+        ImportEntry: Record "Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
+        OutStr: OutStream;
+        MemberInfoCapture: Record "MM Member Info Capture";
+    begin
+
+        //-MM1.44 [400429]
+        member.Import ();
+
+        InsertImportEntry ('BlockMember', ImportEntry);
+        ImportEntry."Document Name" := StrSubstNo ('BlockMember-%1.xml', Format (CurrentDateTime(), 0, 9) );
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        member.SetDestination(OutStr);
+        member.Export;
+        ImportEntry.Modify(true);
+
+        Commit ();
+
+        if (NaviConnectSyncMgt.ProcessImportEntry (ImportEntry)) then begin
+
+          member.ClearResponse ();
+          MemberInfoCapture.SetCurrentKey ("Import Entry Document ID");
+          MemberInfoCapture.SetFilter ("Import Entry Document ID", '=%1', ImportEntry."Document ID");
+          MemberInfoCapture.FindFirst ();
+
+          member.AddResponse (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Member No", MemberInfoCapture."External Card No.");
+
+          MemberInfoCapture.DeleteAll ();
+        end else begin
+          member.AddErrorResponse (ImportEntry."Error Message");
+        end;
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        member.SetDestination(OutStr);
+        member.Export;
+        ImportEntry.Modify(true);
+
+        Commit;
+        //+MM1.44 [400429]
+    end;
+
+    [Scope('Personalization')]
     procedure GetMembershipRoles(var roles: XMLport "MM Get Member GDPR Roles")
     var
         ImportEntry: Record "Nc Import Entry";
@@ -608,7 +656,7 @@ codeunit 6060128 "MM Member WebService"
         MemberInfoCapture: Record "MM Member Info Capture";
     begin
 
-        //-MM1.35 [333592]�
+        //-MM1.35 [333592]õ
         roles.Import ();
 
         InsertImportEntry ('GetMembershipRoles', ImportEntry);
@@ -1188,6 +1236,7 @@ codeunit 6060128 "MM Member WebService"
         Member: Record "MM Member";
         MemberCard: Record "MM Member Card";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        LimitLogEntry: Integer;
     begin
 
         MembershipEntryNo := MembershipMgr.GetMembershipFromExtMemberNo (ExternalMemberNo);
@@ -1219,6 +1268,14 @@ codeunit 6060128 "MM Member WebService"
         Success := 0;
         ResponseMessage := '';
 
+        //-#407401 [407401]
+        LimitLogEntry := 0;
+        MemberLimitationMgr.WS_CheckLimitMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success); //MM1.21 [284653]
+        if (Success <> 0) then
+          exit (Success);
+        //+#407401 [407401]
+
+
         if (MembershipSetup."Ticket Item Barcode" <> '') then begin
 
           //-MM1.33 [326756]
@@ -1231,7 +1288,7 @@ codeunit 6060128 "MM Member WebService"
 
         end;
 
-        MemberLimitationMgr.WS_CheckLimitMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, Success); //MM1.21 [284653]
+        MemberLimitationMgr.WS_CheckLimitMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success); //MM1.21 [284653]
         exit (Success);
     end;
 
@@ -1352,6 +1409,7 @@ codeunit 6060128 "MM Member WebService"
         CreateImportType ('MEMBER-17', 'MemberManagement', 'GetMembershipRoles');
         CreateImportType ('MEMBER-18', 'MemberManagement', 'GetSetAutoRenewOption');
         CreateImportType ('MEMBER-19', 'MemberManagement', 'GetSetMemberComOption');
+        CreateImportType ('MEMBER-20', 'MemberManagement', 'BlockMember');
 
         Commit;
     end;

@@ -2,6 +2,7 @@ table 6059822 "Smart Email"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
     // NPR5.44/THRO/20180723 CASE 310042 Added field 200 "NpXml Template Code"
+    // NPR5.55/THRO/20200511 CASE 343266 Added Provider option Mailchimp + field "Merge Language (Mailchimp)"
 
     Caption = 'Smart Email';
     DrillDownPageID = "Smart Email List";
@@ -16,8 +17,16 @@ table 6059822 "Smart Email"
         field(3;Provider;Option)
         {
             Caption = 'Provider';
-            OptionCaption = 'Campaign Monitor';
-            OptionMembers = "Campaign Monitor";
+            OptionCaption = 'Campaign Monitor,Mailchimp';
+            OptionMembers = "Campaign Monitor",Mailchimp;
+
+            trigger OnValidate()
+            begin
+                //-NPR5.55 [343266]
+                if Provider <> xRec.Provider then
+                  Validate("Smart Email ID",'');
+                //+NPR5.55 [343266]
+            end;
         }
         field(10;Description;Text[30])
         {
@@ -54,17 +63,19 @@ table 6059822 "Smart Email"
         field(100;"Smart Email ID";Text[50])
         {
             Caption = 'Smart Email ID';
-            TableRelation = "Transactional JSON Result".ID;
+            TableRelation = "Transactional JSON Result".ID WHERE (Provider=FIELD(Provider));
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
             var
-                CampaignMonitorMgt: Codeunit "CampaignMonitor Mgt.";
+                TransactionalEmailMgt: Codeunit "Transactional Email Mgt.";
             begin
                 if "Smart Email ID" <> '' then
-                  CampaignMonitorMgt.GetSmartEmailDetails(Rec);
+                  //-NPR5.55 [343266]
+                  TransactionalEmailMgt.GetSmartEmailDetails(Rec);
+                  //+NPR5.55 [343266]
             end;
         }
         field(110;"Smart Email Name";Text[50])
@@ -95,6 +106,12 @@ table 6059822 "Smart Email"
         {
             Caption = 'NpXml Template Code';
             TableRelation = "NpXml Template";
+        }
+        field(300;"Merge Language (Mailchimp)";Option)
+        {
+            Caption = 'Merge Language (Mailchimp)';
+            OptionCaption = ' ,mailchimp,handlebars';
+            OptionMembers = " ",mailchimp,handlebars;
         }
     }
 

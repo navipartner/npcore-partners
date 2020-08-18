@@ -127,7 +127,7 @@ report 6059900 "Analyse Task Queue Usage"
                 until TaskLog.Next = 0;
                 
                 
-                /*virker men er langsom - pr�ver at vende den om
+                /*virker men er langsom - pr¢ver at vende den om
                 IF TMPDateTimeGroup.FINDSET THEN REPEAT
                   Dia.UPDATE(2, TMPDateTimeGroup."No.");
                   //find entries starting before this period start, and ends after this period ends

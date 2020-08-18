@@ -4,6 +4,7 @@ page 6059941 "SMS Template Card"
     // NPR5.30/THRO/20170203 CASE 263182 Added Recipient
     // NPR5.38/THRO/20180108 CASE 301396 Added Action Send Batch SMS
     // NPR5.40/THRO/20180302 CASE 304312 Added "Report ID" and Option to add report link via Azure function
+    // NPR5.55/LS/20200407  CASE 387142 Changed caption of Action "Send test SMS" from "Send test SMS" to "Send SMS"
 
     Caption = 'SMS Template Card';
     PromotedActionCategories = 'New,Process,Report,Functions';
@@ -90,9 +91,9 @@ page 6059941 "SMS Template Card"
             group(Functions)
             {
                 Caption = 'Functions';
-                action("Send test SMS")
+                action("Send SMS")
                 {
-                    Caption = 'Send test SMS';
+                    Caption = 'Send SMS';
                     Image = SendTo;
                     Promoted = true;
                     PromotedCategory = Category4;

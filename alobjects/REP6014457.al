@@ -8,6 +8,7 @@ report 6014457 "Sales Stat/Analysis"
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Picture
+    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales StatAnalysis.rdlc';
 
@@ -862,9 +863,9 @@ report 6014457 "Sales Stat/Analysis"
     procedure Pct(var Value: Decimal;var Total: Decimal) Calculation: Decimal
     begin
         //-NPR5.30
-        // IF v�rdi<>0 THEN
+        // IF værdi<>0 THEN
         // IF total<>0 THEN
-        // resultat:=(v�rdi/total)*100
+        // resultat:=(værdi/total)*100
         // ELSE
         // resultat:=0;
         if (Value <> 0) and (Total <> 0) then

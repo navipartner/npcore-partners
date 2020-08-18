@@ -1,7 +1,7 @@
 table 6014401 Register
 {
     // //-NPR-Dankort1.0c ved Nikolai Pedersen
-    //   Credit Card Solution - tilf�jet Sagem terminal
+    //   Credit Card Solution - tilf¢jet Sagem terminal
     // 
     // NPR4.10/VB/20150601  CASE 213003 Added field Control Add-in Type
     // NPR4.12/VB/20150708  CASE 213003 Added fields Client Decimal Separator and client Thousands Separator

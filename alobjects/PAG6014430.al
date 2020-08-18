@@ -2,10 +2,10 @@ page 6014430 "Credit Voucher List"
 {
     // 
     // 001 - Henrik Ohm
-    // udenReserveret(true/false) tilf�jet, s� ikke bruger reserv tilg.beviser
+    // udenReserveret(true/false) tilf¢jet, så ikke bruger reserv tilg.beviser
     // 
     // //-NPR3.0b ved Nikolai Pedersen
-    //   find tilf�jet
+    //   find tilf¢jet
     // NPR5.29/TS/20161220  CASE 255679 Added COPY of Credit Voucher
     // NPR5.33/TS  /20170619  CASE 281210 Adding Report Credit Voucher
     // NPR5.33/JLK /20170620  CASE 281210 Added Credit Voucher Reports

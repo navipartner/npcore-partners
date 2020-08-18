@@ -4,6 +4,7 @@ table 6014478 "Retail Logo"
     // NPR5.29/MMV /20161207 CASE 252253 Changed field 1 type from Code to Integer. Data upgrade being handled by CU 6059990.
     // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
     // NPR5.40/MMV /20180306 CASE 284505 Added fields for permanent storage of ESCPOS specific constants per logo.
+    // NPR5.55/MITH/20200619 CASE 404276 Added fields to store a 1-bit version of the logo and its size (Boca Printer related)
 
     Caption = 'Retail Logo';
 
@@ -65,6 +66,14 @@ table 6014478 "Retail Logo"
         field(103;"ESCPOS Cmd High Byte";Integer)
         {
             Caption = 'ESCPOS Cmd High Byte';
+        }
+        field(120;OneBitLogo;BLOB)
+        {
+            Caption = '1-bit Logo';
+        }
+        field(121;OneBitLogoByteSize;Integer)
+        {
+            Caption = '1-bit Logo Size in Bytes';
         }
     }
 

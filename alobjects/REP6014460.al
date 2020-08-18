@@ -4,6 +4,9 @@ report 6014460 "Balancing Report -A4 - NEW"
     // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
     // NPR5.50/JAKUBV/20190603  CASE 345706 Transport NPR5.50 - 3 June 2019
     // NPR5.51/ZESO/20190717 CASE 360693 Corrected visibility property of EFT, Set All Print Options to Yes on running report
+    // NPR5.55/ZESO/20200511 CASE 394936 Removed Duplicate Tax Section and move correct one below Discount section
+    // NPR5.55/BHR /20200525 CASE 404681 Replace POSEntry."POS Store Code" with POSEntry."POS Unit No."
+    // NPR5.55/ZESO/20200724 CASE 416046 Display both POS Store Code and POS Unit No.
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Balancing Report -A4 - NEW.rdlc';
 
@@ -62,6 +65,9 @@ report 6014460 "Balancing Report -A4 - NEW"
             {
             }
             column(EFTlbl_;EFTlbl)
+            {
+            }
+            column(POSUnitLbl_;POSUnitLbl)
             {
             }
             column(WorkshiftNo_;"POS Workshift Checkpoint"."Entry No.")
@@ -424,7 +430,7 @@ report 6014460 "Balancing Report -A4 - NEW"
             column(ClosingDate_;POSEntry."Entry Date")
             {
             }
-            column(RegisterNoLbl_;RegisterNoLbl)
+            column(StoreLbl_;StoreLbl)
             {
             }
             column(SalesTicketNoLbl_;SalesTicketNoLbl)
@@ -870,7 +876,7 @@ report 6014460 "Balancing Report -A4 - NEW"
         VarMain: Integer;
         VarBin: Integer;
         POSEntry: Record "POS Entry";
-        RegisterNoLbl: Label 'Register No.';
+        StoreLbl: Label 'POS Store';
         SalesTicketNoLbl: Label 'Sales Ticket No';
         OpeningHrsLbl: Label 'Opening Hours';
         ClosingDatelbl: Label 'Closing Date';
@@ -926,5 +932,6 @@ report 6014460 "Balancing Report -A4 - NEW"
         PrintDiscount: Boolean;
         PrintCountedAmtInclFloat: Boolean;
         PrintEFT: Boolean;
+        POSUnitLbl: Label 'POS Unit';
 }
 

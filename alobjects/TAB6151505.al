@@ -11,6 +11,7 @@ table 6151505 "Nc Import Type"
     // NC2.12/MHA /20180502  CASE 313362 Added fields 400 "Server File Enabled", 405 "Server File Path"
     // NC2.16/MHA /20180917  CASE 328432 Added field 203 "Sftp"
     // NPR5.54/CLVA/20200127 CASE 366790 Added field "XML Stylesheet"
+    // NPR5.55/MHA /20200604  CASE 408100 Added fields 520 "Max. Retry Count", 530 "Delay between Retries"
 
     Caption = 'Nc Import Type';
     LookupPageID = "Nc Import Types";
@@ -133,6 +134,18 @@ table 6151505 "Nc Import Type"
         field(500;"XML Stylesheet";BLOB)
         {
             Caption = 'XML Stylesheet';
+        }
+        field(520;"Max. Retry Count";Integer)
+        {
+            BlankZero = true;
+            Caption = 'Max. Retry Count';
+            Description = 'NPR5.55';
+            MinValue = 0;
+        }
+        field(530;"Delay between Retries";Duration)
+        {
+            Caption = 'Delay between Retries';
+            Description = 'NPR5.55';
         }
     }
 

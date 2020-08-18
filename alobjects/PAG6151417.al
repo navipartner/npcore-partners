@@ -1,14 +1,15 @@
-page 6151417 "Magento Item Group Subform"
+page 6151417 "Magento Child Categories"
 {
     // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
-    // MAG1.04/MH/20150217  CASE 199932 Added function SetParentItemGroup() which is used when for defining parent on Insert
+    // MAG1.04/MH/20150217  CASE 199932 Added function SetParentCategory() which is used when for defining parent on Insert
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.09/TS  /20180108  CASE 300893 Removed Caption on Control Container
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
-    Caption = 'Magento Item Group Subform';
+    Caption = 'Magento Child Categories';
     DelayedInsert = true;
-    PageType = CardPart;
-    SourceTable = "Magento Item Group";
+    PageType = ListPart;
+    SourceTable = "Magento Category";
 
     layout
     {
@@ -17,7 +18,7 @@ page 6151417 "Magento Item Group Subform"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field(Id;Id)
                 {
                 }
                 field(Name;Name)
@@ -34,7 +35,7 @@ page 6151417 "Magento Item Group Subform"
 
                     trigger OnDrillDown()
                     begin
-                        MagentoItemGroupMgt.ItemCountDrillDown("No.");
+                        MagentoCategoryMgt.ItemCountDrillDown(Rec);
                     end;
                 }
             }
@@ -47,18 +48,18 @@ page 6151417 "Magento Item Group Subform"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "No." := ParentItemGroup.GetNewChildGroupNo();
-        "Parent Item Group No." := ParentItemGroup."No.";
-        Level := ParentItemGroup.Level + 1;
+        Id := ParentMagentoCategory.GetNewChildGroupNo();
+        "Parent Category Id" := ParentMagentoCategory.Id;
+        Level := ParentMagentoCategory.Level + 1;
     end;
 
     var
-        MagentoItemGroupMgt: Codeunit "Magento Item Group Mgt.";
-        ParentItemGroup: Record "Magento Item Group";
+        MagentoCategoryMgt: Codeunit "Magento Category Mgt.";
+        ParentMagentoCategory: Record "Magento Category";
 
-    procedure SetParentItemGroup(NewParentItemGroup: Record "Magento Item Group")
+    procedure SetParentItemGroup(NewParentMagentoCategory: Record "Magento Category")
     begin
-        ParentItemGroup := NewParentItemGroup;
+        ParentMagentoCategory := NewParentMagentoCategory;
     end;
 }
 

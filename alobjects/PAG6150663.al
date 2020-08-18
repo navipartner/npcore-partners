@@ -1,8 +1,9 @@
 page 6150663 "NPRE Waiter Pad List"
 {
-    // NPR5.34/ANEN /2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN /20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.50/TJ   /20190502 CASE 346387 Added print pre receipt action
+    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
+    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.50/TJ  /20190502 CASE 346387 Added print pre receipt action
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Waiter Pad List';
     CardPageID = "NPRE Waiter Pad";
@@ -37,6 +38,21 @@ page 6150663 "NPRE Waiter Pad List"
                 }
                 field("Multiple Seating FF";"Multiple Seating FF")
                 {
+                }
+                field("Pre-receipt Printed";"Pre-receipt Printed")
+                {
+                }
+                field(Closed;Closed)
+                {
+                    Visible = false;
+                }
+                field("Close Date";"Close Date")
+                {
+                    Visible = false;
+                }
+                field("Close Time";"Close Time")
+                {
+                    Visible = false;
                 }
             }
         }

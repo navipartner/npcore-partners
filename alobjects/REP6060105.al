@@ -50,7 +50,7 @@ report 6060105 "Terminal Sales Ticket IV"
                 Body3 := false;
                 Body1 := false;
                 FirstLineText := '';
-                //MESSAGE('F�rste=%1, EjF�rste=%2 ,F�rsteLinieText=%3 ,EjCut=%4',F�rste,EjF�rste,F�rsteLinieText,EjCut);
+                //MESSAGE('F¢rste=%1, EjF¢rste=%2 ,F¢rsteLinieText=%3 ,EjCut=%4',F¢rste,EjF¢rste,F¢rsteLinieText,EjCut);
 
                 //+NPR7
 

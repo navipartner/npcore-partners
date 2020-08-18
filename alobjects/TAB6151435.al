@@ -17,7 +17,7 @@ table 6151435 "Magento Display Config"
         {
             Caption = 'No.';
             TableRelation = IF (Type=CONST(Item)) Item
-                            ELSE IF (Type=CONST("Item Group")) "Magento Item Group"
+                            ELSE IF (Type=CONST("Item Group")) "Magento Category"
                             ELSE IF (Type=CONST(Brand)) "Magento Brand";
         }
         field(20;Type;Option)

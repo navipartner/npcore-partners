@@ -131,7 +131,7 @@ page 6014559 "Retail - Owner Role Center"
             action("Magento Item Groups")
             {
                 Caption = 'Magento Item Groups';
-                RunObject = Page "Magento Item Groups";
+                RunObject = Page "Magento Categories";
                 Visible = false;
             }
             action(Brands)

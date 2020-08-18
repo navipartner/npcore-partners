@@ -3,6 +3,7 @@ codeunit 6014635 "Item Block Mgt."
     // NPR5.38/MHA /20170104  CASE 299272 Object created - manages Item Sale- and Purchase Block
     // NPR5.43/MHA /20180619  CASE 319425 Added OnAfterInsertSaleLine POS Sales Workflow
     // NPR5.45/JKL /20180830 CASE 299272 added setup to bypass item block on different levels
+    // NPR5.55/TILA/20200416  CASE 400483 Added code that checks Purchase and Sale Blocked for Item only if Item Block module is enabled
 
 
     trigger OnRun()
@@ -317,11 +318,20 @@ codeunit 6014635 "Item Block Mgt."
     local procedure TestSaleBlocked(ItemNo: Code[20])
     var
         Item: Record Item;
+        DynamicModule: Record "Dynamic Module";
     begin
         if ItemNo = '' then
           exit;
         if not Item.Get(ItemNo) then
           exit;
+
+        //-NPR5.55 [400483]
+        DynamicModule.SetRange("Module Name", GetModuleName);
+        if not DynamicModule.FindFirst then
+          exit;
+        if not DynamicModule.Enabled then
+          exit;
+        //+NPR5.55 [400483]
 
         Item.TestField("Sale Blocked",false);
     end;
@@ -329,16 +339,25 @@ codeunit 6014635 "Item Block Mgt."
     local procedure TestPurchBlocked(ItemNo: Code[20])
     var
         Item: Record Item;
+        DynamicModule: Record "Dynamic Module";
     begin
         if ItemNo = '' then
           exit;
         if not Item.Get(ItemNo) then
           exit;
 
+        //-NPR5.55 [400483]
+        DynamicModule.SetRange("Module Name", GetModuleName);
+        if not DynamicModule.FindFirst then
+          exit;
+        if not DynamicModule.Enabled then
+          exit;
+        //+NPR5.55 [400483]
+
         Item.TestField("Purchase Blocked",false);
     end;
 
-    local procedure "--- Setup"()
+    local procedure "---Setup"()
     begin
     end;
 

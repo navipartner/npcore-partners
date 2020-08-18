@@ -1,6 +1,6 @@
 table 6060103 "BLOB buffer"
 {
-    // NPR4.000.000, 16-07-09, MH - Oprettet i forbindelse med billedindl�sning til rapporter.
+    // NPR4.000.000, 16-07-09, MH - Oprettet i forbindelse med billedindlæsning til rapporter.
 
     Caption = 'BLOB buffer';
 

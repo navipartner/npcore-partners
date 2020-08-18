@@ -1,6 +1,7 @@
 codeunit 6150866 "POS Action - Contact Select"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
+    // NPR5.55/ALPO/20200813 CASE 419139 Front-end was not refreshed properly after multiple contact selection/removal runs
 
 
     trigger OnRun()
@@ -95,6 +96,7 @@ codeunit 6150866 "POS Action - Contact Select"
         SalePOS.Validate("Customer No.", Contact."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
+        POSSale.SetModified();  //NPR5.55 [419139]
     end;
 
     local procedure RemoveContact(var POSSession: Codeunit "POS Session")
@@ -109,6 +111,7 @@ codeunit 6150866 "POS Action - Contact Select"
         SalePOS.Validate("Customer No.", '');
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
+        POSSale.SetModified();  //NPR5.55 [419139]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]

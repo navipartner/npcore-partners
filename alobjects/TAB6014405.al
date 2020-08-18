@@ -24,7 +24,7 @@ table 6014405 "Sale POS"
     // NPR5.31/AP  /20170309 CASE 266785 Removed unused fields 103 "Customer Display Line1", 104 "Customer Display Line2", 124 "Meta Trigger Error" and 125 "Meta Trigger Error String"
     //                                   Removed field 110 "Computer Name" and corresponding, unused key
     // NPR5.31/AP  /20170427 CASE 269105 Reversed removal of 5103 "Prices incl. VAT".
-    // NPR5.32/AP  /20170519 CASE 248534 Apply header defaults to lines when validating customer. Some was never set, others was not set due to refactoring of HentMomsPct and HentBel�b
+    // NPR5.32/AP  /20170519 CASE 248534 Apply header defaults to lines when validating customer. Some was never set, others was not set due to refactoring of HentMomsPct and HentBel¢b
     // NPR5.32/JDH /20170525 CASE 278031 Changed SalesPerson Code field from 20 to 10. renamed a couple of variables to English
     // NPR5.32.01/AP  /20170530 CASE 248534 More issues regarding VAT refactoring. VAT % not always set correct when updating exiting lines.
     // NPR5.36/TJ  /20170904 CASE 286283 Renamed all the danish OptionString properties to english
@@ -41,6 +41,7 @@ table 6014405 "Sale POS"
     // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Store preselected Waiterpad No. and Seating Code as well as Number of Guests on Sale POS
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
     // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
+    // NPR5.55/ALPO/20200702 CASE 380979 Incorrect amount calculation, when a customer with prices set to be vat-including is changed to a customer with VAT-excluding prices
 
     Caption = 'Sale';
 
@@ -311,6 +312,15 @@ table 6014405 "Sale POS"
                     SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
                     SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
                     SaleLinePOS.SetRange(Date, Date);
+                  //-NPR5.55 [380979]
+                  if not SaleLinePOS.IsEmpty and ("Prices Including VAT" <> xRec."Prices Including VAT") then begin
+                    SaleLinePOS.ModifyAll(Amount, 0);
+                    SaleLinePOS.ModifyAll("Amount Including VAT", 0);
+                    SaleLinePOS.ModifyAll("VAT Base Amount" ,0);
+                    SaleLinePOS.ModifyAll("Line Amount", 0);
+                    SaleLinePOS.ModifyAll("Invoice Discount Amount", 0);
+                  end;
+                  //+NPR5.55 [380979]
                     if SaleLinePOS.FindSet(true, false) then begin
                         repeat
                             xSaleLinePOS := SaleLinePOS;  //NPR5.52 [359596]
@@ -358,7 +368,7 @@ table 6014405 "Sale POS"
                 POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(Rec);
                 //+NPR5.45 [326466]
 
-                //�ndring foretaget for at kunne validere p� nummer og slette rabatter p� linier, ved �ndring af kundenummer.
+                //Ændring foretaget for at kunne validere på nummer og slette rabatter på linier, ved ændring af kundenummer.
                 Modify;
 
                 //-NPR5.30 [261728]
@@ -546,12 +556,12 @@ table 6014405 "Sale POS"
         field(111; "Retursalg Bonnummer"; Code[20])
         {
             Caption = 'Reversesale Ticket No.';
-            Description = 'Giver mulighed for at tilbagef�re KUN �N bon - benyttet i CU Ekspeditionsmenu';
+            Description = 'Giver mulighed for at tilbagef¢re KUN ÉN bon - benyttet i CU Ekspeditionsmenu';
         }
         field(112; Parameters; Text[250])
         {
             Caption = 'Parameters';
-            Description = 'Overf�r parametre fra ekspeditionen til underfunktioner. Brug f.eks.  � som separator';
+            Description = 'Overf¢r parametre fra ekspeditionen til underfunktioner. Brug f.eks.  Ÿ som separator';
         }
         field(113; "From Quote no."; Code[20])
         {

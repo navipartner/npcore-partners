@@ -6,6 +6,7 @@ page 6059931 "Doc. Exch. Setup"
     // NPR5.29/BR/20170117 CASE 263705 New Fields added fro FTP Import
     // NPR5.33/BR/20170216 CASE 266527 Added fields for FTP and local file export
     // NPR5.38/MHA /20180105  CASE 301053 Removed empty function RequestEDI() and Action RequestEDI
+    // NPR5.55/MHA /20200623  CASE 400777 Added Page Action "Run Document Exchange"
 
     Caption = 'Doc. Exch. Setup';
     DeleteAllowed = false;
@@ -149,6 +150,21 @@ page 6059931 "Doc. Exch. Setup"
                 Caption = 'Doc. Exchange Paths';
                 Image = CopyBOMVersion;
                 RunObject = Page "Doc. Exchange Paths";
+            }
+            action("Run Document Exchange")
+            {
+                Caption = 'Run Document Exchange';
+                Image = Start;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                begin
+                    //-NPR5.55 [400777]
+                    CODEUNIT.Run(CODEUNIT::"Doc. Exch. File Mgt.");
+                    //+NPR5.55 [400777]
+                end;
             }
         }
     }

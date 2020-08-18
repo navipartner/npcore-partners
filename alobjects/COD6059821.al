@@ -2,6 +2,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
 {
     // NPR5.38/THRO/20180108 CASE 286713 Object created
     // NPR5.44/THRO/20180723 CASE 310042 Use NpXml to generate data to Campaign Monitor data
+    // NPR5.55/THRO/20200511 CASE 343266 Changed PK on Transactional Email Setup + Multiple Providers
 
 
     trigger OnRun()
@@ -33,7 +34,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
         JArray: DotNet JArray;
         I: Integer;
     begin
-        TransactionalEmailSetup.Get;
+        TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
         Initialize(GetSmartEmailListURL(TransactionalEmailSetup."Client ID", ''), 'GET');
 
         if not ExecuteWebServiceRequest then
@@ -45,6 +46,9 @@ codeunit 6059821 "CampaignMonitor Mgt."
             JObject := JArray.Item(I);
             if not IsNull(JObject) then begin
                 TransactionalJSONResult.Init;
+            //-NPR5.55 [343266]
+            TransactionalJSONResult.Provider := TransactionalJSONResult.Provider::"Campaign Monitor";
+            //+NPR5.55 [343266]
                 TransactionalJSONResult."Entry No" := I;
                 TransactionalJSONResult.ID := GetString(JObject, 'ID');
                 TransactionalJSONResult.Name := CopyStr(GetString(JObject, 'Name'), 1, MaxStrLen(TransactionalJSONResult.Name));
@@ -55,60 +59,60 @@ codeunit 6059821 "CampaignMonitor Mgt."
         end;
     end;
 
-    procedure GetSmartEmailDetails(var TransactionalEmail: Record "Smart Email")
+    procedure GetSmartEmailDetails(var SmartEmail: Record "Smart Email")
     var
-        TransactionalEmailVariable: Record "Smart Email Variable";
+        SmartEmailVariable: Record "Smart Email Variable";
         TempVariable: Record "Smart Email Variable" temporary;
         JObject: DotNet JObject;
         JArray: DotNet JArray;
         I: Integer;
     begin
-        TransactionalEmail.TestField("Smart Email ID");
+        SmartEmail.TestField("Smart Email ID");
 
-        Initialize(GetSmartEmailDetailsURL(TransactionalEmail."Smart Email ID"), 'GET');
+        Initialize(GetSmartEmailDetailsURL(SmartEmail."Smart Email ID"),'GET');
 
         if not ExecuteWebServiceRequest then
             Error(GetLastErrorText);
 
         JObject := JObject.Parse(GetWebResonseText);
 
-        TransactionalEmail.Status := GetString(JObject, 'Status');
-        TransactionalEmail."Smart Email Name" := CopyStr(GetString(JObject, 'Name'), 1, MaxStrLen(TransactionalEmail."Smart Email Name"));
+        SmartEmail.Status := GetString(JObject,'Status');
+        SmartEmail."Smart Email Name" := CopyStr(GetString(JObject,'Name'),1,MaxStrLen(SmartEmail."Smart Email Name"));
         if GetJToken(JObject, 'Properties', JObject) then begin
-            TransactionalEmail.From := CopyStr(GetString(JObject, 'From'), 1, MaxStrLen(TransactionalEmail.From));
-            TransactionalEmail."Reply To" := CopyStr(GetString(JObject, 'ReplyTo'), 1, MaxStrLen(TransactionalEmail."Reply To"));
-            TransactionalEmail.Subject := CopyStr(GetString(JObject, 'Subject'), 1, MaxStrLen(TransactionalEmail.Subject));
-            TransactionalEmail."Preview Url" := CopyStr(GetString(JObject, 'HtmlPreviewUrl'), 1, MaxStrLen(TransactionalEmail."Preview Url"));
+          SmartEmail.From := CopyStr(GetString(JObject,'From'),1,MaxStrLen(SmartEmail.From));
+          SmartEmail."Reply To" := CopyStr(GetString(JObject,'ReplyTo'),1,MaxStrLen(SmartEmail."Reply To"));
+          SmartEmail.Subject := CopyStr(GetString(JObject,'Subject'),1,MaxStrLen(SmartEmail.Subject));
+          SmartEmail."Preview Url" := CopyStr(GetString(JObject,'HtmlPreviewUrl'),1,MaxStrLen(SmartEmail."Preview Url"));
             if GetJToken(JObject, 'Content', JObject) then
                 if GetJToken(JObject, 'EmailVariables', JArray) then
                     for I := 0 to JArray.Count() - 1 do begin
                         TempVariable.Init;
-                        TempVariable."Transactional Email Code" := TransactionalEmail.Code;
+                TempVariable."Transactional Email Code" := SmartEmail.Code;
                         TempVariable."Line No." := I;
                         TempVariable."Variable Name" := JArray.Item(I).ToString();
                         TempVariable.Insert;
                     end;
         end;
-        TransactionalEmailVariable.SetRange("Transactional Email Code", TransactionalEmail.Code);
-        if TransactionalEmailVariable.FindSet then
+        SmartEmailVariable.SetRange("Transactional Email Code",SmartEmail.Code);
+        if SmartEmailVariable.FindSet then
             repeat
-                TempVariable.SetRange("Variable Name", TransactionalEmailVariable."Variable Name");
+            TempVariable.SetRange("Variable Name",SmartEmailVariable."Variable Name");
                 if TempVariable.FindSet then
                     TempVariable.DeleteAll
                 else
-                    TransactionalEmailVariable.Delete;
-            until TransactionalEmailVariable.Next = 0;
-        I := TransactionalEmailVariable."Line No." + 10000;
+              SmartEmailVariable.Delete;
+          until SmartEmailVariable.Next = 0;
+        I := SmartEmailVariable."Line No." + 10000;
         TempVariable.Reset;
         if TempVariable.FindSet then
             repeat
-                TransactionalEmailVariable := TempVariable;
-                TransactionalEmailVariable."Line No." := I;
+            SmartEmailVariable := TempVariable;
+            SmartEmailVariable."Line No." := I;
                 I += 10000;
-                TransactionalEmailVariable."Merge Table ID" := TransactionalEmail."Merge Table ID";
-                TransactionalEmailVariable.Insert;
+            SmartEmailVariable."Merge Table ID" := SmartEmail."Merge Table ID";
+            SmartEmailVariable.Insert;
             until TempVariable.Next = 0;
-        TransactionalEmail.Modify;
+        SmartEmail.Modify;
     end;
 
     procedure GetMessageDetails(EmailLog: Record "Transactional Email Log")
@@ -141,7 +145,9 @@ codeunit 6059821 "CampaignMonitor Mgt."
     var
         Attachment: Record "E-mail Attachment" temporary;
     begin
-        SendSmartEmailWAttachment(TransactionalEmail, Recipient, Cc, Bcc, RecRef, Attachment, Silent);
+        //-NPR5.55 [343266]
+        exit(SendSmartEmailWAttachment(TransactionalEmail,Recipient,Cc,Bcc,RecRef,Attachment,Silent));
+        //+NPR5.55 [343266]
     end;
 
     procedure SendSmartEmailWAttachment(TransactionalEmail: Record "Smart Email"; Recipient: Text; Cc: Text; Bcc: Text; RecRef: RecordRef; var Attachment: Record "E-mail Attachment"; Silent: Boolean) ErrorMessage: Text
@@ -169,7 +175,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
         XmlDoc: DotNet npNetXmlDocument;
     begin
         TransactionalEmail.TestField("Smart Email ID");
-        TransactionalEmailSetup.Get;
+        TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
 
         Clear(HttpWebRequestMgt);
         HttpWebRequestMgt.Initialize(SendSmartEmailURL(TransactionalEmail."Smart Email ID"));
@@ -222,6 +228,9 @@ codeunit 6059821 "CampaignMonitor Mgt."
             if not IsNull(JObject) then begin
                 EmailLog.Init;
                 EmailLog."Entry No." := 0;
+            //-NPR5.55 [343266]
+            EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
+            //+NPR5.55 [343266]
                 EmailLog."Message ID" := GetString(JObject, 'MessageID');
                 EmailLog.Status := GetString(JObject, 'Status');
                 EmailLog.Recipient := CopyStr(GetString(JObject, 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
@@ -246,7 +255,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
         OStream: OutStream;
         I: Integer;
     begin
-        TransactionalEmailSetup.Get;
+        TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
 
         Clear(HttpWebRequestMgt);
         HttpWebRequestMgt.Initialize(SendClassicEmailURL(TransactionalEmailSetup."Client ID"));
@@ -299,6 +308,9 @@ codeunit 6059821 "CampaignMonitor Mgt."
             if not IsNull(JObject) then begin
                 EmailLog.Init;
                 EmailLog."Entry No." := 0;
+            //-NPR5.55 [343266]
+            EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
+            //+NPR5.55 [343266]
                 EmailLog."Message ID" := GetString(JObject, 'MessageID');
                 EmailLog.Status := GetString(JObject, 'Status');
                 EmailLog.Recipient := CopyStr(GetString(JObject, 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
@@ -308,11 +320,19 @@ codeunit 6059821 "CampaignMonitor Mgt."
         exit('');
     end;
 
+    procedure PreviewSmartEmail(SmartEmail: Record "Smart Email")
+    begin
+        //-NPR5.55 [343266]
+        if SmartEmail."Preview Url" <> '' then
+          HyperLink(SmartEmail."Preview Url");
+        //+NPR5.55 [343266]
+    end;
+
     local procedure Initialize(URL: Text; Method: Text[6])
     var
         TransactionalEmailSetup: Record "Transactional Email Setup";
     begin
-        TransactionalEmailSetup.Get;
+        TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
         TransactionalEmailSetup.TestField("Client ID");
         TransactionalEmailSetup.TestField("API Key");
 
@@ -337,15 +357,6 @@ codeunit 6059821 "CampaignMonitor Mgt."
             HttpWebRequestMgt.ProcessFaultXMLResponse('', '', '', '');
     end;
 
-    local procedure CheckCredentials()
-    var
-        TransactionalEmailSetup: Record "Transactional Email Setup";
-    begin
-        TransactionalEmailSetup.Get;
-        TransactionalEmailSetup.TestField("Client ID");
-        TransactionalEmailSetup.TestField("API Key");
-    end;
-
     local procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
     var
         Convert: DotNet npNetConvert;
@@ -358,7 +369,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
     var
         TransactionalEmailSetup: Record "Transactional Email Setup";
     begin
-        TransactionalEmailSetup.Get;
+        TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
         TransactionalEmailSetup.TestField("API URL");
         exit(TransactionalEmailSetup."API URL" + PartialURL);
     end;
@@ -425,7 +436,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
         exit(String);
     end;
 
-    procedure DefaultAPIURL(): Text
+    local procedure DefaultAPIURL(): Text
     begin
         exit('https://api.createsend.com/api/v3.1');
     end;
@@ -589,6 +600,13 @@ codeunit 6059821 "CampaignMonitor Mgt."
         MimeMapping: DotNet npNetMimeMapping;
     begin
         exit(MimeMapping.GetMimeMapping(FileName));
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6059820, 'OnBeforeInsertEvent', '', false, false)]
+    local procedure OnInsertTransactionalEmailSetup(var Rec: Record "Transactional Email Setup";RunTrigger: Boolean)
+    begin
+        if Rec."API URL" = '' then
+          Rec."API URL" := DefaultAPIURL;
     end;
 }
 

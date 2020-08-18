@@ -1,28 +1,22 @@
-codeunit 6059833 "RFID Post Print Save Values"
+codeunit 6059833 "RFID Post Print Restore Record"
 {
     // NPR5.48/MMV /20181205 CASE 327107 Created object
     // 
     // This object can be set as "Post processing codeunit" on a template.
-    // If any RFID values were printed it will prompt the user about storing these as item cross reference in the system. This implies that the users has first double check the print quality.
+    // It will show a list of all tags printed with their unique values
     // 
     // CU 6059832 should be "Pre Processing" on those same templates
+    // 
+    // NPR5.55/MMV /20200708 CASE 407265 Changed commit timing.
 
 
     trigger OnRun()
     begin
     end;
 
-    local procedure SaveRFIDValues(var RecRef: RecordRef)
-    var
-        RFIDMgt: Codeunit "RFID Mgt.";
-        tmpRetailJournalLine: Record "Retail Journal Line" temporary;
-    begin
-        RFIDMgt.SaveRFIDValues(RecRef);
-    end;
-
     local procedure RestoreRecord(var RecRef: RecordRef)
     var
-        RFIDPrePrintGenerateValues: Codeunit "RFID Pre Print Generate Values";
+        RFIDPrePrintGenerateValues: Codeunit "RFID Pre Print Generate Buffer";
         OriginalRetailJournalLine: Record "Retail Journal Line";
     begin
         if not RFIDPrePrintGenerateValues.GetOriginalRecord(OriginalRetailJournalLine) then
@@ -37,12 +31,14 @@ codeunit 6059833 "RFID Post Print Save Values"
     var
         RetailJournalLine: Record "Retail Journal Line";
     begin
-        if TemplateHeader."Post Processing Codeunit" <> CODEUNIT::"RFID Post Print Save Values" then
+        if TemplateHeader."Post Processing Codeunit" <> CODEUNIT::"RFID Post Print Restore Record" then
           exit;
         if RecRef.Number <> DATABASE::"Retail Journal Line" then
           exit;
 
-        SaveRFIDValues(RecRef);
+        //-NPR5.55 [407265]
+        //SaveRFIDValues(RecRef);
+        //+NPR5.55 [407265]
         RestoreRecord(RecRef);
     end;
 }

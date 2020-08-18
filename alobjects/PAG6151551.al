@@ -24,6 +24,7 @@ page 6151551 "NpXml Template Card"
     // NC2.08/THRO/20171124  CASE 297308 Added "JSON Root is Array"  -only visible for Json Rest
     // NC2.08/MHA /20171206  CASE 265541 Added field 5405 "Use JSON Numbers"
     // NC2.22/MHA /20190711  CASE 361775 Removed action "Setup from Wsdl"
+    // NPR5.55/MHA /20200630  CASE 411410 Added batch fields "Batch Last Run", "Runtime Error", "Last Error Message", "FTP Filename (Fixed)"
 
     Caption = 'Xml Template';
     DelayedInsert = true;
@@ -145,6 +146,18 @@ page 6151551 "NpXml Template Card"
                 field("Max Records per File"; "Max Records per File")
                 {
                 }
+                field("Batch Last Run";"Batch Last Run")
+                {
+                    Editable = false;
+                }
+                field("Runtime Error";"Runtime Error")
+                {
+                    Editable = false;
+                }
+                field("Last Error Message";"Last Error Message")
+                {
+                    Editable = false;
+                }
                 part(NpXmlBatchFilters; "NpXml Batch Filters")
                 {
                     ShowFilter = false;
@@ -200,11 +213,15 @@ page 6151551 "NpXml Template Card"
                     field("FTP Port"; "FTP Port")
                     {
                     }
+                    field("FTP Passive";"FTP Passive")
+                    {
+                    }
                     field("FTP Directory"; "FTP Directory")
                     {
                     }
-                    field("FTP Passive"; "FTP Passive")
+                    field("FTP Filename (Fixed)";"FTP Filename (Fixed)")
                     {
+                        Importance = Additional;
                     }
                 }
                 group(API)
@@ -430,6 +447,26 @@ page 6151551 "NpXml Template Card"
                     Clear(NpXmlBatchMgt);
                     NpXmlBatchMgt.RunBatch(Rec);
                     //+NC1.13
+                end;
+            }
+            action("Schedule Batch Task")
+            {
+                Caption = 'Schedule Batch Task';
+                Image = NewToDo;
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    NpXmlBatchProcessing: Codeunit "NpXml Batch Processing";
+                    PageManagement: Codeunit "Page Management";
+                begin
+                    //-NPR5.55 [411410]
+                    NpXmlBatchProcessing.ScheduleBatchTask(Rec,JobQueueEntry);
+
+                    Commit;
+                    if GuiAllowed then
+                      PAGE.Run(PageManagement.GetDefaultCardPageID(DATABASE::"Job Queue Entry"),JobQueueEntry);
+                    //+NPR5.55 [411410]
                 end;
             }
             action("Archive Template")

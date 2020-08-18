@@ -114,6 +114,11 @@ table 6014406 "Sale Line POS"
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale: DrillDownPageID set to page 6150748 "POS Sale Lines Subpage"
     // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
     // NPR5.54/TSA /20200311 CASE 395683 Initialization of currency to get correct rounding precision and including discount amount in rounding
+    // NPR5.54/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
+    // NPR5.55/ALPO/20200414 CASE 398263 Set additional filter on Variant Code when looking up for a serial number; Sort serial number list by Expiration date
+    // NPR5.55/ALPO/20200424 CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
+    // NPR5.55/ALPO/20200513 CASE 404458 InPay: Line Amount and VAT Base Amount were not recalculated properly on quantity change
+    // NPR5.55/ALPO/20200703 CASE 380979 Part of 'UpdateAmounts' code extracted to a subfunction 'UpdateLineVatAmounts' to isolate execution
 
     Caption = 'Sale Line';
     DrillDownPageID = "POS Sale Lines Subpage";
@@ -311,8 +316,11 @@ table 6014406 "Sale Line POS"
                                 if Quantity = 0 then
                                     Error(Err003);
                             end;
-                            "Amount Including VAT" := "Unit Price" * Quantity;
-                            Amount := "Amount Including VAT";
+                      //-NPR5.55 [404458]-revoked
+                      //"Amount Including VAT" := "Unit Price" * Quantity;
+                      //Amount := "Amount Including VAT";
+                      //+NPR5.55 [404458]-revoked
+                      UpdateAmounts(Rec);  //NPR5.55 [404458]
                         end;
                     Type::Item:
                         begin
@@ -2297,7 +2305,7 @@ table 6014406 "Sale Line POS"
         FromLineNo: Integer;
         ToLineNo: Integer;
     begin
-        if Sum = 0 then begin               //* Sker kun f�rste gang *
+        if Sum = 0 then begin               //* Sker kun f¢rste gang *
             if Quantity = 0
               then
                 Quantity := 1;                //* Rettelse af fejl i antal under udpakning af stykliste *
@@ -2487,7 +2495,6 @@ table 6014406 "Sale Line POS"
 
     procedure UpdateAmounts(var SaleLinePOS: Record "Sale Line POS")
     var
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
         SaleLinePOS2: Record "Sale Line POS";
         TotalLineAmount: Decimal;
         TotalInvDiscAmount: Decimal;
@@ -2496,9 +2503,9 @@ table 6014406 "Sale Line POS"
         TotalQuantityBase: Decimal;
     begin
         //-NPR5.54 [395683]
-        Currency.InitRoundingPrecision ();
+        //Currency.InitRoundingPrecision ();  //NPR5.55 [380979]-revoked
         //+NPR5.54 [395683]
-
+        
         //-NPR5.31 [248534]
         with SaleLinePOS do begin
             //-NPR5.48 [335967]
@@ -2513,17 +2520,17 @@ table 6014406 "Sale Line POS"
                 SaleLinePOS2.SetFilter(Amount, '<%1', 0);
             SaleLinePOS2.SetRange("VAT Identifier", "VAT Identifier");
             SaleLinePOS2.SetRange("Tax Group Code", "Tax Group Code");
-
+        
             //-NPR5.48 [338181]
             //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
             //+NPR5.48 [338181]:= ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-
+        
             TotalLineAmount := 0;
             TotalInvDiscAmount := 0;
             TotalAmount := 0;
             TotalAmountInclVAT := 0;
             TotalQuantityBase := 0;
-
+        
             if ("VAT Calculation Type" = "VAT Calculation Type"::"Sales Tax") or
                (("VAT Calculation Type" in
                  ["VAT Calculation Type"::"Normal VAT", "VAT Calculation Type"::"Reverse Charge VAT"]) and ("VAT %" <> 0))
@@ -2536,146 +2543,259 @@ table 6014406 "Sale Line POS"
                     TotalAmountInclVAT := SaleLinePOS2."Amount Including VAT";
                     TotalQuantityBase := SaleLinePOS2."Quantity (Base)";
                 end;
-
-            //+NPR5.48 [335967]
-
-            if "Price Includes VAT" then begin
-                "Amount Including VAT" := Quantity * "Unit Price";
-                if "Discount %" <> 0 then
-                    "Discount Amount" := Round("Amount Including VAT" * "Discount %" / 100)
-                else
-                    if "Discount Amount" <> 0 then
-                        "Discount %" := Round(100 - ("Amount Including VAT" - "Discount Amount") / "Amount Including VAT" * 100, 0.0001);
-                "Amount Including VAT" := "Amount Including VAT" - "Discount Amount";
-
-                //-NPR5.48 [338181]
-
-            //-NPR5.54 [395683]
-            //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-            "Line Amount" := Round (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
-            //+NPR5.54 [395683]
-
-            //+NPR5.48 [338181]
-
-                case "VAT Calculation Type" of
-                    "VAT Calculation Type"::"Reverse Charge VAT",
-                    "VAT Calculation Type"::"Normal VAT":
-                        begin
-                            //-NPR5.48 [335967]
-                            //Amount := ROUND("Amount Including VAT"/(1 + "VAT %"/100));
-                            Amount := Round((TotalLineAmount - TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
-                                             Currency."Amount Rounding Precision") - TotalAmount;
-                            //+NPR5.48 [335967]
-                            "Amount Including VAT" := Round("Amount Including VAT");
-                            //-NPR5.51 [365487]
-                            if ("Amount Including VAT" = 0) then
-                                Amount := 0;
-                            //+NPR5.51 [365487]
-
-                            "VAT Base Amount" := Amount;
-                        end;
-                    "VAT Calculation Type"::"Sales Tax":
-                        begin
-                            //-NPR5.34 [284658]
-                            //Amount := SalesTaxCalculate.ReverseCalculateTax(
-                            //-NPR5.40 [303616]
-                            TestField("Tax Area Code");
-                            //+NPR5.40 [303616]
-                            //-NPR5.41 [311309]
-                            //Amount := SalesTaxCalculate.CalculateTax(
-                            Amount := SalesTaxCalculate.ReverseCalculateTax(
-                              //+NPR5.41 [311309]
-                              //+NPR5.34
-                              "Tax Area Code", "Tax Group Code", "Tax Liable", Rec.Date,
-                              //-NPR5.41 [311309]
-                              //  "Amount Including VAT",Quantity,0);
-                              "Amount Including VAT", "Quantity (Base)", 0);
-                            //-NPR5.41 [311309]
-                            if Amount <> 0 then
-                                "VAT %" := Round(100 * ("Amount Including VAT" - Amount) / Amount, 0.00001)
-                            else
-                                "VAT %" := 0;
-                            "Amount Including VAT" := Round("Amount Including VAT");
-                            Amount := Round(Amount);
-                            "VAT Base Amount" := Amount;
-                        end;
-                    else
-                        Error(ErrVATCalcNotSupportInPOS, FieldCaption("VAT Calculation Type"), "VAT Calculation Type");
-                end;
-            end else begin
-                Amount := Quantity * "Unit Price";
-                if "Discount %" <> 0 then
-                    "Discount Amount" := Round(Amount * "Discount %" / 100)
-                else
-                    if "Discount Amount" <> 0 then
-                        "Discount %" := Round(100 - (Amount - "Discount Amount") / Amount * 100, 0.0001);
-                Amount := Amount - "Discount Amount";
-
+        
+          //-NPR5.55 [380979]
+          UpdateLineVatAmounts(
+            SaleLinePOS, TotalLineAmount, TotalInvDiscAmount, TotalAmount, TotalAmountInclVAT);
+          //+NPR5.55 [380979]
+          //-NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
+          /*
+          //+NPR5.48 [335967]
+          IF "Price Includes VAT" THEN BEGIN
+            "Amount Including VAT" := Quantity * "Unit Price";
+            IF "Discount %" <> 0 THEN
+              "Discount Amount" := ROUND("Amount Including VAT" * "Discount %"/100)
+            ELSE
+              IF "Discount Amount" <> 0 THEN
+                "Discount %" := ROUND(100-("Amount Including VAT" - "Discount Amount")/"Amount Including VAT"*100,0.0001);
+            "Amount Including VAT" := "Amount Including VAT" - "Discount Amount";
+        
             //-NPR5.48 [338181]
-
+        
             //-NPR5.54 [395683]
             //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-            "Line Amount" := Round (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+            "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
             //+NPR5.54 [395683]
-
+        
             //+NPR5.48 [338181]
-
-                case "VAT Calculation Type" of
-                    "VAT Calculation Type"::"Reverse Charge VAT",
-                    "VAT Calculation Type"::"Normal VAT":
-                        begin
-                            //-NPR5.48 [335967]
-                            //"Amount Including VAT" := ROUND(Amount * (1 + "VAT %"/100));
-                            //Amount := ROUND(Amount);
-                            //"VAT Base Amount" := Amount;
-                            Amount := Round("Line Amount" - "Invoice Discount Amount", Currency."Amount Rounding Precision");
-                            "VAT Base Amount" := Amount;
-                            "Amount Including VAT" :=
-                              TotalAmount + Amount +
-                              Round(
-                                (TotalAmount + Amount) * "VAT %" / 100,
-                                Currency."Amount Rounding Precision", Currency.VATRoundingDirection) -
-                              TotalAmountInclVAT;
-                            //+NPR5.48 [335967]
-
-                            //-NPR5.51 [365487]
-                            if (Amount = 0) then
-                                "Amount Including VAT" := 0;
-                            //+NPR5.51 [365487]
-
-                        end;
-                    "VAT Calculation Type"::"Sales Tax":
-                        begin
-                            Amount := Round(Amount);
-                            "VAT Base Amount" := Amount;
-                            //-NPR5.34 [284658]
-                            //"Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.ReverseCalculateTax(
-                            "Amount Including VAT" := Amount + Round(SalesTaxCalculate.CalculateTax(
-                              //+NPR5.34
-                              "Tax Area Code", "Tax Group Code", "Tax Liable", Rec.Date,
-                              //-NPR5.41 [311309]
-                              //Amount,Quantity,0));
-                              Amount, "Quantity (Base)", 0));
-                            //+NPR5.41 [311309]
-                            if "VAT Base Amount" <> 0 then
-                                "VAT %" := Round(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount", 0.00001)
-                            else
-                                "VAT %" := 0;
-                        end;
-                    else
-                        Error(ErrVATCalcNotSupportInPOS, FieldCaption("VAT Calculation Type"), "VAT Calculation Type");
-                end;
-            end;
-            //-NPR5.32.01 [248534]
-            "Discount %" := Abs("Discount %");
-
-            //-NPR5.45 [323615] Discount Amount needs to be same sign as quantity field, this value propagates in posting to value entry.
-            //"Discount Amount" := ABS("Discount Amount");
-            //+NPR5.45 [323615]
-
-            //+NPR5.32.01 [248534]
+        
+            CASE "VAT Calculation Type" OF
+              "VAT Calculation Type"::"Reverse Charge VAT",
+              "VAT Calculation Type"::"Normal VAT":
+                BEGIN
+                  //-NPR5.48 [335967]
+                  //Amount := ROUND("Amount Including VAT"/(1 + "VAT %"/100));
+                  Amount:= ROUND((TotalLineAmount -TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
+                                   Currency."Amount Rounding Precision") - TotalAmount;
+                  //+NPR5.48 [335967]
+                  "Amount Including VAT" := ROUND("Amount Including VAT");
+                  //-NPR5.51 [365487]
+                  IF ("Amount Including VAT" = 0) THEN
+                    Amount := 0;
+                  //+NPR5.51 [365487]
+        
+                  "VAT Base Amount" := Amount;
+                END;
+              "VAT Calculation Type"::"Sales Tax":
+                BEGIN
+                  //-NPR5.34 [284658]
+                  //Amount := SalesTaxCalculate.ReverseCalculateTax(
+                  //-NPR5.40 [303616]
+                  TESTFIELD("Tax Area Code");
+                  //+NPR5.40 [303616]
+                  //-NPR5.41 [311309]
+                  //Amount := SalesTaxCalculate.CalculateTax(
+                  Amount := SalesTaxCalculate.ReverseCalculateTax(
+                  //+NPR5.41 [311309]
+                  //+NPR5.34
+                    "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
+                  //-NPR5.41 [311309]
+                  //  "Amount Including VAT",Quantity,0);
+                    "Amount Including VAT","Quantity (Base)",0);
+                  //-NPR5.41 [311309]
+                  IF Amount <> 0 THEN
+                    "VAT %" := ROUND(100 * ("Amount Including VAT" - Amount) / Amount,0.00001)
+                  ELSE
+                    "VAT %" := 0;
+                  "Amount Including VAT" := ROUND("Amount Including VAT");
+                  Amount := ROUND(Amount);
+                  "VAT Base Amount" := Amount;
+                END;
+              ELSE
+                ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
+            END;
+          END ELSE BEGIN
+            Amount := Quantity * "Unit Price";
+            IF "Discount %" <> 0 THEN
+              "Discount Amount" := ROUND(Amount * "Discount %"/100)
+            ELSE
+              IF "Discount Amount" <> 0 THEN
+                "Discount %" := ROUND(100-(Amount - "Discount Amount")/Amount*100,0.0001);
+            Amount := Amount - "Discount Amount";
+        
+            //-NPR5.48 [338181]
+        
+            //-NPR5.54 [395683]
+            //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
+            "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+            //+NPR5.54 [395683]
+        
+            //+NPR5.48 [338181]
+        
+            CASE "VAT Calculation Type" OF
+              "VAT Calculation Type"::"Reverse Charge VAT",
+              "VAT Calculation Type"::"Normal VAT":
+                BEGIN
+                  //-NPR5.48 [335967]
+                  //"Amount Including VAT" := ROUND(Amount * (1 + "VAT %"/100));
+                  //Amount := ROUND(Amount);
+                  //"VAT Base Amount" := Amount;
+                  Amount := ROUND("Line Amount" - "Invoice Discount Amount",Currency."Amount Rounding Precision");
+                  "VAT Base Amount" := Amount;
+                  "Amount Including VAT" :=
+                    TotalAmount + Amount +
+                    ROUND(
+                      (TotalAmount + Amount) * "VAT %" / 100,
+                      Currency."Amount Rounding Precision",Currency.VATRoundingDirection) -
+                    TotalAmountInclVAT;
+                  //+NPR5.48 [335967]
+        
+                  //-NPR5.51 [365487]
+                  IF (Amount  = 0) THEN
+                    "Amount Including VAT" := 0;
+                  //+NPR5.51 [365487]
+        
+                END;
+              "VAT Calculation Type"::"Sales Tax":
+                BEGIN
+                  Amount := ROUND(Amount);
+                  "VAT Base Amount" := Amount;
+                  //-NPR5.34 [284658]
+                  //"Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.ReverseCalculateTax(
+                  "Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.CalculateTax(
+                  //+NPR5.34
+                    "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
+                  //-NPR5.41 [311309]
+                    //Amount,Quantity,0));
+                    Amount,"Quantity (Base)",0));
+                  //+NPR5.41 [311309]
+                  IF "VAT Base Amount" <> 0 THEN
+                    "VAT %" := ROUND(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount",0.00001)
+                  ELSE
+                    "VAT %" := 0;
+                END;
+              ELSE
+                ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
+            END;
+          END;
+          //-NPR5.32.01 [248534]
+          */
+          //+NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
+        
+          "Discount %" := Abs("Discount %");
+        
+          //-NPR5.45 [323615] Discount Amount needs to be same sign as quantity field, this value propagates in posting to value entry.
+          //"Discount Amount" := ABS("Discount Amount");
+          //+NPR5.45 [323615]
+        
+          //+NPR5.32.01 [248534]
         end;
         //+NPR5.31 [248534]
+
+    end;
+
+    procedure UpdateLineVatAmounts(var SaleLinePOS: Record "Sale Line POS";TotalLineAmount: Decimal;TotalInvDiscAmount: Decimal;TotalAmount: Decimal;TotalAmountInclVAT: Decimal)
+    var
+        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+    begin
+        //-NPR5.55 [380979] (Extracted from 'UpdateAmounts')
+        if SaleLinePOS."Currency Code" <> '' then
+          Currency.Get(SaleLinePOS."Currency Code")
+        else
+          Currency.InitRoundingPrecision();
+
+        with SaleLinePOS do begin
+          if "Price Includes VAT" then begin
+            "Amount Including VAT" := Quantity * "Unit Price";
+            if "Discount %" <> 0 then
+              "Discount Amount" := Round("Amount Including VAT" * "Discount %" / 100, Currency."Amount Rounding Precision")
+            else
+              if "Discount Amount" <> 0 then begin
+                "Discount Amount" := Round("Discount Amount", Currency."Amount Rounding Precision");
+                "Discount %" := Round(100 - ("Amount Including VAT" - "Discount Amount") / "Amount Including VAT" * 100, 0.0001);
+              end;
+            "Amount Including VAT" := Round("Amount Including VAT" - "Discount Amount", Currency."Amount Rounding Precision");
+            "Line Amount" := Round (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+
+            case "VAT Calculation Type" of
+              "VAT Calculation Type"::"Reverse Charge VAT",
+              "VAT Calculation Type"::"Normal VAT":
+                begin
+                  Amount :=
+                    Round(
+                      (TotalLineAmount - TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
+                      Currency."Amount Rounding Precision") -
+                    TotalAmount;
+                  "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
+                  if "Amount Including VAT" = 0 then
+                    Amount := 0;
+                  "VAT Base Amount" := Amount;
+                end;
+
+              "VAT Calculation Type"::"Sales Tax":
+                begin
+                  TestField("Tax Area Code");
+                  Amount := SalesTaxCalculate.ReverseCalculateTax(
+                    "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
+                    "Amount Including VAT","Quantity (Base)",0);
+                  if Amount <> 0 then
+                    "VAT %" := Round(100 * ("Amount Including VAT" - Amount) / Amount, 0.00001)
+                  else
+                    "VAT %" := 0;
+                  "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
+                  Amount := Round(Amount, Currency."Amount Rounding Precision");
+                  "VAT Base Amount" := Amount;
+                end;
+              else
+                Error(ErrVATCalcNotSupportInPOS,FieldCaption("VAT Calculation Type"),"VAT Calculation Type");
+            end;
+          end else begin
+            Amount := Quantity * "Unit Price";
+            if "Discount %" <> 0 then
+              "Discount Amount" := Round(Amount * "Discount %" / 100, Currency."Amount Rounding Precision")
+            else
+              if "Discount Amount" <> 0 then begin
+                "Discount Amount" := Round("Discount Amount", Currency."Amount Rounding Precision");
+                "Discount %" := Round(100 - (Amount - "Discount Amount") / Amount * 100, 0.0001);
+              end;
+            Amount := Round(Amount - "Discount Amount", Currency."Amount Rounding Precision");
+            "Line Amount" := Round(Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+
+            case "VAT Calculation Type" of
+              "VAT Calculation Type"::"Reverse Charge VAT",
+              "VAT Calculation Type"::"Normal VAT":
+                begin
+                  Amount := Round("Line Amount" - "Invoice Discount Amount", Currency."Amount Rounding Precision");
+                  "VAT Base Amount" := Amount;
+                  "Amount Including VAT" :=
+                    TotalAmount + Amount +
+                    Round(
+                      (TotalAmount + Amount) * "VAT %" / 100,
+                      Currency."Amount Rounding Precision", Currency.VATRoundingDirection) -
+                    TotalAmountInclVAT;
+                  if Amount  = 0 then
+                    "Amount Including VAT" := 0;
+                end;
+
+              "VAT Calculation Type"::"Sales Tax":
+                begin
+                  Amount := Round(Amount, Currency."Amount Rounding Precision");
+                  "VAT Base Amount" := Amount;
+                  "Amount Including VAT" := Amount +
+                    Round(
+                      SalesTaxCalculate.CalculateTax("Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,Amount,"Quantity (Base)",0),
+                      Currency."Amount Rounding Precision");
+                  if "VAT Base Amount" <> 0 then
+                    "VAT %" := Round(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount", 0.00001)
+                  else
+                    "VAT %" := 0;
+                end;
+              else
+                Error(ErrVATCalcNotSupportInPOS,FieldCaption("VAT Calculation Type"),"VAT Calculation Type");
+            end;
+          end;
+        end;
+        //+NPR5.55 [380979] (Extracted from 'UpdateAmounts')
     end;
 
     local procedure InitFromSalePOS()
@@ -3042,43 +3162,115 @@ table 6014406 "Sale Line POS"
 
     procedure SerialNoLookup()
     var
+        xSaleLinePOS2: Record "Sale Line POS";
+    begin
+        //-NPR5.55 [398263]-revoked (moved to subfunction SerialNoLookup2())
+        /*
+        //-NPR5.48 [335967]
+        //Copied from CU 6014434 - function TR406SerialNoOnLookup
+        RetailSetup.GET;
+        TESTFIELD("Sale Type", "Sale Type"::Sale);
+        TESTFIELD(Type, Type::Item);
+        
+        GetItem;
+        Item.TESTFIELD("Costing Method", Item."Costing Method"::Specific);
+        ItemLedgerEntry.SETCURRENTKEY(Open,Positive,"Item No.","Serial No.");
+        ItemLedgerEntry.SETRANGE(Open, TRUE);
+        ItemLedgerEntry.SETRANGE(Positive, TRUE);
+        ItemLedgerEntry.SETRANGE("Item No.", "No.");
+        ItemLedgerEntry.SETFILTER("Serial No.", '<> %1', '');
+        ItemLedgerEntry.SETRANGE("Location Code", "Location Code");
+        IF NOT RetailSetup."Not use Dim filter SerialNo" THEN
+          ItemLedgerEntry.SETRANGE("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
+        IF ItemLedgerEntry.FIND('-') THEN
+          REPEAT
+            ItemLedgerEntry.SETRANGE("Serial No.", ItemLedgerEntry."Serial No.");
+            ItemLedgerEntry.FINDLAST;
+            TempItemLedgerEntry := ItemLedgerEntry;
+            TempItemLedgerEntry.INSERT;
+            ItemLedgerEntry.SETRANGE("Serial No.");
+          UNTIL ItemLedgerEntry.NEXT = 0;
+        
+        IF PAGE.RUNMODAL(PAGE::"Item - Series Number", TempItemLedgerEntry) <> ACTION::LookupOK THEN
+          EXIT;
+        
+        VALIDATE("Serial No.", TempItemLedgerEntry."Serial No.");
+        
+        TempItemLedgerEntry.CALCFIELDS("Cost Amount (Actual)");
+        VALIDATE("Unit Cost (LCY)", TempItemLedgerEntry."Cost Amount (Actual)");
+        "Custom Cost" := TRUE;
+        //+NPR5.48 [335967]
+        */
+        //+NPR5.55 [398263]-revoked (moved to subfunction SerialNoLookup2())
+        //-NPR5.55 [398263]
+        xSaleLinePOS2 := Rec;
+        if not SerialNoLookup2() then
+          exit;
+        if "Variant Code" <> xSaleLinePOS2."Variant Code" then
+          Validate("Variant Code");
+        Validate("Serial No.");
+        //+NPR5.55 [398263]
+
+    end;
+
+    procedure SerialNoLookup2(): Boolean
+    var
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        //-NPR5.48 [335967]
-        //Copied from CU 6014434 - function TR406SerialNoOnLookup
+        //NPR5.55 [398263] - code moved from SerialNoLookup()
         RetailSetup.Get;
         TestField("Sale Type", "Sale Type"::Sale);
         TestField(Type, Type::Item);
 
         GetItem;
         Item.TestField("Costing Method", Item."Costing Method"::Specific);
-        ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
+        ItemLedgerEntry.SetCurrentKey(Open,Positive,"Item No.","Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
         ItemLedgerEntry.SetRange(Positive, true);
         ItemLedgerEntry.SetRange("Item No.", "No.");
         ItemLedgerEntry.SetFilter("Serial No.", '<> %1', '');
         ItemLedgerEntry.SetRange("Location Code", "Location Code");
+        //-NPR5.55 [398263]
+        if "Variant Code" <> '' then
+          ItemLedgerEntry.SetRange("Variant Code","Variant Code");
+        //+NPR5.55 [398263]
         if not RetailSetup."Not use Dim filter SerialNo" then
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
+          ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
         if ItemLedgerEntry.Find('-') then
-            repeat
-                ItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");
-                ItemLedgerEntry.FindLast;
-                TempItemLedgerEntry := ItemLedgerEntry;
-                TempItemLedgerEntry.Insert;
-                ItemLedgerEntry.SetRange("Serial No.");
-            until ItemLedgerEntry.Next = 0;
+          repeat
+            ItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");
+            ItemLedgerEntry.FindLast;
+            TempItemLedgerEntry := ItemLedgerEntry;
+            TempItemLedgerEntry.Insert;
+            ItemLedgerEntry.SetRange("Serial No.");
+          until ItemLedgerEntry.Next = 0;
 
+        //-NPR5.55 [398263]
+        TempItemLedgerEntry.SetFilter("Expiration Date",'<>%1',0D);
+        if not TempItemLedgerEntry.IsEmpty then
+          TempItemLedgerEntry.SetCurrentKey("Expiration Date");
+        TempItemLedgerEntry.SetRange("Expiration Date");
+        if "Serial No." <> '' then
+          TempItemLedgerEntry.SetRange("Serial No.","Serial No.");
+        if TempItemLedgerEntry.FindFirst then;
+        TempItemLedgerEntry.SetRange("Serial No.");
+        //+NPR5.55 [398263]
         if PAGE.RunModal(PAGE::"Item - Series Number", TempItemLedgerEntry) <> ACTION::LookupOK then
-            exit;
+          exit(false);
 
-        Validate("Serial No.", TempItemLedgerEntry."Serial No.");
+        //VALIDATE("Serial No.", TempItemLedgerEntry."Serial No.");  //NPR5.55 [398263]-revoked
+        "Serial No." := TempItemLedgerEntry."Serial No.";  //NPR5.55 [398263]
 
         TempItemLedgerEntry.CalcFields("Cost Amount (Actual)");
-        Validate("Unit Cost (LCY)", TempItemLedgerEntry."Cost Amount (Actual)");
+        //VALIDATE("Unit Cost (LCY)", TempItemLedgerEntry."Cost Amount (Actual)");  //NPR5.55 [398263]-revoked
+        //-NPR5.55 [398263]
+        "Variant Code" := TempItemLedgerEntry."Variant Code";
+        "Unit Cost (LCY)" := TempItemLedgerEntry."Cost Amount (Actual)";
+        "Unit Cost" := "Unit Cost (LCY)";
+        //+NPR5.55 [398263]
         "Custom Cost" := true;
-        //+NPR5.48 [335967]
+        exit(true);  //NPR5.55 [398263]
     end;
 
     procedure SerialNoValidate()

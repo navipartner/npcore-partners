@@ -12,6 +12,8 @@ report 6014446 "Salesperson Statistics"
     // NPR5.43/JDH /20180604 CASE 317971 Removed a danish unused label
     // NPR5.54/YAHA/20200306 CASE 394845 Row visibility set to false for Inventory,Photo work, Afrunding, Combination & Customer
     // NPR5.54/YAHA/20200324 CASE 394872 Removed Company Picture
+    // NPR5.55/ANPA/20200505 CASE 402925 Added '.' to Rbt1_Lbl
+    // NPR5.55/YAHA/20200610 CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Salesperson Statistics.rdlc';
 
@@ -299,7 +301,7 @@ report 6014446 "Salesperson Statistics"
         AvgDisc_Lbl = 'Average disc. %';
         SalesDisc_Lbl = 'Group Sales %';
         SalesDisc2_Lbl = 'On item no.';
-        Rbt1_Lbl = 'Uncategorized Disc';
+        Rbt1_Lbl = 'Uncategorized Disc.';
         Rbt2_Lbl = 'Period Disc.';
         Rbt3_Lbl = 'Mixed Disc.';
         Rbt4_Lbl = 'Multiple Unit Disc.';

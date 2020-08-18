@@ -7,6 +7,8 @@ table 6150660 "NPRE Waiter Pad"
     // NPR5.53/ALPO/20191210 CASE 380609 Store number of guests on waiter pad
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Waiter Pad';
     DrillDownPageID = "NPRE Waiter Pad List";
@@ -39,7 +41,8 @@ table 6150660 "NPRE Waiter Pad"
         }
         field(17; "Multiple Seating FF"; Integer)
         {
-            CalcFormula = Count ("NPRE Seating - Waiter Pad Link" WHERE("Waiter Pad No." = FIELD("No.")));
+            CalcFormula = Count("NPRE Seating - Waiter Pad Link" WHERE ("Waiter Pad No."=FIELD("No."),
+                                                                        Closed=FIELD(Closed)));
             Caption = 'Multiple Seating';
             Editable = false;
             FieldClass = FlowField;
@@ -82,6 +85,14 @@ table 6150660 "NPRE Waiter Pad"
             Caption = 'Billed Number of Guests';
             Description = 'NPR5.53';
         }
+        field(42;"No. of Guests on POS Sales";Integer)
+        {
+            CalcFormula = Sum("Sale POS"."NPRE Number of Guests" WHERE ("NPRE Pre-Set Waiter Pad No."=FIELD("No.")));
+            Caption = 'No. of Guests on POS Sales';
+            Description = 'NPR5.55';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(50; "Serving Step Code"; Code[10])
         {
             Caption = 'Serving Step Code';
@@ -120,11 +131,16 @@ table 6150660 "NPRE Waiter Pad"
             FieldClass = FlowField;
             MaxValue = 9999999;
         }
+        field(70;"Pre-receipt Printed";Boolean)
+        {
+            Caption = 'Pre-receipt Printed';
+            Description = 'NPR5.55';
+        }
         field(100; "Print Category Filter"; Code[20])
         {
             Caption = 'Print Category Filter';
             FieldClass = FlowFilter;
-            TableRelation = "NPRE Print Category";
+            TableRelation = "NPRE Print/Prod. Category";
         }
     }
 
@@ -173,6 +189,7 @@ table 6150660 "NPRE Waiter Pad"
     var
         NPHWaiterPadLine: Record "NPRE Waiter Pad Line";
         NPHSeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
+        POSInfoWaiterPadLink: Record "POS Info NPRE Waiter Pad";
     begin
         if not (NPHWaiterPad."No." <> '') then exit;
 
@@ -190,6 +207,12 @@ table 6150660 "NPRE Waiter Pad"
         NPHSeatingWaiterPadLink.Reset;
         NPHSeatingWaiterPadLink.SetFilter("Waiter Pad No.", '=%1', NPHWaiterPad."No.");
         if not NPHSeatingWaiterPadLink.IsEmpty then NPHSeatingWaiterPadLink.DeleteAll;
+
+        //-NPR5.55 [399170]
+        POSInfoWaiterPadLink.SetRange("Waiter Pad No.",NPHWaiterPad."No.");
+        if not POSInfoWaiterPadLink.IsEmpty then
+          POSInfoWaiterPadLink.DeleteAll;
+        //+NPR5.55 [399170]
     end;
 }
 

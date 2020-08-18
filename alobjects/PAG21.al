@@ -1,4 +1,4 @@
-pageextension 6014422 pageextension6014422 extends "Customer Card"
+pageextension 6014425 pageextension6014425 extends "Customer Card" 
 {
     // PN1.00/MH/20140725  NAV-AddOn: PDF2NAV
     //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting (Billing-page).
@@ -32,6 +32,7 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
     // MAG2.20/MHA /20190426 CASE 320423 Added Magento Version visibility control
     // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized,Anonymized Date,To Anonymize and Customer Anonymization functionality.
     // NPR5.53/ZESO/20200115 CASE 358656 Use Field 'To Anonymize On' instead of 'To Anonymize'.
+    // NPR5.55/ZESO/20200512 CASE 358656 Remove Reference to 'To Anonymize'
     layout
     {
         modify("Name 2")
@@ -325,7 +326,9 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
                 begin
                     //-NPR5.52 [358656]
                     TestField(Anonymized, false);
-                    TestField("To Anonymize", true);
+                    //-NPR5.55 [388813]
+                    //TESTFIELD("To Anonymize",TRUE);
+                    //+NPR5.55 [388813]
                     if (GDPRManagement.DoAnonymization("No.", ReasonText)) then
                         if (not Confirm(Text000, false)) then
                             Error('');

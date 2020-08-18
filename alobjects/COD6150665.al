@@ -2,6 +2,8 @@ codeunit 6150665 "NPRE POS Action - New Wa."
 {
     // NPR5.45/MHA /20180827 CASE 318369 Object created
     // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Store preselected Waiterpad No. and Seating Code as well as Number of Guests on Sale POS
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (filter seatings by restaurant)
 
 
     trigger OnRun()
@@ -38,6 +40,9 @@ codeunit 6150665 "NPRE POS Action - New Wa."
             Type::Generic,
             "Subscriber Instances Allowed"::Multiple)
           then begin
+            //-NPR5.55 [414938]
+            RegisterWorkflowStep('addPresetValuesToContext','respond();');
+            //+NPR5.55 [414938]
             RegisterWorkflowStep('seatingInput',
               'if (param.FixedSeatingCode) {' +
               '  context.seatingCode = param.FixedSeatingCode;' +
@@ -58,6 +63,11 @@ codeunit 6150665 "NPRE POS Action - New Wa."
               '  }' +
               '}'
             );
+            RegisterWorkflowStep('confirmNewWaiterPad',
+              'if (context.confirmString) {' +
+                'confirm(labels["ConfirmLabel"], context.confirmString, true, true).no(abort);' +
+              '}'
+            );
             //-NPR5.53 [380609]
             RegisterWorkflowStep('SetNumberOfGuests',
               'if (param.AskForNumberOfGuests) {' +
@@ -65,11 +75,6 @@ codeunit 6150665 "NPRE POS Action - New Wa."
               '}'
             );
             //+NPR5.53 [380609]
-            RegisterWorkflowStep('confirmNewWaiterPad',
-              'if (context.confirmString) {' +
-                'confirm(labels["ConfirmLabel"], context.confirmString, true, true).no(abort);' +
-              '}'
-            );
             RegisterWorkflowStep('newWaiterPad',
               'if (context.seatingCode) {' +
               '  respond();' +
@@ -114,6 +119,10 @@ codeunit 6150665 "NPRE POS Action - New Wa."
 
         JSON.InitializeJObjectParser(Context,FrontEnd);
         case WorkflowStep of
+          //-NPR5.55 [414938]
+          'addPresetValuesToContext':
+            OnActionAddPresetValuesToContext(JSON, FrontEnd, POSSession);
+          //+NPR5.55 [414938]
           'seatingInput':
             OnActionSeatingInput(JSON,FrontEnd);
           //-NPR5.53 [380609]
@@ -160,6 +169,7 @@ codeunit 6150665 "NPRE POS Action - New Wa."
         SalePOS: Record "Sale POS";
         POSSale: Codeunit "POS Sale";
         WaiterPadPOSManagement: Codeunit "NPRE Waiter Pad POS Management";
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
         SeatingCode: Code[10];
         NumberOfGuests: Integer;
         OpenWaiterPad: Boolean;
@@ -168,7 +178,8 @@ codeunit 6150665 "NPRE POS Action - New Wa."
         NumberOfGuests := JSON.GetInteger('numberOfGuests',false);  //NPR5.53 [380609]
         NPRESeating.Get(SeatingCode);
 
-        WaiterPadPOSManagement.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);
+        //WaiterPadPOSManagement.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);  //NPR5.55 [399170]-revoked
+        WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);  //NPR5.55 [399170]
         //-NPR5.53 [380609]
         NPREWaiterPad."Number of Guests" := NumberOfGuests;
         NPREWaiterPad.Modify;
@@ -194,11 +205,26 @@ codeunit 6150665 "NPRE POS Action - New Wa."
         FrontEnd.SetActionContext(ActionCode(),JSON);
     end;
 
+    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session")
+    var
+        POSSetup: Codeunit "POS Setup";
+    begin
+        //-NPR5.55 [414938]
+        POSSession.GetSetup(POSSetup);
+        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
+        FrontEnd.SetActionContext(ActionCode(), JSON);
+        //+NPR5.55 [414938]
+    end;
+
     local procedure GetConfirmString(NPRESeating: Record "NPRE Seating") ConfirmString: Text
     var
         NPREWaiterPad: Record "NPRE Waiter Pad";
         NPRESeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
     begin
+        //+NPR5.55 [399170]
+        NPRESeatingWaiterPadLink.SetCurrentKey(Closed);
+        NPRESeatingWaiterPadLink.SetRange(Closed, false);
+        //+NPR5.55 [399170]
         NPRESeatingWaiterPadLink.SetRange("Seating Code",NPRESeating.Code);
         if NPRESeatingWaiterPadLink.IsEmpty then
           exit('');

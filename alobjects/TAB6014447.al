@@ -41,7 +41,7 @@ table 6014447 "Scanner - Setup"
         field(7;Type;Option)
         {
             Caption = 'Communication I/O';
-            Description = 'Indl�sningsform til/fra Navision';
+            Description = 'Indlæsningsform til/fra Navision';
             OptionCaption = 'Direct Cable,File,WiFi,Weight';
             OptionMembers = "Direct Cable",File,WiFi,Weight;
         }

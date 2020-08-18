@@ -2,6 +2,8 @@ page 6014467 "Quantity Discount List"
 {
     // NPR5.29/TJ  /20170123 CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
     // NPR5.30/BHR /20170223 CASE 265244 Add field Item No.
+    // NPR5.55/TJ  /20200421 CASE 400524 Removed Name from action Dimension-Single to default to page name
+    //                                   Removed group Dimensions and unused action Dimensions-Multiple
 
     Caption = 'Quantity Discount List';
     CardPageID = "Quantity Discount Card";
@@ -48,40 +50,14 @@ page 6014467 "Quantity Discount List"
     {
         area(navigation)
         {
-            group(Dimension)
+            action(Dimensions)
             {
                 Caption = 'Dimensions';
                 Image = Dimensions;
-                action("Dimensions-Single")
-                {
-                    Caption = 'Dimensions-Single';
-                    Image = Dimensions;
-                    RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014439),
-                                  "No."=FIELD("Main No.");
-                    ShortCutKey = 'Shift+Ctrl+D';
-                }
-                action("Dimensions-Mulitple")
-                {
-                    Caption = 'Dimensions-Mulitple';
-                    Image = DimensionSets;
-                    Visible = false;
-
-                    trigger OnAction()
-                    var
-                        QuantityDiscount: Record "Quantity Discount Header";
-                        DefaultDimMultiple: Page "Default Dimensions-Multiple";
-                    begin
-                        //-NPR5.29 [263787]
-                        /*
-                        CurrPage.SETSELECTIONFILTER(QuantityDiscount);
-                        DefaultDimMultiple.SetMultiQuantityDiscount(QuantityDiscount);
-                        DefaultDimMultiple.RUNMODAL;
-                        */
-                        //+NPR5.29 [263787]
-
-                    end;
-                }
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID"=CONST(6014439),
+                              "No."=FIELD("Main No.");
+                ShortCutKey = 'Shift+Ctrl+D';
             }
         }
     }

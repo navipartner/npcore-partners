@@ -5,7 +5,7 @@ report 6150660 "NPRE - Rest. Daily Turnover"
     // NPR5.54/ALPO/20200309 CASE 392052 Include into report POS Sales Lines marked with "Exclude from Posting" checkmark
     // NPR5.54/ALPO/20200327 CASe 380918 Some formatting adjustments: column name changes, hide empty columns, hide division by zero errors in cells
     DefaultLayout = RDLC;
-    RDLCLayout = './NPRE - Rest. Daily Turnover.rdlc';
+    RDLCLayout = './layouts/NPRE - Rest. Daily Turnover.rdlc';
 
     Caption = 'Restaurant Daily Turnover';
     UsageCategory = ReportsAndAnalysis;
@@ -19,7 +19,7 @@ report 6150660 "NPRE - Rest. Daily Turnover"
             dataitem("POS Sales Line"; "POS Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.","Line No.") WHERE(Type=CONST(Item));
+                DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = CONST(Item));
                 RequestFilterFields = "No.", "Location Code";
 
                 trigger OnPreDataItem()

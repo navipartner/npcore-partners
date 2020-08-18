@@ -381,18 +381,18 @@ table 6014538 "Audit Roll Backup"
         field(201;"Reversed by Salesperson Code";Code[10])
         {
             Caption = 'Reversed by Salesperson Code';
-            Description = 'Udfyldes med s�lgerkoden der tilbagef�rer bon''en';
+            Description = 'Udfyldes med sælgerkoden der tilbagef¢rer bon''en';
             TableRelation = "Salesperson/Purchaser";
         }
         field(202;"Reverseing Sales Ticket No.";Code[20])
         {
             Caption = 'Reverseing Sales Ticket No.';
-            Description = 'Peger p� det bonnummer som den aktuelle bon tilbagef�rer';
+            Description = 'Peger på det bonnummer som den aktuelle bon tilbagef¢rer';
         }
         field(203;"Reversed by Sales Ticket No.";Code[20])
         {
             Caption = 'Reversed by Sales Ticket No.';
-            Description = 'Peger p� det bonnummer som tilbagef�rte aktuel bonnummer';
+            Description = 'Peger på det bonnummer som tilbagef¢rte aktuel bonnummer';
         }
         field(400;"Discount Type";Option)
         {
@@ -593,7 +593,7 @@ table 6014538 "Audit Roll Backup"
         field(6055;Send;Date)
         {
             Caption = 'Send';
-            Description = 'Bruges ifm. replikering til at afg�ren om det felt er udl�st eller ej';
+            Description = 'Bruges ifm. replikering til at afg¢ren om det felt er udlæst eller ej';
         }
         field(6060;"Offline receipt no.";Code[20])
         {

@@ -26,6 +26,8 @@ codeunit 6060046 "Item Wsht.-Register Line"
     // NPR5.43/JDH /20180628 CASE 317108 Variant Code generation enabled for subscriber
     // NPR5.48/TJ  /20190102 CASE 340615 Commented out usage of field Item."Product Group Code"
     // NPR5.50/THRO/20190528 CASE 353052 Changes to Sales Price update
+    // NPR5.55/TJ  /20200304 CASE 388960 Renamed RegisterAndDeleteLines to CreateRegisteredWorksheetLines
+    //                                   Delete part is moved to batch codeunit
 
     Permissions = TableData "Registered Item Worksheet"=imd,
                   TableData "Registered Item Worksheet Line"=imd,
@@ -208,7 +210,10 @@ codeunit 6060046 "Item Wsht.-Register Line"
           //-NPR5.25 [246088]
           if not CalledFromTest then
           //+NPR5.25 [246088]
-            RegisterAndDeleteLines;
+            //-NPR5.55 [388960]
+            //RegisterAndDeleteLines;
+            CreateRegisteredWorksheetLines();
+            //+NPR5.55 [388960]
         end;
     end;
 
@@ -731,11 +736,11 @@ codeunit 6060046 "Item Wsht.-Register Line"
         //+NPR4.19
     end;
 
-    local procedure RegisterAndDeleteLines()
+    local procedure CreateRegisteredWorksheetLines()
     begin
         if ItemWorksheetTemplate."Register Lines" then begin
           CopyToRegisteredWorksheetLine;
-
+        
           ItemWkshVariantLine.Reset;
           ItemWkshVariantLine.SetRange("Worksheet Template Name",ItemWkshLine."Worksheet Template Name");
           ItemWkshVariantLine.SetRange("Worksheet Name",ItemWkshLine."Worksheet Name");
@@ -743,7 +748,7 @@ codeunit 6060046 "Item Wsht.-Register Line"
           if ItemWkshVariantLine.FindSet then repeat
             CopyToRegisteredWorksheetVariantLine;
           until ItemWkshVariantLine.Next = 0;
-
+        
           ItemWorksheetVarietyValue.Reset;
           ItemWorksheetVarietyValue.SetRange("Worksheet Template Name",ItemWkshLine."Worksheet Template Name");
           ItemWorksheetVarietyValue.SetRange("Worksheet Name",ItemWkshLine."Worksheet Name");
@@ -752,13 +757,17 @@ codeunit 6060046 "Item Wsht.-Register Line"
             CopyToRegisteredWorksheetVarietyValueLine;
           until ItemWorksheetVarietyValue.Next = 0;
         end;
-
-        if ItemWorksheetTemplate."Delete Processed Lines" then
-          if ItemWkshLine.Status = ItemWkshLine.Status :: Processed then
+        //-NPR5.55 [388960]
+        /*
+        IF ItemWorksheetTemplate."Delete Processed Lines" THEN
+          IF ItemWkshLine.Status = ItemWkshLine.Status :: Processed THEN
             //-NPR5.35 [268786]
-            if not (ItemWorksheetTemplate."Leave Skipped Line on Register" and (ItemWkshLine.Action = ItemWkshLine.Action::Skip)) then
-              ItemWkshLine.Delete(true);
+            IF NOT (ItemWorksheetTemplate."Leave Skipped Line on Register" AND (ItemWkshLine.Action = ItemWkshLine.Action::Skip)) THEN
+              ItemWkshLine.DELETE(TRUE);
             //+NPR5.35 [268786]
+        */
+        //+NPR5.55 [388960]
+
     end;
 
     local procedure CopyToRegisteredWorksheetLine()

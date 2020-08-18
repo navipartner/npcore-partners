@@ -2,10 +2,10 @@ codeunit 6014420 "Number Logic"
 {
     // NPK, RR, 310708, Added function "RetailKladdelinie"
     // 
-    // NPR4.000.001, NPK, MH - Tilf�jet funktion, Salgslinie:
-    //                         Sl�r op i alternative varenumre for "Sales Line".
-    // NPR4.000.002, NPK, 01-05-09, MH - Tilf�jet funktion, RetailDokumentLinie:
-    //                         Sl�r op i alternative varenumre for "Retail Document Line".
+    // NPR4.000.001, NPK, MH - Tilf¢jet funktion, Salgslinie:
+    //                         Slår op i alternative varenumre for "Sales Line".
+    // NPR4.000.002, NPK, 01-05-09, MH - Tilf¢jet funktion, RetailDokumentLinie:
+    //                         Slår op i alternative varenumre for "Retail Document Line".
     // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"
     // NPR5.36/TJ /20170920  CASE 286283 Renamed variables/function into english and into proper naming terminology
     //                                   Removed unused variables

@@ -14,6 +14,8 @@ table 6151371 "CS Setup"
     // NPR5.52/CLVA/20190904 CASE 365967 Added field "Post with Job Queue", "Job Queue Category Code","Job Queue Priority for Post","Notify On Success","Run in User Session" and "Sum Qty. to Handle"
     // NPR5.53/CLVA/20191128 CASE 379973 Added field "Earliest Start Date/Time"
     // NPR5.54/CLVA/20202003 CASE 389224 Added field "Batch Size"
+    // NPR5.55/CLVA/20200604 CASE 379709 Added fields "Import Tags to Shipping Doc." and "Use Whse. Receipt"
+    // NPR5.55/ALST/20200727 CASE 415521 added field Disregard Unknown RFID Tags
 
     Caption = 'CS Setup';
 
@@ -160,6 +162,19 @@ table 6151371 "CS Setup"
             Caption = 'Batch Size';
             MaxValue = 1000;
             MinValue = 10;
+        }
+        field(45;"Import Tags to Shipping Doc.";Boolean)
+        {
+            Caption = 'Import Tags to Shipping Doc.';
+        }
+        field(46;"Use Whse. Receipt";Boolean)
+        {
+            Caption = 'Use Whse. Receipt';
+        }
+        field(50;"Disregard Unknown RFID Tags";Boolean)
+        {
+            Caption = 'Disregard Unknown RFID Tags';
+            Description = 'NPR5.55 clean rfid tag values not found in our setup while scanning';
         }
     }
 

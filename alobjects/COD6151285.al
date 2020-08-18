@@ -2,6 +2,7 @@ codeunit 6151285 "SS Action - Item AddOn"
 {
     // 
     // NPR5.54/TSA /20200205 CASE 387912 Initial Version
+    // NPR5.55/TSA /20200424 CASE 387912 Adjusted the workflow, added title to popup
 
 
     trigger OnRun()
@@ -11,6 +12,7 @@ codeunit 6151285 "SS Action - Item AddOn"
     var
         ActionDescription: Label 'This built in function sets the item addon values';
         CommentCaption: Label 'Comment';
+        PopupTitle: Label 'Select your options...';
 
     local procedure ActionCode(): Text
     begin
@@ -21,7 +23,7 @@ codeunit 6151285 "SS Action - Item AddOn"
     local procedure ActionVersion(): Text
     begin
 
-        exit ('2.1');
+        exit ('2.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -35,10 +37,9 @@ codeunit 6151285 "SS Action - Item AddOn"
             ActionVersion())
           then begin
             RegisterWorkflow20(
-              'var addonJson;' +
-              'await (addonJson = await workflow.respond("GetSalesLineAddonConfigJson"));' +
-              'var addonConfig = JSON.parse (addonJson);' +
-              'await ($context.userSelectedAddons = await popup.configuration (addonConfig));'+
+              'let addonJson = await workflow.respond("GetSalesLineAddonConfigJson");' +
+              'let addonConfig = JSON.parse (addonJson);' +
+              '$context.userSelectedAddons = await popup.configuration (addonConfig);'+
               'if ($context.userSelectedAddons) {await workflow.respond ("SetItemAddons")};'
               );
 
@@ -132,7 +133,10 @@ codeunit 6151285 "SS Action - Item AddOn"
         Value: Text;
     begin
 
-        JsonString := StrSubstNo ('{"caption":"%1","title":"%2","settings":[', FormatJson (ItemAddOn.Description), '');
+        //-NPR5.55 [387912]
+        //JsonString := STRSUBSTNO ('{"caption":"%1","title":"%2","settings":[', FormatJson (ItemAddOn.Description), '');
+        JsonString := StrSubstNo ('{"caption":"%1","title":"%2","settings":[', FormatJson (ItemAddOn.Description), FormatJson(PopupTitle));
+        //+NPR5.55 [387912]
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if (ItemAddOnLine.FindSet ()) then begin

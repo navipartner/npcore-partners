@@ -128,7 +128,7 @@ codeunit 6014575 "Report - Kitchen Receipt"
         //  IF STRLEN(Description) > 40 THEN
         //    Printer.AddLine(COPYSTR(Description,41,40));
         //
-        //  IF ("Sale Type" = "Sale Type"::Bem�rkning) THEN
+        //  IF ("Sale Type" = "Sale Type"::Bemærkning) THEN
         //    EXIT;
         //
         //
@@ -212,7 +212,7 @@ codeunit 6014575 "Report - Kitchen Receipt"
           //+NPR5.23 [238800]
                                               AuditRollSale."Sale Type"::Sale,
           //-NPR5.23 [238800]
-          //                                    AuditRollSale."Sale Type"::Bem�rkning,
+          //                                    AuditRollSale."Sale Type"::Bemærkning,
           //+NPR5.23 [238800]
                                               AuditRollSale."Sale Type"::"Debit Sale");
           //-NPR5.23 [238800]

@@ -3,6 +3,7 @@ table 6060137 "MM Member Notification Setup"
     // MM1.14/TSA/20160523  CASE 240871 Reminder Service
     // MM1.29/TSA /20180506 CASE 314131 Added fields "Activate NP Pass" and "Processing Method"
     // MM1.32/TSA /20180710 CASE 318132 Added option Wallet_Create to the Type
+    // MM1.44/TSA /20200416 CASE 400601 Added Magento Password URL support
 
     Caption = 'MM Member Notification Setup';
     DrillDownPageID = "MM Member Notification Setup";
@@ -106,6 +107,16 @@ table 6060137 "MM Member Notification Setup"
         {
             Caption = 'Include NP Pass';
             Description = '//-MM1.29 [314131]';
+        }
+        field(150;"Generate Magento PW URL";Boolean)
+        {
+            Caption = 'Generate Magento PW URL';
+            Description = '//-MM1.44 [400601]';
+        }
+        field(155;"Fallback Magento PW URL";Text[150])
+        {
+            Caption = 'Fallback Magento PW URL';
+            Description = '//-MM1.44 [400601]';
         }
     }
 

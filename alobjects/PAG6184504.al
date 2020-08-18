@@ -5,6 +5,7 @@ page 6184504 "EFT Adyen Payment Type Setup"
     // NPR5.50/MMV /20190430 CASE 352465 Added field 8
     // NPR5.51/MMV /20190520 CASE 355433 Added field 9, 10
     // NPR5.53/MMV /20191211 CASE 377533 Added fields 11, 12
+    // NPR5.55/MMV /20200421 CASE 386254 Added field 13
 
     Caption = 'EFT Adyen Payment Type Setup';
     DelayedInsert = false;
@@ -52,6 +53,9 @@ page 6184504 "EFT Adyen Payment Type Setup"
                 {
                 }
                 field("Recurring API URL Prefix";"Recurring API URL Prefix")
+                {
+                }
+                field(Unattended;Unattended)
                 {
                 }
             }

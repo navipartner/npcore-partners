@@ -2,6 +2,10 @@ table 6151593 "NpDc Sale Line POS Coupon"
 {
     // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
     // NPR5.36/MHA /20170831  CASE 288641 Added functions GetSkipCalcDiscount() and SetSkipCalcDiscount()
+    // NPR5.54/ALPO/20200423  CASE 401611 5.54 upgrade performace optimization
+    // NPR5.55/ALPO/20200424  CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
+    // NPR5.55/ALPO/20200518  CASE 387376 Possibility to define sequence in which discount coupons are applied
+    //                                    - New key: Register No.,Sales Ticket No.,Application Sequence No.
 
     Caption = 'Sale Line POS Coupon';
     DrillDownPageID = "NpDc Sale Line POS Coupons";
@@ -57,6 +61,19 @@ table 6151593 "NpDc Sale Line POS Coupon"
         {
             Caption = 'Coupon Type';
             TableRelation = "NpDc Coupon Type";
+
+            trigger OnValidate()
+            var
+                CouponType: Record "NpDc Coupon Type";
+            begin
+                //-NPR5.55 [387376]
+                if Type =  Type::Coupon then begin
+                  if not CouponType.Get("Coupon Type") then
+                    CouponType.Init;
+                  "Application Sequence No." := CouponType."Application Sequence No.";
+                end;
+                //+NPR5.55 [387376]
+            end;
         }
         field(55;"Coupon No.";Code[20])
         {
@@ -70,6 +87,12 @@ table 6151593 "NpDc Sale Line POS Coupon"
         {
             Caption = 'Discount Amount';
         }
+        field(80;"Application Sequence No.";Integer)
+        {
+            Caption = 'Application Sequence No.';
+            Description = 'NPR5.55';
+            MinValue = 0;
+        }
     }
 
     keys
@@ -79,6 +102,9 @@ table 6151593 "NpDc Sale Line POS Coupon"
             SumIndexFields = "Discount Amount";
         }
         key(Key2;Type,"Coupon No.")
+        {
+        }
+        key(Key3;"Register No.","Sales Ticket No.","Sale Type","Sale Date","Application Sequence No.")
         {
         }
     }

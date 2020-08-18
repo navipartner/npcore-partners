@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="No_GiftVoucherCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>No_GiftVoucherCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>No_GiftVoucherCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesTicketNo_GiftVoucherCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesTicketNo_GiftVoucherCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesTicketNo_GiftVoucherCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="IssueDate_GiftVoucherCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>IssueDate_GiftVoucherCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>IssueDate_GiftVoucherCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Amount_GiftVoucherCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Amount_GiftVoucherCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Amount_GiftVoucherCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CashedDate_GiftVoucherCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CashedDate_GiftVoucherCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CashedDate_GiftVoucherCaption</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="No_GiftVoucher">
+          <DataField>No_GiftVoucher</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_GiftVoucher">
+          <DataField>SalesTicketNo_GiftVoucher</DataField>
+        </Field>
+        <Field Name="IssueDate_GiftVoucher">
+          <DataField>IssueDate_GiftVoucher</DataField>
+        </Field>
+        <Field Name="Amount_GiftVoucher">
+          <DataField>Amount_GiftVoucher</DataField>
+        </Field>
+        <Field Name="Amount_GiftVoucherFormat">
+          <DataField>Amount_GiftVoucherFormat</DataField>
+        </Field>
+        <Field Name="CashedDate_GiftVoucher">
+          <DataField>CashedDate_GiftVoucher</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="ReportNameLbl">
+          <DataField>ReportNameLbl</DataField>
+        </Field>
+        <Field Name="PageLbl">
+          <DataField>PageLbl</DataField>
+        </Field>
+        <Field Name="GVFilters">
+          <DataField>GVFilters</DataField>
+        </Field>
+        <Field Name="TotalLbl">
+          <DataField>TotalLbl</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

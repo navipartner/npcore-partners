@@ -1,7 +1,7 @@
 codeunit 6014410 "POS Apply Customer Entries"
 {
     // --->> NPR Version 1.8 md
-    // Nyoprettet(gl bogf�r revisionsrulle passivt er hermed erstattet)
+    // Nyoprettet(gl bogf¢r revisionsrulle passivt er hermed erstattet)
     // <<--- NPR Version 1.8 slut
     // 
     // //Ohm - 02/08/2006 - code rewritten

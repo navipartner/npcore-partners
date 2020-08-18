@@ -9,6 +9,7 @@ page 6150615 "POS Store Card"
     // NPR5.38/BR/20180125 CASE 302803 Added fields Posting Compression, POS Period Register No. Series
     // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
 
     Caption = 'POS Store Card';
     RefreshOnActivate = true;
@@ -105,6 +106,13 @@ page 6150615 "POS Store Card"
                 {
                 }
                 field("POS Period Register No. Series";"POS Period Register No. Series")
+                {
+                }
+            }
+            group(Profiles)
+            {
+                Caption = 'Profiles';
+                field("POS Restaurant Profile";"POS Restaurant Profile")
                 {
                 }
             }

@@ -5,6 +5,7 @@ table 6150707 "POS Setup"
     // NPR5.40/VB  /20180228 CASE 306347 Replacing BLOB-based temporary-table parameters with physical-table parameters
     // NPR5.54/TSA /20200219 CASE 391850 Added Description
     // NPR5.54/TSA /20200220 CASE 392121 Added "Idle Timeout Action Code"
+    // NPR5.55/TSA /20200417 CASE 400734 Added optionvalue for named workflow "Admin Menu Action Code"
 
     Caption = 'POS Setup';
     LookupPageID = "POS Setup List";
@@ -224,6 +225,29 @@ table 6150707 "POS Setup"
                 ParamMgt.ClearParametersForRecord (RecordId, FieldNo ("Idle Timeout Action Code"));
                 ParamMgt.CopyFromActionToField ("Idle Timeout Action Code", RecordId, FieldNo ("Lock POS Action Code"));
                 //+NPR5.54 [392121]
+            end;
+        }
+        field(150;"Admin Menu Action Code";Code[20])
+        {
+            Caption = 'Admin Menu Action Code';
+            TableRelation = "POS Action";
+
+            trigger OnLookup()
+            begin
+
+                //-NPR5.55 [400734]
+                if ActionMgt.LookupAction("Admin Menu Action Code") then
+                  Validate("Admin Menu Action Code");
+                //+NPR5.55 [400734]
+            end;
+
+            trigger OnValidate()
+            begin
+
+                //-NPR5.55 [400734]
+                ParamMgt.ClearParametersForRecord (RecordId, FieldNo ("Admin Menu Action Code"));
+                ParamMgt.CopyFromActionToField ("Admin Menu Action Code", RecordId, FieldNo ("Admin Menu Action Code"));
+                //+NPR5.55 [400734]
             end;
         }
     }

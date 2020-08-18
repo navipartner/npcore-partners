@@ -9,6 +9,7 @@ table 6060139 "MM Member Notification Entry"
     // MM1.32/TSA /20180710 CASE 318132 Added option Wallet_Create to the Notification Trigger
     // MM1.38/TSA /20190517 CASE 355234 Added field Notification Token
     // MM1.39/TSA /20190529 CASE 350968 Added Auto-Renew fields
+    // MM1.44/TSA /20200416 CASE 400601 Magento Get Password URL
 
     Caption = 'Member Notification Entry';
 
@@ -242,6 +243,11 @@ table 6060139 "MM Member Notification Entry"
         {
             Caption = 'Wallet Pass Combine URL';
             Description = '//-MM1.29.02 [317156]';
+        }
+        field(430;"Magento Get Password URL";Text[200])
+        {
+            Caption = 'Magento Get Password URL';
+            Description = '//-MM1.44 [400601]';
         }
     }
 

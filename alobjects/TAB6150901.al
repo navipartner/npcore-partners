@@ -2,7 +2,7 @@ table 6150901 "HC Audit Roll"
 {
     // NPR5.37/BR  /20171027 CASE 267552 HQ Connector: Created object based on Table 6014407
     // NPR5.38/JDH /20180119 CASE 302570 Changed Option String on Field Sale Type to English
-    // NPR5.39/TJ  /20180206 CASE 302634 Removed unused variable H�ndterFejlUnderBonUdskr
+    // NPR5.39/TJ  /20180206 CASE 302634 Removed unused variable HåndterFejlUnderBonUdskr
     // NPR5.39/BR  /20180220 CASE 305744 Aligned Caption with OptionString
     // NPR5.39/BR  /20180221 CASE 225415 Renumberd fields in 5xxxx range
     // NPR5.48/MHA /20181121 CASE 326055 Added field 5022 "Reference"
@@ -450,7 +450,7 @@ table 6150901 "HC Audit Roll"
         field(6055;Send;Date)
         {
             Caption = 'Send';
-            Description = 'Bruges ifm. replikering til at afg�ren om det felt er udl�st eller ej';
+            Description = 'Bruges ifm. replikering til at afg¢ren om det felt er udlæst eller ej';
         }
         field(6060;"Offline receipt no.";Code[20])
         {

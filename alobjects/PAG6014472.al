@@ -3,9 +3,9 @@ page 6014472 "Retail Journal Line"
     // //- NE 08/07-05
     //   Rettet import tilbage til at bruge forms.
     // // RR 31-07-2008
-    //   Rettet s� Alternativ Varenr tjekkes ved indtastning af varenr.
+    //   Rettet så Alternativ Varenr tjekkes ved indtastning af varenr.
     // // NPR 190609 Sag 68963
-    // Ny felter tilf�jet
+    // Ny felter tilf¢jet
     // 50020     StartDate
     // 50021     CustomerPriceGroupcode
     // 
@@ -27,6 +27,7 @@ page 6014472 "Retail Journal Line"
     // NPR5.53/TJ  /20191119 CASE 375557 New function SetSkipConfirm
     // NPR5.53/MHA /20191121 CASE 374290 Moved filter fields to Main Page
     // NPR5.54/SARA/20200316 CASE 395769 Re activate button 'Invert Selection'
+    // NPR5.55/MMV /20200708 CASE 407265 Added field "RFID Tag Value"
 
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -208,6 +209,10 @@ page 6014472 "Retail Journal Line"
                         CurrPage.Update;
                         //+NPR5.50 [350435]
                     end;
+                }
+                field("RFID Tag Value";"RFID Tag Value")
+                {
+                    Visible = false;
                 }
             }
         }

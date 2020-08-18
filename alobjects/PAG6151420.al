@@ -6,9 +6,11 @@ page 6151420 "Magento Brands"
     // MAG1.21/TR/20151028  CASE 225601 Shortcut to Display Config added
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.09/TS  /20180108  CASE 300893 Removed Caption on Action Container
+    // MAG2.26/MHA /20200601  CASE 404580 Magento Brands can now be managed externally
 
     Caption = 'Brands';
     CardPageID = "Magento Brand Card";
+    Editable = false;
     PageType = List;
     SourceTable = "Magento Brand";
     UsageCategory = Lists;
@@ -20,7 +22,7 @@ page 6151420 "Magento Brands"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field(Id;Id)
                 {
                 }
                 field(Name;Name)
@@ -38,6 +40,28 @@ page 6151420 "Magento Brands"
 
     actions
     {
+        area(processing)
+        {
+            action("Setup Brands")
+            {
+                Caption = 'Setup Brands';
+                Image = Setup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Visible = HasSetupBrands;
+
+                trigger OnAction()
+                var
+                    MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
+                begin
+                    //-MAG2.26 [404580]
+                    MagentoSetupMgt.TriggerSetupBrands();
+                    Message(Text000);
+                    //+MAG2.26 [404580]
+                end;
+            }
+        }
         area(navigation)
         {
             action(Card)
@@ -69,7 +93,13 @@ page 6151420 "Magento Brands"
     }
 
     trigger OnOpenPage()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
+        //-MAG2.26 [404580]
+        HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
+        //+MAG2.26 [404580]
+
         //-MAG1.21
         SetDisplayConfigVisible;
         //+MAG1.21
@@ -77,6 +107,8 @@ page 6151420 "Magento Brands"
 
     var
         DisplayConfigVisible: Boolean;
+        HasSetupBrands: Boolean;
+        Text000: Label 'Brand update initiated';
 
     procedure GetSelectionFilter(): Text
     var

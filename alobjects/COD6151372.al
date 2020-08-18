@@ -29,6 +29,10 @@ codeunit 6151372 "CS WS"
     // NPR5.54/CLVA/20202020 CASE 384506 Added Supervisor and POS user filter on GetStoreDataV2 and GetStoreDataByStoreUser;
     // NPR5.54/CLVA/20200227 CASE 389224 Added batch handling
     // NPR5.54/CLVA/20200310 CASE 384506 Added function CreateStoreRefillDataV2
+    // NPR5.55/CLVA/20200505 CASE 384506 Added changes to UpdateRefill, CreateStoreRefillData and CreateStoreRefillDataV2
+    // NPR5.55/CLVA/20200511 CASE 379709 Added functions SetRfidTagDataTransferBatch, SetRfidTagDataTransfer, ResetTransfer and CloseTransfer
+    // NPR5.55/CLVA/20200616 CASE 405675 Added function GetJournalItemCount and GetDocumentItemCount
+    // NPR5.55/ALST/20200727 CASE 415521 added possibility to clean RFID tag string of values not matching any models in the DB
 
 
     trigger OnRun()
@@ -63,6 +67,9 @@ codeunit 6151372 "CS WS"
         Txt020: Label 'Inventory Calculation can''t been done for journal: %1 %2, because the journal is not empty';
         Txt021: Label 'There is no Items on Location %1';
         Txt022: Label 'POS Store Code is not valid: %1';
+        Txt023: Label 'RFID Document: %1, do not exist';
+        Txt024: Label 'Document can''t be closed when there is no tags collected';
+        NoRfidModelsInDBErr: Label 'There are no Rfid models set up in "%1" please make sure that either values are available or the "%2" check in %3 is switched off';
 
     [Scope('Personalization')]
     procedure ProcessDocument(var Document: Text)
@@ -704,7 +711,19 @@ codeunit 6151372 "CS WS"
                 CSRefillData."Refilled Date" := CurrentDateTime;
                 CSRefillData.Modify;
             until CSRefillData.Next = 0;
+        //-NPR5.55 [384506]
+        //END;
+        end else begin
+            CSRefillData.Init;
+            CSRefillData."Item No." := Item."No.";
+            CSRefillData.Location := CSStockTakes.Location;
+            CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+            CSRefillData.Refilled := RefillStatus;
+            CSRefillData."Refilled By" := UserId;
+            CSRefillData."Refilled Date" := CurrentDateTime;
+            CSRefillData.Insert;
         end;
+        //+NPR5.55 [384506]
 
         exit(StockTakeId);
     end;
@@ -1514,6 +1533,10 @@ codeunit 6151372 "CS WS"
         CSStockTakes: Record "CS Stock-Takes";
         CSStockTakesData: Record "CS Stock-Takes Data";
     begin
+        //-NPR5.55 [384506]
+        exit(CreateStoreRefillDataV2(StockTakeId));
+        //+NPR5.55 [384506]
+
         if not CSSetup.Get then
             exit;
 
@@ -1534,12 +1557,23 @@ codeunit 6151372 "CS WS"
                 repeat
                     if CSStockTakesData."Item No." <> '' then begin
                         if not CSRefillData.Get(CSStockTakesData."Item No.", CSStockTakesData."Variant Code", CSStockTakes.Location, CSStockTakes."Stock-Take Id") then begin
+                  //-NPR5.55 [384506]
+                  //CSRefillData.INIT;
+                  //CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
+                  //CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
+                  //CSRefillData.VALIDATE(Location,CSStockTakes.Location);
+                  //CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                  //CSRefillData.INSERT(TRUE);
+                  CSStockTakesData.CalcFields("Item Description","Variant Description");
                             CSRefillData.Init;
                             CSRefillData.Validate("Item No.", CSStockTakesData."Item No.");
                             CSRefillData.Validate("Variant Code", CSStockTakesData."Variant Code");
                             CSRefillData.Validate(Location, CSStockTakes.Location);
                             CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                  CSRefillData."Item Description" := CSStockTakesData."Item Description";
+                  CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
                             CSRefillData.Insert(true);
+                  //+NPR5.55 [384506]
                         end;
 
                         if CSRefillData."Variant Code" <> '' then
@@ -1562,12 +1596,23 @@ codeunit 6151372 "CS WS"
                 repeat
                     if CSStockTakesData."Item No." <> '' then begin
                         if not CSRefillData.Get(CSStockTakesData."Item No.", CSStockTakesData."Variant Code", CSStockTakes.Location, CSStockTakes."Stock-Take Id") then begin
+                  //-NPR5.55 [384506]
+                  //CSRefillData.INIT;
+                  //CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
+                  //CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
+                  //CSRefillData.VALIDATE(Location,CSStockTakes.Location);
+                  //CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                  //CSRefillData.INSERT(TRUE);
+                  CSStockTakesData.CalcFields("Item Description","Variant Description");
                             CSRefillData.Init;
                             CSRefillData.Validate("Item No.", CSStockTakesData."Item No.");
                             CSRefillData.Validate("Variant Code", CSStockTakesData."Variant Code");
                             CSRefillData.Validate(Location, CSStockTakes.Location);
                             CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                  CSRefillData."Item Description" := CSStockTakesData."Item Description";
+                  CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
                             CSRefillData.Insert(true);
+                  //+NPR5.55 [384506]
                         end;
 
                         if CSRefillData."Variant Code" <> '' then
@@ -2224,6 +2269,7 @@ codeunit 6151372 "CS WS"
     procedure SetRfidTagDataByTypeBatch(StockTakeId: Text;StockTakeConfigCode: Text;WorksheetName: Text;TagIds: Text;"Area": Text;DeviceId: Code[10];BatchId: Text) ResultData: Text
     var
         CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
+        CSSetup: Record "CS Setup";
         OK: Boolean;
         SessionID: Integer;
         Ostream: OutStream;
@@ -2263,6 +2309,11 @@ codeunit 6151372 "CS WS"
         CommaString := TagIds;
         Separator := ',';
         Values := CommaString.Split(Separator.ToCharArray());
+        //-NPR5.55 [415521]
+        CSSetup.SetRange("Disregard Unknown RFID Tags", true);
+        if not CSSetup.IsEmpty then
+          CleanTagEntries(Values);
+        //+NPR5.55 [415521]
         CSStockTakeHandlingRfid.Tags := Values.Length;
         CSStockTakeHandlingRfid.Modify(false);
         Commit;
@@ -2302,7 +2353,7 @@ codeunit 6151372 "CS WS"
     [Scope('Personalization')]
     procedure CreateStoreRefillDataV2(StockTakeId: Text) Result: Text
     var
-        CSRefillData: Record "CS Refill Data" temporary;
+        CSRefillDataTmp: Record "CS Refill Data" temporary;
         Item: Record Item;
         ItemGroup: Record "Item Group";
         MagentoPicture: Record "Magento Picture";
@@ -2312,7 +2363,8 @@ codeunit 6151372 "CS WS"
         CSSetup: Record "CS Setup";
         CSStockTakes: Record "CS Stock-Takes";
         CSStockTakesData: Record "CS Stock-Takes Data";
-        CSRefillSectionData: Record "CS Refill Section Data" temporary;
+        CSRefillSectionDataTmp: Record "CS Refill Section Data" temporary;
+        CSRefillData: Record "CS Refill Data";
     begin
         if not CSSetup.Get then
           exit;
@@ -2323,38 +2375,66 @@ codeunit 6151372 "CS WS"
         if not CSStockTakes.Get(StockTakeId) then
           exit;
 
-        Clear(CSRefillData);
-        Clear(CSRefillSectionData);
+        //-NPR5.55 [384506]
+        //CLEAR(CSRefillData);
+        //CLEAR(CSRefillSectionData);
+        Clear(CSRefillDataTmp);
+        Clear(CSRefillSectionDataTmp);
+        //+NPR5.55 [384506]
 
         CSStockTakes."Create Refill Data Started" := CurrentDateTime;
 
         CSStockTakesData.SetRange("Stock-Take Id",CSStockTakes."Stock-Take Id");
         CSStockTakesData.SetRange(Area,CSStockTakesData.Area::Salesfloor);
-        CSStockTakesData.SetRange("Transferred To Worksheet",false);
+        //-NPR5.55 [384506]
+        //CSStockTakesData.SETRANGE("Transferred To Worksheet",FALSE);
+        //+NPR5.55 [384506]
         if CSStockTakesData.FindSet then begin
           repeat
             if CSStockTakesData."Item No." <> '' then begin
-              if not CSRefillData.Get(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") then begin
+              //-NPR5.55 [384506]
+              //IF NOT CSRefillData.GET(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") THEN BEGIN
+              //  CSStockTakesData.CALCFIELDS("Item Description","Variant Description");
+              //  CSRefillData.INIT;
+              //  CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
+              //  CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
+              //  CSRefillData.VALIDATE(Location,CSStockTakes.Location);
+              //  CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+              //  CSRefillData."Item Description" := CSStockTakesData."Item Description";
+              //  CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
+              //  CSRefillData.INSERT(TRUE);
+              //END;
+              //
+              //IF CSRefillData."Variant Code" <> '' THEN
+              //  CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
+              //ELSE
+              //  CSRefillData."Combined key" := CSRefillData."Item No.";
+              //
+              //CSRefillData."Qty. in Store" += 1;
+              //
+              //CSRefillData.MODIFY(TRUE);
+
+            if not CSRefillDataTmp.Get(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") then begin
                 CSStockTakesData.CalcFields("Item Description","Variant Description");
-                CSRefillData.Init;
-                CSRefillData.Validate("Item No.",CSStockTakesData."Item No.");
-                CSRefillData.Validate("Variant Code",CSStockTakesData."Variant Code");
-                CSRefillData.Validate(Location,CSStockTakes.Location);
-                CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                CSRefillData."Item Description" := CSStockTakesData."Item Description";
-                CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
-                CSRefillData.Insert(true);
+                CSRefillDataTmp.Init;
+                CSRefillDataTmp.Validate("Item No.",CSStockTakesData."Item No.");
+                CSRefillDataTmp.Validate("Variant Code",CSStockTakesData."Variant Code");
+                CSRefillDataTmp.Validate(Location,CSStockTakes.Location);
+                CSRefillDataTmp."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                CSRefillDataTmp."Item Description" := CSStockTakesData."Item Description";
+                CSRefillDataTmp."Variant Description" := CSStockTakesData."Variant Description";
+                CSRefillDataTmp.Insert(true);
               end;
 
-              if CSRefillData."Variant Code" <> '' then
-                CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
+              if CSRefillDataTmp."Variant Code" <> '' then
+                CSRefillDataTmp."Combined key" := CSRefillDataTmp."Item No." + '-' + CSRefillDataTmp."Variant Code"
               else
-                CSRefillData."Combined key" := CSRefillData."Item No.";
+                CSRefillDataTmp."Combined key" := CSRefillDataTmp."Item No.";
 
-              CSRefillData."Qty. in Store" += 1;
+              CSRefillDataTmp."Qty. in Store" += 1;
 
-              CSRefillData.Modify(true);
-
+              CSRefillDataTmp.Modify(true);
+              //+NPR5.55 [384506]
             end;
           until CSStockTakesData.Next = 0;
         end;
@@ -2362,48 +2442,86 @@ codeunit 6151372 "CS WS"
         Clear(CSStockTakesData);
         CSStockTakesData.SetRange("Stock-Take Id",CSStockTakes."Stock-Take Id");
         CSStockTakesData.SetRange(Area,CSStockTakesData.Area::Stockroom);
-        CSStockTakesData.SetRange("Transferred To Worksheet",false);
+        //-NPR5.55 [384506]
+        //CSStockTakesData.SETRANGE("Transferred To Worksheet",FALSE);
+        //+NPR5.55 [384506]
         if CSStockTakesData.FindSet then begin
           repeat
             if CSStockTakesData."Item No." <> '' then begin
-              if not CSRefillData.Get(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") then begin
+              //-NPR5.55 [384506]
+              //IF NOT CSRefillData.GET(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") THEN BEGIN
+              //  CSStockTakesData.CALCFIELDS("Item Description","Variant Description");
+              //  CSRefillData.INIT;
+              //  CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
+              //  CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
+              //  CSRefillData.VALIDATE(Location,CSStockTakes.Location);
+              //  CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+              //  CSRefillData."Item Description" := CSStockTakesData."Item Description";
+              //  CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
+              //  CSRefillData.INSERT(TRUE);
+              //END;
+
+              //IF CSRefillData."Variant Code" <> '' THEN
+              //  CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
+              //ELSE
+              //  CSRefillData."Combined key" := CSRefillData."Item No.";
+
+              //CSRefillData."Qty. in Stock" += 1;
+
+              //CSRefillData.MODIFY(TRUE);
+              if not CSRefillDataTmp.Get(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") then begin
                 CSStockTakesData.CalcFields("Item Description","Variant Description");
-                CSRefillData.Init;
-                CSRefillData.Validate("Item No.",CSStockTakesData."Item No.");
-                CSRefillData.Validate("Variant Code",CSStockTakesData."Variant Code");
-                CSRefillData.Validate(Location,CSStockTakes.Location);
-                CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                CSRefillData."Item Description" := CSStockTakesData."Item Description";
-                CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
-                CSRefillData.Insert(true);
+                CSRefillDataTmp.Init;
+                CSRefillDataTmp.Validate("Item No.",CSStockTakesData."Item No.");
+                CSRefillDataTmp.Validate("Variant Code",CSStockTakesData."Variant Code");
+                CSRefillDataTmp.Validate(Location,CSStockTakes.Location);
+                CSRefillDataTmp."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                CSRefillDataTmp."Item Description" := CSStockTakesData."Item Description";
+                CSRefillDataTmp."Variant Description" := CSStockTakesData."Variant Description";
+                CSRefillDataTmp.Insert(true);
               end;
 
-              if CSRefillData."Variant Code" <> '' then
-                CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
+              if CSRefillDataTmp."Variant Code" <> '' then
+                CSRefillDataTmp."Combined key" := CSRefillDataTmp."Item No." + '-' + CSRefillDataTmp."Variant Code"
               else
-                CSRefillData."Combined key" := CSRefillData."Item No.";
+                CSRefillDataTmp."Combined key" := CSRefillDataTmp."Item No.";
 
-              CSRefillData."Qty. in Stock" += 1;
+              CSRefillDataTmp."Qty. in Stock" += 1;
 
-              CSRefillData.Modify(true);
+              CSRefillDataTmp.Modify(true);
+              //+NPR5.55 [384506]
             end;
           until CSStockTakesData.Next = 0;
         end;
 
-        CSRefillData.SetFilter("Qty. in Store",'>0');
-        CSRefillData.DeleteAll(false);
-        CSRefillData.Reset;
+        //-NPR5.55 [384506]
+        //CSRefillData.SETFILTER("Qty. in Store",'>0');
+        //CSRefillData.DELETEALL(FALSE);
+        //CSRefillData.RESET;
 
-        if CSRefillData.FindFirst then begin
+        //IF CSRefillData.FINDFIRST THEN BEGIN
+        //  REPEAT
+        //    IF NOT CSRefillSectionData.GET(CSStockTakesData."Item No.") THEN BEGIN
+        //      CSRefillSectionData.INIT;
+        //      CSRefillSectionData.VALIDATE("Item No.",CSRefillData."Item No.");
+        //      CSRefillSectionData."Item Description" := CSRefillData."Item Description";
+        //      CSRefillSectionData.Refilled := CSRefillData.Refilled;
+        //      CSRefillSectionData.INSERT(TRUE);
+        //    END;
+        //  UNTIL CSRefillData.NEXT = 0;
+        CSRefillDataTmp.SetFilter("Qty. in Store",'>0');
+        CSRefillDataTmp.DeleteAll(false);
+        CSRefillDataTmp.Reset;
+
+        if CSRefillDataTmp.FindFirst then begin
           repeat
-            if not CSRefillSectionData.Get(CSStockTakesData."Item No.") then begin
-              CSRefillSectionData.Init;
-              CSRefillSectionData.Validate("Item No.",CSRefillData."Item No.");
-              CSRefillSectionData."Item Description" := CSRefillData."Item Description";
-              CSRefillSectionData.Refilled := CSRefillData.Refilled;
-              CSRefillSectionData.Insert(true);
-            end;
-          until CSRefillData.Next = 0;
+            CSRefillSectionDataTmp.Init;
+            CSRefillSectionDataTmp.Validate("Item No.",CSRefillDataTmp."Item No.");
+            CSRefillSectionDataTmp."Item Description" := CSRefillDataTmp."Item Description";
+            CSRefillSectionDataTmp.Refilled := CSRefillDataTmp.Refilled;
+            if CSRefillSectionDataTmp.Insert(true) then;
+          until CSRefillDataTmp.Next = 0;
+        //+NPR5.55 [384506]
         end;
 
         CSStockTakes."Create Refill Data Ended" := CurrentDateTime;
@@ -2415,49 +2533,97 @@ codeunit 6151372 "CS WS"
 
         WritePropertyName('section');
         WriteStartArray;
-        if CSRefillSectionData.FindFirst then begin
+        //-NPR5.55 [384506]
+        // IF CSRefillSectionData.FINDFIRST THEN BEGIN
+        //  REPEAT
+        //    WriteStartObject;
+        //    WritePropertyName('key');
+        //    WriteValue(CSRefillSectionData."Item No.");
+        //    WritePropertyName('title');
+        //    WriteValue(CSRefillSectionData."Item Description");
+        //    WritePropertyName('itemgroup');
+        //    WriteValue('');
+        //    WritePropertyName('marked');
+        //    WriteValue(CSRefillSectionData.Refilled);
+        //    WriteEndObject;
+        //  UNTIL CSRefillSectionData.NEXT = 0;
+        if CSRefillSectionDataTmp.FindFirst then begin
           repeat
             WriteStartObject;
             WritePropertyName('key');
-            WriteValue(CSRefillSectionData."Item No.");
+            WriteValue(CSRefillSectionDataTmp."Item No.");
             WritePropertyName('title');
-            WriteValue(CSRefillSectionData."Item Description");
+            WriteValue(CSRefillSectionDataTmp."Item Description");
             WritePropertyName('itemgroup');
             WriteValue('');
             WritePropertyName('marked');
-            WriteValue(CSRefillSectionData.Refilled);
+            Clear(CSRefillData);
+            CSRefillData.SetRange("Stock-Take Id",CSStockTakes."Stock-Take Id");
+            CSRefillData.SetRange("Item No.",CSRefillSectionDataTmp."Item No.");
+            if CSRefillData.FindFirst then
+              WriteValue(CSRefillData.Refilled)
+            else
+              WriteValue(CSRefillSectionDataTmp.Refilled);
             WriteEndObject;
-          until CSRefillSectionData.Next = 0;
+          until CSRefillSectionDataTmp.Next = 0;
+        //+NPR5.55 [384506]
         end;
         WriteEndArray;
 
         WritePropertyName('item');
         WriteStartArray;
-        if CSRefillData.FindFirst then begin
+        //-NPR5.55 [384506]
+        // IF CSRefillData.FINDFIRST THEN BEGIN
+        //  REPEAT
+        //    WriteStartObject;
+        //    WritePropertyName('key');
+        //    WriteValue(CSRefillData."Combined key");
+        //    WritePropertyName('title');
+        //    WriteValue(CSRefillData."Item Description");
+        //    WritePropertyName('itemno');
+        //    WriteValue(CSRefillData."Item No.");
+        //    WritePropertyName('variantcode');
+        //    WriteValue(CSRefillData."Variant Code");
+        //    WritePropertyName('varianttitle');
+        //    WriteValue(CSRefillData."Variant Description");
+        //    WritePropertyName('itemgroup');
+        //    WriteValue(CSRefillData."Item Group Code");
+        //    WritePropertyName('imageurl');
+        //    WriteValue(CSRefillData."Image Url");
+        //    WritePropertyName('qtystock');
+        //    WriteValue(CSRefillData."Qty. in Stock");
+        //    WritePropertyName('qtystore');
+        //    WriteValue(CSRefillData."Qty. in Store");
+        //    WritePropertyName('marked');
+        //    WriteValue(CSRefillData.Refilled);
+        //    WriteEndObject;
+        //  UNTIL CSRefillData.NEXT = 0;
+        if CSRefillDataTmp.FindFirst then begin
           repeat
             WriteStartObject;
             WritePropertyName('key');
-            WriteValue(CSRefillData."Combined key");
+            WriteValue(CSRefillDataTmp."Combined key");
             WritePropertyName('title');
-            WriteValue(CSRefillData."Item Description");
+            WriteValue(CSRefillDataTmp."Item Description");
             WritePropertyName('itemno');
-            WriteValue(CSRefillData."Item No.");
+            WriteValue(CSRefillDataTmp."Item No.");
             WritePropertyName('variantcode');
-            WriteValue(CSRefillData."Variant Code");
+            WriteValue(CSRefillDataTmp."Variant Code");
             WritePropertyName('varianttitle');
-            WriteValue(CSRefillData."Variant Description");
+            WriteValue(CSRefillDataTmp."Variant Description");
             WritePropertyName('itemgroup');
-            WriteValue(CSRefillData."Item Group Code");
+            WriteValue(CSRefillDataTmp."Item Group Code");
             WritePropertyName('imageurl');
-            WriteValue(CSRefillData."Image Url");
+            WriteValue(CSRefillDataTmp."Image Url");
             WritePropertyName('qtystock');
-            WriteValue(CSRefillData."Qty. in Stock");
+            WriteValue(CSRefillDataTmp."Qty. in Stock");
             WritePropertyName('qtystore');
-            WriteValue(CSRefillData."Qty. in Store");
+            WriteValue(CSRefillDataTmp."Qty. in Store");
             WritePropertyName('marked');
-            WriteValue(CSRefillData.Refilled);
+            WriteValue(CSRefillDataTmp.Refilled);
             WriteEndObject;
-          until CSRefillData.Next = 0;
+          until CSRefillDataTmp.Next = 0;
+        //+NPR5.55 [384506]
         end;
         WriteEndArray;
 
@@ -2466,6 +2632,338 @@ codeunit 6151372 "CS WS"
         end;
 
         Result := JObject.ToString();
+    end;
+
+    [Scope('Personalization')]
+    procedure SetRfidTagDataTransferBatch(DocId: Text;TagIds: Text;ToDocNo: Text;DeviceId: Code[10];BatchId: Text) ResultData: Text
+    var
+        CSTransferHandlingRfid: Record "CS Transfer Handling Rfid";
+        OK: Boolean;
+        SessionID: Integer;
+        Ostream: OutStream;
+        BigTextData: BigText;
+        ValInt: Integer;
+        ValBool: Boolean;
+        CommaString: DotNet npNetString;
+        Separator: DotNet npNetString;
+        Value: Text;
+        Values: DotNet npNetArray;
+        TagData: Text;
+    begin
+        BigTextData.AddText(TagIds);
+
+        CSTransferHandlingRfid.Init;
+        CSTransferHandlingRfid.Id := CreateGuid;
+        CSTransferHandlingRfid."Batch Id" := BatchId;
+        CSTransferHandlingRfid.Created := CurrentDateTime;
+        CSTransferHandlingRfid."Created By" := UserId;
+        CSTransferHandlingRfid."Rfid Header Id" := DocId;
+        if ToDocNo = '' then
+          CSTransferHandlingRfid.Area := CSTransferHandlingRfid.Area::Shipping
+        else
+          CSTransferHandlingRfid.Area := CSTransferHandlingRfid.Area::Receiving;
+        CSTransferHandlingRfid."Device Id" := DeviceId;
+        CSTransferHandlingRfid."Posting Started" := CurrentDateTime;
+        CSTransferHandlingRfid."Request Data".CreateOutStream(Ostream);
+        BigTextData.Write(Ostream);
+
+        CSTransferHandlingRfid.Insert(false);
+        Commit;
+
+        CommaString := TagIds;
+        Separator := ',';
+        Values := CommaString.Split(Separator.ToCharArray());
+        CSTransferHandlingRfid.Tags := Values.Length;
+        CSTransferHandlingRfid.Modify(false);
+        Commit;
+
+        Clear(Ostream);
+        Clear(BigTextData);
+
+        ResultData := '';
+        TagData := '';
+
+        foreach Value in Values do begin
+          if Value <> '' then begin
+            TagData := Value + '|' + SetRfidTagDataTransfer(CSTransferHandlingRfid."Rfid Header Id", Value, ToDocNo);
+            if ResultData = '' then
+              ResultData := TagData
+            else
+              ResultData := ResultData + ',' + TagData;
+          end;
+        end;
+
+        CSTransferHandlingRfid."Posting Ended" := CurrentDateTime;
+        CSTransferHandlingRfid.Handled := true;
+        CSTransferHandlingRfid.Modify(true);
+
+        BigTextData.AddText(ResultData);
+        CSTransferHandlingRfid."Response Data".CreateOutStream(Ostream);
+        BigTextData.Write(Ostream);
+        CSTransferHandlingRfid.Modify(false);
+        exit(ResultData);
+    end;
+
+    [Scope('Personalization')]
+    procedure SetRfidTagDataTransfer(DocId: Text;TagId: Text;ToDocNo: Text): Text
+    var
+        CSRfidLines: Record "CS Rfid Lines";
+        CSRfidData: Record "CS Rfid Data";
+        Result: Text;
+    begin
+        if ToDocNo = '' then begin
+          CSRfidLines.Init;
+          CSRfidLines.Id := DocId;
+          CSRfidLines."Tag Id" := TagId;
+          CSRfidLines.Created := CurrentDateTime;
+          CSRfidLines."Created By" := UserId;
+          CSRfidLines."Tag Shipped" := true;
+          if CSRfidData.Get(TagId) then begin
+            CSRfidLines.Validate("Item No.",CSRfidData."Cross-Reference Item No.");
+            CSRfidLines.Validate("Variant Code",CSRfidData."Cross-Reference Variant Code");
+            CSRfidLines.Validate("Item Group Code",CSRfidData."Item Group Code");
+            CSRfidLines."Combined key" := CSRfidData."Combined key";
+            Result := CSRfidData."Combined key" + '|1';
+          end else
+            Result := 'UNKNOWNITEM|0';
+          CSRfidLines.Insert();
+        end else begin
+          if CSRfidLines.Get(DocId,TagId) then begin
+            CSRfidLines.Match := true;
+            CSRfidLines."Tag Received" := true;
+            CSRfidLines.Modify(true);
+            if CSRfidLines."Combined key" <> '' then
+              Result := CSRfidLines."Combined key" + '|1'
+            else
+              Result := 'UNKNOWNITEM|1';
+          end else begin
+            CSRfidLines.Init;
+            CSRfidLines.Id := DocId;
+            CSRfidLines."Tag Id" := TagId;
+            CSRfidLines.Created := CurrentDateTime;
+            CSRfidLines."Created By" := UserId;
+            CSRfidLines."Tag Received" := true;
+            if CSRfidData.Get(TagId) then begin
+              CSRfidLines.Validate("Item No.",CSRfidData."Cross-Reference Item No.");
+              CSRfidLines.Validate("Variant Code",CSRfidData."Cross-Reference Variant Code");
+              CSRfidLines.Validate("Item Group Code",CSRfidData."Item Group Code");
+              CSRfidLines."Combined key" := CSRfidData."Combined key";
+              Result := CSRfidData."Combined key" + '|0';
+            end else
+              Result := 'UNKNOWNITEM|0';
+            CSRfidLines.Insert();
+          end;
+        end;
+
+        exit(Result)
+    end;
+
+    [Scope('Personalization')]
+    procedure ResetTransfer(DocId: Text;ToDocNo: Text): Text
+    var
+        CSTransferHandlingRfid: Record "CS Transfer Handling Rfid";
+        CSRfidHeader: Record "CS Rfid Header";
+        CSRfidLines: Record "CS Rfid Lines";
+    begin
+        Clear(CSRfidHeader);
+        CSRfidHeader.SetRange(Id,DocId);
+        CSRfidHeader.SetRange("To Document No.",ToDocNo);
+        if CSRfidHeader.FindSet then begin
+          if ToDocNo = '' then begin
+            Clear(CSTransferHandlingRfid);
+            CSTransferHandlingRfid.SetRange("Rfid Header Id",CSRfidHeader.Id);
+            CSTransferHandlingRfid.SetRange(Area, CSTransferHandlingRfid.Area::Shipping);
+            CSTransferHandlingRfid.DeleteAll(true);
+
+            Clear(CSRfidLines);
+            CSRfidLines.SetRange(Id,CSRfidHeader.Id);
+            CSRfidLines.DeleteAll(true);
+          end else begin
+            Clear(CSTransferHandlingRfid);
+            CSTransferHandlingRfid.SetRange("Rfid Header Id",CSRfidHeader.Id);
+            CSTransferHandlingRfid.SetRange(Area, CSTransferHandlingRfid.Area::Receiving);
+            CSTransferHandlingRfid.DeleteAll(true);
+
+            Clear(CSRfidLines);
+            CSRfidLines.SetRange(Id,CSRfidHeader.Id);
+            if CSRfidLines.FindSet then begin
+              repeat
+                CSRfidLines.Match := false;
+                CSRfidLines.Modify(true);
+              until CSRfidLines.Next = 0;
+            end;
+
+            Clear(CSRfidLines);
+            CSRfidLines.SetRange(Id,CSRfidHeader.Id);
+            CSRfidLines.SetRange("Tag Shipped",false);
+            CSRfidLines.DeleteAll(true);
+          end;
+        end;
+
+        exit(DocId);
+    end;
+
+    [Scope('Personalization')]
+    procedure CloseTransfer(DocId: Text;ToDocNo: Text): Text
+    var
+        CSSetup: Record "CS Setup";
+        CSRfidHeader: Record "CS Rfid Header";
+        CSRfidLines: Record "CS Rfid Lines";
+    begin
+        if not CSSetup.Get then
+          exit(StrSubstNo(Txt010,CompanyName));
+
+        if not CSRfidHeader.Get(DocId) then
+          exit(StrSubstNo(Txt023,DocId));
+
+        Clear(CSRfidLines);
+        CSRfidLines.SetRange(Id,CSRfidHeader.Id);
+        if CSRfidLines.Count = 0 then
+          Error(Txt024);
+
+        if ToDocNo <> '' then
+          if CSSetup."Use Whse. Receipt" then
+            CSRfidHeader.TransferWhseReceiptLines();
+
+        exit(DocId)
+    end;
+
+    [Scope('Personalization')]
+    procedure GetJournalItemCount(StockTakeConfigCode: Text;WorksheetName: Text): Text
+    var
+        CSSetup: Record "CS Setup";
+        ItemJournalBatch: Record "Item Journal Batch";
+        CSItemJournalItems: Query "CS Item Journal Items";
+        CombinedKey: Code[30];
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        Result: Text;
+    begin
+        if not CSSetup.Get then
+          exit(StrSubstNo(Txt010,CompanyName));
+
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",WorksheetName) then
+          exit('UNKNOWNSTOCKTAKEWORKSHEET');
+
+        JTokenWriter := JTokenWriter.JTokenWriter;
+        with JTokenWriter do begin
+          WriteStartObject;
+          WritePropertyName('item');
+          WriteStartArray;
+
+          CSItemJournalItems.SetRange(Journal_Template_Name,CSSetup."Phys. Inv Jour Temp Name");
+          CSItemJournalItems.SetRange(Journal_Batch_Name,ItemJournalBatch.Name);
+          CSItemJournalItems.Open;
+          while CSItemJournalItems.Read do
+          begin
+            WriteStartObject;
+            WritePropertyName('key');
+
+            if CSItemJournalItems.Variant_Code <> '' then
+              CombinedKey := CSItemJournalItems.Item_No + '-' + CSItemJournalItems.Variant_Code
+            else
+              CombinedKey := CSItemJournalItems.Item_No;
+
+            WriteValue(CombinedKey);
+            WritePropertyName('predicted');
+            WriteValue(CSItemJournalItems.Sum_Qty_Calculated);
+            WriteEndObject;
+          end;
+
+          CSItemJournalItems.Close;
+
+          WriteEndArray;
+          WriteEndObject;
+          JObject := Token;
+        end;
+
+        Result := JObject.ToString();
+        exit(Result);
+    end;
+
+    [Scope('Personalization')]
+    procedure GetDocumentItemCount(DocId: Text): Text
+    var
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        Result: Text;
+        CSRfidHeader: Record "CS Rfid Header";
+        CSRfidLines: Record "CS Rfid Lines";
+        CSRFIDDocumentItems: Query "CS RFID Document Items";
+        CombinedKey: Code[30];
+    begin
+        if not CSRfidHeader.Get(DocId) then
+          exit('UNKNOWNDOCUMENT');
+
+        JTokenWriter := JTokenWriter.JTokenWriter;
+        with JTokenWriter do begin
+          WriteStartObject;
+          WritePropertyName('item');
+          WriteStartArray;
+
+          CSRFIDDocumentItems.SetRange(Id,CSRfidHeader.Id);
+          CSRFIDDocumentItems.SetRange(Tag_Shipped,true);
+          CSRFIDDocumentItems.Open;
+          while CSRFIDDocumentItems.Read do
+          begin
+            WriteStartObject;
+            WritePropertyName('key');
+
+            if CSRFIDDocumentItems.Variant_Code <> '' then
+              CombinedKey := CSRFIDDocumentItems.Item_No + '-' + CSRFIDDocumentItems.Variant_Code
+            else
+              CombinedKey := CSRFIDDocumentItems.Item_No;
+
+            if CombinedKey = '' then
+              CombinedKey := 'UNKNOWNITEM';
+
+            WriteValue(CombinedKey);
+            WritePropertyName('predicted');
+            WriteValue(CSRFIDDocumentItems.Count_);
+            WriteEndObject;
+          end;
+
+          CSRFIDDocumentItems.Close;
+
+          WriteEndArray;
+          WriteEndObject;
+          JObject := Token;
+        end;
+
+        Result := JObject.ToString();
+        exit(Result);
+    end;
+
+    local procedure CleanTagEntries(var Values: DotNet npNetArray)
+    var
+        CSRfidTagModels: Record "CS Rfid Tag Models";
+        CSSetup: Record "CS Setup";
+        TagIDs: Text;
+        Value: DotNet npNetString;
+        ValuesString: DotNet npNetString;
+        Separator: DotNet npNetString;
+        EmptyArray: DotNet npNetArray;
+    begin
+        //-NPR5.55 [415521]
+        CSRfidTagModels.SetRange(Discontinued, false);
+        if not CSRfidTagModels.FindSet then
+          Error(NoRfidModelsInDBErr, CSRfidTagModels.TableCaption, CSSetup.FieldCaption("Disregard Unknown RFID Tags"), CSSetup.TableCaption);
+
+        Separator := ',';
+        ValuesString := '';
+        foreach Value in Values do begin
+          CSRfidTagModels.SetRange(Family, Value.Substring(0, 4));
+          CSRfidTagModels.SetRange(Model, Value.Substring(3, 4));
+
+          if not CSRfidTagModels.IsEmpty then
+            ValuesString.Concat(ValuesString, Separator, Value);
+        end;
+
+        if ValuesString.Equals('') then
+          Values := EmptyArray.CreateInstance(Value.GetType(), 0)
+        else
+          Values := ValuesString.Split(Separator.ToCharArray());
+        //+NPR5.55 [415521]
     end;
 }
 

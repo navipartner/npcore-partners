@@ -1,6 +1,7 @@
 page 6150747 "Unfinished POS Sale Transact."
 {
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.55/ALPO/20200812 CASE 391678 Log sale canceling to POS Entry
 
     Caption = 'Unfinished POS Sale Transactions';
     DataCaptionExpression = '';
@@ -104,7 +105,8 @@ page 6150747 "Unfinished POS Sale Transact."
                     trigger OnAction()
                     begin
                         Error('Not Supported');
-                        POSResumeSale.DoSaveAsPOSQuote(Rec,false);
+                        //POSResumeSale.DoSaveAsPOSQuote(Rec,FALSE);  //NPR5.55 [391678]-revoked
+                        POSResumeSale.DoSaveAsPOSQuote(POSSession, Rec, false, false);  //NPR5.55 [391678]
                         CurrPage.Update(false);
                     end;
                 }

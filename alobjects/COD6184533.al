@@ -1,6 +1,7 @@
 codeunit 6184533 "EFT NETSCloud Token"
 {
     // NPR5.54/MMV /20200129 CASE 364340 Created object
+    // NPR5.55/MMV /20200420 CASE 386254 Added WF2 methods, unattended lookup skip & fixed sale completion check.
 
     SingleInstance = true;
 
@@ -46,7 +47,16 @@ codeunit 6184533 "EFT NETSCloud Token"
 
         String := TokenIn;
         StringArray := String.Split(CharArray);
-        Payload := StringArray.GetValue(1);
+        //-NPR5.55 [386254]
+        String := StringArray.GetValue(1);
+        String := String.Replace('-','+');
+        String := String.Replace('_','/');
+        Payload := String;
+
+        while (StrLen(Payload) mod 4) <> 0 do begin
+          Payload += '=';
+        end;
+        //+NPR5.55 [386254]
 
         Payload := Encoding.UTF8.GetString(Convert.FromBase64String(Payload));
         JObject := JObject.Parse(Payload);

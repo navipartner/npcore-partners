@@ -18,9 +18,10 @@ page 6060121 "TM Ticket BOM"
     // TM1.42/TSA /20190411 CASE 351050 Added "Revisit Condition (Statistics)"
     // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
     // TM1.45/TSA /20191120 CASE 378212 Added "Sales Start Date", "Sales Until Date",
-    // TM1.45/TSA /20191127 CASE 379766 Deligates ticket activation method to Ticket BOM, added activation method to page
-    // TM90.1.46/TSA /20200123 CASE 386850 Set ignore schedule filter
-    // TM90.1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
+    // TM1.45/TSA /20191127 CASE 379766 Delegates ticket activation method to Ticket BOM, added activation method to page
+    // TM1.46/TSA /20200123 CASE 386850 Set ignore schedule filter
+    // TM1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
+    // TM1.48/TSA/20200730  CASE 411704 Transport TM1.48 - 30 July 2020
 
     Caption = 'Ticket BOM';
     PageType = List;
@@ -60,6 +61,9 @@ page 6060121 "TM Ticket BOM"
                 field("Activation Method"; "Activation Method")
                 {
                     Visible = false;
+                }
+                field("Percentage of Adm. Capacity";"Percentage of Adm. Capacity")
+                {
                 }
                 field("Max No. Of Entries"; "Max No. Of Entries")
                 {

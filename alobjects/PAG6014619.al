@@ -131,7 +131,7 @@ page 6014619 "Retail - Sales RC My Report"
             action("Magento Item Groups")
             {
                 Caption = 'Magento Item Groups';
-                RunObject = Page "Magento Item Groups";
+                RunObject = Page "Magento Categories";
                 Visible = false;
             }
             action(MixedDiscounts)

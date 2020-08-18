@@ -9,6 +9,7 @@ codeunit 6060141 "MM Loyalty WebService"
     // MM1.43/TSA /20200113 CASE 370398 Added the ListCoupons() service
     // MM1.43/TSA /20200123 CASE 387009 Fixed an initialization issue with CreateCoupon()
     // MM1.43/MHA /20200217 CASE 390998 Added default report in GetMembershipReceiptPdf()
+    // MM1.45/TSA /20200612 CASE 404908 Added language selection from user personalization
 
 
     trigger OnRun()
@@ -151,7 +152,9 @@ codeunit 6060141 "MM Loyalty WebService"
         ReportSelections: Record "Report Selection Retail";
         POSEntry: Record "POS Entry";
         Membership: Record "MM Membership";
+        UserPersonalization: Record "User Personalization";
         Filename: Text;
+        LanguageId: Integer;
     begin
 
         //-MM1.40 [365879]
@@ -172,7 +175,19 @@ codeunit 6060141 "MM Loyalty WebService"
         POSEntry.SetRecFilter;
 
         Filename := TemporaryPath + 'Receipt-' + Format(ReceiptEntryNo, 0, 9) + '.pdf';
+
+        //-MM1.45 [404908]
+        UserPersonalization.SetFilter ("User ID", '%1', UserId);
+        if (UserPersonalization.FindFirst ()) then
+          LanguageId := GlobalLanguage (UserPersonalization."Language ID");
+        //+MM1.45 [404908]
+
         REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, POSEntry);
+
+        //-MM1.45 [404908]
+        if (LanguageId <> 0) then
+          GlobalLanguage (LanguageId);
+        //+MM1.45 [404908]
 
         PdfDoc := GetBase64(Filename);
         if Erase(Filename) then;

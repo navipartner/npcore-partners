@@ -24,6 +24,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     //                                   Parse web exception on error to fill buffer.
     //                                   Handle acquire card hard error.
     // NPR5.54/MMV /20200227 CASE 364340 Changed background session method.
+    // NPR5.55/MMV /20200421 CASE 386254 Parameter controlled model GUI
 
 
     trigger OnRun()
@@ -51,48 +52,37 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         exit('ADYEN_CLOUD');
     end;
 
-    procedure SendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request")
+    procedure SendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request";OpenDialog: Boolean)
     begin
         // All the request types that show a front-end dialog while waiting for terminal customer interaction, are asynchronous using STARTSESSION to perform a long timeout webservice request.
         // The POS user session will poll a table until a response record appears or timeout is reached.
         // The reason is that Adyens transaction API requires concurrent requests which a single user session does not support in pure C/AL.
 
+        //-NPR5.55 [386254]
         case EftTransactionRequest."Processing Type" of
-            EftTransactionRequest."Processing Type"::PAYMENT:
-                StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
-            EftTransactionRequest."Processing Type"::REFUND:
-                StartRefundTransaction(EftTransactionRequest); //Via async dialog & background session
-            EftTransactionRequest."Processing Type"::VOID:
-                VoidTransaction(EftTransactionRequest); //Via blocking ws invoke
-            EftTransactionRequest."Processing Type"::LOOK_UP:
-                LookupTransaction(EftTransactionRequest); //Via blocking ws invoke
-            EftTransactionRequest."Processing Type"::SETUP:
-                SetupTerminal(EftTransactionRequest); //Via blocking ws invoke
-            EftTransactionRequest."Processing Type"::AUXILIARY:
-                case EftTransactionRequest."Auxiliary Operation ID" of
-                    1:
-                        AbortTransaction(EftTransactionRequest); //via blocking ws invoke
-                    2:
-                        StartAcquireCard(EftTransactionRequest); //Via async dialog & background session
-                    3:
-                        AbortAcquireCard(EftTransactionRequest); //via blocking ws invoke
-                                                                 //-NPR5.53 [377533]
-                    4:
-                        StartAcquireCard(EftTransactionRequest); //Via async dialog & background session
-                    5:
-                        StartAcquireCard(EftTransactionRequest); //Via async dialog & background session
-                    6:
-                        DisableRecurringContract(EftTransactionRequest); //via blocking ws invoke
-                                                                         //+NPR5.53 [377533]
-                end;
+          EftTransactionRequest."Processing Type"::PAYMENT : StartPaymentTransaction(EftTransactionRequest, OpenDialog); //Via async dialog & background session
+          EftTransactionRequest."Processing Type"::REFUND : StartRefundTransaction(EftTransactionRequest, OpenDialog); //Via async dialog & background session
+          EftTransactionRequest."Processing Type"::VOID : VoidTransaction(EftTransactionRequest); //Via blocking ws invoke
+          EftTransactionRequest."Processing Type"::LOOK_UP : LookupTransaction(EftTransactionRequest); //Via blocking ws invoke
+          EftTransactionRequest."Processing Type"::SETUP : SetupTerminal(EftTransactionRequest); //Via blocking ws invoke
+          EftTransactionRequest."Processing Type"::AUXILIARY :
+            case EftTransactionRequest."Auxiliary Operation ID" of
+              1 : AbortTransaction(EftTransactionRequest); //via blocking ws invoke
+              2 : StartAcquireCard(EftTransactionRequest, OpenDialog); //Via async dialog & background session
+              3 : AbortAcquireCard(EftTransactionRequest); //via blocking ws invoke
+              4 : StartAcquireCard(EftTransactionRequest, OpenDialog); //Via async dialog & background session
+              5 : StartAcquireCard(EftTransactionRequest, OpenDialog); //Via async dialog & background session
+              6 : DisableRecurringContract(EftTransactionRequest); //via blocking ws invoke
+            end;
         end;
+        //+NPR5.55 [386254]
     end;
 
     local procedure "// Operations"()
     begin
     end;
 
-    local procedure StartPaymentTransaction(EftTransactionRequest: Record "EFT Transaction Request")
+    local procedure StartPaymentTransaction(EftTransactionRequest: Record "EFT Transaction Request";OpenDialog: Boolean)
     var
         POSFrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
@@ -128,7 +118,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
             if GetLinkedCardAcquisition(EftTransactionRequest, AcquireCardRequest) then
                 exit; //Dialog already open
 
-        EFTAdyenCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
+        //-NPR5.55 [386254]
+        if OpenDialog then
+        //+NPR5.55 [386254]
+          EFTAdyenCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
     end;
 
     local procedure EndPaymentTransaction(var EftTransactionRequest: Record "EFT Transaction Request"; Response: Text)
@@ -164,7 +157,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.53 [377533]
     end;
 
-    local procedure StartRefundTransaction(EftTransactionRequest: Record "EFT Transaction Request")
+    local procedure StartRefundTransaction(EftTransactionRequest: Record "EFT Transaction Request";OpenDialog: Boolean)
     var
         POSFrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
@@ -200,7 +193,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
             if GetLinkedCardAcquisition(EftTransactionRequest, AcquireCardRequest) then
                 exit; //Dialog already open
 
-        EFTAdyenCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
+        //-NPR5.55 [386254]
+        if OpenDialog then
+        //+NPR5.55 [386254]
+          EFTAdyenCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
     end;
 
     local procedure EndRefundTransaction(var EftTransactionRequest: Record "EFT Transaction Request"; Response: Text)
@@ -426,7 +422,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.54 [387990]
     end;
 
-    local procedure StartAcquireCard(EftTransactionRequest: Record "EFT Transaction Request")
+    local procedure StartAcquireCard(EftTransactionRequest: Record "EFT Transaction Request";OpenDialog: Boolean)
     var
         POSFrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
@@ -449,7 +445,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
         //+NPR5.53 [377533]
 
-        EFTAdyenCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
+        //-NPR5.55 [386254]
+        if OpenDialog then
+        //+NPR5.55 [386254]
+          EFTAdyenCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
     end;
 
     local procedure EndAcquireCard(EftTransactionRequest: Record "EFT Transaction Request"; Response: Text)

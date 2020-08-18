@@ -25,6 +25,9 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     // MM1.41/TSA /20191002 CASE 368608 Adding new action to edit current membership
     // MM1.42/TSA /20200114 CASE 385449 Changed the member lookup on login to show member list rather than member card list due to search limits on pages shown in browser
     // MM1.43/TSA /20200226 CASE 392087 Switching from the POS Member Card page to the full Member Card page after a member is selected after login
+    // MM1.44/TSA /20200420 CASE 395991 Changed the listing page when membership card is not provided.
+    // MM1.45/ALPO/20200617 CASE 407500 Clear last error before running member selection UI
+    // #416870/TSA /20200813 CASE 416870 Added a new subscriber for handling load save sale
 
 
     trigger OnRun()
@@ -1001,11 +1004,15 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         MemberCard: Record "MM Member Card";
     begin
 
-        if (ACTION::LookupOK <> PAGE.RunModal (0, MemberCard)) then
-          exit (false);
+        //-MM1.44 [395991]
+        // IF (ACTION::LookupOK <> PAGE.RUNMODAL (0, MemberCard)) THEN
+        //  EXIT (FALSE);
+        //
+        // ExtMemberCardNo := MemberCard."External Card No.";
+        // EXIT (ExtMemberCardNo <> '');
 
-        ExtMemberCardNo := MemberCard."External Card No.";
-        exit (ExtMemberCardNo <> '');
+        exit (SelectMemberCardViaMemberUI (ExtMemberCardNo));
+        //+MM1.44 [395991]
     end;
 
     local procedure SelectMemberUI(var ExtMemberNo: Code[20]): Boolean
@@ -1020,6 +1027,60 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         ExtMemberNo := Member."External Member No.";
         exit (ExtMemberNo <> '');
         //+MM1.42 [385449]
+    end;
+
+    local procedure SelectMemberCardViaMemberUI(var ExtMemberCardNo: Text[100]): Boolean
+    var
+        Member: Record "MM Member";
+        MemberCard: Record "MM Member Card";
+        MemberCardList: Page "MM Member Card List";
+        ExtMemberNo: Code[20];
+    begin
+
+        //-MM1.44 [395991]
+        if (not SelectMemberUI (ExtMemberNo)) then
+          exit (false);
+
+        Member.SetFilter ("External Member No.", '=%1', ExtMemberNo);
+        Member.SetFilter (Blocked, '=%1', false);
+        if (not Member.FindFirst ()) then
+          exit (false);
+
+        MemberCard.SetFilter ("Member Entry No.", '=%1', Member."Entry No.");
+        MemberCard.SetFilter (Blocked, '=%1', false);
+        MemberCard.SetFilter ("Valid Until", '=%1|>=%2', 0D, Today);
+        if (MemberCard.Count() > 1) then begin
+          MemberCardList.SetTableView (MemberCard);
+          MemberCardList.Editable (false);
+          MemberCardList.LookupMode (true);
+          if (ACTION::LookupOK <> MemberCardList.RunModal ()) then
+            exit (false);
+
+          MemberCardList.GetRecord (MemberCard);
+
+        end else begin
+          if (not MemberCard.FindFirst ()) then begin
+            MemberCard.Reset ();
+            MemberCard.SetFilter ("Member Entry No.", '=%1', Member."Entry No.");
+            MemberCard.SetFilter (Blocked, '=%1', false);
+            if (MemberCard.Count() > 1) then begin
+              MemberCardList.SetTableView (MemberCard);
+              MemberCardList.Editable (false);
+              MemberCardList.LookupMode (true);
+              if (ACTION::LookupOK <> MemberCardList.RunModal ()) then
+                exit (false);
+              MemberCardList.GetRecord (MemberCard);
+            end else begin
+              if (not MemberCard.FindFirst ()) then
+                exit (false);
+            end;
+          end;
+        end;
+
+        ExtMemberCardNo := MemberCard."External Card No.";
+        exit (true);
+
+        //+MM1.44 [395991]
     end;
 
     local procedure "--- Publisher"()
@@ -1046,7 +1107,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeLoadSavedSale', '', true, true)]
-    local procedure OnBeforeLoadSavedSaleSubscriber(var Sender: Codeunit "POS Sale";OriginalSalesTicketNo: Code[20];NewSalesTicketNo: Code[20])
+    local procedure OnBeforeLoadSavedSaleSubscriber_discontinued(var Sender: Codeunit "POS Sale";OriginalSalesTicketNo: Code[20];NewSalesTicketNo: Code[20])
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MemberInfoCapture2: Record "MM Member Info Capture";
@@ -1079,6 +1140,48 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
           until (POSSalesInfo.Next () = 0);
         end;
         //+MM1.25 [257011]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
+    local procedure OnBeforeLoadSavedSaleSubscriber(POSQuoteEntry: Record "POS Quote Entry";var SalePOS: Record "Sale POS")
+    var
+        MemberInfoCapture: Record "MM Member Info Capture";
+        MemberInfoCapture2: Record "MM Member Info Capture";
+        POSSalesInfo: Record "MM POS Sales Info";
+        POSSalesInfo2: Record "MM POS Sales Info";
+        OriginalSalesTicketNo: Code[20];
+        NewSalesTicketNo: Code[20];
+    begin
+
+        //-#416870 [416870]
+        OriginalSalesTicketNo := POSQuoteEntry."Sales Ticket No.";
+        NewSalesTicketNo := SalePOS."Sales Ticket No.";
+
+        MemberInfoCapture.SetCurrentKey ("Receipt No.");
+        MemberInfoCapture.SetFilter ("Receipt No.", '=%1', OriginalSalesTicketNo);
+        if (MemberInfoCapture.FindSet ()) then begin
+          repeat
+            MemberInfoCapture2.Get (MemberInfoCapture."Entry No.");
+            MemberInfoCapture2."Receipt No."  := NewSalesTicketNo;
+            MemberInfoCapture2.Modify ();
+          until (MemberInfoCapture.Next () = 0);
+        end;
+
+        //-MM1.25 [257011]
+        if (POSSalesInfo.Get (POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0)) then begin
+          POSSalesInfo."Receipt No." := NewSalesTicketNo;
+          if not (POSSalesInfo.Insert ()) then ;
+        end;
+
+        POSSalesInfo.SetFilter ("Association Type", '=%1', POSSalesInfo."Association Type"::LINE);
+        POSSalesInfo.SetFilter ("Receipt No.", '=%1', OriginalSalesTicketNo);
+        if (POSSalesInfo.FindSet ()) then begin
+          repeat
+            POSSalesInfo."Receipt No." := NewSalesTicketNo;
+            if (not POSSalesInfo.Insert ()) then ;
+          until (POSSalesInfo.Next () = 0);
+        end;
+        //+#416870 [416870]
     end;
 
     local procedure "--- OnAfterInsertSaleLine Workflow"()
@@ -1168,6 +1271,10 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
 
           if (Member.Get (MembershipManagement.GetMemberFromExtMemberNo (ExternalMemberNo))) then begin
 
+            //-MM1.44 [395991]
+            Clear (POSMemberCardEdit);
+            //-MM1.44 [395991]
+
             //-MM1.43 [392087]
             //  POSMemberCard.LOOKUPMODE (TRUE);
             //  POSMemberCard.SETRECORD (Member);
@@ -1178,6 +1285,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
 
             POSMemberCardEdit.SetRecord (Member);
             POSMemberCardEdit.LookupMode (true);
+            ClearLastError;  //MM1.45 [407500]
             if (POSMemberCardEdit.RunModal() = ACTION::LookupOK) then
               MembershipSelected := AssignPOSMember (SalePOS, ExternalMemberNo);
             //+MM1.43 [392087]

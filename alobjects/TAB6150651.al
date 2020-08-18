@@ -1,6 +1,7 @@
 table 6150651 "POS View Profile"
 {
-    // NPR5.49/TJ  /20190201 CASE 335739 New object
+    // NPR5.49/TJ /20190201 CASE 335739 New object
+    // NPR5.55/TSA /20200527 CASE 406862 Added "Initial Sales View", "After End-of-Sale View"
 
     Caption = 'POS View Profile';
     DrillDownPageID = "POS View Profiles";
@@ -52,6 +53,18 @@ table 6150651 "POS View Profile"
             Caption = 'Line Order on Screen';
             OptionCaption = 'Normal (new at the end),Reverse (new on top),After Selected Line';
             OptionMembers = Normal,Reverse,AutoSplitKey;
+        }
+        field(50;"Initial Sales View";Option)
+        {
+            Caption = 'Initial Sales View';
+            OptionCaption = 'Sales View,Restaurant View';
+            OptionMembers = SALES_VIEW,RESTAURANT_VIEW;
+        }
+        field(55;"After End-of-Sale View";Option)
+        {
+            Caption = 'After End-of-Sale View';
+            OptionCaption = 'Initial Sales View,Login View';
+            OptionMembers = INITIAL_SALE_VIEW,LOGIN_VIEW;
         }
     }
 

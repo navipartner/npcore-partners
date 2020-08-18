@@ -10,12 +10,12 @@ table 6150904 "HC Retail Setup"
         field(1;"Key";Code[20])
         {
             Caption = 'Key';
-            Description = 'Prim�rn�gle';
+            Description = 'Primærn¢gle';
         }
         field(13;"Amount Rounding Precision";Decimal)
         {
             Caption = 'Amount Rounding Precision';
-            Description = 'Afrundingspr�cision for �reafrunding';
+            Description = 'Afrundingspræcision for ¢reafrunding';
             InitValue = 0.25;
             MaxValue = 1;
             MinValue = 0;
@@ -34,13 +34,13 @@ table 6150904 "HC Retail Setup"
         field(20;"Posting Source Code";Code[10])
         {
             Caption = 'Posting Source Code';
-            Description = 'Kildespor til bogf�ring';
+            Description = 'Kildespor til bogf¢ring';
             TableRelation = "Source Code";
         }
         field(51;"Posting No. Management";Code[10])
         {
             Caption = 'Posting No. Management';
-            Description = 'Nummerserie til kassebogf�ring';
+            Description = 'Nummerserie til kassebogf¢ring';
             TableRelation = "No. Series";
         }
         field(450;"Gen. Journal Template";Code[10])
@@ -83,14 +83,14 @@ table 6150904 "HC Retail Setup"
         field(800;"Balancing Posting Type";Option)
         {
             Caption = 'Balancing';
-            Description = 'Ops�tning til kasseafslutning';
+            Description = 'Opsætning til kasseafslutning';
             OptionCaption = 'PER REGISTER,TOTAL';
             OptionMembers = "PER KASSE",SAMLET;
         }
         field(4018;"Vat Bus. Posting Group";Code[10])
         {
             Caption = 'VAT Bus. Posting Group';
-            Description = 'V�rdi som automatisk s�ttes n�r man opretter en debitor.';
+            Description = 'Værdi som automatisk sættes når man opretter en debitor.';
             TableRelation = "VAT Business Posting Group".Code;
         }
         field(5092;"Post registers compressed";Boolean)

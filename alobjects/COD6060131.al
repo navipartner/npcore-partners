@@ -64,6 +64,9 @@ codeunit 6060131 "MM Member Retail Integration"
     // MM1.40/TSA /20190730 CASE 360275 Added AdmitMembersOnEndOfSalesWorker(), removed AdmittMembersOnCreateMembership(), corrected spelling of "admit"
     // MM1.40/TSA /20190830 CASE 360242 Added a confirm when printing membercard that is blocked
     // MM1.41/TSA /20190910 CASE 368136 Discontinuing old code
+    // MM1.44/TSA /20200514 CASE 401199 Changed caption for ADMIT_MEMBERS
+    // MM1.44/TSA /20200519 CASE 405500 Account Print did not support template option for printing
+    // MM1.45/TSA /20200729 CASE 416671 Signature change on POS_CheckLimitMemberCardArrival()
 
 
     var
@@ -86,7 +89,7 @@ codeunit 6060131 "MM Member Retail Integration"
         gLastMessage: Text;
         Text000: Label 'Print Membership';
         INVALID_TICKET_ITEM: Label 'Ticket Item specified on %1 %2, is not valid. ';
-        ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
+        ADMIT_MEMBERS: Label 'Do you want to admit the member(s)?';
         NOT_SUPPORTED_FOR_REMOTE: Label 'This membership action is not supported for a remote membership';
         CONFIRM_CARD_BLOCKED: Label 'This membercard is blocked, do you want to continue anyway?';
 
@@ -483,6 +486,7 @@ codeunit 6060131 "MM Member Retail Integration"
         ObjectOutputMgt: Codeunit "Object Output Mgt.";
         LinePrintMgt: Codeunit "RP Line Print Mgt.";
         ReportPrinterInterface: Codeunit "Report Printer Interface";
+        PrintTemplateMgt: Codeunit "RP Template Mgt.";
     begin
 
         case MembershipSetup."Account Print Object Type" of
@@ -497,6 +501,11 @@ codeunit 6060131 "MM Member Retail Integration"
 
             MembershipSetup."Account Print Object Type"::REPORT:
                 ReportPrinterInterface.RunReport(MembershipSetup."Account Print Object ID", false, false, Member);
+
+          //-MM1.44 [405500]
+          MembershipSetup."Account Print Object Type"::TEMPLATE :
+            PrintTemplateMgt.PrintTemplate (MembershipSetup."Account Print Template Code", Member, 0);
+          //+MM1.44 [405500]
 
             else
                 Error(ILLEGAL_VALUE, MembershipSetup."Account Print Object Type", MembershipSetup.FieldCaption("Account Print Object Type"));

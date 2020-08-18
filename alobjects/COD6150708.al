@@ -16,6 +16,9 @@ codeunit 6150708 "POS Setup"
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
     // NPR5.54/TSA /20200219 CASE 391850 Refresh of the POS Setup record when POS Unit is changed, added GetNamedActionSetup();
     // NPR5.54/TSA /20200220 CASE 392121 Added ActionCode_IdleTimout(), Action_IdleTimeout();
+    // NPR5.55/TSA /20200424 CASE 400734 Added Action_AdminMenu(), ActionCode_AdminMenu()
+    // NPR5.55/TSA /20200527 CASE 406862 Added GetPOSUnitViewProfile()
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile" handling)
 
 
     trigger OnRun()
@@ -31,6 +34,7 @@ codeunit 6150708 "POS Setup"
         POSUnitRec: Record "POS Unit";
         POSStoreRec: Record "POS Store";
         POSPostingProfile: Record "POS Posting Profile";
+        POSRestaurantProfile: Record "POS NPRE Restaurant Profile";
         POSUnitIdentityGlobal: Record "POS Unit Identity";
         Initialized: Boolean;
         SetupInitialized: Boolean;
@@ -111,6 +115,8 @@ codeunit 6150708 "POS Setup"
         if (POSUnit."POS Named Actions Profile" <> '') then
           Setup.Get (POSUnit."POS Named Actions Profile");
         //+NPR5.54 [391850]
+
+        FindPOSRestaurantProfile();  //NPR5.55 [414938]
     end;
 
     local procedure MakeSureIsInitialized()
@@ -171,6 +177,13 @@ codeunit 6150708 "POS Setup"
         exit(RetailSetup."Open Register Password");
     end;
 
+    procedure RestaurantCode(): Code[20]
+    begin
+        //-NPR5.55 [414938]
+        exit(POSRestaurantProfile."Restaurant Code");
+        //-NPR5.55 [414938]
+    end;
+
     local procedure FindPOSPostingProfile()
     var
         NPRetailSetup: Record "NP Retail Setup";
@@ -179,6 +192,20 @@ codeunit 6150708 "POS Setup"
         NPRetailSetup.Get;
         NPRetailSetup.GetPostingProfile(POSUnitRec."No.",POSPostingProfile);
         //+NPR5.53 [371955]
+    end;
+
+    local procedure FindPOSRestaurantProfile()
+    begin
+        //-NPR5.55 [414938]
+        case true of
+          (POSUnitRec."POS Restaurant Profile" <> ''):
+            POSRestaurantProfile.Get(POSUnitRec."POS Restaurant Profile");
+          (POSStoreRec."POS Restaurant Profile" <> ''):
+            POSRestaurantProfile.Get(POSStoreRec."POS Restaurant Profile");
+          else
+            Clear(POSPostingProfile);
+        end;
+        //-NPR5.55 [414938]
     end;
 
     local procedure "---Set Record => functions---"()
@@ -219,6 +246,7 @@ codeunit 6150708 "POS Setup"
         //-NPR5.32.10 [279551]
         POSStoreRec := POSStore;
         //+NPR5.32.10 [279551]
+        FindPOSRestaurantProfile();  //NPR5.55 [414938]
     end;
 
     local procedure "---Get Record => functions---"()
@@ -245,6 +273,18 @@ codeunit 6150708 "POS Setup"
         //-NPR5.32.10 [279551]
         POSUnitOut := POSUnitRec;
         //+NPR5.32.10 [279551]
+    end;
+
+    procedure GetPOSViewProfile(var POSViewProfile: Record "POS View Profile"): Boolean
+    begin
+
+        //-NPR5.55 [406862]
+        if (POSUnitRec."POS View Profile" = '') then
+          exit (false);
+
+        POSViewProfile.Get (POSUnitRec."POS View Profile");
+        exit (true);
+        //+NPR5.55 [406862]
     end;
 
     procedure GetPOSStore(var POSStoreOut: Record "POS Store")
@@ -393,6 +433,16 @@ codeunit 6150708 "POS Setup"
         //+NPR5.54 [392121]
     end;
 
+    procedure Action_AdminMenu(var ActionOut: Record "POS Action";POSSession: Codeunit "POS Session") IsConfigured: Boolean
+    begin
+
+        //-NPR5.55 [400734]
+        Clear(ActionOut);
+        InitializeSetup();
+        IsConfigured := POSSession.RetrieveSessionAction (ActionCode_AdminMenu, ActionOut);
+        //+NPR5.55 [400734]
+    end;
+
     procedure ActionCode_Login(): Code[20]
     begin
         with Setup do begin
@@ -469,6 +519,15 @@ codeunit 6150708 "POS Setup"
         InitializeSetup();
         exit (Setup."Idle Timeout Action Code");
         //+NPR5.54 [392121]
+    end;
+
+    procedure ActionCode_AdminMenu(): Code[20]
+    begin
+
+        //-NPR5.55 [400734]
+        InitializeSetup();
+        exit (Setup."Admin Menu Action Code");
+        //+NPR5.55 [400734]
     end;
 }
 

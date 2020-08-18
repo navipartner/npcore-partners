@@ -4,6 +4,7 @@ page 6014639 "RP Template List"
     // NPR4.12/MMV/20150702 CASE 217872 Moved actions from "RelatedInformation" (Navigation) to "ActionItems" (Handlinger) subtype
     // NPR5.29/MMV /20170110 CASE 241995 Added package module support instead of table export/import.
     // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
+    // NPR5.55/MMV /20200615 CASE 409573 Moved deployment of retail print templates from npdeploy to azure blob storage.
 
     Caption = 'Template List';
     CardPageID = "RP Template Card";
@@ -136,9 +137,9 @@ page 6014639 "RP Template List"
                 var
                     PackageHandler: Codeunit "RP Package Handler";
                 begin
-                    //-NPR5.29 [241995]
-                    PackageHandler.DeployPackageFromGC();
-                    //+NPR5.29 [241995]
+                    //-NPR5.55 [409573]
+                    PackageHandler.DeployPackageFromBlobStorage();
+                    //+NPR5.55 [409573]
                 end;
             }
         }

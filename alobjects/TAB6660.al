@@ -1,4 +1,4 @@
-tableextension 6014448 tableextension6014448 extends "Return Receipt Header" 
+tableextension 6014449 tableextension6014449 extends "Return Receipt Header" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Field 6014400

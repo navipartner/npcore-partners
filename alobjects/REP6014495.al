@@ -2,7 +2,7 @@ report 6014495 "NP Whse. - Shipment"
 {
     // NPR5.51/ZESO/20190724 CASE 355486 Object Created
     DefaultLayout = RDLC;
-    RDLCLayout = './NP Whse. - Shipment.rdlc';
+    RDLCLayout = './layouts/NP Whse. - Shipment.rdlc';
 
     Caption = 'Whse. - Shipment';
 

@@ -20,6 +20,7 @@ codeunit 6014544 "RP Citizen CLP Device Library"
     // 
     // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
     // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
+    // NPR5.55/MITH/20200727 CASE 415706 Added target encoding (ibm850) to prevent errors related to the hardware connector.
 
     EventSubscriberInstance = Manual;
 
@@ -93,6 +94,14 @@ codeunit 6014544 "RP Citizen CLP Device Library"
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
         tmpRetailList.Insert;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnGetTargetEncoding', '', false, false)]
+    local procedure OnGetTargetEncoding(var TargetEncoding: Text)
+    begin
+        //-NPR5.55 [415706]
+        TargetEncoding := 'ibm850';
+        //+NPR5.55 [415706]
     end;
 
     procedure "// ShortHandFunctions"()
@@ -245,7 +254,7 @@ codeunit 6014544 "RP Citizen CLP Device Library"
     local procedure Barcode(rotate: Integer;font: Text[1];thick: Text[1];narrow: Text[1];height: Text[3];row: Text[4];column: Text[4];d: Text[30])
     begin
         // Ref sheet 81-82 (1-78, 1-79)
-        // rotate   :   Orientation,                [1,2,3,4] -> [0�,90�,180�,270�]
+        // rotate   :   Orientation,                [1,2,3,4] -> [0º,90º,180º,270º]
         // font     :   Barcode type,               see table 3 for details.
         // thick    :   Sets thick bar width,       1-9, A-O (A-O corresponds to 10-24)
         // narrow   :   Sets narrow bar width,      1-9, A-O (A-O corresponds to 10-24)
@@ -261,7 +270,7 @@ codeunit 6014544 "RP Citizen CLP Device Library"
     procedure Character(rotate: Integer;font: Integer;hexp: Text[1];vexp: Text[1];point: Text[3];row: Text[4];column: Text[4];d: Text[30])
     begin
         // Ref sheet 77-79 (1-74, 1-75, 1-76)
-        // rotate   :   Orientation,                [1,2,3,4] -> [0�,90�,180�,270�]
+        // rotate   :   Orientation,                [1,2,3,4] -> [0º,90º,180º,270º]
         // font     :   Font type,                  see table 1 and 2 for details.
         // hexp     :   Sets expansion rate (horz), 1-9, A-O (A-O corresponds to 10-24)
         // vexp     :   Sets expansion rate (vert), 1-9, A-O (A-O corresponds to 10-24)
@@ -300,8 +309,8 @@ codeunit 6014544 "RP Citizen CLP Device Library"
 
     procedure LatinConvert(Input: Text[1024]) Output: Text[1024]
     var
-        txtTo: Label '����Ꭹ������';
-        txtFrom: Label '�۹��Į��ڲ�';
+        txtTo: Label 'ÈÛ¹ÉßÄ®ÃÙÚ²â¿';
+        txtFrom: Label '‘›†’«Ž™š‚ÔŠ';
     begin
         Output := ConvertStr(Input, txtFrom, txtTo);
     end;

@@ -14,7 +14,7 @@ codeunit 6014456 MathLib
         MESSAGE('Sin(30) = %1',Sin("Grad>Rad"(30)));
         MESSAGE('Cos(30) = %1',Cos("Grad>Rad"(30)));
         MESSAGE('Tan(30) = %1',Tan("Grad>Rad"(30)));
-        MESSAGE('30� adjusted by PI = %1',Adjust(30));
+        MESSAGE('30° adjusted by PI = %1',Adjust(30));
         MESSAGE('Squareroot of 30 = %1',Sqrt(30));
         MESSAGE('the greatest common Divisor of 35 and 25 = %1',gcd(35,25));
         MESSAGE('the least common multipler of 35 and 25 = %1',lcm(35,25));
@@ -194,7 +194,7 @@ codeunit 6014456 MathLib
     var
         Puffer: Decimal;
     begin
-        //gr��ter gemeinsamer Teiler
+        //größter gemeinsamer Teiler
         x := Abs(Int(x));
         y := Abs(Int(y));
 
@@ -256,13 +256,13 @@ codeunit 6014456 MathLib
         exit((x - 10) mod 9 + 1);
     end;
 
-    procedure "(a+b)�"(a: Decimal;b: Decimal): Decimal
+    procedure "(a+b)²"(a: Decimal;b: Decimal): Decimal
     begin
         //Binomic1
         exit(Power(a,2) + 2*a*b + Power(b,2));
     end;
 
-    procedure "(a-b)�"(a: Decimal;b: Decimal): Decimal
+    procedure "(a-b)²"(a: Decimal;b: Decimal): Decimal
     begin
         //Binomic2
         exit(Power(a,2) - 2*a*b + Power(b,2));
@@ -338,7 +338,7 @@ codeunit 6014456 MathLib
     var
         Multiplier: Decimal;
     begin
-        //L�ngengrad zu Km
+        //Längengrad zu Km
         exit(Cos("Grad>Rad"(Latitude)) * 111.32386667);
     end;
 

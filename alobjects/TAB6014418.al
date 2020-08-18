@@ -5,6 +5,7 @@ table 6014418 "Archive Sale POS"
     //   The table may be deleted later, when it is no longer relevant.
     // 
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.55/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
 
     Caption = 'Sale';
     DrillDownPageID = "Archive POS Sale";
@@ -177,12 +178,12 @@ table 6014418 "Archive Sale POS"
         field(111;"Retursalg Bonnummer";Code[20])
         {
             Caption = 'Reversesale Ticket No.';
-            Description = 'Giver mulighed for at tilbagef�re KUN �N bon - benyttet i CU Ekspeditionsmenu';
+            Description = 'Giver mulighed for at tilbagef¢re KUN ÉN bon - benyttet i CU Ekspeditionsmenu';
         }
         field(112;Parameters;Text[250])
         {
             Caption = 'Parameters';
-            Description = 'Overf�r parametre fra ekspeditionen til underfunktioner. Brug f.eks.  � som separator';
+            Description = 'Overf¢r parametre fra ekspeditionen til underfunktioner. Brug f.eks.  Ÿ som separator';
         }
         field(113;"From Quote no.";Code[20])
         {
@@ -345,10 +346,6 @@ table 6014418 "Archive Sale POS"
         field(710;"NPRE Number of Guests";Integer)
         {
             Caption = 'Number of Guests';
-        }
-        field(5999;"POS Sales Data";BLOB)
-        {
-            Caption = 'POS Sales Data';
         }
     }
 

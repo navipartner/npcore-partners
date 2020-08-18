@@ -590,7 +590,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     begin
         //For use with the scaleable font 0
         // Align     :   Alignment of text
-        // Rotate    :   Orientation,                [1,2,3,4] -> [0�,90�,180�,270�]
+        // Rotate    :   Orientation,                [1,2,3,4] -> [0º,90º,180º,270º]
         // Type      :   Font Type
         // Height    :   Character height
         // Width     :   Character width
@@ -713,7 +713,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     begin
         // Ref sheet 55
         // Align     :   Alignment of text
-        // Rotate    :   Orientation,                [1,2,3,4] -> [0�,90�,180�,270�]
+        // Rotate    :   Orientation,                [1,2,3,4] -> [0º,90º,180º,270º]
         // Type      :   Font Type
         // Height    :   Character height
         // Width     :   Character width

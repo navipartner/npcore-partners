@@ -10,6 +10,7 @@ codeunit 6014432 "Quantity Discount Management"
     // NPR5.48/TSA /20181210 CASE 339434 Unit Price was assumed to be the same across all lines
     // NPR5.48/MMV /20181210 CASE 339413 Event discover subscriber was not setting cross line parameter.
     // NPR5.48/TSA /20181214 CASE 339434 Also added Unit Price consideration and VAT inclustion. Ignoring negative discounts
+    // NPR5.55/TJ  /20200420 CASE 400524 Setting "Discount Code" as basis for dimension transfer
 
 
     trigger OnRun()
@@ -84,6 +85,9 @@ codeunit 6014432 "Quantity Discount Management"
 
               TempSaleLinePOS."Discount %" := DiscountPercent;
               TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Quantity;
+              //-NPR5.55 [400524]
+              TempSaleLinePOS."Discount Code" := TempQuantityDiscountLine."Main no.";
+              //+NPR5.55 [400524]
               TempSaleLinePOS."FP Anvendt"    := true;
 
               //-NPR5.48 [338181]

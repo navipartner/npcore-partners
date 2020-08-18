@@ -6,6 +6,7 @@ codeunit 6060144 "MM Member Limitation Mgr."
     // MM1.29/TSA /20180511 CASE 313795 GDPR Constraint Source
     // MM1.29/TSA /20180525 CASE 316468 When rules where processed by webservice, the there were no rollback on created artifacts
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
+    // MM1.45/TSA /20200729 CASE 416671 Added a feature to check without actual logging Signature change, added ReUseLogEntryNo parameter
 
 
     trigger OnRun()
@@ -23,39 +24,57 @@ codeunit 6060144 "MM Member Limitation Mgr."
         ExternalMembershipNo: Code[20];
         MembershipCode: Code[20];
         IgnoreMessage: Text;
+        LogEntryNo: Integer;
     begin
 
         GetExternalMemberNo (ExternalMemberCardNo, ExternalMemberNo, IgnoreMessage);
         GetExternalMembershipNo (ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, IgnoreMessage);
 
-        InternalLogArrival (ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode, 0);
+        InternalLogArrival (ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, LogEntryNo, ResponseMessage, ResponseCode, 0);
 
         exit (ResponseCode);
     end;
 
-    procedure WS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ResponseMessage: Text;var ResponseCode: Integer)
+    procedure WS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ReUseLogEntryNo: Integer;var ResponseMessage: Text;var ResponseCode: Integer) LogEntryNo: Integer
     begin
 
-        CheckLimitMemberCardArrival (1, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+        CheckLimitMemberCardArrival (1, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
 
-    procedure POS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ResponseMessage: Text;var ResponseCode: Integer)
+    procedure POS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ResponseMessage: Text;var ResponseCode: Integer) LogEntryNo: Integer
+    var
+        ReUseLogEntryNo: Integer;
     begin
 
-        CheckLimitMemberCardArrival (0, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+        CheckLimitMemberCardArrival (0, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
 
     local procedure "--Internal"()
     begin
     end;
 
-    local procedure InternalLogArrival(ExternalMemberShipNo: Code[20];ExternalMemberNo: Code[20];ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];ResponseMessage: Text;ResponseCode: Integer;ResponseRuleEntry: Integer)
+    local procedure InternalLogArrival(ExternalMemberShipNo: Code[20];ExternalMemberNo: Code[20];ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ReUseLogEntryNo: Integer;ResponseMessage: Text;ResponseCode: Integer;ResponseRuleEntry: Integer)
     var
         MembershipSetup: Record "MM Membership Setup";
         MemberArrivalLogEntry: Record "MM Member Arrival Log Entry";
+        DoReuseLogEntry: Boolean;
     begin
 
-        MemberArrivalLogEntry."Entry No." := 0;
+        //-MM1.45 [416671]
+        //MemberArrivalLogEntry."Entry No." := 0;
+
+        DoReuseLogEntry := (ReUseLogEntryNo > 0);
+        if (DoReuseLogEntry) then DoReuseLogEntry := MemberArrivalLogEntry.Get (ReUseLogEntryNo);
+        if (DoReuseLogEntry) then DoReuseLogEntry := (MemberArrivalLogEntry."External Card No." = ExternalMemberCardNo);
+        if (DoReuseLogEntry) then MemberArrivalLogEntry.Init ();
+
+        if (not DoReuseLogEntry) then begin
+          MemberArrivalLogEntry."Entry No." := 0;
+          MemberArrivalLogEntry.Init ();
+          MemberArrivalLogEntry.Insert ();
+        end;
+        //+MM1.45 [416671]
+
         MemberArrivalLogEntry."Event Type" := MemberArrivalLogEntry."Event Type"::ARRIVAL;
         MemberArrivalLogEntry."Created At" := CurrentDateTime ();
         MemberArrivalLogEntry."Local Date" := Today;
@@ -84,10 +103,16 @@ codeunit 6060144 "MM Member Limitation Mgr."
         end;
 
         MemberArrivalLogEntry."Response Rule Entry No." := ResponseRuleEntry;
-        MemberArrivalLogEntry.Insert ();
+
+        //-MM1.45 [416671]
+        //MemberArrivalLogEntry.INSERT ();
+
+        MemberArrivalLogEntry.Modify ();
+        ReUseLogEntryNo := MemberArrivalLogEntry."Entry No.";
+        //+MM1.45 [416671]
     end;
 
-    local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS;ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ResponseMessage: Text;var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS;ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ReUseLogEntryNo: Integer;var ResponseMessage: Text;var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "MM Membership Limitation Setup";
         ExternalMemberNo: Code[20];
@@ -95,13 +120,21 @@ codeunit 6060144 "MM Member Limitation Mgr."
         MembershipCode: Code[20];
         NewResponseMessage: Text;
         NewResponseCode: Integer;
+        IgnoreMessage: Text;
     begin
 
+        // Log the sent message and code
         if (ResponseCode <> 0) then begin
-          LogMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+          //-MM1.45 [416671]
+          // LogMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+          GetExternalMemberNo (ExternalMemberCardNo, ExternalMemberNo, IgnoreMessage);
+          GetExternalMembershipNo (ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, IgnoreMessage);
+          InternalLogArrival (ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode, 0);
+          //-MM1.45 [416671]
           exit;
         end;
 
+        // Figure out who we are - be careful with references...
         if (ResponseCode = 0) then
           if (not GetExternalMemberNo (ExternalMemberCardNo, ExternalMemberNo, NewResponseMessage)) then
             NewResponseCode := -9998;
@@ -110,15 +143,16 @@ codeunit 6060144 "MM Member Limitation Mgr."
           if (not GetExternalMembershipNo (ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, NewResponseMessage)) then
             NewResponseCode := -9999;
 
+        // IF we can not resolve who we are, dont bother checking the rules
         if (ResponseCode <> 0) then begin
-          LogMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, NewResponseMessage, NewResponseCode);
+          InternalLogArrival (ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, NewResponseMessage, NewResponseCode, 0);
           exit;
         end;
 
-        RuleNo := CheckAndLogArrival (ClientType, MembershipCode, ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+        RuleNo := CheckAndLogArrival (ClientType, MembershipCode, ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
 
-    local procedure CheckAndLogArrival(ClientType: Option POS,WS;MembershipCode: Code[20];ExternalMemberShipNo: Code[20];ExternalMemberNo: Code[20];ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ResponseMessage: Text;var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckAndLogArrival(ClientType: Option POS,WS;MembershipCode: Code[20];ExternalMemberShipNo: Code[20];ExternalMemberNo: Code[20];ExternalMemberCardNo: Text[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var ReUseLogEntryNo: Integer;var ResponseMessage: Text;var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "MM Membership Limitation Setup";
         NewResponseMessage: Text;
@@ -162,7 +196,7 @@ codeunit 6060144 "MM Member Limitation Mgr."
           ResponseMessage := NewResponseMessage;
         end;
 
-        InternalLogArrival (ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode, RuleNo);
+        InternalLogArrival (ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode, RuleNo);
 
         if (RuleNo <> 0) then begin
           MembershipLimitationSetup.Get (RuleNo);

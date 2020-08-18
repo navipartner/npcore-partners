@@ -5,6 +5,8 @@ table 6150669 "NPRE Restaurant Setup"
     // NPR5.52/ALPO/20190813 CASE 360258 Location specific setting of 'Auto print kintchen order'
     //                                   Field 'Auto print kintchen order' type changed from boolean to option
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Restaurant Setup';
 
@@ -44,6 +46,14 @@ table 6150669 "NPRE Restaurant Setup"
             OptionCaption = 'No,Yes,Ask';
             OptionMembers = No,Yes,Ask;
         }
+        field(15;"Serving Step Discovery Method";Option)
+        {
+            Caption = 'Serving Step Discovery Method';
+            Description = 'NPR5.55';
+            InitValue = "Item Routing Profiles";
+            OptionCaption = 'Legacy (using print tags),Item Routing Profiles';
+            OptionMembers = "Legacy (using print tags)","Item Routing Profiles";
+        }
         field(20;"Kitchen Printing Active";Boolean)
         {
             Caption = 'Kitchen Printing Active';
@@ -60,6 +70,36 @@ table 6150669 "NPRE Restaurant Setup"
             Description = 'NPR5.54';
             OptionCaption = 'Same for Source Document,New Each Time';
             OptionMembers = "Same for Source Document","New Each Time";
+        }
+        field(70;"Seat.Status: Ready";Code[10])
+        {
+            Caption = 'Seat.Status: Ready';
+            Description = 'NPR5.55';
+            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(Seating));
+        }
+        field(71;"Seat.Status: Occupied";Code[10])
+        {
+            Caption = 'Seat.Status: Occupied';
+            Description = 'NPR5.55';
+            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(Seating));
+        }
+        field(72;"Seat.Status: Reserved";Code[10])
+        {
+            Caption = 'Seat.Status: Reserved';
+            Description = 'NPR5.55';
+            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(Seating));
+        }
+        field(73;"Seat.Status: Cleaning Required";Code[10])
+        {
+            Caption = 'Seat.Status: Cleaning Required';
+            Description = 'NPR5.55';
+            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(Seating));
+        }
+        field(90;"Default Service Flow Profile";Code[20])
+        {
+            Caption = 'Default Service Flow Profile';
+            Description = 'NPR5.55';
+            TableRelation = "NPRE Service Flow Profile";
         }
     }
 

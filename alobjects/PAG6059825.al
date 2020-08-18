@@ -1,6 +1,7 @@
 page 6059825 "Transactional Email Log"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
+    // NPR5.55/THRO/20200511 CASE 343266 Added Provider and "Status Message"
 
     Caption = 'Transactional Email Log';
     DeleteAllowed = false;
@@ -20,10 +21,16 @@ page 6059825 "Transactional Email Log"
                 field("Entry No.";"Entry No.")
                 {
                 }
+                field(Provider;Provider)
+                {
+                }
                 field("Message ID";"Message ID")
                 {
                 }
                 field(Status;Status)
+                {
+                }
+                field("Status Message";"Status Message")
                 {
                 }
                 field(Recipient;Recipient)
@@ -61,12 +68,14 @@ page 6059825 "Transactional Email Log"
                 trigger OnAction()
                 var
                     LogEntry: Record "Transactional Email Log";
-                    CampaignMonitorMgt: Codeunit "CampaignMonitor Mgt.";
+                    TransactionalEmailMgt: Codeunit "Transactional Email Mgt.";
                 begin
                     CurrPage.SetSelectionFilter(LogEntry);
                     if LogEntry.FindSet then
                       repeat
-                        CampaignMonitorMgt.GetMessageDetails(LogEntry);
+                        //-NPR5.55 [343266]
+                        TransactionalEmailMgt.GetMessageDetails(LogEntry);
+                        //-NPR5.55 [343266]
                       until LogEntry.Next = 0;
                 end;
             }

@@ -21,10 +21,22 @@ codeunit 6060118 "TM Admission Sch. Management"
     // #308299/TSA /20180315 CASE 308299 I18 hardcoded date
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
     // TM1.45/TSA /20191120 CASE 378212 Added the sales cut-off date
+    // TM1.47/TSA /20200508 CASE 403559 Added possibility to schedule the schedule creation by task queue
 
 
     trigger OnRun()
+    var
+        Admission: Record "TM Admission";
     begin
+
+        //-TM1.47 [403559]
+        if (Admission.FindSet ()) then begin
+          repeat
+            Commit;
+            CreateAdmissionSchedule (Admission."Admission Code", false, Today);
+          until (Admission.Next () = 0);
+        end;
+        //+TM1.47 [403559]
     end;
 
     var

@@ -1,6 +1,7 @@
 table 6151445 "Magento Customer Mapping"
 {
     // MAG2.22/MHA /20190710  CASE 360098 Object created
+    // MAG2.26/MHA /20200429  CASE 402247 Added field 30 "Fixed Customer No."
 
     Caption = 'Magento Customer Mapping';
 
@@ -29,6 +30,12 @@ table 6151445 "Magento Customer Mapping"
         {
             Caption = 'Config. Template Code';
             TableRelation = "Config. Template Header".Code WHERE ("Table ID"=CONST(18));
+        }
+        field(30;"Fixed Customer No.";Code[20])
+        {
+            Caption = 'Fixed Customer No.';
+            Description = 'MAG2.26';
+            TableRelation = Customer;
         }
         field(95;"Country/Region Name";Text[50])
         {

@@ -39,6 +39,9 @@ codeunit 6150700 "POS Session"
     // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
     // NPR5.54/MMV /20200305 CASE 364340 Added mock constructor.
+    // NPR5.55/MMV /20200423 CASE 398235 Guard against blank frontend ID
+    // NPR5.55/TSA /20200527 CASE 406862 Added ChangeViewRestaurant()
+    // NPR5.55/VB  /20200527 CASE 406862 Added functionality to mark session as Dragonglass
 
     EventSubscriberInstance = Manual;
 
@@ -84,6 +87,7 @@ codeunit 6150700 "POS Session"
         Finalized: Boolean;
         SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
         FRONTEND_MISSING: Label 'POS Front End object could not be retrieved. This is a programming bug, not a user error.';
+        DragonglassSession: Boolean;
         "--- Workflow 2.0 state ---": Integer;
         Workflow20State: array[1000] of Codeunit "POS Workflows 2.0 - State";
         Workflow20StateIndex: DotNet npNetDictionary_Of_T_U;
@@ -298,6 +302,10 @@ codeunit 6150700 "POS Session"
     [Scope('Personalization')]
     procedure InitializeSessionId(HardwareIdIn: Text; SessionNameIn: Text; HostNameIn: Text)
     begin
+        //-NPR5.55 [398235]
+        if HardwareIdIn = '' then
+          Error('Hardware ID from front end is blank. This is a programming error.');
+        //+NPR5.55 [398235]
         HardwareId := HardwareIdIn;
         SessionName := SessionNameIn;
         HostName := HostNameIn;
@@ -719,6 +727,20 @@ codeunit 6150700 "POS Session"
         //+NPR5.54 [364340]
     end;
 
+    procedure SetDragonglassSession()
+    begin
+        //-NPR5.55 [406862]
+        DragonglassSession := true;
+        //+NPR5.55 [406862]
+    end;
+
+    procedure IsDragonglassSession(): Boolean
+    begin
+        //-NPR5.55 [406862]
+        exit(DragonglassSession);
+        //+NPR5.55 [406862]
+    end;
+
     local procedure "---Data Refresh---"()
     begin
     end;
@@ -816,6 +838,21 @@ codeunit 6150700 "POS Session"
         // TODO: any business logic goes here
 
         FrontEnd.BalancingView(Setup);
+    end;
+
+    procedure ChangeViewRestaurant()
+    begin
+
+        //-NPR5.55 [406862]
+        if (IsDragonglassSession()) then begin
+          //FrontEnd.RestaurantView (Setup);
+          Error ('FrontEnd.RestaurantView() missing');
+          exit;
+        end;
+
+        Message ('Restaurant view is not supported in this version. Change the setup on the POS View Profile. The default view is selected.');
+        ChangeViewSale ();
+        //+NPR5.55 [406862]
     end;
 
     local procedure "---Framework auto-detection---"()

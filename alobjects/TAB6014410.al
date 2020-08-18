@@ -423,7 +423,7 @@ table 6014410 "Item Group"
                                                                           "Global Dimension 1 Code"=FIELD("Global Dimension 1 Filter"),
                                                                           "Global Dimension 2 Code"=FIELD("Global Dimension 2 Filter")));
             Caption = 'Inventory Value';
-            Description = 'Lagerv�rdi';
+            Description = 'Lagerværdi';
             FieldClass = FlowField;
         }
         field(98;"Tax Group Code";Code[10])

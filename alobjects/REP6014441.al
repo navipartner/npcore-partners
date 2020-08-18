@@ -3,8 +3,9 @@ report 6014441 "POS Item Sales with Dimensions"
     // NPR5.53/ALPO/20191016 CASE 371478 New report to get a list of POS item sales with selected dimensions
     // NPR5.54/ALPO/20200212 CASE 390673 Fixed incorrect filter
     // NPR5.54/ALPO/20200309 CASE 392052 Include into report POS Sales Lines marked with "Exclude from Posting" checkmark
+    // NPR5.55/ANPA/20200608 CASE 402927 Changed layout to landscape
     DefaultLayout = RDLC;
-    RDLCLayout = './POS Item Sales with Dimensions.rdlc';
+    RDLCLayout = './layouts/POS Item Sales with Dimensions.rdlc';
 
     Caption = 'POS Item Sales with Dimensions';
     UsageCategory = ReportsAndAnalysis;
@@ -18,7 +19,7 @@ report 6014441 "POS Item Sales with Dimensions"
             dataitem("POS Sales Line"; "POS Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.","Line No.") WHERE(Type=CONST(Item));
+                DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = CONST(Item));
                 RequestFilterFields = "No.", "Location Code";
 
                 trigger OnPreDataItem()

@@ -1,16 +1,17 @@
-page 6151418 "Magento Item Group Link"
+page 6151418 "Magento Category Links"
 {
     // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
     // MAG1.21/MHA/20151118 CASE 227359 Added function SetRootNo and Root Filters
-    // MAG1.22/MHA/20151202  CASE 228290 Changed SETRANGE to SETFILTER for ItemGroup."Root No." as blank should include all
+    // MAG1.22/MHA/20151202  CASE 228290 Changed SETRANGE to SETFILTER for Category."Root No." as blank should include all
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
-    Caption = 'Item Group Link';
+    Caption = 'Magento Category Links';
     DelayedInsert = true;
     LinksAllowed = false;
-    PageType = CardPart;
+    PageType = ListPart;
     ShowFilter = false;
-    SourceTable = "Magento Item Group Link";
+    SourceTable = "Magento Category Link";
 
     layout
     {
@@ -19,28 +20,31 @@ page 6151418 "Magento Item Group Link"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Item Group";"Item Group")
+                field("Category Id";"Category Id")
                 {
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
-                        MagentoItemGroup: Record "Magento Item Group";
+                        MagentoCategory: Record "Magento Category";
                     begin
                         //-MAG1.21
-                        MagentoItemGroup.FilterGroup(2);
+                        MagentoCategory.FilterGroup(2);
                         //-MAG1.22
-                        //MagentoItemGroup.SETRANGE("Root No.",RootNo);
-                        MagentoItemGroup.SetFilter("Root No.",RootNo);
+                        //MagentoCategory.SETRANGE("Root No.",RootNo);
+                        MagentoCategory.SetFilter("Root No.",RootNo);
                         //+MAG1.22
-                        MagentoItemGroup.FilterGroup(0);
-                        if PAGE.RunModal(PAGE::"Magento Item Group List",MagentoItemGroup) <> ACTION::LookupOK then
+                        MagentoCategory.FilterGroup(0);
+                        //-MAG2.26 [404580]
+                        if MagentoCategory.Get("Category Id") then;
+                        //+MAG2.26 [404580]
+                        if PAGE.RunModal(PAGE::"Magento Category List",MagentoCategory) <> ACTION::LookupOK then
                           exit;
 
-                        Validate("Item Group",MagentoItemGroup."No.");
+                        Validate("Category Id",MagentoCategory.Id);
                         //+MAG1.21
                     end;
                 }
-                field("Item Group Name";"Item Group Name")
+                field("Category Name";"Category Name")
                 {
                 }
                 field(Position;Position)

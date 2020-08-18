@@ -1,22 +1,22 @@
 codeunit 6014409 "Post audit roll"
 {
     // --->> NPR Version 1.7
-    //    Kalder codeunit 'Bogf�r revisionsrulle aktivt'
+    //    Kalder codeunit 'Bogf¢r revisionsrulle aktivt'
     // <<--- NPR Version 1.7 slut
     // 
     // 
     // --->> NPR Version 1.8
-    //   Codeunit 'Bogf�r revisionsrulle' (6014410) fjernet!
-    //   Codeunit 'Bogf�r revisionsrulle aktivt' om�bt til
-    //   Codeunit 'Bogf�r revisionsrulle' (6014414)
-    //   Kalder codeunit 'Bogf�r revisionsrulle' (6014414)
+    //   Codeunit 'Bogf¢r revisionsrulle' (6014410) fjernet!
+    //   Codeunit 'Bogf¢r revisionsrulle aktivt' om¢bt til
+    //   Codeunit 'Bogf¢r revisionsrulle' (6014414)
+    //   Kalder codeunit 'Bogf¢r revisionsrulle' (6014414)
     // <<--- NPR version 1.8
     // 
     // --->> NPR Version 1.93
-    //   Indf�rt tjek for h�ngende udbetalinger via funktionen 'FjernH�ngendeUdbetalinger'.
+    //   Indf¢rt tjek for hængende udbetalinger via funktionen 'FjernHængendeUdbetalinger'.
     // <<--- NPR Version 1.93
     // 
-    // Lavet mulighed for at bruge temporer tabel til bogf�ring af revisionsrullen
+    // Lavet mulighed for at bruge temporer tabel til bogf¢ring af revisionsrullen
     // 
     // NPR5.23/JDH /20160429  CASE 240004 Possible to initiate from Task Queue (or other places) to avoid posting of items or GL
     // NPR5.29/MHA /20170116  CASE 262116 Adjusted Filter Reset on Item Ledger Posting
@@ -55,7 +55,7 @@ codeunit 6014409 "Post audit roll"
         TotalCount: Integer;
         TxtDlgFin: Label 'Removing outstanding financial payments #1######### of #2########## @3@@@@@@@@@';
     begin
-        //FjernH�ngendeUdbetalinger
+        //FjernHængendeUdbetalinger
         Clear(AuditRoll2);
         AuditRoll2.SetCurrentKey("Sale Type",Type,"No.");
         AuditRoll.SetCurrentKey("Sale Type",Type,"No.");
@@ -119,7 +119,7 @@ codeunit 6014409 "Post audit roll"
     var
         TempAuditRollPosting: Record "Audit Roll Posting" temporary;
     begin
-        //Bogf�rperkassetemp
+        //Bogf¢rperkassetemp
 
         if AuditRollPosting.Count > 0 then begin
           //ohm-
@@ -154,7 +154,7 @@ codeunit 6014409 "Post audit roll"
     var
         TempAuditRollPosting: Record "Audit Roll Posting" temporary;
     begin
-        //Bogf�rperkassetempItemLedger
+        //Bogf¢rperkassetempItemLedger
 
         if AuditRollPosting.Count > 0 then begin
           //ohm-
@@ -162,7 +162,7 @@ codeunit 6014409 "Post audit roll"
           //  Kasse."Last G/L Posting No." := '0';
           //Kasse."Last G/L Posting No." := INCSTR(Kasse."Last G/L Posting No.");
           //Kasse.MODIFY;
-          //tBogf�r.setPostingNo(tBogf�r.getNewPostingNo(TRUE));
+          //tBogf¢r.setPostingNo(tBogf¢r.getNewPostingNo(TRUE));
           //ohm+
 
           AuditRollPosting.ModifyAll("Internal Posting No.",0);

@@ -31,6 +31,9 @@ page 6060137 "MM Membership Card"
     // MM1.41/TSA /20191009 CASE 367471 Added Sponsorship Tickets
     // MM1.42/TSA /20191024 CASE 374403 Changed signature on IssueOneCoupon(), IssueOneCouponAndPrint(), and IssueCoupon()
     // MM1.42/ALPO/20191125 CASE 377727 Raptor integration
+    // MM1.44/TSA /20200512 CASE 383842 Fixed attribute lookup reference issue
+    // MM1.45/TSA /20200709 CASE 411768 Added Pointsummary page part
+    // MM1.45/TSA /20200717 CASE 415293 Added a warning when updating external number
 
     Caption = 'Membership Card';
     DataCaptionExpression = "External Membership No."+' - ' + "Membership Code";
@@ -46,6 +49,16 @@ page 6060137 "MM Membership Card"
             {
                 field("External Membership No.";"External Membership No.")
                 {
+
+                    trigger OnValidate()
+                    begin
+
+                        //-MM1.45 [415293]
+                        if ((Rec."External Membership No." <> xRec."External Membership No.") and (xRec."External Membership No." <> '')) then
+                          if (not Confirm (EXT_NO_CHANGE, false)) then
+                            Error ('');
+                        //+MM1.45 [415293]
+                    end;
                 }
                 field(ShowMemberCountAs;ShowMemberCountAs)
                 {
@@ -135,6 +148,14 @@ page 6060137 "MM Membership Card"
                 field("Remaining Points";"Remaining Points")
                 {
                 }
+            }
+            part(PointsSummary;"MM Membership Points Summary")
+            {
+                ShowFilter = false;
+                SubPageLink = "Membership Entry No."=FIELD("Entry No.");
+                SubPageView = SORTING("Membership Entry No.","Relative Period")
+                              ORDER(Descending);
+                UpdatePropagation = Both;
             }
             group(Attributes)
             {
@@ -627,6 +648,11 @@ page 6060137 "MM Membership Card"
         //-MM1.40 [360242]
         NPRAttrEditable := CurrPage.Editable ();
         //+MM1.40 [360242]
+
+        //-MM1.45 [411768]
+        CurrPage.PointsSummary.PAGE.FillPageSummary (Rec."Entry No.");
+        CurrPage.PointsSummary.PAGE.Update (false);
+        //+MM1.45 [411768]
     end;
 
     trigger OnAfterGetRecord()
@@ -687,6 +713,7 @@ page 6060137 "MM Membership Card"
         NPRAttrVisible10: Boolean;
         RaptorEnabled: Boolean;
         MEMBERSHIP_EXPIRED: Label 'Expired';
+        EXT_NO_CHANGE: Label 'Please note that changing the external number requires re-printing of documents where this number is used. Do you want to continue?';
 
     local procedure AddMembershipMember()
     var
@@ -892,9 +919,12 @@ page 6060137 "MM Membership Card"
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
 
+        //-MM1.44 [383842]
         //-MM1.40 [360242]
-        NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, Format (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
+        //NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, FORMAT (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
+        NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, Format ("Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber] );
         //+MM1.40 [360242]
+        //+MM1.44 [383842]
     end;
 
     local procedure IssueAdHocSponsorshipTickets(MembershipEntryNo: Integer)

@@ -478,7 +478,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
                 LoyaltySetup.Get(MembershipSetup."Loyalty Code");
                 RemainingValue := StrSubstNo('%1', Round(Membership."Remaining Points" * LoyaltySetup."Point Rate"));
                 //-MM1.41 [371095]
-                RedeemablePoints := StrSubstNo('%1', LoyaltyPointManagement.CalculateRedeemablePoints(Membership."Entry No."));
+            RedeemablePoints := StrSubstNo ('%1', LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod (Membership."Entry No."));
                 //-MM1.41 [371095]
             end;
         end;

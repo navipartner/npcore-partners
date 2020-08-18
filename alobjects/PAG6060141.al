@@ -12,6 +12,7 @@ page 6060141 "MM Membership Alteration"
     // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member On Sale"
     // MM1.41/TSA /20191016 CASE 373297 Added "Grace Period Presets" and made some grace period settings fields not visible (by default)
     // MM1.43/TSA /20200331 CASE 398328 added "Presentation Order"
+    // MM1.44/TSA /20200529 CASE 407401 Added Age Verification
 
     Caption = 'Membership Alteration';
     PageType = List;
@@ -103,6 +104,12 @@ page 6060141 "MM Membership Alteration"
                 {
                 }
                 field("Auto-Admit Member On Sale";"Auto-Admit Member On Sale")
+                {
+                }
+                field("Age Constraint Type";"Age Constraint Type")
+                {
+                }
+                field("Age Constraint (Years)";"Age Constraint (Years)")
                 {
                 }
             }

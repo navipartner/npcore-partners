@@ -2,6 +2,7 @@ query 6014416 "Sales Stats - Item Cat Sales"
 {
     // NPR5.52/ZESO/20191010  Object created
     // NPR5.53/JAKUBV/20200121  CASE 371446-01 Transport NPR5.53 - 21 January 2020
+    // NPR5.55/ZESO/20200708  CASE 378805 Added Location Code filter
 
     Caption = 'Sales Stats - Item Cat Sales';
 
@@ -31,6 +32,9 @@ query 6014416 "Sales Stats - Item Cat Sales"
             {
             }
             filter(Filter_Vendor_No;"Vendor No.")
+            {
+            }
+            filter(Filter_Location_Code;"Location Code")
             {
             }
             column(Item_Category_Code;"Item Category Code")

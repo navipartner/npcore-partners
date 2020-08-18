@@ -1,6 +1,10 @@
 codeunit 6151289 "SS Action - Insert Item"
 {
     // NPR5.54/TSA /20200220 CASE 387912 Initial Version of SS-ITEM for Self Service. Starts out as a copy if ITEM
+    // NPR5.55/TSA /20200420 CASE 364420 Added implementation for +/- button
+    // NPR5.55/MMV /20200420 CASE 386254 Set blocking UI to false.
+    // NPR5.55/TSA /20200508 CASE 403784 Added feature to specify quantity in dialog after threshold has been reached
+    // NPR5.55/TSA /20200520 CASE 405186 Added/reworked localization
 
 
     trigger OnRun()
@@ -22,6 +26,8 @@ codeunit 6151289 "SS Action - Insert Item"
         TEXTeditDesc_lead: Label 'Line description';
         TEXTeditDesc_title: Label 'Add or change description.';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
+        EnterQuantityCaption: Label 'Enter Quantity';
+        ValidRangeText: Label 'The valid range is %1 to %2.';
 
     local procedure ActionCode(): Text
     begin
@@ -31,7 +37,7 @@ codeunit 6151289 "SS Action - Insert Item"
     local procedure ActionVersion(): Text
     begin
 
-        exit ('2.1');
+        exit ('2.5');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -48,8 +54,35 @@ codeunit 6151289 "SS Action - Insert Item"
         then begin
 
           RegisterWorkflow20 (
-            'var workflowList;' +
-            'await (workflow.respond ("addSalesLine"));'
+            'let workflowstep = "AddSalesLine";' +
+            'let qtyDialogThreshold = 9;' +
+            'let qtyMax = 100;'+
+            'let qtyMin = 1;'+
+
+            'if ($context.hasOwnProperty ("_additionalContext")) {' +
+            '  if ($context._additionalContext.hasOwnProperty("plusMinus"))'+
+            '    workflowstep = ($context._additionalContext.quantity > 0) ? "IncreaseQuantity" : "DecreaseQuantity";' +
+
+            '  const salesline = runtime.getData("BUILTIN_SALELINE");' +
+            '  let row = salesline.find(r => r[6] === $parameters.itemNo) || null;'+
+            '  console.log ("Searching for item: " +$parameters.itemNo+" found row: "+ JSON.stringify (row));'+
+            '  if ((row != null) &&' +
+            '      ((row[12] >= qtyDialogThreshold) && ($context._additionalContext.quantity > 0) ||'+
+            '       (row[12] >  qtyDialogThreshold) && ($context._additionalContext.quantity < 0))' +
+            '     ) {' +
+            '     let quantity = ($context._additionalContext.quantity > 0) ? row[12] + 1 : row[12] - 1;' +
+            '     $context.specificQuantity = await popup.intpad ({title: $captions.EnterQuantityCaption, caption: $captions.EnterQuantityCaption, value: quantity});' +
+            '     if ($context.specificQuantity === null) {return;} ' +
+            '     if (parseInt ($context.specificQuantity) > qtyMax || parseInt ($context.specificQuantity) < qtyMin) {' +
+            '       await popup.message ({title: $captions.EnterQuantityCaption, caption: $captions.ValidRangeText.substitute (qtyMin, qtyMax)});' +
+            '       return;' +
+            '     } ' +
+            '     workflowstep = "SetSpecificQuantity";' +
+            '  }' +
+
+            '}' +
+
+            'await (workflow.respond (workflowstep));'
             // 'await (workflowList = workflow.respond("getExtraItemWorkflows"));'
             );
 
@@ -59,6 +92,9 @@ codeunit 6151289 "SS Action - Insert Item"
           RegisterBooleanParameter('descriptionEdit', false);
           RegisterBooleanParameter('usePreSetUnitPrice', false);
           RegisterDecimalParameter('preSetUnitPrice', 0);
+        //-NPR5.55 [386254]
+          RegisterBlockingUI(false);
+        //+NPR5.55 [386254]
           SetWorkflowTypeUnattended ();
         end;
     end;
@@ -72,10 +108,14 @@ codeunit 6151289 "SS Action - Insert Item"
         Handled := true;
 
         case WorkflowStep of
-          'itemTrackingForce':     Step_ItemTracking (Context, POSSession, FrontEnd);
-          'addSalesLine':          Step_AddSalesLine (Context, POSSession, FrontEnd);
+          'itemTrackingForce':  Step_ItemTracking (Context, POSSession, FrontEnd);
+          'AddSalesLine':       Step_AddSalesLine (Context, POSSession, FrontEnd);
+          'IncreaseQuantity':    Step_IncreaseQuantity (Context, POSSession, FrontEnd); //-+NPR5.55 [364420]
+          'DecreaseQuantity':    Step_DecreaseQuantity (Context, POSSession, FrontEnd); //-+NPR5.55 [364420]
+          'SetSpecificQuantity': Step_SetQuantity (Context, POSSession, FrontEnd); //-+NPR5.55 [403784]
           //'getExtraItemWorkflows': Step_GetWorkflowList (Contex, POSSession, FrontEnd);
         end;
+
 
         POSSession.RequestRefreshData();
     end;
@@ -85,12 +125,17 @@ codeunit 6151289 "SS Action - Insert Item"
     var
         UI: Codeunit "POS UI Management";
     begin
-        Captions.AddActionCaption (ActionCode, 'itemTracking_title', TEXTitemTracking_title);
-        Captions.AddActionCaption (ActionCode, 'itemTracking_lead', TEXTitemTracking_lead);
-        Captions.AddActionCaption (ActionCode, 'UnitpriceTitle', UnitPriceTitle);
-        Captions.AddActionCaption (ActionCode, 'UnitpriceCaption', UnitPriceCaption);
-        Captions.AddActionCaption (ActionCode, 'editDesc_title', TEXTeditDesc_title);
-        Captions.AddActionCaption (ActionCode, 'editDesc_lead', TEXTeditDesc_title);
+        //-NPR5.55 [405186]
+        // Captions.AddActionCaption (ActionCode, 'itemTracking_title', TEXTitemTracking_title);
+        // Captions.AddActionCaption (ActionCode, 'itemTracking_lead', TEXTitemTracking_lead);
+        // Captions.AddActionCaption (ActionCode, 'UnitpriceTitle', UnitPriceTitle);
+        // Captions.AddActionCaption (ActionCode, 'UnitpriceCaption', UnitPriceCaption);
+        // Captions.AddActionCaption (ActionCode, 'editDesc_title', TEXTeditDesc_title);
+        // Captions.AddActionCaption (ActionCode, 'editDesc_lead', TEXTeditDesc_title);
+
+        Captions.AddActionCaption (ActionCode, 'EnterQuantityCaption', EnterQuantityCaption);
+        Captions.AddActionCaption (ActionCode, 'ValidRangeText', ValidRangeText);
+        //+NPR5.55 [405186]
     end;
 
     local procedure Step_AddSalesLine(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
@@ -111,7 +156,9 @@ codeunit 6151289 "SS Action - Insert Item"
     begin
         //-NPR5.40 [294655]
 
+
         HasPrompted := JSON.GetBoolean('promptPrice', false) or JSON.GetBoolean('promptSerial', false);
+
         JSON.SetScope('parameters',true);
         ItemIdentifier := JSON.GetString('itemNo',true);
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType',false);
@@ -124,25 +171,27 @@ codeunit 6151289 "SS Action - Insert Item"
 
         GetItem(Item, ItemCrossReference, ItemIdentifier, ItemIdentifierType);
 
-        if not HasPrompted then begin
-          if Item."Group sale" and (not UsePresetUnitPrice)then begin
-            DialogContext.SetContext('promptPrice', true);
-            DialogPrompt := true;
-          end;
-
-          if ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking) then begin
-            DialogContext.SetContext('promptSerial', true);
-            DialogContext.SetContext('itemTracking_instructions',TEXTitemTracking_instructions);
-            DialogContext.SetContext('useSpecificTracking', UseSpecificTracking);
-            DialogPrompt := true;
-          end;
-
-          if DialogPrompt then begin
-            FrontEnd.SetActionContext(ActionCode, DialogContext);
-            FrontEnd.ContinueAtStep('promptContextDialogs');
-            exit;
-          end;
-        end;
+        //-NPR5.55 [364420]
+        // IF NOT HasPrompted THEN BEGIN
+        //  IF Item."Group sale" AND (NOT UsePresetUnitPrice)THEN BEGIN
+        //    DialogContext.SetContext('promptPrice', TRUE);
+        //    DialogPrompt := TRUE;
+        //  END;
+        //
+        //  IF ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking) THEN BEGIN
+        //    DialogContext.SetContext('promptSerial', TRUE);
+        //    DialogContext.SetContext('itemTracking_instructions',TEXTitemTracking_instructions);
+        //    DialogContext.SetContext('useSpecificTracking', UseSpecificTracking);
+        //    DialogPrompt := TRUE;
+        //  END;
+        //
+        //  IF DialogPrompt THEN BEGIN
+        //    FrontEnd.SetActionContext(ActionCode, DialogContext);
+        //    FrontEnd.ContinueAtStep('promptContextDialogs');
+        //    EXIT;
+        //  END;
+        // END;
+        //+NPR5.55 [364420]
 
         AddItemLine(Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, UsePresetUnitPrice, PresetUnitPrice, JSON, POSSession, FrontEnd);
         //+NPR5.40 [294655]
@@ -190,6 +239,81 @@ codeunit 6151289 "SS Action - Insert Item"
         exit;
 
         POSSession.RequestRefreshData();
+    end;
+
+    local procedure Step_DecreaseQuantity(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    var
+        Item: Record Item;
+        ItemCrossReference: Record "Item Cross Reference";
+        ItemIdentifier: Text;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemQuantity: Decimal;
+    begin
+        //-NPR5.55 [364420]õ
+        JSON.SetScope('parameters',true);
+        ItemIdentifier := JSON.GetString('itemNo',true);
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType',false);
+        ItemQuantity := JSON.GetDecimal('itemQuantity',false);
+
+        if ItemIdentifierType < 0 then
+          ItemIdentifierType := 0;
+
+        GetItem (Item, ItemCrossReference, ItemIdentifier, ItemIdentifierType);
+        RemoveQuantityFromItemLine (Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd);
+
+        //+NPR5.55 [364420]
+    end;
+
+    local procedure Step_IncreaseQuantity(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    var
+        Item: Record Item;
+        ItemCrossReference: Record "Item Cross Reference";
+        ItemIdentifier: Text;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemQuantity: Decimal;
+    begin
+
+        //-NPR5.55 [364420]õ
+        JSON.SetScope('parameters',true);
+        ItemIdentifier := JSON.GetString('itemNo',true);
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType',false);
+        ItemQuantity := JSON.GetDecimal('itemQuantity',false);
+        JSON.SetScopeRoot (false);
+
+        if ItemIdentifierType < 0 then
+          ItemIdentifierType := 0;
+
+        GetItem (Item, ItemCrossReference, ItemIdentifier, ItemIdentifierType);
+        if (not AddQuantityToItemLine (Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd)) then
+          Step_AddSalesLine (JSON, POSSession, FrontEnd);
+
+        //+NPR5.55 [364420]
+    end;
+
+    local procedure Step_SetQuantity(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    var
+        Item: Record Item;
+        ItemCrossReference: Record "Item Cross Reference";
+        ItemIdentifier: Text;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemQuantity: Decimal;
+    begin
+
+        //-NPR5.55 [403784]
+        JSON.SetScope('parameters',true);
+        ItemIdentifier := JSON.GetString('itemNo',true);
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType',false);
+        JSON.SetScopeRoot (false);
+        ItemQuantity := JSON.GetDecimal('specificQuantity',false);
+
+        if ItemIdentifierType < 0 then
+          ItemIdentifierType := 0;
+
+        GetItem (Item, ItemCrossReference, ItemIdentifier, ItemIdentifierType);
+        if (not SetQuantityToItemLine (Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd)) then
+          Step_AddSalesLine (JSON, POSSession, FrontEnd);
+
+        //+NPR5.55 [403784]
     end;
 
     local procedure "-- Various support functions"()
@@ -370,6 +494,101 @@ codeunit 6151289 "SS Action - Insert Item"
         //+NPR5.40 [294655]
     end;
 
+    procedure AddQuantityToItemLine(Item: Record Item;ItemCrossReference: Record "Item Cross Reference";ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;ItemQuantity: Decimal;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    var
+        SalePOS: Record "Sale POS";
+        SaleLinePOS: Record "Sale Line POS";
+        POSSale: Codeunit "POS Sale";
+        POSSaleLine: Codeunit "POS Sale Line";
+        SSActionQtyIncrease: Codeunit "SS Action - Qty Increase";
+    begin
+
+        //-NPR5.55 [364420]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale (SalePOS);
+
+        SaleLinePOS.SetFilter ("Orig. POS Sale ID", '=%1', SalePOS."POS Sale ID");
+        SaleLinePOS.SetFilter ("No.", '=%1', Item."No.");
+        SaleLinePOS.SetFilter (Quantity, '>=%1', ItemQuantity);
+        if (not SaleLinePOS.FindFirst ()) then
+          exit (false);
+
+        POSSession.GetSaleLine (POSSaleLine);
+        POSSaleLine.SetPosition (SaleLinePOS.GetPosition ());
+
+        SSActionQtyIncrease.IncreaseSalelineQuantity (POSSession, ItemQuantity);
+
+        POSSession.RequestRefreshData();
+        exit (true);
+
+        //+NPR5.55 [364420]
+    end;
+
+    procedure RemoveQuantityFromItemLine(Item: Record Item;ItemCrossReference: Record "Item Cross Reference";ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;ItemQuantity: Decimal;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    var
+        SalePOS: Record "Sale POS";
+        SaleLinePOS: Record "Sale Line POS";
+        POSSale: Codeunit "POS Sale";
+        POSSaleLine: Codeunit "POS Sale Line";
+        SSActionQtyDecrease: Codeunit "SS Action - Qty Decrease";
+        SSActionDeletePOSLine: Codeunit "SS Action - Delete POS Line";
+    begin
+
+        //-NPR5.55 [364420]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale (SalePOS);
+
+        SaleLinePOS.SetFilter ("Orig. POS Sale ID", '=%1', SalePOS."POS Sale ID");
+        SaleLinePOS.SetFilter ("No.", '=%1', Item."No.");
+        SaleLinePOS.SetFilter (Quantity, '>=%1', ItemQuantity);
+        if (not SaleLinePOS.FindFirst ()) then
+          exit;
+
+        POSSession.GetSaleLine (POSSaleLine);
+        POSSaleLine.SetPosition (SaleLinePOS.GetPosition ());
+
+        if (SaleLinePOS.Quantity = ItemQuantity) then begin
+          SSActionDeletePOSLine.DeletePosLine (POSSession);
+        end else begin
+          SSActionQtyDecrease.DecreaseSalelineQuantity (POSSession, Abs (ItemQuantity));
+        end;
+
+        POSSession.RequestRefreshData();
+        //+NPR5.55 [364420]
+    end;
+
+    procedure SetQuantityToItemLine(Item: Record Item;ItemCrossReference: Record "Item Cross Reference";ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;ItemQuantity: Decimal;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    var
+        SalePOS: Record "Sale POS";
+        SaleLinePOS: Record "Sale Line POS";
+        POSSale: Codeunit "POS Sale";
+        POSSaleLine: Codeunit "POS Sale Line";
+        SSActionQtyIncrease: Codeunit "SS Action - Qty Increase";
+    begin
+
+        //-NPR5.55 [403784]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale (SalePOS);
+
+        SaleLinePOS.SetFilter ("Orig. POS Sale ID", '=%1', SalePOS."POS Sale ID");
+        SaleLinePOS.SetFilter ("No.", '=%1', Item."No.");
+        SaleLinePOS.SetFilter (Quantity, '>=%1', 1);
+        if (not SaleLinePOS.FindFirst ()) then
+          exit (false);
+
+        POSSession.GetSaleLine (POSSaleLine);
+        POSSaleLine.SetPosition (SaleLinePOS.GetPosition ());
+
+        POSSession.GetSaleLine (POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine (SaleLinePOS);
+        POSSaleLine.SetQuantity (ItemQuantity);
+
+        POSSession.RequestRefreshData();
+        exit (true);
+
+        //+NPR5.55 [403784]
+    end;
+
     local procedure AutoExplodeBOM(Item: Record Item;POSSaleLine: Codeunit "POS Sale Line")
     var
         BOMComponent: Record "BOM Component";
@@ -399,7 +618,7 @@ codeunit 6151289 "SS Action - Insert Item"
     var
         AccessorySparePart: Record "Accessory/Spare Part";
     begin
-        // This is an adoption of the original function UdpakTilbeh�r in 6014418
+        // This is an adoption of the original function UdpakTilbeh¢r in 6014418
 
         //-NPR5.40 [294655]
         AccessorySparePart.SetFilter (Type, '=%1', AccessorySparePart.Type::Accessory);

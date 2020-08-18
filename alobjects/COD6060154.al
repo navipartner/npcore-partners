@@ -17,6 +17,7 @@ codeunit 6060154 "Event Ticket Management"
     // NPR5.48/TJ  /20181113 CASE 335824 Removed/recoded any usage of field Ticket No. on table Job Planning Line
     //                                   New function ShowIssuedTickets
     //                                   Revoking is now done from the Ticket List/Ticket Request list
+    // NPR5.55/TJ  /20200109 CASE 377120 Recoded reservation request creation
 
 
     trigger OnRun()
@@ -199,7 +200,11 @@ codeunit 6060154 "Event Ticket Management"
           else
             exit;
         //+NPR5.34 [285043]
-        CreateReservationRequest(JobPlanningLine,JobPlanningLine."Ticket Token" = '');
+        //-NPR5.55 [377120]
+        //CreateReservationRequest(JobPlanningLine,JobPlanningLine."Ticket Token" = '');
+        JobPlanningLine.Validate("Ticket Token",TicketRequestManager.POS_CreateReservationRequest('',0,JobPlanningLine."No.",JobPlanningLine."Variant Code",JobPlanningLine.Quantity,''));
+        JobPlanningLine."Ticket Status" := JobPlanningLine."Ticket Status"::Registered;
+        //+NPR5.55 [377120]
         //-NPR5.34 [285043]
         //IssueTicketWithLog(JobPlanningLine,FALSE);
         if FromAction then
@@ -217,45 +222,50 @@ codeunit 6060154 "Event Ticket Management"
         TicketReqManager: Codeunit "TM Ticket Request Manager";
         AdmSchEntry: Record "TM Admission Schedule Entry";
     begin
-        if RequestNewToken then
+        //-NPR5.55 [377120]
+        /*
+        IF RequestNewToken THEN
           //-NPR5.43 [262079]
           //JobPlanningLine."Ticket Token" := TicketReqManager.GetNewToken();
-          JobPlanningLine.Validate("Ticket Token",TicketReqManager.GetNewToken());
+          JobPlanningLine.VALIDATE("Ticket Token",TicketReqManager.GetNewToken());
           //+NPR5.43 [262079]
         JobPlanningLine."Ticket Status" := JobPlanningLine."Ticket Status"::Registered;
-
-        TicketAdmBOM.SetRange("Item No.",JobPlanningLine."No.");
-        TicketAdmBOM.SetRange("Variant Code",JobPlanningLine."Variant Code");
-        TicketAdmBOM.FindSet();
-        repeat
-          Admission.Get(TicketAdmBOM."Admission Code");
-
-          Clear(TicketReservRequest);
+        
+        TicketAdmBOM.SETRANGE("Item No.",JobPlanningLine."No.");
+        TicketAdmBOM.SETRANGE("Variant Code",JobPlanningLine."Variant Code");
+        TicketAdmBOM.FINDSET();
+        REPEAT
+          Admission.GET(TicketAdmBOM."Admission Code");
+        
+          CLEAR(TicketReservRequest);
           TicketReservRequest."Entry No." := 0;
           TicketReservRequest."Session Token ID" := JobPlanningLine."Ticket Token";
           TicketReservRequest."Ext. Line Reference No." := JobPlanningLine."Line No.";
           TicketReservRequest."Admission Code" := TicketAdmBOM."Admission Code";
-
+        
           TicketReservRequest."External Item Code" := TicketReqManager.GetExternalNo(JobPlanningLine."No.",JobPlanningLine."Variant Code");
           TicketReservRequest.Quantity := JobPlanningLine.Quantity;
           TicketReservRequest."External Member No." := '';
           TicketReservRequest."Admission Description" := Admission.Description;
-
-          case Admission."Default Schedule" of
+        
+          CASE Admission."Default Schedule" OF
             Admission."Default Schedule"::TODAY,
             Admission."Default Schedule"::NEXT_AVAILABLE:
-              if AdmSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(Admission."Admission Code", true)) then begin
+              IF AdmSchEntry.GET(TicketManagement.GetCurrentScheduleEntry(Admission."Admission Code", TRUE)) THEN BEGIN
                 TicketReservRequest."External Adm. Sch. Entry No." := AdmSchEntry."External Schedule Entry No.";
-                TicketReservRequest."Scheduled Time Description" := StrSubstNo('%1 - %2',AdmSchEntry."Admission Start Date",AdmSchEntry."Admission Start Time");
-              end;
-          end;
-
-          TicketReservRequest."Created Date Time" := CurrentDateTime;
+                TicketReservRequest."Scheduled Time Description" := STRSUBSTNO('%1 - %2',AdmSchEntry."Admission Start Date",AdmSchEntry."Admission Start Time");
+              END;
+          END;
+        
+          TicketReservRequest."Created Date Time" := CURRENTDATETIME;
           TicketReservRequest."Request Status" := TicketReservRequest."Request Status"::WIP;
-          TicketReservRequest."Request Status Date Time" := CurrentDateTime;
-          TicketReservRequest."Expires Date Time" := CurrentDateTime + 1500 * 1000;
-          TicketReservRequest.Insert;
-        until TicketAdmBOM.Next = 0;
+          TicketReservRequest."Request Status Date Time" := CURRENTDATETIME;
+          TicketReservRequest."Expires Date Time" := CURRENTDATETIME + 1500 * 1000;
+          TicketReservRequest.INSERT;
+        UNTIL TicketAdmBOM.NEXT = 0;
+        */
+        //+NPR5.55 [377120]
+
     end;
 
     local procedure DeleteTicketReservRequest(var JobPlanningLine: Record "Job Planning Line";RemoveRequest: Boolean;RemoveToken: Boolean)

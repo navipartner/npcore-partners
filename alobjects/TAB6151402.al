@@ -8,6 +8,7 @@ table 6151402 "Magento Website"
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.01/TS/20161014  CASE 254886 Added Location Code
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
+    // MAG2.26/MHA /20200505  CASE 402828 Added field 40 "Sales Order No. Series"
 
     Caption = 'Magento Website';
     DrillDownPageID = "Magento Website List";
@@ -47,6 +48,12 @@ table 6151402 "Magento Website"
             Caption = 'Location Code';
             Description = 'MAG2.01';
             TableRelation = Location.Code;
+        }
+        field(40;"Sales Order No. Series";Code[20])
+        {
+            Caption = 'Sales Order No. Series';
+            Description = 'MAG2.26';
+            TableRelation = "No. Series";
         }
     }
 

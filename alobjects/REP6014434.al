@@ -175,7 +175,7 @@ report 6014434 "Vendor/Debtor by date"
         Total_Caption = 'Total';
         Creditor_Caption = 'Creditor per Date';
         Customer_Caption = 'Customer per Date';
-        Footer_Caption = '�NAVIPARTNER K�benhavn 2002';
+        Footer_Caption = 'ˆNAVIPARTNER K¢benhavn 2002';
     }
 
     trigger OnInitReport()

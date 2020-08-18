@@ -5,10 +5,10 @@ page 6150707 "POS Setup"
     // NPR5.40/VB  /20180228 CASE 306347  Replacing BLOB-based parameters with phyisical-table parameters.
     // NPR5.54/TSA /20200219 CASE 391850 Added Description
     // NPR5.54/TSA /20200220 CASE 392121 Added "Idle Timeout Action Code"
+    // NPR5.55/TSA /20200417 CASE 400734 Added "Admin Menu Action Code"
 
     Caption = 'POS Setup';
     DeleteAllowed = false;
-    InsertAllowed = false;
     PageType = Card;
     SourceTable = "POS Setup";
     UsageCategory = Administration;
@@ -193,6 +193,17 @@ page 6150707 "POS Setup"
                         //-NPR5.54 [392121]
                         AssistEdit ("Idle Timeout Action Code", FieldNo ("Idle Timeout Action Code"));
                         //+NPR5.54 [392121]
+                    end;
+                }
+                field("Admin Menu Action Code";"Admin Menu Action Code")
+                {
+
+                    trigger OnAssistEdit()
+                    begin
+
+                        //-NPR5.55 [400734]
+                        AssistEdit ("Admin Menu Action Code", FieldNo ("Admin Menu Action Code"));
+                        //-NPR5.55 [400734]
                     end;
                 }
             }

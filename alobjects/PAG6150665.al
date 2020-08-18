@@ -4,6 +4,7 @@ page 6150665 "NPRE Seating"
     // NPR5.34/ANEN/20170717 CASE 262628 Added support for status (fld "Status", "Status Description")
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Seating';
     PageType = Card;
@@ -23,6 +24,12 @@ page 6150665 "NPRE Seating"
                 {
                 }
                 field("Seating Location";"Seating Location")
+                {
+                }
+                field(Blocked;Blocked)
+                {
+                }
+                field("Blocking Reason";"Blocking Reason")
                 {
                 }
             }

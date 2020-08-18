@@ -2,6 +2,8 @@ tableextension 6014442 tableextension6014442 extends "Item Variant"
 {
     // NPR5.29/TJ  /20170119 CASE 263917 Moved function GetFromVariety to codeunit 6059972
     // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018
+    // NPR5.55/BHR /20200219 CASE 361515 Delete Key as it's not supported in extension
+    //                                   Item No.,Variety 1 Value,Variety 2 Value,Variety 3 Value,Variety 4 Value
     fields
     {
         field(6059970;"Variety 1";Code[10])

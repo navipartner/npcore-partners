@@ -4,6 +4,8 @@ page 6150669 "NPRE Restaurant Setup"
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.41/THRO/20180412 CASE 309873 Replaced 2 template fields by a listpart page for setup of multiple templates
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Restaurant Setup';
     PageType = Card;
@@ -14,11 +16,38 @@ page 6150669 "NPRE Restaurant Setup"
     {
         area(content)
         {
-            group("Waiter Pad")
+            group(General)
             {
-                Caption = 'Waiter Pad';
+                Caption = 'General';
                 field("Waiter Pad No. Serie";"Waiter Pad No. Serie")
                 {
+                }
+                field("Default Service Flow Profile";"Default Service Flow Profile")
+                {
+                }
+            }
+            group(Seating)
+            {
+                Caption = 'Seating';
+                group(Statuses)
+                {
+                    Caption = 'Statuses';
+                    field("Seat.Status: Ready";"Seat.Status: Ready")
+                    {
+                        Caption = 'Ready for New Guests';
+                    }
+                    field("Seat.Status: Occupied";"Seat.Status: Occupied")
+                    {
+                        Caption = 'Occupied';
+                    }
+                    field("Seat.Status: Reserved";"Seat.Status: Reserved")
+                    {
+                        Caption = 'Reserved';
+                    }
+                    field("Seat.Status: Cleaning Required";"Seat.Status: Cleaning Required")
+                    {
+                        Caption = 'Cleaning Required';
+                    }
                 }
             }
             group(KitchenInegration)
@@ -28,6 +57,9 @@ page 6150669 "NPRE Restaurant Setup"
                 {
                 }
                 field("Resend All On New Lines";"Resend All On New Lines")
+                {
+                }
+                field("Serving Step Discovery Method";"Serving Step Discovery Method")
                 {
                 }
                 group(Print)
@@ -64,7 +96,7 @@ page 6150669 "NPRE Restaurant Setup"
             {
                 Caption = 'Print Categories';
                 Image = PrintForm;
-                RunObject = Page "NPRE Print Categories";
+                RunObject = Page "NPRE Select Print Categories";
             }
             action(Restaurants)
             {

@@ -45,6 +45,7 @@ codeunit 6060129 "MM Member WebService Mgr"
     // MM1.42/TSA /20191231 CASE 382728 Added GetSetMemberCommunicationOption service
     // MM1.43/TSA /20200130 CASE 386080 Added customer no and contact no to membership info for pre-assign customers/contacts
     // MM1.43/TSA /20200226 CASE 392659 Added finalization for sponsorship tickets
+    // MM1.44/TSA /20200506 CASE 400429 Added ImportBlockMember and renamed functions to reflect actual work done
 
     TableNo = "Nc Import Entry";
 
@@ -75,7 +76,13 @@ codeunit 6060129 "MM Member WebService Mgr"
             'GetMembershipTicketList'         : ImportGetMembershipTicketList (XmlDoc, "Document ID");
             'GetMembershipMembers'            : ImportGetMembershipMembers (XmlDoc, "Document ID");
             'UpdateMember'                    : ImportUpdateMembers (XmlDoc, "Document ID");
-            'BlockMembership'                 : ImportBlockMembers (XmlDoc, "Document ID");
+
+
+            //-MM1.44 [400429]
+            // 'BlockMembership'                 : ImportBlockMembers (XmlDoc, "Document ID");
+            'BlockMembership'                 : ImportBlockMemberships (XmlDoc, "Document ID");
+            'BlockMember'                     : ImportBlockMembers (XmlDoc, "Document ID");
+            //+MM1.44 [400429]
 
             'ChangeMembership'                : ImportChangeMemberships (XmlDoc, "Document ID");
             'GetMembershipChangeItemsList'    : ImportGetChangeMembershipList (XmlDoc, "Document ID");
@@ -659,12 +666,14 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportBlockMembers(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
+    local procedure ImportBlockMemberships(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
         XmlElement: DotNet npNetXmlElement;
         XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
+
+        //-+MM1.44 [400429] renamed ImportBlockMembers -> ImportBlockMemberships
 
         if IsNull(XmlDoc) then
           exit;
@@ -680,18 +689,20 @@ codeunit 6060129 "MM Member WebService Mgr"
 
         for i := 0 to XmlNodeList.Count - 1 do begin
           XmlElement := XmlNodeList.ItemOf(i);
-          ImportBlockMember (XmlElement, DocumentID);
+          ImportBlockMembership (XmlElement, DocumentID);
         end;
 
         Commit;
     end;
 
-    local procedure ImportBlockMember(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportBlockMembership(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
         Membership: Record "MM Membership";
     begin
+
+        //-+MM1.44 [400429] renamed ImportBlockMember -> ImportBlockMembership
 
         if IsNull(XmlElement) then
           exit(false);
@@ -726,6 +737,98 @@ codeunit 6060129 "MM Member WebService Mgr"
         Membership.Modify ();
 
         exit(true);
+    end;
+
+    local procedure ImportBlockMembers(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
+    var
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        i: Integer;
+    begin
+
+        //-MM1.44 [400429]
+
+        if IsNull(XmlDoc) then
+          exit;
+        XmlElement := XmlDoc.DocumentElement;
+        if IsNull(XmlElement) then
+          exit;
+
+        if not NpXmlDomMgt.FindNodes(XmlElement,'blockmember',XmlNodeList) then
+          exit;
+
+        if not NpXmlDomMgt.FindNodes(XmlElement,'request',XmlNodeList) then
+          exit;
+
+        for i := 0 to XmlNodeList.Count - 1 do begin
+          XmlElement := XmlNodeList.ItemOf(i);
+          ImportBlockMember (XmlElement, DocumentID);
+        end;
+
+        Commit;
+
+        //+MM1.44 [400429]
+    end;
+
+    local procedure ImportBlockMember(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
+    var
+        MemberInfoCapture: Record "MM Member Info Capture";
+        MembershipManagement: Codeunit "MM Membership Management";
+        Membership: Record "MM Membership";
+        MembershipRole: Record "MM Membership Role";
+        Member: Record "MM Member";
+    begin
+
+        //-MM1.44 [400429]
+
+        if IsNull(XmlElement) then
+          exit(false);
+
+        //UPDATE
+        MemberInfoCapture.Init ();
+        MemberInfoCapture."Import Entry Document ID" := DocumentID;
+        InsertGetMemberQuery (XmlElement, MemberInfoCapture);
+
+        if (MemberInfoCapture."External Member No" <> '') then begin
+          MemberInfoCapture."Member Entry No" := MembershipManagement.GetMemberFromExtMemberNo (MemberInfoCapture."External Member No");
+          if (MemberInfoCapture."Member Entry No" = 0) then
+            Error (INVALID_MEMBER_NO, MemberInfoCapture."External Member No");
+        end;
+
+        if (MemberInfoCapture."External Membership No." <> '') then begin
+          MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMembershipNo (MemberInfoCapture."External Membership No.");
+          if (MemberInfoCapture."Membership Entry No." = 0) then
+            Error (INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
+        end;
+
+        if (MemberInfoCapture."Member Entry No" = 0) then
+          Error (NOT_FOUND);
+
+        MemberInfoCapture.Modify ();
+
+        MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberInfoCapture."Member Entry No");
+        if (MemberInfoCapture."Membership Entry No." <> 0) then
+          MembershipRole.SetFilter ("Membership Entry No.", '=%1', MemberInfoCapture."Membership Entry No.");
+        if (not MembershipRole.FindSet ()) then
+          Error (NOT_FOUND);
+
+        repeat
+          MembershipManagement.BlockMember (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", true);
+
+          Member.Get (MembershipRole."Member Entry No.");
+          Member."Document ID" := DocumentID;
+          Member.Modify ();
+
+          Membership.Get (MembershipRole."Membership Entry No.");
+          Membership."Document ID" := DocumentID;
+          Membership.Modify ();
+
+        until (MembershipRole.Next () = 0);
+
+
+
+        exit(true);
+        //+MM1.44 [400429]
     end;
 
     local procedure ImportChangeMemberships(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])

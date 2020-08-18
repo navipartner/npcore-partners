@@ -598,7 +598,7 @@ codeunit 6014505 "Touch Screen - Functions"
 
         AuditRoll.Init;
         //-NPR5.33 [275728]
-        ////Forny hvis vi �bner p� en gammel bon.
+        ////Forny hvis vi åbner på en gammel bon.
         //AuditRollCheck.SETFILTER("Sales Ticket No.",'>%1',SalePOS."Sales Ticket No.");
         //IF AuditRollCheck.FIND('+') THEN
         //  AuditRoll."Sales Ticket No." := FormCode.FetchSalesTicketNumber(SalePOS."Register No.")

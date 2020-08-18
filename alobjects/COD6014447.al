@@ -7,6 +7,7 @@ codeunit 6014447 "Label Library Sub. Mgt."
     // NPR5.46/JDH /20181001 CASE 294354  Restructured functionality for printing
     // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Psted Purchase Invoice
     // NPR5.53/SARA/20191119 CASE 377622 Added Print Price Label for Retail Item Journal
+    // NPR5.55/BHR /202020713 CASE 414268 Add retail print and Price label for warehouse activity line
 
 
     trigger OnRun()
@@ -148,6 +149,24 @@ codeunit 6014447 "Label Library Sub. Mgt."
         PrintLabel(Rec,ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
+    [EventSubscriber(ObjectType::Page, 7375, 'OnAfterActionEvent', 'RetailPrint', false, false)]
+    local procedure InventoryPutAwayOnAfterActionEventRetailPrint(var Rec: Record "Warehouse Activity Header")
+    begin
+        //-NPR5.55 [414268]
+        ChooseLabel(Rec);
+        //+NPR5.55 [414268]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 7375, 'OnAfterActionEvent', 'PriceLabel', false, false)]
+    local procedure InventoryPutAwayOnAfterActionEventPriceLabel(var Rec: Record "Warehouse Activity Header")
+    var
+        ReportSelectionRetail: Record "Report Selection Retail";
+    begin
+        //-NPR5.55 [414268]
+        PrintLabel(Rec,ReportSelectionRetail."Report Type"::"Inv.PutAway Label");
+        //+NPR5.55 [414268]
+    end;
+
     procedure ChooseLabel(VarRec: Variant)
     begin
         ApplyFilterAndRun(VarRec,0,false);
@@ -177,6 +196,8 @@ codeunit 6014447 "Label Library Sub. Mgt."
         TransferReceiptLine: Record "Transfer Receipt Line";
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
         RecRef2.GetTable(VarRec);
         case RecRef2.Number of
@@ -232,6 +253,15 @@ codeunit 6014447 "Label Library Sub. Mgt."
               RecRef.GetTable(PurchInvLine);
             end;
           //+NPR5.51 [358287]
+          //-NPR5.55 [414268]
+            DATABASE::"Warehouse Activity Header":
+            begin
+              RecRef2.SetTable(WarehouseActivityHeader);
+              WarehouseActivityLine.SetRange("Activity Type",WarehouseActivityHeader.Type);
+              WarehouseActivityLine.SetRange("No.",WarehouseActivityHeader."No.");
+              RecRef.GetTable(WarehouseActivityLine);
+            end;
+          //+NPR5.55 [414268]
           else begin
             RecRef := RecRef2;
             RecRef.SetRecFilter;

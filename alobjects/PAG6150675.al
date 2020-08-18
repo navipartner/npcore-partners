@@ -5,6 +5,10 @@ page 6150675 "POS Entry Card"
     // NPR5.54/SARA/20200218 CASE 391360 Remove Shortcut 'POS Audit Log' and 'POS Info Audit Roll'
     // NPR5.54/SARA/20200228 CASE 393492 Remove Delete button
     // NPR5.54/SARA/20200323 CASE 397581 Added Section NpRV Voucher under Navigate Ribbon
+    // NPR5.55/SARA/20200511 CASE 401547 Add shortcut 'POS Period Register List'
+    // NPR5.55/YAHA/20200218 CASE 391361 Remove groupaction EFT.
+    // NPR5.55/MMV /20200623 CASE 391360 Re-actived action 'POS Audit Log'.
+    // NPR5.55/SARA/20200706 CASE 412905 Related Sales Document Button: Filter only by Entry No.
 
     Caption = 'POS Entry Card';
     DeleteAllowed = false;
@@ -326,7 +330,6 @@ page 6150675 "POS Entry Card"
             {
                 Caption = 'POS Audit Log';
                 Image = InteractionLog;
-                Visible = false;
 
                 trigger OnAction()
                 var
@@ -348,8 +351,10 @@ page 6150675 "POS Entry Card"
                 begin
                     //-NPR5.50 [300557]
                     POSEntrySalesDocLink.SetRange("POS Entry No.", "Entry No.");
-                    POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
-                    POSEntrySalesDocLink.SetRange("POS Entry Reference Line No.", 0);
+                    //-NPR5.55 [412905]
+                    //POSEntrySalesDocLink.SETRANGE("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
+                    //POSEntrySalesDocLink.SETRANGE("POS Entry Reference Line No.", 0);
+                    //+NPR5.55 [412905]
                     PAGE.RunModal(PAGE::"POS Entry Related Sales Doc.", POSEntrySalesDocLink);
                     //+NPR5.50 [300557]
                 end;
@@ -366,6 +371,12 @@ page 6150675 "POS Entry Card"
                     ShowWorkshift (Rec);
                     //+NPR5.50 [345376]
                 end;
+            }
+            action("POS Period Register")
+            {
+                Image = PeriodEntries;
+                RunObject = Page "POS Period Register List";
+                RunPageLink = "No."=FIELD("POS Period Register No.");
             }
             group(Vouchers)
             {

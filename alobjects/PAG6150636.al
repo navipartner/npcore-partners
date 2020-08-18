@@ -1,6 +1,7 @@
 page 6150636 "POS View Profile Card"
 {
     // NPR5.49/TJ  /20190201 CASE 335739 New object
+    // NPR5.55/TSA /20200527 CASE 406862 Added "Initial Sales View", "After End-of-Sale View"
 
     Caption = 'POS View Profile Card';
     PageType = Card;
@@ -23,6 +24,12 @@ page 6150636 "POS View Profile Card"
                 {
                 }
                 field("Line Order on Screen"; "Line Order on Screen")
+                {
+                }
+                field("Initial Sales View";"Initial Sales View")
+                {
+                }
+                field("After End-of-Sale View";"After End-of-Sale View")
                 {
                 }
             }

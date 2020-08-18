@@ -4,6 +4,7 @@ codeunit 6014408 "POS Prepayment Mgt."
     // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
     // NPR5.53/MMV /20191106 CASE 352473 Changed how prepayment amount is spread across lines.
     // NPR5.53/MMV /20191113 CASE 375290 Removed unused function.
+    // NPR5.55/ALPO/20201416 CASE 391568 Exclude lines with "Line Amount" = 0 from prepayment calculations
 
 
     trigger OnRun()
@@ -63,6 +64,7 @@ codeunit 6014408 "POS Prepayment Mgt."
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetFilter("No.", '<>%1', '');
+        SalesLine.SetFilter("Line Amount", '<>%1', 0);  //NPR5.55 [391568]
         SalesLine.SetHideValidationDialog(true);
         SalesLine.SuspendStatusCheck(true);  //NPR5.53 [360297]
 
@@ -131,6 +133,7 @@ codeunit 6014408 "POS Prepayment Mgt."
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetFilter("No.", '<>%1', '');
+        SalesLine.SetFilter("Line Amount", '<>%1', 0);  //NPR5.55 [391568]
         SalesLine.SetHideValidationDialog(true);
         SalesLine.SuspendStatusCheck(true);  //NPR5.53 [360297]
 

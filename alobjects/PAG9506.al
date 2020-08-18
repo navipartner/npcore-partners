@@ -1,4 +1,4 @@
-pageextension 6014485 pageextension6014485 extends "Concurrent Session List"
+pageextension 6014490 pageextension6014490 extends "Concurrent Session List"
 {
     // NPR70.00.00.00/TS/20150126 CASE 205355  Added Kill Session
     // NPR5.48/JDH /20181109 CASE 334163 Removed Space from Caption Kill session

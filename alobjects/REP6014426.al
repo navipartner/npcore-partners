@@ -9,6 +9,7 @@ report 6014426 "Vendor Top/Sale"
     // NPR5.43/ZESO/20180607 CASE 317517 Corrected bug
     // NPR5.49/BHR /20190207 CASE 343119 Corrected report as per OMA
     // NPR5.54/YAHA/20200306 CASE 394856 Set logo visibility set to false
+    // NPR5.55/ANPA/20200521  CASE 388517 Add quantity and filter to item group
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Vendor TopSale.rdlc';
 
@@ -229,6 +230,12 @@ report 6014426 "Vendor Top/Sale"
             column(IndexDb_2;IndexDb[2])
             {
             }
+            column(Qty_Vendor;Vendor."Sales (Qty.)")
+            {
+            }
+            column(StockQty;StockQty)
+            {
+            }
 
             trigger OnAfterGetRecord()
             begin
@@ -250,7 +257,10 @@ report 6014426 "Vendor Top/Sale"
                 VendorAmount."Amount (LCY)" := Multipl * VendorAmount."Amount (LCY)";
 
                 Vendor.Get(VendorAmount."Vendor No.");
-                Vendor.CalcFields("Sales (LCY)","Balance (LCY)","COGS (LCY)");
+                //-NPR5.55 [388517]
+                Vendor.CalcFields("Sales (LCY)","Balance (LCY)","COGS (LCY)", "Sales (Qty.)");
+                //Vendor.CALCFIELDS("Sales (LCY)","Balance (LCY)","COGS (LCY)");
+                //+NPR5.55 [388517]
                 ProfitPct := "Pct."(Vendor."Sales (LCY)" - Vendor."COGS (LCY)",Vendor."Sales (LCY)");
 
                 if (MaxAmt <> 0) then
@@ -288,6 +298,11 @@ report 6014426 "Vendor Top/Sale"
                 j := IncStr(j);
 
                 // Calculates inventory for that supplier
+                //-NPR5.55 [388517]
+                Vendor.CopyFilter("Global Dimension 1 Filter", Vendor3."Global Dimension 1 Filter");
+                Vendor.CopyFilter("Item Group Filter", Vendor3."Item Group Filter");
+                //+NPR5.55 [388517]
+
                 Vendor3.Get(VendorAmount."Vendor No.");
                 Vendor3.CalcFields(Stock);
                 PctOfTotalInventory := "Pct."(Vendor3.Stock, InventoryTotal);
@@ -307,6 +322,22 @@ report 6014426 "Vendor Top/Sale"
                 IndexDb[1]   := "Pct."(Vendor."Sales (LCY)"-Vendor."COGS (LCY)", Vendor2."Sales (LCY)"- Vendor2."COGS (LCY)");
                 IndexDb[2]   := "Pct."(VendorProfit, DbLastYear);
                 //+NPR70.00.00.00
+
+                //-NPR5.55 [388517]
+                //Calculates stock(Qty)
+                Clear(StockQty);
+                ValueEntry2.SetFilter("Posting Date", '..%1', Vendor.GetRangeMax("Date Filter"));
+                Vendor.CopyFilter("Global Dimension 1 Filter", ValueEntry2."Global Dimension 1 Code");
+                Vendor.CopyFilter("Item Group Filter", ValueEntry2."Item Group No.");
+                Vendor.CopyFilter("Salesperson Filter", ValueEntry2."Salespers./Purch. Code");
+                ValueEntry2.SetFilter("Vendor No.", Vendor."No.");
+
+                if ValueEntry2.FindFirst then repeat
+                  if ValueEntry2."Cost per Unit" <> 0 then
+                    StockQty += ValueEntry2."Cost Amount (Actual)"/ValueEntry2."Cost per Unit";
+                until ValueEntry2.Next = 0;
+
+                //+NPR5.55 [388517]
             end;
 
             trigger OnPreDataItem()
@@ -328,6 +359,11 @@ report 6014426 "Vendor Top/Sale"
                 VendorProfit := VendorSales-Abs(ValueEntry."Cost Amount (Actual)");
 
                 // Calculates the inventory total for the period '..GETRANGEMAX'
+                //-NPR5.55 [388517]
+                Vendor3.SetFilter("Global Dimension 1 Filter", Vendor."Global Dimension 1 Filter");
+                Vendor.CopyFilter("Item Group Filter", Vendor3."Item Group Filter");
+                //+NPR5.55 [388517]
+
                 Vendor3.SetFilter("Date Filter", '..%1', Vendor.GetRangeMax("Date Filter"));
                 if Vendor3.FindFirst then repeat
                   Vendor3.CalcFields(Stock);
@@ -404,6 +440,8 @@ report 6014426 "Vendor Top/Sale"
         Sale_Caption = 'Sale';
         IndexSale_Caption = 'Index Sale';
         IndexDb_Caption = 'IndexDb';
+        Qty_Caption = 'Sales (Qty)';
+        Qty_Inventory = 'Inventory (Qty)';
     }
 
     trigger OnInitReport()
@@ -493,6 +531,8 @@ report 6014426 "Vendor Top/Sale"
         Text10600001: Label 'Period: %1';
         Text10600002: Label 'Order by %1 ';
         CostAmtFooter: Decimal;
+        StockQty: Decimal;
+        ValueEntry2: Record "Value Entry";
 
     local procedure "Pct."(Tal1: Decimal;Tal2: Decimal): Decimal
     begin

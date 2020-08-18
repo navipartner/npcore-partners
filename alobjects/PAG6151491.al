@@ -4,6 +4,7 @@ page 6151491 "Raptor Setup"
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
     // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
+    // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor
 
     AccessByPermission = TableData "Raptor Setup"=M;
     Caption = 'Raptor Setup';
@@ -23,9 +24,8 @@ page 6151491 "Raptor Setup"
                 field("Enable Raptor Functions";"Enable Raptor Functions")
                 {
                 }
-                field("Send Data to Raptor";"Send Data to Raptor")
+                field("Base Url";"Base Url")
                 {
-                    Enabled = "Enable Raptor Functions";
                 }
                 field("Customer ID";"Customer ID")
                 {
@@ -34,17 +34,32 @@ page 6151491 "Raptor Setup"
                 {
                 }
             }
-            group(Urls)
+            group(Tracking)
             {
-                Caption = 'Urls';
-                field("Base Url";"Base Url")
+                Caption = 'Tracking';
+                field("Send Data to Raptor";"Send Data to Raptor")
                 {
+                    Enabled = "Enable Raptor Functions";
                 }
                 field("Tracking Service Url";"Tracking Service Url")
                 {
                 }
                 field("Tracking Service Type";"Tracking Service Type")
                 {
+                }
+                field("Exclude Webshop Sales";"Exclude Webshop Sales")
+                {
+                }
+                field("Webshop Salesperson Filter";"Webshop Salesperson Filter")
+                {
+                    Enabled = "Exclude Webshop Sales";
+
+                    trigger OnAssistEdit()
+                    var
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        RaptorMgt.SelectWebShopSalespersons("Webshop Salesperson Filter");  //NPR5.55 [400925]
+                    end;
                 }
             }
         }

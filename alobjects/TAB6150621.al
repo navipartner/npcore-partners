@@ -30,6 +30,7 @@ table 6150621 "POS Entry"
     // NPR5.53/ALPO/20191105 CASE 376035 Added field 180 "Event No." to save info about event used on sale
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
     // NPR5.54/ALPO/20200324 CASE 397063 Global dimensions were not updated on assigned dimension change through ShowDimensions() function ("Dimensions" button)
+    // NPR5.55/MMV /20200701 CASE 412426 Added index for "Document No."
 
     Caption = 'POS Entry';
     DrillDownPageID = "POS Entries";
@@ -391,6 +392,9 @@ table 6150621 "POS Entry"
         {
         }
         key(Key3; "POS Store Code", "POS Unit No.", "Document No.")
+        {
+        }
+        key(Key4;"Document No.")
         {
         }
     }

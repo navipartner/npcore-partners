@@ -4,6 +4,7 @@ table 6151126 "NpIa Item AddOn Line"
     // NPR5.48/MHA /20181109  CASE 334922 Extended type with Quantity and Select
     // NPR5.52/ALPO/20190912  CASE 354309 Possibility to fix the quantity so user would not be able to change it on sale line
     //                                    Set whether or not specified quantity is per unit of main item
+    // NPR5.55/ALPO/20200506  CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
 
     Caption = 'Item AddOn Line';
 
@@ -112,10 +113,16 @@ table 6151126 "NpIa Item AddOn Line"
         {
             Caption = 'Description 2';
         }
+        field(49;"Use Unit Price";Option)
+        {
+            Caption = 'Use Unit Price';
+            Description = 'NPR5.55';
+            OptionCaption = 'Non-Zero,Always';
+            OptionMembers = "Non-Zero",Always;
+        }
         field(50;"Unit Price";Decimal)
         {
             AutoFormatType = 2;
-            BlankZero = true;
             Caption = 'Unit Price';
         }
         field(55;"Discount %";Decimal)

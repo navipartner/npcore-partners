@@ -1,13 +1,15 @@
-page 6151020 "NpRv POS Issue Voucher Refs."
+page 6151020 "NpRv Sales Line References"
 {
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
+    // NPR5.55/MHA /20200512  CASE 402015 Updated object name
 
     AutoSplitKey = true;
     Caption = 'Issue Retail Voucher References';
     DataCaptionExpression = Format(Quantity) + ' ' + VoucherType.Description;
     DelayedInsert = true;
     PageType = List;
-    SourceTable = "NpRv Sale Line POS Reference";
+    SourceTable = "NpRv Sales Line Reference";
+    SourceTableView = SORTING("Sales Line Id","Voucher No.","Reference No.");
 
     layout
     {
@@ -26,6 +28,13 @@ page 6151020 "NpRv POS Issue Voucher Refs."
     {
     }
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        //-NPR5.55 [402015]
+        "Sales Line Id" := NpRvSalesLine.Id;
+        //+NPR5.55 [402015]
+    end;
+
     trigger OnOpenPage()
     begin
         SetVoucherView();
@@ -37,7 +46,7 @@ page 6151020 "NpRv POS Issue Voucher Refs."
     end;
 
     var
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
         VoucherType: Record "NpRv Voucher Type";
         Text000: Label 'Reference No. Quantity does not match.\  - Sales Line Quantity: %1\  - Reference No. Quantity: %2\\Close anyway?';
         Quantity: Decimal;
@@ -53,9 +62,9 @@ page 6151020 "NpRv POS Issue Voucher Refs."
         exit(Confirm(Text000,true,Quantity,RefNoQty));
     end;
 
-    procedure SetSaleLinePOSVoucher(NewSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";NewQuantity: Decimal)
+    procedure SetNpRvSalesLine(NewNpRvSalesLine: Record "NpRv Sales Line";NewQuantity: Decimal)
     begin
-        SaleLinePOSVoucher := NewSaleLinePOSVoucher;
+        NpRvSalesLine := NewNpRvSalesLine;
         Quantity := NewQuantity;
     end;
 
@@ -64,10 +73,10 @@ page 6151020 "NpRv POS Issue Voucher Refs."
         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
     begin
         FilterGroup(2);
-        NpRvVoucherMgt.SetSaleLinePOSReferenceFilter(SaleLinePOSVoucher,Rec);
+        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine,Rec);
         FilterGroup(0);
 
-        if VoucherType.Get(SaleLinePOSVoucher."Voucher Type") then;
+        if VoucherType.Get(NpRvSalesLine."Voucher Type") then;
     end;
 }
 

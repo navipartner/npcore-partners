@@ -6,6 +6,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     //                                     - Function Approve(): new call parameter: OnlyFixedQtyLines (boolean)
     //                                     - Functions InitScript(), InitScriptData(), CreateUserInterface(), WebDepCode(), InitCss(), InitHtml()
     //                                       moved out to CU 6151125 to avoid excessive code dublication
+    // NPR5.55/ALPO/20200803 CASE 417118 Item addon lines were not linked to a base line, if item addon insert action was called manually
 
     SingleInstance = true;
 
@@ -130,9 +131,31 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
         //CreateUserInterface(SalePOS,NpIaItemAddOn);  //NPR5.54 [374666]-revoked
         //-NPR5.54 [374666]
         Clear(AppliesToSaleLinePOS);
+        FindBaseLine(POSSession, AppliesToSaleLinePOS);  //NPR5.55 [417118]
         NpIaItemAddOnMgt.CreateUserInterface(Model,SalePOS,AppliesToSaleLinePOS,NpIaItemAddOn);
         //+NPR5.54 [374666]
         ActiveModelID := FrontEnd.ShowModel(Model);
+    end;
+
+    local procedure FindBaseLine(POSSession: Codeunit "POS Session";var AppliesToSaleLinePOS: Record "Sale Line POS")
+    var
+        SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
+        NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
+        POSSaleLine: Codeunit "POS Sale Line";
+    begin
+        //-NPR5.55 [417118]
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(AppliesToSaleLinePOS);
+        NpIaItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(AppliesToSaleLinePOS, SaleLinePOSAddOn);
+        if SaleLinePOSAddOn.FindFirst then
+          if SaleLinePOSAddOn."Applies-to Line No." <> 0 then
+            AppliesToSaleLinePOS.Get(
+              AppliesToSaleLinePOS."Register No.",
+              AppliesToSaleLinePOS."Sales Ticket No.",
+              AppliesToSaleLinePOS.Date,
+              AppliesToSaleLinePOS."Sale Type",
+              SaleLinePOSAddOn."Applies-to Line No.");
+        //+NPR5.55 [417118]
     end;
 
     local procedure "--- Approve"()
@@ -171,6 +194,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
 
     local procedure Approve(JsonText: Text;FrontEnd: Codeunit "POS Front End Management";OnlyFixedQtyLines: Boolean)
     var
+        AppliesToSaleLinePOS: Record "Sale Line POS";
         POSSession: Codeunit "POS Session";
         NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
         POSJavaScriptInterface: Codeunit "POS JavaScript Interface";
@@ -179,7 +203,15 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
         AddOnLines := AddOnLines.Parse(JsonText);
         FrontEnd.GetSession(POSSession);
         //NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0);  //NPR5.54 [374666]-revoked
-        NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0,OnlyFixedQtyLines);  //NPR5.54 [374666]
+        //NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0,OnlyFixedQtyLines);  //NPR5.54 [374666]  //NPR5.55 [417118]-revoked
+        //-NPR5.55 [417118]
+        FindBaseLine(POSSession, AppliesToSaleLinePOS);
+        Clear(NpIaItemAddOnMgt);
+        NpIaItemAddOnMgt.InsertPOSAddOnLines(
+          CurrNpIaItemAddOn, AddOnLines, POSSession, AppliesToSaleLinePOS."Line No.", OnlyFixedQtyLines);
+        if NpIaItemAddOnMgt.InsertedWithAutoSplitKey() then
+          POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
+        //+NPR5.55 [417118]
 
         POSSession.RequestRefreshData();
         POSJavaScriptInterface.RefreshData(POSSession,FrontEnd);

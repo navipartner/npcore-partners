@@ -1,6 +1,7 @@
 page 6059821 "Smart Email List"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
+    // NPR5.55/THRO/20200511 CASE 343266 Added Provider
 
     Caption = 'Smart Email List';
     CardPageID = "Smart Email Card";
@@ -19,6 +20,9 @@ page 6059821 "Smart Email List"
                 {
                 }
                 field(Description;Description)
+                {
+                }
+                field(Provider;Provider)
                 {
                 }
                 field("Merge Table ID";"Merge Table ID")

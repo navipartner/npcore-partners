@@ -4,6 +4,8 @@ page 6150661 "NPRE Waiter Pad Subform"
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
     // NPR5.54/ALPO/20200217 CASE 390995 Block quantity change on waiterpad line: fields Quantity, "Amount Excl. VAT", "Amount Incl. VAT" set to not editable
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Lines';
     InsertAllowed = false;
@@ -64,6 +66,10 @@ page 6150661 "NPRE Waiter Pad Subform"
                     Editable = false;
                 }
                 field(Quantity;Quantity)
+                {
+                    Editable = false;
+                }
+                field("Billed Quantity";"Billed Quantity")
                 {
                     Editable = false;
                 }
@@ -169,10 +175,21 @@ page 6150661 "NPRE Waiter Pad Subform"
                     Editable = false;
                     Visible = false;
                 }
+                field("AssignedFlowStatusesAsString(FlowStatus.""Status Object""::WaiterPadLineMealFlow)";AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
+                {
+                    Caption = 'Serving Steps';
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowFlowStatuses(FlowStatus."Status Object"::WaiterPadLineMealFlow);  //NPR5.55 [382428]
+                    end;
+                }
                 field("AssignedPrintCategoriesAsString()";AssignedPrintCategoriesAsString())
                 {
-                    Caption = 'Print Categories';
+                    Caption = 'Print/Prod. Categories';
                     Editable = false;
+                    Visible = false;
 
                     trigger OnDrillDown()
                     begin
@@ -222,6 +239,7 @@ page 6150661 "NPRE Waiter Pad Subform"
     end;
 
     var
+        FlowStatus: Record "NPRE Flow Status";
         LineIsMarked: Boolean;
 
     procedure GetSelection(var WaiterPadLine: Record "NPRE Waiter Pad Line")

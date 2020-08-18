@@ -45,7 +45,7 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
               GetSalesSetup;
               SalesSetup.TestField("Customer Nos.");
         //-NPR5.22
-        //      NrSerieStyring.InitSeries(SalgOps�t."Customer Nos.",xIDeb."No. Series",0D,"No.","No. Series");
+        //      NrSerieStyring.InitSeries(SalgOpsæt."Customer Nos.",xIDeb."No. Series",0D,"No.","No. Series");
               NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.",'',0D,"No.","No. Series");
         //+NPR5.22
               "Invoice Disc. Code" := "No.";

@@ -1,7 +1,7 @@
 page 6014419 "Gift Voucher"
 {
     // // 18-07/05 NE
-    //    Tilf�jet kommentarknap
+    //    Tilf¢jet kommentarknap
     // NC1.05 /TS  /20150223  CASE 201682 Added Web Group
     // NPR4.14/BHR /20150818  CASE 220660 Set property DeleteAllowed to "No"
     // NC2.00 /MHA /20160525  CASE 240005 NaviConnect

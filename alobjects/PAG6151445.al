@@ -64,7 +64,7 @@ page 6151445 "Magento Store Items"
                     group(Control6150684)
                     {
                         ShowCaption = false;
-                        part(MagentoItemGroupLinks;"Magento Item Group Link")
+                        part(MagentoItemGroupLinks;"Magento Category Links")
                         {
                             SubPageLink = "Item No."=FIELD("Item No.");
                         }

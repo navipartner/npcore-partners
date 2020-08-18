@@ -32,6 +32,7 @@ codeunit 6151402 "Magento Mgt."
     // MAG2.18/MHA /20190314  CASE 348660 Increased return value of GetVATBusPostingGroup() from 10 to 20 as standard field is increased from NAV2018
     // MAG2.22/MHA /20190705  CASE 361164 Updated Exception Message parsing in MagentoApiGet() and MagentoApiPost()
     // MAG2.22/MHA /20190710  CASE 360098 Added functions GetCustTemplate(), GetCustConfigTemplate()
+    // MAG2.26/MHA /20200429  CASE 402247 Added function GetFixedCustomerNo()
 
 
     trigger OnRun()
@@ -125,6 +126,32 @@ codeunit 6151402 "Magento Mgt."
         MagentoVatBusGroup.TestField("VAT Business Posting Group");
         VATBusPostingGroup.Get(MagentoVatBusGroup."VAT Business Posting Group");
         exit(VATBusPostingGroup.Code);
+    end;
+
+    procedure GetFixedCustomerNo(Customer: Record Customer): Code[20]
+    var
+        MagentoCustomerMapping: Record "Magento Customer Mapping";
+    begin
+        //-MAG2.26 [402247]
+        if MagentoCustomerMapping.Get(Customer."Country/Region Code",Customer."Post Code") then begin
+          MagentoCustomerMapping.TestField("Fixed Customer No.");
+          exit(MagentoCustomerMapping."Fixed Customer No.");
+        end;
+
+        if MagentoCustomerMapping.Get(Customer."Country/Region Code",'') then begin
+          MagentoCustomerMapping.TestField("Fixed Customer No.");
+          exit(MagentoCustomerMapping."Fixed Customer No.");
+        end;
+
+        if MagentoCustomerMapping.Get('','') then begin
+          MagentoCustomerMapping.TestField("Fixed Customer No.");
+          exit(MagentoCustomerMapping."Fixed Customer No.");
+        end;
+
+        MagentoSetup.Get;
+        MagentoSetup.TestField("Fixed Customer No.");
+        exit(MagentoSetup."Fixed Customer No.");
+        //+MAG2.26 [402247]
     end;
 
     procedure "--- Magento Api"()

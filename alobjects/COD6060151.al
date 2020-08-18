@@ -25,6 +25,8 @@ codeunit 6060151 "Event EWS Management"
     // NPR5.46/TJ  /20180904 CASE 323953 New function GetEventExchIntEmail
     // NPR5.48/TJ  /20181217 CASE 327413 Fixed issue with no default e-mail
     // NPR5.48/TJ  /20190130 CASE 342511 Easier to see for which calendar item type is template selection for
+    // NPR5.55/TJ  /20200204 CASE 374887 When searching for email template using current job instead of searching for it
+    //                                   New function SetSkipLookup
 
 
     trigger OnRun()
@@ -36,6 +38,7 @@ codeunit 6060151 "Event EWS Management"
         ExchItemType: Option "E-Mail",Appointment,"Meeting Request";
         EventExchIntEmailGlobal: Record "Event Exch. Int. E-Mail";
         ExchTemplateCaption: Label 'Please select a %1 template...';
+        SkipLookup: Boolean;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
@@ -423,6 +426,7 @@ codeunit 6060151 "Event EWS Management"
     var
         EmailTemplateFilter: Record "E-mail Template Filter";
         FieldRef: FieldRef;
+        FieldRef2: FieldRef;
     begin
         RecRef.SetRecFilter;
         EmailTemplateHeader.SetRange("Table No.", RecRef.Number);
@@ -431,15 +435,28 @@ codeunit 6060151 "Event EWS Management"
                 EmailTemplateFilter.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
                 EmailTemplateFilter.SetRange("Table No.", EmailTemplateHeader."Table No.");
                 if EmailTemplateFilter.FindSet then begin
+              //-NPR5.55 [374887]
+              RecordExists := true;
+              //+NPR5.55 [374887]
                     repeat
                         FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
-                        FieldRef.SetFilter(EmailTemplateFilter.Value);
-                    until EmailTemplateFilter.Next = 0;
-                    RecordExists := RecRef.FindFirst;
-                    Clear(FieldRef);
+              //-NPR5.55 [374887]
+              /*
+                FieldRef.SETFILTER(EmailTemplateFilter.Value);
+              UNTIL EmailTemplateFilter.NEXT = 0;
+              RecordExists := RecRef.FINDFIRST;
+              CLEAR(FieldRef);
+              */
+                FieldRef2 := RecRef.Field(EmailTemplateFilter."Field No.");
+                if Evaluate(FieldRef2,EmailTemplateFilter.Value) then
+                  RecordExists := RecordExists and (Format(FieldRef2) = Format(FieldRef))
+                else
+                  RecordExists := false;
+              until (EmailTemplateFilter.Next = 0) or (not RecordExists);
+              //+NPR5.55 [374887]
                 end;
             until (EmailTemplateHeader.Next = 0) or RecordExists;
-
+        
         //-NPR5.40 [307700]
         if RecordExists then
             EmailTemplateHeader.Get(EmailTemplateFilter."E-mail Template Code")
@@ -448,6 +465,7 @@ codeunit 6060151 "Event EWS Management"
             //+NPR5.40 [307700]
             RecordExists := EmailTemplateHeader.FindFirst;
         exit(RecordExists);
+
     end;
 
     local procedure FindEmailTemplateHeader(Job: Record Job; var EmailTemplateHeader: Record "E-mail Template Header"): Boolean
@@ -471,6 +489,10 @@ codeunit 6060151 "Event EWS Management"
             exit(false);
         if EventExchIntTemplate.FindFirst and (EventExchIntTemplate.Count = 1) then
             exit(true);
+        //-NPR5.55 [374887]
+        if SkipLookup then
+          exit(false);
+        //+NPR5.55 [374887]
         EventExchIntTemplates.LookupMode := true;
         //-NPR5.48 [342511]
         EventExchIntTemplates.Caption := StrSubstNo(ExchTemplateCaption, Format(ExchItemType, 0, 0));
@@ -490,6 +512,10 @@ codeunit 6060151 "Event EWS Management"
     begin
         if (EventExchIntTemplate.Code <> '') and EventExchIntTempEntry.Get(EventExchIntTemplate.Code, Job.RecordId) and EventExchIntTempEntry.Active then
             exit(true);
+        //-NPR5.55 [374887]
+        if SkipLookup then
+          exit(false);
+        //+NPR5.55 [374887]
         EventExchIntTempEntry.SetRange("Source Record ID", Job.RecordId);
         EventExchIntTempEntries.LookupMode := true;
         EventExchIntTempEntries.SetTableView(EventExchIntTempEntry);
@@ -709,6 +735,14 @@ codeunit 6060151 "Event EWS Management"
         //-NPR5.46 [323953]
         EventExchIntEmail := EventExchIntEmailGlobal;
         //+NPR5.46 [323953]
+    end;
+
+    [Scope('Personalization')]
+    procedure SetSkipLookup(SkipLookupHere: Boolean)
+    begin
+        //-NPR5.55 [374887]
+        SkipLookup := SkipLookupHere;
+        //+NPR5.55 [374887]
     end;
 }
 

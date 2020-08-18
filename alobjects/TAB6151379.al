@@ -4,6 +4,7 @@ table 6151379 "CS Warehouse Activity Handling"
     // NPR5.43/CLVA/20180605 CASE 304872 Added user info OnInsert
     // NPR5.48/CLVA/20181109 CASE 335606 Added "Unit of Measure"
     // NPR5.51/ALST/20190726 CASE 362173 added field Bin Base Qty.
+    // NPR5.55/ALPO/20200723 CASE 384923 Stock adjustments for not bin-enabled locations
 
     Caption = 'CS Warehouse Activity Handling';
 
@@ -166,6 +167,25 @@ table 6151379 "CS Warehouse Activity Handling"
             Description = 'NPR5.51';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(130;Inventory;Decimal)
+        {
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE ("Location Code"=FIELD("Location Code"),
+                                                                  "Item No."=FIELD("Item No."),
+                                                                  "Variant Code"=FIELD("Variant Code"),
+                                                                  "Lot No."=FIELD("Lot No."),
+                                                                  "Serial No."=FIELD("Serial No.")));
+            Caption = 'Inventory';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(140;"Qty. in Stock";Decimal)
+        {
+            Caption = 'Qty. in Stock';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
         }
     }
 

@@ -22,6 +22,7 @@ codeunit 6150707 "POS Payment Line"
     // NPR5.52/MHA /20191016 CASE 373294 Added "Allow Cashback" to ValidatePaymentLine()
     // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
     // NPR5.53/MHA /20190114 CASE 384841 Added parameter NegativePaymentBalance to function CalculateRemainingPaymentSuggestion()
+    // NPR5.55/MMV /20200421 CASE 386254 Added ValidateAmountBeforePayment
 
 
     trigger OnRun()
@@ -41,6 +42,9 @@ codeunit 6150707 "POS Payment Line"
         DeleteNotAllowed: Label 'Payments approved by a 3-party must be cancelled, not deleted.';
         Initialized: Boolean;
         ErrVATCalcNotSupportInPOS: Label '%1 %2 not supported in POS';
+        MaxAmountLimit: Label 'Maximum payment amount for %1 is %2.';
+        MinAmountLimit: Label 'Minimum payment amount for %1 is %2.';
+        InvalidAmount: Label 'Amount %1 is not valid for payment type %2';
 
     [Scope('Personalization')]
     procedure Init(RegisterNoIn: Code[20];SalesTicketNoIn: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
@@ -398,11 +402,6 @@ codeunit 6150707 "POS Payment Line"
           PaymentType.TestField (PaymentType."G/L Account No.");
 
         PaymentType.TestField (Status, PaymentType.Status::Active);
-
-        //-NPR5.52 [373294]
-        if Line."Amount Including VAT" < 0 then
-          PaymentType.TestField("Allow Refund");
-        //+NPR5.52 [373294]
     end;
 
     local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "Sale Line POS";PrecalculatedAmount: Boolean;ForeignAmount: Decimal)
@@ -420,11 +419,6 @@ codeunit 6150707 "POS Payment Line"
 
           if (PaymentType."Fixed Rate" <> 0) then
             "Currency Amount" := "Amount Including VAT" / ( PaymentType."Fixed Rate" / 100 );
-
-          //-NPR5.52 [373294]
-          // IF ("Currency Amount" < 0) THEN
-          //  "Currency Amount" := 0;
-          //+NPR5.52 [373294]
 
           if (PrecalculatedAmount) then
             "Currency Amount" := ForeignAmount;
@@ -603,6 +597,31 @@ codeunit 6150707 "POS Payment Line"
 
         //EXIT (ROUND(Amount, PaymentTypePOS."Rounding Precision", '='));
         //+NPR5.37.03 [296642]
+    end;
+
+    procedure ValidateAmountBeforePayment(PaymentTypePOS: Record "Payment Type POS";AmountToCapture: Decimal)
+    begin
+        //-NPR5.55 [386254]
+        if (PaymentTypePOS."Maximum Amount" <> 0) then
+          if (AmountToCapture > PaymentTypePOS."Maximum Amount") then
+            Error(MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Maximum Amount");
+
+        if (PaymentTypePOS."Minimum Amount" <> 0) then
+          if (AmountToCapture < PaymentTypePOS."Minimum Amount") then
+            Error(MinAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Minimum Amount");
+
+        if (PaymentTypePOS."Rounding Precision" <> 0) then
+          if (AmountToCapture mod PaymentTypePOS."Rounding Precision") <> 0 then
+            Error(InvalidAmount, AmountToCapture, PaymentTypePOS.Description);
+
+        if (PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account") then
+          PaymentTypePOS.TestField("G/L Account No.");
+
+        if AmountToCapture < 0 then
+          PaymentTypePOS.TestField("Allow Refund");
+
+        PaymentTypePOS.TestField(Status, PaymentTypePOS.Status::Active);
+        //+NPR5.55 [386254]
     end;
 
     [IntegrationEvent(false, false)]

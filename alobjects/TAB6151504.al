@@ -15,6 +15,7 @@ table 6151504 "Nc Import Entry"
     // NC2.12/MHA /20180418  CASE 308107 Length of field 3 "Code" extended from 10 to 20 and caption added to fields 30,35
     // NC2.16/MHA /20180907  CASE 313184 Added fields 40,45,50 for diagnostics
     // NC2.23/MHA /20190927  CASE 369170 Field 70220322 "NaviPartner Case Url" Removed
+    // NPR5.55/MHA /20200604  CASE 408100 Added fields 60 "Import Count", 70 "Import Started by", 80 "Server Instance Id", 90 "Session Id"
 
     Caption = 'Nc Import Entry';
 
@@ -119,6 +120,33 @@ table 6151504 "Nc Import Entry"
             Description = 'NC2.16';
             Editable = false;
         }
+        field(60;"Import Count";Integer)
+        {
+            BlankZero = true;
+            Caption = 'Import Count';
+            Description = 'NPR5.55';
+            MinValue = 0;
+        }
+        field(70;"Import Started by";Code[50])
+        {
+            Caption = 'Import Started by';
+            Description = 'NPR5.55';
+        }
+        field(80;"Server Instance Id";Integer)
+        {
+            Caption = 'Server Instance Id';
+            Description = 'NPR5.55';
+        }
+        field(90;"Session Id";Integer)
+        {
+            Caption = 'Session Id';
+            Description = 'NPR5.55';
+        }
+        field(100;"Earliest Import Datetime";DateTime)
+        {
+            Caption = 'Earliest Import Datetime';
+            Description = 'NPR5.55';
+        }
     }
 
     keys
@@ -165,6 +193,38 @@ table 6151504 "Nc Import Entry"
         Clear(InStr);
         exit(true);
         //+NC1.16
+    end;
+
+    procedure HasActiveImport(): Boolean
+    var
+        ActiveSession: Record "Active Session";
+    begin
+        //-NPR5.55 [408100]
+        if "Import Completed at" > "Import Started at" then
+          exit(false);
+
+        if not GetActiveSession(ActiveSession) then
+          exit(false);
+
+        if ActiveSession."User ID" <> "Import Started by" then
+          exit(false);
+
+        exit(ActiveSession."Login Datetime" <= "Import Started at");
+        //+NPR5.55 [408100]
+    end;
+
+    local procedure GetActiveSession(var ActiveSession: Record "Active Session"): Boolean
+    begin
+        //-NPR5.55 [408100]
+        Clear(ActiveSession);
+
+        if "Server Instance Id" <= 0 then
+          exit(false);
+        if "Session Id" <= 0 then
+          exit(false);
+
+        exit(ActiveSession.Get("Server Instance Id","Session Id"));
+        //+NPR5.55 [408100]
     end;
 }
 

@@ -11,6 +11,7 @@ codeunit 6151200 "NpCs Import Sales Document"
     // NPR5.53/MHA /20191129  CASE 378895 Added Comment Type in InsertSalesLine()
     // NPR5.53/MHA /20191204  CASE 378216 Added import of <processing_status> if occurs
     // NPR5.53/MHA /20191209  CASE 381524 Added Nav Publisher OnFindItemVariant()
+    // NPR5.55/MHA /20200701  CASE 411513 Sales Documents from another Local Store should be updated rather than re-inserted
 
     TableNo = "Nc Import Entry";
 
@@ -37,10 +38,12 @@ codeunit 6151200 "NpCs Import Sales Document"
         Text002: Label '%1 is blank in %2';
         Text004: Label 'Item %1 could not be mapped in line no. %2';
         Text005: Label 'Order received from Store %1';
+        Text006: Label 'Order updated from Store %1 to Store %2';
 
     local procedure ImportSalesDoc(XmlElement: DotNet npNetXmlElement)
     var
         Customer: Record Customer;
+        NpCsStoreFrom: Record "NpCs Store";
         NpCsDocument: Record "NpCs Document";
         NpCsWorkflowModule: Record "NpCs Workflow Module";
         SalesHeader: Record "Sales Header";
@@ -54,10 +57,27 @@ codeunit 6151200 "NpCs Import Sales Document"
 
         InitPOSSalesWorkflow();
 
-        UpsertFromStore(XmlElement);
-        //-NPR5.51 [362197]
+        //-NPR5.55 [411513]
+        UpsertFromStore(XmlElement,NpCsStoreFrom);
         InsertToStore(XmlElement);
-        //+NPR5.51 [362197]
+
+        if NpCsStoreFrom."Local Store" then begin
+          FindSalesHeader(XmlElement,SalesHeader);
+          UpdateSalesHeader(XmlElement,SalesHeader);
+          InsertCollectDocument(XmlElement,SalesHeader,NpCsDocument);
+
+          LogMessage := StrSubstNo(Text006,NpCsDocument."From Store Code",NpCsDocument."To Store Code");
+          NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
+          NpCsWorkflowMgt.InsertLogEntry(NpCsDocument,NpCsWorkflowModule,LogMessage,false,'');
+          NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
+          Commit;
+          NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+          if NpCsDocument."Processing expires at" > 0DT then
+            NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument,NpCsDocument."Processing expires at");
+
+          exit;
+        end;
+        //+NPR5.55 [411513]
         InsertDocumentMappings(XmlElement);
         Commit;
 
@@ -80,9 +100,8 @@ codeunit 6151200 "NpCs Import Sales Document"
           NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument,NpCsDocument."Processing expires at");
     end;
 
-    local procedure UpsertFromStore(XmlElement: DotNet npNetXmlElement)
+    local procedure UpsertFromStore(XmlElement: DotNet npNetXmlElement;var NpCsStore: Record "NpCs Store")
     var
-        NpCsStore: Record "NpCs Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         StoreCode: Code[20];
         PrevRec: Text;
@@ -97,7 +116,9 @@ codeunit 6151200 "NpCs Import Sales Document"
 
         PrevRec := Format(NpCsStore);
 
-        NpCsStore."Company Name" := NpXmlDomMgt.GetElementText(XmlElement,'from_store/company_name',MaxStrLen(NpCsStore."Company Name"),true);
+        //-NPR5.55 [411513]
+        NpCsStore.Validate("Company Name",NpXmlDomMgt.GetElementText(XmlElement,'from_store/company_name',MaxStrLen(NpCsStore."Company Name"),true));
+        //+NPR5.55 [411513]
         NpCsStore.Name := NpXmlDomMgt.GetElementText(XmlElement,'from_store/name',MaxStrLen(NpCsStore.Name),true);
         NpCsStore."Service Url" := NpXmlDomMgt.GetElementText(XmlElement,'from_store/service_url',MaxStrLen(NpCsStore."Service Url"),true);
         NpCsStore."Service Username" := NpXmlDomMgt.GetElementText(XmlElement,'from_store/service_username',MaxStrLen(NpCsStore."Service Username"),true);
@@ -239,6 +260,48 @@ codeunit 6151200 "NpCs Import Sales Document"
 
         if PrevRec <> Format(Customer) then
           Customer.Modify(true);
+    end;
+
+    local procedure UpdateSalesHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
+    var
+        xSalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        NpCsStore: Record "NpCs Store";
+        ReleaseSalesDoc: Codeunit "Release Sales Document";
+        ToStoreCode: Code[10];
+        PrevRec: Text;
+    begin
+        //-NPR5.55 [411513]
+        xSalesHeader := SalesHeader;
+
+        SalesHeader.SetHideValidationDialog(true);
+        ToStoreCode := GetToStoreCode(XmlElement);
+        NpCsStore.Get(ToStoreCode);
+
+        if SalesHeader.Status = SalesHeader.Status::Released then
+          ReleaseSalesDoc.Reopen(SalesHeader);
+
+        PrevRec := Format(SalesHeader);
+
+        if SalesHeader."Location Code" <> NpCsStore."Location Code" then begin
+          SalesLine.SetRange("Document Type",SalesHeader."Document Type");
+          SalesLine.SetRange("Document No.",SalesHeader."No.");
+          SalesLine.SetRange("Location Code",SalesHeader."Location Code");
+          if SalesLine.FindSet then
+            repeat
+              SalesLine.Validate("Location Code",NpCsStore."Location Code");
+              SalesLine.Modify(true);
+            until SalesLine.Next = 0;
+
+          SalesHeader.Validate("Location Code",NpCsStore."Location Code");
+        end;
+
+        if PrevRec <> Format(SalesHeader) then
+          SalesHeader.Modify(true);
+
+        if xSalesHeader.Status = xSalesHeader.Status::Released then
+          ReleaseSalesDoc.PerformManualRelease(SalesHeader);
+        //+NPR5.55 [411513]
     end;
 
     local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;Customer: Record Customer;var SalesHeader: Record "Sales Header")
@@ -515,6 +578,21 @@ codeunit 6151200 "NpCs Import Sales Document"
         NpCsDocument.SetRange("From Document No.",DocNo);
         NpCsDocument.SetRange("From Store Code",StoreCode);
         exit(NpCsDocument.FindFirst);
+    end;
+
+    local procedure FindSalesHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
+    var
+        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
+        DocType: Integer;
+        DocNo: Text;
+        StoreCode: Code[20];
+    begin
+        //-NPR5.55 [411513]
+        Clear(SalesHeader);
+        DocType := NpXmlDomMgt.GetAttributeInt(XmlElement,'','document_type',true);
+        DocNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'','document_no',MaxStrLen(SalesHeader."No."),true);
+        SalesHeader.Get(DocType,DocNo);
+        //+NPR5.55 [411513]
     end;
 
     local procedure FindItemVariant(XmlElement: DotNet npNetXmlElement;var ItemVariant: Record "Item Variant")

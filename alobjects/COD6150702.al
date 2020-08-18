@@ -23,6 +23,9 @@ codeunit 6150702 "POS UI Management"
     // NPR5.54/TSA /20200219 CASE 391850 Refresh of the POS Setup record when POS Unit is changed
     // NPR5.54/TSA /20200220 CASE 392121 Added optionvalue for named workflow "Idle Timeout Action Code", removed some green code
     // NPR5.54/TSA /20200221 CASE 392247 Adde optionvalue for POS Type. [Attended, Unattended]
+    // NPR5.55/TSA /20200417 CASE 400734 Added optionvalue for named workflow "Admin Menu Action Code"
+    // NPR5.55/TSA /20200520 CASE 405186 Added Global_Abort
+    // NPR5.55/TSA /20200521 CASE 405186 Added localization captions for timeout action
 
 
     trigger OnRun()
@@ -531,6 +534,7 @@ codeunit 6150702 "POS UI Management"
         CaptionGlobalToday: Label 'today';
         CaptionGlobalTomorrow: Label 'tomorrow';
         CaptionGlobalYesterday: Label 'yesterday';
+        CaptionGlobalAbort: Label 'Abort';
         CaptionBalancingRegisterTransactions: Label 'Register Transactions';
         CaptionBalancingRegisters: Label 'Registers';
         CaptionBalancingReceipts: Label 'Receipts';
@@ -600,6 +604,12 @@ codeunit 6150702 "POS UI Management"
         CaptionPayment_Paid: Label 'Paid';
         CaptionPayment_Balance: Label 'Balance';
         CaptionItemCount: Label 'Item Count';
+        Sale_TimeoutTitle: Label 'We seem to have lost you...';
+        Sale_TimeoutCaption: Label 'Do you wish to continue?';
+        Sale_TimeoutButtonCaption: Label 'Yes please, I need some more time.';
+        Payment_TimeoutTitle: Label 'We seem to have lost you...';
+        Payment_TimeoutCaption: Label 'Do you wish to continue?';
+        Payment_TimeoutButtonCaption: Label 'Yes please, I need some more time.';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -607,6 +617,15 @@ codeunit 6150702 "POS UI Management"
         Captions.Add('Login_FunctionButtonText', CaptionFunctionButtonText);
         Captions.Add('Login_MainMenuButtonText', CaptionMainMenuButtonText);
         Captions.Add('Sale_PaymentAmount', CaptionLabelPaymentAmount);
+
+        //-NPR5.55 [405186]
+        Captions.Add ('Sale_TimeoutTitle', Sale_TimeoutTitle);
+        Captions.Add ('Sale_TimeoutCaption', Sale_TimeoutCaption);
+        Captions.Add ('Sale_TimeoutButtonCaption', Sale_TimeoutButtonCaption);
+        Captions.Add ('Payment_TimeoutTitle', Payment_TimeoutTitle);
+        Captions.Add ('Payment_TimeoutCaption', Payment_TimeoutCaption);
+        Captions.Add ('Payment_TimeoutButtonCaption', Payment_TimeoutButtonCaption);
+        //+NPR5.55 [405186]
 
         //-NPR5.39 [299908]
         //Captions.Add('Sale_PaymentTotal',CaptionLabelPaymentTotal);
@@ -637,6 +656,7 @@ codeunit 6150702 "POS UI Management"
         Captions.Add('Global_Today', CaptionGlobalToday);
         Captions.Add('Global_Tomorrow', CaptionGlobalTomorrow);
         Captions.Add('Global_Yesterday', CaptionGlobalYesterday);
+        Captions.Add('Global_Abort',CaptionGlobalAbort);
         Captions.Add('CaptionBalancingRegisterTransactions', CaptionBalancingRegisterTransactions);
         Captions.Add('CaptionBalancingRegisters', CaptionBalancingRegisters);
         Captions.Add('CaptionBalancingReceipts', CaptionBalancingReceipts);
@@ -747,6 +767,11 @@ codeunit 6150702 "POS UI Management"
         Setup.Action_IdleTimeout (Action, POSSession);
         ConfigureReusableWorkflow (Action, POSSession, StrSubstNo ('%1, %2',POSSetup.TableCaption, POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
         //+NPR5.54 [392121]
+
+        //-NPR5.55 [400734]
+        Setup.Action_AdminMenu (Action, POSSession);
+        ConfigureReusableWorkflow (Action, POSSession, StrSubstNo ('%1, %2',POSSetup.TableCaption, POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
+        //+NPR5.55 [400734]
     end;
 
     procedure ConfigureReusableWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; Source: Text; FieldNumber: Integer)
@@ -784,24 +809,20 @@ codeunit 6150702 "POS UI Management"
     var
         Request: DotNet npNetSetOptionJsonRequest;
         Options: DotNet npNetDictionary_Of_T_U;
+        POSSetup: Record "POS Setup";
+        POSActionParameterMgt: Codeunit "POS Action Parameter Mgt.";
     begin
         Options := Request.GetDictionary();
 
         Options.Add('itemWorkflow', Setup.ActionCode_Item);
         Options.Add('paymentWorkflow', Setup.ActionCode_Payment);
         Options.Add('customerWorkflow', Setup.ActionCode_Customer);
-        //-NPR5.37 [293905]
         Options.Add('lockWorkflow', Setup.ActionCode_LockPOS);
         Options.Add('unlockWorkflow', Setup.ActionCode_UnlockPOS);
         Options.Add('autoLockTimeout', Setup.GetLockTimeout());
-        //+NPR5.37 [293905]
-        //-NPR5.53 [362777]
         Options.Add('loginWorkflow',Setup.ActionCode_Login);
         Options.Add('textEnterWorkflow',Setup.ActionCode_TextEnter);
-        //+NPR5.53 [362777]
-        //-NPR5.45 [323728]
         Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
-        //+NPR5.45 [323728]
 
         //-NPR5.54 [392121]
         Options.Add('idleTimeoutWorkflow', Setup.ActionCode_IdleTimeout());
@@ -811,9 +832,13 @@ codeunit 6150702 "POS UI Management"
         Options.Add ('posUnitType', Format (GetPOSUnitType(Setup), 0, 9));
         //+NPR5.54 [392247]
 
-        //-NPR5.51 [361184]
+        //-NPR5.55 [400734]
+        Options.Add('adminMenuWorkflow', Setup.ActionCode_AdminMenu());
+        Setup.GetNamedActionSetup (POSSetup);
+        Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson (POSSetup.RecordId, POSSetup.FieldNo ("Admin Menu Action Code")));
+        //-NPR5.55 [400734]
+
         Options.Add('nprVersion',GetNPRVersion());
-        //+NPR5.51 [361184]
         FrontEnd.SetOptions(Options);
     end;
 

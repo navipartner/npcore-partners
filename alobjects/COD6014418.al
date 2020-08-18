@@ -1,6 +1,6 @@
 codeunit 6014418 "Retail Sales Code"
 {
-    // NPR3.2s - 14.12.06 Nies. DIBS Tilbagef�rsel, ved tilbagef�rsel af bon.
+    // NPR3.2s - 14.12.06 Nies. DIBS Tilbagef¢rsel, ved tilbagef¢rsel af bon.
     // NPR4.10/RMT/20150107 Case 203282 - Set silent for reverse audit info
     // NPR4.10/RMT/20150115 Case 203078 - Change function ReverseSalesTicket to insert "Sale Line POS" before reversing
     //                                   (as is done in nyeste62)
@@ -15,7 +15,7 @@ codeunit 6014418 "Retail Sales Code"
     // NPR5.22/MMV/20160421 CASE 237314 Added support for Report Printer Interface & Retail Report Selection Mgt.
     // NPR5.23/JDH /20160517 CASE 240916 Removed old VariaX solution
     // NPR5.30/BHR /20171403  CASE 268750 Correct description
-    // NPR5.31/MHA /20170502  CASE 262904 UdpakTilbeh�r() should not trigger on Temporary Tables
+    // NPR5.31/MHA /20170502  CASE 262904 UdpakTilbeh¢r() should not trigger on Temporary Tables
     // NPR5.35/BR  /20170823  CASE 284379 Add support for Cashback
     // NPR5.36/TJ  /20170915  CASE 286283 Renamed variables/function into english and into proper naming terminology
     //                                    Removed unused variables
@@ -52,7 +52,7 @@ codeunit 6014418 "Retail Sales Code"
         ReportSelectionRetail: Record "Report Selection Retail";
     begin
         //OnRun
-        //Udskriv Gavekort. Kaldes fra CU 6014435 - funktion "Overf�rTilFaktura" og "LavKreditnota".
+        //Udskriv Gavekort. Kaldes fra CU 6014435 - funktion "Overf¢rTilFaktura" og "LavKreditnota".
         RetailSetup.Get;
         Customer.Get("Customer No.");
 
@@ -339,7 +339,7 @@ codeunit 6014418 "Retail Sales Code"
         AccessorySparePart: Record "Accessory/Spare Part";
         RetailSetup: Record "Retail Setup";
     begin
-        //UdpakTilbeh�r
+        //UdpakTilbeh¢r
         //-002
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Customer;
         Return := false;
@@ -502,13 +502,13 @@ codeunit 6014418 "Retail Sales Code"
             Ekspeditionslinie."Discount Type" := Ekspeditionslinie."Discount Type"::Combination;
             Ekspeditionslinie."Discount Code" := Kombination."Combination No.";
             Ekspeditionslinie."Discount %" := RabatPct;
-            Ekspeditionslinie.HentBel�b( Ekspeditionslinie, Vare, Ekspeditionslinie."Unit Price" );
+            Ekspeditionslinie.HentBel¢b( Ekspeditionslinie, Vare, Ekspeditionslinie."Unit Price" );
             Ekspeditionslinie.MODIFY;
           UNTIL Kombinationlinie.NEXT = 0;
         END;
         Linie."Discount %" := RabatPct;
         Linie."Discount Amount"  := Linie."Unit Price" * Linie.Quantity * RabatPct / 100;
-        Linie.HentBel�b( Linie, Vare, Linie."Unit Price" );
+        Linie.HentBel¢b( Linie, Vare, Linie."Unit Price" );
         Linie.MODIFY;
         EXIT( RabatPct );
         */
@@ -713,7 +713,7 @@ codeunit 6014418 "Retail Sales Code"
         IsCashLine: Boolean;
         PepperTransactionRequest: Record "EFT Transaction Request";
     begin
-        //Tilbagef�rBon
+        //Tilbagef¢rBon
         RetailSetup.Get;
         IsEANCode := false;
         ReturnValue := false;
@@ -796,7 +796,7 @@ codeunit 6014418 "Retail Sales Code"
                     CreditCardTransaction.Next;
                     Amount := AuditRoll."Amount Including VAT";
                     DibsTransID := CopyStr(CreditCardTransaction.Text,10,StrLen(CreditCardTransaction.Text)-9);
-                    // Inds�t info i tmp records.
+                    // Indsæt info i tmp records.
                     Evaluate(TempDibsTrans.Number,DibsTransID);
                     TempDibsTrans.Choice := OrderID;
                     TempDibsTrans.Insert;
@@ -874,7 +874,7 @@ codeunit 6014418 "Retail Sales Code"
         end else
           Error(ErrNoLines);
 
-        // Inds�tter returbetalinger kontant
+        // Indsætter returbetalinger kontant
         AuditRoll.SetCurrentKey("Register No.","Sales Ticket No.","Sale Type",Type);
         AuditRoll.SetRange(Type,AuditRoll.Type::Payment);
         AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Payment);
@@ -897,7 +897,7 @@ codeunit 6014418 "Retail Sales Code"
     var
         OldDimSetID: Integer;
     begin
-        //ModifyTilbF�rEkspHoved
+        //ModifyTilbF¢rEkspHoved
         SalePOS.Validate("Customer Type",AuditRoll."Customer Type");
         SalePOS.Validate("Customer No.",AuditRoll."Customer No.");
         SalePOS.Validate("Location Code",AuditRoll.Lokationskode);
@@ -942,7 +942,7 @@ codeunit 6014418 "Retail Sales Code"
         AmountItt: Integer;
         TextRefundMandatory: Label 'There are %1 related Card payments to ticket %2. To process the cancellation all Card payments must be reversed or cancelled.';
     begin
-        //Inserttilbf�rlinje
+        //Inserttilbf¢rlinje
         SaleLinePOS.Init;
         SaleLinePOS."Register No." := SalePOS."Register No.";
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
@@ -952,8 +952,8 @@ codeunit 6014418 "Retail Sales Code"
         //+NPR5.53 [374750]
         SaleLinePOS.ForceApris := true;
         if AuditRoll.Type = AuditRoll.Type::"Debit Sale" then
-          if AuditRoll."No." <> '' then            // Bem�rkning
-            if AuditRoll."No." <> '*' then begin   // Bem�rkning
+          if AuditRoll."No." <> '' then            // Bemærkning
+            if AuditRoll."No." <> '*' then begin   // Bemærkning
               if AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment then
                 if AuditRoll.Type = AuditRoll.Type::"Debit Sale" then begin
                   SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
@@ -996,7 +996,7 @@ codeunit 6014418 "Retail Sales Code"
           AuditRoll.Type::"Debit Sale":
             begin
               if AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment then
-                if AuditRoll."No." = '' then begin  // Bem�rkning
+                if AuditRoll."No." = '' then begin  // Bemærkning
                   AuditRoll."No." := '*';
                   SaleLinePOS.Type := SaleLinePOS.Type::Comment;
                 end;
@@ -1030,7 +1030,7 @@ codeunit 6014418 "Retail Sales Code"
         SaleLinePOS."Posting Group" := AuditRoll."Posting Group";
         SaleLinePOS."Qty. Discount Code" := AuditRoll."Qty. Discount Code";
         //-NPR5.30 [268750]
-        //Ekspeditionslinie.Description := STRSUBSTNO( txtTilbagef�rt, RevRulle.Description, Sale."Salesperson Code" );
+        //Ekspeditionslinie.Description := STRSUBSTNO( txtTilbagef¢rt, RevRulle.Description, Sale."Salesperson Code" );
         SaleLinePOS.Description := AuditRoll.Description;
         //+NPR5.30 [268750]
         if (AuditRoll."No." <> '*') and (AuditRoll.Type <> AuditRoll.Type::Payment) then begin
@@ -1094,7 +1094,7 @@ codeunit 6014418 "Retail Sales Code"
 
         //+NPR5.20
 
-        // Sporing af tilbagef�rsel s� betalingstyper kan genfindes og �bnes under bogf�ring
+        // Sporing af tilbagef¢rsel så betalingstyper kan genfindes og åbnes under bogf¢ring
         SaleLinePOS."Return Sale Register No." := AuditRoll."Register No.";
         SaleLinePOS."Return Sale Sales Ticket No." := AuditRoll."Sales Ticket No.";
         SaleLinePOS."Return Sales Sales Type" := AuditRoll."Sale Type";

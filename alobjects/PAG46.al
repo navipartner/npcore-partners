@@ -1,4 +1,4 @@
-pageextension 6014443 pageextension6014443 extends "Sales Order Subform" 
+pageextension 6014447 pageextension6014447 extends "Sales Order Subform" 
 {
     // NPR4.04/MH/20150423  CASE 212082 Changed "Variant Code".VISIBLE from FALSE to TRUE
     // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"

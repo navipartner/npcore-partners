@@ -20,7 +20,7 @@ table 6014550 "Package Module Configuration"
         field(3;"COD No. Series";Code[10])
         {
             Caption = 'Cash on delivery package numbers';
-            Description = 'Package Number Series for cash on delivery (postopkr�vning)';
+            Description = 'Package Number Series for cash on delivery (postopkrævning)';
             TableRelation = "No. Series";
         }
         field(4;"Has EDI contract";Boolean)

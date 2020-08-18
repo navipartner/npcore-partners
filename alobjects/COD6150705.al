@@ -1,6 +1,6 @@
 codeunit 6150705 "POS Sale"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 270909 Transport NPR5.32 - 26 May 2017
+    // RecorNPR5.32/NPKNAV/20170526  CASE 270909 Transport NPR5.32 - 26 May 2017
     // NPR5.32.11/CLVA/20170623  CASE 279495 Added event OnBeforeEndSale, On
     // NPR5.34/TSA /20170705  CASE 283019 Added SetDimension, SetGlobalDimension1 and SetGlobalDimension2
     // NPR5.34/TSA /20170710  CASE 279495 Shifted OnBeforeEndSale to before sale is ended, and added OnAfterEndSales in EndSale
@@ -32,6 +32,8 @@ codeunit 6150705 "POS Sale"
     // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
     // NPR5.54/MMV /20200217 CASE 364658 Added configurable start of new sale to allow business logic first.
+    // NPR5.55/TSA /20200527 CASE 406862 Refactored SelectViewForEndOfSale()
+    // NPR5.55/ALPO/20200720 CASE 391678 Log sale resume to POS Entry
 
 
     trigger OnRun()
@@ -130,10 +132,12 @@ codeunit 6150705 "POS Sale"
     begin
         with Rec do begin
         
+          //-NPR5.55 [406862]
           // TODO: Assign the salesperson
-          if Register."Touch Screen Login Type" <> Register."Touch Screen Login Type"::Automatic then begin
-            "Salesperson Code" := '';
-          end;
+          // IF Register."Touch Screen Login Type" <> Register."Touch Screen Login Type"::Automatic THEN BEGIN
+          //   "Salesperson Code" := '';
+          // END;
+          //+NPR5.55 [406862]
           "Salesperson Code" := Setup.Salesperson();
         
           "Register No." := Register."Register No.";
@@ -148,7 +152,7 @@ codeunit 6150705 "POS Sale"
           "Saved Sale" := false;
           TouchScreen := true;
         
-          /* tjek om der er ekspeditioner p� rev.rullen efter d.d. */
+          /* tjek om der er ekspeditioner på rev.rullen efter d.d. */
           TouchScreenFunctions.TestSalesDate;
         
           UpdateSaleDeviceID(Rec);  //NPR5.54 [364658]
@@ -505,13 +509,34 @@ codeunit 6150705 "POS Sale"
 
     [Scope('Personalization')]
     procedure SelectViewForEndOfSale(POSSession: Codeunit "POS Session")
+    var
+        POSViewProfile: Record "POS View Profile";
     begin
-        if (Register."Touch Screen Login Type" = Register."Touch Screen Login Type"::Automatic) then begin
+
+        //-NPR5.55 [406862]
+        // IF (Register."Touch Screen Login Type" = Register."Touch Screen Login Type"::Automatic) THEN BEGIN
+        //  POSSession.StartTransaction ();
+        //  POSSession.ChangeViewSale ();
+        // END ELSE BEGIN
+        //  POSSession.StartPOSSession ();
+        // END;
+
+        POSViewProfile.Init ();
+        Setup.GetPOSViewProfile (POSViewProfile);
+
+        if (POSViewProfile."After End-of-Sale View" = POSViewProfile."After End-of-Sale View"::INITIAL_SALE_VIEW) then begin
           POSSession.StartTransaction ();
-          POSSession.ChangeViewSale ();
+
+          case POSViewProfile."Initial Sales View" of
+            POSViewProfile."Initial Sales View"::SALES_VIEW      : POSSession.ChangeViewSale ();
+            POSViewProfile."Initial Sales View"::RESTAURANT_VIEW : POSSession.ChangeViewRestaurant ();
+          end;
+
         end else begin
           POSSession.StartPOSSession ();
         end;
+
+        //+NPR5.55 [406862]
     end;
 
     [Scope('Personalization')]
@@ -662,6 +687,7 @@ codeunit 6150705 "POS Sale"
     local procedure ResumeSale(SalePOS_ToResume: Record "Sale POS")
     var
         SaleLinePOS: Record "Sale Line POS";
+        POSResumeSale: Codeunit "POS Resume Sale Mgt.";
         TouchScreenFunctions: Codeunit "Touch Screen - Functions";
     begin
         //-NPR5.54 [364658]
@@ -696,6 +722,8 @@ codeunit 6150705 "POS Sale"
           FilterGroup := 0;
 
           IsModified := true;
+
+          POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");  //NPR5.55 [391678]
         end;
         //+NPR5.54 [364658]
     end;

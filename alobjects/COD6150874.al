@@ -5,6 +5,7 @@ codeunit 6150874 "POS Action - EFT Gift Card"
     // NPR5.54/MMV /20200302 CASE 364340 Moved gift card functions into EFT payment object.
     //                                   Isolated business logic.
     //                                   Break loop if lookup trx happens instead, or trx error.
+    // NPR5.55/MMV /20200810 CASE 364340 Removed invalid & unused reference.
 
 
     trigger OnRun()
@@ -86,7 +87,6 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         JSON: Codeunit "POS JSON Management";
         PaymentType: Text;
         Amount: Decimal;
-        EFTGiftCardMgt: Codeunit "EFT Gift Card Mgt.";
         EFTSetup: Record "EFT Setup";
         POSSale: Codeunit "POS Sale";
         SalePOS: Record "Sale POS";

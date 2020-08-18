@@ -1,6 +1,6 @@
 codeunit 6060127 "MM Membership Management"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
+    // ::MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
     // MM1.01/TSA/20151222  CASE 230149 Added function get member from external card no
     // MM1.02/TSA/20151228  CASE 229684 Added Image update function, member update function
     // MM1.03/TSA/20160104  CASE 230647 Added NewsLetter CRM option
@@ -122,6 +122,16 @@ codeunit 6060127 "MM Membership Management"
     // MM1.43/TSA /20200303 CASE 394404 Added a guard when issuing new member cards to prevent endless looping
     // MM1.43/TSA /20200310 CASE 394986 Card print on renew
     // MM1.43/TSA /20200331 CASE 398328 Added presentation order sorting on alterations
+    // MM1.44/TSA /20200415 CASE 400409 Member Block needs to cater for Magento version 1 & 2 differences
+    // MM1.44/TSA /20200427 CASE 397911 Added handling for renew with Back-to-Back option
+    // MM1.44/TSA /20200508 CASE 402040 Added limit to membercard create on renew and issue new cards
+    // MM1.44/TSA /20200513 CASE 396091 Added wallet create notification if missing and enabled on membership alteration
+    // MM1.44/TSA /20200529 CASE 407401 Age Validation CheckAgeConstraint(), CalculateLedgerEntryDates_NEW(), GetMembershipAgeConstraintDate()
+    // MM1.45/TSA /20200709 CASE 413622 Added OnMembershipChangeEvent() to when first membership entry is created
+    // MM1.45/TSA /20200713 CASE 414208 Adding subscribers to Navigate function to navigate from POS Entry to membership
+    // MM1.45/TSA /20200715 CASE 414992 Membership delete enhancements
+    // #416213/TSA /20200727 CASE 416213 Anonymous members can not become dependents
+    // MM1.45/TSA /20200730 CASE 416921 Unlinking customer number from a regretted membership when attempting to reuse it.
 
 
     trigger OnRun()
@@ -175,11 +185,16 @@ codeunit 6060127 "MM Membership Management"
         NO_ADMIN_MEMBER_NO: Label '-127003';
         MEMBERCARD_BLANK_NO: Label '-127004';
         INVALID_CONTACT_NO: Label '-127005';
+        AGE_VERIFICATION_SETUP_NO: Label '-127006';
+        AGE_VERIFICATION_NO: Label '-127007';
         NO_LEDGER_ENTRY: Label 'The membership %1 is NOT valid.\\It must be activated, but there is no ledger entry associated with that membership that can be actived.';
         NOT_ACTIVATED: Label 'The membership is marked as activate on first use, but has not been activated yet. Retry the action after the membership has been activated.';
         NOT_FOUND: Label '%1 not found. %2';
         GRACE_PERIOD: Label 'The %1 is not allowed because of grace period constraint.';
         PREVENT_CARD_EXTEND: Label 'The validity for card %1 must first manually be extend until %2.';
+        INVALID_ACTIVATION_DATE: Label 'The option %1 for %2 is not valid for alteration type %3.';
+        AGE_VERIFICATION_SETUP: Label 'Add member failed on age verification because item number for sales was not provided.';
+        AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
 
     procedure CreateMembershipAll(MembershipSalesSetup: Record "MM Membership Sales Setup";var MemberInfoCapture: Record "MM Member Info Capture";CreateMembershipLedgerEntry: Boolean) MembershipEntryNo: Integer
     var
@@ -251,7 +266,9 @@ codeunit 6060127 "MM Membership Management"
     procedure DeleteMembership(MembershipEntryNo: Integer;Force: Boolean)
     var
         Membership: Record "MM Membership";
+        Member: Record "MM Member";
         MembershipRole: Record "MM Membership Role";
+        TempMembershipRole: Record "MM Membership Role" temporary;
         MembershipLedgerEntry: Record "MM Membership Entry";
         MemberCard: Record "MM Member Card";
         MembershipSetup: Record "MM Membership Setup";
@@ -259,6 +276,16 @@ codeunit 6060127 "MM Membership Management"
         Contact: Record Contact;
         MembershipNotification: Record "MM Membership Notification";
         MemberNotificationEntry: Record "MM Member Notification Entry";
+        MagentoSetup: Record "Magento Setup";
+        Customer: Record Customer;
+        MemberArrivalLogEntry: Record "MM Member Arrival Log Entry";
+        MemberCommunication: Record "MM Member Communication";
+        NPGDPRManagement: Codeunit "NP GDPR Management";
+        GDPRAnonymizationRequestWS: Codeunit "GDPR Anonymization Request WS";
+        OriginalCustomerNo: Code[20];
+        MembershipTimeFrameEntries: Boolean;
+        ReasonCode: Text;
+        AnonymizationResponseCode: Integer;
     begin
 
         //-MM1.24 [298110]
@@ -272,47 +299,147 @@ codeunit 6060127 "MM Membership Management"
           MembershipSetup.TestField ("Allow Membership Delete", true);
         end;
 
+        //-MM1.45 [414992] refactored
+        MembershipRole.SetCurrentKey ("Membership Entry No.");
+        MembershipRole.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
+        if (MembershipRole.FindSet ()) then begin
+          repeat
+            TempMembershipRole.TransferFields (MembershipRole, true);
+            TempMembershipRole.Insert ();
+          until (MembershipRole.Next () = 0);
+        end;
+
         MembershipLedgerEntry.SetCurrentKey ("Membership Entry No.");
         MembershipLedgerEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-        if (MembershipLedgerEntry.FindSet ()) then
+        MembershipTimeFrameEntries := MembershipLedgerEntry.FindSet ();
+        if (MembershipTimeFrameEntries) then
           MembershipLedgerEntry.DeleteAll (true);
 
-        //-MM1.32 [318132]
         MembershipNotification.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
         MembershipNotification.DeleteAll ();
 
         MemberNotificationEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
         MemberNotificationEntry.DeleteAll ();
-        //+MM1.32 [318132]
+
+        MemberArrivalLogEntry.SetFilter ("External Membership No.", '=%1', Membership."External Membership No.");
+        MemberArrivalLogEntry.DeleteAll ();
 
         MemberCard.SetCurrentKey ("Membership Entry No.");
         MemberCard.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-        if (MemberCard.FindFirst ()) then
-          MemberCard.DeleteAll ();
+        MemberCard.DeleteAll (true);
 
-        MembershipRole.SetCurrentKey ("Membership Entry No.");
-        MembershipRole.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-        if (MembershipRole.FindFirst ()) then
-          MembershipRole.DeleteAll ();
+        MembershipPointsEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipPointsEntry.DeleteAll ();
 
-        MembershipPointsEntry.SetFilter ("Entry No.", '=%1', Membership."Entry No.");
-        //-MM1.29 [313741]
-        //IF (MembershipPointsEntry.FINDFIRST ()) THEN
-        //  MembershipPointsEntry.DELETEALL ();
-        if (MembershipRole.FindSet ()) then begin
-          repeat
-            if (Contact.Get (MembershipRole."Contact No.")) then begin
-              Contact."Magento Contact" := false;
-              Contact.Modify (true);
-            end;
-          until (MembershipRole.Next () = 0);
-          MembershipPointsEntry.DeleteAll ();
+        MemberCommunication.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
+        MemberCommunication.DeleteAll ();
+
+        if (Membership."Customer No." <> '') then begin
+          OriginalCustomerNo := Membership."Customer No.";
+          Membership."Customer No." := '';
+          Membership.Modify ();
+
+          if (not MembershipTimeFrameEntries) then
+            if (Customer.Get (OriginalCustomerNo)) then
+              if (not Customer.Delete (true)) then
+                if (GDPRAnonymizationRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizationResponseCode)) then
+                  NPGDPRManagement.AnonymizeCustomer (OriginalCustomerNo);
+
+          if (MembershipTimeFrameEntries) then
+            if (GDPRAnonymizationRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizationResponseCode)) then
+              NPGDPRManagement.AnonymizeCustomer (OriginalCustomerNo);
+
         end;
 
-        //+MM1.29 [313741]
+        TempMembershipRole.Reset ();
+        if (TempMembershipRole.FindSet ()) then begin
 
+          if (not MagentoSetup.Get ()) then
+            MagentoSetup.Init ();
+
+          repeat
+            if (Contact.Get (TempMembershipRole."Contact No.")) then begin
+              if (not Contact.Delete (true)) then begin
+                case MagentoSetup."Magento Version" of
+                  MagentoSetup."Magento Version"::"1" : Contact."Magento Contact" := false;
+                  MagentoSetup."Magento Version"::"2" : Contact."Magento Account Status" := Contact."Magento Account Status"::BLOCKED;
+                end;
+                Contact.Modify (true);
+              end;
+            end;
+
+            MembershipRole.Get (TempMembershipRole."Membership Entry No.", TempMembershipRole."Member Entry No.");
+            MembershipRole.Delete ();
+
+            // Delete member only when orphaned
+            MembershipRole.Reset ();
+            MembershipRole.SetFilter ("Member Entry No.", '=%1', TempMembershipRole."Member Entry No.");
+            if (MembershipRole.IsEmpty ()) then
+              if (Member.Get (TempMembershipRole."Member Entry No.")) then
+                Member.Delete ();
+
+          until (TempMembershipRole.Next () = 0);
+        end;
 
         Membership.Delete();
+
+        ///**** original
+        // MembershipLedgerEntry.SETCURRENTKEY ("Membership Entry No.");
+        // MembershipLedgerEntry.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
+        // IF (MembershipLedgerEntry.FINDSET ()) THEN
+        //  MembershipLedgerEntry.DELETEALL (TRUE);
+        //
+        // //-MM1.32 [318132]
+        // MembershipNotification.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
+        // MembershipNotification.DELETEALL ();
+        //
+        // MemberNotificationEntry.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
+        // MemberNotificationEntry.DELETEALL ();
+        // //+MM1.32 [318132]
+        //
+        // MemberCard.SETCURRENTKEY ("Membership Entry No.");
+        // MemberCard.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
+        // IF (MemberCard.FINDFIRST ()) THEN
+        //  MemberCard.DELETEALL ();
+        //
+        // MembershipRole.SETCURRENTKEY ("Membership Entry No.");
+        // MembershipRole.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
+        // IF (MembershipRole.FINDFIRST ()) THEN
+        //  MembershipRole.DELETEALL ();
+        //
+        // MembershipPointsEntry.SETFILTER ("Entry No.", '=%1', Membership."Entry No.");
+        // //-MM1.29 [313741]
+        // //IF (MembershipPointsEntry.FINDFIRST ()) THEN
+        // //  MembershipPointsEntry.DELETEALL ();
+        //
+        // IF (MembershipRole.FINDSET ()) THEN BEGIN
+        //
+        //  //-MM1.44 [400409]
+        //  IF (NOT MagentoSetup.GET ()) THEN
+        //    MagentoSetup.INIT ();
+        //  //+MM1.44 [400409]
+        //
+        //  REPEAT
+        //    IF (Contact.GET (MembershipRole."Contact No.")) THEN BEGIN
+        //      //-MM1.44 [400409]
+        //      //Contact."Magento Contact" := FALSE;
+        //      CASE MagentoSetup."Magento Version" OF
+        //        MagentoSetup."Magento Version"::"1" : Contact."Magento Contact" := FALSE;
+        //        MagentoSetup."Magento Version"::"2" : Contact."Magento Account Status" := Contact."Magento Account Status"::BLOCKED;
+        //      END;
+        //      //+MM1.44 [400409]
+        //
+        //      Contact.MODIFY (TRUE);
+        //    END;
+        //  UNTIL (MembershipRole.NEXT () = 0);
+        //  MembershipPointsEntry.DELETEALL ();
+        // END;
+        //
+        // //+MM1.29 [313741]
+        //
+        //
+        // Membership.DELETE();
+        //+MM1.45 [414992]
     end;
 
     procedure AddMemberAndCard(FailWithError: Boolean;MembershipEntryNo: Integer;var MemberInfoCapture: Record "MM Member Info Capture";AllowBlankExternalCardNumber: Boolean;var MemberEntryNo: Integer;var ResponseMessage: Text): Boolean
@@ -341,6 +468,7 @@ codeunit 6060127 "MM Membership Management"
         MembershipSetup: Record "MM Membership Setup";
         Community: Record "MM Member Community";
         MembershipRole: Record "MM Membership Role";
+        MembershipSalesSetup: Record "MM Membership Sales Setup";
         ErrorText: Text;
         MemberCount: Integer;
         GuardianMemberEntryNo: Integer;
@@ -416,6 +544,17 @@ codeunit 6060127 "MM Membership Management"
         TransferInfoCaptureAttributes (MembershipInfoCapture."Entry No.", DATABASE::"MM Member",  Member."Entry No.");
         //-#360242 [360242]
 
+        //-MM1.44 [407401]
+        if (MembershipSetup."Enable Age Verification") then begin
+          if (not MembershipSalesSetup.Get (MembershipSalesSetup.Type::ITEM, MembershipInfoCapture."Item No.")) then
+            exit (RaiseError (FailWithError, ReasonText, AGE_VERIFICATION_SETUP, AGE_VERIFICATION_SETUP_NO) = 0);
+
+          if (not CheckAgeConstraint (GetMembershipAgeConstraintDate (MembershipSalesSetup, MembershipInfoCapture), Member.Birthday, MembershipSetup."Validate Age Against",
+              MembershipSalesSetup."Age Constraint Type", MembershipSalesSetup."Age Constraint (Years)")) then
+            exit (RaiseError (FailWithError, ReasonText, StrSubstNo (AGE_VERIFICATION, Member."Display Name", MembershipSalesSetup."Age Constraint (Years)"), AGE_VERIFICATION_NO) = 0);
+        end;
+        //+MM1.44 [407401]
+
         OnAfterMemberCreateEvent (Membership, Member);
 
         //-MM1.42 [382728]
@@ -435,6 +574,7 @@ codeunit 6060127 "MM Membership Management"
         MemberCard: Record "MM Member Card";
         MemberNotificationEntry: Record "MM Member Notification Entry";
         Contact: Record Contact;
+        MagentoSetup: Record "Magento Setup";
     begin
 
         //-MM1.40 [357360]
@@ -444,9 +584,21 @@ codeunit 6060127 "MM Membership Management"
         MembershipRole.SetCurrentKey ("Member Entry No.");
         MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
         if (MembershipRole.FindSet ()) then begin
+          //-MM1.44 [400409]
+          if (not MagentoSetup.Get ()) then
+            MagentoSetup.Init ();
+          //+MM1.44 [400409]
+
           repeat
             if (Contact.Get (MembershipRole."Contact No.")) then begin
-              Contact."Magento Contact" := false;
+              //-MM1.44 [400409]
+              //Contact."Magento Contact" := FALSE;
+              case MagentoSetup."Magento Version" of
+                MagentoSetup."Magento Version"::"1" : Contact."Magento Contact" := false;
+                MagentoSetup."Magento Version"::"2" : Contact."Magento Account Status" := Contact."Magento Account Status"::BLOCKED;
+              end;
+              //+MM1.44 [400409]
+
               Contact.Modify (true);
             end;
           until (MembershipRole.Next () = 0);
@@ -1359,6 +1511,14 @@ codeunit 6060127 "MM Membership Management"
         case MembershipAlterationSetup."Alteration Activate From" of
           MembershipAlterationSetup."Alteration Activate From"::ASAP : EndDateNew := MemberInfoCapture."Document Date";
           MembershipAlterationSetup."Alteration Activate From"::DF   : EndDateNew := CalcDate (MembershipAlterationSetup."Alteration Date Formula", MemberInfoCapture."Document Date");
+          //-MM1.44 [397911]
+          else
+            begin
+                ReasonText := StrSubstNo (INVALID_ACTIVATION_DATE, Format (MembershipAlterationSetup."Alteration Activate From"),
+                  MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format (MembershipAlterationSetup."Alteration Type"));
+                exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+            end;
+          //+MM1.44 [397911]
         end;
 
         if (MembershipEntry."Valid Until Date" <= EndDateNew) then begin
@@ -1501,16 +1661,27 @@ codeunit 6060127 "MM Membership Management"
 
         Item.Get (MemberInfoCapture."Item No.");
 
-        if (MembershipEntry."Valid Until Date" < Today) then
-          MembershipEntry."Valid Until Date" := CalcDate ('<-1D>', Today);
+        //-MM1.44 [397911]
+        //IF (MembershipEntry."Valid Until Date" < TODAY) THEN
+        //  MembershipEntry."Valid Until Date" := CALCDATE ('<-1D>', TODAY);
+        if (MembershipAlterationSetup."Alteration Activate From" <> MembershipAlterationSetup."Alteration Activate From"::B2B) then
+          if (MembershipEntry."Valid Until Date" < Today) then
+            MembershipEntry."Valid Until Date" := CalcDate ('<-1D>', Today);
+        //+MM1.44 [397911]
 
         case MembershipAlterationSetup."Alteration Activate From" of
           MembershipAlterationSetup."Alteration Activate From"::ASAP : StartDateNew := CalcDate('<+1D>', MembershipEntry."Valid Until Date");
           MembershipAlterationSetup."Alteration Activate From"::DF   : StartDateNew := CalcDate (MembershipAlterationSetup."Alteration Date Formula", MembershipEntry."Valid Until Date");
+          MembershipAlterationSetup."Alteration Activate From"::B2B  : StartDateNew := CalcDate('<+1D>', MembershipEntry."Valid Until Date"); //-+MM1.44 [397911]
         end;
 
-        if (StartDateNew < Today) then
-          StartDateNew := Today;
+        //-MM1.44 [397911]
+        // IF (StartDateNew < TODAY) THEN
+        //  StartDateNew := TODAY;
+        if (MembershipAlterationSetup."Alteration Activate From" <> MembershipAlterationSetup."Alteration Activate From"::B2B) then
+          if (StartDateNew < Today) then
+            StartDateNew := Today;
+        //+MM1.44 [397911]
 
         EndDateNew := CalcDate (MembershipAlterationSetup."Membership Duration", StartDateNew);
 
@@ -1535,6 +1706,11 @@ codeunit 6060127 "MM Membership Management"
         if (MembershipAlterationSetup."To Membership Code" <> '') then
           if (not (ValidateChangeMembershipCode (WithConfirm, Membership."Entry No.", StartDateNew, MembershipAlterationSetup."To Membership Code", ReasonText))) then
             exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+
+        //-MM1.44 [407401]
+        if (not CheckAgeConstraintOnMembershipAlter (Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
+          exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        //+MM1.44 [407401]
 
         case MembershipAlterationSetup."Price Calculation" of
           MembershipAlterationSetup."Price Calculation"::UNIT_PRICE : SuggestedUnitPrice := Item."Unit Price";
@@ -1694,6 +1870,14 @@ codeunit 6060127 "MM Membership Management"
         case MembershipAlterationSetup."Alteration Activate From" of
           MembershipAlterationSetup."Alteration Activate From"::ASAP : StartDateNew := MemberInfoCapture."Document Date";
           MembershipAlterationSetup."Alteration Activate From"::DF   : StartDateNew := CalcDate (MembershipAlterationSetup."Alteration Date Formula", MemberInfoCapture."Document Date");
+          //-MM1.44 [397911]
+          else
+            begin
+                ReasonText := StrSubstNo (INVALID_ACTIVATION_DATE, Format (MembershipAlterationSetup."Alteration Activate From"),
+                  MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format (MembershipAlterationSetup."Alteration Type"));
+                exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+            end;
+          //+MM1.44 [397911]
         end;
 
         EndDateNew := CalcDate (MembershipAlterationSetup."Membership Duration", StartDateNew);
@@ -1727,6 +1911,11 @@ codeunit 6060127 "MM Membership Management"
           MembershipEntry."Unit Price (Base)" := OldItem."Unit Price";
         end;
         //+MM1.29 [316141]
+
+        //-MM1.44 [407401]
+        if (not CheckAgeConstraintOnMembershipAlter (Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
+          exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        //+MM1.44 [407401]
 
         CancelledFraction := 1 - CalculatePeriodStartToDateFraction (MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", StartDateNew);
         NewFraction :=  1 - CalculatePeriodStartToDateFraction (StartDateNew, EndDateNew, MembershipEntry."Valid Until Date");
@@ -1893,11 +2082,19 @@ codeunit 6060127 "MM Membership Management"
 
         case MembershipAlterationSetup."Alteration Activate From" of
           MembershipAlterationSetup."Alteration Activate From"::ASAP : StartDateNew := MemberInfoCapture."Document Date";
-          MembershipAlterationSetup."Alteration Activate From"::DF   :
+          //-MM1.44 [397911]
+          // MembershipAlterationSetup."Alteration Activate From"::DF   :
+          //  BEGIN
+          //    ReasonText := FUTUREDATE_NOT_SUPPORTED;
+          //    EXIT (ExitFalseOrWithError (WithConfirm, ReasonText));
+          //  END;
+          else
             begin
-              ReasonText := FUTUREDATE_NOT_SUPPORTED;
-              exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+                ReasonText := StrSubstNo (INVALID_ACTIVATION_DATE, Format (MembershipAlterationSetup."Alteration Activate From"),
+                  MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format (MembershipAlterationSetup."Alteration Type"));
+                exit (ExitFalseOrWithError (WithConfirm, ReasonText));
             end;
+          //+MM1.44 [397911]
         end;
 
         EndDateCurrent := CalcDate ('<-1D>', StartDateNew);
@@ -1928,6 +2125,11 @@ codeunit 6060127 "MM Membership Management"
         end;
         ValidFromDate := GetUpgradeInitialValidFromDate (MembershipEntry."Entry No.");
         //+MM1.29 [316141]
+
+        //-MM1.44 [407401]
+        if (not CheckAgeConstraintOnMembershipAlter (Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
+          exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        //+MM1.44 [407401]
 
         RemainingFraction := 1 - CalculatePeriodStartToDateFraction (ValidFromDate, EndDateNew, StartDateNew);
         case MembershipAlterationSetup."Price Calculation" of
@@ -2206,6 +2408,14 @@ codeunit 6060127 "MM Membership Management"
         case MembershipAlterationSetup."Alteration Activate From" of
           MembershipAlterationSetup."Alteration Activate From"::ASAP : StartDateNew := CalcDate('<+1D>', MembershipEntry."Valid Until Date");
           MembershipAlterationSetup."Alteration Activate From"::DF   : StartDateNew := CalcDate (MembershipAlterationSetup."Alteration Date Formula", MembershipEntry."Valid Until Date");
+          //-MM1.44 [397911]
+          else
+            begin
+              ReasonText := StrSubstNo (INVALID_ACTIVATION_DATE, Format (MembershipAlterationSetup."Alteration Activate From"),
+                MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format (MembershipAlterationSetup."Alteration Type"));
+              exit (ExitFalseOrWithError (false, ReasonText));
+            end;
+          //+MM1.44 [397911]
         end;
 
         if (StartDateNew < Today) then
@@ -2324,6 +2534,7 @@ codeunit 6060127 "MM Membership Management"
         UpdateRequired: Boolean;
         NewCardEntryNo: Integer;
         LastEntryNo: Integer;
+        PreviousMemberEntryNo: Integer;
     begin
 
         //-MM1.42 [384394]
@@ -2340,6 +2551,10 @@ codeunit 6060127 "MM Membership Management"
         MemberCard.SetFilter ("Entry No.", '..%1', LastEntryNo);
         //+MM1.43 [394404]
 
+        //-MM1.44 [402040]
+        MemberCard.SetCurrentKey ("Membership Entry No.","Member Entry No.");
+        //+MM1.44 [402040]
+
         if (not MemberCard.FindSet ()) then
           exit (true);
 
@@ -2353,7 +2568,8 @@ codeunit 6060127 "MM Membership Management"
             AlterationSetup."Card Expired Action"::IGNORE  : UpdateRequired := false;
             AlterationSetup."Card Expired Action"::PREVENT : if (UpdateRequired) then ResponseMessage := StrSubstNo (PREVENT_CARD_EXTEND, MemberCard."External Card No.", NewTimeFrameEndDate);
             AlterationSetup."Card Expired Action"::UPDATE  : ;
-            AlterationSetup."Card Expired Action"::NEW     : ;
+            // AlterationSetup."Card Expired Action"::NEW     : ;
+            AlterationSetup."Card Expired Action"::NEW     : UpdateRequired := (PreviousMemberEntryNo <> MemberCard."Member Entry No."); //-+MM1.44 [402040]
           end;
 
           if (ResponseMessage <> '') then
@@ -2374,6 +2590,10 @@ codeunit 6060127 "MM Membership Management"
             //+MM1.43 [394986]
 
           end;
+
+          //-MM1.44 [402040]
+          PreviousMemberEntryNo := MemberCard."Member Entry No.";
+          //+MM1.44 [402040]
 
         until (MemberCard.Next () = 0);
 
@@ -2420,36 +2640,48 @@ codeunit 6060127 "MM Membership Management"
         if (DocumentDate = 0D) then
           DocumentDate :=  WorkDate;
 
-        case MembershipSalesSetup."Valid From Base" of
-          MembershipSalesSetup."Valid From Base"::PROMPT :
-            ValidFromDate := MemberInfoCapture."Document Date";
+        //-MM1.44 [407401]
+        // CASE MembershipSalesSetup."Valid From Base" OF
+        //  MembershipSalesSetup."Valid From Base"::PROMPT :
+        //    ValidFromDate := MemberInfoCapture."Document Date";
+        //
+        //  MembershipSalesSetup."Valid From Base"::SALESDATE :
+        //    ValidFromDate := DocumentDate;
+        //
+        //  MembershipSalesSetup."Valid From Base"::DATEFORMULA :
+        //    BEGIN
+        //      ValidFromDate := DocumentDate;
+        //      IF (DocumentDate = WORKDATE) THEN BEGIN
+        //        MembershipSalesSetup.TESTFIELD ("Valid From Date Calculation");
+        //        ValidFromDate := CALCDATE (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
+        //      END;
+        //    END;
+        //
+        //  MembershipSalesSetup."Valid From Base"::FIRST_USE :
+        //    ValidFromDate := 0D;
+        // END;
+        //
+        // IF ((MembershipSetup.Perpetual) OR (MembershipSalesSetup."Valid Until Calculation" = MembershipSalesSetup."Valid Until Calculation"::END_OF_TIME)) THEN BEGIN
+        //  IF (ValidFromDate = 0D) THEN
+        //    ValidFromDate := DocumentDate;
+        //  ValidUntilDate := DMY2DATE (31, 12, 9999); //31129999D;
+        // END ELSE BEGIN
+        //  MembershipSalesSetup.TESTFIELD ("Duration Formula");
+        //  IF (MembershipSalesSetup."Valid From Base" <> MembershipSalesSetup."Valid From Base"::FIRST_USE) THEN
+        //    ValidUntilDate := CALCDATE (MembershipSalesSetup."Duration Formula", ValidFromDate);
+        //  MemberInfoCapture."Duration Formula" := MembershipSalesSetup."Duration Formula";
+        // END;
 
-          MembershipSalesSetup."Valid From Base"::SALESDATE :
-            ValidFromDate := DocumentDate;
+        CalculateLedgerEntryDates_NEW (
+          MembershipSalesSetup,
+          ((MembershipSetup.Perpetual) or (MembershipSalesSetup."Valid Until Calculation" = MembershipSalesSetup."Valid Until Calculation"::END_OF_TIME)),
+          DocumentDate,
+          MemberInfoCapture."Document Date",
+          ValidFromDate,
+          ValidUntilDate);
 
-          MembershipSalesSetup."Valid From Base"::DATEFORMULA :
-            begin
-              ValidFromDate := DocumentDate;
-              if (DocumentDate = WorkDate) then begin
-                MembershipSalesSetup.TestField ("Valid From Date Calculation");
-                ValidFromDate := CalcDate (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
-              end;
-            end;
-
-          MembershipSalesSetup."Valid From Base"::FIRST_USE :
-            ValidFromDate := 0D;
-        end;
-
-        if ((MembershipSetup.Perpetual) or (MembershipSalesSetup."Valid Until Calculation" = MembershipSalesSetup."Valid Until Calculation"::END_OF_TIME)) then begin
-          if (ValidFromDate = 0D) then
-            ValidFromDate := DocumentDate;
-          ValidUntilDate := DMY2Date (31, 12, 9999); //31129999D;
-        end else begin
-          MembershipSalesSetup.TestField ("Duration Formula");
-          if (MembershipSalesSetup."Valid From Base" <> MembershipSalesSetup."Valid From Base"::FIRST_USE) then
-            ValidUntilDate := CalcDate (MembershipSalesSetup."Duration Formula", ValidFromDate);
-          MemberInfoCapture."Duration Formula" := MembershipSalesSetup."Duration Formula";
-        end;
+        MemberInfoCapture."Duration Formula" := MembershipSalesSetup."Duration Formula";
+        //+MM1.44 [407401]
 
         MemberInfoCapture."Membership Code" := MembershipSalesSetup."Membership Code";
 
@@ -2466,7 +2698,94 @@ codeunit 6060127 "MM Membership Management"
         end;
         //+MM1.42 [384394]
 
-        exit (AddMembershipLedgerEntry (MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate));
+
+        //-MM1.45 [413622]
+        // EXIT (AddMembershipLedgerEntry (MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate));
+        LedgerEntryNo := AddMembershipLedgerEntry (MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate);
+        OnMembershipChangeEvent (MembershipEntryNo);
+
+        exit (LedgerEntryNo);
+        //+MM1.45 [413622]
+    end;
+
+    local procedure CalculateLedgerEntryDates_NEW(MembershipSalesSetup: Record "MM Membership Sales Setup";Perpetual: Boolean;SalesDate: Date;PromptDate: Date;var ValidFromDate: Date;var ValiduntilDate: Date)
+    begin
+
+        //-MM1.44 [407401]
+        if (Perpetual) then begin
+          ValidFromDate := SalesDate;
+          ValiduntilDate := DMY2Date (31, 12, 9999); //31129999D;
+          exit;
+        end;
+
+        case MembershipSalesSetup."Valid From Base" of
+
+          MembershipSalesSetup."Valid From Base"::PROMPT :
+            ValidFromDate := PromptDate;
+
+          MembershipSalesSetup."Valid From Base"::SALESDATE :
+            ValidFromDate := SalesDate;
+
+          MembershipSalesSetup."Valid From Base"::DATEFORMULA :
+            begin
+              ValidFromDate := SalesDate;
+              if (SalesDate = WorkDate) then begin
+                MembershipSalesSetup.TestField ("Valid From Date Calculation");
+                ValidFromDate := CalcDate (MembershipSalesSetup."Valid From Date Calculation", SalesDate);
+              end;
+            end;
+
+          MembershipSalesSetup."Valid From Base"::FIRST_USE :
+            begin
+              ValidFromDate := 0D;
+              ValiduntilDate := 0D;
+              exit;
+            end;
+        end;
+
+        MembershipSalesSetup.TestField ("Duration Formula");
+        ValiduntilDate := CalcDate (MembershipSalesSetup."Duration Formula", ValidFromDate);
+        //+MM1.44 [407401]
+    end;
+
+    procedure GetMembershipAgeConstraintDate(MembershipSalesSetup: Record "MM Membership Sales Setup";MemberInfoCapture: Record "MM Member Info Capture") ConstraintDate: Date
+    var
+        MembershipSetup: Record "MM Membership Setup";
+        DocumentDate: Date;
+        ValidFromDate: Date;
+        ValidUntilDate: Date;
+    begin
+
+        //-MM1.44 [407401]
+        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+
+        DocumentDate := MemberInfoCapture."Document Date";
+        if (DocumentDate = 0D) then
+          DocumentDate := WorkDate;
+
+        CalculateLedgerEntryDates_NEW (
+          MembershipSalesSetup,
+          ((MembershipSalesSetup."Valid Until Calculation" = MembershipSalesSetup."Valid Until Calculation"::END_OF_TIME) or MembershipSetup.Perpetual),
+          DocumentDate,
+          MemberInfoCapture."Document Date",
+          ValidFromDate,
+          ValidUntilDate);
+
+        with MembershipSetup do
+          case "Validate Age Against" of
+            "Validate Age Against"::SALESDATE_Y,
+            "Validate Age Against"::SALESDATE_YM,
+            "Validate Age Against"::SALESDATE_YMD :   ConstraintDate := DocumentDate;
+            "Validate Age Against"::PERIODBEGIN_Y,
+            "Validate Age Against"::PERIODBEGIN_YM,
+            "Validate Age Against"::PERIODBEGIN_YMD : ConstraintDate := ValidFromDate;
+            "Validate Age Against"::PERIODEND_Y,
+            "Validate Age Against"::PERIODEND_YM,
+            "Validate Age Against"::PERIODEND_YMD :   ConstraintDate := ValidUntilDate;
+          end;
+
+        exit (ConstraintDate);
+        //+MM1.44 [407401]
     end;
 
     procedure SynchronizeCustomerAndContact(MembershipEntryNo: Integer)
@@ -2958,6 +3277,213 @@ codeunit 6060127 "MM Membership Management"
         exit (true);
     end;
 
+    local procedure CheckAgeConstraintOnMembershipAlter(Membership: Record "MM Membership";MembershipAlterationSetup: Record "MM Membership Alteration Setup";SalesDate: Date;PeriodStartDate: Date;PeriodEndDate: Date;var ReasonText: Text): Boolean
+    var
+        MembershipSetup: Record "MM Membership Setup";
+        ReferenceDate: Date;
+    begin
+
+        //-MM1.44 [407401]
+        ReasonText := '';
+
+        MembershipSetup.Get (Membership."Membership Code");
+        if (MembershipAlterationSetup."To Membership Code" <> '') then
+          MembershipSetup.Get (MembershipAlterationSetup."To Membership Code");
+
+        if (not MembershipSetup."Enable Age Verification") then
+          exit (true);
+
+        with MembershipSetup do
+          case "Validate Age Against" of
+            "Validate Age Against"::SALESDATE_Y,
+            "Validate Age Against"::SALESDATE_YM,
+            "Validate Age Against"::SALESDATE_YMD   : ReferenceDate := SalesDate;
+
+            "Validate Age Against"::PERIODBEGIN_Y,
+            "Validate Age Against"::PERIODBEGIN_YM,
+            "Validate Age Against"::PERIODBEGIN_YMD : ReferenceDate := PeriodStartDate;
+
+            "Validate Age Against"::PERIODEND_Y,
+            "Validate Age Against"::PERIODEND_YM,
+            "Validate Age Against"::PERIODEND_YMD   : ReferenceDate := PeriodEndDate;
+          end;
+
+        with MembershipAlterationSetup do
+          exit (CheckMemberAgeConstraint (Membership."Entry No.", ReferenceDate, MembershipSetup."Validate Age Against", "Age Constraint Type", "Age Constraint (Years)", "Age Constraint Applies To", ReasonText));
+
+        //+MM1.44 [407401]
+    end;
+
+    local procedure CheckMemberAgeConstraint(MembershipEntryNo: Integer;ReferenceDate: Date;ReferenceDateType: Option;ConstraintType: Option NA,"Less Than","Less Than or Equal To","Greater Then","Greater Than or Equal To","Equal To";Constraint: Integer;AppliesTo: Option;var ReasonText: Text): Boolean
+    var
+        MembershipSalesSetup: Record "MM Membership Sales Setup";
+        MembershipRole: Record "MM Membership Role";
+        MembershipEntry: Record "MM Membership Entry";
+        Member: Record "MM Member";
+        AgeConstraintOk: Boolean;
+        MemberEntryNo: Integer;
+        MemberBirthDate: Date;
+        AgeDuration: Duration;
+    begin
+
+        //-MM1.44 [407401]
+        MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter (Blocked, '=%1', false);
+        MembershipRole.SetFilter ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
+
+        if (AppliesTo = MembershipSalesSetup."Age Constraint Applies To"::DEPENDANTS) then
+          MembershipRole.SetFilter ("Member Role", '=%1', MembershipRole."Member Role"::DEPENDENT);
+
+        if (AppliesTo = MembershipSalesSetup."Age Constraint Applies To"::ADMINS) then
+          MembershipRole.SetFilter ("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
+
+        if (MembershipRole.IsEmpty ()) then
+          exit (false);
+
+        if (AppliesTo in [MembershipSalesSetup."Age Constraint Applies To"::OLDEST, MembershipSalesSetup."Age Constraint Applies To"::YOUNGEST]) then begin
+          MembershipRole.FindSet ();
+          MemberBirthDate := 0D;
+          MemberEntryNo := -1;
+          if (AppliesTo = MembershipSalesSetup."Age Constraint Applies To"::OLDEST) then
+            MemberBirthDate := Today;
+          repeat
+            if (Member.Get (MembershipRole."Member Entry No.")) then begin
+              if (not Member.Blocked) then begin
+                if ((AppliesTo = MembershipSalesSetup."Age Constraint Applies To"::OLDEST) and (Member.Birthday < MemberBirthDate)) then begin
+                  MemberBirthDate := Member.Birthday;
+                  MemberEntryNo := Member."Entry No.";
+                end;
+                if ((AppliesTo = MembershipSalesSetup."Age Constraint Applies To"::YOUNGEST) and (Member.Birthday > MemberBirthDate)) then begin
+                  MemberBirthDate := Member.Birthday;
+                  MemberEntryNo := Member."Entry No.";
+                end;
+
+              end;
+            end;
+          until (MembershipRole.Next () = 0);
+
+          MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+        end;
+
+        MembershipRole.FindSet ();
+        repeat
+          Member.Get (MembershipRole."Member Entry No.");
+          if (not Member.Blocked) then
+            AgeConstraintOk := CheckAgeConstraint (ReferenceDate, Member.Birthday, ReferenceDateType, ConstraintType, Constraint);
+
+        until ((MembershipRole.Next () = 0) or (not AgeConstraintOk));
+
+        if (not AgeConstraintOk) then begin
+
+          if (Member.Birthday = 0D) then
+            ReasonText := StrSubstNo (AGE_VERIFICATION, Member."Display Name", Constraint);
+
+          if (Member.Birthday <> 0D) then
+            ReasonText := StrSubstNo (AGE_VERIFICATION, Member."Display Name", Constraint) +
+                          StrSubstNo (' {%5 must be %4 %3 => (%1 + %2)}', Member.Birthday, Constraint, CalcDate (StrSubstNo ('<+%1Y>',Constraint), Member.Birthday), Format (ConstraintType), ReferenceDate);
+        end;
+
+        exit (AgeConstraintOk);
+        //+MM1.44 [407401]
+    end;
+
+    procedure CheckAgeConstraint(ReferenceDate1: Date;ReferenceDate2: Date;ReferenceDateType: Option;ConstraintType: Option NA,LT,LTE,GT,GTE,E;Years: Integer) ConstraintOK: Boolean
+    var
+        MembershipSalesSetup: Record "MM Membership Sales Setup";
+        MembershipRole: Record "MM Membership Role";
+        MembershipEntry: Record "MM Membership Entry";
+        MembershipSetup: Record "MM Membership Setup";
+        LowRange: Date;
+        HighRange: Date;
+        LowDate: Date;
+        HighDate: Date;
+        DateToValidate: Date;
+    begin
+        //-MM1.44 [407401]
+        if (ConstraintType = ConstraintType::NA) then
+          exit (true);
+
+        if (ReferenceDate1 = 0D) then
+          exit (false);
+
+        if (ReferenceDate2 = 0D) then
+          exit (false);
+
+        LowDate := ReferenceDate1;
+        HighDate := ReferenceDate2;
+        if (ReferenceDate2 < ReferenceDate1) then begin
+          LowDate := ReferenceDate2;
+          HighDate := ReferenceDate1;
+        end;
+
+        LowRange  := CalcDate ('<CY-1Y+1D>', HighDate);
+        HighRange := CalcDate ('<CY>', HighDate);
+        DateToValidate := CalcDate (StrSubstNo ('<+%1Y>', Years), LowDate); // Birth date + constraint in years
+
+        // Always check year
+        case ConstraintType of
+          ConstraintType::E   : ConstraintOK := (Date2DMY (DateToValidate, 3) =  Date2DMY (HighDate, 3));
+          ConstraintType::LT  : ConstraintOK := (Date2DMY (DateToValidate, 3) >  Date2DMY (HighDate, 3));
+          ConstraintType::LTE : ConstraintOK := (Date2DMY (DateToValidate, 3) >= Date2DMY (HighDate, 3));
+          ConstraintType::GT  : ConstraintOK := (Date2DMY (DateToValidate, 3) <  Date2DMY (HighDate, 3));
+          ConstraintType::GTE : ConstraintOK := (Date2DMY (DateToValidate, 3) <= Date2DMY (HighDate, 3));
+        end;
+
+        with MembershipSetup do
+          if (ReferenceDateType in ["Validate Age Against"::SALESDATE_YM, "Validate Age Against"::PERIODBEGIN_YM, "Validate Age Against"::PERIODEND_YM]) then
+            case ConstraintType of
+              ConstraintType::E   : ConstraintOK := ConstraintOK and (Date2DMY (DateToValidate, 2) =  Date2DMY (HighDate, 2));
+              ConstraintType::LT  : ConstraintOK := (DateToValidate >  CalcDate ('<CM>', HighDate));
+              ConstraintType::LTE : ConstraintOK := (DateToValidate >= CalcDate ('<CM-1M>', HighDate));
+              ConstraintType::GT  : ConstraintOK := (DateToValidate <  CalcDate ('<CM-1M>', HighDate));
+              ConstraintType::GTE : ConstraintOK := (DateToValidate <= CalcDate ('<CM>', HighDate));
+            end;
+
+        with MembershipSetup do
+          if (ReferenceDateType in ["Validate Age Against"::SALESDATE_YMD, "Validate Age Against"::PERIODBEGIN_YMD, "Validate Age Against"::PERIODEND_YMD]) then
+            case ConstraintType of
+              ConstraintType::E   : ConstraintOK := (DateToValidate =  HighDate);
+              ConstraintType::LT  : ConstraintOK := (DateToValidate >  HighDate);
+              ConstraintType::LTE : ConstraintOK := (DateToValidate >= HighDate);
+              ConstraintType::GT  : ConstraintOK := (DateToValidate <  HighDate);
+              ConstraintType::GTE : ConstraintOK := (DateToValidate <= HighDate);
+            end;
+
+
+
+        // CASE ConstraintType OF
+        //  ConstraintType::E   : ConstraintOK := (ABS (DATE2DMY (ReferenceDate1, 3) - DATE2DMY (ReferenceDate2, 3)) =  Years);
+        //  ConstraintType::LT  : ConstraintOK := (ABS (DATE2DMY (ReferenceDate1, 3) - DATE2DMY (ReferenceDate2, 3)) <  Years);
+        //  ConstraintType::LTE : ConstraintOK := (ABS (DATE2DMY (ReferenceDate1, 3) - DATE2DMY (ReferenceDate2, 3)) <= Years);
+        //  ConstraintType::GT  : ConstraintOK := (ABS (DATE2DMY (ReferenceDate1, 3) - DATE2DMY (ReferenceDate2, 3)) >  Years);
+        //  ConstraintType::GTE : ConstraintOK := (ABS (DATE2DMY (ReferenceDate1, 3) - DATE2DMY (ReferenceDate2, 3)) >= Years);
+        // END;
+        //
+        // WITH MembershipSetup DO
+        //  IF ((ConstraintOK) AND (ReferenceDateType IN ["Age Verification Date"::SALESDATE_YM, "Age Verification Date"::PERIODBEGIN_YM, "Age Verification Date"::PERIODEND_YM,
+        //                                                "Age Verification Date"::SALESDATE_YMD, "Age Verification Date"::PERIODBEGIN_YMD, "Age Verification Date"::PERIODEND_YMD])) THEN
+        //    CASE ConstraintType OF
+        //      ConstraintType::E   : ConstraintOK := (DATE2DMY (ReferenceDate1, 2) =  DATE2DMY (ReferenceDate2, 2));
+        //      ConstraintType::LT  : ConstraintOK := (DATE2DMY (ReferenceDate1, 2) <  DATE2DMY (ReferenceDate2, 2));
+        //      ConstraintType::LTE : ConstraintOK := (DATE2DMY (ReferenceDate1, 2) <= DATE2DMY (ReferenceDate2, 2));
+        //      ConstraintType::GT  : ConstraintOK := (DATE2DMY (ReferenceDate1, 2) >  DATE2DMY (ReferenceDate2, 2));
+        //      ConstraintType::GTE : ConstraintOK := (DATE2DMY (ReferenceDate1, 2) >= DATE2DMY (ReferenceDate2, 2));
+        //    END;
+        //
+        // WITH MembershipSetup DO
+        //  IF ((ConstraintOK) AND (ReferenceDateType IN ["Age Verification Date"::SALESDATE_YMD, "Age Verification Date"::PERIODBEGIN_YMD, "Age Verification Date"::PERIODEND_YMD])) THEN
+        //    CASE ConstraintType OF
+        //      ConstraintType::E   : ConstraintOK := (DATE2DMY (ReferenceDate1, 1) =  DATE2DMY (ReferenceDate2, 1));
+        //      ConstraintType::LT  : ConstraintOK := (DATE2DMY (ReferenceDate1, 1) <  DATE2DMY (ReferenceDate2, 1));
+        //      ConstraintType::LTE : ConstraintOK := (DATE2DMY (ReferenceDate1, 1) <= DATE2DMY (ReferenceDate2, 1));
+        //      ConstraintType::GT  : ConstraintOK := (DATE2DMY (ReferenceDate1, 1) >  DATE2DMY (ReferenceDate2, 1));
+        //      ConstraintType::GTE : ConstraintOK := (DATE2DMY (ReferenceDate1, 1) >= DATE2DMY (ReferenceDate2, 1));
+        //    END;
+
+        exit (ConstraintOK);
+        //+MM1.44 [407401]
+    end;
+
     local procedure GetMembershipMemberCount(MembershipEntryNo: Integer) MemberCount: Integer
     var
         Membership: Record "MM Membership";
@@ -3152,6 +3678,13 @@ codeunit 6060127 "MM Membership Management"
             MembershipRole.SetFilter ("Wallet Pass Id", '<>%1', '');
             if (not MembershipRole.IsEmpty ()) then
               MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
+
+            //-MM1.44 [396091]
+            MembershipRole.SetFilter ("Wallet Pass Id", '=%1', '');
+            if (not MembershipRole.IsEmpty ()) then
+              MemberNotification.CreateWalletSendNotification (Membership."Entry No.", 0, 0);
+            //+MM1.44 [396091]
+
           end;
         end;
 
@@ -3407,6 +3940,7 @@ codeunit 6060127 "MM Membership Management"
         ContComp: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
         MarketingSetup: Record "Marketing Setup";
+        MagentoSetup: Record "Magento Setup";
     begin
 
         Membership.Get (MembershipEntryNo);
@@ -3479,7 +4013,26 @@ codeunit 6060127 "MM Membership Management"
 
         if (ContactBusinessRelation.FindFirst ()) then begin
           if (ContComp.Get (ContactBusinessRelation."Contact No.")) then begin
-            ContComp."Magento Contact" := (not Member.Blocked) and (Member."E-Mail Address" <> '');
+
+            //-MM1.44 [400409]
+            // ContComp."Magento Contact" := (NOT Member.Blocked) AND (Member."E-Mail Address" <> '');
+            if (not MagentoSetup.Get ()) then
+              MagentoSetup.Init ();
+
+            case MagentoSetup."Magento Version" of
+              MagentoSetup."Magento Version"::"1" : ContComp."Magento Contact" := (not Member.Blocked) and (Member."E-Mail Address" <> '');
+              MagentoSetup."Magento Version"::"2" :
+                begin
+                  ContComp."Magento Contact" := true;
+                  if ((not Member.Blocked) and (Member."E-Mail Address" <> '')) then begin
+                    ContComp."Magento Account Status" := ContComp."Magento Account Status"::ACTIVE;
+                  end else begin
+                    ContComp."Magento Account Status" := ContComp."Magento Account Status"::BLOCKED;
+                  end;
+                end;
+            end;
+            //+MM1.44 [400409]
+
             ContComp.Modify (true);
 
             // TODO - remove this field
@@ -3511,6 +4064,7 @@ codeunit 6060127 "MM Membership Management"
         MembershipRole: Record "MM Membership Role";
         Contact: Record Contact;
         ContactXRec: Record Contact;
+        MagentoSetup: Record "Magento Setup";
         HaveContact: Boolean;
     begin
 
@@ -3555,8 +4109,24 @@ codeunit 6060127 "MM Membership Management"
         Contact.Validate ("Phone No.", CopyStr (Member."Phone No.", 1, MaxStrLen (Contact."Phone No.")));
         Contact.Validate ("E-Mail", CopyStr (Member."E-Mail Address", 1, MaxStrLen (Contact."E-Mail")));
 
+        //-MM1.44 [400409]
+        //Contact."Magento Contact" := (NOT Member.Blocked) AND (Member."E-Mail Address" <> '');
+        if (not MagentoSetup.Get ()) then
+          MagentoSetup.Init ();
 
-        Contact."Magento Contact" := (not Member.Blocked) and (Member."E-Mail Address" <> '');
+        case MagentoSetup."Magento Version" of
+          MagentoSetup."Magento Version"::"1" : Contact."Magento Contact" := (not Member.Blocked) and (Member."E-Mail Address" <> '');
+          MagentoSetup."Magento Version"::"2" :
+            begin
+              Contact."Magento Contact" := true;
+              if ((not Member.Blocked) and (Member."E-Mail Address" <> '')) then begin
+                Contact."Magento Account Status" := Contact."Magento Account Status"::ACTIVE;
+              end else begin
+                Contact."Magento Account Status" := Contact."Magento Account Status"::BLOCKED;
+              end;
+            end;
+        end;
+        //+MM1.44 [400409]
 
         Contact.Modify(True);
 
@@ -3919,6 +4489,7 @@ codeunit 6060127 "MM Membership Management"
         // All non-guardians will have their GDPR approval set to "Delegated to Guardian"
         MembershipRole.Reset ();
         MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS); //-+#416213 [416213]
         MembershipRole.SetFilter (Blocked, '=%1', false);
         if (MembershipRole.FindSet ()) then begin
           Membership.Get (MembershipEntryNo);
@@ -4350,7 +4921,20 @@ codeunit 6060127 "MM Membership Management"
 
         Membership.SetFilter ("Customer No.", '=%1', CustomerNo);
         Membership.SetFilter (Blocked, '=%1', false);
-        exit (Membership.IsEmpty ());
+
+        //-MM1.45 [416921]
+        // EXIT (Membership.ISEMPTY ());
+        if (not Membership.FindFirst ()) then
+          exit (true);
+
+        if (IsMembershipActive (Membership."Entry No.", Today, false)) then
+          exit (false);
+
+        Membership."Customer No." := '';
+        Membership.Modify ();
+        exit (true);
+        //+MM1.45 [416921]
+
         //+MM1.43 [386080]
     end;
 
@@ -4475,6 +5059,7 @@ codeunit 6060127 "MM Membership Management"
 
         //-+MM1.16 [239052]
         if (Membership.Get (MembershipEntryNo)) then begin
+          Membership."Modified At" := CurrentDateTime (); //-+MM1.45 [413622]
           Membership.Modify (true);
         end;
     end;
@@ -4876,6 +5461,74 @@ codeunit 6060127 "MM Membership Management"
         exit (MemberCard."Entry No.");
     end;
 
+    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateFindRecords', '', true, true)]
+    local procedure OnAfterNavigateFindRecordsSubscriber(var DocumentEntry: Record "Document Entry";DocNoFilter: Text;PostingDateFilter: Text)
+    var
+        MembershipEntry: Record "MM Membership Entry";
+        POSPeriodRegister: Record "POS Period Register";
+        POSEntry: Record "POS Entry";
+        Entries: Integer;
+    begin
+
+        //-MM1.45 [414208]
+        if (MembershipEntry.ReadPermission ()) then begin
+          if (not MembershipEntry.SetCurrentKey ("Receipt No.")) then ;
+          MembershipEntry.SetFilter ("Receipt No.", '%1', DocNoFilter);
+          Entries := InsertIntoDocEntry (DocumentEntry, DATABASE::"MM Membership Entry", 0, CopyStr (DocNoFilter, 1, 20), MembershipEntry.TableCaption, MembershipEntry.Count ());
+        end;
+        //+MM1.45 [414208]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateShowRecords', '', true, true)]
+    local procedure OnAfterNavigateShowRecordsSubscriber(TableID: Integer;DocNoFilter: Text;PostingDateFilter: Text;ItemTrackingSearch: Boolean)
+    var
+        MembershipEntry: Record "MM Membership Entry";
+        Membership: Record "MM Membership";
+        MembershipFilter: Text;
+    begin
+
+        //-MM1.45 [414208]
+        if (TableID = DATABASE::"MM Membership Entry") then begin
+          if (not MembershipEntry.SetCurrentKey ("Receipt No.")) then ;
+          MembershipEntry.SetFilter ("Receipt No.", DocNoFilter);
+          MembershipEntry.FindSet ();
+          repeat
+            MembershipFilter += StrSubstNo ('|%1', MembershipEntry."Membership Entry No.");
+          until (MembershipEntry.Next () = 0);
+
+          Membership.SetFilter ("Entry No.", CopyStr (MembershipFilter, 2));
+
+          if (Membership.Count () = 1) then begin
+            PAGE.Run (PAGE::"MM Membership Card", Membership);
+          end else begin
+            PAGE.Run (PAGE::"MM Memberships", Membership);
+          end;
+        end;
+        //+MM1.45 [414208]
+    end;
+
+    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary;DocTableID: Integer;DocType: Integer;DocNoFilter: Code[20];DocTableName: Text[1024];DocNoOfRecords: Integer): Integer
+    begin
+
+        //-MM1.45 [414208]
+        if (DocNoOfRecords = 0) then
+          exit (DocNoOfRecords);
+
+        with DocumentEntry do begin
+          Init;
+          "Entry No." := "Entry No." + 1;
+          "Table ID" := DocTableID;
+          "Document Type" := DocType;
+          "Document No." := DocNoFilter;
+          "Table Name" := CopyStr(DocTableName,1,MaxStrLen("Table Name"));
+          "No. of Records" := DocNoOfRecords;
+          Insert;
+        end;
+
+        exit (DocNoOfRecords);
+        //+MM1.45 [414208]
+    end;
+
     local procedure "--"()
     begin
     end;
@@ -4888,6 +5541,10 @@ codeunit 6060127 "MM Membership Management"
         //-MM1.09
         for i := 1 to 31 do
           CtrlChrs[i] := i;
+
+        //-#415642 [415642]
+        StringToClean := DelChr (StringToClean, '<>', ' ');
+        //+#415642 [415642]
 
         exit (DelChr (StringToClean,'=', CtrlChrs));
         //+MM1.09

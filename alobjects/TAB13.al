@@ -7,6 +7,7 @@ tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
     // NPR5.34/KENU/20170712 CASE 281419 Added Key: "Name"
     // NPR5.38/AE  /20180113 CASE 289390 Added filed Supervisor POS
     // NPR5.53/BHR /20191008 CASE 369354 deleted field 6014401
+    // NPR5.55/BHR /20201902 CASE 361515 Delete key Name
     fields
     {
         field(6014400; "Register Password"; Code[20])

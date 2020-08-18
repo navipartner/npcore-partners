@@ -69,7 +69,7 @@ table 6014423 Period
         field(9;"Date Opened";Date)
         {
             Caption = 'Date Opened';
-            Description = 'overf�r fra kasse';
+            Description = 'overf¢r fra kasse';
             Editable = false;
         }
         field(10;"Date Closed";Date)
@@ -215,7 +215,7 @@ table 6014423 Period
         field(40;"Balance Per Denomination";Text[250])
         {
             Caption = 'Balance Per Denomination';
-            Description = 'm�nt optalt streng separeret af '';''';
+            Description = 'm¢nt optalt streng separeret af '';''';
             Editable = false;
         }
         field(41;"Balanced Sec. Currency";Text[250])
@@ -475,8 +475,8 @@ table 6014423 Period
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer;var ShortcutDimCode: Code[20])
     begin
-        //Ops�tning.GET;
-        //IF Ops�tning."Brug dimensionsstyring" THEN
+        //Opsætning.GET;
+        //IF Opsætning."Brug dimensionsstyring" THEN
           NPRDimMgt.LookupDimValueCode(FieldNumber,ShortcutDimCode);
     end;
 }

@@ -1,6 +1,8 @@
 table 6151180 "Retail Cross Reference"
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created
+    // NPR5.54/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
+    // NPR5.55/ALPO/20200424 CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
 
     Caption = 'Retail Cross Reference';
     DrillDownPageID = "Retail Cross References";

@@ -22,6 +22,7 @@ page 6060124 "MM Membership Setup"
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.41/TSA  /20191010 CASE 367471 Added Sponsorship Ticket Setup related action
     // MM1.42/TSA /20191219 CASE 382728 Added Member Communication Setup related action
+    // MM1.44/TSA /20200529 CASE 407401 Added age verification
 
     Caption = 'Membership Setup';
     CardPageID = "MM Membership Setup Card";
@@ -181,6 +182,14 @@ page 6060124 "MM Membership Setup"
                 }
                 field("Enable NP Pass Integration";"Enable NP Pass Integration")
                 {
+                }
+                field("Enable Age Verification";"Enable Age Verification")
+                {
+                    Visible = false;
+                }
+                field("Validate Age Against";"Validate Age Against")
+                {
+                    Visible = false;
                 }
             }
         }

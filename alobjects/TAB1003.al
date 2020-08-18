@@ -9,6 +9,7 @@ tableextension 6014401 tableextension6014401 extends "Job Planning Line"
     // NPR5.48/JDH /20181109 CASE 334163 Added option caption to Ticket Collect Status
     // NPR5.48/TJ  /20190201 CASE 335824 Removed Field "Ticket No."
     // NPR5.49/TJ  /20190218 CASE 345047 New field Att. to Line No.
+    // NPR5.55/TJ  /20200326 CASE 397741 New fields "Group Source Line No.", "Group Line" and "Skip Cap./Avail. Check"
     fields
     {
         field(6060150;"Starting Time";Time)
@@ -117,6 +118,21 @@ tableextension 6014401 tableextension6014401 extends "Job Planning Line"
             Caption = 'Est. Line Amt. Incl. VAT (LCY)';
             Description = 'NPR5.38';
             Editable = false;
+        }
+        field(6151579;"Group Source Line No.";Integer)
+        {
+            Caption = 'Group Source Line No.';
+            Description = 'NPR5.55';
+        }
+        field(6151580;"Group Line";Boolean)
+        {
+            Caption = 'Group Line';
+            Description = 'NPR5.55';
+        }
+        field(6151581;"Skip Cap./Avail. Check";Boolean)
+        {
+            Caption = 'Skip Cap./Avail. Check';
+            Description = 'NPR5.55';
         }
     }
 }

@@ -16,6 +16,9 @@ table 6060127 "MM Membership"
     // MM1.38/TSA /20190527 CASE 356057 Minor change
     // MM1.39/TSA /20190527 CASE 350968 Changed Auto-Renew from boolean to option
     // MM1.41/TSA /20191021 CASE 369123 Block cascasde
+    // MM1.44/TSA /20200507 CASE 407401 Touched
+    // MM1.45/TSA /20200707 CASE 413622 Incorrect and not required filter and loop on membership role
+    // MM1.45/TSA /20200708 CASE 413622 Added field Has Membership Entries flow field
 
     Caption = 'Membership';
     DrillDownPageID = "MM Memberships";
@@ -236,6 +239,15 @@ table 6060127 "MM Membership"
         {
             Caption = 'Synchronized At';
         }
+        field(1000;"Has Membership Entry";Boolean)
+        {
+            CalcFormula = Exist("MM Membership Entry" WHERE ("Membership Entry No."=FIELD("Entry No."),
+                                                             Blocked=CONST(false),
+                                                             Context=CONST(NEW)));
+            Caption = 'Has Membership Entry';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
@@ -289,12 +301,15 @@ table 6060127 "MM Membership"
 
         //+#308332 [308332]
 
-        MembershipRole.SetFilter ("Member Entry No.", '=%1', "Entry No.");
-        if (MembershipRole.FindSet ()) then begin
-          repeat
-            MembershipManagement.SynchronizeCustomerAndContact (MembershipRole."Membership Entry No.");
-          until (MembershipRole.Next () = 0);
-        end;
+        //-MM1.45 [413622]
+        // MembershipRole.SETFILTER ("Member Entry No.", '=%1', "Entry No.");
+        // IF (MembershipRole.FINDSET ()) THEN BEGIN
+        //  REPEAT
+        //    MembershipManagement.SynchronizeCustomerAndContact (MembershipRole."Membership Entry No.");
+        //  UNTIL (MembershipRole.NEXT () = 0);
+        // END;
+        MembershipManagement.SynchronizeCustomerAndContact (Rec."Entry No.");
+        //+MM1.45 [413622]
     end;
 
     var

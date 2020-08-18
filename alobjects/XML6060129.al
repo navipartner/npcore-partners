@@ -10,6 +10,7 @@ xmlport 6060129 "MM Get Membership"
     // MM1.29/TSA /20180502 CASE 306121 - Added membership entry details to output
     // MM1.40/TSA /20190827 CASE 360242 - Added support for Attributes
     // MM1.42/TSA /20191121 CASE 378339 - Added descriptive names
+    // MM1.44/TSA /20200420 CASE 400649 - Added loyalty program information
 
     Caption = 'Get Membership';
     FormatEvaluate = Xml;
@@ -81,6 +82,15 @@ xmlport 6060129 "MM Get Membership"
                         fieldelement(membershipcode;tmpMembershipResponse."Membership Code")
                         {
                             textattribute(membershipname)
+                            {
+                                XmlName = 'name';
+                            }
+                        }
+                        textelement(loyaltycode)
+                        {
+                            MaxOccurs = Once;
+                            XmlName = 'loyaltyprogram';
+                            textattribute(loyaltyname)
                             {
                                 XmlName = 'name';
                             }
@@ -250,6 +260,7 @@ xmlport 6060129 "MM Get Membership"
         NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         MemberCommunity: Record "MM Member Community";
+        LoyaltySetup: Record "MM Loyalty Setup";
         MembershipManagement: Codeunit "MM Membership Management";
         AdminMemberCount: Integer;
         NamedMemberCount: Integer;
@@ -275,6 +286,15 @@ xmlport 6060129 "MM Get Membership"
         CommunityName := MemberCommunity.Description;
         MembershipName := MembershipSetup.Description;
         //-MM1.42 [378339]
+
+        //-MM1.44 [400649]
+        if (MemberCommunity."Activate Loyalty Program") then begin
+          if (LoyaltySetup.Get (MembershipSetup."Loyalty Code")) then begin
+            LoyaltyCode := LoyaltySetup.Code;
+            LoyaltyName := LoyaltySetup.Description;
+          end;
+        end;
+        //+MM1.44 [400649]
 
         //-MM1.22 [287080]
         // MembershipRole.SETFILTER ("Membership Entry No.", '=%1', MembershipEntryNo);

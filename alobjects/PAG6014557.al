@@ -52,6 +52,7 @@ page 6014557 "POS - Sales Person Role Center"
     // NPR5.38.06/THRO/20180219  CASE 305188 Added Power BI Spinner part for NAV2017 + removed subgroups
     // NPR5.40/TS  /20180320  CASE 307510 Added Page Retail Journal List
     // NPR5.42/JLK /20180523  CASE 315306 Corrected ENU Caption to ENU=Retail Salesperson
+    // NPR5.55/YAHA/20200715  CASE 412525 Moved Customer list above Salesperson/purchasers action
 
     Caption = 'Retail Salesperson';
     PageType = RoleCenter;
@@ -490,7 +491,7 @@ page 6014557 "POS - Sales Person Role Center"
                 action("Item Groups")
                 {
                     Caption = 'Item Groups';
-                    RunObject = Page "Magento Item Groups";
+                    RunObject = Page "Magento Categories";
                 }
                 action(Brands)
                 {
@@ -707,6 +708,11 @@ page 6014557 "POS - Sales Person Role Center"
             {
                 Caption = 'Sales';
                 Image = Sales;
+                action("Customers ")
+                {
+                    Caption = 'Customers';
+                    RunObject = Page "Customer List";
+                }
                 action("Salespeople/Purchasers")
                 {
                     Caption = 'Salespeople/Purchasers';
@@ -716,11 +722,6 @@ page 6014557 "POS - Sales Person Role Center"
                 {
                     Caption = 'Contact List';
                     RunObject = Page "Contact List";
-                }
-                action("Customers ")
-                {
-                    Caption = 'Customers';
-                    RunObject = Page "Customer List";
                 }
                 action(Orders)
                 {

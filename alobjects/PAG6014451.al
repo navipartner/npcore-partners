@@ -5,6 +5,8 @@ page 6014451 "Mixed Discount Lines"
     // NPR5.31/MHA /20170110  CASE 262904 Added functions for enabling view: MixedDiscount."Mix Type"::::Combination
     //                                    Deleted unused functions and variables
     // NPR5.54/YAHA/20200303  CASE 393386 Added Mix Discount Price
+    // NPR5.55/YAHA/20200513  CASE 393386 Code review Mix Discount Price
+    // NPR5.55/ALPO/20200714  CASE 412946 Set Visible property of Mix Discount Price to "(DiscountType <> 4)"
 
     Caption = 'Mix Discount Lines';
     DelayedInsert = true;
@@ -63,6 +65,7 @@ page 6014451 "Mixed Discount Lines"
                 field(TotalAmount;TotalAmount)
                 {
                     Caption = 'Mix Discount Price';
+                    Visible = (DiscountType <> 4);
                 }
             }
             repeater(MixLines)
@@ -148,6 +151,9 @@ page 6014451 "Mixed Discount Lines"
         //BeregnBesparelse;
         //OnAfterGetCurrRecord;
         //+NPR5.31 [262904]
+        //-NPR5.55 [393386]
+        TotalAmount := GetTotalAmount;
+        //+NPR5.55 [393386]
     end;
 
     trigger OnInit()
@@ -170,6 +176,7 @@ page 6014451 "Mixed Discount Lines"
         Text10600002: Label 'Saving %1';
         Text10600003: Label 'Saving %1 %2 %3';
         Lot: Boolean;
+        DiscountType: Integer;
         MixType: Integer;
         TotalAmount: Decimal;
 
@@ -223,6 +230,7 @@ page 6014451 "Mixed Discount Lines"
         //-NPR5.31 [262904]
         Lot := MixedDiscount.Lot;
         MixType := MixedDiscount."Mix Type";
+        DiscountType := MixedDiscount."Discount Type";  //NPR5.55 [412946]
 
         FilterGroup(2);
         case MixType of
@@ -241,14 +249,12 @@ page 6014451 "Mixed Discount Lines"
     var
         MixedDiscount: Record "Mixed Discount";
     begin
-        //-393386 [393386]
-        if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
-          exit;
-        if not MixedDiscount.Get("No.") then
+        //-NPR5.55 [393386]
+        if not MixedDiscount.Get(Code) then
           exit;
 
         exit(MixedDiscount."Total Amount");
-        //+393386 [393386]
+        //+NPR5.55 [393386]
     end;
 }
 

@@ -6,7 +6,7 @@ table 6014422 "Retail Journal Line"
     // 61     Discount code       Code        30
     // 
     // // NPR 190609 Sag 68963
-    // Ny felter tilf�jet
+    // Ny felter tilf¢jet
     // 50020     StartDate
     // 50021     CustomerPriceGroupcode
     // 

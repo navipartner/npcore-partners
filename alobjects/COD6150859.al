@@ -12,6 +12,7 @@ codeunit 6150859 "POS Action - Doc. Export"
     //                                   Added new param for exporting with blank customer, selected manually later in card page.
     //                                   Moved prompts for payment of exported document to after export.
     // NPR5.54/ALPO/20200228 CASE 392239 Possibility to use location code from POS store, POS sale or specific location as an alternative to using location from Register
+    // NPR5.55/ALPO/20200423 CASE 401616 Added support for sending intercompany sales order confirmation
 
 
     trigger OnRun()
@@ -125,6 +126,8 @@ codeunit 6150859 "POS Action - Doc. Export"
         CaptionUseSpecLocationCode: Label 'Use Specific Location Code';
         DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
         SpecLocationCodeMustBeSpecified: Label 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
+        CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
+        DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
 
     local procedure ActionCode(): Text
     begin
@@ -133,6 +136,7 @@ codeunit 6150859 "POS Action - Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
+        exit ('1.9'); //NPR5.55 [401616]
         exit ('1.8'); //NPR5.54 [392239]
         exit('1.7'); //-+NPR5.53 [377510]
     end;
@@ -205,6 +209,7 @@ codeunit 6150859 "POS Action - Doc. Export"
             RegisterOptionParameter('UseLocationFrom', 'Register,POS Store,POS Sale,SpecificLocation', 'Register');
             RegisterTextParameter('UseSpecLocationCode','');
             //+NPR5.54 [392239]
+            RegisterBooleanParameter('SendICOrderConfirmation', false);  //NPR5.55 [401616]
             end;
         end;
     end;
@@ -467,6 +472,7 @@ codeunit 6150859 "POS Action - Doc. Export"
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(JSON.GetBooleanParameter('OpenDocumentAfterExport', true));
         RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameter('SetSend', true));
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
+        RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation', false));  //NPR5.55 [401616]
 
         if JSON.GetBooleanParameter('SetShowCreationMessage', true) then
             RetailSalesDocMgt.SetShowCreationMessage();
@@ -757,6 +763,7 @@ codeunit 6150859 "POS Action - Doc. Export"
           'UseLocationFrom': Caption :=  CaptionUseLocationFrom;
           'UseSpecLocationCode': Caption := CaptionUseSpecLocationCode;
           //+NPR5.54 [392239]
+          'SendICOrderConfirmation': Caption := CaptionSendICOrderConfirmation;  //NPR5.55 [401616]
         end;
     end;
 
@@ -847,6 +854,7 @@ codeunit 6150859 "POS Action - Doc. Export"
           'UseLocationFrom': Caption :=  DescUseLocationFrom;
           'UseSpecLocationCode': Caption := DescUseSpecLocationCode;
           //+NPR5.54 [392239]
+          'SendICOrderConfirmation': Caption := DescSendICOrderConfirmation;  //NPR5.55 [401616]
         end;
     end;
 

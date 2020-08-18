@@ -11,7 +11,7 @@ codeunit 6014525 "DotNet File Library"
         This.TEXTMODE(true);
         /*IF This.CREATE('\\tsclient\c\dankort\admin.txt') THEN BEGIN
           This.SEEK(This.LEN);
-          This.WRITE('�������������');
+          This.WRITE('æ¢åæ¢åææÆ¥ÅÆÅ');
           This.CLOSE;
         END;*/
         TestInit;

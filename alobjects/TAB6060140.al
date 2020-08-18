@@ -5,6 +5,7 @@ table 6060140 "MM Loyalty Setup"
     // MM1.23/TSA /20171006 CASE 257011 Extended Description to 50
     // MM1.32/TSA /20180712 CASE 321176 Voucher Creation, new option "Prompt"
     // MM1.40/TSA /20190816 CASE 361664 Added field 80
+    // MM1.45/TSA /20200709 CASE 411768 When unchecking expire points, expire transactiona are deleted
 
     Caption = 'Loyalty Setup';
 
@@ -37,6 +38,21 @@ table 6060140 "MM Loyalty Setup"
         field(30;"Expire Uncollected Points";Boolean)
         {
             Caption = 'Expire Uncollected Points';
+
+            trigger OnValidate()
+            var
+                MembershipPointsEntry: Record "MM Membership Points Entry";
+            begin
+                //-MM1.45 [411768]
+                if ((not "Expire Uncollected Points") and (xRec."Expire Uncollected Points")) then begin
+                  if (not Confirm (REMOVE_EXPIRE, false)) then
+                    exit;
+                  MembershipPointsEntry.SetFilter ("Loyalty Code", '=%1', Code);
+                  MembershipPointsEntry.SetFilter ("Entry Type", '=%1', MembershipPointsEntry."Entry Type"::EXPIRED);
+                  MembershipPointsEntry.DeleteAll (false);
+                end;
+                //+MM1.45 [411768]
+            end;
         }
         field(31;"Expire Uncollected After";DateFormula)
         {
@@ -107,5 +123,8 @@ table 6060140 "MM Loyalty Setup"
     fieldgroups
     {
     }
+
+    var
+        REMOVE_EXPIRE: Label 'Unchecking this option will also remove all expire transaction for this loyalty program.';
 }
 

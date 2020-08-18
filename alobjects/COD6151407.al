@@ -24,6 +24,8 @@ codeunit 6151407 "Magento Item Mgt."
     // MAG2.19/MHA /20190319  CASE 345884 Added function AutoUpdateSeoLink()
     // MAG2.20/MHA /20190430  CASE 353499 Removed function ItemOnAfterValidateAttributeSetId() and check on "Magento Item" when "Attribute Set ID" in ItemOnModify()
     // MAG2.23/BHR /20190822  CASE 363897 Skip creation of websites when entries already exists
+    // MAG2.26/MHA /20200430  CASE 402486 Reworked Inventory Mgt. functions
+    // MAG2.26/MHA /20200505  CASE 402488 Added Stock Calculation publisher functions
 
 
     trigger OnRun()
@@ -45,7 +47,7 @@ codeunit 6151407 "Magento Item Mgt."
     var
         MagentoItemAttribute: Record "Magento Item Attribute";
         MagentoItemAttributeValue: Record "Magento Item Attribute Value";
-        MagentoItemGroupLink: Record "Magento Item Group Link";
+        MagentoItemGroupLink: Record "Magento Category Link";
         MagentoPictureLink: Record "Magento Picture Link";
         MagentoProductRelation: Record "Magento Product Relation";
         MagentoWebsiteLink: Record "Magento Website Link";
@@ -347,58 +349,412 @@ codeunit 6151407 "Magento Item Mgt."
         //+MAG2.00
     end;
 
-    procedure "--- Inventory Mgt."()
+    procedure "--- Stock Mgt."()
     begin
     end;
 
-    procedure GetAvailInventory(ItemNo: Code[20];VariantFilter: Text;LocationFilter: Text) AvailInventory: Decimal
+    procedure GetStockQty(ItemNo: Code[20];VariantFilter: Text) StockQty: Decimal
+    var
+        MagentoSetup: Record "Magento Setup";
+    begin
+        //-MAG2.26 [402486]
+        if MagentoSetup.Get then;
+        StockQty := CalcStockQty(ItemNo,VariantFilter,MagentoSetup."Inventory Location Filter");
+        exit(StockQty);
+        //+MAG2.26 [402486]
+    end;
+
+    procedure GetStockQty2(var RecRef: RecordRef) StockQty: Decimal
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        VariantInventory: Decimal;
+        MagentoItemMgt: Codeunit "Magento Item Mgt.";
     begin
-        //-MAG1.22
-        Clear(Item);
-        if not Item.Get(ItemNo) then
-          exit(0);
+        //-MAG2.26 [402486]
+        StockQty := 0;
+        case RecRef.Number of
+          DATABASE::Item :
+            begin
+              RecRef.SetTable(Item);
+              StockQty := GetStockQty(Item."No.",'');
+              exit(StockQty);
+            end;
+          DATABASE::"Item Variant" :
+            begin
+              RecRef.SetTable(ItemVariant);
+              StockQty := GetStockQty(ItemVariant."Item No.",ItemVariant.Code);
+              exit(StockQty);
+            end;
+        end;
+
+        exit(StockQty);
+        //+MAG2.26 [402486]
+    end;
+
+    procedure GetStockQty3(ItemNo: Code[20];VariantFilter: Text;MagentoInventoryCompany: Record "Magento Inventory Company") StockQty: Decimal
+    var
+        MagentoSetup: Record "Magento Setup";
+    begin
+        //-MAG2.26 [402486]
+        StockQty := CalcStockQty(ItemNo,VariantFilter,MagentoInventoryCompany."Location Filter");
+        exit(StockQty);
+        //+MAG2.26 [402486]
+    end;
+
+    procedure CalcStockQty(ItemNo: Code[20];VariantFilter: Text;LocationFilter: Text) StockQty: Decimal
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        VariantStockQty: Decimal;
+        Handled: Boolean;
+    begin
+        //-MAG2.26 [402486]
         VariantFilter := UpperCase(VariantFilter);
         LocationFilter := UpperCase(LocationFilter);
+
+        //-MAG2.26 [402488]
+        if MagentoSetup.Get then;
+        case MagentoSetup."Stock Calculation Method" of
+          MagentoSetup."Stock Calculation Method"::"Function":
+            begin
+               OnCalcStockQty(MagentoSetup,ItemNo,VariantFilter,LocationFilter,StockQty,Handled);
+            end;
+        end;
+
+        if Handled then
+          exit(StockQty);
+        //+MAG2.26 [402488]
+
+        StockQty := 0;
+        if not Item.Get(ItemNo) then
+          exit(0);
 
         if VariantFilter <> '' then begin
           Item.SetFilter("Variant Filter",VariantFilter);
           Item.SetFilter("Location Filter",LocationFilter);
           Item.CalcFields(Inventory,"Qty. on Sales Order");
-          AvailInventory := Item.Inventory - Item."Qty. on Sales Order";
-          if AvailInventory < 0 then
-            AvailInventory := 0;
+          StockQty := Item.Inventory - Item."Qty. on Sales Order";
+          if StockQty < 0 then
+            StockQty := 0;
 
-          exit(AvailInventory);
+          exit(StockQty);
         end;
 
         ItemVariant.SetRange("Item No.",Item."No.");
         if ItemVariant.FindSet then begin
-          AvailInventory := 0;
-          VariantInventory := 0;
+          StockQty := 0;
+          VariantStockQty := 0;
           repeat
             Item.SetFilter("Variant Filter",ItemVariant.Code);
             Item.SetFilter("Location Filter",LocationFilter);
             Item.CalcFields(Inventory,"Qty. on Sales Order");
-            VariantInventory := Item.Inventory - Item."Qty. on Sales Order";
-            if VariantInventory < 0 then
-              VariantInventory := 0;
+            VariantStockQty := Item.Inventory - Item."Qty. on Sales Order";
+            if VariantStockQty < 0 then
+              VariantStockQty := 0;
 
-            AvailInventory += VariantInventory;
+            StockQty += VariantStockQty;
           until ItemVariant.Next = 0;
 
-          exit(AvailInventory);
+          exit(StockQty);
         end;
 
         Item.SetFilter("Location Filter",LocationFilter);
         Item.CalcFields(Inventory,"Qty. on Sales Order");
-        AvailInventory := Item.Inventory - Item."Qty. on Sales Order";
+        StockQty := Item.Inventory - Item."Qty. on Sales Order";
 
-        exit(AvailInventory);
-        //+MAG1.22
+        exit(StockQty);
+        //+MAG2.26 [402486]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6151401, 'OnAfterModifyEvent', '', true, true)]
+    local procedure OnAfterModifyMagentoSetup(var Rec: Record "Magento Setup";var xRec: Record "Magento Setup";RunTrigger: Boolean)
+    begin
+        //-MAG2.26 [402488]
+        if Rec.IsTemporary then
+          exit;
+        if not RunTrigger then
+          exit;
+
+        if (xRec."Stock Calculation Method" <> Rec."Stock Calculation Method") or
+          (xRec."Stock NpXml Template" <> Rec."Stock NpXml Template") or
+          (xRec."Stock Codeunit Id" <>  Rec."Stock Codeunit Id") or
+          (xRec."Stock Function Name" <> Rec."Stock Function Name")
+        then
+          UpsertStockTriggers();
+        //+MAG2.26 [402488]
+    end;
+
+    procedure UpsertStockTriggers()
+    var
+        MagentoSetup: Record "Magento Setup";
+        NpXmlTemplate: Record "NpXml Template";
+        Item: Record Item;
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        SalesLine: Record "Sales Line";
+        PurchLine: Record "Purchase Line";
+        ReqLine: Record "Requisition Line";
+        AssemblyHeader: Record "Assembly Header";
+        AssemblyLine: Record "Assembly Line";
+        JobPlanningLine: Record "Job Planning Line";
+        ProdOrderLine: Record "Prod. Order Line";
+        ProdOrderComponent: Record "Prod. Order Component";
+        TransLine: Record "Transfer Line";
+        ServiceLine: Record "Service Line";
+        PlanningComponent: Record "Planning Component";
+        NpXmlTemplateTrigger: Record "NpXml Template Trigger";
+        Handled: Boolean;
+    begin
+        //-MAG2.26 [402488]
+        if not MagentoSetup.Get then
+          exit;
+
+        if MagentoSetup."Stock NpXml Template" = '' then
+          exit;
+        if not NpXmlTemplate.Get(MagentoSetup."Stock NpXml Template") then
+          exit;
+        if NpXmlTemplate."Table No." <> DATABASE::Item then
+          exit;
+
+        NpXmlTemplateTrigger.SetRange("Xml Template Code",NpXmlTemplate.Code);
+        if NpXmlTemplateTrigger.FindFirst then
+          NpXmlTemplateTrigger.DeleteAll(true);
+
+        case MagentoSetup."Stock Calculation Method" of
+          MagentoSetup."Stock Calculation Method"::"Function":
+            begin
+              OnUpsertStockTriggers(MagentoSetup,NpXmlTemplate,Handled);
+            end;
+        end;
+
+        if Handled then
+          exit;
+
+        UpsertStockTrigger(NpXmlTemplate,Item.FieldNo("No."),DATABASE::"Item Ledger Entry",ItemLedgerEntry.FieldNo("Item No."),true,false,false);
+        UpsertStockTrigger(NpXmlTemplate,Item.FieldNo("No."),DATABASE::"Sales Line",SalesLine.FieldNo("No."),true,true,true);
+        //+MAG2.26 [402488]
+    end;
+
+    procedure UpsertStockTrigger(NpXmlTemplate: Record "NpXml Template";LinkFieldNoParent: Integer;TableNo: Integer;LinkFieldNoChild: Integer;TriggerOnInsert: Boolean;TriggerOnModify: Boolean;TriggerOnDelete: Boolean)
+    var
+        NpXmlTemplateTrigger: Record "NpXml Template Trigger";
+        NpXmlTemplateTriggerLink: Record "NpXml Template Trigger Link";
+        "Field": Record "Field";
+        LineNo: Integer;
+    begin
+        //-MAG2.26 [402488]
+        NpXmlTemplateTrigger.SetRange("Xml Template Code",NpXmlTemplate.Code);
+        NpXmlTemplateTrigger.SetRange("Table No.",TableNo);
+        if not NpXmlTemplateTrigger.FindFirst then begin
+          Clear(NpXmlTemplateTrigger);
+          NpXmlTemplateTrigger.SetRange("Xml Template Code",NpXmlTemplate.Code);
+          if NpXmlTemplateTrigger.FindLast then;
+          LineNo := NpXmlTemplateTrigger."Line No." + 10000;
+
+          NpXmlTemplateTrigger.Init;
+          NpXmlTemplateTrigger."Xml Template Code" := NpXmlTemplate.Code;
+          NpXmlTemplateTrigger."Line No." := LineNo;
+          NpXmlTemplateTrigger."Table No." := TableNo;
+          NpXmlTemplateTrigger."Parent Table No." := NpXmlTemplate."Table No.";
+          NpXmlTemplateTrigger."Parent Line No." := 0;
+          NpXmlTemplateTrigger."Insert Trigger" := TriggerOnInsert;
+          NpXmlTemplateTrigger."Modify Trigger" := TriggerOnModify;
+          NpXmlTemplateTrigger."Delete Trigger" := TriggerOnDelete;
+          NpXmlTemplateTrigger."Generic Parent Codeunit ID" := CurrCodeunitId();
+          NpXmlTemplateTrigger."Generic Parent Function" := GetTriggerStockFunctionName();
+          NpXmlTemplateTrigger.Insert;
+        end else begin
+          NpXmlTemplateTrigger."Parent Table No." := NpXmlTemplate."Table No.";
+          NpXmlTemplateTrigger."Parent Line No." := 0;
+          NpXmlTemplateTrigger."Insert Trigger" := TriggerOnInsert;
+          NpXmlTemplateTrigger."Modify Trigger" := TriggerOnModify;
+          NpXmlTemplateTrigger."Delete Trigger" := TriggerOnDelete;
+          NpXmlTemplateTrigger."Generic Parent Codeunit ID" := CurrCodeunitId();
+          NpXmlTemplateTrigger."Generic Parent Function" := GetTriggerStockFunctionName();
+          NpXmlTemplateTrigger.Modify;
+        end;
+
+        NpXmlTemplateTriggerLink.SetRange("Xml Template Code",NpXmlTemplateTrigger."Xml Template Code");
+        NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.",NpXmlTemplateTrigger."Line No.");
+        NpXmlTemplateTriggerLink.SetRange("Parent Table No.",NpXmlTemplateTrigger."Parent Table No.");
+        NpXmlTemplateTriggerLink.SetRange("Parent Field No.",LinkFieldNoParent);
+        NpXmlTemplateTriggerLink.SetRange("Link Type",NpXmlTemplateTriggerLink."Link Type"::TableLink);
+        NpXmlTemplateTriggerLink.SetRange("Table No.",NpXmlTemplateTrigger."Table No.");
+        NpXmlTemplateTriggerLink.SetRange("Field No.",LinkFieldNoChild);
+        if not NpXmlTemplateTriggerLink.FindFirst then begin
+          Clear(NpXmlTemplateTriggerLink);
+          NpXmlTemplateTriggerLink.SetRange("Xml Template Code",NpXmlTemplateTrigger."Xml Template Code");
+          NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.",NpXmlTemplateTrigger."Line No.");
+          if NpXmlTemplateTriggerLink.FindLast then;
+          LineNo := NpXmlTemplateTriggerLink."Line No." + 10000;
+
+          NpXmlTemplateTriggerLink.Init;
+          NpXmlTemplateTriggerLink."Xml Template Code" := NpXmlTemplateTrigger."Xml Template Code";
+          NpXmlTemplateTriggerLink."Xml Template Trigger Line No." := NpXmlTemplateTrigger."Line No.";
+          NpXmlTemplateTriggerLink."Line No." := LineNo;
+          NpXmlTemplateTriggerLink."Parent Table No." := NpXmlTemplateTrigger."Parent Table No.";
+          NpXmlTemplateTriggerLink."Parent Field No." := LinkFieldNoParent;
+          NpXmlTemplateTriggerLink."Link Type" := NpXmlTemplateTriggerLink."Link Type"::TableLink;
+          NpXmlTemplateTriggerLink."Table No." := NpXmlTemplateTrigger."Table No.";
+          NpXmlTemplateTriggerLink."Field No." := LinkFieldNoChild;
+          NpXmlTemplateTriggerLink.Insert(true);
+        end;
+
+        NpXmlTemplateTrigger.UpdateNaviConnectSetup();
+        //+MAG2.26 [402488]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6151553, 'OnSetupGenericParentTable', '', true, true)]
+    local procedure TriggerStockUpdate(NpXmlTemplateTrigger: Record "NpXml Template Trigger";ChildLinkRecRef: RecordRef;var ParentRecRef: RecordRef;var Handled: Boolean)
+    var
+        TempItem: Record Item temporary;
+        MagentoSetup: Record "Magento Setup";
+    begin
+        //-MAG2.26 [402488]
+        if Handled then
+          exit;
+        if NpXmlTemplateTrigger."Generic Parent Codeunit ID" <> CurrCodeunitId() then
+          exit;
+        if NpXmlTemplateTrigger."Generic Parent Function" <> GetTriggerStockFunctionName() then
+          exit;
+        if NpXmlTemplateTrigger."Parent Table No." <>  DATABASE::Item then
+          exit;
+
+        Handled := true;
+
+        if MagentoSetup.Get then;
+        Trigger2Item(MagentoSetup,ChildLinkRecRef,TempItem);
+
+        ParentRecRef.GetTable(TempItem);
+        //+MAG2.26 [402488]
+    end;
+
+    local procedure Trigger2Item(MagentoSetup: Record "Magento Setup";RecRef: RecordRef;var TempItem: Record Item temporary)
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        Item: Record Item;
+        TempSalesLine: Record "Sales Line" temporary;
+        ItemNo: Code[20];
+        Handled: Boolean;
+    begin
+        //-MAG2.26 [402488]
+        if not TempItem.IsTemporary then
+          exit;
+
+        Clear(TempItem);
+        TempItem.DeleteAll;
+
+        case MagentoSetup."Stock Calculation Method" of
+          MagentoSetup."Stock Calculation Method"::"Function":
+            begin
+              OnTrigger2Item(MagentoSetup,RecRef,TempItem,Handled);
+            end;
+        end;
+
+        if Handled then
+          exit;
+
+        case RecRef.Number of
+          DATABASE::"Item Ledger Entry":
+            begin
+              RecRef.SetTable(ItemLedgerEntry);
+              ItemLedgerEntry.SetFilter("Location Code",MagentoSetup."Inventory Location Filter");
+              if not ItemLedgerEntry.Find then
+                exit;
+
+              ItemNo := ItemLedgerEntry."Item No.";
+            end;
+          DATABASE::"Sales Line":
+            begin
+              if not RecRef2TempSalesLine(RecRef,TempSalesLine) then
+                exit;
+
+              TempSalesLine.SetRecFilter;
+              TempSalesLine.FilterGroup(40);
+              TempSalesLine.SetFilter("Location Code",MagentoSetup."Inventory Location Filter");
+              TempSalesLine.SetRange("Document Type",TempSalesLine."Document Type"::Order);
+              TempSalesLine.SetFilter("Location Code",MagentoSetup."Inventory Location Filter");
+              TempSalesLine.SetRange(Type,TempSalesLine.Type::Item);
+              TempSalesLine.SetFilter("No.",'<>%1','');
+              if not TempSalesLine.FindFirst then
+                exit;
+
+              ItemNo := TempSalesLine."No.";
+            end;
+          else
+            exit;
+        end;
+
+        if not Item.Get(ItemNo) then
+          exit;
+
+        if not Item."Magento Item" then
+          exit;
+
+        TempItem.Init;
+        TempItem := Item;
+        TempItem.Insert;
+        //+MAG2.26 [402488]
+    end;
+
+    local procedure RecRef2TempSalesLine(RecRef: RecordRef;var TempSalesLine: Record "Sales Line" temporary): Boolean
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        //-MAG2.26 [402488]
+        if RecRef.IsTemporary then begin
+          RecRef.SetTable(TempSalesLine);
+          TempSalesLine.Insert;
+          exit(true);
+        end;
+
+        RecRef.SetTable(SalesLine);
+        if not SalesLine.Find then
+          exit(false);
+
+        TempSalesLine.Init;
+        TempSalesLine := SalesLine;
+        TempSalesLine.Insert;
+        exit(true)
+        //+MAG2.26 [402488]
+    end;
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        //-MAG2.26 [402488]
+        exit(CODEUNIT::"Magento Item Mgt.");
+        //+MAG2.26 [402488]
+    end;
+
+    local procedure GetTriggerStockFunctionName(): Text
+    begin
+        //-MAG2.26 [402488]
+        exit('TriggerStockUpdate');
+        //+MAG2.26 [402488]
+    end;
+
+    local procedure "--- Stock Calculation Interface"()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcStockQty(MagentoSetup: Record "Magento Setup";ItemNo: Code[20];VariantFilter: Text;LocationFilter: Text;var StockQty: Decimal;var Handled: Boolean)
+    begin
+        //-MAG2.26 [402488]
+        //+MAG2.26 [402488]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpsertStockTriggers(MagentoSetup: Record "Magento Setup";NpXmlTemplate: Record "NpXml Template";var Handled: Boolean)
+    begin
+        //-MAG2.26 [402488]
+        //+MAG2.26 [402488]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTrigger2Item(MagentoSetup: Record "Magento Setup";RecRef: RecordRef;var TempItem: Record Item temporary;var Handled: Boolean)
+    begin
+        //-MAG2.26 [402488]
+        //+MAG2.26 [402488]
     end;
 }
 

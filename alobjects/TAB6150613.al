@@ -28,6 +28,8 @@ table 6150613 "NP Retail Setup"
     //                                     10036Post to G/L after Item PostingBoolean
     //                                   New field added: "Default POS Posting Profile"
     // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
+    // NPR5.55/BHR /20200408  CASE 399443 Removed Fields300Item Price Codeunit ID,305Item Price Codeunit ,310Item Price Function
+    // NPR5.55/JAVA/20200717  CASE 413695 NPR Core for AL: Merge Role Centers extension into the core (add dummy/disabled fields in C/AL, true fields added in AL).
 
     Caption = 'NP Retail Setup';
 
@@ -99,99 +101,7 @@ table 6150613 "NP Retail Setup"
             Caption = 'License Agreement';
             ExtendedDatatype = URL;
         }
-        field(300; "Item Price Codeunit ID"; Integer)
-        {
-            BlankZero = true;
-            Caption = 'Item Price Codeunit ID';
-            Description = 'NPR5.45';
 
-            trigger OnLookup()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                //-NPR5.45 [323705]
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
-                    exit;
-
-                "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Item Price Function" := EventSubscription."Subscriber Function";
-                //+NPR5.45 [323705]
-            end;
-
-            trigger OnValidate()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                //-NPR5.45 [323705]
-                if "Item Price Codeunit ID" = 0 then begin
-                    "Item Price Function" := '';
-                    exit;
-                end;
-
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID", "Item Price Codeunit ID");
-                if "Item Price Function" <> '' then
-                    EventSubscription.SetRange("Subscriber Function", "Item Price Function");
-                EventSubscription.FindFirst;
-                //+NPR5.45 [323705]
-            end;
-        }
-        field(305; "Item Price Codeunit Name"; Text[30])
-        {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
-                                                             "Object ID" = FIELD("Item Price Codeunit ID")));
-            Caption = 'Item Price Codeunit Name';
-            Description = 'NPR5.45';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(310; "Item Price Function"; Text[250])
-        {
-            Caption = 'Item Price Function';
-            Description = 'NPR5.45';
-
-            trigger OnLookup()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                //-NPR5.45 [323705]
-
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
-                    exit;
-
-                "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Item Price Function" := EventSubscription."Subscriber Function";
-                //+NPR5.45 [323705]
-            end;
-
-            trigger OnValidate()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                //-NPR5.45 [323705]
-                if "Item Price Function" = '' then begin
-                    "Item Price Codeunit ID" := 0;
-                    exit;
-                end;
-
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID", "Item Price Codeunit ID");
-                if "Item Price Function" <> '' then
-                    EventSubscription.SetRange("Subscriber Function", "Item Price Function");
-                EventSubscription.FindFirst;
-                //+NPR5.45 [323705]
-            end;
-        }
         field(10000; "Data Model Build"; Integer)
         {
             Caption = 'Data Model Build';

@@ -1,15 +1,15 @@
 codeunit 6014503 "I-Comm"
 {
     // //-NAS1.3 ved Nikolai Pedersen
-    // tilf�jet funktionerne
-    //   FtpGetFiles der henter navnene p� filerne og ligger dem i files.txt
-    //   FtpDownloadSelectFiles der giver mulighed for at v�lge hvilke filer man vil hente
+    // tilf¢jet funktionerne
+    //   FtpGetFiles der henter navnene på filerne og ligger dem i files.txt
+    //   FtpDownloadSelectFiles der giver mulighed for at vælge hvilke filer man vil hente
     // 
     // //-NAS1.4 ved Nikolai Pedersen
-    // tilf�jet funktionerne
+    // tilf¢jet funktionerne
     //   smsDll
     //   smsDllMultiple
-    //   �ndret SendSMS
+    //   ændret SendSMS
     // NPR4.16/20151016 CASE 225285 Removed unused functions + vars
     // NPR5.36/TJ  /20170914 CASE 286283 Renamed variables/function into english and into proper naming terminology
     //                                   Removed unused variables
@@ -68,7 +68,7 @@ codeunit 6014503 "I-Comm"
            //   ERROR( ErrGiftNotFound, Gavekort.Nummer );
             StatusInt := GiftVoucher.Status;
            // DB.setTableRec( DBconnect, RecRef, STRSUBSTNO( 'F%1=%2,F%3=%4', Gavekort.FIELDNO( Status ), StatusInt,
-           //                 Gavekort.FIELDNO( "Indl�st i butik" ), pling + COMPANYNAME + pling ));
+           //                 Gavekort.FIELDNO( "Indl¢st i butik" ), pling + COMPANYNAME + pling ));
           end else begin
             RecRef.Find;
             //DB.setTableRec( DBconnect, RecRef, '' );
@@ -109,7 +109,7 @@ codeunit 6014503 "I-Comm"
             StatusInt := CreditVoucher.Status;
            // DB.setTableRec( DBconnect, RecRef, STRSUBSTNO( 'F%1=%2,F%3=%4',
            //                 Tilgodebevis.FIELDNO( Status ), StatusInt,
-            //                Tilgodebevis.FIELDNO( "Indl�st i butik" ), pling + COMPANYNAME + pling ));
+            //                Tilgodebevis.FIELDNO( "Indl¢st i butik" ), pling + COMPANYNAME + pling ));
           end else begin
             RecRef.Find;
            // DB.setTableRec( DBconnect, RecRef, '' );

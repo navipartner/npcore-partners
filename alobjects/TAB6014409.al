@@ -1,13 +1,13 @@
 table 6014409 "Gift Voucher"
 {
-    // //NPR2.2r - Ohm - "Indl�st den" som n�gle
+    // //NPR2.2r - Ohm - "Indl¢st den" som n¢gle
     // //
     // //001,002,003 - Ohm - 210704
     //   MySQL clearing integration - set status of gift voucher
     //   Insert, modify, delete
-    //   - hvis denne kode ikke skal bruges s� fjern KUN i modtagers objekt.
+    //   - hvis denne kode ikke skal bruges så fjern KUN i modtagers objekt.
     // 
-    // //NPR3.01j - NE - tilf�jet det boolske flowfield comment
+    // //NPR3.01j - NE - tilf¢jet det boolske flowfield comment
     // 
     // //NPK1.0 , 13-03-12, job 118881, JS - Modified the print function, so i only prints for a specific register.
     // NPR70.00.01.01/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
@@ -567,21 +567,21 @@ table 6014409 "Gift Voucher"
         //RedeemFromSaleLinePOS
         RetailSetup.Get;
 
-        /*IF Ops�tning."Tillad I-Comm" THEN BEGIN
+        /*IF Opsætning."Tillad I-Comm" THEN BEGIN
           recIComm.GET;
           IF recIComm."Company - Clearing" <> '' THEN BEGIN
-            IF NOT ( IComm.DBGavekort( Rec, TRUE, TRUE, TRUE, TestBel�b ) = Status::�ben ) THEN
-              ERROR( ErrIndl�stDB, Nummer );
-            Status := Status::Indl�st;
-            IComm.DBGavekort( Rec, FALSE, TRUE, TRUE, TestBel�b );
-            IF TestBel�b <> EkspLinie."Bel�b inkl. moms" THEN
-              ERROR( ErrDBAmount, TestBel�b );
+            IF NOT ( IComm.DBGavekort( Rec, TRUE, TRUE, TRUE, TestBel¢b ) = Status::Åben ) THEN
+              ERROR( ErrIndl¢stDB, Nummer );
+            Status := Status::Indl¢st;
+            IComm.DBGavekort( Rec, FALSE, TRUE, TRUE, TestBel¢b );
+            IF TestBel¢b <> EkspLinie."Bel¢b inkl. moms" THEN
+              ERROR( ErrDBAmount, TestBel¢b );
           END ELSE
-            IF Status = Status::Indl�st THEN
-              ERROR( ErrIndl�st, Nummer, "Indl�st den" );
+            IF Status = Status::Indl¢st THEN
+              ERROR( ErrIndl¢st, Nummer, "Indl¢st den" );
         END ELSE BEGIN
-            IF Status = Status::Indl�st THEN
-              ERROR( ErrIndl�st, Nummer, "Indl�st den" );
+            IF Status = Status::Indl¢st THEN
+              ERROR( ErrIndl¢st, Nummer, "Indl¢st den" );
         END;                                                 */
 
         if Status = Status::Cashed then

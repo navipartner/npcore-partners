@@ -4,6 +4,7 @@ xmlport 6060115 "TM Ticket PreConfirm"
     // TM1.04/TSA/20160118  CASE 231834 NaviPartner Ticket Management
     // TM1.09/TSA/20160309  CASE 236563 Boolean XML response in changed to use XML style format
     // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
+    // TM1.48/TSA /20200722 CASE 415894 Added expiry utc time to response
 
     Caption = 'Ticket PreConfirm';
     Encoding = UTF8;
@@ -47,6 +48,23 @@ xmlport 6060115 "TM Ticket PreConfirm"
                         begin
                             status := Format (tmpTicketReservationResponse.Status, 0, 9);
                         end;
+                    }
+                    fieldelement(new_expiry_time;tmpTicketReservationResponse."Exires (Seconds)")
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        textattribute(atutc)
+                        {
+                            XmlName = 'utc';
+
+                            trigger OnBeforePassVariable()
+                            begin
+
+                                //-TM1.48 [415894]
+                                AtUTC := Format (CurrentDateTime () + (tmpTicketReservationResponse."Exires (Seconds)" -1) * 1000, 0, 9);
+                                //+TM1.48 [415894]
+                            end;
+                        }
                     }
                 }
             }
@@ -94,7 +112,10 @@ xmlport 6060115 "TM Ticket PreConfirm"
 
         TicketReservationResponse.SetFilter ("Session Token ID", '=%1', DocumentID);
         if (TicketReservationResponse.FindFirst ()) then
-          tmpTicketReservationResponse.Status := TicketReservationResponse.Status;
+          //-TM1.48 [415894]
+          //tmpTicketReservationResponse.Status := TicketReservationResponse.Status;
+          tmpTicketReservationResponse.TransferFields (TicketReservationResponse, true);
+          //+TM1.48 [415894]
 
         tmpTicketReservationResponse.Insert ();
     end;

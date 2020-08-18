@@ -5,9 +5,10 @@ page 6150660 "NPRE Waiter Pad"
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20191210 CASE 380609 Store number of guests on waiter pad
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Waiter Pad';
-    DelayedInsert = true;
+    InsertAllowed = false;
     PageType = Document;
     PromotedActionCategories = 'New,Process,Report,Kitchen Print';
     SourceTable = "NPRE Waiter Pad";
@@ -16,76 +17,101 @@ page 6150660 "NPRE Waiter Pad"
     {
         area(content)
         {
-            field("Start Time";"Start Time")
+            group(Control6014423)
             {
-                Caption = 'Opened';
-                Editable = false;
-            }
-            field("Current Seating FF";"Current Seating FF")
-            {
-                Caption = 'Seating';
-                Editable = false;
-            }
-            field("Current Seating Description";"Current Seating Description")
-            {
-                Editable = false;
-            }
-            field("Number of Guests";"Number of Guests")
-            {
-            }
-            field(Description;Description)
-            {
-            }
-            field(Status;Status)
-            {
-                Visible = false;
-            }
-            field("Status Description FF";"Status Description FF")
-            {
-                Caption = 'Waiter Pad Status';
-                DrillDown = false;
+                ShowCaption = false;
+                field("Start Time";"Start Time")
+                {
+                    Caption = 'Opened';
+                    Editable = false;
+                }
+                field("Current Seating FF";"Current Seating FF")
+                {
+                    Caption = 'Seating';
+                    Editable = false;
+                }
+                field("Current Seating Description";"Current Seating Description")
+                {
+                    Editable = false;
+                }
+                field("Number of Guests";"Number of Guests")
+                {
+                }
+                field(Description;Description)
+                {
+                }
+                field(Status;Status)
+                {
+                    Visible = false;
+                }
+                field("Status Description FF";"Status Description FF")
+                {
+                    Caption = 'Waiter Pad Status';
+                    DrillDown = false;
 
-                trigger OnAssistEdit()
-                var
-                    FlowStatus: Record "NPRE Flow Status";
-                    NewStatusCode: Code[10];
-                begin
-                    //-NPR5.53 [360258]
-                    NewStatusCode := Status;
-                    if LookupFlowStatus(FlowStatus."Status Object"::WaiterPad,NewStatusCode) then begin
-                      Validate(Status,NewStatusCode);
-                      CalcFields("Status Description FF");
+                    trigger OnAssistEdit()
+                    var
+                        FlowStatus: Record "NPRE Flow Status";
+                        NewStatusCode: Code[10];
+                    begin
+                        //-NPR5.53 [360258]
+                        NewStatusCode := Status;
+                        if LookupFlowStatus(FlowStatus."Status Object"::WaiterPad,NewStatusCode) then begin
+                          Validate(Status,NewStatusCode);
+                          CalcFields("Status Description FF");
+                        end;
+                        //+NPR5.53 [360258]
                     end;
-                    //+NPR5.53 [360258]
-                end;
-            }
-            field("Serving Step Code";"Serving Step Code")
-            {
-                Visible = false;
-            }
-            field("Serving Step Description";"Serving Step Description")
-            {
-                Caption = 'Serving Step';
-                DrillDown = false;
+                }
+                field("Serving Step Code";"Serving Step Code")
+                {
+                    Visible = false;
+                }
+                field("Serving Step Description";"Serving Step Description")
+                {
+                    Caption = 'Serving Step';
+                    DrillDown = false;
 
-                trigger OnAssistEdit()
-                var
-                    FlowStatus: Record "NPRE Flow Status";
-                    NewStatusCode: Code[10];
-                begin
-                    //-NPR5.53 [360258]
-                    NewStatusCode := "Serving Step Code";
-                    if LookupFlowStatus(FlowStatus."Status Object"::WaiterPadLineMealFlow,NewStatusCode) then begin
-                      Validate("Serving Step Code",NewStatusCode);
-                      CalcFields("Serving Step Description");
+                    trigger OnAssistEdit()
+                    var
+                        FlowStatus: Record "NPRE Flow Status";
+                        NewStatusCode: Code[10];
+                    begin
+                        //-NPR5.53 [360258]
+                        NewStatusCode := "Serving Step Code";
+                        if LookupFlowStatus(FlowStatus."Status Object"::WaiterPadLineMealFlow,NewStatusCode) then begin
+                          Validate("Serving Step Code",NewStatusCode);
+                          CalcFields("Serving Step Description");
+                        end;
+                        //+NPR5.53 [360258]
                     end;
-                    //+NPR5.53 [360258]
-                end;
+                }
+                field("Pre-receipt Printed";"Pre-receipt Printed")
+                {
+                    Editable = false;
+                }
             }
             part(WaiterPadLinesSubpage;"NPRE Waiter Pad Subform")
             {
                 SubPageLink = "Waiter Pad No."=FIELD("No.");
                 UpdatePropagation = Both;
+            }
+            group(ClosingStatus)
+            {
+                Caption = 'Closed';
+                Editable = false;
+                field(Closed;Closed)
+                {
+                    Importance = Promoted;
+                }
+                field("Close Date";"Close Date")
+                {
+                    Importance = Promoted;
+                }
+                field("Close Time";"Close Time")
+                {
+                    Importance = Promoted;
+                }
             }
         }
     }
@@ -111,7 +137,8 @@ page 6150660 "NPRE Waiter Pad"
 
                         trigger OnAction()
                         begin
-                            HospitalityPrint.PrintWaiterPadPreOrderToKitchenPressed(Rec);
+                            //HospitalityPrint.PrintWaiterPadPreOrderToKitchenPressed(Rec);  //NPR5.55 [399170]-revoked
+                            HospitalityPrint.PrintWaiterPadPreOrderToKitchenPressed(Rec,true);  //NPR5.55 [399170]
                         end;
                     }
                     action(RunNext)
@@ -162,7 +189,8 @@ page 6150660 "NPRE Waiter Pad"
                             WaiterPadLine.SetRange("Waiter Pad No.","No.");
                             WaiterPadLine.MarkedOnly(true);
                             if not WaiterPadLine.IsEmpty then begin
-                              HospitalityPrint.PrintWaiterPadLinesToKitchen(Rec,WaiterPadLine,PrintTemplate."Print Type"::"Serving Request",'',false);
+                              //HospitalityPrint.PrintWaiterPadLinesToKitchen(Rec,WaiterPadLine,PrintTemplate."Print Type"::"Serving Request",'',FALSE);  //NPR5.55 [399170]-revoked
+                              HospitalityPrint.PrintWaiterPadLinesToKitchen(Rec,WaiterPadLine,PrintTemplate."Print Type"::"Serving Request",'',false,true);  //NPR5.55 [399170]
                               CurrPage.WaiterPadLinesSubpage.PAGE.ClearMarkedLines();
                             end;
                             //+NPR5.53 [360258]
@@ -230,7 +258,12 @@ page 6150660 "NPRE Waiter Pad"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        WaiterPadManagement.InsertWaiterPad(Rec, true);
+        //WaiterPadManagement.InsertWaiterPad(Rec, TRUE);  //NPR5.55 [399170]-revoked (inserts are not allowed here)
+    end;
+
+    trigger OnOpenPage()
+    begin
+        CurrPage.Editable := not Closed;  //NPR5.55 [399170]
     end;
 
     var

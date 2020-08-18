@@ -1,13 +1,16 @@
-table 6150663 "NPRE Print Category"
+table 6150663 "NPRE Print/Prod. Category"
 {
     // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
     //                                   - Field Code: length changed from 10 to 20 and set to NotBlank
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
+    //                                   - Removed field 11 "Kitchen Order Template"
+    //                                   - Table renamed from "NPRE Print Category" to "NPRE Print/Prod. Category"
 
-    Caption = 'Print Category';
-    DrillDownPageID = "NPRE Print Categories";
-    LookupPageID = "NPRE Print Categories";
+    Caption = 'Print/Production Category';
+    DrillDownPageID = "NPRE Select Print Categories";
+    LookupPageID = "NPRE Select Print Categories";
 
     fields
     {
@@ -26,12 +29,6 @@ table 6150663 "NPRE Print Category"
             Caption = 'Description';
             Description = 'NPR5.53';
         }
-        field(11;"Kitchen Order Template";Code[20])
-        {
-            Caption = 'Kitchen Order Template';
-            TableRelation = "RP Template Header".Code;
-            ValidateTableRelation = true;
-        }
     }
 
     keys
@@ -44,5 +41,8 @@ table 6150663 "NPRE Print Category"
     fieldgroups
     {
     }
+
+    var
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
 }
 

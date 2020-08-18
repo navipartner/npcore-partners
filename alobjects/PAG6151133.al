@@ -12,6 +12,7 @@ page 6151133 "TM Ticket Wizard"
     ShowFilter = false;
     SourceTable = "TM Ticket Type";
     SourceTableTemporary = true;
+    UsageCategory = Administration;
 
     layout
     {

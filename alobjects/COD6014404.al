@@ -112,6 +112,7 @@ codeunit 6014404 "NPR Event Subscriber"
     // NPR5.49/BHR /20171128 CASE 296801 Rename P43OnAfterActionEventImportFromScannerFile to P49OnAfterActionEventImportFromScannerFile
     //                                   Added Action Import From Scanner P43OnAfterActionEventImportFromScannerFile
     // NPR5.52/ZESO/20191008 CASE 371446 Flow Document Date and Time in Value Entry
+    // NPR5.55/BHR /20200703 CASE 413203 Update document time in item ledger for all entries
 
 
     trigger OnRun()
@@ -288,14 +289,14 @@ codeunit 6014404 "NPR Event Subscriber"
         //-NPR5.32 [249432]
         //ToCheck: Originally code was like this:
         //-NPR7.000.000
-        //IF ApplicationManagement.CheckLicenseRetail THEN RetailCodeunitCode.Inds�tOverf�rselPost( NewItemLedgEntry, ItemLedgEntry );
+        //IF ApplicationManagement.CheckLicenseRetail THEN RetailCodeunitCode.IndsætOverf¢rselPost( NewItemLedgEntry, ItemLedgEntry );
         //+NPR7.000.000
         // but since we don't have a standard event with those parameters we can completelly remove this or try to use standard event:
         //-NPR7.000.000
-        //RetailCodeunitCode.Inds�tOverf�rselPost(NewItemLedgerEntry,OldItemLedgerEntry);
+        //RetailCodeunitCode.IndsætOverf¢rselPost(NewItemLedgerEntry,OldItemLedgerEntry);
         //+NPR7.000.000
 
-        //Inds�tOverf�rselPost
+        //IndsætOverf¢rselPost
         RetailSetup.Get;
         NewItemLedgerEntry."Vendor No." := OldItemLedgerEntry."Vendor No.";
         NewItemLedgerEntry."Item Group No." := OldItemLedgerEntry."Item Group No.";
@@ -322,6 +323,10 @@ codeunit 6014404 "NPR Event Subscriber"
         if ItemJournalLine."Item Group No." = '' then
             ItemJournalLine."Item Group No." := Item."Item Group";
         //+NPR5.33 [264324]
+        //-NPR5.55 [413203]
+        if ItemJournalLine."Document Time" = 0T then
+            ItemJournalLine."Document Time" := Time;
+        //+NPR5.55 [413203]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterInitItemLedgEntry', '', true, false)]
@@ -332,15 +337,15 @@ codeunit 6014404 "NPR Event Subscriber"
         //-NPR5.32 [249432]
 
         //-NPR7.000.000
-        //RetailCodeunitCode.Ops�tVarePost(NewItemLedgEntry,ItemJournalLine);
+        //RetailCodeunitCode.OpsætVarePost(NewItemLedgEntry,ItemJournalLine);
         //+NPR7.000.000
 
         with NewItemLedgEntry do begin
-            //Ops�tning.GET;
+            //Opsætning.GET;
             "Vendor No." := ItemJournalLine."Vendor No.";
             "Item Group No." := ItemJournalLine."Item Group No.";
             //not needed - its a standard field that is always transferred by CU22
-            //IF Ops�tning."Transfer SeO Item Entry" THEN
+            //IF Opsætning."Transfer SeO Item Entry" THEN
             //  Varepost2."Cross-Reference No." := "Cross-Reference No.";
             "Discount Type" := ItemJournalLine."Discount Type";
             "Discount Code" := ItemJournalLine."Discount Code";

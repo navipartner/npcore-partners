@@ -1,6 +1,7 @@
 page 6150738 "POS Setup List"
 {
     // NPR5.54/TSA /20200407 CASE 391850 Initial Version
+    // NPR5.55/TSA /20200422 CASE 400734 Added "Admin Menu Action Code"
 
     Caption = 'POS Setup List';
     CardPageID = "POS Setup";
@@ -48,6 +49,10 @@ page 6150738 "POS Setup List"
                     Editable = false;
                 }
                 field("OnBeforePaymentView Action";"OnBeforePaymentView Action")
+                {
+                    Editable = false;
+                }
+                field("Admin Menu Action Code";"Admin Menu Action Code")
                 {
                     Editable = false;
                 }

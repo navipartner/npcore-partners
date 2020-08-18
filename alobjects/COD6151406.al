@@ -1,32 +1,34 @@
-codeunit 6151406 "Magento Item Group Mgt."
+codeunit 6151406 "Magento Category Mgt."
 {
     // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
     // MAG1.04/MH/20150217  CASE 199932 Deleted unused functions for Setup of Item Group Structure
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
 
     trigger OnRun()
     begin
     end;
 
-    procedure ItemCountDrillDown(ItemGroupNo: Code[20])
+    procedure ItemCountDrillDown(MagentoCategory: Record "Magento Category")
     var
         Item: Record Item;
         TempItem: Record Item temporary;
-        WebLinkToItemGroup: Record "Magento Item Group Link";
+        MagentoCategoryLink: Record "Magento Category Link";
     begin
-        TempItem.DeleteAll;
-        WebLinkToItemGroup.Reset;
-        WebLinkToItemGroup.SetRange("Item Group",ItemGroupNo);
-        if WebLinkToItemGroup.FindSet then repeat
-          if Item.Get(WebLinkToItemGroup."Item No.") then begin
-            TempItem.Init;
-            TempItem := Item;
-            TempItem.Insert;
-          end;
-        until WebLinkToItemGroup.Next = 0;
+        //-MAG2.26 [404580]
+        MagentoCategoryLink.SetRange("Category Id",MagentoCategory.Id);
+        if MagentoCategoryLink.FindSet then
+          repeat
+            if Item.Get(MagentoCategoryLink."Item No.") then begin
+              TempItem.Init;
+              TempItem := Item;
+              TempItem.Insert;
+            end;
+        until MagentoCategoryLink.Next = 0;
 
-        PAGE.RunModal(PAGE::"Item List",TempItem);
+        PAGE.Run(0,TempItem);
+        //+MAG2.26 [404580]
     end;
 }
 

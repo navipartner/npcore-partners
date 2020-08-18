@@ -2,6 +2,7 @@ codeunit 6151594 "NpDc Module Apply - Default"
 {
     // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
     // NPR5.51/MHA /20190725  CASE 355406 Applied Discount Amount cannot be more than 100%
+    // NPR5.55/TSA /20200414 CASE 390697 Added "simple" support for VAT based discount amount
 
 
     trigger OnRun()
@@ -57,16 +58,25 @@ codeunit 6151594 "NpDc Module Apply - Default"
         LineNo: Integer;
         LineDiscountAmt: Decimal;
         LineDiscountPct: Decimal;
+        LineDiscountBaseAmt: Decimal;
     begin
         LineDiscountPct := (SaleLinePOS."Amount Including VAT" - CalcAppliedDiscount(SaleLinePOS)) / TotalAmt;
         LineDiscountAmt := Round(DiscountAmt * LineDiscountPct,0.01);
         if LineDiscountAmt <= 0 then
           exit;
 
-        //-NPR5.51 [355406]
-        if LineDiscountAmt > SaleLinePOS."Amount Including VAT" then
-          LineDiscountAmt := SaleLinePOS."Amount Including VAT";
-        //+NPR5.51 [355406]
+        //-NPR5.55 [390697]
+        // //-NPR5.51 [355406]
+        // IF LineDiscountAmt > SaleLinePOS."Amount Including VAT" THEN
+        //   LineDiscountAmt := SaleLinePOS."Amount Including VAT";
+        // //+NPR5.51 [355406]
+        LineDiscountBaseAmt := SaleLinePOS."Amount Including VAT";
+        if (not SaleLinePOS."Price Includes VAT") then
+          LineDiscountBaseAmt := SaleLinePOS.Amount;
+
+        if LineDiscountAmt > LineDiscountBaseAmt then
+          LineDiscountAmt := LineDiscountBaseAmt;
+        //+NPR5.55 [390697]
 
         LineNo := GetNextLineNo(SaleLinePOS);
         SaleLinePOSCouponApply.Init;
@@ -94,6 +104,7 @@ codeunit 6151594 "NpDc Module Apply - Default"
     var
         SaleLinePOSCouponApply: Record "NpDc Sale Line POS Coupon";
         AdjustmentAmount: Decimal;
+        LineDiscountBaseAmt: Decimal;
     begin
         //-NPR5.51 [355406]
         AdjustmentAmount := DiscountAmt - AppliedDiscountAmt;
@@ -103,8 +114,17 @@ codeunit 6151594 "NpDc Module Apply - Default"
         if not FindSaleLinePOSCouponApply2(SaleLinePOSCoupon,SaleLinePOS,SaleLinePOSCouponApply) then
           exit;
 
-        if AdjustmentAmount > SaleLinePOS."Amount Including VAT" - SaleLinePOSCouponApply."Discount Amount" then
-          AdjustmentAmount := SaleLinePOS."Amount Including VAT" - SaleLinePOSCouponApply."Discount Amount";
+        //-NPR5.55 [390697]
+        // IF AdjustmentAmount > SaleLinePOS."Amount Including VAT" - SaleLinePOSCouponApply."Discount Amount" THEN
+        //   AdjustmentAmount := SaleLinePOS."Amount Including VAT" - SaleLinePOSCouponApply."Discount Amount";
+        LineDiscountBaseAmt := SaleLinePOS."Amount Including VAT";
+        if (not SaleLinePOS."Price Includes VAT") then
+          LineDiscountBaseAmt := SaleLinePOS.Amount;
+
+        if AdjustmentAmount > LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount" then
+          AdjustmentAmount := LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount";
+        //+NPR5.55 [390697]
+
         if AdjustmentAmount <= 0 then
           exit;
 

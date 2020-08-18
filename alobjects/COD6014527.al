@@ -32,9 +32,9 @@ codeunit 6014527 "Credit Card Protocol Helper"
 
         CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,CompanyInformation.Name);
         CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'************************');
-        CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'Bel�b (DKK): ' + Format(ResultAmount / 100,0,'<Sign><Integer><Decimals,3>'));
+        CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'Bel¢b (DKK): ' + Format(ResultAmount / 100,0,'<Sign><Integer><Decimals,3>'));
         CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'Kort: ' + SelectStr(1,ResultText));
-        CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'GENNEMF�RT');
+        CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'GENNEMF¥RT');
         CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'Terminalbon mangler');
         CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,0,'************************');
         CreateTransactionLine(SalePOS,SaleLinePOS,EntryNo,3,SelectStr(1,ResultText));

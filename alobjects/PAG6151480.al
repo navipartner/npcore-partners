@@ -73,7 +73,7 @@ page 6151480 "Magento Manag. Role Center"
             action("Magento Item Groups")
             {
                 Caption = 'Magento Item Groups';
-                RunObject = Page "Magento Item Groups";
+                RunObject = Page "Magento Categories";
                 Visible = false;
             }
             action(Brands)

@@ -25,6 +25,10 @@ codeunit 6150627 "POS Workshift Checkpoint"
     // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
     // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
     // NPR5.53/TSA /20191107 CASE 376170 Added number series support for Z and X reports
+    // NPR5.55/TSA /20200511 CASE 401889 Conditional errorhandling on EOD posting
+    // NPR5.55/TSA /20200511 CASE 400098 Changed aggregation for tax checkpoint to include "tax jurisdiction area" and "tax group code"
+    // NPR5.55/ALPO/20200605 CASE 397342 Fix: deleted sales documents shouldn't be counted as posted, shouldn't affect number of credit sales and unrealized sales amount
+    // NPR5.55/TSA /20200611 CASE 409261 Sales lines marked as "Exclude from Posting" are also excluded from balancing summary
 
 
     trigger OnRun()
@@ -42,6 +46,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
         EndOfDayUIOption: Option SUMMARY,BALANCING,"NONE";
         EodWorkshiftMode: Option XREPORT,ZREPORT,CLOSEWORKSHIFT;
         EntrySourceMethodOption: Option NA,AUDITROLL,BINENTRY;
+        POSTING_ERROR: Label 'While posting end-of-day, the following error occured:\\%1';
 
     procedure BeginWorkshift(POSUnit: Code[10])
     begin
@@ -660,7 +665,22 @@ codeunit 6150627 "POS Workshift Checkpoint"
 
             POSPostEntries.SetStopOnError (true);
             POSPostEntries.SetPostCompressed (false);
-            POSPostEntries.Run (POSEntryToPost);
+            //-NPR5.55 [401889]
+            //POSPostEntries.RUN (POSEntryToPost);
+            if (POSEndofDayProfile."Posting Error Handling" = POSEndofDayProfile."Posting Error Handling"::WITH_ERROR) then begin
+              POSPostEntries.Run (POSEntryToPost);
+            end else begin
+              ClearLastError ();
+              Commit;
+              if (not POSPostEntries.Run (POSEntryToPost)) then begin
+                POSEntryToPost.Get (EntryNo);
+                POSEntryToPost."POS Posting Log Entry No." := CreatePOSPostingLogEntry (POSEntryToPost, GetLastErrorText);
+                POSEntryToPost.Modify;
+                if (POSEndofDayProfile."Posting Error Handling" = POSEndofDayProfile."Posting Error Handling"::WITH_MESSAGE) then
+                  Message (POSTING_ERROR, GetLastErrorText);
+              end;
+            end;
+            //+NPR5.55 [401889]
             Commit;
           end;
 
@@ -874,6 +894,11 @@ codeunit 6150627 "POS Workshift Checkpoint"
               TargetWorkshiftTaxCheckpoint.SetFilter ("Tax Area Code", '=%1', "Tax Area Code");
               TargetWorkshiftTaxCheckpoint.SetFilter ("VAT Identifier", '=%1', "VAT Identifier");
               TargetWorkshiftTaxCheckpoint.SetFilter ("Tax Calculation Type", '=%1', "Tax Calculation Type");
+              //-NPR5.55 [400098]
+              TargetWorkshiftTaxCheckpoint.SetFilter ("Tax Jurisdiction Code", '=%1', "Tax Jurisdiction Code");
+              TargetWorkshiftTaxCheckpoint.SetFilter ("Tax Group Code", '=%1', "Tax Group Code");
+              //+NPR5.55 [400098]
+
               if (TargetWorkshiftTaxCheckpoint.FindFirst ()) then begin
                 TargetWorkshiftTaxCheckpoint."Tax Base Amount" += "Tax Base Amount";
                 TargetWorkshiftTaxCheckpoint."Tax Amount" += "Tax Amount";
@@ -894,6 +919,31 @@ codeunit 6150627 "POS Workshift Checkpoint"
           end;
         end;
         //+NPR5.49 [348458]
+    end;
+
+    local procedure CreatePOSPostingLogEntry(var POSEntry: Record "POS Entry";ErrorReason: Text): Integer
+    var
+        POSPostingLog: Record "POS Posting Log";
+        LastPOSEntry: Record "POS Entry";
+    begin
+
+        //-NPR5.55 [401889]
+        LastPOSEntry.Reset;
+        LastPOSEntry.FindLast;
+
+        with POSPostingLog do begin
+          Init;
+          "Entry No." := 0;
+          "User ID" := UserId;
+          "Posting Timestamp" := CurrentDateTime;
+          "With Error" := true;
+          "Error Description" := CopyStr (ErrorReason, 1, MaxStrLen ("Error Description"));
+          "POS Entry View" := CopyStr(POSEntry.GetView,1,MaxStrLen("POS Entry View"));
+          "Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
+          Insert(true);
+          exit("Entry No.");
+        end;
+        //+NPR5.55 [401889]
     end;
 
     local procedure "--"()
@@ -1016,6 +1066,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
 
         POSSalesLine.SetFilter ("POS Entry No.", '%1..', FromPosEntryNo);
         POSSalesLine.SetFilter ("POS Unit No.", '=%1', POSUnitNo);
+        POSSalesLine.SetFilter ("Exclude from Posting", '=%1', false); //-+NPR5.55 [409261]
         if (POSSalesLine.FindSet ()) then begin
 
           repeat
@@ -1048,6 +1099,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
     local procedure SetGeneralStatistics(POSUnitNo: Code[20];var POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";FromPosEntryNo: Integer)
     var
         POSEntry: Record "POS Entry";
+        DocDeleted: Boolean;
     begin
 
         // Number of sales
@@ -1072,7 +1124,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
         POSEntry.SetFilter ("Entry Type", '=%1', POSEntry."Entry Type"::"Credit Sale");
         POSEntry.SetFilter ("System Entry", '=%1', false);
         //-NPR5.48 [339571]
-        POSWorkshiftCheckpoint."Credit Sales Count" := POSEntry.Count;
+        //POSWorkshiftCheckpoint."Credit Sales Count" := POSEntry.COUNT;  //NPR5.55 [397342]-revoked
         // IF (POSEntry.FINDSET ()) THEN BEGIN
         //  REPEAT
         //    POSWorkshiftCheckpoint."Credit Sales Count" += 1;
@@ -1085,15 +1137,64 @@ codeunit 6150627 "POS Workshift Checkpoint"
         //  UNTIL (POSEntry.NEXT () = 0);
         // END;
         //+NPR5.48 [339571]
+        //-NPR5.55 [397342]
+        POSWorkshiftCheckpoint."Credit Sales Count" := 0;
+        if POSEntry.FindSet then
+          repeat
+            CheckIsPosted(POSEntry."Sales Document Type", POSEntry."Sales Document No.", DocDeleted);
+            if not DocDeleted then
+              POSWorkshiftCheckpoint."Credit Sales Count" += 1;
+          until POSEntry.Next = 0;
+        //+NPR5.55 [397342]
     end;
 
-    local procedure CheckIsPosted(DocumentType: Option;DocmentNo: Code[20]): Boolean
+    local procedure CheckIsPosted(DocumentType: Option;DocmentNo: Code[20];var DocDeleted: Boolean): Boolean
     var
         SalesHeader: Record "Sales Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesInvHeader: Record "Sales Invoice Header";
     begin
-
         // If still in table 36, consider it unposted
-        exit (not SalesHeader.Get (DocumentType, DocmentNo));
+        //EXIT (NOT SalesHeader.GET (DocumentType, DocmentNo));  //NPR5.55 [397342]-revoked
+
+        //-NPR5.55 [397342]
+        DocDeleted := false;
+        if SalesHeader.Get(DocumentType,DocmentNo) then
+          exit(false);
+
+        case DocumentType of
+          SalesHeader."Document Type"::Order: begin
+            SalesInvHeader.SetCurrentKey("Order No.");
+            SalesInvHeader.SetRange("Order No.",DocmentNo);
+            if not SalesInvHeader.IsEmpty then
+              exit(true);
+          end;
+
+          SalesHeader."Document Type"::Invoice: begin
+            SalesInvHeader.SetCurrentKey("Pre-Assigned No.");
+            SalesInvHeader.SetRange("Pre-Assigned No.",DocmentNo);
+            if not SalesInvHeader.IsEmpty then
+              exit(true);
+          end;
+
+          SalesHeader."Document Type"::"Return Order": begin
+            SalesCrMemoHeader.SetCurrentKey("Return Order No.");
+            SalesCrMemoHeader.SetRange("Return Order No.",DocmentNo);
+            if not SalesCrMemoHeader.IsEmpty then
+              exit(true);
+          end;
+
+          SalesHeader."Document Type"::"Credit Memo": begin
+            SalesCrMemoHeader.SetCurrentKey("Pre-Assigned No.");
+            SalesCrMemoHeader.SetRange("Pre-Assigned No.",DocmentNo);
+            if not SalesCrMemoHeader.IsEmpty then
+              exit(true);
+          end;
+        end;
+
+        DocDeleted := true;
+        exit(false);
+        //+NPR5.55 [397342]
     end;
 
     local procedure GetTransferStatistics(var POSWorkshiftCheckpointOut: Record "POS Workshift Checkpoint";FromPosEntryNo: Integer)
@@ -1142,6 +1243,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
     end;
 
     local procedure SetTurnoverAndProfit(var POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";POSSalesLine: Record "POS Sales Line";POSEntry: Record "POS Entry")
+    var
+        DocDeleted: Boolean;
     begin
 
         with POSSalesLine do begin
@@ -1151,13 +1254,15 @@ codeunit 6150627 "POS Workshift Checkpoint"
           // POSWorkshiftCheckpoint."Net Turnover (LCY)" += "Amount Excl. VAT (LCY)";
           // POSWorkshiftCheckpoint."Net Cost (LCY)" += "Unit Cost (LCY)" * Quantity;
           if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale") then begin
-
-            POSWorkshiftCheckpoint."Credit Sales Amount (LCY)" += "Amount Incl. VAT (LCY)";
-            POSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += "Amount Excl. VAT (LCY)";
+            //-NPR5.55 [397342]-revoked
+            //POSWorkshiftCheckpoint."Credit Sales Amount (LCY)" += "Amount Incl. VAT (LCY)";
+            //POSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += "Amount Excl. VAT (LCY)";
+            //+NPR5.55 [397342]-revoked
 
             //-NPR5.49 [348458]
             // IF (CheckIsPosted (POSEntry."Sales Document Type", POSEntry."Sales Document No.")) AND (POSSalesLine.Type <> POSSalesLine.Type::Voucher) THEN BEGIN
-            if ((CheckIsPosted (POSEntry."Sales Document Type", POSEntry."Sales Document No.")) and
+            //IF ((CheckIsPosted (POSEntry."Sales Document Type", POSEntry."Sales Document No.")) AND  //NPR5.55 [397342]-revoked
+            if (CheckIsPosted(POSEntry."Sales Document Type", POSEntry."Sales Document No.", DocDeleted) and  //NPR5.55 [397342]
                 (Type <> Type::Voucher) and
                 (Type <> Type::Payout) and
                 (Type <> Type::"G/L Account")) then begin
@@ -1177,15 +1282,20 @@ codeunit 6150627 "POS Workshift Checkpoint"
               POSWorkshiftCheckpoint."Net Cost (LCY)" += "Unit Cost (LCY)" * Quantity;
 
             end else begin
-              case (POSEntry."Sales Document Type") of
-                POSEntry."Sales Document Type"::Invoice       : POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-                POSEntry."Sales Document Type"::Order         : POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-                POSEntry."Sales Document Type"::"Credit Memo" : POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-                POSEntry."Sales Document Type"::"Return Order": POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-              end;
+              if not DocDeleted then  //NPR5.55 [397342]
+                case (POSEntry."Sales Document Type") of
+                  POSEntry."Sales Document Type"::Invoice       : POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                  POSEntry."Sales Document Type"::Order         : POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                  POSEntry."Sales Document Type"::"Credit Memo" : POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                  POSEntry."Sales Document Type"::"Return Order": POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                end;
             end;
-
-
+            //-NPR5.55 [397342]
+            if not DocDeleted then begin
+              POSWorkshiftCheckpoint."Credit Sales Amount (LCY)" += "Amount Incl. VAT (LCY)";
+              POSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += "Amount Excl. VAT (LCY)";
+            end;
+            //+NPR5.55 [397342]
           end;
           //+NPR5.48 [339571]
 
@@ -1545,6 +1655,10 @@ codeunit 6150627 "POS Workshift Checkpoint"
               SetFilter ("Tax Area Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Area Code");
               SetFilter ("Tax Calculation Type", '=%1', POSWorkshiftTaxCheckpoint."Tax Calculation Type");
               SetFilter ("VAT Identifier", '=%1', POSWorkshiftTaxCheckpoint."VAT Identifier");
+              //-NPR5.55 [400098]
+              SetFilter ("Tax Jurisdiction Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Jurisdiction Code");
+              SetFilter ("Tax Group Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Group Code");
+              //+NPR5.55 [400098]
 
               if (not FindFirst ()) then begin
                 TempEntryNo += 1;
@@ -1556,6 +1670,10 @@ codeunit 6150627 "POS Workshift Checkpoint"
                 "Tax Calculation Type" := POSWorkshiftTaxCheckpoint."Tax Calculation Type";
                 "VAT Identifier" := POSWorkshiftTaxCheckpoint."VAT Identifier";
                 "Tax Area Code" :=  POSWorkshiftTaxCheckpoint."Tax Area Code";
+                //-NPR5.55 [400098]
+                "Tax Jurisdiction Code" := POSWorkshiftTaxCheckpoint."Tax Jurisdiction Code";
+                "Tax Group Code" := POSWorkshiftTaxCheckpoint."Tax Group Code";
+                //+NPR5.55 [400098]
 
                 "Tax %" := POSWorkshiftTaxCheckpoint."Tax %";
                 "Tax Type" := POSWorkshiftTaxCheckpoint."Tax Type";
@@ -2329,14 +2447,20 @@ codeunit 6150627 "POS Workshift Checkpoint"
                 SetFilter ("Tax Area Code", '=%1', POSTaxAmountLine."Tax Area Code");
                 SetFilter ("Tax Calculation Type", '=%1', POSTaxAmountLine."Tax Calculation Type");
 
-                //-NPR5.42 [306858]
-                //SETFILTER ("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
-                if (POSTaxAmountLine."VAT Identifier" <> '') then
-                  SetFilter ("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
+                //-NPR5.55 [400098]
+        //        //-NPR5.42 [306858]
+        //        //SETFILTER ("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
+        //        IF (POSTaxAmountLine."VAT Identifier" <> '') THEN
+        //          SETFILTER ("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
+        //
+        //        IF ((POSTaxAmountLine."VAT Identifier" = '') AND (POSTaxAmountLine."Tax Jurisdiction Code" <> '')) THEN
+        //          SETFILTER ("VAT Identifier", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
+        //        //+NPR5.42 [306858]
 
-                if ((POSTaxAmountLine."VAT Identifier" = '') and (POSTaxAmountLine."Tax Jurisdiction Code" <> '')) then
-                  SetFilter ("VAT Identifier", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
-                //+NPR5.42 [306858]
+                SetFilter ("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
+                SetFilter ("Tax Jurisdiction Code", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
+                SetFilter ("Tax Group Code", '=%1', POSTaxAmountLine."Tax Group Code");
+                //-NPR5.55 [400098]
 
                 if (not FindFirst ()) then begin
                   TempEntryNo += 1;
@@ -2349,16 +2473,21 @@ codeunit 6150627 "POS Workshift Checkpoint"
                   //"Tax Calculation Type" := POSTaxAmountLine."Tax Calculation Type"::"Normal VAT";
                   "Tax Calculation Type" := POSTaxAmountLine."Tax Calculation Type";
 
-                  //"VAT Identifier" := POSTaxAmountLine."VAT Identifier";
-                  if (POSTaxAmountLine."VAT Identifier" <> '') then
-                    "VAT Identifier" := POSTaxAmountLine."VAT Identifier";
+                  //-NPR5.55 [400098]
+        //          //"VAT Identifier" := POSTaxAmountLine."VAT Identifier";
+        //          IF (POSTaxAmountLine."VAT Identifier" <> '') THEN
+        //            "VAT Identifier" := POSTaxAmountLine."VAT Identifier";
+        //
+        //          IF ((POSTaxAmountLine."VAT Identifier" = '') AND (POSTaxAmountLine."Tax Jurisdiction Code" <> '')) THEN
+        //             "VAT Identifier" := POSTaxAmountLine."Tax Jurisdiction Code";
+        //          //+NPR5.42 [306858]
 
-                  if ((POSTaxAmountLine."VAT Identifier" = '') and (POSTaxAmountLine."Tax Jurisdiction Code" <> '')) then
-                     "VAT Identifier" := POSTaxAmountLine."Tax Jurisdiction Code";
-                  //+NPR5.42 [306858]
+                  "VAT Identifier" := POSTaxAmountLine."VAT Identifier";
+                  "Tax Jurisdiction Code" := POSTaxAmountLine."Tax Jurisdiction Code";
+                  "Tax Group Code" := POSTaxAmountLine."Tax Group Code";
+                  //+NPR5.55 [400098]
 
                   "Tax Area Code" :=  POSTaxAmountLine."Tax Area Code";
-
                   "Tax %" := POSTaxAmountLine."Tax %";
                   Insert ();
                 end;

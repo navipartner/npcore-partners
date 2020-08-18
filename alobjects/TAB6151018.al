@@ -5,6 +5,7 @@ table 6151018 "NpRv Arch. Voucher"
     // NPR5.48/MHA /20190213  CASE 345739 No. Series length has been increased from 10 to 20 in NAV2018 and newer
     // NPR5.49/MHA /20190228  CASE 342811 Added partner fields
     // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
+    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
 
     Caption = 'Archived Retail Voucher';
     DrillDownPageID = "NpRv Arch. Vouchers";
@@ -64,6 +65,11 @@ table 6151018 "NpRv Arch. Voucher"
             Caption = 'Provision Account No.';
             TableRelation = "G/L Account" WHERE ("Account Type"=CONST(Posting),
                                                  "Direct Posting"=CONST(true));
+        }
+        field(62;"Allow Top-up";Boolean)
+        {
+            Caption = 'Allow Top-up';
+            Description = 'NPR5.55';
         }
         field(65;"Print Template Code";Code[20])
         {
@@ -198,6 +204,12 @@ table 6151018 "NpRv Arch. Voucher"
         {
             Caption = 'Phone No.';
         }
+        field(270;"Language Code";Code[10])
+        {
+            Caption = 'Language Code';
+            Description = 'NPR5.55';
+            TableRelation = Language;
+        }
         field(300;"Voucher Message";Text[250])
         {
             Caption = 'Voucher Message';
@@ -278,6 +290,15 @@ table 6151018 "NpRv Arch. Voucher"
             CalcFormula = Max("NpRv Arch. Voucher Entry"."Partner Clearing" WHERE ("Arch. Voucher No."=FIELD("No.")));
             Caption = 'Partner Clearing';
             Description = 'NPR5.49';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(1030;"No. Send";Integer)
+        {
+            CalcFormula = Count("NpRv Arch. Sending Log" WHERE ("Arch. Voucher No."=FIELD("No."),
+                                                                "Error during Send"=CONST(false)));
+            Caption = 'No. Send';
+            Description = 'NPR5.55';
             Editable = false;
             FieldClass = FlowField;
         }

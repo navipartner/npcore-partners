@@ -19,6 +19,9 @@ page 6060151 "Event Planning Lines Subpage"
     //                                   Object renamed to Event Planning Lines Subpage
     // NPR5.49/TJ  /20190306 CASE 342305 Fields "Est. Unit Price Incl. VAT" and "Est. Line Amount Incl. VAT" made non-editable
     // NPR5.49/TJ  /20190218 CASE 345047 Extended text support
+    // NPR5.55/TJ  /20200326 CASE 397741 Added visual style change to Type, "No." and Description fields
+    //                                   New action DistributeOverPeriod
+    //                                   New field "Description 2"
 
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -781,6 +784,18 @@ page 6060151 "Event Planning Lines Subpage"
                         //+NPR5.49 [345047]
                     end;
                 }
+                action(DistributeAcrossPeriodAction)
+                {
+                    Caption = 'Distribute Across Period';
+                    Image = Period;
+
+                    trigger OnAction()
+                    begin
+                        //-NPR5.55 [397741]
+                        EventPlanLineGroupMgt.DistributeAccrossPeriod(Rec);
+                        //+NPR5.55 [397741]
+                    end;
+                }
             }
             group(Reports)
             {
@@ -830,6 +845,13 @@ page 6060151 "Event Planning Lines Subpage"
     trigger OnAfterGetCurrRecord()
     begin
         SetEditable("Qty. Transferred to Invoice" = 0);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        //-NPR5.55 [397741]
+        ApplyStyle := Rec."Group Line" and (Rec."Group Source Line No." = 0);
+        //+NPR5.55 [397741]
     end;
 
     trigger OnInit()
@@ -933,10 +955,12 @@ page 6060151 "Event Planning Lines Subpage"
         [InDataSet]
         "Unit CostEditable": Boolean;
         Text002: Label 'The %1 was successfully transferred to a %2.';
+        ApplyStyle: Boolean;
         EventCalendarMgt: Codeunit "Event Calendar Management";
         EventEmailMgt: Codeunit "Event Email Management";
         EventTicketMgt: Codeunit "Event Ticket Management";
         EventMgt: Codeunit "Event Management";
+        EventPlanLineGroupMgt: Codeunit "Event Plan. Line Grouping Mgt.";
 
     local procedure CreateSalesInvoice(CrMemo: Boolean)
     var
@@ -1061,6 +1085,13 @@ page 6060151 "Event Planning Lines Subpage"
         if EventTransferExtText.MakeUpdate then
           CurrPage.Update(true);
         //+NPR5.49 [345047]
+    end;
+
+    procedure DistributeAcrossPeriod()
+    begin
+        //-NPR5.55 [397741]
+        EventPlanLineGroupMgt.DistributeAccrossPeriod(Rec);
+        //+NPR5.55 [397741]
     end;
 }
 

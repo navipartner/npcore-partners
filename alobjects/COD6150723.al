@@ -27,11 +27,16 @@ codeunit 6150723 "POS Action - Insert Item"
     // NPR5.52/CLVA/20190928  CASE 369231  Added support for serial no./rfid tag validation
     //                                    Added EventCodeSerialNoItemCrossRef and SetEanBoxEventInScopeSerialNoItemCrossRef
     // NPR5.52/MHA /20191014  CASE 370961 Accessory Alt. Price is adjusted for Price Includes VAT in AddAccessoryForItem()
-    // NPR5.54/ALPO/20200218  CASE 388951 Suggest Item AddOns after new line is inserted
+    // NPR5.54/ALPO/20200218 CASE 388951 Suggest Item AddOns after new line is inserted
     // NPR5.54/TSA /20200221 CASE 369231 Added SerialNoItemCrossReference as an option in itemIdentifyerType so EAN box discovery works
     // NPR5.54/CLVA/20200302 CASE 369231 Added option value SerialNoItemCrossReference to local variable ItemIdentifierType in function Step_AddSalesLine
     // NPR5.54/MMV /20200304 CASE 364340 Isolated line insertion from JSON parsing in global function for test purposes.
     // NPR5.54/ALPO/20200410 CASE 399978 AddItemLine(): fixed issue with unit price not being passed to POS line
+    // NPR5.55/MMV /20200420 CASE 386254 Set to explicit blocking UI false, now that default is true
+    // NPR5.55/ALPO/20200414 CASE 398263 Show a list of available serial numbers to user to select from, if a serial number was not scanned/typed in previously
+    //                                   Use variant code from selected serial number
+    //                                   Fix: function SerialNumberCanBeUsedForItem() was not called properly, when itemIdentifyerType' <> 'ItemNo'
+    // NPR5.55/ALPO/20200512 CASE 404331 Accessories: double VAT deduction for customers with prices set to be VAT-excluding, when unit price is retrieved from item card
 
 
     trigger OnRun()
@@ -42,18 +47,19 @@ codeunit 6150723 "POS Action - Insert Item"
         ActionDescription: Label 'This is a built-in action for inserting an item line into the current transaction';
         TEXTitemTracking_title: Label 'Enter Serial Number';
         TEXTitemTracking_lead: Label 'This item requires serial number, enter serial number.';
-        Setup: Codeunit "POS Setup";
         TEXTitemTracking_instructions: Label 'Enter serial number now and press OK. Press Cancel to enter serial number later.';
         TEXTActive: Label 'active';
         TEXTSaved: Label 'saved';
-        TEXTWrongSerialOnILE: Label 'Serial number %1 for item %2 - %3 can not be used since it can not be found as received. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
-        TEXTWrongSerialOnSLP: Label 'Serial number %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\''';
+        TEXTWrongSerialOnILE: Label 'Serial number %1 for item %2 - %3 can not be used since it can not be found as received.';
+        TEXTWrongSerialOnSLP: Label 'Serial number %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6.';
+        TEXTWrongSerial_Instr: Label ' \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
         UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
         UnitPriceTitle: Label 'Unit price is required';
         TEXTeditDesc_lead: Label 'Line description';
         TEXTeditDesc_title: Label 'Add or change description.';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
         COMMENT_UNKNOWN_TAG: Label 'Unknown RFID Tag %1';
+        SerialSelectionFromList: Boolean;
 
     procedure ActionCode(): Text
     begin
@@ -62,10 +68,8 @@ codeunit 6150723 "POS Action - Insert Item"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.40 [294655]
-        //EXIT ('1.5');
-        exit('1.7');
-        //+NPR5.40 [294655]
+        exit('1.8');  //NPR5.55 [398263]
+        //EXIT('1.7');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -85,7 +89,13 @@ codeunit 6150723 "POS Action - Insert Item"
 
             Sender.RegisterWorkflowStep('promptContextDialogs', '');
             Sender.RegisterWorkflowStep('unitPrice', 'context.promptPrice && numpad({title: labels.UnitpriceTitle, caption: labels.UnitPriceCaption}).cancel(abort);');
-            Sender.RegisterWorkflowStep('itemTrackingForce', 'context.promptSerial && context.useSpecificTracking && input(labels.itemTracking_title, labels.itemTracking_lead, context.itemTracking_instructions, "", true).respond().cancel(abort);');
+          //-NPR5.55 [398263]-revoked
+          //Sender.RegisterWorkflowStep('itemTrackingForce', 'context.promptSerial && context.useSpecificTracking && input(labels.itemTracking_title, labels.itemTracking_lead, context.itemTracking_instructions, "", true).respond().cancel(abort);');
+          //+NPR5.55 [398263]-revoked
+          //-NPR5.55 [398263]
+          Sender.RegisterWorkflowStep('itemTrackingForce',
+            'context.promptSerial && context.useSpecificTracking && input(labels.itemTracking_title, labels.itemTracking_lead, context.itemTracking_instructions, "", !param.AllowToSelectSerialNoFromList).respond().cancel(abort);');
+          //+NPR5.55 [398263]
             Sender.RegisterWorkflowStep('itemTrackingOptional', 'context.promptSerial && !context.useSpecificTracking && input(labels.itemTracking_title, labels.itemTracking_lead, context.itemTracking_instructions, "", true);');
 
             Sender.RegisterWorkflowStep('addSalesLine', 'respond();');
@@ -102,6 +112,11 @@ codeunit 6150723 "POS Action - Insert Item"
             Sender.RegisterBooleanParameter('descriptionEdit', false);
             Sender.RegisterBooleanParameter('usePreSetUnitPrice', false);
             Sender.RegisterDecimalParameter('preSetUnitPrice', 0);
+          Sender.RegisterBooleanParameter('AllowToSelectSerialNoFromList',false);  //NPR5.55 [398263]
+
+        //-NPR5.55 [386254]
+          Sender.RegisterBlockingUI(false);
+        //+NPR5.55 [386254]
         end;
     end;
 
@@ -159,6 +174,7 @@ codeunit 6150723 "POS Action - Insert Item"
         SetUnitPrice: Boolean;
         CustomDescription: Text;
         ValidatedSerialNumber: Text;
+        ValidatedVariantCode: Text;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         HasPrompted := JSON.GetBoolean('promptPrice', false) or JSON.GetBoolean('promptSerial', false);
@@ -199,6 +215,11 @@ codeunit 6150723 "POS Action - Insert Item"
         JSON.SetScope ('/', true);
         UseSpecificTracking := JSON.GetBoolean('useSpecificTracking', false);
         ValidatedSerialNumber := JSON.GetString('validatedSerialNumber', false);
+        //-NPR5.55 [398263]
+        ValidatedVariantCode := JSON.GetString('validatedVariantCode', false);
+        if ValidatedVariantCode <> '' then
+          ItemCrossReference."Variant Code" := CopyStr(ValidatedVariantCode,1,MaxStrLen(ItemCrossReference."Variant Code"));
+        //+NPR5.55 [398263]
 
         if UsePresetUnitPrice then begin
           UnitPrice := PresetUnitPrice;
@@ -228,10 +249,15 @@ codeunit 6150723 "POS Action - Insert Item"
         JSON: Codeunit "POS JSON Management";
         SerialNumberInput: Text;
         SpecificTracking: Boolean;
-        ItemNo: Code[20];
         OKInput: Boolean;
         SerialNoUsedOnPOSSaleLine: Boolean;
         UserInformationErrorWarning: Text;
+        Item: Record Item;
+        ItemCrossReference: Record "Item Cross Reference";
+        Register: Record Register;
+        Setup: Codeunit "POS Setup";
+        ItemIdentifier: Text;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
     begin
         //Called on OK when serial number is filled on item witch requires specific tracking on serial number.
 
@@ -241,10 +267,32 @@ codeunit 6150723 "POS Action - Insert Item"
         SerialNumberInput := JSON.GetString('input', true);
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScope('parameters', true);
-        ItemNo := JSON.GetString('itemNo', true);
+        //ItemNo := JSON.GetString('itemNo',TRUE);  //NPR5.55 [398263]-revoked
+        //-NPR5.55 [398263]
+        ItemIdentifier := JSON.GetString('itemNo',true);
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType',false);
+        SerialSelectionFromList := JSON.GetBoolean('AllowToSelectSerialNoFromList',false);
+
+        GetItem(Item, ItemCrossReference, ItemIdentifier, ItemIdentifierType);
+        //+NPR5.55 [398263]
 
         //Some number is inputed, now check if valid for item
-        if not SerialNumberCanBeUsedForItem(ItemNo, SerialNumberInput, UserInformationErrorWarning) then begin
+        //-NPR5.55 [398263]
+        if SerialSelectionFromList then begin
+          while not SerialNumberCanBeUsedForItem(ItemCrossReference,SerialNumberInput,UserInformationErrorWarning) do begin
+            if SerialNumberInput <> '' then
+              Message(UserInformationErrorWarning);
+            SerialNumberInput := '';
+            POSSession.GetSetup(Setup);
+            Register.Get(Setup.Register());
+            SelectSerialNoFromList(ItemCrossReference,Register."Location Code",1,false,SerialNumberInput);
+            if SerialNumberInput = '' then
+              Error('');
+          end;
+        end else
+        if not SerialNumberCanBeUsedForItem(ItemCrossReference,SerialNumberInput,UserInformationErrorWarning) then begin
+        //+NPR5.55 [398263]
+        //IF NOT SerialNumberCanBeUsedForItem(ItemNo, SerialNumberInput, UserInformationErrorWarning) THEN BEGIN  //NPR5.55 [398263]-revoked
             SerialNumberInput := '';
             //Serial number is not valid, lets reask
             JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -264,6 +312,7 @@ codeunit 6150723 "POS Action - Insert Item"
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScope('/', true);
         JSON.SetContext('validatedSerialNumber', SerialNumberInput);
+        JSON.SetContext('validatedVariantCode',ItemCrossReference."Variant Code");  //NPR5.55 [398263]
         JSON.InitializeJObjectParser(Context, FrontEnd);
         FrontEnd.SetActionContext(ActionCode, JSON);
         exit;
@@ -281,6 +330,7 @@ codeunit 6150723 "POS Action - Insert Item"
         TagId: Code[20];
     begin
         //-NPR5.40 [294655]
+        Clear(ItemCrossReference); //NPR5.55 [398263]
         case ItemIdentifierType of
             ItemIdentifierType::ItemNo:
                 Item.Get(ItemIdentifier);
@@ -330,6 +380,7 @@ codeunit 6150723 "POS Action - Insert Item"
                 end;
                 //+NPR5.52 [369231]
         end;
+        ItemCrossReference."Item No." := Item."No.";  //NPR5.55 [398263]
         //+NPR5.40 [294655]
     end;
 
@@ -378,6 +429,7 @@ codeunit 6150723 "POS Action - Insert Item"
                 ItemIdentifierType::ItemNo:
                     begin
                         "No." := Item."No.";
+                "Variant Code" := ItemCrossReference."Variant Code";  //NPR5.55 [398263]
                     end;
 
                 ItemIdentifierType::ItemCrossReference:
@@ -461,7 +513,7 @@ codeunit 6150723 "POS Action - Insert Item"
     var
         AccessorySparePart: Record "Accessory/Spare Part";
     begin
-        // This is an adoption of the original function UdpakTilbeh�r in 6014418
+        // This is an adoption of the original function UdpakTilbeh¢r in 6014418
 
         //-NPR5.40 [294655]
         AccessorySparePart.SetFilter(Type, '=%1', AccessorySparePart.Type::Accessory);
@@ -500,7 +552,7 @@ codeunit 6150723 "POS Action - Insert Item"
         AccessorySaleLinePOS: Record "Sale Line POS";
         AccessorySparePart: Record "Accessory/Spare Part";
     begin
-
+        
         AccessorySparePart.SetFilter(Type, '=%1', AccessorySparePart.Type::Accessory);
         //-NPR5.40 [294655]
         AccessorySparePart.SetFilter(Code, '=%1', Item."No.");
@@ -508,71 +560,93 @@ codeunit 6150723 "POS Action - Insert Item"
         //+NPR5.40 [294655]
         if (not AccessorySparePart.FindSet()) then
             exit;
-
+        
         //-NPR5.40 [294655]
         //Item.GET (ItemNo);
         //+NPR5.40 [294655]
         POSSaleLine.GetCurrentSaleLine(MainSaleLinePOS);
-
+        
         repeat
             POSSaleLine.GetNewSaleLine(AccessorySaleLinePOS);
-
+        
             AccessorySaleLinePOS.Accessory := true;
             //-NPR5.40 [294655]
             //  AccessorySaleLinePOS."Main Item No." := ItemNo;
             AccessorySaleLinePOS."Main Item No." := Item."No.";
             //+NPR5.40 [294655]
-
+        
             AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
             if (GroupAccessory) then
                 AccessorySaleLinePOS."Accessories Item Group No." := Item."Item Group";
-
+        
             AccessorySaleLinePOS.Validate("No.", AccessorySparePart."Item No.");
-
+        
             // This is not support unless we add a commit at this point
             if (AccessorySparePart."Quantity in Dialogue") then
                 Error('The possibility to specify quantity per accessory line in a dialogue has been discontinued.');
-
+        
             if (AccessorySparePart."Per unit") then
                 AccessorySaleLinePOS.Validate(Quantity, AccessorySparePart.Quantity * MainSaleLinePOS.Quantity)
             else
                 AccessorySaleLinePOS.Validate(Quantity, AccessorySparePart.Quantity);
-
-            POSSaleLine.InsertLine(AccessorySaleLinePOS);
-
-            //-NPR5.52 [370961]
-            if AccessorySparePart."Use Alt. Price" then begin
-                if (AccessorySaleLinePOS."Price Includes VAT") and (not Item."Price Includes VAT") then
-                    AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (AccessorySaleLinePOS."VAT %" / 100))
-                else
-                    if (not AccessorySaleLinePOS."Price Includes VAT") and (Item."Price Includes VAT") then
-                        AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" / (1 + (AccessorySaleLinePOS."VAT %" / 100));
-
-                if AccessorySparePart."Show Discount" then
-                    AccessorySaleLinePOS.Validate("Amount Including VAT", AccessorySparePart."Alt. Price")
-                else
-                    AccessorySaleLinePOS.Validate("Unit Price", AccessorySparePart."Alt. Price");
-            end;
-            //+NPR5.52 [370961]
-
+        
+          //-NPR5.55 [404331]
+          if AccessorySparePart."Use Alt. Price" and not AccessorySparePart."Show Discount" then begin
+            AccessorySaleLinePOS."Manual Item Sales Price" := true;
+            AccessorySaleLinePOS."Unit Price" := AccessorySparePart."Alt. Price";
+          end else
+            AccessorySaleLinePOS."Unit Price" := 0;  //Allow for default price retrieval routine to kick in
+          //+NPR5.55 [404331]
+        
+          POSSaleLine.InsertLine (AccessorySaleLinePOS);
+        
+          //-NPR5.55 [404331]-revoked
+          /*
+          //-NPR5.52 [370961]
+          IF AccessorySparePart."Use Alt. Price" THEN BEGIN
+            IF (AccessorySaleLinePOS."Price Includes VAT") AND (NOT Item."Price Includes VAT") THEN
+              AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (AccessorySaleLinePOS."VAT %" / 100))
+            ELSE IF (NOT AccessorySaleLinePOS."Price Includes VAT") AND (Item."Price Includes VAT") THEN
+              AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" / (1 + (AccessorySaleLinePOS."VAT %" / 100));
+        
+            IF AccessorySparePart."Show Discount" THEN
+              AccessorySaleLinePOS.VALIDATE("Amount Including VAT",AccessorySparePart."Alt. Price")
+            ELSE
+              AccessorySaleLinePOS.VALIDATE("Unit Price",AccessorySparePart."Alt. Price");
+          END;
+          //+NPR5.52 [370961]
+          */
+          //+NPR5.55 [404331]-revoked
+          //-NPR5.55 [404331]
+          if AccessorySparePart."Use Alt. Price" and AccessorySparePart."Show Discount" then begin
+            POSSaleLine.ConvertPriceToVAT(
+              Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group",
+              AccessorySaleLinePOS, AccessorySparePart."Alt. Price");
+            if not AccessorySaleLinePOS."Price Includes VAT" then
+              AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (AccessorySaleLinePOS."VAT %" / 100));
+            AccessorySaleLinePOS.Validate("Amount Including VAT", AccessorySparePart."Alt. Price" * AccessorySaleLinePOS.Quantity);
+          end;
+          //+NPR5.55 [404331]
+        
             //-NPR5.40 [305045]
             AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
             if (GroupAccessory) then
                 AccessorySaleLinePOS."Accessories Item Group No." := Item."Item Group";
-
+        
             AccessorySaleLinePOS.Accessory := true;
             AccessorySaleLinePOS."Main Item No." := Item."No.";
             AccessorySaleLinePOS."Main Line No." := MainSaleLinePOS."Line No.";
-
+        
             AccessorySaleLinePOS.Modify();
             POSSaleLine.RefreshCurrent();
-
+        
             //   AccessorySaleLinePOS.MODIFY ();
             //   POSSaleLine.RefreshCurrent ();
             // END;
             //+NPR5.40 [305045]
-
+        
         until (AccessorySparePart.Next() = 0);
+
     end;
 
     local procedure AddItemAddOns(POSFrontEnd: Codeunit "POS Front End Management";Item: Record Item;BaseLineNo: Integer)
@@ -609,7 +683,7 @@ codeunit 6150723 "POS Action - Insert Item"
         exit(ItemTrackingCode."SN Sales Outbound Tracking");
     end;
 
-    local procedure SerialNumberCanBeUsedForItem(ItemNo: Code[20]; SerialNumber: Code[20]; var UserInformationErrorWarning: Text) CanBeUsed: Boolean
+    local procedure SerialNumberCanBeUsedForItem(var ItemCrossRef: Record "Item Cross Reference";SerialNumber: Code[20];var UserInformationErrorWarning: Text) CanBeUsed: Boolean
     var
         Register: Record Register;
         Item: Record Item;
@@ -620,9 +694,12 @@ codeunit 6150723 "POS Action - Insert Item"
         TextActiveSaved: Text;
     begin
         //Global
-        if not Item.Get(ItemNo) then exit(false);
+        //IF NOT Item.GET(ItemNo) THEN EXIT(FALSE);  //NPR5.55 [398263]-revoked
+        if not Item.Get(ItemCrossRef."Item No.") then exit(false);  //NPR5.55 [398263]
         if Item."Item Tracking Code" = '' then exit(false);
         if not ItemTrackingCode.Get(Item."Item Tracking Code") then exit(false);
+
+        UserInformationErrorWarning := '';  //NPR5.55 [398263]
 
         if not ItemTrackingCode."SN Specific Tracking" then begin
             //No constraint on to what number to use
@@ -635,40 +712,96 @@ codeunit 6150723 "POS Action - Insert Item"
             ItemLedgerEntry.SetRange(Open, true);
             ItemLedgerEntry.SetRange(Positive, true);
             ItemLedgerEntry.SetFilter("Serial No.", '=%1', SerialNumber);
-            ItemLedgerEntry.SetRange("Item No.", ItemNo);
-            if ItemLedgerEntry.IsEmpty then begin
+          //-NPR5.55 [398263]-revoked
+          //ItemLedgerEntry.SETRANGE("Item No.", ItemNo);
+          //IF ItemLedgerEntry.ISEMPTY THEN BEGIN
+          //+NPR5.55 [398263]-revoked
+          //-NPR5.55 [398263]
+          ItemLedgerEntry.SetRange("Item No.",ItemCrossRef."Item No.");
+          if ItemCrossRef."Variant Code" <> '' then
+            ItemLedgerEntry.SetRange("Variant Code",ItemCrossRef."Variant Code");
+          if not ItemLedgerEntry.FindSet then begin
+          //+NPR5.55 [398263]
                 CanBeUsed := false;
                 //Create user information message
-                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnILE, SerialNumber, ItemNo, Item.Description, TEXTitemTracking_instructions);
+            //UserInformationErrorWarning := STRSUBSTNO(TEXTWrongSerialOnILE, SerialNumber, ItemNo, Item.Description,TEXTitemTracking_instructions);  //NPR5.55 [398263]-revoked
+            UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnILE, SerialNumber, Item."No.", Item.Description,TEXTitemTracking_instructions);  //NPR5.55 [398263]
             end else begin
                 CanBeUsed := true;
             end;
-        end;
+        //END;  //NPR5.55 [398263]-revoked
 
-
-        //Check if serial number exists in saved/active pos sale line
-        if ItemTrackingCode."SN Specific Tracking" then begin
+          //Check if serial number exists in saved/active pos sale line
+          //TO DO: check pos quotes?
+        //IF ItemTrackingCode."SN Specific Tracking" THEN BEGIN  //NPR5.55 [398263]-revoked
+          if CanBeUsed then begin  //NPR5.55 [398263]
             SaleLinePOS.Reset;
             SaleLinePOS.SetCurrentKey("Serial No.");
-            SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
-            SaleLinePOS.SetFilter("No.", '=%1', ItemNo);
-            SaleLinePOS.SetFilter("Serial No.", '=%1', SerialNumber);
-            if not SaleLinePOS.IsEmpty then begin
-                CanBeUsed := false;
-                //Create user information message
-                SaleLinePOS.FindFirst;
-                "Sale POS".Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
-                if "Sale POS"."Saved Sale" then begin
-                    TextActiveSaved := TEXTSaved;
-                end else begin
-                    TextActiveSaved := TEXTActive;
-                end;
-                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnSLP, SerialNumber, ItemNo, Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.", TEXTitemTracking_instructions);
-
+            SaleLinePOS.SetFilter(Type, '=%1',SaleLinePOS.Type::Item);
+            //SaleLinePOS.SETFILTER("No.", '=%1' ,ItemNo);  //NPR5.55 [398263]-revoked
+            SaleLinePOS.SetRange("No.",ItemCrossRef."Item No.");  //NPR5.55 [398263]
+            SaleLinePOS.SetFilter("Serial No.", '=%1' , SerialNumber);
+            //-NPR5.55 [398263]
+            repeat
+              SaleLinePOS.SetRange("Variant Code",ItemLedgerEntry."Variant Code");
+              CanBeUsed := SaleLinePOS.IsEmpty;
+              if CanBeUsed then
+                ItemCrossRef."Variant Code" := ItemLedgerEntry."Variant Code";
+            until (ItemLedgerEntry.Next = 0) or CanBeUsed;
+            //+NPR5.55 [398263]
+            //-NPR5.55 [398263]-revoked
+            //IF NOT SaleLinePOS.ISEMPTY THEN BEGIN
+            //  CanBeUsed := FALSE;
+            //+NPR5.55 [398263]-revoked
+            if not CanBeUsed then begin  //NPR5.55 [398263]
+              //Create user information message
+              SaleLinePOS.FindFirst;
+              "Sale POS".Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+              if "Sale POS"."Saved Sale" then begin
+                TextActiveSaved := TEXTSaved;
+              end else begin
+                TextActiveSaved := TEXTActive;
+              end;
+        //UserInformationErrorWarning := STRSUBSTNO(TEXTWrongSerialOnSLP, SerialNumber, ItemNo, Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.",TEXTitemTracking_instructions);  //NPR5.55 [398263]-revoked
+              UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnSLP, SerialNumber, Item."No.", Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.",TEXTitemTracking_instructions);  //NPR5.55 [398263]
             end;
+          //-NPR5.55 [398263]
+          end;
+          if (UserInformationErrorWarning <> '') and not SerialSelectionFromList then
+            UserInformationErrorWarning := UserInformationErrorWarning + TEXTWrongSerial_Instr;
+          //+NPR5.55 [398263]
         end;
 
         exit(CanBeUsed);
+    end;
+
+    local procedure SelectSerialNoFromList(var ItemCrossRef: Record "Item Cross Reference";LocationCode: Code[10];Qty: Decimal;InsertIsBlocked: Boolean;var SerialNo: Text)
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        TrackingSpecification: Record "Tracking Specification" temporary;
+        ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection";
+    begin
+        //-NPR5.55 [398263]
+        // TrackingSpecification.INIT;
+        // TrackingSpecification."Item No." := ItemCrossRef."Item No.";
+        // TrackingSpecification."Variant Code" := ItemCrossRef."Variant Code";
+        // TrackingSpecification."Location Code" := LocationCode;
+        // TrackingSpecification."Qty. per Unit of Measure" := 1;
+        // ItemTrackingDataCollection.AssistEditLotSerialNo(TrackingSpecification,(-Qty < 0) AND NOT InsertIsBlocked,-1,0,Qty);
+        // SerialNo := TrackingSpecification."Serial No.";
+
+        SaleLinePOS.Init;
+        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."No." := ItemCrossRef."Item No.";
+        SaleLinePOS."Variant Code" := ItemCrossRef."Variant Code";
+        SaleLinePOS."Location Code" := LocationCode;
+        SaleLinePOS.Quantity := 1;
+        if SaleLinePOS.SerialNoLookup2() then begin
+          SerialNo := SaleLinePOS."Serial No.";
+          ItemCrossRef."Variant Code" := SaleLinePOS."Variant Code";
+        end;
+        //+NPR5.55 [398263]
     end;
 
     local procedure "--- Ean Box Event Handling"()

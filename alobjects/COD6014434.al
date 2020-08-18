@@ -3,7 +3,7 @@ codeunit 6014434 "NF Retail Code"
     // //001 - Ohm
     //   Der skal ikke oprettes en kunde ved oprettelse af debitor
     // //002 - ABP
-    //   CR426DebitorOnInsert: Overf�rsel af Rykkerbetingelse fra ops�tning
+    //   CR426DebitorOnInsert: Overf¢rsel af Rykkerbetingelse fra opsætning
     // //4.001.001 - Jerome
     //   CR426DebitorOnInsert & CR426DebitorOnInsertTDC moved to Std. Table Code
     // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"
@@ -136,9 +136,9 @@ codeunit 6014434 "NF Retail Code"
             Varepost1.SETRANGE("Serienr.","Serienr.");
             IF NOT Varepost1.FINDFIRST THEN BEGIN
               Antal := -1;
-              Bel�b := -ABS(Bel�b);
-              "Bel�b inkl. moms" := -ABS("Bel�b inkl. moms");
-              "Momsgrundlag (bel�b)" := -ABS("Momsgrundlag (bel�b)");
+              Bel¢b := -ABS(Bel¢b);
+              "Bel¢b inkl. moms" := -ABS("Bel¢b inkl. moms");
+              "Momsgrundlag (bel¢b)" := -ABS("Momsgrundlag (bel¢b)");
             */
             //      MODIFY;
             if Quantity <> Abs(1) then
@@ -301,7 +301,7 @@ codeunit 6014434 "NF Retail Code"
           //+NPR4.04
 
           //-NPR5.23 [240916]
-        //  IF Ops�tning."Use VariaX module" AND ("Variant Code" <> '') THEN BEGIN
+        //  IF Opsætning."Use VariaX module" AND ("Variant Code" <> '') THEN BEGIN
         //    IF STRLEN( "Variant Code" ) <= 10 THEN
         //      IF VariaXInfo.GET( "Variant Code" ) THEN
         //        EXIT( VariaXInfo."Unit Cost" * PriceMult );
@@ -313,7 +313,7 @@ codeunit 6014434 "NF Retail Code"
 
     procedure CR414PostTodaysGLEntries(var GenJnlLine: Record "Gen. Journal Line")
     begin
-        //CR414Bogf�rDagensPosteringer()
+        //CR414Bogf¢rDagensPosteringer()
         GenJnlPostLine.RunWithoutCheck(GenJnlLine);
     end;
 
@@ -465,7 +465,7 @@ codeunit 6014434 "NF Retail Code"
         SalesHeader.SetRange("Document Type",DocType);
         SalesHeader.SetRange("Sell-to Customer No.",CustomerNo);
         NewLineNo := 10000;
-        if SalesHeader.FindLast then begin  // Tilf�j til eksisterende ordre
+        if SalesHeader.FindLast then begin  // Tilf¢j til eksisterende ordre
           SalesLine.SetRange("Document Type",SalesHeader."Document Type");
           SalesLine.SetRange("Document No.",SalesHeader."No.");
           if SalesLine.FindLast then
@@ -550,39 +550,39 @@ codeunit 6014434 "NF Retail Code"
               ELSE
                 ShipDec += -Varepost.Quantity;
             END;
-            V�rdipost.SETCURRENTKEY( "Item Ledger Entry No." );
-            V�rdipost.SETRANGE( "Item Ledger Entry No.", Varepost."Entry No." );
-            V�rdipost.SETFILTER( "Variant Code", GETFILTER( "Variant Filter" ));
-            V�rdipost.SETFILTER( "Location Code", GETFILTER( "Location Filter" ));
-            V�rdipost.SETFILTER( "Global Dimension 1 Code", GETFILTER( "Global Dimension 1 Code" ));
-            V�rdipost.SETFILTER( "Global Dimension 2 Code", GETFILTER( "Global Dimension 2 Code" ));
-            IF V�rdipost.FINDSET THEN REPEAT
-              IF NOT (( EndDate <> 0D ) AND ( V�rdipost."Posting Date" > EndDate )) THEN BEGIN
+            Værdipost.SETCURRENTKEY( "Item Ledger Entry No." );
+            Værdipost.SETRANGE( "Item Ledger Entry No.", Varepost."Entry No." );
+            Værdipost.SETFILTER( "Variant Code", GETFILTER( "Variant Filter" ));
+            Værdipost.SETFILTER( "Location Code", GETFILTER( "Location Filter" ));
+            Værdipost.SETFILTER( "Global Dimension 1 Code", GETFILTER( "Global Dimension 1 Code" ));
+            Værdipost.SETFILTER( "Global Dimension 2 Code", GETFILTER( "Global Dimension 2 Code" ));
+            IF Værdipost.FINDSET THEN REPEAT
+              IF NOT (( EndDate <> 0D ) AND ( Værdipost."Posting Date" > EndDate )) THEN BEGIN
                 IF Varepost."Posting Date" < StartDate THEN BEGIN
-                  ValQtyOnHand  += V�rdipost."Cost Amount (Expected)";
-                  ValInvQty     += V�rdipost."Cost Amount (Actual)";
-                  InvQty        += V�rdipost."Invoiced Quantity";
-                END ELSE IF ( V�rdipost."Item Ledger Entry Type" IN
-                             [V�rdipost."Item Ledger Entry Type"::Purchase,
-                              V�rdipost."Item Ledger Entry Type"::"Positive Adjmt.",
-                              V�rdipost."Item Ledger Entry Type"::Output ])
+                  ValQtyOnHand  += Værdipost."Cost Amount (Expected)";
+                  ValInvQty     += Værdipost."Cost Amount (Actual)";
+                  InvQty        += Værdipost."Invoiced Quantity";
+                END ELSE IF ( Værdipost."Item Ledger Entry Type" IN
+                             [Værdipost."Item Ledger Entry Type"::Purchase,
+                              Værdipost."Item Ledger Entry Type"::"Positive Adjmt.",
+                              Værdipost."Item Ledger Entry Type"::Output ])
                 THEN BEGIN
-                  ValRcdInc   += V�rdipost."Cost Amount (Expected)";
-                  ValInvInc   += V�rdipost."Cost Amount (Actual)";
-                  InvInc      += V�rdipost."Invoiced Quantity";
+                  ValRcdInc   += Værdipost."Cost Amount (Expected)";
+                  ValInvInc   += Værdipost."Cost Amount (Actual)";
+                  InvInc      += Værdipost."Invoiced Quantity";
                 END ELSE BEGIN
-                  CostShipDec += -V�rdipost."Cost Amount (Expected)";
-                  CostInvDec  += -V�rdipost."Cost Amount (Actual)";
-                  InvDec      += -V�rdipost."Invoiced Quantity";
+                  CostShipDec += -Værdipost."Cost Amount (Expected)";
+                  CostInvDec  += -Værdipost."Cost Amount (Actual)";
+                  InvDec      += -Værdipost."Invoiced Quantity";
                 END;
-                IF V�rdipost."Expected Cost" THEN BEGIN
-                  CostToGL    += V�rdipost."Cost Posted to G/L";
-                  ExpCostToGL += V�rdipost."Cost Posted to G/L";
+                IF Værdipost."Expected Cost" THEN BEGIN
+                  CostToGL    += Værdipost."Cost Posted to G/L";
+                  ExpCostToGL += Værdipost."Cost Posted to G/L";
                 END ELSE
-                  InvCostToGL += V�rdipost."Cost Posted to G/L";
-                ValCostAmount += V�rdipost."Cost Amount (Actual)";
+                  InvCostToGL += Værdipost."Cost Posted to G/L";
+                ValCostAmount += Værdipost."Cost Amount (Actual)";
               END;
-            UNTIL V�rdipost.NEXT = 0;
+            UNTIL Værdipost.NEXT = 0;
             ValQtyOnHand  += ValInvQty;
             ValRcdInc     += ValInvInc;
             CostShipDec   += CostInvDec;
@@ -593,12 +593,12 @@ codeunit 6014434 "NF Retail Code"
         Win.UPDATE( 4, 0 );
         IF ValCostAmount=0 THEN BEGIN
           IF Difference <> 0 THEN
-            EXIT((Item."Last Direct Cost"-V�rdi) /Difference)
+            EXIT((Item."Last Direct Cost"-Værdi) /Difference)
           ELSE
            EXIT(Item."Last Direct Cost")
         END ELSE BEGIN
           IF Difference <> 0 THEN
-            EXIT(( ValCostAmount - V�rdi ) / Difference )
+            EXIT(( ValCostAmount - Værdi ) / Difference )
           ELSE
             EXIT( ValCostAmount );
         END;

@@ -6,6 +6,7 @@ report 6014431 "Sales Person Trn. by Item Gr."
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.39/TJ  /20180212  CASE 302634 Renamed Name property of controls Sort and SortBy to english
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.55/BHR /20200219 CASE 361515 Change Key as it's not supported in extension
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Person Trn. by Item Gr..rdlc';
 
@@ -203,9 +204,11 @@ report 6014431 "Sales Person Trn. by Item Gr."
             trigger OnPreDataItem()
             begin
                 CopyFilter("Date Filter", ValueEntry."Posting Date");
-
-                ValueEntry.SetCurrentKey(
-                "Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Item Charge No.","Location Code","Variant Code");
+                //-NPR5.55 [361515]
+                //ValueEntry.SETCURRENTKEY(
+                //"Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Item Charge No.","Location Code","Variant Code");
+                ValueEntry.SetCurrentKey("Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Variance Type","Item Charge No.","Location Code","Variant Code");
+                //+NPR5.55 [361515]
                 ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
                 //-NPR5.29
                 ValueEntry.SetFilter(ValueEntry."Item Group No.",'<>%1','');

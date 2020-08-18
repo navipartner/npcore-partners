@@ -20,6 +20,7 @@ page 6060152 "Event List"
     // NPR5.49/TJ  /20190307 CASE 345048 Added field "Bill-to Name"
     // NPR5.50/JAVA/20190429 CASE 353381 BC14: Implement changes done in page 542 (use generic SetMultiRecord() function instead of specific functions).
     // NPR5.54/TJ  /20200302 CASE 392832 Added field "Creation Date"
+    // NPR5.55/TJ  /20200205 CASE 374887 New parameter was added for email sending function
 
     Caption = 'Event List';
     CardPageID = "Event Card";
@@ -502,7 +503,10 @@ page 6060152 "Event List"
 
                         trigger OnAction()
                         begin
-                            EventEmailMgt.SendEMail(Rec,0);
+                            //-NPR5.55 [374887]
+                            //EventEmailMgt.SendEMail(Rec,0);
+                            EventEmailMgt.SendEMail(Rec,0,0);
+                            //+NPR5.55 [374887]
                             CurrPage.Update(false);
                         end;
                     }
@@ -514,7 +518,10 @@ page 6060152 "Event List"
 
                         trigger OnAction()
                         begin
-                            EventEmailMgt.SendEMail(Rec,1);
+                            //-NPR5.55 [374887]
+                            //EventEmailMgt.SendEMail(Rec,1);
+                            EventEmailMgt.SendEMail(Rec,1,0);
+                            //+NPR5.55 [374887]
                             CurrPage.Update(false);
                         end;
                     }

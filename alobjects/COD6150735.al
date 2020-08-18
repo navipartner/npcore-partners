@@ -1,6 +1,7 @@
 codeunit 6150735 "POS Workflows 2.0 - Require"
 {
     // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
+    // NPR5.55/VB    /20200504  CASE 376799 Support for requiring images (as Data URI)
 
 
     trigger OnRun()
@@ -22,21 +23,23 @@ codeunit 6150735 "POS Workflows 2.0 - Require"
             exit;
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        ID := JSON.GetInteger('id', true);
-        Type := JSON.GetString('type', true);
+        JSON.InitializeJObjectParser(Context,FrontEnd);
+        ID := JSON.GetInteger('id',true);
+        Type := JSON.GetString('type',true);
         case Type of
-            'action':
-                RequireAction(POSSession, ID, JSON, FrontEnd);
-            'script':
-                RequireScript(ID, JSON, FrontEnd);
-            else begin
-                    OnRequireCustom(ID, Type, JSON, FrontEnd, CustomHandled);
-                    if not CustomHandled then begin
-                        FrontEnd.ReportBug(StrSubstNo(Text001, Type));
-                        exit;
-                    end;
-                end;
+          'action':  RequireAction(POSSession,ID,JSON,FrontEnd);
+          'script':  RequireScript(ID,JSON,FrontEnd);
+          //-NPR5.55 [376799]
+          'image':   RequireImage(ID,JSON,FrontEnd);
+          //+NPR5.55 [376799]
+          else
+            begin
+              OnRequireCustom(ID,Type,JSON,FrontEnd,CustomHandled);
+              if not CustomHandled then begin
+                FrontEnd.ReportBug(StrSubstNo(Text001,Type));
+                exit;
+              end;
+            end;
         end;
     end;
 
@@ -102,6 +105,18 @@ codeunit 6150735 "POS Workflows 2.0 - Require"
             until POSActionParam.Next = 0;
 
         FrontEnd.RequireResponse(ID, WorkflowAction);
+    end;
+
+    local procedure RequireImage(ID: Integer;JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management")
+    var
+        WebClientDependency: Record "Web Client Dependency";
+        ImageCode: Code[20];
+    begin
+        //-NPR5.55 [376799]
+        JSON.SetScope('context',true);
+        ImageCode := JSON.GetString('code',true);
+        FrontEnd.RequireResponse(ID,WebClientDependency.GetDataUri(ImageCode));
+        //+NPR5.55 [376799]
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,8 +1,9 @@
 page 6014611 "Retail Campaign"
 {
     // NPR5.38.01/MHA /20171220  CASE 299436 Object created - Retail Campaign
-    // NPR5.38.01/JKL /20180105  CASE 299436 Added action Create Planning Items - Retail Campaign �field Distribution Group + requested delivery date
+    // NPR5.38.01/JKL /20180105  CASE 299436 Added action Create Planning Items - Retail Campaign Ùfield Distribution Group + requested delivery date
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
+    // MAG2.26/MHA /20200507  CASE 401235 Added field 6151414 "Magento Category Id"
 
     Caption = 'Retail Campaign';
     PageType = Card;
@@ -22,6 +23,10 @@ page 6014611 "Retail Campaign"
                     }
                     field(Description;Description)
                     {
+                    }
+                    field("Magento Category Id";"Magento Category Id")
+                    {
+                        Visible = MagentoEnabled;
                     }
                 }
                 group(Control6014410)
@@ -148,7 +153,17 @@ page 6014611 "Retail Campaign"
         CurrPage.RetailItems.PAGE.ShowCampaignItems(Rec);
     end;
 
+    trigger OnOpenPage()
+    var
+        MagentoSetup: Record "Magento Setup";
+    begin
+        //-MAG2.26 [401235]
+        MagentoEnabled := MagentoSetup.Get and MagentoSetup."Magento Enabled";
+        //+MAG2.26 [401235]
+    end;
+
     var
         RetailCampaignCalcMgt: Codeunit "Retail Campaign Calc. Mgt.";
+        MagentoEnabled: Boolean;
 }
 

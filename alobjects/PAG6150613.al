@@ -61,6 +61,9 @@ page 6150613 "NP Retail Setup"
     // NPR5.52/BHR /20190925  CASE 368143 Moved the Action RFID setup to "Navigate and other configuration"
     // NPR5.52/BHR /20191002  CASE 370447 remove Actions Step 1 to step 5 and rename action 'Upgrade to Balancing V3 Setups' to 'Upgrade Audit Roll to POS Entry '
     // NPR5.52/MHA /20191016  CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
+    // NPR5.55/BHR /20200408  CASE 399443 Removed Fields300Item Price Codeunit ID,305Item Price Codeunit ,310Item Price Function
+    // NPR5.55/YAHA/20200227  CASE 393297 Moved transaction types,Transaction subtype & Result code into pepper group
+    // NPR5.55/CLVA/20200804  CASE 416793 Added action "MCS API Setup"
 
     Caption = 'NP Retail Setup';
     SourceTable = "NP Retail Setup";
@@ -101,17 +104,6 @@ page 6150613 "NP Retail Setup"
                 {
                 }
                 field("Advanced Posting Activated"; "Advanced Posting Activated")
-                {
-                }
-                field("Item Price Codeunit ID"; "Item Price Codeunit ID")
-                {
-                    Visible = false;
-                }
-                field("Item Price Codeunit Name"; "Item Price Codeunit Name")
-                {
-                    Visible = false;
-                }
-                field("Item Price Function"; "Item Price Function")
                 {
                 }
                 field("Default POS Posting Profile"; "Default POS Posting Profile")
@@ -403,6 +395,12 @@ page 6150613 "NP Retail Setup"
                         Caption = 'RFID Setup';
                         Image = Setup;
                         RunObject = Page "RFID Setup";
+                    }
+                    action("MCS API Setup")
+                    {
+                        Caption = 'MCS API Setup';
+                        Image = setup;
+                        RunObject = Page "MCS API Setup";
                     }
                     action("Lookup Templates")
                     {
@@ -1027,6 +1025,11 @@ page 6150613 "NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "EFT Integration Types";
                     }
+                }
+                group(Pepper)
+                {
+                    Caption = 'Pepper';
+                    Image = Administration;
                     action("Transaction Types")
                     {
                         Caption = 'Transaction Types';
@@ -1045,11 +1048,6 @@ page 6150613 "NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "Pepper EFT Result Codes";
                     }
-                }
-                group(Pepper)
-                {
-                    Caption = 'Pepper';
-                    Image = Administration;
                     action("Terminal Types")
                     {
                         Caption = 'Terminal Types';

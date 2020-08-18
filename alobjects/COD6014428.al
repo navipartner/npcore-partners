@@ -1,7 +1,7 @@
 codeunit 6014428 "Std. Codeunit Code"
 {
     // //-NPR3.1b
-    // //  tager h�jde for virtuelPDF printer
+    // //  tager h¢jde for virtuelPDF printer
     // //-NPR3.2k
     //   Fallback tabel lavet til printer opslag
     // 
@@ -33,7 +33,7 @@ codeunit 6014428 "Std. Codeunit Code"
     // NPR5.29/JC/20161103  CASE 257499 Fixed Cross reference field used for serial no. not created
     // NPR5.29.01/JDH/20170203 CASE     Removed unused var
     // NPR5.30/TJ  /20170222 CASE 266874 Removed functions C11CheckGLLine and C12PostGLLine
-    // NPR5.30/TJ  /20170224 CASE 266866 Commented code in functions Inds�tOverf�rselPost and Ops�tVarePost
+    // NPR5.30/TJ  /20170224 CASE 266866 Commented code in functions IndsætOverf¢rselPost and OpsætVarePost
     // NPR5.31/MMV /20170321 CASE 269028 Re-added increment of printed no. on sales receipt.
     // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
     // NPR5.36/TJ  /20170919 CASE 286283 Renamed variables/function into english and into proper naming terminology

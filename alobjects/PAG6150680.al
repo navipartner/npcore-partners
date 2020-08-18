@@ -1,12 +1,13 @@
-page 6150680 "NPRE W.Pad L. Print Categories"
+page 6150680 "NPRE Print/Prod. Categories"
 {
-    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
-    Caption = 'W. Pad Line Print Categories';
+    Caption = 'Print/Prod. Categories';
+    DataCaptionExpression = '';
     DelayedInsert = true;
-    LinksAllowed = false;
     PageType = List;
-    SourceTable = "NPRE W.Pad Line Print Category";
+    SourceTable = "NPRE Print/Prod. Category";
+    UsageCategory = Administration;
 
     layout
     {
@@ -14,16 +15,15 @@ page 6150680 "NPRE W.Pad L. Print Categories"
         {
             repeater(Group)
             {
-                field("Waiter Pad No.";"Waiter Pad No.")
+                field("Code";Code)
                 {
-                    Visible = false;
                 }
-                field("Waiter Pad Line No.";"Waiter Pad Line No.")
+                field(Description;Description)
                 {
-                    Visible = false;
                 }
-                field("Print Category Code";"Print Category Code")
+                field("Print Tag";"Print Tag")
                 {
+                    Visible = ShowPrintTags;
                 }
             }
         }
@@ -32,5 +32,17 @@ page 6150680 "NPRE W.Pad L. Print Categories"
     actions
     {
     }
+
+    trigger OnOpenPage()
+    var
+        SetupProxy: Codeunit "NPRE Restaurant Setup Proxy";
+        ServingStepDiscoveryMethod: Integer;
+    begin
+        ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
+        ShowPrintTags := ServingStepDiscoveryMethod = 0;
+    end;
+
+    var
+        ShowPrintTags: Boolean;
 }
 

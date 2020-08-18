@@ -1,7 +1,7 @@
 table 6014509 "Warranty Directory"
 {
     // //-NPR3.0h
-    //   hvis forsikring er sendt med mail kan der ikke �ndres mere. onModify;
+    //   hvis forsikring er sendt med mail kan der ikke ændres mere. onModify;
     // NPR5.29/MHA /20161212  CASE 256690 Customer Fields extended to match standard
     // NPR5.29/MMV /20170110  CASE 260033 Added report interface support for better webclient printing.
     // NPR5.35/TJ  /20170816  CASE 286283 Renamed variables/function into english and into proper naming terminology

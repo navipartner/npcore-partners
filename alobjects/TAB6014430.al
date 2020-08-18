@@ -343,7 +343,7 @@ table 6014430 "NPR Line Dimension"
         if not NPRLineDimLine.Find('-') then
           exit;
 
-        // Genneml�b alle dimensionerne p� "Ekspedition" EFTER dim er blevet opdateret.
+        // Genneml¢b alle dimensionerne på "Ekspedition" EFTER dim er blevet opdateret.
         with NPRLineDimHeader do
           if Find('-') then
             repeat
@@ -367,8 +367,8 @@ table 6014430 "NPR Line Dimension"
               end;
             until Next = 0;
 
-        // Genneml�b alle dimensionerne p� "Ekspedition" F�R dim er blevet opdateret.
-        // hvis Dimensionskoden vare der f�r men ikke mere, s� slettes Dimensionslinjerne med denne Dimensionskode
+        // Genneml¢b alle dimensionerne på "Ekspedition" F¥R dim er blevet opdateret.
+        // hvis Dimensionskoden vare der f¢r men ikke mere, så slettes Dimensionslinjerne med denne Dimensionskode
         with OldNPRLineDimHeader do
           if Find('-') then
             repeat

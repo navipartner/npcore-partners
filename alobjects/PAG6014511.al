@@ -51,6 +51,8 @@ page 6014511 "Retail Item List"
     // NPR5.51/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
     // NPR5.51/SARA/20190904 CASE 366962 Added Page Action 'Shelf Labels'
     // NPR5.53/MHA /20191113  CASE 374721 Updated Page Caption
+    // NPR5.55/YAHA/20200303 CASE 393483 Added ondrilldown functionality to ItemAvlByLocation(New field)
+    // NPR5.55/YAHA/20200818 CASE 418943 Added filters for the drill down options
 
     Caption = 'Retail Item List';
     CardPageID = "Retail Item Card";
@@ -139,6 +141,32 @@ page 6014511 "Retail Item List"
                 }
                 field(Inventory;Inventory)
                 {
+                }
+                field(ItemAvlByLocation;ItemAvlByLocation)
+                {
+                    Caption = 'Inv availability by location';
+                    DecimalPlaces = 2:2;
+
+                    trigger OnDrillDown()
+                    begin
+                        //-NPR5.55 [393483]
+                        ItemFilter.Reset;
+                        ItemFilter.SetRange("No.","No.");
+                        //-NPR5.55 [418943]
+                        if "Global Dimension 1 Filter" <> '' then
+                          ItemFilter.SetRange("Global Dimension 1 Filter","Global Dimension 1 Filter");
+                        if "Global Dimension 2 Filter" <> '' then
+                          ItemFilter.SetRange("Global Dimension 2 Filter","Global Dimension 2 Filter");
+                        if "Location Filter" <>  '' then
+                          ItemFilter.SetRange("Location Filter","Location Filter");
+                        if "Drop Shipment Filter"  then
+                          ItemFilter.SetRange("Drop Shipment Filter","Drop Shipment Filter");
+                        if "Variant Filter" <>  '' then
+                          ItemFilter.SetRange("Variant Filter","Variant Filter");
+                        //+NPR5.55 [418943]
+                        PAGE.Run(PAGE::"Item Availability by Location",ItemFilter);
+                        //+NPR5.55 [393483]
+                    end;
                 }
                 field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
                 {
@@ -1801,6 +1829,16 @@ page 6014511 "Retail Item List"
         if ItemGroup.Get("Item Group") then
           ItemGroupDesc  := ItemGroup.Description;
         //+NPR5.38
+
+
+        //-NPR5.55 [393483]
+        ItemFilter.Reset;
+        ItemFilter.SetRange("No.",Rec."No.");
+        if ItemFilter.FindFirst then begin
+          ItemFilter.CalcFields(Inventory);
+          ItemAvlByLocation := ItemFilter.Inventory;
+        end;
+        //+NPR5.55 [393483]
     end;
 
     trigger OnOpenPage()
@@ -1858,6 +1896,8 @@ page 6014511 "Retail Item List"
         ItemGroupDesc: Text[50];
         ItemGroup: Record "Item Group";
         RetailInventoryEnabled: Boolean;
+        ItemFilter: Record Item;
+        ItemAvlByLocation: Decimal;
 
     procedure GetSelectionFilter(): Text
     var

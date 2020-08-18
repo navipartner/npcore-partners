@@ -1,4 +1,4 @@
-pageextension 6014440 pageextension6014440 extends "Sales Credit Memo" 
+pageextension 6014444 pageextension6014444 extends "Sales Credit Memo" 
 {
     // NPR5.23/TS/20160603 CASE 2430085 Added field Posting Description
     // NPR5.29/TJ/20160113 CASE 262797 Restored standard values of property ToolTipML on some actions
@@ -6,11 +6,21 @@ pageextension 6014440 pageextension6014440 extends "Sales Credit Memo"
     // NPR5.38/BR  /20171117 CASE 295255 Added Action POS Entries
     // NPR5.49/BHR /20190227 CASE 346899 Add Action Import Scanner
     // MAG2.23/MHA /20190911 CASE 355841 Added "Magento Payment Amount"
+    // NPR5.55/BHR /20200525 CASE 405953 Added Fields"Bill-to E-mail","Document Processing"
     layout
     {
         addafter("Responsibility Center")
         {
             field(NPRPostingDescription1;"Posting Description")
+            {
+            }
+        }
+        addafter("Payment Method Code")
+        {
+            field("Bill-to E-mail";"Bill-to E-mail")
+            {
+            }
+            field("Document Processing";"Document Processing")
             {
             }
         }

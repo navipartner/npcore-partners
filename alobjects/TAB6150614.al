@@ -11,6 +11,7 @@ table 6150614 "POS Store"
     // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
     // NPR5.51/TSA /20190722 CASE 361917 Removed unreferenced functions SendToJournal(), PostToEntries(), PostOnFinaliseSale(), PostOnClosePOS()
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
 
     Caption = 'POS Store';
     DataCaptionFields = "Code", Name;
@@ -221,6 +222,12 @@ table 6150614 "POS Store"
             Caption = 'POS Entry Doc. No. Series';
             Description = 'NPR5.36';
             TableRelation = "No. Series";
+        }
+        field(570;"POS Restaurant Profile";Code[20])
+        {
+            Caption = 'POS Restaurant Profile';
+            Description = 'NPR5.55';
+            TableRelation = "POS NPRE Restaurant Profile";
         }
         field(800; "Geolocation Latitude"; Decimal)
         {

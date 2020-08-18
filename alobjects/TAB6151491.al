@@ -4,6 +4,7 @@ table 6151491 "Raptor Setup"
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
     // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
+    // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor
 
     Caption = 'Raptor Setup';
 
@@ -69,6 +70,16 @@ table 6151491 "Raptor Setup"
             begin
                 RaptorMgt.ValidateTrackingServiceType("Tracking Service Type");  //NPR5.54 [355871]
             end;
+        }
+        field(18;"Exclude Webshop Sales";Boolean)
+        {
+            Caption = 'Exclude Webshop Sales';
+            Description = 'NPR5.55';
+        }
+        field(19;"Webshop Salesperson Filter";Text[250])
+        {
+            Caption = 'Webshop Salesperson Filter';
+            Description = 'NPR5.55';
         }
     }
 

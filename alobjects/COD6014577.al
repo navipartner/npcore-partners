@@ -242,7 +242,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
 
         //-243285 [243285]
         // IF thisReg.GET( AuditRoll."Register No." ) THEN BEGIN
-        // flg�benkasse := TRUE;
+        // flgÅbenkasse := TRUE;
         // IF (AuditRoll."Copy No.") < 0 THEN BEGIN
         //  //IF NOT thisReg."Money drawer - open on special" THEN BEGIN
         //    AuditTemp.SETRANGE("Sales Ticket No.",AuditRoll."Sales Ticket No.");
@@ -252,12 +252,12 @@ codeunit 6014577 "Report - Tax Free Receipt"
         //    IF AuditTemp.FIND('-') THEN BEGIN
         //      AuditTemp.SETRANGE("No.",'K');
         //      AuditTemp.SETFILTER("Amount Including VAT",'<0');
-        //      flg�benkasse := AuditTemp.FIND('-');
+        //      flgÅbenkasse := AuditTemp.FIND('-');
         //    END;// Find
         //  //END; // IF "Money drawer - open on special"
         // END; // IF Copy No. = 0
         // END; // IF GET Register
-        // IF ({thisReg."Money drawer attached" AND} flg�benkasse) THEN BEGIN
+        // IF ({thisReg."Money drawer attached" AND} flgÅbenkasse) THEN BEGIN
         //  // Audit Roll, Header (2)
         //  Printer.SetFont('Control');
         //  Printer.AddLine(Text10600000);
@@ -327,7 +327,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
 
     procedure PrintIntegerLoop()
     begin
-        // L�kke - Properties
+        // L¢kke - Properties
         LoopCounter.SetCurrentKey(Number);
         //-243285 [243285]
         //LoopCounter.SETFILTER(Number, '1..2');
@@ -338,7 +338,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
 
           LOOPCurrReport_SKIP := false;
 
-          // L�kke - OnAfterGetRecord()
+          // L¢kke - OnAfterGetRecord()
           LoopCounterOnAfterGetRecord();
 
           if not LOOPCurrReport_SKIP then begin
@@ -545,7 +545,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
         //  // Salgslinie, Body (8) - OnPreSection()
         //  FRV_STR_txt:='';
         //  farvetxt:='';
-        //  st�rrelseTXT:='';
+        //  st¢rrelseTXT:='';
         //
         //  IF variant1.GET(AuditRollSalesLines."No.",AuditRollSalesLines.Color,AuditRollSalesLines.Size) THEN BEGIN
         //     IF (variant1."Description - Color"<>Text10600008) THEN BEGIN
@@ -554,10 +554,10 @@ codeunit 6014577 "Report - Tax Free Receipt"
         //       END
         //     ELSE
         //       mellemrum:='';
-        //     IF (variant1."Description - Size"<>'') THEN st�rrelseTXT:=Text10600010+FORMAT(variant1."Description - Size");
+        //     IF (variant1."Description - Size"<>'') THEN st¢rrelseTXT:=Text10600010+FORMAT(variant1."Description - Size");
         //     END;
         //
-        //  FRV_STR_txt:=farvetxt+mellemrum+st�rrelseTXT;
+        //  FRV_STR_txt:=farvetxt+mellemrum+st¢rrelseTXT;
         //
         //  IF FRV_STR_txt<>'' THEN BEGIN
         //    Printer.SetFont('B11');
@@ -615,7 +615,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
                 DebitorFound:=true;
                 flgIndbetal:=true;
                 IndbetalTXT:='Indbetaling';
-                IndbetalTXT2:='p� konto '+Format(AuditRollSalesLines."No.");
+                IndbetalTXT2:='på konto '+Format(AuditRollSalesLines."No.");
                 IndbetalTXT3:=Format(AuditRollSalesLines."Buffer Document Type")+' '+AuditRollSalesLines."Buffer ID";
               end
 
@@ -657,7 +657,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
                 DebitorFound:=true;
                 flgIndbetal:=true;
                 IndbetalTXT:='Indbetaling';
-                IndbetalTXT2:='p� konto '+Format(AuditRollSalesLines."No.");
+                IndbetalTXT2:='på konto '+Format(AuditRollSalesLines."No.");
                 IndbetalTXT3:=Format(AuditRollSalesLines."Buffer Document Type")+' '+AuditRollSalesLines."Buffer ID";
               end else begin
                 IndbetalTXT:='Indbetaling:';
@@ -808,7 +808,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
     procedure PrintNPRetailConfiguration()
     begin
         // NP Retail Configuration, Body (1) - OnPreSection()
-        //IF NPK."Stregkode p� bonudskrift" AND
+        //IF NPK."Stregkode på bonudskrift" AND
         //  (Register."Receipt Printer Type"=Register."Receipt Printer Type"::"TM-T88") THEN
         //   CurrReport.SHOWOUTPUT(TRUE) ELSE
         //  CurrReport.SHOWOUTPUT(FALSE);
@@ -856,8 +856,8 @@ codeunit 6014577 "Report - Tax Free Receipt"
                 Printer.AddTextField(1,0,'This is a VAT form issued by:');
                 Printer.AddTextField(1,0,'Premier Tax Free');
                 Printer.AddTextField(1,0,'VAT no.: 29602492 ');
-                Printer.AddTextField(1,0,'R�dhusstr�de 3, 2. sal');
-                Printer.AddTextField(1,0,'1466 K�benhavn K');
+                Printer.AddTextField(1,0,'Rådhusstræde 3, 2. sal');
+                Printer.AddTextField(1,0,'1466 K¢benhavn K');
                 Printer.AddTextField(1,0,'Denmark');
                 Printer.AddTextField(1,0,'TEL: +45 70277844');
                 Printer.AddTextField(1,0,'FAX: +45 70277843');
@@ -1085,7 +1085,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
 
     procedure LoopCounterOnAfterGetRecord()
     begin
-        // L�kke - OnAfterGetRecord()
+        // L¢kke - OnAfterGetRecord()
 
         //-243285 [243285]
         // CASE LoopCounter.Number OF
@@ -1511,7 +1511,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
         // IF EVALUATE(calcInt, calcValue) THEN
         //  EXIT(FORMAT(calcInt MOD 72))
         // ELSE
-        //  //ERROR('Automation returnerede d�rligt resultat. Kontakt dit Navision Kundecenter \fejl: %1\%2',calcValue,calcInt);
+        //  //ERROR('Automation returnerede dårligt resultat. Kontakt dit Navision Kundecenter \fejl: %1\%2',calcValue,calcInt);
         //  //Removed error message. Caused errors in audit roll.
         //  EXIT('-1');
         //+NPR5.26 [243285]

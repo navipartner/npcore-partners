@@ -1,6 +1,8 @@
 codeunit 6150674 "NPRE Kitchen Order Mgt."
 {
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200420 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
 
     trigger OnRun()
@@ -8,11 +10,11 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
     end;
 
     var
-        IncorrectFunctionCallMsg: Label '%1: incorrect function call. %2. This indicates a programming bug, not a user error.';
-        MustBeTempMsg: Label 'Must be called with temporary record variable';
-        KitchenOrder: Record "NPRE Kitchen Order";
+        GlobalKitchenOrder: Record "NPRE Kitchen Order";
         SetupProxy: Codeunit "NPRE Restaurant Setup Proxy";
-        AlreadyFinishedMsg: Label 'The production of the item has already been finished. Are you sure you want to start over?';
+        AlreadyFinishedMsg: Label 'The production of the item has already been marked as finished. Are you sure you want to start over?';
+        MustBeTempMsg: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';
+        RequestCancelledMsg: Label 'The kitchen request is cancelled. Are you sure you want to continue?';
 
     procedure SendWPLinesToKitchen(var WaiterPadLineIn: Record "NPRE Waiter Pad Line";FlowStatusCode: Code[10];PrintCategoryCode: Code[20];RequestType: Option "Order","Serving Request";SentDateTime: DateTime): Boolean
     var
@@ -20,7 +22,7 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
         RestaurantPrint: Codeunit "NPRE Restaurant Print";
         Success: Boolean;
     begin
-        if not (RequestType in [RequestType::Order,RequestType::"Serving Request"]) then
+        if not (RequestType in [RequestType::Order, RequestType::"Serving Request"]) then
           exit(false);
 
         if SentDateTime = 0DT then
@@ -29,8 +31,8 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
         WaiterPadLine.Copy(WaiterPadLineIn);
         if WaiterPadLine.FindSet then
           repeat
-            if SendWPLineToKitchen(WaiterPadLine,FlowStatusCode,PrintCategoryCode,RequestType,SentDateTime) then begin
-              RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine,RequestType,FlowStatusCode,PrintCategoryCode,SentDateTime,1);
+            if SendWPLineToKitchen(WaiterPadLine, FlowStatusCode, PrintCategoryCode, RequestType, SentDateTime) then begin
+              RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine, RequestType, FlowStatusCode, PrintCategoryCode, SentDateTime, 1);
               Success := true;
             end;
           until WaiterPadLine.Next = 0;
@@ -41,85 +43,206 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
     local procedure SendWPLineToKitchen(WaiterPadLine: Record "NPRE Waiter Pad Line";FlowStatusCode: Code[10];PrintCategoryCode: Code[20];RequestType: Option "Order","Serving Request";SentDateTime: DateTime): Boolean
     var
         KitchenRequest: Record "NPRE Kitchen Request";
+        KitchenRequest2: Record "NPRE Kitchen Request";
         KitchenRequestParam: Record "NPRE Kitchen Request";
+        KitchenReqSourceParam: Record "NPRE Kitchen Req. Source Link";
         KitchenStation: Record "NPRE Kitchen Station";
         KitchenStationBuffer: Record "NPRE Kitchen Station Selection" temporary;
     begin
-        if not FindApplicableWPLineKitchenStations(KitchenStationBuffer,WaiterPadLine,FlowStatusCode,PrintCategoryCode) then
+        if not FindApplicableWPLineKitchenStations(KitchenStationBuffer, WaiterPadLine, FlowStatusCode, PrintCategoryCode) then
           exit(false);
 
-        repeat
-          KitchenRequestParam.InitFromWaiterPadLine(WaiterPadLine);
-          KitchenRequestParam."Restaurant Code" := KitchenStationBuffer."Restaurant Code";
-          KitchenRequestParam."Serving Step" := FlowStatusCode;
-          KitchenRequestParam."Created Date-Time" := SentDateTime;
-          FindKitchenRequestEntry(KitchenRequest,KitchenRequestParam);
+        KitchenRequestParam.InitFromWaiterPadLine(WaiterPadLine);
+        KitchenRequestParam."Restaurant Code" := KitchenStationBuffer."Restaurant Code";
+        KitchenRequestParam."Serving Step" := FlowStatusCode;
+        KitchenRequestParam."Created Date-Time" := SentDateTime;
+        InitKitchenReqSourceFromWaiterPadLine(
+          KitchenReqSourceParam, WaiterPadLine, KitchenStationBuffer."Restaurant Code", KitchenRequestParam."Serving Step", KitchenRequestParam."Created Date-Time");
 
-          if RequestType = RequestType::"Serving Request" then begin
-            KitchenRequest."Serving Requested Date-Time" := SentDateTime;
-            if KitchenRequest."Line Status" = KitchenRequest."Line Status"::Planned then
-              KitchenRequest."Line Status" := KitchenRequest."Line Status"::"Serving Requested";
-            UpdateRequestLineStatus(KitchenRequest);
-            KitchenRequest.Modify;
-          end;
+        FindKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+        HandleQtyChange(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam);
 
-          KitchenStation.Get(KitchenStationBuffer."Production Restaurant Code",KitchenStationBuffer."Kitchen Station");
-          CreateKitchenStationRequest(KitchenRequest,KitchenStation);
-          UpdateOrderStatus(KitchenOrder);
-        until KitchenStationBuffer.Next = 0;
+        if KitchenRequest.FindSet then
+          repeat
+            KitchenRequest2 := KitchenRequest;
+            if RequestType = RequestType::"Serving Request" then begin
+              KitchenRequest2."Serving Requested Date-Time" := SentDateTime;
+              if KitchenRequest2."Line Status" = KitchenRequest2."Line Status"::Planned then
+                KitchenRequest2."Line Status" := KitchenRequest2."Line Status"::"Serving Requested";
+              UpdateRequestLineStatus(KitchenRequest2);
+              KitchenRequest2.Modify;
+            end;
+
+            KitchenStationBuffer.FindSet;
+            repeat
+              KitchenStation.Get(KitchenStationBuffer."Production Restaurant Code", KitchenStationBuffer."Kitchen Station");
+              CreateKitchenStationRequest(KitchenRequest2, KitchenStation);
+            until KitchenStationBuffer.Next = 0;
+
+            UpdateOrderStatus(KitchenRequest2."Order ID");
+          until KitchenRequest.Next = 0;
         exit(true);
     end;
 
-    local procedure FindKitchenRequestEntry(var KitchenRequest: Record "NPRE Kitchen Request";KitchenRequestParam: Record "NPRE Kitchen Request")
+    procedure FindKitchenRequests(var KitchenRequest: Record "NPRE Kitchen Request";KitchenReqSourceParam: Record "NPRE Kitchen Req. Source Link")
+    var
+        KitchenReqWSourceQry: Query "NPRE Kitchen Request w. Source";
     begin
-        with KitchenRequest do begin
-          SetRange("Source Document Type",KitchenRequestParam."Source Document Type");
-          SetRange("Source Document Subtype",KitchenRequestParam."Source Document Subtype");
-          SetRange("Source Document No.",KitchenRequestParam."Source Document No.");
-          SetRange("Source Document Line No.",KitchenRequestParam."Source Document Line No.");
-          SetRange("Restaurant Code",KitchenRequestParam."Restaurant Code");
-          SetRange("Serving Step",KitchenRequestParam."Serving Step");
-          SetFilter("Line Status",'<>%1',"Line Status"::Cancelled);
-          if FindFirst then
-            KitchenOrder.Get("Order ID")
-          else begin
-            KitchenRequest := KitchenRequestParam;
-            "Line Status" := "Line Status"::Planned;
-            "Production Status" := "Production Status"::"Not Started";
-            "Order ID" := FindKitchenOrderId(KitchenRequest);
-            Priority := KitchenOrder.Priority;
-            "Request No." := 0;
-            Insert(true);
+        KitchenRequest.Reset;
+        KitchenRequest.SetAutoCalcFields(Quantity, "Quantity (Base)");
+
+        KitchenReqWSourceQry.SetRange(Source_Document_Type, KitchenReqSourceParam."Source Document Type");
+        KitchenReqWSourceQry.SetRange(Source_Document_Subtype, KitchenReqSourceParam."Source Document Subtype");
+        KitchenReqWSourceQry.SetRange(Source_Document_No, KitchenReqSourceParam."Source Document No.");
+        KitchenReqWSourceQry.SetRange(Source_Document_Line_No, KitchenReqSourceParam."Source Document Line No.");
+        KitchenReqWSourceQry.SetRange(Restaurant_Code, KitchenReqSourceParam."Restaurant Code");
+        KitchenReqWSourceQry.SetRange(Serving_Step, KitchenReqSourceParam."Serving Step");
+        KitchenReqWSourceQry.SetFilter(Line_Status, '<>%1', KitchenRequest."Line Status"::Cancelled);
+        KitchenReqWSourceQry.Open;
+        while KitchenReqWSourceQry.Read do begin
+          KitchenRequest.Get(KitchenReqWSourceQry.Request_No);
+          KitchenRequest.Mark(true);
+        end;
+        KitchenRequest.MarkedOnly(true);
+    end;
+
+    local procedure FindKitchenOrderId(KitchenRequest: Record "NPRE Kitchen Request";KitchenReqSourceLink: Record "NPRE Kitchen Req. Source Link"): BigInteger
+    var
+        Restaurant: Record "NPRE Restaurant";
+        KitchenReqWSourceQry: Query "NPRE Kitchen Request w. Source";
+    begin
+        if GlobalKitchenOrder."Order ID" = 0 then begin
+          SetupProxy.SetRestaurant(KitchenRequest."Restaurant Code");
+          if SetupProxy.OrderIDAssignmentMethod = Restaurant."Order ID Assign. Method"::"Same for Source Document" then begin
+            KitchenReqWSourceQry.SetRange(Source_Document_Type, KitchenReqSourceLink."Source Document Type");
+            KitchenReqWSourceQry.SetRange(Source_Document_Subtype, KitchenReqSourceLink."Source Document Subtype");
+            KitchenReqWSourceQry.SetRange(Source_Document_No, KitchenReqSourceLink."Source Document No.");
+            KitchenReqWSourceQry.SetRange(Order_Status, GlobalKitchenOrder.Status::Active, GlobalKitchenOrder.Status::Planned);
+            KitchenReqWSourceQry.SetFilter(Order_ID, '<>%1', 0);
+            KitchenReqWSourceQry.Open;
+            if KitchenReqWSourceQry.Read then
+              GlobalKitchenOrder.Get(KitchenReqWSourceQry.Order_ID);
           end;
+
+          if GlobalKitchenOrder."Order ID" = 0 then begin
+            GlobalKitchenOrder.Init;
+            GlobalKitchenOrder.Status := GlobalKitchenOrder.Status::Planned;
+            GlobalKitchenOrder.Priority := DefaultPriority(KitchenRequest);
+            GlobalKitchenOrder."Created Date-Time" := KitchenRequest."Created Date-Time";
+            GlobalKitchenOrder."Restaurant Code" := KitchenRequest."Restaurant Code";
+            GlobalKitchenOrder.Insert;
+          end;
+        end;
+        exit(GlobalKitchenOrder."Order ID");
+    end;
+
+    local procedure HandleQtyChange(var KitchenRequest: Record "NPRE Kitchen Request";KitchenRequestParam: Record "NPRE Kitchen Request";KitchenReqSourceParam: Record "NPRE Kitchen Req. Source Link")
+    begin
+        KitchenRequest.FilterGroup(2);
+        KitchenRequest.SetFilter("Line Status", '<>%1', KitchenRequest."Line Status"::Cancelled);
+        KitchenRequest.SetFilter("Production Status", '<>%1', KitchenRequest."Production Status"::Cancelled);
+        KitchenRequest.FilterGroup(0);
+
+        if KitchenRequest.FindSet then
+          repeat
+            KitchenReqSourceParam.Quantity := KitchenReqSourceParam.Quantity - KitchenRequest.Quantity;
+            KitchenReqSourceParam."Quantity (Base)" := KitchenReqSourceParam."Quantity (Base)" - KitchenRequest."Quantity (Base)";
+          until KitchenRequest.Next = 0;
+        if KitchenReqSourceParam.Quantity = 0 then
+          exit;
+
+        KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::"Serving Requested", KitchenRequest."Line Status"::Planned);
+        KitchenRequest.SetRange("Production Status", KitchenRequest."Production Status"::"Not Started", KitchenRequest."Production Status"::"On Hold");
+        AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+
+        if KitchenReqSourceParam.Quantity < 0 then begin
+          //Allocate quantity decrease, even if production has already been finished
+          KitchenRequest.SetRange("Production Status");
+          AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+
+          if KitchenReqSourceParam.Quantity < 0 then begin
+            //Allocate quantity decrease, even if items have already been served
+            KitchenRequest.SetRange("Line Status");
+            AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+          end;
+        end;
+
+        KitchenRequest.SetRange("Line Status");
+        KitchenRequest.SetRange("Production Status");
+
+        if KitchenReqSourceParam.Quantity > 0 then begin
+          //New request for quantity increase
+          CreateKitchenRequest(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam);
+          KitchenRequest.Mark(true);
         end;
     end;
 
-    local procedure FindKitchenOrderId(KitchenRequest: Record "NPRE Kitchen Request"): BigInteger
+    local procedure AllocateQtyChangeToExistingKitchenRequests(var KitchenRequest: Record "NPRE Kitchen Request";var KitchenReqSourceParam: Record "NPRE Kitchen Req. Source Link")
     var
-        KitchenRequest2: Record "NPRE Kitchen Request";
-        Restaurant: Record "NPRE Restaurant";
+        xKitchenReqSourceParam: Record "NPRE Kitchen Req. Source Link";
     begin
-        if KitchenOrder."Order ID" = 0 then begin
-          SetupProxy.SetRestaurant(KitchenRequest."Restaurant Code");
-          if SetupProxy.OrderIDAssignmentMethod = Restaurant."Order ID Assign. Method"::"Same for Source Document" then begin
-            KitchenRequest2.SetRange("Source Document Type",KitchenRequest."Source Document Type");
-            KitchenRequest2.SetRange("Source Document Subtype",KitchenRequest."Source Document Subtype");
-            KitchenRequest2.SetRange("Source Document No.",KitchenRequest."Source Document No.");
-            KitchenRequest2.SetFilter("Order ID",'<>%1',0);
-            if KitchenRequest2.FindFirst then
-              KitchenOrder.Get(KitchenRequest2."Order ID");
-          end;
+        if KitchenReqSourceParam.Quantity = 0 then
+          exit;
 
-          if KitchenOrder."Order ID" = 0 then begin
-            KitchenOrder.Init;
-            KitchenOrder.Status := KitchenOrder.Status::Planned;
-            KitchenOrder.Priority := DefaultPriority(KitchenRequest);
-            KitchenOrder."Created Date-Time" := KitchenRequest."Created Date-Time";
-            KitchenOrder."Restaurant Code" := KitchenRequest."Restaurant Code";
-            KitchenOrder.Insert;
-          end;
-        end;
-        exit(KitchenOrder."Order ID");
+        if KitchenRequest.FindSet then
+          repeat
+            if (KitchenRequest.Quantity > 0) or (KitchenReqSourceParam.Quantity > 0) then begin
+              xKitchenReqSourceParam := KitchenReqSourceParam;
+              if KitchenRequest.Quantity + KitchenReqSourceParam.Quantity <= 0 then begin
+                KitchenReqSourceParam.Quantity := -KitchenRequest.Quantity;
+                KitchenReqSourceParam."Quantity (Base)" := -KitchenRequest."Quantity (Base)";
+                CancelKitchenRequest(KitchenRequest);
+              end else begin
+                CreateKitchenRequestSourceLink(KitchenRequest, KitchenReqSourceParam);
+                SetQtyChanged(KitchenRequest);
+              end;
+
+              KitchenReqSourceParam.Quantity := xKitchenReqSourceParam.Quantity - KitchenReqSourceParam.Quantity;
+              KitchenReqSourceParam."Quantity (Base)" := xKitchenReqSourceParam."Quantity (Base)" - KitchenReqSourceParam."Quantity (Base)";
+            end;
+          until (KitchenRequest.Next = 0) or (KitchenReqSourceParam.Quantity = 0);
+    end;
+
+    local procedure SetQtyChanged(KitchenRequest: Record "NPRE Kitchen Request")
+    var
+        KitchenRequestStation: Record "NPRE Kitchen Request Station";
+    begin
+        KitchenRequestStation.SetRange("Request No.", KitchenRequest."Request No.");
+        KitchenRequestStation.ModifyAll("Qty. Change Not Accepted", true);
+    end;
+
+    procedure InitKitchenReqSourceFromWaiterPadLine(var KitchenReqSource: Record "NPRE Kitchen Req. Source Link";WaiterPadLine: Record "NPRE Waiter Pad Line";RestaurantCode: Code[20];ServingStep: Code[10];SentDateTime: DateTime)
+    begin
+        KitchenReqSource.Init;
+        KitchenReqSource.InitSource(WaiterPadLine.RecordId);
+        KitchenReqSource."Restaurant Code" := RestaurantCode;
+        KitchenReqSource."Serving Step" := ServingStep;
+        KitchenReqSource."Created Date-Time" := SentDateTime;
+        KitchenReqSource.Quantity := WaiterPadLine.Quantity;
+        KitchenReqSource."Quantity (Base)" := WaiterPadLine."Quantity (Base)";
+    end;
+
+    local procedure CreateKitchenRequest(var KitchenRequest: Record "NPRE Kitchen Request";KitchenRequestParam: Record "NPRE Kitchen Request";KitchenReqSourceParam: Record "NPRE Kitchen Req. Source Link")
+    begin
+        KitchenRequest := KitchenRequestParam;
+        KitchenRequest."Line Status" := KitchenRequest."Line Status"::Planned;
+        KitchenRequest."Production Status" := KitchenRequest."Production Status"::"Not Started";
+        KitchenRequest."Order ID" := FindKitchenOrderId(KitchenRequest, KitchenReqSourceParam);
+        KitchenRequest.Priority := GlobalKitchenOrder.Priority;
+        KitchenRequest."Request No." := 0;
+        KitchenRequest.Insert(true);
+
+        CreateKitchenRequestSourceLink(KitchenRequest, KitchenReqSourceParam);
+    end;
+
+    local procedure CreateKitchenRequestSourceLink(var KitchenRequest: Record "NPRE Kitchen Request";KitchenReqSourceParam: Record "NPRE Kitchen Req. Source Link")
+    var
+        KitchenReqSourceLink: Record "NPRE Kitchen Req. Source Link";
+    begin
+        KitchenReqSourceLink := KitchenReqSourceParam;
+        KitchenReqSourceLink."Request No." := KitchenRequest."Request No.";
+        KitchenReqSourceLink."Entry No." := 0;
+        KitchenReqSourceLink.Insert;
     end;
 
     local procedure CreateKitchenStationRequest(KitchenRequest: Record "NPRE Kitchen Request";KitchenStation: Record "NPRE Kitchen Station")
@@ -127,10 +250,10 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
         KitchenOrdLineStation: Record "NPRE Kitchen Request Station";
     begin
         with KitchenOrdLineStation do begin
-          SetRange("Request No.",KitchenRequest."Request No.");
-          SetRange("Production Restaurant Code",KitchenStation."Restaurant Code");
-          SetRange("Kitchen Station",KitchenStation.Code);
-          SetFilter("Production Status",'<>%1',"Production Status"::Cancelled);
+          SetRange("Request No.", KitchenRequest."Request No.");
+          SetRange("Production Restaurant Code", KitchenStation."Restaurant Code");
+          SetRange("Kitchen Station", KitchenStation.Code);
+          SetFilter("Production Status", '<>%1', "Production Status"::Cancelled);
           if IsEmpty then begin
             Init;
             "Request No." := KitchenRequest."Request No.";
@@ -144,7 +267,7 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
         end;
     end;
 
-    local procedure FindApplicableWPLineKitchenStations(var KitchenStationBuffer: Record "NPRE Kitchen Station Selection";WaiterPadLine: Record "NPRE Waiter Pad Line";FlowStatusCode: Code[10];PrintCategoryCode: Code[20]): Boolean
+    procedure FindApplicableWPLineKitchenStations(var KitchenStationBuffer: Record "NPRE Kitchen Station Selection";WaiterPadLine: Record "NPRE Waiter Pad Line";FlowStatusCode: Code[10];PrintCategoryCode: Code[20]): Boolean
     var
         KitchenStationSelection: Record "NPRE Kitchen Station Selection";
         Seating: Record "NPRE Seating";
@@ -152,13 +275,13 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
         SeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
     begin
         if not KitchenStationBuffer.IsTemporary then
-          Error(IncorrectFunctionCallMsg,'CU6150674.FindKitchenStations',MustBeTempMsg);
+          Error(MustBeTempMsg,'CU6150674.FindKitchenStations');
 
         Clear(KitchenStationBuffer);
         KitchenStationBuffer.DeleteAll;
 
-        SeatingWaiterPadLink.SetRange("Waiter Pad No.",WaiterPadLine."Waiter Pad No.");
-        SeatingWaiterPadLink.SetFilter("Seating Code",'<>%1','');
+        SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
+        SeatingWaiterPadLink.SetFilter("Seating Code", '<>%1', '');
         if SeatingWaiterPadLink.IsEmpty then
           SeatingWaiterPadLink.SetRange("Seating Code");
         if SeatingWaiterPadLink.FindFirst then begin
@@ -190,28 +313,28 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
     local procedure GetKitchenStationSelection(var KitchenStationSelection: Record "NPRE Kitchen Station Selection"): Boolean
     begin
         with KitchenStationSelection do begin
-          SetRange("Restaurant Code","Restaurant Code");
-          SetRange("Seating Location","Seating Location");
-          SetRange("Serving Step","Serving Step");
-          SetRange("Print Category Code","Print Category Code");
+          SetRange("Restaurant Code", "Restaurant Code");
+          SetRange("Seating Location", "Seating Location");
+          SetRange("Serving Step", "Serving Step");
+          SetRange("Print Category Code", "Print Category Code");
           if IsEmpty then begin
-            SetRange("Seating Location",'');
+            SetRange("Seating Location", '');
             if IsEmpty then begin
-              SetRange("Seating Location","Seating Location");
-              SetRange("Serving Step",'');
+              SetRange("Seating Location", "Seating Location");
+              SetRange("Serving Step", '');
               if IsEmpty then begin
-                SetRange("Seating Location",'');
+                SetRange("Seating Location", '');
                 if IsEmpty then begin
-                  SetRange("Seating Location","Seating Location");
-                  SetRange("Serving Step","Serving Step");
-                  SetRange("Print Category Code",'');
+                  SetRange("Seating Location", "Seating Location");
+                  SetRange("Serving Step", "Serving Step");
+                  SetRange("Print Category Code", '');
                   if IsEmpty then begin
-                    SetRange("Seating Location",'');
+                    SetRange("Seating Location", '');
                     if IsEmpty then begin
-                      SetRange("Seating Location","Seating Location");
-                      SetRange("Serving Step",'');
+                      SetRange("Seating Location", "Seating Location");
+                      SetRange("Serving Step", '');
                       if IsEmpty then begin
-                        SetRange("Seating Location",'');
+                        SetRange("Seating Location", '');
                         if IsEmpty and ("Restaurant Code" <> '') then begin
                           "Restaurant Code" := '';
                           exit(GetKitchenStationSelection(KitchenStationSelection));
@@ -233,10 +356,18 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
     end;
 
     procedure StartProduction(var KitchenRequestStation: Record "NPRE Kitchen Request Station")
+    var
+        KitchenRequest: Record "NPRE Kitchen Request";
     begin
         with KitchenRequestStation do begin
+          if "Production Status" = "Production Status"::Started then
+            exit;
+          KitchenRequest.Get("Request No.");
+          if KitchenRequest."Line Status" = KitchenRequest."Line Status"::Cancelled then
+            if not Confirm(RequestCancelledMsg, false) then
+              Error('');
           if "Production Status" = "Production Status"::Finished then
-            if not Confirm(AlreadyFinishedMsg,true) then
+            if not Confirm(AlreadyFinishedMsg, true) then
               Error('');
 
           if "Start Date-Time" = 0DT then
@@ -252,7 +383,7 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
     procedure EndProduction(var KitchenRequestStation: Record "NPRE Kitchen Request Station")
     begin
         with KitchenRequestStation do begin
-          if "Production Status" in ["Production Status"::"Not Started","Production Status"::Finished,"Production Status"::Cancelled] then
+          if "Production Status" in ["Production Status"::"Not Started", "Production Status"::Finished, "Production Status"::Cancelled] then
             FieldError("Production Status");
 
           "End Date-Time" := CurrentDateTime;
@@ -261,6 +392,15 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
           Modify;
         end;
         UpdateRequestStatusesFromStation(KitchenRequestStation);
+    end;
+
+    procedure AcceptQtyChange(var KitchenRequestStation: Record "NPRE Kitchen Request Station")
+    begin
+        if KitchenRequestStation."Qty. Change Not Accepted" then begin
+          KitchenRequestStation."Qty. Change Not Accepted" := false;
+          KitchenRequestStation."Last Qty. Change Accepted" := CurrentDateTime;
+          KitchenRequestStation.Modify;
+        end;
     end;
 
     local procedure UpdateRequestStatusesFromStation(KitchenRequestStation: Record "NPRE Kitchen Request Station")
@@ -272,15 +412,12 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
     end;
 
     local procedure UpdateRequestStatuses(var KitchenRequest: Record "NPRE Kitchen Request")
-    var
-        KitchenOrder: Record "NPRE Kitchen Order";
     begin
         UpdateRequestProdStatus(KitchenRequest);
         UpdateRequestLineStatus(KitchenRequest);
         KitchenRequest.Modify;
 
-        KitchenOrder.Get(KitchenRequest."Order ID");
-        UpdateOrderStatus(KitchenOrder);
+        UpdateOrderStatus(KitchenRequest."Order ID");
     end;
 
     local procedure UpdateRequestProdStatus(var KitchenRequest: Record "NPRE Kitchen Request")
@@ -288,7 +425,7 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
         KitchenRequestStation: Record "NPRE Kitchen Request Station";
     begin
         with KitchenRequest do begin
-          KitchenRequestStation.SetRange("Request No.","Request No.");
+          KitchenRequestStation.SetRange("Request No.", "Request No.");
           if not KitchenRequestStation.FindSet then
             exit;
 
@@ -324,7 +461,7 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
               "Line Status" := "Line Status"::"Ready for Serving";
 
             ("Line Status" in ["Line Status"::"Ready for Serving", "Line Status"::Served]) and
-            not ("Production Status" in ["Production Status"::Finished,"Production Status"::Cancelled]):
+            not ("Production Status" in ["Production Status"::Finished, "Production Status"::Cancelled]):
               if "Serving Requested Date-Time" <> 0DT then
                 "Line Status" := "Line Status"::"Serving Requested"
               else
@@ -332,37 +469,37 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
           end;
     end;
 
-    local procedure UpdateOrderStatus(var KitchenOrder: Record "NPRE Kitchen Order")
+    local procedure UpdateOrderStatus(OrderID: BigInteger)
     var
+        KitchenOrder: Record "NPRE Kitchen Order";
         KitchenRequest: Record "NPRE Kitchen Request";
     begin
-        with KitchenOrder do begin
-          Status := Status::Cancelled;
+        KitchenOrder.Get(OrderID);
+        KitchenOrder.Status := KitchenOrder.Status::Cancelled;
 
-          KitchenRequest.SetCurrentKey("Order ID");
-          KitchenRequest.SetRange("Order ID","Order ID");
-          KitchenRequest.SetFilter("Line Status",'<>%1',KitchenRequest."Line Status"::Cancelled);
-          if KitchenRequest.FindSet then
-            repeat
-              case KitchenRequest."Line Status" of
-                KitchenRequest."Line Status"::"Ready for Serving",
-                KitchenRequest."Line Status"::"Serving Requested": begin
-                  Status := Status::Active;
-                  Modify;
-                  exit;
-                end;
-
-                KitchenRequest."Line Status"::Planned:
-                  Status := Status::Planned;
-
-                KitchenRequest."Line Status"::Served:
-                  if Status = Status::Cancelled then
-                    Status := Status::Finished;
+        KitchenRequest.SetCurrentKey("Order ID");
+        KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
+        KitchenRequest.SetFilter("Line Status", '<>%1', KitchenRequest."Line Status"::Cancelled);
+        if KitchenRequest.FindSet then
+          repeat
+            case KitchenRequest."Line Status" of
+              KitchenRequest."Line Status"::"Ready for Serving",
+              KitchenRequest."Line Status"::"Serving Requested": begin
+                KitchenOrder.Status := KitchenOrder.Status::Active;
+                KitchenOrder.Modify;
+                exit;
               end;
-            until KitchenRequest.Next = 0;
 
-          Modify;
-        end;
+              KitchenRequest."Line Status"::Planned:
+                KitchenOrder.Status := KitchenOrder.Status::Planned;
+
+              KitchenRequest."Line Status"::Served:
+                if KitchenOrder.Status = KitchenOrder.Status::Cancelled then
+                  KitchenOrder.Status := KitchenOrder.Status::Finished;
+            end;
+          until KitchenRequest.Next = 0;
+
+        KitchenOrder.Modify;
     end;
 
     procedure SetRequestLinesAsServed(var KitchenRequest: Record "NPRE Kitchen Request")
@@ -380,17 +517,96 @@ codeunit 6150674 "NPRE Kitchen Order Mgt."
     var
         KitchenOrder: Record "NPRE Kitchen Order";
     begin
-        KitchenRequest.TestField("Line Status",KitchenRequest."Line Status"::"Ready for Serving");
+        KitchenRequest.TestField("Line Status", KitchenRequest."Line Status"::"Ready for Serving");
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::Served;
         KitchenRequest.Modify;
 
-        KitchenOrder.Get(KitchenRequest."Order ID");
-        UpdateOrderStatus(KitchenOrder);
+        UpdateOrderStatus(KitchenRequest."Order ID");
     end;
 
     procedure KDSAvailable(): Boolean
     begin
-        exit(false);
+        exit(true);
+    end;
+
+    procedure SplitWaiterPadLineKitchenReqSourceLinks(FromWaiterPadLine: Record "NPRE Waiter Pad Line";NewWaiterPadLine: Record "NPRE Waiter Pad Line";FullLineTransfer: Boolean)
+    var
+        KitchenReqSourceLink: Record "NPRE Kitchen Req. Source Link";
+        NewKitchenReqSourceLink: Record "NPRE Kitchen Req. Source Link";
+        RemainingQtyToMove: Decimal;
+    begin
+        KitchenReqSourceLink.SetCurrentKey(
+          "Source Document Type","Source Document Subtype","Source Document No.","Source Document Line No.","Serving Step","Request No.");
+        KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
+        KitchenReqSourceLink.SetRange("Source Document Subtype", 0);
+        KitchenReqSourceLink.SetRange("Source Document No.", FromWaiterPadLine."Waiter Pad No.");
+        KitchenReqSourceLink.SetRange("Source Document Line No.", FromWaiterPadLine."Line No.");
+        if KitchenReqSourceLink.FindSet then
+          repeat
+            if FullLineTransfer then begin
+              NewKitchenReqSourceLink := KitchenReqSourceLink;
+              NewKitchenReqSourceLink."Source Document No." := NewWaiterPadLine."Waiter Pad No.";
+              NewKitchenReqSourceLink."Source Document Line No." := NewWaiterPadLine."Line No.";
+              NewKitchenReqSourceLink.Modify;
+            end else begin
+              KitchenReqSourceLink.SetRange("Serving Step", KitchenReqSourceLink."Serving Step");
+              RemainingQtyToMove := NewWaiterPadLine.Quantity;
+              repeat
+                NewKitchenReqSourceLink := KitchenReqSourceLink;
+                KitchenReqSourceLink.SetRange("Request No.", KitchenReqSourceLink."Request No.");
+                KitchenReqSourceLink.CalcSums(Quantity);
+
+                if KitchenReqSourceLink.Quantity > 0 then begin
+                  if RemainingQtyToMove > KitchenReqSourceLink.Quantity then
+                    NewKitchenReqSourceLink.Validate(Quantity, -NewKitchenReqSourceLink.Quantity)
+                  else
+                    NewKitchenReqSourceLink.Validate(Quantity, -RemainingQtyToMove);
+                  RemainingQtyToMove := RemainingQtyToMove + NewKitchenReqSourceLink.Quantity;
+                  NewKitchenReqSourceLink.Context := NewKitchenReqSourceLink.Context::"Line Splitting";
+                  NewKitchenReqSourceLink."Entry No." := 0;
+                  NewKitchenReqSourceLink.Insert;
+
+                  NewKitchenReqSourceLink."Source Document No." := NewWaiterPadLine."Waiter Pad No.";
+                  NewKitchenReqSourceLink."Source Document Line No." := NewWaiterPadLine."Line No.";
+                  NewKitchenReqSourceLink.Quantity := -NewKitchenReqSourceLink.Quantity;
+                  NewKitchenReqSourceLink."Quantity (Base)" := -NewKitchenReqSourceLink."Quantity (Base)";
+                  NewKitchenReqSourceLink."Entry No." := 0;
+                  NewKitchenReqSourceLink.Insert;
+                end;
+
+                KitchenReqSourceLink.FindLast;
+                KitchenReqSourceLink.SetRange("Request No.");
+              until (KitchenReqSourceLink.Next = 0) or (RemainingQtyToMove = 0);
+              KitchenReqSourceLink.FindLast;
+              KitchenReqSourceLink.SetRange("Serving Step");
+            end;
+          until KitchenReqSourceLink.Next = 0;
+    end;
+
+    procedure CancelKitchenOrder(var KitchenOrderIn: Record "NPRE Kitchen Order")
+    var
+        KitchenOrder: Record "NPRE Kitchen Order";
+        KitchenRequest: Record "NPRE Kitchen Request";
+    begin
+        KitchenOrder := KitchenOrderIn;
+        KitchenOrder.Status := KitchenOrder.Status::Cancelled;
+        KitchenOrder.Modify;
+
+        KitchenRequest.SetCurrentKey("Order ID");
+        KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
+        if KitchenRequest.FindSet then
+          repeat
+            CancelKitchenRequest(KitchenRequest);
+          until KitchenRequest.Next = 0;
+    end;
+
+    procedure CancelKitchenRequest(var KitchenRequestIn: Record "NPRE Kitchen Request")
+    var
+        KitchenRequest: Record "NPRE Kitchen Request";
+    begin
+        KitchenRequest := KitchenRequestIn;
+        KitchenRequest."Line Status" := KitchenRequest."Line Status"::Cancelled;
+        KitchenRequest.Modify;
     end;
 }
 

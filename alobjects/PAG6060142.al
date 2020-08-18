@@ -6,6 +6,7 @@ page 6060142 "MM Member Notification Setup"
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.36/TSA /20181120 CASE 331590 Added Action "Refresh Renew Notification"
     // MM1.40/TSA /20190722 CASE 362794 Removed RunCmdModal(), added RunProcess() to use interop
+    // MM1.44/TSA /20200416 CASE 400601 Added fields "Generate Magento PW URL", "Fallback Magento PW URL"
 
     Caption = 'Member Notification Setup';
     PageType = List;
@@ -71,6 +72,12 @@ page 6060142 "MM Member Notification Setup"
                 {
                 }
                 field("Pass Type Code"; "Pass Type Code")
+                {
+                }
+                field("Generate Magento PW URL";"Generate Magento PW URL")
+                {
+                }
+                field("Fallback Magento PW URL";"Fallback Magento PW URL")
                 {
                 }
             }

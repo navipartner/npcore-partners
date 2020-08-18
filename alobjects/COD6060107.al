@@ -10,6 +10,7 @@ codeunit 6060107 "Ean Box Event Handler"
     // NPR5.45/MHA /20180817  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
     // NPR5.47/MHA /20181024  CASE 332237 Ean Box should be immediately cleared in FrontEnd during InvokeEanBox()
     // NPR5.47/MHA /20181024  CASE 333512 Added Ean Box Setup Event Priority
+    // NPR5.55/TSA /20200514 CASE 404286 EAN Box is not selecting action parameter values from correct EAN box setup when multiple setup are defined
 
 
     trigger OnRun()
@@ -184,6 +185,7 @@ codeunit 6060107 "Ean Box Event Handler"
     var
         EanBoxParameter: Record "Ean Box Parameter";
     begin
+        EanBoxParameter.SetRange("Setup Code",EanBoxSetupEvent."Setup Code"); //-+NPR5.55 [404286]
         EanBoxParameter.SetRange("Event Code",EanBoxSetupEvent."Event Code");
         if not EanBoxParameter.FindSet then
           exit;

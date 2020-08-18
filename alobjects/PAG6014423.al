@@ -2,7 +2,7 @@ page 6014423 "Report Selection - Retail"
 {
     // NPR4.15/JDH/20150909 CASE 222525 Translated to English + changed caption values
     // NPR4.18/MMV/20151217 CASE 225584 Added fields 12, 13.
-    // NPR4.18/MMV/20151230 CASE 229221 Blanked "Report Type" options: Label (Single) & Byttem�rke (Single) - They are deprecated.
+    // NPR4.18/MMV/20151230 CASE 229221 Blanked "Report Type" options: Label (Single) & Byttemærke (Single) - They are deprecated.
     // NPR5.22/MMV/20160408 CASE 232067 Added "Report Type" options: "CustomerLocationOnSave" & "CustomerLocationOnTrigger"
     //                                  Added missing "Report Type" option captions.
     //                                  Renamed english page caption to match other report selection pages.
@@ -17,6 +17,8 @@ page 6014423 "Report Selection - Retail"
     // NPR5.40/MMV /20180328 CASE 276562 Renamed option
     // NPR5.42/ZESO/20180517 CASE 312186 Added new option Large Balancing (POS Entry) to variable ReportType2.
     // NPR5.50/TSA /20190423 CASE 352483 Added Report Type "Begin Workshift (POS Entry)"
+    // NPR5.55/YAHA/20191127 CASE 362312 Added Report Type "Transfer Order"
+    // NPR5.55/BHR /202020713 CASE 414268 Add Report type ,Inv.PutAway Label
 
     Caption = 'Report Selection - Retail';
     DelayedInsert = true;
@@ -35,7 +37,7 @@ page 6014423 "Report Selection - Retail"
                 ShowCaption = false;
                 field(ReportType2;ReportType2)
                 {
-                    OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry)';
+                    OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry),Transfer Order,Inv.PutAway Label';
                     ShowCaption = false;
 
                     trigger OnValidate()
@@ -148,7 +150,7 @@ page 6014423 "Report Selection - Retail"
     end;
 
     var
-        ReportType2: Option "Sales Receipt","Register Balancing","Price Label","Signature Receipt","Gift Voucher",,"Credit Voucher",,"Terminal Receipt","Large Sales Receipt",,,"Exchange Label",,"Customer Sales Receipt",Rental,Tailor,"Order","Photo Label",,,,"Warranty Certificate","Shelf Label",,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,"Bin Label","Sales Receipt (POS Entry)","Large Sales Receipt (POS Entry)","Balancing (POS Entry)","Sales Doc. Confirmation (POS Entry)","Large Balancing (POS Entry)","Begin Workshift (POS Entry)";
+        ReportType2: Option "Sales Receipt","Register Balancing","Price Label","Signature Receipt","Gift Voucher",,"Credit Voucher",,"Terminal Receipt","Large Sales Receipt",,,"Exchange Label",,"Customer Sales Receipt",Rental,Tailor,"Order","Photo Label",,,,"Warranty Certificate","Shelf Label",,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,"Bin Label","Sales Receipt (POS Entry)","Large Sales Receipt (POS Entry)","Balancing (POS Entry)","Sales Doc. Confirmation (POS Entry)","Large Balancing (POS Entry)","Begin Workshift (POS Entry)","Transfer Order","Inv.PutAway Label";
 
     local procedure SetUsageFilter()
     begin

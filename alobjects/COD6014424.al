@@ -1,17 +1,17 @@
 codeunit 6014424 Utility
 {
-    // //+NPR3.1t v.Simon Sch�bel d.20-10-05
+    // //+NPR3.1t v.Simon Sch¢bel d.20-10-05
     //    Funktion til at finde bonteksten
     // //+NPR3.1m d.14/09-2005 v.Simon
     //   Har lavet funktionen offFakturering der formaterer
     //   EAN, ref, att til fakturare og smidder dem i et 2D array
-    //   med captions og v�rdien.
+    //   med captions og værdien.
     // 
-    // //NPR3.2g, NPK, DL, 05-01-07, Tilf�jet funktion CreateMailBarcode og CalcCheckNumber til stregkode for postlabel
+    // //NPR3.2g, NPK, DL, 05-01-07, Tilf¢jet funktion CreateMailBarcode og CalcCheckNumber til stregkode for postlabel
     //                      05-03-07, Flyttet funktionalitet til Sales Shipment Header
-    //                      05-03-07, CreateMailBarcode f�rdig implementeret
+    //                      05-03-07, CreateMailBarcode færdig implementeret
     // 
-    // //NPR3.3, NPK, DL, 30-04-07, Tilf�jet funktion SendMailMergeDocumentViaSMTP
+    // //NPR3.3, NPK, DL, 30-04-07, Tilf¢jet funktion SendMailMergeDocumentViaSMTP
     // 
     // 
     // currSubstr:=0;
@@ -37,7 +37,7 @@ codeunit 6014424 Utility
     // Out:
     // substr text 250
     // 
-    // //NPR4.000.001, NPK, MH, 21-01-09, Overf�rt funktion CreateMailBarcode til Cu 6014495 Package Label Management.
+    // //NPR4.000.001, NPK, MH, 21-01-09, Overf¢rt funktion CreateMailBarcode til Cu 6014495 Package Label Management.
     // 
     // NPR4.12/TSA /20150703  CASE 216800 - Created W1 Version, adding wrappers on DK local fields in function offFakturering
     // NPR5.22/BHR /20160318  CASE 235061 Add check for EAN size

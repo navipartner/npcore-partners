@@ -106,7 +106,7 @@ table 6150902 "HC Register"
         field(25;Rounding;Code[20])
         {
             Caption = 'Rounding';
-            Description = 'Kontonummer til �reafrunding.';
+            Description = 'Kontonummer til ¢reafrunding.';
             TableRelation = "G/L Account"."No." WHERE (Blocked=CONST(false));
 
             trigger OnValidate()

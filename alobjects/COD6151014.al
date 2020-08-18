@@ -8,6 +8,7 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
     // NPR5.51/MHA /20190823  CASE 364542 VoucherType in EndSale() should depend on the Scanned Voucher in VoucherPayment()
     // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
     // NPR5.54/TSA /20200403 CASE 396652 Refactored the VoucherPayment() payment line create function to use payment line logic instead of sales line logic
+    // NPR5.55/MHA /20200427  CASE 402015 New Primary Key on Sale Line POS Voucher
 
 
     trigger OnRun()
@@ -146,7 +147,7 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
         SalePOS: Record "Sale POS";
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
         VoucherType: Record "NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         POSSale: Codeunit "POS Sale";
@@ -205,13 +206,13 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
         //
         // POSSession.RequestRefreshData();
         //
-        // SaleLinePOSVoucher.INIT;
+        // NpRvSalesLine.INIT;
         //
-        // SaleLinePOSVoucher."Register No." := SaleLinePOS."Register No.";
-        // SaleLinePOSVoucher."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        // SaleLinePOSVoucher."Sale Type" := SaleLinePOS."Sale Type";
-        // SaleLinePOSVoucher."Sale Date" := SaleLinePOS.Date;
-        // SaleLinePOSVoucher."Sale Line No." := SaleLinePOS."Line No.";
+        // NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
+        // NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        // NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
+        // NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
+        // NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
         POSSession.GetPaymentLine (POSPaymentLine);
         POSPaymentLine.GetPaymentLine (POSLine);
 
@@ -225,25 +226,29 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
 
         POSSession.RequestRefreshData();
 
-        SaleLinePOSVoucher.Init;
-        SaleLinePOSVoucher."Register No." := SalePOS."Register No.";
-        SaleLinePOSVoucher."Sales Ticket No." :=SalePOS."Sales Ticket No.";
-        SaleLinePOSVoucher."Sale Type" := POSLine."Sale Type";
-        SaleLinePOSVoucher."Sale Date" := POSLine.Date;
-        SaleLinePOSVoucher."Sale Line No." := POSLine."Line No.";
+        NpRvSalesLine.Init;
+        //-NPR5.55 [402015]
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+        NpRvSalesLine."Retail ID" := POSLine."Retail ID";
+        NpRvSalesLine."Register No." := SalePOS."Register No.";
+        NpRvSalesLine."Sales Ticket No." :=SalePOS."Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := POSLine."Sale Type";
+        NpRvSalesLine."Sale Date" := POSLine.Date;
+        NpRvSalesLine."Sale Line No." := POSLine."Line No.";
         //+NPR5.54 [396652]
 
-        SaleLinePOSVoucher."Line No." := 10000;
-        SaleLinePOSVoucher.Type := SaleLinePOSVoucher.Type::Payment;
+        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
         //-NPR5.49 [342811]
-        SaleLinePOSVoucher."Voucher No." := NpRvVoucherBuffer."No.";
-        SaleLinePOSVoucher."Reference No." := NpRvVoucherBuffer."Reference No.";
+        NpRvSalesLine."Voucher No." := NpRvVoucherBuffer."No.";
+        NpRvSalesLine."Reference No." := NpRvVoucherBuffer."Reference No.";
         //+NPR5.49 [342811]
-        SaleLinePOSVoucher."Voucher Type" := VoucherType.Code;
-        SaleLinePOSVoucher.Description := VoucherType.Description;
-        SaleLinePOSVoucher.Insert;
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine.Description := VoucherType.Description;
+        NpRvSalesLine.Insert(true);
+        //+NPR5.55 [402015]
 
-        NpRvVoucherMgt.ApplyPayment(FrontEnd,POSSession,SaleLinePOSVoucher);
+        NpRvVoucherMgt.ApplyPayment(FrontEnd,POSSession,NpRvSalesLine);
 
         //-NPR5.51 [364542]
         JSON.SetContext('VoucherType',NpRvVoucherBuffer."Voucher Type");

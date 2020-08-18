@@ -1,7 +1,7 @@
 page 6014587 "Item Group Statistics Subpage"
 {
     // 
-    // NPR3.1, NPK, DL, Tilf�jet kode s� der foldes rigtigt
+    // NPR3.1, NPK, DL, Tilf¢jet kode så der foldes rigtigt
     // NPR4.000.001, JC, 06-09-2010,Case no. 92938 - Item Group Stat crashing
     // 
     // 
@@ -43,6 +43,7 @@ page 6014587 "Item Group Statistics Subpage"
     // NPR4.21/TS/20160225  CASE 226010 Commented code as not to display as Tree Structure
     // NPR5.31/BR/20172021  CASE 272890 Changed from ListPart to List (for export to Excel) and made non-editable
     // NPR5.51/ZESO/20190620 CASE 358271 Added Item Group Filter from Advanced Sales Statistics Page
+    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
 
     Caption = 'Item Group Statistics Subpage';
     DeleteAllowed = false;
@@ -336,7 +337,9 @@ page 6014587 "Item Group Statistics Subpage"
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
         ValueEntry.SetRange( "Item Group No.", "No." );
         if not LastYear then

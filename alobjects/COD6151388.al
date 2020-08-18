@@ -12,6 +12,7 @@ codeunit 6151388 "CS UI Warehouse Receipt"
     // NPR5.51/CLVA/20190628 CASE 359093 Changed posting rutine
     // NPR5.51/CLVA/20190702 CASE 360675 Added option to expand or collaps summary items
     // NPR5.51/JAKUBV/20190903  CASE 346068-01 Transport NPR5.51 - 3 September 2019
+    // NPR5.55/ALPO/20200729 CASE 404663 Possibility to use vendor item number & description for CS warehouse activity lines
 
     TableNo = "CS UI Header";
 
@@ -449,6 +450,8 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         CurrRecordID: RecordID;
         TableNo: Integer;
         Location: Record Location;
+        CSWarehouseActivitySetup: Record "CS Warehouse Activity Setup";
+        ItemIdentifier: Text;
     begin
         Clear(CSWarehouseReceiptHandling);
         CSWarehouseReceiptHandling.SetRange(Id, CSSessionId);
@@ -495,10 +498,16 @@ codeunit 6151388 "CS UI Warehouse Receipt"
                 Line := DOMxmlin.CreateElement('Line');
                 AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Item No."));
                 AddAttribute(Line,'Type',Format(LineType::TEXT));
-                if WhseReceiptLine."Variant Code" <> '' then
-                  Line.InnerText := StrSubstNo(Text027,WhseReceiptLine."Item No.",WhseReceiptLine."Variant Code")
-                else
-                  Line.InnerText := WhseReceiptLine."Item No.";
+                //-NPR5.55 [404663]-revoked
+        //        IF WhseReceiptLine."Variant Code" <> '' THEN
+        //          Line.InnerText := STRSUBSTNO(Text027,WhseReceiptLine."Item No.",WhseReceiptLine."Variant Code")
+        //        ELSE
+        //          Line.InnerText := WhseReceiptLine."Item No.";
+                //+NPR5.55 [404663]-revoked
+                //-NPR5.55 [404663]
+                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseReceiptLine.RecordId, true, ' | ');
+                Line.InnerText := ItemIdentifier;
+                //+NPR5.55 [404663]
                 Record.AppendChild(Line);
 
                 //4
@@ -539,12 +548,19 @@ codeunit 6151388 "CS UI Warehouse Receipt"
                 AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption(Description));
                 AddAttribute(Line,'Indicator',Indicator);
                 AddAttribute(Line,'Type',Format(LineType::TEXT));
-                //-NPR5.49 [346224]
-                if WhseReceiptLine."Variant Code" <> '' then
-                  Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code",WhseReceiptLine.Description)
-                else
-                //+NPR5.49 [346224]
-                Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No.",WhseReceiptLine.Description);
+                //-NPR5.55 [404663]-revoked
+        //        //-NPR5.49 [346224]
+        //        IF WhseReceiptLine."Variant Code" <> '' THEN
+        //          Line.InnerText := STRSUBSTNO(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code",WhseReceiptLine.Description)
+        //        ELSE
+        //        //+NPR5.49 [346224]
+        //        Line.InnerText := STRSUBSTNO(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No.",WhseReceiptLine.Description);
+                //+NPR5.55 [404663]-revoked
+                //-NPR5.55 [404663]
+                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseReceiptLine.RecordId, true, '-');
+                Line.InnerText :=
+                  StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding", ItemIdentifier, WhseReceiptLine.Description);
+                //+NPR5.55 [404663]
                 Record.AppendChild(Line);
 
                 Line := DOMxmlin.CreateElement('Line');
@@ -623,10 +639,16 @@ codeunit 6151388 "CS UI Warehouse Receipt"
                     Line := DOMxmlin.CreateElement('Line');
                     AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Item No."));
                     AddAttribute(Line,'Type',Format(LineType::TEXT));
-                    if WhseReceiptLine."Variant Code" <> '' then
-                      Line.InnerText := StrSubstNo(Text027,WhseReceiptLine."Item No.",WhseReceiptLine."Variant Code")
-                    else
-                      Line.InnerText := WhseReceiptLine."Item No.";
+                    //-NPR5.55 [404663]-revoked
+        //            IF WhseReceiptLine."Variant Code" <> '' THEN
+        //              Line.InnerText := STRSUBSTNO(Text027,WhseReceiptLine."Item No.",WhseReceiptLine."Variant Code")
+        //            ELSE
+        //              Line.InnerText := WhseReceiptLine."Item No.";
+                    //+NPR5.55 [404663]-revoked
+                    //-NPR5.55 [404663]
+                    ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseReceiptLine.RecordId, true, ' | ');
+                    Line.InnerText := ItemIdentifier;
+                    //+NPR5.55 [404663]
                     Record.AppendChild(Line);
 
                     //4
@@ -666,12 +688,19 @@ codeunit 6151388 "CS UI Warehouse Receipt"
                     AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption(Description));
                     AddAttribute(Line,'Indicator',Indicator);
                     AddAttribute(Line,'Type',Format(LineType::TEXT));
-                    //-NPR5.49 [346224]
-                    if WhseReceiptLine."Variant Code" <> '' then
-                      Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code",WhseReceiptLine.Description)
-                    else
-                    //+NPR5.49 [346224]
-                    Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No.",WhseReceiptLine.Description);
+                    //-NPR5.55 [404663]-revoked
+        //            //-NPR5.49 [346224]
+        //            IF WhseReceiptLine."Variant Code" <> '' THEN
+        //              Line.InnerText := STRSUBSTNO(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code",WhseReceiptLine.Description)
+        //            ELSE
+        //            //+NPR5.49 [346224]
+        //            Line.InnerText := STRSUBSTNO(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No.",WhseReceiptLine.Description);
+                    //+NPR5.55 [404663]-revoked
+                    //-NPR5.55 [404663]
+                    ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseReceiptLine.RecordId, true, '-');
+                    Line.InnerText :=
+                      StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding", ItemIdentifier, WhseReceiptLine.Description);
+                    //+NPR5.55 [404663]
                     Record.AppendChild(Line);
 
                     Line := DOMxmlin.CreateElement('Line');

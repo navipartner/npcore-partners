@@ -12,6 +12,7 @@ codeunit 6150739 "POS Resume Sale Mgt."
     //     END;
     // 
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.55/ALPO/20200720 CASE 391678 Log sale resume to POS Entry
 
 
     trigger OnRun()
@@ -24,9 +25,11 @@ codeunit 6150739 "POS Resume Sale Mgt."
         NoInfoProvidedMsg: Label 'The POS sale cancel routine did not provide any additional infromation.';
         POSActionDeleteMsg: Label 'This sales can''t be deleted.';
         ResumedWithNewTicketMsg: Label 'Instead system created a new sale ticket and copied all the information from the old sale.';
+        SaleWasParkedTxt: Label 'Sale was saved as POS Quote (parked) at %1';
         SavedAsQuoteMsg: Label 'The sale was saved as POS quote No. %1. You can retrieve it from the list of parked sales.';
         SelectAction_InstructionMsg: Label 'Please select what do you want to do with the sale:\\';
         SelectAction_OptionsMsg: Label 'Resume,Park (save as a POS quote)';
+        AltSaleCancelDescription: Text;
         CancelErrorText: Text;
 
     procedure SelectUnfinishedSaleToResume(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";var POSQuoteEntryNo: Integer): Boolean
@@ -59,6 +62,7 @@ codeunit 6150739 "POS Resume Sale Mgt."
     var
         ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError;
         ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote;
+        CancelFailed: Boolean;
         ForceSaveAsQuote: Boolean;
         Handled: Boolean;
         SkipDialog: Boolean;
@@ -84,9 +88,11 @@ codeunit 6150739 "POS Resume Sale Mgt."
           end;
 
         CancelErrorText := '';
+        CancelFailed := false;  //NPR5.55 [391678]
         if ActionOption = ActionOption::CancelAndNew then begin
           ActionOption := ActionOption::" ";
           if not TryCancelSale(SalePOS,POSSession) then begin
+            CancelFailed := true;  //NPR5.55 [391678]
             if ActionOnCancelError = ActionOnCancelError::" " then
               ActionOnCancelError := StrMenu(SelectAction_OptionsMsg,1,StrSubstNo(CannotCancelMsg,CancelErrorText) + '\\' + SelectAction_InstructionMsg);
             case ActionOnCancelError of
@@ -108,7 +114,8 @@ codeunit 6150739 "POS Resume Sale Mgt."
           (ActionOption = ActionOption::Resume) and ((SalePOS.Date <> Today) or (SalePOS."Register No." <>  POSUnit."No."));
 
         if (ActionOption = ActionOption::SaveAsQuote) or ForceSaveAsQuote then begin
-          POSQuoteEntryNo := DoSaveAsPOSQuote(SalePOS,ForceSaveAsQuote or SkipDialog);
+          //POSQuoteEntryNo := DoSaveAsPOSQuote(SalePOS,ForceSaveAsQuote OR SkipDialog);  //NPR5.55 [391678]-revoked
+          POSQuoteEntryNo := DoSaveAsPOSQuote(POSSession, SalePOS, ForceSaveAsQuote or SkipDialog, CancelFailed);  //NPR5.55 [391678]
           if not ForceSaveAsQuote then begin
             POSQuoteEntryNo := 0;
             ActionOption := ActionOption::" ";
@@ -121,12 +128,28 @@ codeunit 6150739 "POS Resume Sale Mgt."
         exit(ActionOption = ActionOption::Resume);
     end;
 
-    procedure DoSaveAsPOSQuote(SalePOS: Record "Sale POS";SkipDialog: Boolean): Integer
+    procedure DoSaveAsPOSQuote(POSSession: Codeunit "POS Session";SalePOS: Record "Sale POS";SkipDialog: Boolean;CancelFailed: Boolean): Integer
     var
         POSQuoteEntry: Record "POS Quote Entry";
         POSActionSavePOSQuote: Codeunit "POS Action - Save POS Quote";
     begin
-        POSActionSavePOSQuote.CreatePOSQuote(SalePOS,POSQuoteEntry);
+        //-NPR5.55 [391678]
+        //Do not save as POS quotes unfinished sales with no lines
+        if not SalePOS.SalesLinesExist then
+          SkipDialog := true
+        else
+        //+NPR5.55 [391678]
+          POSActionSavePOSQuote.CreatePOSQuote(SalePOS,POSQuoteEntry);
+        //-NPR5.55 [391678]
+        if not CancelFailed then begin
+          Commit;
+          AltSaleCancelDescription := StrSubstNo(SaleWasParkedTxt, CurrentDateTime);
+          CancelFailed := not TryCancelSale(SalePOS,POSSession);
+          AltSaleCancelDescription := '';
+        end;
+        if CancelFailed then
+          SalePOS.Delete(true);
+        //+NPR5.55 [391678]
         Commit;
 
         if not SkipDialog then
@@ -157,7 +180,14 @@ codeunit 6150739 "POS Resume Sale Mgt."
     begin
         if not POSQuoteEntry.Get(POSQuoteEntryNo) then
           exit(false);
-        exit(POSActionLoadPOSQuote.LoadFromQuote(POSQuoteEntry,SalePOS));
+        //EXIT(POSActionLoadPOSQuote.LoadFromQuote(POSQuoteEntry,SalePOS));  //NPR5.55 [391678]-revoked
+        //-NPR5.55 [391678]
+        if POSActionLoadPOSQuote.LoadFromQuote(POSQuoteEntry,SalePOS) then begin
+          LogSaleResume(SalePOS, POSQuoteEntry."Sales Ticket No.");
+          exit(true);
+        end else
+          exit(false);
+        //+NPR5.55 [391678]
     end;
 
     procedure DoCancelSale(SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session")
@@ -174,6 +204,7 @@ codeunit 6150739 "POS Resume Sale Mgt."
     begin
         Clear(POSTryCancelSale);
         POSTryCancelSale.Initialize(POSSession);
+        POSTryCancelSale.SetAlternativeDescription(AltSaleCancelDescription);  //NPR5.55 [391678]
         ClearLastError;
         Success := POSTryCancelSale.Run(SalePOS);
         if not Success then begin
@@ -184,6 +215,23 @@ codeunit 6150739 "POS Resume Sale Mgt."
           if CancelErrorText = '' then
             CancelErrorText := NoInfoProvidedMsg;
         end;
+    end;
+
+    procedure LogSaleResume(SalePOS: Record "Sale POS";FromTicketNo: Code[20])
+    var
+        POSCreateEntry: Codeunit "POS Create Entry";
+    begin
+        //-NPR5.55 [391678]
+        POSCreateEntry.InsertResumeSaleEntry(
+          SalePOS."Register No.", SalePOS."Salesperson Code", FromTicketNo, SalePOS."Sales Ticket No.");
+        //+NPR5.55 [391678]
+    end;
+
+    procedure SetAlternativeCancelDescription(NewAltSaleCancelDescription: Text)
+    begin
+        //-NPR5.55 [391678]
+        AltSaleCancelDescription := NewAltSaleCancelDescription;
+        //+NPR5.55 [391678]
     end;
 
     [IntegrationEvent(false, false)]

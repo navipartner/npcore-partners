@@ -4,6 +4,7 @@ page 6150664 "NPRE Seating List"
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.36/ANEN/20170918 CASE 290639 Adding column seating location
     // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Seating List';
     CardPageID = "NPRE Seating";
@@ -25,6 +26,9 @@ page 6150664 "NPRE Seating List"
                 {
                 }
                 field(Description;Description)
+                {
+                }
+                field(Blocked;Blocked)
                 {
                 }
                 field("Seating Location";"Seating Location")

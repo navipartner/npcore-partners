@@ -1,6 +1,7 @@
 codeunit 6151509 "Nc Import List Processing"
 {
     // NC2.23/MHA /20191018  CASE 358499 Object created - Process Nc Import List via Job Queue
+    // NPR5.55/MHA /20200604  CASE 408100 Added filter on Earliest Import Datetime
 
     TableNo = "Job Queue Entry";
 
@@ -44,6 +45,9 @@ codeunit 6151509 "Nc Import List Processing"
         NcImportEntry.SetFilter("Import Type",NcImportType.Code);
         NcImportEntry.SetRange(Imported,false);
         NcImportEntry.SetRange("Runtime Error",false);
+        //-NPR5.55 [408100]
+        NcImportEntry.SetFilter("Earliest Import Datetime",'<=%1',CurrentDateTime);
+        //+NPR5.55 [408100]
         if NcImportEntry.FindSet then
           repeat
             NcSyncMgt.ProcessImportEntry(NcImportEntry);

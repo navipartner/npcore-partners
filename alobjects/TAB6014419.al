@@ -5,6 +5,7 @@ table 6014419 "Archive Sale Line POS"
     //   The table may be deleted later, when it is no longer relevant.
     // 
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.55/ALPO/20200429 CASE 402411 Starting from NAV2017 field's "Item Category Code" length is changed from 10 to 20
 
     Caption = 'Archive Sale Line POS';
     DrillDownPageID = "Archive POS Sale Lines Subpage";
@@ -770,9 +771,10 @@ table 6014419 "Archive Sale Line POS"
             BlankZero = true;
             Caption = 'Order Line No. from Web';
         }
-        field(6050; "Item Category Code"; Code[10])
+        field(6050;"Item Category Code";Code[20])
         {
             Caption = 'Item Category Code';
+            Description = '#402411 [402411]';
         }
         field(6051; "Product Group Code"; Code[10])
         {

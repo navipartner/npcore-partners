@@ -1,6 +1,7 @@
 page 6059823 "Smart Email Variables"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
+    // NPR5.55/THRO/20200511 CASE 343266 Added "Variable Type"
 
     Caption = 'Smart Email Variables';
     PageType = ListPart;
@@ -14,6 +15,10 @@ page 6059823 "Smart Email Variables"
             {
                 field("Variable Name";"Variable Name")
                 {
+                }
+                field("Variable Type";"Variable Type")
+                {
+                    Visible = false;
                 }
                 field("Field No.";"Field No.")
                 {

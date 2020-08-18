@@ -9,6 +9,7 @@ report 6060132 "MM Membership Status"
     // MM1.41/TSA /20191011 CASE 355444 Refactored
     // MM1.42/TSA /20191213 CASE 382181 Refactored again, adding options for "active and renewed", "active and not renewed", + general clean-up
     // MM1.43/TSA /20200203 CASE 388818 Added "Required filter fields" or the table filtering will no be shown in web client
+    // MM1.44/TSA /20200506 CASE 403511 Removed duplicted filter field - problem in AL
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/MM Membership Status.rdlc';
 

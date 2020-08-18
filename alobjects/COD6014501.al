@@ -2,7 +2,7 @@ codeunit 6014501 "Convert used goods"
 {
     // NPR4.10/TSA/20150518 CASE 213150  Changed behaviour of F34 "Puljemomsordning", never post to the item ledger
     // NPR5.26/TS/20160805 CASE 246761 Aded Function UsedGoods2SalesCreditMemo
-    // NPR5.31/TS  /20161221  CASE  246761 Reworked Function Bogf�rBrugtVare
+    // NPR5.31/TS  /20161221  CASE  246761 Reworked Function Bogf¢rBrugtVare
     // NPR5.34/TS  /20170511  CASE 274836  Adding Cross reference when creating Item from Used Items
     // NPR5.39/TJ  /20180212  CASE 302634  Removed unused variables
 
@@ -92,7 +92,7 @@ codeunit 6014501 "Convert used goods"
         Kosterreg := Rec;
         //-NPR4.10 [213150]
         //IF Puljemomsordning THEN
-          //Bogf�rBrugtVare(Vare);
+          //Bogf¢rBrugtVare(Vare);
         //+NPR4.10 [213150]
         //-NPR5.31
         CreateItemJournal(Vare,Kosterreg);

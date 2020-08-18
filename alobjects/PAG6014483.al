@@ -9,6 +9,7 @@ page 6014483 "Turnover Stats"
     //                                  Removed unused variables
     // NPR5.40/BHR /20180316 CASE 308385 Removed unused function CallSub
     // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.55/YAHA/20200717 CASE 414769 Adding Date Filter
 
     Caption = 'Turnover';
     DeleteAllowed = false;
@@ -31,9 +32,46 @@ page 6014483 "Turnover Stats"
                     RetailSetup.Get;
                     if RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::"PER REGISTER" then
                       Filter := StrSubstNo('=%1',RegisterNo2);
-                    TurnoverStatistics(Filter);
+                    //-NPR5.55 [414769]
+                    //TurnoverStatistics(Filter);
+                    TurnoverStatistics(Filter,StartDate,EndDate);
+                    //+NPR5.55 [414769]
                     CurrPage.sub1.PAGE.SetDeptFilter(DepartmentFilter);
                     CurrPage.Update(true);
+                end;
+            }
+            field("Start Date";StartDate)
+            {
+
+                trigger OnValidate()
+                var
+                    "Filter": Code[30];
+                begin
+                    //-NPR5.55 [414769]
+                    RetailSetup.Get;
+                    if RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::"PER REGISTER" then
+                      Filter := StrSubstNo('=%1',RegisterNo2);
+                    TurnoverStatistics(Filter,StartDate,EndDate);
+                    //CurrPage.sub1.PAGE.SetDateFilter(TRUE);
+                    CurrPage.Update(true);
+                    //+NPR5.55 [414769]
+                end;
+            }
+            field("End Date";EndDate)
+            {
+
+                trigger OnValidate()
+                var
+                    "Filter": Code[30];
+                begin
+                    //-NPR5.55 [414769]
+                    RetailSetup.Get;
+                    if RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::"PER REGISTER" then
+                      Filter := StrSubstNo('=%1',RegisterNo2);
+                    TurnoverStatistics(Filter,StartDate,EndDate);
+                    //CurrPage.sub1.PAGE.SetDateFilter(TRUE);
+                    CurrPage.Update(true);
+                    //+NPR5.55 [414769]
                 end;
             }
             group("Audit Roll")
@@ -53,8 +91,8 @@ page 6014483 "Turnover Stats"
                             begin
                                 //+TS
                                  /*
-                                IF Statistikmenu = Statistikmenu::Oms�tning THEN
-                                  IF Ops�tning.Balancing = Ops�tning.Balancing::SAMLET THEN
+                                IF Statistikmenu = Statistikmenu::Omsætning THEN
+                                  IF Opsætning.Balancing = Opsætning.Balancing::SAMLET THEN
                                     Text := KasseText;
                                 */
                                 //-TS
@@ -154,8 +192,10 @@ page 6014483 "Turnover Stats"
                         "Filter": Text[250];
                     begin
                         Filter := StrSubstNo('=%1',RegisterNo2);
-
-                        TurnoverStatistics(Filter);
+                        //-NPR5.55 [414769]
+                        //TurnoverStatistics(Filter);
+                        TurnoverStatistics(Filter,StartDate,EndDate);
+                        //+NPR5.55 [414769]
                         CurrPage.Update(true);
                     end;
                 }
@@ -176,7 +216,10 @@ page 6014483 "Turnover Stats"
                         if not (RegisterList.RunModal = ACTION::LookupOK) then
                           exit;
                         RegisterList.GetRecord(Register);
-                        TurnoverStatistics(StrSubstNo('=%1',Register."Register No."));
+                        //-NPR5.55 [414769]
+                        //TurnoverStatistics(STRSUBSTNO('=%1',Register."Register No."));
+                        TurnoverStatistics(StrSubstNo('=%1',Register."Register No."),StartDate,EndDate);
+                        //+NPR5.55 [414769]
                     end;
                 }
                 action("All Registers")
@@ -189,7 +232,10 @@ page 6014483 "Turnover Stats"
 
                     trigger OnAction()
                     begin
-                        TurnoverStatistics('');
+                        //-NPR5.55 [414769]
+                        //TurnoverStatistics('');
+                        TurnoverStatistics('',StartDate,EndDate);
+                        //+NPR5.55 [414769]
                     end;
                 }
             }
@@ -234,13 +280,16 @@ page 6014483 "Turnover Stats"
         SaleDate: Date;
         RegisterNo2: Code[10];
         TSMode: Boolean;
+        DateFilter2: Text;
+        StartDate: Date;
+        EndDate: Date;
 
     procedure SetType(No: Integer)
     begin
         //AktiverMenu
         StatisticType := No;
 
-        //CurrForm.Afdelingsfilter.VISIBLE( "Nr." = Statistikmenu::Oms�tning );
+        //CurrForm.Afdelingsfilter.VISIBLE( "Nr." = Statistikmenu::Omsætning );
 
         RetailSetup.Get;
         if RetailSetup."Internal Dept. Code" <> '' then
@@ -248,7 +297,7 @@ page 6014483 "Turnover Stats"
         //CurrForm.CAPTION("Oms. Caption");
     end;
 
-    procedure TurnoverStatistics(RegisterFilter: Text[250])
+    procedure TurnoverStatistics(RegisterFilter: Text[250];StartDateFilter: Date;EndDateFilter: Date)
     var
         AuditRoll: Record "Audit Roll";
         TotalCost: Decimal;
@@ -259,8 +308,18 @@ page 6014483 "Turnover Stats"
         POSSetup: Codeunit "POS Setup";
     begin
         //TurnoverStatistics
-        if SaleDate = 0D then
-          SaleDate := Today;
+
+        //-NPR5.55 [414769]
+        //IF SaleDate = 0D THEN
+        //  SaleDate := TODAY;
+
+        if EndDateFilter = 0D then
+          EndDateFilter := Today;
+        //+NPR5.55 [414769]
+
+
+
+
 
         if RegisterFilter = '' then
           RegisterNo := Txt001
@@ -270,7 +329,10 @@ page 6014483 "Turnover Stats"
         RetailSetup.Get;
         AuditRoll.SetCurrentKey("Register No.","Sale Date","Sale Type",Type,Quantity);
         AuditRoll.SetFilter("Register No.",RegisterFilter);
-        AuditRoll.SetRange("Sale Date",SaleDate);
+        //-NPR5.55 [414769]
+        //AuditRoll.SETRANGE("Sale Date",SaleDate);
+        AuditRoll.SetFilter("Sale Date",'%1..%2',StartDateFilter,EndDateFilter);
+        //+NPR5.55 [414769]
 
         if DepartmentFilter <> '' then
           AuditRoll.SetFilter("Shortcut Dimension 1 Code",DepartmentFilter)
@@ -310,7 +372,7 @@ page 6014483 "Turnover Stats"
 
         //Samlet debetsalg
         AuditRoll.SetCurrentKey("Sale Date","Sale Type",Type,"Gift voucher ref.","Register No.");
-        // Revisionsrulle.SETRANGE( "Sale Type", Revisionsrulle."Sale Type"::Bem�rkning );
+        // Revisionsrulle.SETRANGE( "Sale Type", Revisionsrulle."Sale Type"::Bemærkning );
         AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::"Debit Sale");
         AuditRoll.SetRange("Gift voucher ref.",'');
         AuditRoll.CalcSums("Amount Including VAT");
@@ -381,11 +443,13 @@ page 6014483 "Turnover Stats"
           ProfitPct := ProfitAmount / TotalNetAmt * 100
         else
           ProfitPct := 0;
-
-        CalculateSaleLineNoAmount(RegisterFilter,SaleDate);
+        //-NPR5.55 [414769]
+        //CalculateSaleLineNoAmount(RegisterFilter,SaleDate);
+        CalculateSaleLineNoAmount(RegisterFilter,StartDateFilter,EndDateFilter);
+        //+NPR5.55 [414769]
     end;
 
-    procedure CalculateSaleLineNoAmount(RegisterFilter: Text[250];CalculationDate: Date)
+    procedure CalculateSaleLineNoAmount(RegisterFilter: Text[250];StartDate: Date;EndDate: Date)
     var
         PaymentTypePOS: Record "Payment Type POS";
     begin
@@ -394,9 +458,12 @@ page 6014483 "Turnover Stats"
           PaymentTypePOS.SetFilter("Register Filter",RegisterFilter)
         else
           PaymentTypePOS.SetRange("Register Filter");
-
-        if CalculationDate <> 0D then
-          PaymentTypePOS.SetRange("Date Filter",CalculationDate)
+        //-NPR5.55 [414769]
+        //IF CalculationDate <> 0D THEN
+          //PaymentTypePOS.SETRANGE("Date Filter",CalculationDate)
+        if (StartDate <> 0D) and (EndDate <> 0D) then
+          PaymentTypePOS.SetFilter("Date Filter",'%1..%2',StartDate,EndDate)
+        //+NPR5.55 [414769]
         else
           PaymentTypePOS.SetRange("Date Filter");
 
@@ -429,7 +496,9 @@ page 6014483 "Turnover Stats"
           RetailSetup."F9 Statistics When Login"::"Show local register":
             Filter := StrSubstNo('=%1',RegisterNo2);
         end;
-        TurnoverStatistics(Filter);
+        //-NPR5.55 [414769]
+        TurnoverStatistics(Filter,SaleDate,EndDate);
+        //+NPR5.55 [414769]
     end;
 
     procedure GetTurnoverStats(var NPRTempBuffer: Record "NPR - TEMP Buffer")

@@ -24,6 +24,7 @@ table 6060124 "MM Membership Setup"
     // MM1.32/TSA/20180725  CASE 318132 Transport MM1.32 - 25 July 2018
     // MM1.36/TSA /20181126 CASE 337110 Added Ticket Print option on member card swipe
     // MM1.43/TSA /20200317 CASE 337112 Changed spelling, "Ticket Print Model"::CONDENSED
+    // MM1.44/TSA /20200529 CASE 407401 Added age verification setup
 
     Caption = 'Membership Setup';
     DrillDownPageID = "MM Membership Setup";
@@ -119,6 +120,16 @@ table 6060124 "MM Membership Setup"
         {
             Caption = 'Loyalty Code';
             TableRelation = "MM Loyalty Setup";
+        }
+        field(28;"Enable Age Verification";Boolean)
+        {
+            Caption = 'Enable Age Verification';
+        }
+        field(29;"Validate Age Against";Option)
+        {
+            Caption = 'Validate Age Against';
+            OptionCaption = 'Sales Date (Year),Period Begin (Year),Period End (Year),Sales Date (Year+Month),Period Begin (Year+Month),Period End (Year+Month),Sales Date (Year+Month+Day),Period Begin (Year+Month+Day),Period End (Year+Month+Day)';
+            OptionMembers = SALESDATE_Y,PERIODBEGIN_Y,PERIODEND_Y,SALESDATE_YM,PERIODBEGIN_YM,PERIODEND_YM,SALESDATE_YMD,PERIODBEGIN_YMD,PERIODEND_YMD;
         }
         field(30;"Card Number Scheme";Option)
         {

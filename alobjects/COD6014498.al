@@ -19,6 +19,7 @@ codeunit 6014498 "Exchange Label Management"
     // NPR5.49/MHA /20190211 CASE 345209 Amount Including Vat should be changed so that Discount is reflected
     // NPR5.51/ALST/20190624 CASE 337539 "Retail Cross Reference No." gets a value if global exchange is set up
     // NPR5.53/ALST/20191028 CASE 372948 check EAN prefix in range instead of single value
+    // NPR5.55/ALPO/20200731 CASE 412253 Correct unit price calclulation with prices set to be VAT-excluding
 
     var
         Text00001: Label 'The item was not found. Use manual procedure in order to return the item.';
@@ -49,7 +50,7 @@ codeunit 6014498 "Exchange Label Management"
         ExchangeLabel."Company Name" := CompanyName;
         ExchangeLabel."Table No." := RecRef.Number;
         ExchangeLabel."Valid From" := ValidFromDate;
-        //-345209 [345209]
+        //-NPR5.49 [345209]
         ExchangeLabel."Unit Price" := GetUnitPriceInclVat(RecRef);
         //+NPR5.49 [345209]
         ExchangeLabel."Sales Price Incl. Vat" := GetSalesPriceInclVat(RecRef);
@@ -326,6 +327,7 @@ codeunit 6014498 "Exchange Label Management"
         RetailConfiguration: Record "Retail Setup";
         SaleLinePOS: Record "Sale Line POS";
         LineNo: Integer;
+        SalesPrice: Decimal;
     begin
         RetailConfiguration.Get;
 
@@ -386,13 +388,26 @@ codeunit 6014498 "Exchange Label Management"
                     else
                         SaleLinePOS.Validate(Quantity, -1);
                     SaleLinePOS.Insert(true);
-                    SaleLinePOS."Price Includes VAT" := true;
+              //SaleLinePOS."Price Includes VAT" := TRUE;  //NPR5.55 [412253]-revoked
+              //-NPR5.55 [412253]
+              if not SaleLinePOS."Price Includes VAT" and (SaleLinePOS."VAT %" <> 0) then begin
+                ExchangeLabel."Unit Price" := Round(ExchangeLabel."Unit Price" / (1 + SaleLinePOS."VAT %" / 100), 0.00001);
+                SalesPrice := Round(ExchangeLabel."Sales Price Incl. Vat" / (1 + SaleLinePOS."VAT %" / 100), 0.00001);
+              end else
+                SalesPrice := ExchangeLabel."Sales Price Incl. Vat";
+              //+NPR5.55 [412253]
                     //-NPR5.49 [345209]
                     //SaleLinePOS.VALIDATE("Unit Price", ExchangeLabel."Sales Price Incl. Vat");
                     if ExchangeLabel."Unit Price" <> 0 then
                         SaleLinePOS.Validate("Unit Price", ExchangeLabel."Unit Price");
-                    if SaleLinePOS."Unit Price" < ExchangeLabel."Sales Price Incl. Vat" then
-                        SaleLinePOS.Validate("Unit Price", ExchangeLabel."Sales Price Incl. Vat")
+              //-NPR5.55 [412253]-revoked
+              //IF SaleLinePOS."Unit Price" < ExchangeLabel."Sales Price Incl. Vat" THEN
+              //  SaleLinePOS.VALIDATE("Unit Price", ExchangeLabel."Sales Price Incl. Vat")
+              //+NPR5.55 [412253]-revoked
+              //-NPR5.55 [412253]
+              if SaleLinePOS."Unit Price" < SalesPrice then
+                SaleLinePOS.Validate("Unit Price", SalesPrice)
+              //+NPR5.55 [412253]
                     else
                         SaleLinePOS.Validate("Amount Including VAT", ExchangeLabel."Sales Price Incl. Vat" * SaleLinePOS.Quantity);
                     //+NPR5.49 [345209]

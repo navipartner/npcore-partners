@@ -4,6 +4,8 @@ table 6151014 "NpRv Voucher Entry"
     // NPR5.48/MHA /20180921  CASE 302179 Renamed field 55 "Sales Ticket No." to "Document No." and added fields 53 "Document Type", 60 "External Document No."
     // NPR5.49/MHA /20190228  CASE 342811 Added partner fields
     // NPR5.50/MHA /20190426  CASE 353079 Added Option "Top-up" to field 10 "Entry Type"
+    // NPR5.55/MHA /20200512  CASE 404116 Change Option [0] for field 53 "Document Type" from "Audit Roll" to "POS Entry"
+    // NPR5.55/MHA /20200427  CASE 402013 Added key "Entry Type","Document Type","Document No."
 
     Caption = 'Retail Voucher Entry';
     DrillDownPageID = "NpRv Voucher Entries";
@@ -63,9 +65,9 @@ table 6151014 "NpRv Voucher Entry"
         field(53;"Document Type";Option)
         {
             Caption = 'Document Type';
-            Description = 'NPR5.48';
-            OptionCaption = 'Audit Roll,Invoice';
-            OptionMembers = "Audit Roll",Invoice;
+            Description = 'NPR5.48,NPR5.55';
+            OptionCaption = 'POS Entry,Invoice';
+            OptionMembers = "POS Entry",Invoice;
         }
         field(55;"Document No.";Code[20])
         {
@@ -120,6 +122,9 @@ table 6151014 "NpRv Voucher Entry"
             SumIndexFields = Amount,"Remaining Amount";
         }
         key(Key3;"Entry Type","Register No.","Document No.")
+        {
+        }
+        key(Key4;"Entry Type","Document Type","Document No.")
         {
         }
     }

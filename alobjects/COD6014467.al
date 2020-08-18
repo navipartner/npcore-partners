@@ -16,6 +16,7 @@ codeunit 6014467 "Retail Journal Code"
     // NPR5.53/TJ  /20191118 CASE 375557 New function to print report from Retail Journal which is not part of the Report Selection Retail
     // NPR5.54/ALPO/20200310 CASE 385913 Do not overwrite "Unite Price" (field 29) in Retail Journal by field's "Unit Price (LCY)" value from Purchase Invoice Line
     //                                   Added publishers to alter this behaviour in customer specific solutions
+    // NPR5.55/BHR /202020713 CASE 414268 Add retail print and Price label for warehouse activity line
 
 
     trigger OnRun()
@@ -640,6 +641,49 @@ codeunit 6014467 "Retail Journal Code"
         end;
         RetailJnlLine.CloseGUI;
         //+NPR5.51 [358287]
+    end;
+
+    procedure InventoryPutAway2RetailJnl(DocumentType: Integer;DocumentNo: Code[20];RetailJnlCode: Code[40])
+    var
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+    begin
+        //-NPR5.55 [414268]
+        if DocumentNo = '' then begin
+          WarehouseActivityHeader.SetRange(Type, DocumentType);
+          if not (PAGE.RunModal(0, WarehouseActivityHeader) = ACTION::LookupOK) then
+            exit;
+        end else
+         WarehouseActivityHeader.Get(DocumentType,DocumentNo);
+
+        WarehouseActivityLine.SetRange("Activity Type",DocumentType);
+        WarehouseActivityLine.SetRange("No.",DocumentNo);
+        CopyInventoryPutAway2RetailJnlLines(WarehouseActivityLine,RetailJnlCode);
+        //+NPR5.55 [414268]
+    end;
+
+    procedure CopyInventoryPutAway2RetailJnlLines(var WarehouseActivityLine: Record "Warehouse Activity Line";RetailJnlCode: Code[40])
+    var
+        RetailJnlLine: Record "Retail Journal Line";
+    begin
+        //-NPR5.55 [414268]
+        if not SetRetailJnl(RetailJnlCode) then
+          exit;
+
+        with WarehouseActivityLine do begin
+          RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+          RetailJnlLine.UseGUI(Count);
+          if FindSet then repeat
+            RetailJnlLine.InitLine;
+
+            RetailJnlLine.SetItem(WarehouseActivityLine."Item No.", "Variant Code", '');
+            RetailJnlLine."Quantity to Print" := Quantity;
+
+            RetailJnlLine.Insert();
+          until Next = 0;
+        end;
+        RetailJnlLine.CloseGUI;
+        //+NPR5.55 [414268]
     end;
 
     procedure SetRetailJnl(var RetailJnlCode: Code[40]) Selected: Boolean

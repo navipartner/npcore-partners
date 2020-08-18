@@ -21,7 +21,7 @@ page 6014541 "Report Selection - Contract"
                 trigger OnValidate()
                 begin
                     //-NPR5.30 [264918]
-                    //S�tBrugsFilter;
+                    //SætBrugsFilter;
                     SetReportTypeFilter();
                     //+NPR5.30 [264918]
                     CurrPage.Update(true);

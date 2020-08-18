@@ -56,7 +56,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         NcTask.CalcFields("Table Name");
         OutputName := 'RapCo-' + CopyStr(DelChr(ConvertStr(Format(CurrentDateTime, 0, 9), ':', '.'), '=', '.,- TZ'), 1, 16) + '-';
         OutputName += Format(NcTask."Table No.") + '-' + NcTask."Table Name" + '-' + NcTask."Record Value";
-        OutputName := DelChr(OutputName, '=', ':?|<>"^`ï¿½*/\"#ï¿½%&/''');
+        OutputName := DelChr(OutputName,'=',':?|<>"^`´*/\"#¤%&/''');
         //-NC2.17 [335927]
         //OutputName := COPYSTR(OutputName,1,100 - STRLEN('.xlsx'));
         //OutputName += '.xlsx';

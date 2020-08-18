@@ -11556,17 +11556,17 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
                         <FontFamily>Times New Roman</FontFamily>
                         <FontSize>8pt</FontSize>
                         <FontWeight>Bold</FontWeight>
-                        <Format>dd-MM-yyyy</Format>
+                        <Format>D</Format>
                       </Style>
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Left</TextAlign>
+                    <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.28109cm</Top>
-              <Left>0.10015cm</Left>
+              <Top>0.09878cm</Top>
+              <Left>14.64529cm</Left>
               <Height>0.423cm</Height>
               <Width>2.76414cm</Width>
               <ZIndex>1</ZIndex>
@@ -11590,42 +11590,15 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.78523cm</Top>
-              <Left>0.10544cm</Left>
-              <Height>0.46408cm</Height>
-              <Width>8.08172cm</Width>
-              <ZIndex>2</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName17">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value EvaluationMode="Constant" />
-                      <Style>
-                        <FontSize>8pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
                     <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.22288cm</Top>
-              <Left>12.77346cm</Left>
-              <Height>0.423cm</Height>
-              <Width>4.63597cm</Width>
-              <ZIndex>3</ZIndex>
+              <Top>1.04455cm</Top>
+              <Left>14.64529cm</Left>
+              <Height>0.46408cm</Height>
+              <Width>2.76414cm</Width>
+              <ZIndex>2</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -11648,10 +11621,10 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
                 </Paragraph>
               </Paragraphs>
               <Top>1.22288cm</Top>
-              <Left>4.43109cm</Left>
+              <Left>6.33609cm</Left>
               <Height>0.15625in</Height>
               <Width>0.16667in</Width>
-              <ZIndex>4</ZIndex>
+              <ZIndex>3</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -11684,7 +11657,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Left>0.10544cm</Left>
               <Height>0.423cm</Height>
               <Width>3.96735cm</Width>
-              <ZIndex>5</ZIndex>
+              <ZIndex>4</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -11711,7 +11684,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Left>0.10544cm</Left>
               <Height>0.423cm</Height>
               <Width>3.96735cm</Width>
-              <ZIndex>6</ZIndex>
+              <ZIndex>5</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -11738,7 +11711,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Left>0.10015cm</Left>
               <Height>0.423cm</Height>
               <Width>3.97264cm</Width>
-              <ZIndex>7</ZIndex>
+              <ZIndex>6</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -11761,10 +11734,10 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
                 </Paragraph>
               </Paragraphs>
               <Top>1.22288cm</Top>
-              <Left>3.78173cm</Left>
+              <Left>5.68673cm</Left>
               <Height>0.17979in</Height>
               <Width>0.11459in</Width>
-              <ZIndex>8</ZIndex>
+              <ZIndex>7</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -11793,11 +11766,11 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.78523cm</Top>
-              <Left>12.77346cm</Left>
+              <Top>1.15023cm</Top>
+              <Left>0.10521cm</Left>
               <Height>0.423cm</Height>
               <Width>4.63597cm</Width>
-              <ZIndex>9</ZIndex>
+              <ZIndex>8</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -11806,7 +11779,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Top>2.34103cm</Top>
               <Height>0cm</Height>
               <Width>17.5214cm</Width>
-              <ZIndex>10</ZIndex>
+              <ZIndex>9</ZIndex>
               <Style>
                 <Border>
                   <Style>Solid</Style>
@@ -11818,7 +11791,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Left>0.0181cm</Left>
               <Height>0cm</Height>
               <Width>17.5214cm</Width>
-              <ZIndex>11</ZIndex>
+              <ZIndex>10</ZIndex>
               <Style>
                 <Border>
                   <Style>Solid</Style>
@@ -11847,7 +11820,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Left>4.14334cm</Left>
               <Height>0.423cm</Height>
               <Width>3.24834cm</Width>
-              <ZIndex>12</ZIndex>
+              <ZIndex>11</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -11880,7 +11853,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Left>4.14687cm</Left>
               <Height>0.423cm</Height>
               <Width>3.24834cm</Width>
-              <ZIndex>13</ZIndex>
+              <ZIndex>12</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -11913,7 +11886,7 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
               <Left>4.14687cm</Left>
               <Height>0.423cm</Height>
               <Width>3.24834cm</Width>
-              <ZIndex>14</ZIndex>
+              <ZIndex>13</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -11922,6 +11895,39 @@ Fields!DateFilter_PaymentLastYr.Value</Value>
                 <PaddingRight>2pt</PaddingRight>
                 <PaddingTop>2pt</PaddingTop>
                 <PaddingBottom>2pt</PaddingBottom>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox240">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=First(Fields!CurrReportPageNoCaption.Value, "DataSet_Result") &amp; " " &amp; Globals!PageNumber</Value>
+                      <Style>
+                        <FontFamily>Times New Roman</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox240</rd:DefaultName>
+              <Top>0.55245cm</Top>
+              <Left>14.64529cm</Left>
+              <Height>0.46408cm</Height>
+              <Width>2.76414cm</Width>
+              <ZIndex>14</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
           </ReportItems>
@@ -12762,6 +12768,9 @@ End Function
         </Field>
         <Field Name="ItemQtyLine2_PaymentTypePeriodFormat">
           <DataField>ItemQtyLine2_PaymentTypePeriodFormat</DataField>
+        </Field>
+        <Field Name="CurrReportPageNoCaption">
+          <DataField>CurrReportPageNoCaption</DataField>
         </Field>
         <Field Name="No_PaymentLastYr">
           <DataField>No_PaymentLastYr</DataField>

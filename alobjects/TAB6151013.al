@@ -8,6 +8,9 @@ table 6151013 "NpRv Voucher"
     // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
     // NPR5.53/MHA /20191122  CASE 378597 Fixed mapping of Name 2 in UpdateContactInfo()
     // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
+    // NPR5.55/MHA /20200427  CASE 402015 Removed field 85 "In-use Quantity (External)"
+    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
+    // NPR5.55/MHA /20200702  CASE 407070 Added field 1030 "No. Send"
 
     Caption = 'Retail Voucher';
     DrillDownPageID = "NpRv Vouchers";
@@ -129,18 +132,9 @@ table 6151013 "NpRv Voucher"
         }
         field(80;"In-use Quantity";Integer)
         {
-            CalcFormula = Count("NpRv Sale Line POS Voucher" WHERE (Type=CONST(Payment),
-                                                                    "Voucher No."=FIELD("No.")));
+            CalcFormula = Count("NpRv Sales Line" WHERE (Type=CONST(Payment),
+                                                         "Voucher No."=FIELD("No.")));
             Caption = 'In-use Quantity';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(85;"In-use Quantity (External)";Integer)
-        {
-            CalcFormula = Count("NpRv Ext. Voucher Sales Line" WHERE (Type=CONST(Payment),
-                                                                      "Voucher No."=FIELD("No.")));
-            Caption = 'In-use Quantity (External)';
-            Description = 'NPR5.48';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -320,6 +314,12 @@ table 6151013 "NpRv Voucher"
         {
             Caption = 'Phone No.';
         }
+        field(270;"Language Code";Code[10])
+        {
+            Caption = 'Language Code';
+            Description = 'NPR5.55';
+            TableRelation = Language;
+        }
         field(300;"Voucher Message";Text[250])
         {
             Caption = 'Voucher Message';
@@ -403,6 +403,15 @@ table 6151013 "NpRv Voucher"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(1030;"No. Send";Integer)
+        {
+            CalcFormula = Count("NpRv Sending Log" WHERE ("Voucher No."=FIELD("No."),
+                                                          "Error during Send"=CONST(false)));
+            Caption = 'No. Send';
+            Description = 'NPR5.55';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
@@ -421,6 +430,20 @@ table 6151013 "NpRv Voucher"
     fieldgroups
     {
     }
+
+    trigger OnDelete()
+    var
+        NpRvVoucherEntry: Record "NpRv Voucher Entry";
+    begin
+        //-NPR5.55 [402015]
+        CalcFields(Open);
+        TestField(Open,false);
+
+        NpRvVoucherEntry.SetRange("Voucher No.","No.");
+        if NpRvVoucherEntry.FindFirst then
+          NpRvVoucherEntry.DeleteAll;
+        //+NPR5.55 [402015]
+    end;
 
     trigger OnInsert()
     var
@@ -488,6 +511,9 @@ table 6151013 "NpRv Voucher"
           "Country/Region Code" := Cont."Country/Region Code";
           "E-mail" := Cont."E-Mail";
           "Phone No." := Cont."Phone No.";
+          //-NPR5.55 [397527]
+          "Language Code" := Cont."Language Code";
+          //-NPR5.55 [397527]
           exit;
         end;
 
@@ -505,16 +531,21 @@ table 6151013 "NpRv Voucher"
           "Country/Region Code" := Cust."Country/Region Code";
           "E-mail" := Cust."E-Mail";
           "Phone No." := Cust."Phone No.";
+          //-NPR5.55 [397527]
+          "Language Code" := Cust."Language Code";
+          //-NPR5.55 [397527]
           exit;
         end;
     end;
 
     procedure CalcInUseQty() InUseQty: Integer
     begin
+        //-NPR5.55 [402015]
         //-NPR5.48 [302179]
-        CalcFields("In-use Quantity","In-use Quantity (External)");
-        exit("In-use Quantity" + "In-use Quantity (External)");
+        CalcFields("In-use Quantity");
+        exit("In-use Quantity");
         //+NPR5.48 [302179]
+        //+NPR5.55 [402015]
     end;
 }
 

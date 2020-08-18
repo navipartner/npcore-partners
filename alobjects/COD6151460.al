@@ -7,6 +7,7 @@ codeunit 6151460 "M2 Setup Mgt."
     // MAG2.22/MHA /20190625  CASE 359285 Added Picture Variety Type in SetupNpXmlTemplates()
     // MAG2.22/MHA /20190705  CASE 361164 Updated Exception Message parsing in MagentoApiGet() and MagentoApiPost()
     // MAG2.22/MHA /20190708  CASE 352201 Added SetupTemplateCollectStore() to SetupNpXmlTemplates()
+    // MAG2.26/MHA /20200601  CASE 404580 Setup Event Subscription added for Categories and Brands
 
 
     trigger OnRun()
@@ -57,29 +58,29 @@ codeunit 6151460 "M2 Setup Mgt."
 
     local procedure CreateRootItemGroup(ItemGroupNo: Code[20]; ItemGroupName: Text[50])
     var
-        ItemGroup: Record "Magento Item Group";
+        ItemGroup: Record "Magento Category";
     begin
         if ItemGroup.Get(ItemGroupNo) then begin
-            if (ItemGroup.Name <> ItemGroupName) or (not ItemGroup.Root) or (ItemGroup."Root No." <> ItemGroup."No.") then begin
+          if (ItemGroup.Name <> ItemGroupName) or (not ItemGroup.Root) or (ItemGroup."Root No." <> ItemGroup.Id) then begin
                 ItemGroup.Name := ItemGroupName;
                 ItemGroup.Root := true;
-                ItemGroup."Root No." := ItemGroup."No.";
+            ItemGroup."Root No." := ItemGroup.Id;
                 ItemGroup.Modify(true);
             end;
             exit;
         end;
 
         ItemGroup.Init;
-        ItemGroup."No." := ItemGroupNo;
+        ItemGroup.Id := ItemGroupNo;
         ItemGroup.Name := ItemGroupName;
         ItemGroup.Root := true;
-        ItemGroup."Root No." := ItemGroup."No.";
+        ItemGroup."Root No." := ItemGroup.Id;
         ItemGroup.Insert(true);
     end;
 
     local procedure SetDefaultItemGroupRoots()
     var
-        ItemGroup: Record "Magento Item Group";
+        ItemGroup: Record "Magento Category";
         MagentoStore: Record "Magento Store";
         MagentoWebsite: Record "Magento Website";
     begin
@@ -92,14 +93,14 @@ codeunit 6151460 "M2 Setup Mgt."
         if not MagentoStore.FindFirst then
             exit;
 
-        ItemGroup.SetFilter("Parent Item Group No.", '=%1', '');
+        ItemGroup.SetFilter("Parent Category Id",'=%1','');
         ItemGroup.SetFilter("Root No.", '=%1', '');
         ItemGroup.SetRange(Root, false);
         if not ItemGroup.FindSet then
             exit;
 
         repeat
-            ItemGroup."Parent Item Group No." := MagentoStore."Root Item Group No.";
+          ItemGroup."Parent Category Id" := MagentoStore."Root Item Group No.";
             ItemGroup."Root No." := MagentoStore."Root Item Group No.";
             ItemGroup.Modify(true);
         until ItemGroup.Next = 0;
@@ -394,6 +395,18 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
     end;
 
+    [EventSubscriber(ObjectType::Table, 6151401, 'OnAfterInsertEvent', '', true, true)]
+    local procedure OnAfterInsertMagentoSetup(var Rec: Record "Magento Setup";RunTrigger: Boolean)
+    begin
+        //-MAG2.26 [404580]
+        if Rec.IsTemporary then
+          exit;
+
+        if Rec."Magento Version" = Rec."Magento Version"::"2" then
+          InitMagentoSetupEvents();
+        //+MAG2.26 [404580]
+    end;
+
     [EventSubscriber(ObjectType::Table, 6151401, 'OnBeforeModifyEvent', '', true, true)]
     local procedure OnAfterModifyMagentoSetup(var Rec: Record "Magento Setup"; var xRec: Record "Magento Setup"; RunTrigger: Boolean)
     var
@@ -433,6 +446,10 @@ codeunit 6151460 "M2 Setup Mgt."
         InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Payment Method Mapping", CODEUNIT::"M2 Setup Mgt.", 'SetupM2PaymentMethodMapping');
         InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Shipment Method Mapping", CODEUNIT::"M2 Setup Mgt.", 'SetupM2ShipmentMethodMapping');
         //+MAG2.20 [320423]
+        //-MAG2.26 [404580]
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Categories",CODEUNIT::"M2 Category Mgt.",'SetupM2Categories');
+        InitMagentoSetupEvent(MagentoSetupEventSub.Type::"Setup Brands",CODEUNIT::"M2 Brand Mgt.",'SetupM2Brands');
+        //+MAG2.26 [404580]
     end;
 
     local procedure InitMagentoSetupEvent(Type: Integer; CodeunitId: Integer; FunctionName: Text)

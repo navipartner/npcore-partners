@@ -25,6 +25,7 @@ table 6014402 "Payment Type POS"
     // NPR5.52/MHA /20191016 CASE 373294 Added field 120 "Allow Cashback"
     // NPR5.53/MHA /20191202 CASE 373294 Renamed field 120 to "Allow Refund"
     // NPR5.54/MMV /20200224 CASE 364340 Added surcharge & tip fields
+    // NPR5.55/ALPO/20200623 CASE 410991 Zero as default payment amount on popup window for specific payment types
 
     Caption = 'Payment Type';
     LookupPageID = "Payment Type - Register";
@@ -69,11 +70,11 @@ table 6014402 "Payment Type POS"
                     ERROR(Trans0001,Behandlingsart);
                   Betaling.SETRANGE(Behandlingsart);
                 END;
-                             //-v�k
+                             //-væk
                 IF (Behandlingsart = Behandlingsart::Kontant) OR (xRec.Behandlingsart = Behandlingsart::Kontant)
                 OR (Behandlingsart = Behandlingsart::Gavekort) OR (xRec.Behandlingsart = Behandlingsart::Gavekort)
                 OR (Behandlingsart = Behandlingsart::Tilgodebevis) OR (xRec.Behandlingsart = Behandlingsart::Tilgodebevis) THEN BEGIN
-                  IF Ops�tning.GET THEN IF Ops�tning."Kassestyret betalingsvalg" THEN
+                  IF Opsætning.GET THEN IF Opsætning."Kassestyret betalingsvalg" THEN
                     Kasse.SETRANGE(Kassenummer,Betaling.Kassenummer);
                   IF Kasse.FIND('-') THEN
                     REPEAT
@@ -90,7 +91,7 @@ table 6014402 "Payment Type POS"
                       Kasse.MODIFY;
                     UNTIL Kasse.NEXT = 0;
                 END;
-                                  //+v�k
+                                  //+væk
                 */
 
             end;
@@ -321,7 +322,7 @@ table 6014402 "Payment Type POS"
                                                     "Shortcut Dimension 1 Code" = FIELD ("Global Dimension Code 1 Filter"),
                                                     "Shortcut Dimension 2 Code" = FIELD ("Global Dimension Code 2 Filter")));
             Caption = 'No. Sales in audit roll';
-            Description = 'T�ller kun linier m. linienr=10000,vare, salg';
+            Description = 'Tæller kun linier m. linienr=10000,vare, salg';
             FieldClass = FlowField;
         }
         field(38; "Normal Sale in Audit Roll"; Decimal)
@@ -336,7 +337,7 @@ table 6014402 "Payment Type POS"
                                                                          "Shortcut Dimension 2 Code" = FIELD ("Global Dimension Code 2 Filter"),
                                                                          "Sales Ticket No." = FIELD ("Receipt Filter")));
             Caption = 'Normal sale in audit roll';
-            Description = 'T�ller "bel�b inkl. moms" hvis salg, vare';
+            Description = 'Tæller "bel¢b inkl. moms" hvis salg, vare';
             FieldClass = FlowField;
         }
         field(39; "Debit Sale in Audit Roll"; Decimal)
@@ -395,7 +396,7 @@ table 6014402 "Payment Type POS"
                                                     "Shortcut Dimension 1 Code" = FIELD ("Global Dimension Code 1 Filter"),
                                                     "Shortcut Dimension 2 Code" = FIELD ("Global Dimension Code 2 Filter")));
             Caption = 'No. sales lines in audit roll';
-            Description = 'T�ller alle linier m. type <>Afbrudt &<>�ben/Luk';
+            Description = 'Tæller alle linier m. type <>Afbrudt &<>Åben/Luk';
             FieldClass = FlowField;
         }
         field(43; "Salesperson Filter"; Code[10])
@@ -448,7 +449,7 @@ table 6014402 "Payment Type POS"
                                                     "Shortcut Dimension 1 Code" = FIELD ("Global Dimension Code 1 Filter"),
                                                     "Shortcut Dimension 2 Code" = FIELD ("Global Dimension Code 2 Filter")));
             Caption = 'No. debit sales in audit roll';
-            Description = 'T�ller linie debetsalg,linienr=10000';
+            Description = 'Tæller linie debetsalg,linienr=10000';
             FieldClass = FlowField;
         }
         field(47; Euro; Boolean)
@@ -510,12 +511,12 @@ table 6014402 "Payment Type POS"
         field(54; "Maximum Amount"; Decimal)
         {
             Caption = 'Max amount';
-            Description = 'Maksimalt bel�b, hvor prisen skal g�lde';
+            Description = 'Maksimalt bel¢b, hvor prisen skal gælde';
         }
         field(55; "Minimum Amount"; Decimal)
         {
             Caption = 'Min amount';
-            Description = 'Minimumsbel�b, hvor gebyret skal g�lde';
+            Description = 'Minimumsbel¢b, hvor gebyret skal gælde';
         }
         field(56; "Debit Cost Amount Audit Roll"; Decimal)
         {
@@ -530,7 +531,7 @@ table 6014402 "Payment Type POS"
                                                        "Shortcut Dimension 2 Code" = FIELD ("Global Dimension Code 2 Filter"),
                                                        "Sales Ticket No." = FIELD ("Receipt Filter")));
             Caption = 'Cost amount in audit';
-            Description = 'Calcformula tilf�jet';
+            Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
         }
         field(57; "Debit Sales in Audit Excl. VAT"; Decimal)
@@ -546,7 +547,7 @@ table 6014402 "Payment Type POS"
                                                          "Shortcut Dimension 2 Code" = FIELD ("Global Dimension Code 2 Filter"),
                                                          "Sales Ticket No." = FIELD ("Receipt Filter")));
             Caption = 'Debit sales in audit ex VAT';
-            Description = 'Calcformula tilf�jet';
+            Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
         }
         field(58; "Cardholder Verification Method"; Option)
@@ -666,6 +667,11 @@ table 6014402 "Payment Type POS"
             Caption = 'Allow Refund';
             Description = 'NPR5.52,NPR5.53';
             InitValue = true;
+        }
+        field(130;"Zero as Default on Popup";Boolean)
+        {
+            Caption = 'Zero as Default on Popup';
+            Description = 'NPR5.55';
         }
         field(200; "PBS Gift Voucher"; Boolean)
         {

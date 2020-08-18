@@ -14,6 +14,7 @@ codeunit 6014628 "Managed Package Mgt."
     // NPR5.38/MMV /20171201 CASE 294095 Expanded event OnLoadPackage() with LoadType.
     //                                   Ignore DateTime while parsing json.
     // NPR5.39/MMV /20180222 CASE 306227 Replaced system captions with hardcoded text.
+    // NPR5.55/MMV /20200615 CASE 409573 Added support for importing from devops feed.
 
 
     trigger OnRun()
@@ -175,6 +176,32 @@ codeunit 6014628 "Managed Package Mgt."
 
             exit(false);
         end;
+    end;
+
+    procedure DeployPackageFromURL(URL: Text)
+    var
+        WebClient: DotNet npNetWebClient;
+        Credential: DotNet npNetNetworkCredential;
+        JSON: Text;
+        JObject: DotNet npNetJObject;
+        PrimaryPackageTable: Integer;
+        ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
+        Handled: Boolean;
+        Encoding: DotNet npNetEncoding;
+    begin
+        //-NPR5.55 [409573]
+        WebClient := WebClient.WebClient();
+        WebClient.Encoding := Encoding.UTF8;
+        ManagedDependencyMgt.ParseJSON(WebClient.DownloadString(URL), JObject);
+        Evaluate(PrimaryPackageTable, Format(JObject.Item('Primary Package Table')));
+        JObject := JObject.Item('Data');
+
+        OnLoadPackage(Handled, PrimaryPackageTable, JObject, 0);
+        if Handled then
+          exit;
+
+        LoadPackage(JObject);
+        //+NPR5.55 [409573]
     end;
 
     local procedure LoadPackage(JObject: DotNet JObject): Boolean

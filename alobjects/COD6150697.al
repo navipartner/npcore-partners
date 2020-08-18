@@ -20,6 +20,10 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
     // NPR5.52/SARA/20191011 CASE 371142 Enhancement on conversion tool for POS Entry, function UpgradeSetupsBalancingV3
     // NPR5.53/SARA/20191119 CASE 375828 Modify mapping for fields 'Rounding Gain Account' and 'Rounding Losses Account' for POS Paymeny Method
     // NPR5.53/SARA/20191206 CASE 381094 Correction Description for in POS Payment Bin for 'Bank' and 'Safe'
+    // NPR5.55/SARA/20200305 CASE 394811 Added CheckPaymentTypePOSAccount to check payment types not having an account number
+    // NPR5.55/SARA/20200310 CASE 395030 Update POS Unit 'Name' with Register 'Description'
+    // NPR5.55/SARA/20200525 CASE 404019 Create Tax Amount Line when convert Audit roll to POS Entry
+    // NPR5.55/SARA/20200608 CASE 407687 Update "Condensed Posting Description" in POS Payment Method
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -50,6 +54,7 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         POSBalancingLine: Record "POS Balancing Line";
         POSUnit: Record "POS Unit";
         POSLedgerRegister: Record "POS Period Register";
+        VATAmountLine: Record "VAT Amount Line";
         HasOpenPOSLedgerRegister: Boolean;
     begin
         //Use "Audit Roll to POS Entry Link" to determine how far the Migration has come, and if new Datamodel have been disabled and therefore
@@ -95,8 +100,13 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             if (AuditRoll."Register No." <> xAuditRoll."Register No.") or
                (AuditRoll."Sales Ticket No." <> xAuditRoll."Sales Ticket No.") or
                ((AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment) and (AuditRoll.Type = AuditRoll.Type::"Open/Close")) then begin
-              if NoOfPOSEntriesCreated > 0 then
+              if NoOfPOSEntriesCreated > 0 then begin
                 FinalizePOSEntry(POSEntry,AuditRoll);
+                //-NPR5.55 [404019]
+                CalcVATAmountLines(POSEntry,VATAmountLine,POSSalesLine);
+                PersistVATAmountLines(POSEntry,VATAmountLine);
+                //+NPR5.55 [404019]
+              end;
 
               if POSUnit."No." <> AuditRoll."Register No." then
                 if POSUnit.Get(AuditRoll."Register No.") then;
@@ -106,7 +116,7 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
               POSEntry."POS Store Code" := POSUnit."POS Store Code";
               POSEntry."POS Unit No." := AuditRoll."Register No.";
               POSEntry."Document No." := AuditRoll."Sales Ticket No.";
-              POSEntry."Entry Type" := POSEntry."Entry Type"::Comment ; //Default, until possible lines changes this.
+              POSEntry."Entry Type" := POSEntry."Entry Type"::Comment; //Default, until possible lines changes this.
               POSEntry."Entry Date" := AuditRoll."Sale Date";
               POSEntry."Posting Date" := POSEntry."Entry Date";
               POSEntry."Document Date" := POSEntry."Entry Date";
@@ -161,8 +171,13 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             UpdatePOSEntry(POSEntry,AuditRoll);
             xAuditRoll := AuditRoll;
           until AuditRoll.Next = 0;
-          if NoOfPOSEntriesCreated > 0 then
+          if NoOfPOSEntriesCreated > 0 then begin
             FinalizePOSEntry(POSEntry,AuditRoll);
+            //-NPR5.55 [404019]
+            CalcVATAmountLines(POSEntry,VATAmountLine,POSSalesLine);
+            PersistVATAmountLines(POSEntry,VATAmountLine);
+            //+NPR5.55 [404019]
+          end;
           if GuiAllowed then
             ProgressDialog.Close;
         end;
@@ -297,6 +312,8 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         IUoM: Record "Item Unit of Measure";
         GLAccount: Record "G/L Account";
         Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        AuditRollComment: Record "Audit Roll";
     begin
         with POSSalesLine do begin
           Init;
@@ -355,7 +372,12 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
           "Tax Liable" := AuditRoll."Tax Liable";
           "Tax Group Code" := AuditRoll."Tax Group Code";
           "Use Tax" := AuditRoll."Use Tax";
-
+          //-NPR5.55 [404019]
+          if VATPostingSetup.Get("VAT Bus. Posting Group","VAT Prod. Posting Group") then begin
+            "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+            "VAT Identifier" := VATPostingSetup."VAT Identifier";
+          end;
+          //+NPR5.55 [404019]
           "Unit of Measure Code" := AuditRoll."Unit of Measure Code";
           Quantity := AuditRoll.Quantity;
           if (Type = Type::Item) then begin
@@ -429,8 +451,31 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
           AuditRolltoPOSEntryLink.Insert;
 
           //Update POS Entry
-          if Type <> Type::Comment then //any line not being comment should change type to sale
-            POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
+          //-NPR5.55 [404019]
+          //IF Type <> Type::Comment THEN //any line not being comment should change type to sale
+            //POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
+          case AuditRoll."Sale Type" of
+            AuditRoll."Sale Type"::"Debit Sale":
+            begin
+              POSEntry."Entry Type" := POSEntry."Entry Type"::"Credit Sale";
+              AuditRollComment.Reset;
+              AuditRollComment.SetRange("Sales Ticket No.",AuditRoll."Sales Ticket No.");
+              AuditRollComment.SetRange(Type,AuditRollComment.Type::Comment);
+              if AuditRollComment.FindFirst then
+                POSEntry.Description := AuditRollComment.Description;
+            end;
+            AuditRoll."Sale Type"::Sale:
+            begin
+              POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
+              POSEntry.Description := 'Sales Ticket ' + Format(AuditRoll."Sales Ticket No.");
+            end;
+             AuditRoll."Sale Type"::Deposit,AuditRoll."Sale Type"::"Out payment":
+            begin
+              POSEntry.Description := AuditRoll.Description;
+            end;
+          end;
+          //+NPR5.55 [404019]
+
           if POSEntry."Dimension Set ID" = 0 then begin
             POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
             POSEntry."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
@@ -444,15 +489,22 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
           //Update measures
           if Type = Type::Item then begin
             POSEntry."Item Sales (LCY)" += "Amount Incl. VAT";
-            POSEntry."Discount Amount" += "Line Discount Amount Incl. VAT";
+            //-NPR5.55 [404019]
+            //POSEntry."Discount Amount" += "Line Discount Amount Incl. VAT";
+            POSEntry."Discount Amount" += "Line Discount Amount Excl. VAT";
+            //+NPR5.55 [404019]
             if Quantity < 0 then
               POSEntry."Return Sales Quantity" -= Quantity
             else
               POSEntry."Sales Quantity" += Quantity;
           end;
           POSEntry."Amount Excl. Tax" += "Amount Excl. VAT";
-          POSEntry."Tax Amount" += "Amount Incl. VAT";
-          POSEntry."Amount Incl. Tax" += "Amount Incl. VAT"-"Amount Excl. VAT";
+          //-NPR5.55 [404019]
+          //POSEntry."Tax Amount" += "Amount Incl. VAT";
+          //POSEntry."Amount Incl. Tax" += "Amount Incl. VAT"-"Amount Excl. VAT";
+          POSEntry."Tax Amount" += "Amount Incl. VAT"-"Amount Excl. VAT";
+          POSEntry."Amount Incl. Tax" += "Amount Incl. VAT";
+          //-NPR5.55 [404019]
         end;
     end;
 
@@ -599,6 +651,7 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         POSBalancingLine: Record "POS Balancing Line";
         POSLedgerRegister: Record "POS Period Register";
         POSEntryCommentLine: Record "POS Entry Comment Line";
+        POSTaxAmountLine: Record "POS Tax Amount Line";
     begin
         if (not POSEntry.IsEmpty) or
            (not POSSalesLine.IsEmpty) or
@@ -613,6 +666,9 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             POSBalancingLine.DeleteAll;
             POSLedgerRegister.DeleteAll;
             POSEntryCommentLine.DeleteAll;
+            //-NPR5.55 [404019]
+            POSTaxAmountLine.DeleteAll;
+            //+NPR5.55 [404019]
           end else
             Error('Can not initialize Poseidon Datamodel.');
         end;
@@ -661,6 +717,9 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
     begin
         if POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Unposted then
           POSEntry."Post Item Entry Status" := POSEntry."Post Entry Status";
+        //-NPR5.55 [404019]
+        POSEntry."Amount Incl. Tax & Round" := POSEntry."Amount Incl. Tax" + POSEntry."Rounding Amount (LCY)";
+        //+NPR5.55 [404019]
         POSEntry.Modify;
     end;
 
@@ -789,6 +848,7 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         POSPaymentMethodCheck: Record "POS Payment Method";
         PaymentTypePOS: Record "Payment Type POS";
         POSUnit: Record "POS Unit";
+        POSUnitCheck: Record "POS Unit";
         POSPaymentBin: Record "POS Payment Bin";
         POSPaymentBinCheck: Record "POS Payment Bin";
         POSPostingSetup: Record "POS Posting Setup";
@@ -807,6 +867,20 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
                                'Populate POS Payment Bin #2########\' +
                                'Set POS Posting Setup #3########');
         //+NPR5.51 [334335]
+        //Upadte POS Unit Name with Register Decsription
+        //-NPR5.55 [395030]
+        Register.Reset;
+        POSUnit.Reset;
+        if Register.FindSet then begin
+          repeat
+            if POSUnitCheck.Get(Register."Register No.") then begin
+              POSUnit := POSUnitCheck;
+              POSUnit.Name := Register.Description;
+              POSUnit.Modify;
+            end;
+          until Register.Next = 0;
+        end;
+        //+NPR5.55 [395030]
         
         //1. Populate POS Payment Method
         POSPaymentMethod.Reset;  // Target
@@ -886,6 +960,10 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
               POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::NO;
         
             POSPaymentMethod."Post Condensed" := (PaymentTypePOS.Posting = PaymentTypePOS.Posting::Condensed);
+            //-NPR5.55 [407687]
+            if (POSPaymentMethod."Post Condensed") and (POSPaymentMethod."Condensed Posting Description" = '') then
+              POSPaymentMethod."Condensed Posting Description" := 'Dagens bevægelser %6 %3 kasse %1';
+            //+NPR5.55 [407687]
             POSPaymentMethod."Rounding Type" := POSPaymentMethod."Rounding Type"::Nearest;
             POSPaymentMethod."Rounding Precision" := PaymentTypePOS."Rounding Precision";
             //-NPR5.52[371142]
@@ -989,34 +1067,38 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             if GuiAllowed then
               ProgressDialog.Update(3,PaymentTypePOS.Count);
             //+NPR5.51 [334335]
-            POSPostingSetup.Reset;
-            POSPostingSetup.Init;
-            POSPostingSetup."POS Store Code" := '';
-            POSPostingSetup."POS Payment Method Code" := PaymentTypePOS."No.";
-            POSPostingSetup."POS Payment Bin Code" := '';
-            case PaymentTypePOS."Account Type" of
-              PaymentTypePOS."Account Type"::Bank:
-              begin
-                POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::"Bank Account";
-                POSPostingSetup."Account No." := PaymentTypePOS."Bank Acc. No.";
+            //-NPR5.55 [394811]
+            if CheckPaymentTypePOSAccount(PaymentTypePOS) then begin
+            //+NPR5.55 [394811]
+              POSPostingSetup.Reset;
+              POSPostingSetup.Init;
+              POSPostingSetup."POS Store Code" := '';
+              POSPostingSetup."POS Payment Method Code" := PaymentTypePOS."No.";
+              POSPostingSetup."POS Payment Bin Code" := '';
+              case PaymentTypePOS."Account Type" of
+                PaymentTypePOS."Account Type"::Bank:
+                begin
+                  POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::"Bank Account";
+                  POSPostingSetup."Account No." := PaymentTypePOS."Bank Acc. No.";
+                end;
+                PaymentTypePOS."Account Type"::Customer:
+                begin
+                  POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::Customer;
+                  POSPostingSetup."Account No." := PaymentTypePOS."Customer No.";
+                end;
+                PaymentTypePOS."Account Type"::"G/L Account":
+                begin
+                  POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::"G/L Account";
+                  POSPostingSetup."Account No." := PaymentTypePOS."G/L Account No.";
+                end;
               end;
-              PaymentTypePOS."Account Type"::Customer:
-              begin
-                POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::Customer;
-                POSPostingSetup."Account No." := PaymentTypePOS."Customer No.";
+              POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
+              if Register.FindFirst then begin
+                POSPostingSetup."Difference Acc. No." := Register."Difference Account";
+                POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
               end;
-              PaymentTypePOS."Account Type"::"G/L Account":
-              begin
-                POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::"G/L Account";
-                POSPostingSetup."Account No." := PaymentTypePOS."G/L Account No.";
-              end;
+              POSPostingSetup.Insert(true);
             end;
-            POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
-            if Register.FindFirst then begin
-              POSPostingSetup."Difference Acc. No." := Register."Difference Account";
-              POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
-            end;
-            POSPostingSetup.Insert(true);
           until PaymentTypePOS.Next = 0;
         
           //Line Per POS Store
@@ -1096,7 +1178,10 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         if AuditRoll.Type in [AuditRoll.Type::Comment] then
           exit(true);
 
-        exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment,AuditRoll."Sale Type"::"Debit Sale",AuditRoll."Sale Type"::"Open/Close"]);
+        //-NPR5.55 [404019]
+        //EXIT(AuditRoll."Sale Type" IN [AuditRoll."Sale Type"::Comment,AuditRoll."Sale Type"::"Debit Sale",AuditRoll."Sale Type"::"Open/Close"]);
+        exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment,AuditRoll."Sale Type"::"Open/Close"]);//Remove "Sale Type"::"Debit Sale"
+        //+NPR5.55 [404019]
         //+NPR5.51 [362329]
     end;
 
@@ -1141,6 +1226,243 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
           end;
         end;
         //+NPR5.52[371142]
+    end;
+
+    local procedure CheckPaymentTypePOSAccount(PaymentTypePOS: Record "Payment Type POS"): Boolean
+    begin
+        //-NPR5.55 [394811]
+        case PaymentTypePOS."Account Type" of
+          PaymentTypePOS."Account Type"::Bank: exit(PaymentTypePOS."Bank Acc. No." <> '');
+          PaymentTypePOS."Account Type"::Customer: exit(PaymentTypePOS."Customer No." <> '');
+          PaymentTypePOS."Account Type"::"G/L Account": exit(PaymentTypePOS."G/L Account No." <> '');
+        else
+          exit(false);
+        end;
+        //+NPR5.55 [394811]
+    end;
+
+    local procedure DeleteDuplicatePOSStore()
+    var
+        POSStore: Record "POS Store";
+        POSStoreDuplicate: Record "POS Store";
+        POSStoreTemp: Record "POS Store";
+    begin
+        Clear(POSStore);
+        Clear(POSStoreTemp);
+        Clear(POSStoreDuplicate);
+        POSStore.SetCurrentKey(POSStore."Location Code",POSStore."Gen. Bus. Posting Group");
+        if POSStore.FindSet then begin
+          repeat
+            POSStoreTemp := POSStore;
+            if (POSStore."Location Code" = POSStoreDuplicate."Location Code") and (POSStore."Gen. Bus. Posting Group" = POSStoreDuplicate."Gen. Bus. Posting Group") then
+               POSStore.Delete;
+              POSStoreDuplicate := POSStoreTemp;
+          until POSStore.Next = 0;
+        end;
+    end;
+
+    local procedure PersistVATAmountLines(var POSEntryIn: Record "POS Entry";var VATAmountLine: Record "VAT Amount Line")
+    var
+        PersistentPOSTaxAmountLine: Record "POS Tax Amount Line";
+    begin
+        if VATAmountLine.FindSet then repeat
+          PersistentPOSTaxAmountLine.Init;
+          PersistentPOSTaxAmountLine."VAT Identifier" := VATAmountLine."VAT Identifier";
+          PersistentPOSTaxAmountLine."Tax Calculation Type" := VATAmountLine."VAT Calculation Type";
+          PersistentPOSTaxAmountLine."Tax Group Code" := VATAmountLine."Tax Group Code";
+          PersistentPOSTaxAmountLine."Use Tax" := VATAmountLine."Use Tax";
+          PersistentPOSTaxAmountLine.Positive := VATAmountLine.Positive;
+          PersistentPOSTaxAmountLine."Tax %" := VATAmountLine."VAT %";
+          PersistentPOSTaxAmountLine."Tax Base Amount" := VATAmountLine."VAT Base";
+          PersistentPOSTaxAmountLine."Tax Amount" := VATAmountLine."VAT Amount";
+          PersistentPOSTaxAmountLine."Amount Including Tax" := VATAmountLine."Amount Including VAT";
+          PersistentPOSTaxAmountLine."Line Amount" := VATAmountLine."Line Amount";
+          PersistentPOSTaxAmountLine."Inv. Disc. Base Amount" := VATAmountLine."Inv. Disc. Base Amount";
+          PersistentPOSTaxAmountLine."Invoice Discount Amount" := VATAmountLine."Invoice Discount Amount";
+          PersistentPOSTaxAmountLine.Quantity := VATAmountLine.Quantity;
+          PersistentPOSTaxAmountLine.Modified := VATAmountLine.Modified;
+          PersistentPOSTaxAmountLine."Calculated Tax Amount" := VATAmountLine."Calculated VAT Amount";
+          PersistentPOSTaxAmountLine."Tax Difference" := VATAmountLine."VAT Difference";
+          PersistentPOSTaxAmountLine."POS Entry No." := POSEntryIn."Entry No.";
+          PersistentPOSTaxAmountLine.Insert;
+        until VATAmountLine.Next  = 0;
+    end;
+
+    procedure CalcVATAmountLines(POSEntryIn: Record "POS Entry";var VATAmountLine: Record "VAT Amount Line";POSSalesLine: Record "POS Sales Line")
+    var
+        PrevVatAmountLine: Record "VAT Amount Line";
+        Currency: Record Currency;
+        POSEntry: Record "POS Entry";
+        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+        TotalVATAmount: Decimal;
+        QtyToHandle: Decimal;
+        RoundingLineInserted: Boolean;
+    begin
+        POSEntry := POSEntryIn;
+        /*
+        Posted := POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted;
+        SetUpCurrency(POSEntry."Currency Code");
+        IF POSEntry."Currency Code" <> '' THEN
+          POSEntry.TESTFIELD("Currency Factor");
+        IF POSEntry."Currency Factor" = 0 THEN
+          ExchangeFactor := 1
+        ELSE
+          ExchangeFactor := POSEntry."Currency Factor";
+        */
+        VATAmountLine.DeleteAll;
+        
+        with POSSalesLine do begin
+          SetRange("POS Entry No.",POSEntryIn."Entry No.");
+          SetFilter(Type, '<>%1', Type::Rounding);
+          SetRange("Exclude from Posting",false);
+          if FindSet then
+            repeat
+              if (("Unit Price" <> 0) and (Quantity <> 0)) or ("Amount Excl. VAT" <> 0) then begin
+                if ("VAT Calculation Type" in
+                   ["VAT Calculation Type"::"Reverse Charge VAT","VAT Calculation Type"::"Sales Tax"])
+                then
+                  "VAT %" := 0;
+                if not VATAmountLine.Get(
+                     "VAT Identifier","VAT Calculation Type","Tax Group Code",false,"Amount Excl. VAT" >= 0)
+                then begin
+                  VATAmountLine.Init;
+                  VATAmountLine."VAT Identifier" := "VAT Identifier";
+                  VATAmountLine."VAT Calculation Type" := "VAT Calculation Type";
+                  VATAmountLine."Tax Group Code" := "Tax Group Code";
+                  VATAmountLine."VAT %" := "VAT %";
+                  VATAmountLine.Modified := true;
+                  VATAmountLine.Positive := "Amount Excl. VAT" >= 0;
+                  VATAmountLine.Insert;
+                end;
+                VATAmountLine.Quantity := VATAmountLine.Quantity + "Quantity (Base)";
+                VATAmountLine."Line Amount" := VATAmountLine."Line Amount" + "Amount Excl. VAT";
+                VATAmountLine."VAT Difference" := VATAmountLine."VAT Difference" + "VAT Difference";
+                VATAmountLine."VAT Base" := VATAmountLine."VAT Base" + "Amount Excl. VAT";
+                VATAmountLine."Amount Including VAT" := VATAmountLine."Amount Including VAT" + "Amount Incl. VAT";
+                VATAmountLine."VAT Amount" := VATAmountLine."VAT Amount" + ("Amount Incl. VAT" - "Amount Excl. VAT");
+                VATAmountLine.Modify;
+                TotalVATAmount := TotalVATAmount + "Amount Incl. VAT" - "Amount Excl. VAT";
+              end;
+            until Next = 0;
+        end;
+        /*
+        WITH VATAmountLine DO
+          IF FINDSET THEN
+            REPEAT
+              IF (PrevVatAmountLine."VAT Identifier" <> "VAT Identifier") OR
+                 (PrevVatAmountLine."VAT Calculation Type" <> "VAT Calculation Type") OR
+                 (PrevVatAmountLine."Tax Group Code" <> "Tax Group Code") OR
+                 (PrevVatAmountLine."Use Tax" <> "Use Tax")
+              THEN
+                PrevVatAmountLine.INIT;
+              //IF POSEntry."Prices Including VAT" THEN BEGIN
+                CASE "VAT Calculation Type" OF
+                  "VAT Calculation Type"::"Normal VAT",
+                  "VAT Calculation Type"::"Reverse Charge VAT":
+                    BEGIN
+                      "VAT Base" := "Line Amount";
+                      {
+                        ROUND(
+                          ("Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
+                          Currency."Amount Rounding Precision") - "VAT Difference";
+                      }
+                      "VAT Amount" := POSSalesLine.va
+                        "VAT Difference" +
+                        ROUND(
+                          PrevVatAmountLine."VAT Amount" +
+                          ("Line Amount" - "Invoice Discount Amount" - "VAT Base" - "VAT Difference"),
+                          Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
+                      "Amount Including VAT" := "VAT Base" + "VAT Amount";
+                      IF Positive THEN
+                        PrevVatAmountLine.INIT
+                      ELSE BEGIN
+                        PrevVatAmountLine := VATAmountLine;
+                        PrevVatAmountLine."VAT Amount" :=
+                          ("Line Amount" - "Invoice Discount Amount" - "VAT Base" - "VAT Difference");
+                        PrevVatAmountLine."VAT Amount" :=
+                          PrevVatAmountLine."VAT Amount" -
+                          ROUND(PrevVatAmountLine."VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
+                      END;
+                    END;
+                  "VAT Calculation Type"::"Full VAT":
+                    BEGIN
+                      "VAT Base" := 0;
+                      "VAT Amount" := "VAT Difference" + "Line Amount" - "Invoice Discount Amount";
+                      "Amount Including VAT" := "VAT Amount";
+                    END;
+                  "VAT Calculation Type"::"Sales Tax":
+                    BEGIN
+                      "Amount Including VAT" := "Line Amount" - "Invoice Discount Amount";
+                      "VAT Base" :=
+                        ROUND(
+                          SalesTaxCalculate.ReverseCalculateTax(
+                            POSEntry."Tax Area Code","Tax Group Code",POSSalesLine."Tax Liable",
+                            POSEntry."Posting Date","Amount Including VAT",Quantity,POSEntry."Currency Factor"),
+                          Currency."Amount Rounding Precision");
+                      "VAT Amount" := "VAT Difference" + "Amount Including VAT" - "VAT Base";
+                      IF "VAT Base" = 0 THEN
+                        "VAT %" := 0
+                      ELSE
+                        "VAT %" := ROUND(100 * "VAT Amount" / "VAT Base",0.00001);
+                    END;
+                END;
+              //END ELSE
+              {
+                CASE "VAT Calculation Type" OF
+                  "VAT Calculation Type"::"Normal VAT",
+                  "VAT Calculation Type"::"Reverse Charge VAT":
+                    BEGIN
+                      "VAT Base" := "Line Amount" - "Invoice Discount Amount";
+                      "VAT Amount" :=
+                        "VAT Difference" +
+                        ROUND(
+                          PrevVatAmountLine."VAT Amount" +
+                          "VAT Base" * "VAT %" / 100,
+                          Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
+                      "Amount Including VAT" := "Line Amount" - "Invoice Discount Amount" + "VAT Amount";
+                      IF Positive THEN
+                        PrevVatAmountLine.INIT
+                      ELSE
+                        IF NOT "Includes Prepayment" THEN BEGIN
+                          PrevVatAmountLine := VATAmountLine;
+                          PrevVatAmountLine."VAT Amount" :=
+                            "VAT Base" * "VAT %" / 100;
+                          PrevVatAmountLine."VAT Amount" :=
+                            PrevVatAmountLine."VAT Amount" -
+                            ROUND(PrevVatAmountLine."VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
+                        END;
+                    END;
+                  "VAT Calculation Type"::"Full VAT":
+                    BEGIN
+                      "VAT Base" := 0;
+                      "VAT Amount" := "VAT Difference" + "Line Amount" - "Invoice Discount Amount";
+                      "Amount Including VAT" := "VAT Amount";
+                    END;
+                  "VAT Calculation Type"::"Sales Tax":
+                    BEGIN
+                      "VAT Base" := "Line Amount" - "Invoice Discount Amount";
+                      "VAT Amount" :=
+                        SalesTaxCalculate.CalculateTax(
+                          POSEntry."Tax Area Code","Tax Group Code",POSSalesLine."Tax Liable",
+                          POSEntry."Posting Date","VAT Base",Quantity,POSEntry."Currency Factor");
+                      IF "VAT Base" = 0 THEN
+                        "VAT %" := 0
+                      ELSE
+                        "VAT %" := ROUND(100 * "VAT Amount" / "VAT Base",0.00001);
+                      "VAT Amount" :=
+                        "VAT Difference" +
+                        ROUND("VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
+                      "Amount Including VAT" := "VAT Base" + "VAT Amount";
+                    END;
+                    }
+                //END;
+        
+              "Calculated VAT Amount" := "VAT Amount" - "VAT Difference";
+              MODIFY;
+            UNTIL NEXT = 0;
+        */
+        //+NPR5.48 [335967]
+
     end;
 }
 

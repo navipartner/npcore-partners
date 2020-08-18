@@ -1,7 +1,7 @@
 report 6014416 "Sale Statistics per Vendor"
 {
     // NPR70.00.00.00/LS/27-11-12 CASE 143264 : Convert Report to Nav 2013
-    // NPR4.14/KN/20150818 CASE 220286 Removed field with 'NAVIPARTNER K�benhavn 2000' caption from footer
+    // NPR4.14/KN/20150818 CASE 220286 Removed field with 'NAVIPARTNER K¢benhavn 2000' caption from footer
     // NPR4.21/LS/20160321  CASE 236888 Correction of report
     // NPR5.26/JLK /20160824  CASE 249097 Corrected SalesDg formula in rdlc to calculate correct value instead of using Sum function
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
@@ -9,7 +9,9 @@ report 6014416 "Sale Statistics per Vendor"
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     // NPR5.54/LS  /20190205  CASE 389133 Changed Global var Report_Caption_Lbl from 'Item Sale per Vendor' to 'Sale Statistics per Vendor'
     // NPR5.54/LS  /20190206  CASE 389133 Changed Global var Inventory_Caption_Lbl from 'Net Inv. Change' to 'Inventory per Date'
-    // NPR5.54/ANPA/20200327  CASE 392703 Avoid 0 sales and changed Net_Change_Item from Net change to Inventory
+    // NPR5.54/ANPA/20200327  CASE 384505 Avoid 0 sales and changed Net_Change_Item from Net change to Inventory
+    // NPR5.55/ANPA/20200506  CASE 392703 Changed the report to use 'Location Filter' on item rather than 'Global Dimension 1 Filter' from vendor - now matches result from report 705,
+    //                                    Also use 'Date Filter' on item rather than on Vendor, to get report to match result from report 6014412.
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sale Statistics per Vendor.rdlc';
 
@@ -21,7 +23,7 @@ report 6014416 "Sale Statistics per Vendor"
         dataitem(Vendor;Vendor)
         {
             PrintOnlyIfDetail = true;
-            RequestFilterFields = "No.","Search Name","Vendor Posting Group","Date Filter","Global Dimension 1 Filter";
+            RequestFilterFields = "No.","Search Name","Vendor Posting Group";
             column(PageNoCaptionLbl;PageNoCaptionLbl)
             {
             }
@@ -99,7 +101,7 @@ report 6014416 "Sale Statistics per Vendor"
                 CalcFields = "Sales (Qty.)","COGS (LCY)","Sales (LCY)","Purchases (LCY)";
                 DataItemLink = "Vendor No."=FIELD("No.");
                 PrintOnlyIfDetail = false;
-                RequestFilterFields = "Item Group";
+                RequestFilterFields = "Item Group","Location Filter","Date Filter";
                 column(No_Item;Item."No.")
                 {
                 }
@@ -211,16 +213,17 @@ report 6014416 "Sale Statistics per Vendor"
                       Item2.CalcFields("Purchases (Qty.)");
                       PeriodPurchaseQty :=  Item2."Purchases (Qty.)";
                     end;
-
+                    //+#392703 [392703]
                     //-NPR5.54 [384505]
-                    Item2.Reset;
-                    if Item2.Get(Item."No.") then begin
-                      Item2.CopyFilters(Item);
-                      Item2.SetFilter("Date Filter", '..%1', InventoryDate);
-                      Item2.CalcFields("Net Change");
-                      Inventory :=  Item2."Net Change";
-                    end;
+                    //Item2.RESET;
+                    //IF Item2.GET(Item."No.") THEN BEGIN
+                    //  Item2.COPYFILTERS(Item);
+                    //  Item2.SETFILTER("Date Filter", '..%1', InventoryDate);
+                    //  Item2.CALCFIELDS("Net Change");
+                    //  Inventory :=  Item2."Net Change";
+                    //END;
                     //+NPR5.54 [384505]
+                    //-#392703 [392703]
 
                     ItemUsage := (StartDateInventory + PeriodPurchaseQty) - EndDateInventory;
 
@@ -234,10 +237,12 @@ report 6014416 "Sale Statistics per Vendor"
                     InventoryValVendor   += InventoryValuation;
                     SalesValVendor       += ActualSales;
                     dbVendor             := dbVendor + db;
+                    //-#392703 [392703]
                     //-NPR5.54 [384505]
-                    //NetChangeVendor      += Item1."Net Change";
-                    NetChangeVendor      += Inventory;
+                    NetChangeVendor      += Item1."Net Change";
+                    //NetChangeVendor      += Inventory;
                     //+NPR5.54 [384505]
+                    //-#392703 [392703]
                     SalesQtyVendor       += Item."Sales (Qty.)";
                     COGS_LCY_Vendor      += Item."COGS (LCY)";
                     Sales_LCY_Vendor     += Item."Sales (LCY)";
@@ -249,28 +254,36 @@ report 6014416 "Sale Statistics per Vendor"
 
                 trigger OnPreDataItem()
                 begin
-                    Vendor.CopyFilter("Global Dimension 1 Filter",Item."Global Dimension 1 Filter");
+                    //-#392703 [392703]
+                    //Vendor.COPYFILTER("Global Dimension 1 Filter",Item."Global Dimension 1 Filter");
+                    Item.SetFilter("Location Filter",GetFilter("Location Filter"));
+                    //+#392703 [392703]
 
                     Item1.CopyFilters(Item);
 
-                    if (StartDate <> 0D) and (EndDate <> 0D) then begin
-                      if StartDate = EndDate then
-                        Item1.SetFilter("Date Filter", '..%1', EndDate)
-                      else
-                        Item1.SetRange("Date Filter", StartDate, EndDate);
+                    //-#392703 [392703]
+                    Item1.SetFilter("Date Filter", '..%1', InventoryDate);
 
-                    end
-                    else begin
+                    //IF (StartDate <> 0D) AND (EndDate <> 0D) THEN BEGIN
+                    //  Item2.SETFILTER("Date Filter", '..%1', InventoryDate);
+                    //  IF StartDate = EndDate THEN
+                    //    Item1.SETFILTER("Date Filter", '..%1', EndDate)
+                    //  ELSE
+                    //    Item1.SETRANGE("Date Filter", StartDate, EndDate);
+
+                    //END;
+                    //ELSE BEGIN
                       //-NPR5.40 [307717]
                       //StartDate := 010180D;
-                      StartDate := DMY2Date(1,1,1980);
+                      //StartDate := DMY2DATE(1,1,1980);
                       //+NPR5.40 [307717]
-                      EndDate   := InventoryDate;
+                      //EndDate   := InventoryDate;
                       //-NPR5.40 [307717]
                       //Item1.SETRANGE("Date Filter", 010180D, InventoryDate);
-                      Item1.SetRange("Date Filter",StartDate,InventoryDate);
+                      //Item1.SETRANGE("Date Filter",StartDate,InventoryDate);
                       //+NPR5.40 [307717]
-                    end;
+                    //END;
+                    //+#392703 [392703]
                 end;
             }
 
@@ -421,11 +434,23 @@ report 6014416 "Sale Statistics per Vendor"
         // //+NPR4.21
         //-NPR5.39
 
-        if Vendor.GetFilter("Date Filter") <> '' then
+        //-#392703 [392703]
+        //IF Vendor.GETFILTER("Date Filter") <> '' THEN
+        //   BEGIN
+        //      StartDate := Vendor.GETRANGEMIN("Date Filter");
+        //      EndDate := Vendor.GETRANGEMAX("Date Filter");
+        //   END;
+
+        if Item.GetFilter("Date Filter") <> '' then
            begin
-              StartDate := Vendor.GetRangeMin("Date Filter");
-              EndDate := Vendor.GetRangeMax("Date Filter");
+              StartDate := Item.GetRangeMin("Date Filter");
+              EndDate := Item.GetRangeMax("Date Filter");
            end;
+
+
+        if Item.GetFilters <> '' then
+          LocationFilterItem := Item.GetFilters;
+        //+#392703 [392703]
 
         //-NPR4.21
         //-NPR70.00.00.00
@@ -502,6 +527,6 @@ report 6014416 "Sale Statistics per Vendor"
         NextPageGroupNo: Integer;
         TextNetChangeDate: Text;
         Avoid0Sales: Boolean;
-        Inventory: Integer;
+        LocationFilterItem: Text;
 }
 

@@ -13,6 +13,7 @@ page 6060112 "TM Ticket Select Schedule"
     // #322432/TSA /20191121 CASE 322432 Added Remaining calculation for seating
     // TM1.45/TSA /20191121 CASE 378212 Added Sales cut-off date handling and cleaned green code
     // TM1.45/TSA /20191203 CASE 380754 Added waiting list caption
+    // TM1.48/TSA /20200629 CASE 411704 Changed from GetAdmissionCapacity() to GetTicketCapacity()
 
     Caption = 'Ticket Select Schedule';
     DataCaptionFields = "Admission Code";
@@ -104,7 +105,11 @@ page 6060112 "TM Ticket Select Schedule"
         LocalDateTimeText := StrSubstNo('%1 %2', Format(Today), Format(Time));
 
         CalcFields("Open Reservations", "Open Admitted", "Initial Entry");
-        TicketManagement.GetMaxCapacity("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+
+        //-TM1.48 [411704]
+        //TicketManagement.GetAdmissionCapacity ("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+        TicketManagement.GetTicketCapacity (gTicketItemNo, gTicketVariantCode, "Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+        //+TM1.48 [411704]
 
         RemainingReservations := MaxCapacity - "Open Reservations";
         RemainingAdmitted := MaxCapacity - "Open Admitted";

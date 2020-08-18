@@ -3,7 +3,8 @@ table 6151418 "Magento Setup Event Sub."
     // MAG2.05/MHA /20170714  CASE 283777 Object created
     // MAG2.07/MHA /20170830  CASE 286943 Added Options to field 1 "Type"
     // MAG2.08/MHA /20171016  CASE 292926 Removed "Setup Vat Bus. Posting Groups","Setup Vat Product Posting Groups" from field 1 "Type" and added new Options
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Fields 1 and 15
+    // MAG2.17/JDH /20181112  CASE 334163 Added Caption to Fields 1 and 15
+    // MAG2.26/MHA /20200601  CASE 404580 Added Options to Field 1 "Type"; "Setup Categories", "Setup Brands"
 
     Caption = 'Magento Setup Event Subscription';
     DrillDownPageID = "Magento Setup Event Subs.";
@@ -14,9 +15,9 @@ table 6151418 "Magento Setup Event Sub."
         field(1;Type;Option)
         {
             Caption = 'Type';
-            Description = 'MAG2.07,MAG2.08';
-            OptionCaption = 'DragDrop Picture,Magento Picture Url,,,,,,,Setup NpXml Templates,Setup Magento Tax Classes,,,Setup Magento Api Credentials,Setup Magento Websites,Setup Magento Customer Groups,Setup Payment Method Mapping,Setup Shipment Method Mapping';
-            OptionMembers = "DragDrop Picture","Magento Picture Url",,,,,,,"Setup NpXml Templates","Setup Magento Tax Classes",,,"Setup Magento Api Credentials","Setup Magento Websites","Setup Magento Customer Groups","Setup Payment Method Mapping","Setup Shipment Method Mapping";
+            Description = 'MAG2.07,MAG2.08,MAG2.26';
+            OptionCaption = 'DragDrop Picture,Magento Picture Url,,,,,,,Setup NpXml Templates,Setup Magento Tax Classes,,,Setup Magento Api Credentials,Setup Magento Websites,Setup Magento Customer Groups,Setup Payment Method Mapping,Setup Shipment Method Mapping,,,Setup Categories,,,Setup Brands';
+            OptionMembers = "DragDrop Picture","Magento Picture Url",,,,,,,"Setup NpXml Templates","Setup Magento Tax Classes",,,"Setup Magento Api Credentials","Setup Magento Websites","Setup Magento Customer Groups","Setup Payment Method Mapping","Setup Shipment Method Mapping",,,"Setup Categories",,,"Setup Brands";
         }
         field(5;"Codeunit ID";Integer)
         {
@@ -182,6 +183,20 @@ table 6151418 "Magento Setup Event Sub."
               EventSubscription.SetRange("Published Function",'OnSetupShipmentMethodMapping');
             end;
           //+MAG2.07 [286943]
+          //-MAG2.26 [404580]
+          Type::"Setup Categories":
+            begin
+              EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
+              EventSubscription.SetRange("Publisher Object ID",CODEUNIT::"Magento Setup Mgt.");
+              EventSubscription.SetRange("Published Function",'OnSetupCategories');
+            end;
+          Type::"Setup Brands":
+            begin
+              EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
+              EventSubscription.SetRange("Publisher Object ID",CODEUNIT::"Magento Setup Mgt.");
+              EventSubscription.SetRange("Published Function",'OnSetupBrands');
+            end;
+          //+MAG2.26 [404580]
           else
             exit(false);
         end;

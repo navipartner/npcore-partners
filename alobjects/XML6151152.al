@@ -10,6 +10,7 @@ xmlport 6151152 "M2 Get Account"
     // NPR5.51/JAKUBV/20190904  CASE 364282 Transport NPR5.51 - 3 September 2019
     // MAG2.23/TSA /20191015 CASE 373151 Move Person to address, removed CompanyName, added Name, PricesIncludeVat, Contact
     // MAG2.24/TSA /20191119 CASE 372304 Added Membership section
+    // NPR5.55/TJ  /20200707 CASE 402814 Postcode node in Shipto is now properly pointing to "Post Code" field
 
     Caption = 'Get Account';
     Encoding = UTF8;
@@ -401,7 +402,7 @@ xmlport 6151152 "M2 Get Account"
                                 fieldelement(Address2;TmpShipToAddress."Address 2")
                                 {
                                 }
-                                fieldelement(Postcode;TmpShipToAddress."Phone No.")
+                                fieldelement(Postcode;TmpShipToAddress."Post Code")
                                 {
                                 }
                                 fieldelement(City;TmpShipToAddress.City)

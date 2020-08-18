@@ -1,6 +1,7 @@
 table 6184880 "FTP Setup"
 {
     // NPR5.54/ALST/20200212 CASE 383718 Object created
+    // NPR5.55/ALST/20200709 CASE 408285 added port number
 
     Caption = 'FTP Setup';
 
@@ -30,6 +31,11 @@ table 6184880 "FTP Setup"
         field(40; "Service Password"; Guid)
         {
             Caption = 'Service Password';
+        }
+        field(45;"Port Number";Integer)
+        {
+            Caption = 'Port Number';
+            Description = 'NPR5.55 only needed for SSH, for all rest it can be included in the URI';
         }
         field(50; "Storage On Server"; Text[250])
         {

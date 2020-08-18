@@ -5,6 +5,7 @@ table 6151590 "NpDc Coupon Type"
     // NPR5.39/MHA /20180214  CASE 305146 Added field 70 "Enabled"
     // NPR5.42/MHA /20180521  CASE 305859 Added field 67 Print on Issue
     // NPR5.51/MHA /20190724  CASE 343352 Added cleanup of External Coupon Sales Lines in OnDelete()
+    // NPR5.55/ALPO/20200518  CASE 387376 Possibility to define sequence in which discount coupons are applied
 
     Caption = 'Coupon Type';
     DataCaptionFields = "Code",Description;
@@ -96,6 +97,12 @@ table 6151590 "NpDc Coupon Type"
         {
             Caption = 'Enabled';
             Description = 'NPR5.39';
+        }
+        field(80;"Application Sequence No.";Integer)
+        {
+            Caption = 'Application Sequence No.';
+            Description = 'NPR5.55';
+            MinValue = 0;
         }
         field(100;"Issue Coupon Module";Code[20])
         {

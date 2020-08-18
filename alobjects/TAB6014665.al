@@ -275,9 +275,9 @@ table 6014665 "Stock-Take Configuration"
         /*
         WITH this DO BEGIN
           this := Rec;
-          Ops�tning.GET;
-          Ops�tning.TESTFIELD("Phys. Inventory Journal Nos.");
-          IF Nrseriestyring.SelectSeries(Ops�tning."Phys. Inventory Journal Nos.", '',Ops�tning."Phys. Inventory Journal Nos.") THEN BEGIN
+          Opsætning.GET;
+          Opsætning.TESTFIELD("Phys. Inventory Journal Nos.");
+          IF Nrseriestyring.SelectSeries(Opsætning."Phys. Inventory Journal Nos.", '',Opsætning."Phys. Inventory Journal Nos.") THEN BEGIN
             Nrseriestyring.SetSeries(Code);
             Rec := this;
             EXIT(TRUE);

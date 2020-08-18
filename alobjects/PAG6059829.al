@@ -1,6 +1,7 @@
 page 6059829 "Transactional JSON Result"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
+    // NPR5.55/THRO/20200511 CASE 343266 Multiple Providers
 
     Caption = 'Transactional JSON Result';
     DeleteAllowed = false;
@@ -43,10 +44,12 @@ page 6059829 "Transactional JSON Result"
 
     trigger OnOpenPage()
     var
-        CampaignMonitorMgt: Codeunit "CampaignMonitor Mgt.";
+        TransactionalEmailMgt: Codeunit "Transactional Email Mgt.";
     begin
         if IsEmpty then
-          CampaignMonitorMgt.GetSmartEmailList(Rec);
+          //-NPR5.55 [343266]
+          TransactionalEmailMgt.GetSmartEmailList(Rec);
+          //+NPR5.55 [343266]
     end;
 
     var

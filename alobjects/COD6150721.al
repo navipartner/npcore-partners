@@ -11,6 +11,9 @@ codeunit 6150721 "POS Action - Login"
     // NPR5.51/MMV /20190628 CASE 356076 Added system entry for login without balancing
     // NPR5.53/TJ  /20191202 CASE 379680 New publisher OnAfterFindSalesperson
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.55/TSA /20200505 CASE 402244 Make sure we have a active transaction when balance is performed to be able to get dimensions correct.
+    // NPR5.55/TSA /20200527 CASE 406862 Added selection of initial view
+    // NPR5.55/ALPO/20200528 CASE 401222 Ensure cash register is not opened multiple times
 
 
     trigger OnRun()
@@ -255,6 +258,7 @@ codeunit 6150721 "POS Action - Login"
     var
         SalePOS: Record "Sale POS";
         POSAction: Record "POS Action";
+        POSViewProfile: Record "POS View Profile";
         POSResumeSale: Codeunit "POS Resume Sale Mgt.";
         POSSale: Codeunit "POS Sale";
         POSCreateEntry: Codeunit "POS Create Entry";
@@ -284,7 +288,15 @@ codeunit 6150721 "POS Action - Login"
             POSSession.RequestRefreshData();
         //+NPR5.54 [364658]
         POSSale.GetCurrentSale (SalePOS);
-        POSSession.ChangeViewSale();
+
+        //-NPR5.55 [406862]
+        // POSSession.ChangeViewSale();
+        POSSetup.GetPOSViewProfile (POSViewProfile);
+        case POSViewProfile."Initial Sales View" of
+          POSViewProfile."Initial Sales View"::SALES_VIEW      : POSSession.ChangeViewSale ();
+          POSViewProfile."Initial Sales View"::RESTAURANT_VIEW : POSSession.ChangeViewRestaurant ();
+        end;
+        //+NPR5.55 [406862]
     end;
 
     local procedure StartWorkflow(FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session";ActionName: Code[20])
@@ -312,6 +324,10 @@ codeunit 6150721 "POS Action - Login"
         //-NPR5.49 [348458]
         if (not POSSession.RetrieveSessionAction (ActionName, POSAction)) then
           POSAction.Get (ActionName);
+
+        //-NPR5.55 [402244]
+        POSSession.StartTransaction ();
+        //+NPR5.55 [402244]
 
         case ActionName of
           'BALANCE_V3' :
@@ -360,12 +376,12 @@ codeunit 6150721 "POS Action - Login"
               POSSession.StartTransaction ();
               POSSession.GetSale (POSSale);
               POSSale.GetCurrentSale (SalePOS);
-              RegisterOpen (SalePOS);
-
-              // RegisterOpen consumes the current sales ticket when opening the register on first open after balancing
-              POSSession.StartTransaction ();
-
-              POSSale.GetCurrentSale (SalePOS);
+              //RegisterOpen (SalePOS);  //NPR5.55 [401222]-revoked
+              if RegisterOpen(SalePOS) then begin  //NPR5.55 [401222]
+                // RegisterOpen consumes the current sales ticket when opening the register on first open after balancing
+                POSSession.StartTransaction ();
+                POSSale.GetCurrentSale (SalePOS);
+              end;  //NPR5.55 [401222]
               POSSession.ChangeViewSale();
             end;
 
@@ -457,7 +473,7 @@ codeunit 6150721 "POS Action - Login"
         //+NPR5.32.11 [279495]
     end;
 
-    local procedure RegisterOpen(SalePOS: Record "Sale POS")
+    local procedure RegisterOpen(SalePOS: Record "Sale POS"): Boolean
     var
         CashRegister: Record Register;
         RetailSalesCode: Codeunit "Retail Sales Code";
@@ -473,12 +489,23 @@ codeunit 6150721 "POS Action - Login"
         // POSCreateEntry.InsertUnitOpenEntry (Register."Register No.", SalePOS."Salesperson Code");
         //+NPR5.38 [297087]
 
+        //-NPR5.55 [401222]
+        CashRegister.LockTable;
+        CashRegister.Get(SalePOS."Register No.");
+        if CashRegister.Status <> CashRegister.Status::Afsluttet then
+          exit(false);
+        //+NPR5.55 [401222]
+
         TouchScreenFunctions.RegisterOpen (SalePOS);
 
-        CashRegister.Get (SalePOS."Register No.");
-        CashRegister.Status := CashRegister.Status::Ekspedition;
-        CashRegister.Modify;
+        //-NPR5.55 [401222]-revoked
+        //CashRegister.GET (SalePOS."Register No.");
+        //CashRegister.Status := CashRegister.Status::Ekspedition;
+        //CashRegister.MODIFY;
+        //+NPR5.55 [401222]-revoked
         //+NPR5.32.11 [279495]
+
+        exit(true);  //NPR5.55 [401222]
     end;
 
     local procedure "--"()

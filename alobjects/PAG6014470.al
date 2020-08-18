@@ -2,8 +2,8 @@ page 6014470 "Retail Document Lines"
 {
     // 
     // NPK, MIM 01-09-2007: Rettet form til at overholde GUI retningslinjer.
-    // NPR4.000.002, NPK, 01-05-09, MH, Tilf�jet lookup p� alternativt varenummer.
-    // NPR4.000.004, NPK, 11-06-09, MH - Tilf�jet feltet "Lock Code" (sag 65422).
+    // NPR4.000.002, NPK, 01-05-09, MH, Tilf¢jet lookup på alternativt varenummer.
+    // NPR4.000.004, NPK, 11-06-09, MH - Tilf¢jet feltet "Lock Code" (sag 65422).
     // 
     // NPK TS 18.10.12  : Commented code Update Control to use Page Property RefreshonActivate
     // NPK TS 18.10.12  : The Visible property of these fields have bben commented and replace by boolean variables to allow the valu to be set on the page

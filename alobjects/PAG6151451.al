@@ -171,7 +171,7 @@ page 6151451 "Magento DragDropPic. Addin"
 
     local procedure SavePictureLinks(PictureType: Integer;var TempMagentoPicture2: Record "Magento Picture" temporary)
     var
-        ItemGroup: Record "Magento Item Group";
+        ItemGroup: Record "Magento Category";
         MagentoPictureLink: Record "Magento Picture Link";
         Brand: Record "Magento Brand";
         LineNo: Integer;

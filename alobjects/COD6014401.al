@@ -3,6 +3,7 @@ codeunit 6014401 NPRDimensionManagement
     // NPR5.30/MHA /20170201  CASE 264918 Np Photo Module removed
     // NPR5.36/TJ  /20170920  CASE 286283 Renamed variables/function into english and into proper naming terminology
     //                                    Removed unused variables
+    // NPR5.55/TJ  /20200420  CASE 400524 Multi-Piece type should be mapped to Quantity Discount Header
 
 
     trigger OnRun()
@@ -216,7 +217,10 @@ codeunit 6014401 NPRDimensionManagement
           Type::Mix:
             exit(DATABASE::"Mixed Discount");
           Type::"Multi-Piece":
-            exit(DATABASE::"Quantity Discount Line");
+            //-NPR5.55 [400524]
+            //EXIT(DATABASE::"Quantity Discount Line");
+            exit(DATABASE::"Quantity Discount Header");
+            //+NPR5.55 [400524]
           Type::"Sales Card":
             exit(0);
           Type::BOM:

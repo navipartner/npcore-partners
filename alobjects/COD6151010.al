@@ -15,6 +15,9 @@ codeunit 6151010 "NpRv Voucher Mgt."
     // NPR5.53/MHA /20192211  CASE 378597 Added support for Sales Line Quantity greater than 1
     // NPR5.53/MHA /20191209  CASE 380284 Vouchers with balance should be Send again upon Payment and Topup
     // NPR5.54/MHA /20200310  CASE 372135 Adjusted function signature of IssueVoucher() to allow for Voucher No. to also be parsed
+    // NPR5.55/MHA /20200427  CASE 402013 Sales Doc. functions moved to codeunit 6151024
+    // NPR5.55/MHA /20200427  CASE 402015 Removed reference to deprecated table 6151022 from ResetInUseQty()
+    // NPR5.55/MHA /20200702  CASE 407070 Added function LogSending()
 
 
     trigger OnRun()
@@ -29,22 +32,14 @@ codeunit 6151010 "NpRv Voucher Mgt."
 
     procedure ResetInUseQty(Voucher: Record "NpRv Voucher")
     var
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
-        ExtSaleLineVoucher: Record "NpRv Ext. Voucher Sales Line";
+        NpRvSalesLine: Record "NpRv Sales Line";
     begin
-        SaleLinePOSVoucher.SetRange("Voucher No.",Voucher."No.");
-        //-NPR5.48 [302179]
-        // IF SaleLinePOSVoucher.ISEMPTY THEN
-        //  EXIT;
-        //
-        // SaleLinePOSVoucher.DELETEALL;
-        if SaleLinePOSVoucher.FindFirst then
-          SaleLinePOSVoucher.DeleteAll;
-
-        ExtSaleLineVoucher.SetRange("Voucher No.");
-        if ExtSaleLineVoucher.FindFirst then
-          ExtSaleLineVoucher.DeleteAll;
-        //+NPR5.48 [302179]
+        NpRvSalesLine.SetRange("Voucher No.",Voucher."No.");
+        //-NPR5.55 [402015]
+        NpRvSalesLine.SetRange(Type,NpRvSalesLine.Type::Payment);
+        //+NPR5.55 [402015]
+        if NpRvSalesLine.FindFirst then
+          NpRvSalesLine.DeleteAll;
     end;
 
     local procedure "--- POS Subscribers"()
@@ -54,75 +49,56 @@ codeunit 6151010 "NpRv Voucher Mgt."
     [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "Sale Line POS";RunTrigger: Boolean)
     var
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
     begin
         if Rec.IsTemporary then
           exit;
 
-        SetSaleLinePOSVoucherFilter(Rec,SaleLinePOSVoucher);
-        if SaleLinePOSVoucher.IsEmpty then
+        SetSalesLineFilter(Rec,NpRvSalesLine);
+        if NpRvSalesLine.IsEmpty then
           exit;
 
-        SaleLinePOSVoucher.DeleteAll;
+        NpRvSalesLine.DeleteAll;
     end;
 
     [EventSubscriber(ObjectType::Table, 6151015, 'OnBeforeDeleteEvent', '', true, true)]
-    local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NpRv Sale Line POS Voucher";RunTrigger: Boolean)
+    local procedure OnBeforeDeleteNpRvSalesLine(var Rec: Record "NpRv Sales Line";RunTrigger: Boolean)
     var
-        SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
     begin
         if Rec.IsTemporary then
           exit;
 
-        SetSaleLinePOSReferenceFilter(Rec,SaleLinePOSReference);
-        if SaleLinePOSReference.IsEmpty then
+        SetSalesLineReferenceFilter(Rec,NpRvSalesLineReference);
+        if NpRvSalesLineReference.IsEmpty then
           exit;
 
-        SaleLinePOSReference.DeleteAll;
+        NpRvSalesLineReference.DeleteAll;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014435, 'OnBeforeAuditRoleLineInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, 6014435, 'OnBeforeAuditRoleLineInsertEvent', '', true, true)]
     local procedure OnBeforeAuditRollInsert(var SaleLinePos: Record "Sale Line POS")
     var
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
     begin
-        SetSaleLinePOSVoucherFilter(SaleLinePos,SaleLinePOSVoucher);
-        if SaleLinePOSVoucher.IsEmpty then
+        SetSalesLineFilter(SaleLinePos,NpRvSalesLine);
+        if NpRvSalesLine.IsEmpty then
           exit;
 
-        SaleLinePOSVoucher.SetRange(Type,SaleLinePOSVoucher.Type::"New Voucher");
-        if SaleLinePOSVoucher.FindSet then
+        //-NPR5.55 [402015]
+        NpRvSalesLine.SetFilter(Type,'%1|%2|%3',NpRvSalesLine.Type::"New Voucher",NpRvSalesLine.Type::"Top-up",NpRvSalesLine.Type::"Partner Issue Voucher");
+        if NpRvSalesLine.FindSet then
           repeat
-            IssueVouchers(SaleLinePOSVoucher);
-          until SaleLinePOSVoucher.Next = 0;
+            IssueVouchers(NpRvSalesLine);
+          until NpRvSalesLine.Next = 0;
+        //+NPR5.55 [402015]
 
-        //-NPR5.50 [356003]
-        SetSaleLinePOSVoucherFilter(SaleLinePos,SaleLinePOSVoucher);
-        SaleLinePOSVoucher.SetRange(Type,SaleLinePOSVoucher.Type::"Partner Issue Voucher");
-        if SaleLinePOSVoucher.FindSet then
+        SetSalesLineFilter(SaleLinePos,NpRvSalesLine);
+        NpRvSalesLine.SetRange(Type,NpRvSalesLine.Type::Payment);
+        if NpRvSalesLine.FindSet then
           repeat
-            OnPostPartnerIssueVoucher(SaleLinePOSVoucher);
-          until SaleLinePOSVoucher.Next = 0;
-        //+NPR5.50 [356003]
-
-        //-NPR5.50 [353079]
-        SetSaleLinePOSVoucherFilter(SaleLinePos,SaleLinePOSVoucher);
-        SaleLinePOSVoucher.SetRange(Type,SaleLinePOSVoucher.Type::"Top-up");
-        if SaleLinePOSVoucher.FindSet then
-          repeat
-            ApplyVoucherTopup(SaleLinePOSVoucher);
-          until SaleLinePOSVoucher.Next = 0;
-        //+NPR5.50 [353079]
-
-        SetSaleLinePOSVoucherFilter(SaleLinePos,SaleLinePOSVoucher);
-        SaleLinePOSVoucher.SetRange(Type,SaleLinePOSVoucher.Type::Payment);
-        if SaleLinePOSVoucher.FindSet then
-          repeat
-            PostPayment(SaleLinePOSVoucher);
-          until SaleLinePOSVoucher.Next = 0;
-
-        SetSaleLinePOSVoucherFilter(SaleLinePos,SaleLinePOSVoucher);
-        SaleLinePOSVoucher.DeleteAll;
+            PostPayment(NpRvSalesLine);
+          until NpRvSalesLine.Next = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
@@ -172,299 +148,158 @@ codeunit 6151010 "NpRv Voucher Mgt."
         //+NPR5.51 [358582]
     end;
 
-    local procedure "--- Sales Doc Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 37, 'OnBeforeDeleteEvent', '', true, true)]
-    local procedure OnBeforeDeleteSalesLine(var Rec: Record "Sales Line";RunTrigger: Boolean)
-    var
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
-    begin
-        //-NPR5.48 [302179]
-        if Rec.IsTemporary then
-          exit;
-        if not RunTrigger then
-          exit;
-
-        NpRvExtVoucherSalesLine.SetRange("Document Type",Rec."Document Type");
-        NpRvExtVoucherSalesLine.SetRange("Document No.",Rec."Document No.");
-        NpRvExtVoucherSalesLine.SetRange("Document Line No.",Rec."Line No.");
-        if NpRvExtVoucherSalesLine.FindFirst then
-          NpRvExtVoucherSalesLine.DeleteAll;
-        //+NPR5.48 [302179]
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6151409, 'OnBeforeDeleteEvent', '', true, true)]
-    local procedure OnBeforeDeleteMagentoPaymentLine(var Rec: Record "Magento Payment Line")
-    var
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
-    begin
-        //-NPR5.48 [302179]
-        if Rec.IsTemporary then
-          exit;
-        if Rec."Payment Type" <> Rec."Payment Type"::Voucher then
-          exit;
-        if Rec."Source Table No." <> DATABASE::"NpRv Voucher" then
-          exit;
-        if Rec."External Reference No." = '' then
-          exit;
-        if Rec."No." = '' then
-          exit;
-
-        NpRvExtVoucherSalesLine.SetRange("External Document No.",Rec."External Reference No.");
-        NpRvExtVoucherSalesLine.SetRange("Reference No.",Rec."No.");
-        if NpRvExtVoucherSalesLine.FindFirst then
-          NpRvExtVoucherSalesLine.DeleteAll;
-        //+NPR5.48 [302179]
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'OnCheckPayment', '', true, true)]
-    local procedure OnCheckMagentoPayment(SalesHeader: Record "Sales Header")
-    var
-        NpRvVoucher: Record "NpRv Voucher";
-        PaymentLine: Record "Magento Payment Line";
-    begin
-        //-NPR5.48 [302179]
-        if SalesHeader.IsTemporary then
-          exit;
-        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order,SalesHeader."Document Type"::Invoice]) then
-          exit;
-
-        PaymentLine.SetRange("Document Table No.",DATABASE::"Sales Header");
-        PaymentLine.SetRange("Document Type",SalesHeader."Document Type");
-        PaymentLine.SetRange("Document No.",SalesHeader."No.");
-        PaymentLine.SetRange("Payment Type",PaymentLine."Payment Type"::Voucher);
-        PaymentLine.SetRange("Source Table No.",DATABASE::"NpRv Voucher");
-        if PaymentLine.IsEmpty then
-          exit;
-
-        PaymentLine.FindSet;
-        repeat
-          if PaymentLine.Amount < 0 then
-            Error(Text003,PaymentLine.Amount);
-          NpRvVoucher.Get(PaymentLine."Source No.");
-          NpRvVoucher.TestField("Reference No.",PaymentLine."No.");
-          NpRvVoucher.CalcFields(Amount);
-          if NpRvVoucher.Amount < PaymentLine.Amount then
-            Error(Text002,PaymentLine.Amount,NpRvVoucher.Amount,NpRvVoucher."Reference No.");
-        until PaymentLine.Next = 0;
-        //+NPR5.48 [302179]
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'OnBeforePostPaymentLine', '', true, true)]
-    local procedure OnBeforePostMagentoPaymentLine(var PaymentLine: Record "Magento Payment Line")
-    var
-        NpRvVoucher: Record "NpRv Voucher";
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
-    begin
-        //-NPR5.48 [302179]
-        if PaymentLine."Payment Type" <> PaymentLine."Payment Type"::Voucher then
-          exit;
-        if PaymentLine."Source Table No." <> DATABASE::"NpRv Voucher" then
-          exit;
-        if not NpRvVoucher.Get(PaymentLine."Source No.") then
-          exit;
-        if NpRvVoucher."Reference No." <> PaymentLine."No." then
-          exit;
-
-        NpRvExtVoucherSalesLine.SetRange("External Document No.",PaymentLine."External Reference No.");
-        NpRvExtVoucherSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
-        NpRvExtVoucherSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
-        NpRvExtVoucherSalesLine.SetRange("Reference No.",PaymentLine."No.");
-        NpRvExtVoucherSalesLine.SetRange(Type,NpRvExtVoucherSalesLine.Type::Payment);
-        if NpRvExtVoucherSalesLine.IsEmpty then
-          exit;
-
-        NpRvExtVoucherSalesLine.FindFirst;
-        PostMagentoPayment(PaymentLine,NpRvExtVoucherSalesLine);
-        NpRvExtVoucherSalesLine.DeleteAll;
-        //+NPR5.48 [302179]
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
-    local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header";SalesInvHdrNo: Code[20])
-    var
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
-        NpRvVoucher: Record "NpRv Voucher";
-        NpRvVoucher2: Record "NpRv Voucher";
-        SalesInvHeader: Record "Sales Invoice Header";
-        SalesInvLine: Record "Sales Invoice Line";
-        TempNpRvVoucher: Record "NpRv Voucher" temporary;
-        i: Integer;
-    begin
-        if SalesHeader."External Order No." = '' then
-          exit;
-        if not SalesHeader.Invoice then
-          exit;
-        if SalesInvHdrNo = '' then
-          exit;
-        if not SalesInvHeader.Get(SalesInvHdrNo) then
-          exit;
-
-        //-NPR5.53 [372315]
-        NpRvExtVoucherSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
-        NpRvExtVoucherSalesLine.SetRange(Type,NpRvExtVoucherSalesLine.Type::"New Voucher");
-        if NpRvExtVoucherSalesLine.FindSet then
-          repeat
-            if SalesInvLine.Get(SalesInvHeader."No.",NpRvExtVoucherSalesLine."Document Line No.") and NpRvVoucher.Get(NpRvExtVoucherSalesLine."Voucher No.") then begin
-              //-NPR5.53 [378597]
-              for i := 1 to SalesInvLine."Quantity (Base)" do begin
-                NpRvVoucher2.Get(NpRvVoucher."No.");
-                if TempNpRvVoucher.Get(NpRvVoucher."No.") then begin
-                  NpRvVoucher2.Init;
-                  NpRvVoucher2 := NpRvVoucher;
-                  NpRvVoucher2."No." := '';
-                  NpRvVoucher2."Reference No." := '';
-                  NpRvVoucher2.Insert(true);
-                end;
-
-                PostIssueVoucherInv(NpRvVoucher2,SalesInvHeader,SalesInvLine);
-
-                TempNpRvVoucher.Init;
-                TempNpRvVoucher := NpRvVoucher2;
-                TempNpRvVoucher.Insert;
-              end;
-              //+NPR5.53 [378597]
-            end;
-            NpRvExtVoucherSalesLine.Delete;
-          until NpRvExtVoucherSalesLine.Next = 0;
-
-        NpRvExtVoucherSalesLine.SetRange(Type,NpRvExtVoucherSalesLine.Type::"Top-up");
-        if NpRvExtVoucherSalesLine.FindSet then
-          repeat
-            if SalesInvLine.Get(SalesInvHeader."No.",NpRvExtVoucherSalesLine."Document Line No.") and NpRvVoucher.Get(NpRvExtVoucherSalesLine."Voucher No.") then begin
-              ApplyVoucherTopupInv(NpRvVoucher,SalesInvHeader,SalesInvLine);
-
-              if not TempNpRvVoucher.Get(NpRvVoucher."No.") then begin
-                TempNpRvVoucher.Init;
-                TempNpRvVoucher := NpRvVoucher;
-                TempNpRvVoucher.Insert;
-              end;
-            end;
-            NpRvExtVoucherSalesLine.Delete;
-          until NpRvExtVoucherSalesLine.Next = 0;
-
-        Commit;
-
-        if TempNpRvVoucher.FindSet then
-          repeat
-            NpRvVoucher.Get(TempNpRvVoucher."No.");
-            SendVoucher(NpRvVoucher);
-          until TempNpRvVoucher.Next = 0;
-        //+NPR5.53 [372315]
-    end;
-
     local procedure "--- Issue Voucher"()
     begin
     end;
 
-    local procedure IssueVouchers(var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    procedure IssueVouchers(var NpRvSalesLine: Record "NpRv Sales Line")
     var
+        MagentoPaymentLine: Record "Magento Payment Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
         SaleLinePOS: Record "Sale Line POS";
-        SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
         VoucherType: Record "NpRv Voucher Type";
         i: Integer;
+        VoucherAmount: Decimal;
+        VoucherQty: Decimal;
     begin
-        VoucherType.Get(SaleLinePOSVoucher."Voucher Type");
-        if not SaleLinePOS.Get(SaleLinePOSVoucher."Register No.",SaleLinePOSVoucher."Sales Ticket No.",SaleLinePOSVoucher."Sale Date",
-                               SaleLinePOSVoucher."Sale Type",SaleLinePOSVoucher."Sale Line No.") then
-          exit;
-        //-NPR5.51 [364542]
-        if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then begin
-          SaleLinePOS."Unit Price" := Abs(SaleLinePOS."Amount Including VAT");
-          SaleLinePOS.Quantity := 1;
-        end;
-        //+NPR5.51 [364542]
-        if SaleLinePOS."Unit Price" <= 0 then
-          exit;
-        if SaleLinePOS.Quantity <= 0 then
+        //-NPR5.55 [402015]
+        if not (NpRvSalesLine.Type in [NpRvSalesLine.Type::"New Voucher",NpRvSalesLine.Type::"Top-up",NpRvSalesLine.Type::"Partner Issue Voucher"]) then
           exit;
 
-        SaleLinePOSReference.SetRange("Register No.",SaleLinePOSVoucher."Register No.");
-        SaleLinePOSReference.SetRange("Sales Ticket No.",SaleLinePOSVoucher."Sales Ticket No.");
-        SaleLinePOSReference.SetRange("Sale Type",SaleLinePOSVoucher."Sale Type");
-        SaleLinePOSReference.SetRange("Sale Date",SaleLinePOSVoucher."Sale Date");
-        SaleLinePOSReference.SetRange("Sale Line No.",SaleLinePOSVoucher."Sale Line No.");
-        SaleLinePOSReference.SetRange("Voucher Line No.",SaleLinePOSVoucher."Line No.");
-        if SaleLinePOSReference.FindSet then;
+        VoucherType.Get(NpRvSalesLine."Voucher Type");
+        case NpRvSalesLine."Document Source" of
+          NpRvSalesLine."Document Source"::POS:
+            begin
+              SaleLinePOS.SetRange("Retail ID",NpRvSalesLine."Retail ID");
+              if not SaleLinePOS.FindFirst then
+                exit;
 
-        for i := 1 to SaleLinePOS.Quantity do begin
-          //-NPR5.54 [372135]
-          //IssueVoucher(VoucherType,SaleLinePOS,SaleLinePOSVoucher,SaleLinePOSReference."Reference No.");
-          //IF SaleLinePOSReference.NEXT = 0 THEN
-          //  SaleLinePOSReference."Reference No." := '';
-          IssueVoucher(VoucherType,SaleLinePOS,SaleLinePOSVoucher,SaleLinePOSReference);
-          if SaleLinePOSReference.Next = 0 then begin
-            SaleLinePOSReference."Voucher No." := '';
-            SaleLinePOSReference."Reference No." := '';
-          end;
-          //+NPR5.54 [372135]
+              if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then begin
+                SaleLinePOS."Unit Price" := Abs(SaleLinePOS."Amount Including VAT");
+                SaleLinePOS.Quantity := 1;
+              end;
+
+              VoucherQty := SaleLinePOS.Quantity;
+              VoucherAmount := SaleLinePOS."Unit Price";
+              if not SaleLinePOS."Price Includes VAT" then
+                VoucherAmount *= 1 + SaleLinePOS."VAT %" / 100;
+            end;
+          NpRvSalesLine."Document Source"::"Sales Document":
+            begin
+              if not SalesLine.Get(NpRvSalesLine."Document Type",NpRvSalesLine."Document No.",NpRvSalesLine."Document Line No.") then
+                exit;
+
+              VoucherQty := SalesLine."Qty. to Invoice";
+              VoucherAmount := SalesLine."Unit Price";
+              if SalesHeader.Get(SalesHeader."Document Type",SalesLine."Document No.") and not SalesHeader."Prices Including VAT" then
+                VoucherAmount *= 1 + SalesLine."VAT %" / 100;
+            end;
+          NpRvSalesLine."Document Source"::"Payment Line":
+            begin
+              if not MagentoPaymentLine.Get(DATABASE::"Sales Invoice Header",0,NpRvSalesLine."Posting No.",NpRvSalesLine."Document Line No.") then begin
+                if not MagentoPaymentLine.Get(DATABASE::"Sales Header",NpRvSalesLine."Document Type",NpRvSalesLine."Document No.",NpRvSalesLine."Document Line No.") then
+                  exit;
+              end;
+              if MagentoPaymentLine.Amount >= 0 then
+                exit;
+
+              VoucherQty := 1;
+              VoucherAmount := -MagentoPaymentLine.Amount;
+            end;
         end;
+
+        if VoucherAmount <= 0 then
+          exit;
+        if VoucherQty <= 0 then
+          exit;
+
+        for i := 1 to VoucherQty do begin
+          Clear(NpRvSalesLineReference);
+          NpRvSalesLineReference.SetRange("Sales Line Id",NpRvSalesLine.Id);
+          if NpRvSalesLineReference.FindFirst then;
+
+          IssueVoucher(VoucherType,VoucherAmount,NpRvSalesLine,NpRvSalesLineReference);
+        end;
+        //+NPR5.55 [402015]
     end;
 
-    local procedure IssueVoucher(VoucherType: Record "NpRv Voucher Type";SaleLinePOS: Record "Sale Line POS";var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";SaleLinePOSReference: Record "NpRv Sale Line POS Reference")
+    local procedure IssueVoucher(VoucherType: Record "NpRv Voucher Type";VoucherAmount: Decimal;var NpRvSalesLine: Record "NpRv Sales Line";var NpRvSalesLineReference: Record "NpRv Sales Line Reference")
     var
+        NpRvSalesLine2: Record "NpRv Sales Line";
         Voucher: Record "NpRv Voucher";
         PrevVoucher: Text;
+        NpRvSalesLineReferencePrev: Record "NpRv Sales Line Reference";
     begin
-        if SaleLinePOS."Unit Price" <= 0 then
+        //-NPR5.55 [402015]
+        if VoucherAmount <= 0 then
           exit;
-        //-NPR5.54 [372135]
-        //IF ReferenceNo <> '' THEN
-        //  VoucherType.TESTFIELD("Reference No. Pattern");
-        if SaleLinePOSReference."Reference No." = '' then
-          VoucherType.TestField("Reference No. Pattern");
-        //+NPR5.54 [372135]
 
-        Voucher.Init;
-        Voucher."Starting Date" := SaleLinePOSVoucher."Starting Date";
-        Voucher.Validate("Voucher Type",VoucherType.Code);
-        //-NPR5.54 [372135]
-        // Voucher."No." := '';
-        // Voucher."Reference No." := ReferenceNo;
-        Voucher."No." := SaleLinePOSReference."Voucher No.";
-        Voucher."Reference No." := SaleLinePOSReference."Reference No.";
-        //+NPR5.54 [372135]
+        case NpRvSalesLine.Type of
+          NpRvSalesLine.Type::"New Voucher":
+            begin
+              if NpRvSalesLineReference."Reference No." = '' then
+                VoucherType.TestField("Reference No. Pattern");
+
+              Voucher.Init;
+              if NpRvSalesLine."Starting Date" > CurrentDateTime then
+                Voucher."Starting Date" := NpRvSalesLine."Starting Date";
+              Voucher.Validate("Voucher Type",VoucherType.Code);
+              Voucher."No." := NpRvSalesLineReference."Voucher No.";
+              Voucher."Reference No." := NpRvSalesLineReference."Reference No.";
+              //-NPR5.50 [356003]
+              OnBeforeInsertIssuedVoucher(Voucher, NpRvSalesLine);
+              //+NPR5.50 [356003]
+              Voucher.Insert(true);
+
+              PrevVoucher := Format(Voucher);
+              Voucher.Description := CopyStr(VoucherType.Description + ' ' + Voucher."No.",1,MaxStrLen(Voucher.Description));
+              Voucher."Customer No." := NpRvSalesLine."Customer No.";
+              Voucher."Contact No." := NpRvSalesLine."Contact No.";
+              Voucher.Name := NpRvSalesLine.Name;
+              Voucher."Name 2" := NpRvSalesLine."Name 2";
+              Voucher.Address := NpRvSalesLine.Address;
+              Voucher."Address 2" := NpRvSalesLine."Address 2";
+              Voucher."Post Code" := NpRvSalesLine."Post Code";
+              Voucher.City := NpRvSalesLine.City;
+              Voucher.County := NpRvSalesLine.County;
+              Voucher."Country/Region Code" := NpRvSalesLine."Country/Region Code";
+              Voucher."E-mail" := NpRvSalesLine."E-mail";
+              Voucher."Phone No." := NpRvSalesLine."Phone No.";
+              //-NPR5.48 [341711]
+              Voucher."Send via Print" := NpRvSalesLine."Send via Print";
+              Voucher."Send via E-mail" := NpRvSalesLine."Send via E-mail";
+              Voucher."Send via SMS" := NpRvSalesLine."Send via SMS";
+              //+NPR5.48 [341711]
+              Voucher."Voucher Message" := NpRvSalesLine."Voucher Message";
+              if PrevVoucher <>  Format(Voucher) then
+                Voucher.Modify(true);
+            end;
+          NpRvSalesLine.Type::"Top-up":
+            begin
+              Voucher.Get(NpRvSalesLine."Voucher No.");
+            end;
+        end;
+
+        if NpRvSalesLineReference.Find then begin
+          NpRvSalesLineReferencePrev := NpRvSalesLineReference;
+          NpRvSalesLineReference.Delete;
+          NpRvSalesLineReference := NpRvSalesLineReferencePrev;
+        end;
+
+        PostIssueVoucher(Voucher,VoucherAmount,NpRvSalesLine);
+
         //-NPR5.50 [356003]
-        OnBeforeInsertIssuedVoucher(Voucher, SaleLinePOSVoucher);
-        //+NPR5.50 [356003]
-        Voucher.Insert(true);
-
-        PrevVoucher := Format(Voucher);
-        Voucher.Description := CopyStr(VoucherType.Description + ' ' + Voucher."No.",1,MaxStrLen(Voucher.Description));
-        Voucher."Customer No." := SaleLinePOSVoucher."Customer No.";
-        Voucher."Contact No." := SaleLinePOSVoucher."Contact No.";
-        Voucher.Name := SaleLinePOSVoucher.Name;
-        Voucher."Name 2" := SaleLinePOSVoucher."Name 2";
-        Voucher.Address := SaleLinePOSVoucher.Address;
-        Voucher."Address 2" := SaleLinePOSVoucher."Address 2";
-        Voucher."Post Code" := SaleLinePOSVoucher."Post Code";
-        Voucher.City := SaleLinePOSVoucher.City;
-        Voucher.County := SaleLinePOSVoucher.County;
-        Voucher."Country/Region Code" := SaleLinePOSVoucher."Country/Region Code";
-        Voucher."E-mail" := SaleLinePOSVoucher."E-mail";
-        Voucher."Phone No." := SaleLinePOSVoucher."Phone No.";
-        //-NPR5.48 [341711]
-        Voucher."Send via Print" := SaleLinePOSVoucher."Send via Print";
-        Voucher."Send via E-mail" := SaleLinePOSVoucher."Send via E-mail";
-        Voucher."Send via SMS" := SaleLinePOSVoucher."Send via SMS";
-        //+NPR5.48 [341711]
-        Voucher."Voucher Message" := SaleLinePOSVoucher."Voucher Message";
-        if PrevVoucher <>  Format(Voucher) then
-          Voucher.Modify(true);
-
-        PostIssueVoucher(Voucher,SaleLinePOS);
-
-        //-NPR5.50 [356003]
-        if not SaleLinePOSVoucher.Posted then begin
-          SaleLinePOSVoucher.Posted := true;
-          SaleLinePOSVoucher.Modify;
+        if NpRvSalesLine2.Get(NpRvSalesLine.Id) and not NpRvSalesLine2.Posted then begin
+          NpRvSalesLine2.Posted := true;
+          NpRvSalesLine2.Modify;
         end;
         //+NPR5.50 [356003]
+        //+NPR5.55 [402015]
     end;
 
-    local procedure InitialEntryExists(Voucher: Record "NpRv Voucher"): Boolean
+    procedure InitialEntryExists(Voucher: Record "NpRv Voucher"): Boolean
     var
         VoucherEntry: Record "NpRv Voucher Entry";
     begin
@@ -473,76 +308,73 @@ codeunit 6151010 "NpRv Voucher Mgt."
         exit(VoucherEntry.FindFirst);
     end;
 
-    procedure PostIssueVoucher(Voucher: Record "NpRv Voucher";SaleLinePOS: Record "Sale Line POS")
+    local procedure PostIssueVoucher(Voucher: Record "NpRv Voucher";VoucherAmount: Decimal;var NpRvSalesLine: Record "NpRv Sales Line")
     var
         VoucherEntry: Record "NpRv Voucher Entry";
         VoucherType: Record "NpRv Voucher Type";
     begin
-        if InitialEntryExists(Voucher) then
-          exit;
-
+        //-NPR5.55 [402015]
         VoucherType.Get(Voucher."Voucher Type");
 
         VoucherEntry.Init;
         VoucherEntry."Entry No." := 0;
         VoucherEntry."Voucher No." := Voucher."No.";
-        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
+        case NpRvSalesLine.Type of
+          NpRvSalesLine.Type::"New Voucher":
+            begin
+              if InitialEntryExists(Voucher) then
+                exit;
+
+              VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
+            end;
+          NpRvSalesLine.Type::"Top-up":
+            begin
+              VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
+            end;
+          NpRvSalesLine.Type::"Partner Issue Voucher":
+            begin
+              if InitialEntryExists(Voucher) then
+                exit;
+
+              VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Partner Issue Voucher";
+            end;
+        end;
         VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-        VoucherEntry.Amount := SaleLinePOS."Unit Price";
+        VoucherEntry.Amount := VoucherAmount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := SaleLinePOS.Date;
+        VoucherEntry."Posting Date" := DT2Date(Voucher."Starting Date");
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
-        VoucherEntry."Register No." := SaleLinePOS."Register No.";
-        //-NPR5.48 [302179]
-        VoucherEntry."Document Type" := VoucherEntry."Document Type"::"Audit Roll";
-        //+NPR5.48 [302179]
-        VoucherEntry."Document No." := SaleLinePOS."Sales Ticket No.";
+        VoucherEntry."Register No." := NpRvSalesLine."Register No.";
+        case NpRvSalesLine."Document Source" of
+          NpRvSalesLine."Document Source"::POS:
+            begin
+              VoucherEntry."Document Type" := VoucherEntry."Document Type"::"POS Entry";
+              VoucherEntry."Document No." := NpRvSalesLine."Sales Ticket No.";
+            end;
+          NpRvSalesLine."Document Source"::"Sales Document":
+            begin
+              VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
+              VoucherEntry."Document No." := NpRvSalesLine."Posting No.";
+              VoucherEntry."External Document No." := NpRvSalesLine."External Document No.";
+            end;
+          NpRvSalesLine."Document Source"::"Payment Line":
+            begin
+              VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
+              VoucherEntry."Document No." := NpRvSalesLine."Posting No.";
+              VoucherEntry."External Document No." := NpRvSalesLine."External Document No.";
+            end;
+        end;
         //-NPR5.49 [342811]
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
         //+NPR5.49 [342811]
         VoucherEntry."User ID" := UserId;
         VoucherEntry."Closed by Entry No." := 0;
         //-NPR5.50 [356003]
-        OnBeforeInsertIssuedVoucherEntry(VoucherEntry, Voucher, SaleLinePOS);
+        OnBeforeInsertIssuedVoucherEntry(VoucherEntry, Voucher, NpRvSalesLine);
         //+NPR5.50 [356003]
         VoucherEntry.Insert;
-    end;
-
-    procedure PostIssueVoucherInv(Voucher: Record "NpRv Voucher";SalesInvHeader: Record "Sales Invoice Header";SalesInvLine: Record "Sales Invoice Line")
-    var
-        VoucherEntry: Record "NpRv Voucher Entry";
-        VoucherType: Record "NpRv Voucher Type";
-    begin
-        //-NPR5.48 [302179]
-        if InitialEntryExists(Voucher) then
-          exit;
-
-        VoucherType.Get(Voucher."Voucher Type");
-
-        VoucherEntry.Init;
-        VoucherEntry."Entry No." := 0;
-        VoucherEntry."Voucher No." := Voucher."No.";
-        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
-        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-        //-NPR5.53 [378597]
-        VoucherEntry.Amount := SalesInvLine."Unit Price";
-        //+NPR5.53 [378597]
-        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
-        VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := SalesInvLine."Posting Date";
-        VoucherEntry.Open := VoucherEntry.Amount <> 0;
-        VoucherEntry."Register No." := '';
-        VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
-        VoucherEntry."Document No." := SalesInvLine."Document No.";
-        //-NPR5.49 [342811]
-        VoucherEntry."Partner Code" := VoucherType."Partner Code";
-        //+NPR5.49 [342811]
-        VoucherEntry."External Document No." := SalesInvHeader."External Order No.";
-        VoucherEntry."User ID" := UserId;
-        VoucherEntry."Closed by Entry No." := 0;
-        VoucherEntry.Insert;
-        //+NPR5.48 [302179]
+        //+NPR5.55 [402015]
     end;
 
     procedure SendVoucher(Voucher: Record "NpRv Voucher")
@@ -571,153 +403,125 @@ codeunit 6151010 "NpRv Voucher Mgt."
           //+NPR5.48 [341711]
     end;
 
-    local procedure "--- Voucher Top-up"()
-    begin
-    end;
-
-    local procedure ApplyVoucherTopup(var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    procedure LogSending(NpRvVoucher: Record "NpRv Voucher";SendingType: Integer;LogMessage: Text;SentTo: Text;ErrorMessage: Text)
     var
-        SaleLinePOS: Record "Sale Line POS";
-        NpRvVoucherType: Record "NpRv Voucher Type";
-        Voucher: Record "NpRv Voucher";
-        VoucherEntry: Record "NpRv Voucher Entry";
-        i: Integer;
+        NpRvSendingLog: Record "NpRv Sending Log";
+        OutStr: OutStream;
     begin
-        //-NPR5.50 [353079]
-        if not SaleLinePOS.Get(
-          SaleLinePOSVoucher."Register No.",SaleLinePOSVoucher."Sales Ticket No.",SaleLinePOSVoucher."Sale Date",SaleLinePOSVoucher."Sale Type",SaleLinePOSVoucher."Sale Line No.")
-        then
-          exit;
+        //-NPR5.55 [407070]
+        NpRvVoucher.CalcFields(Amount);
 
-        if SaleLinePOS."Amount Including VAT" <= 0 then
-          exit;
-
-        Voucher.Get(SaleLinePOSVoucher."Voucher No.");
-
-        VoucherEntry.Init;
-        VoucherEntry."Entry No." := 0;
-        VoucherEntry."Voucher No." := Voucher."No.";
-        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
-        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-        VoucherEntry.Amount := SaleLinePOS."Amount Including VAT";
-        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
-        VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := SaleLinePOS.Date;
-        VoucherEntry.Open := VoucherEntry.Amount <> 0;
-        VoucherEntry."Register No." := SaleLinePOS."Register No.";
-        VoucherEntry."Document Type" := VoucherEntry."Document Type"::"Audit Roll";
-        VoucherEntry."Document No." := SaleLinePOS."Sales Ticket No.";
-        VoucherEntry."User ID" := UserId;
-        VoucherEntry."Closed by Entry No." := 0;
-        if NpRvVoucherType.Get(Voucher."Voucher Type") then
-          VoucherEntry."Partner Code" := NpRvVoucherType."Partner Code";
-        VoucherEntry.Insert;
-
-        ApplyEntry(VoucherEntry);
-
-        ArchiveClosedVoucher(Voucher);
-
-        //-NPR5.50 [356003]
-        SaleLinePOSVoucher.Posted := true;
-        SaleLinePOSVoucher.Modify;
-        //+NPR5.50 [356003]
-    end;
-
-    local procedure ApplyVoucherTopupInv(Voucher: Record "NpRv Voucher";SalesInvHeader: Record "Sales Invoice Header";SalesInvLine: Record "Sales Invoice Line")
-    var
-        NpRvVoucherType: Record "NpRv Voucher Type";
-        VoucherEntry: Record "NpRv Voucher Entry";
-        i: Integer;
-    begin
-        //-NPR5.53 [372315]
-        if not Voucher."Allow Top-up" then
-          exit;
-
-        if SalesInvLine."Line Amount" <= 0 then
-          exit;
-
-        VoucherEntry.Init;
-        VoucherEntry."Entry No." := 0;
-        VoucherEntry."Voucher No." := Voucher."No.";
-        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
-        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-        VoucherEntry.Amount := SalesInvLine."Line Amount";
-        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
-        VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := SalesInvLine."Posting Date";
-        VoucherEntry.Open := VoucherEntry.Amount <> 0;
-        VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
-        VoucherEntry."Document No." := SalesInvLine."Document No.";
-        VoucherEntry."External Document No." := SalesInvHeader."External Document No.";
-        VoucherEntry."User ID" := UserId;
-        VoucherEntry."Closed by Entry No." := 0;
-        if NpRvVoucherType.Get(Voucher."Voucher Type") then
-          VoucherEntry."Partner Code" := NpRvVoucherType."Partner Code";
-        VoucherEntry.Insert;
-
-        ApplyEntry(VoucherEntry);
-        //+NPR5.53 [372315]
+        NpRvSendingLog.Init;
+        NpRvSendingLog."Entry No." := 0;
+        NpRvSendingLog."Voucher No." := NpRvVoucher."No.";
+        NpRvSendingLog."Log Date" := CurrentDateTime;
+        if SendingType > 0 then
+          NpRvSendingLog."Sending Type" := SendingType;
+        NpRvSendingLog."Log Message" := CopyStr(LogMessage,1,MaxStrLen(NpRvSendingLog."Log Message"));
+        NpRvSendingLog."Sent to" := CopyStr(SentTo,1,MaxStrLen(NpRvSendingLog."Sent to"));
+        NpRvSendingLog.Amount := NpRvVoucher.Amount;
+        NpRvSendingLog."User ID" := UserId;
+        NpRvSendingLog."Error during Send" := ErrorMessage <> '';
+        if ErrorMessage <> '' then begin
+          NpRvSendingLog."Error Message".CreateOutStream(OutStr,TEXTENCODING::UTF8);
+          OutStr.WriteText(ErrorMessage);
+        end;
+        NpRvSendingLog.Insert(true);
+        //+NPR5.55 [407070]
     end;
 
     local procedure "--- Voucher Payment"()
     begin
     end;
 
-    procedure ApplyPayment(FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session";SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    procedure ApplyPayment(FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session";NpRvSalesLine: Record "NpRv Sales Line")
     var
         VoucherType: Record "NpRv Voucher Type";
         NpRvModuleMgt: Codeunit "NpRv Module Mgt.";
         NpRvModulePaymentDefault: Codeunit "NpRv Module Payment - Default";
         Handled: Boolean;
     begin
-        VoucherType.Get(SaleLinePOSVoucher."Voucher Type");
-        NpRvModuleMgt.OnRunApplyPayment(FrontEnd,POSSession,VoucherType,SaleLinePOSVoucher,Handled);
+        VoucherType.Get(NpRvSalesLine."Voucher Type");
+        NpRvModuleMgt.OnRunApplyPayment(FrontEnd,POSSession,VoucherType,NpRvSalesLine,Handled);
         if Handled then
           exit;
 
-        NpRvModulePaymentDefault.ApplyPayment(FrontEnd,POSSession,VoucherType,SaleLinePOSVoucher);
+        NpRvModulePaymentDefault.ApplyPayment(FrontEnd,POSSession,VoucherType,NpRvSalesLine);
     end;
 
-    local procedure PostPayment(var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    procedure PostPayment(var NpRvSalesLine: Record "NpRv Sales Line")
     var
+        MagentoPaymentLine: Record "Magento Payment Line";
+        NpRvSalesLine2: Record "NpRv Sales Line";
         SaleLinePOS: Record "Sale Line POS";
         NpRvVoucherType: Record "NpRv Voucher Type";
         Voucher: Record "NpRv Voucher";
         VoucherEntry: Record "NpRv Voucher Entry";
         i: Integer;
     begin
-        if not SaleLinePOS.Get(SaleLinePOSVoucher."Register No.",SaleLinePOSVoucher."Sales Ticket No.",SaleLinePOSVoucher."Sale Date",
-                               SaleLinePOSVoucher."Sale Type",SaleLinePOSVoucher."Sale Line No.") then
-          exit;
+        //-NPR5.55 [402015]
+        case NpRvSalesLine."Document Source" of
+          NpRvSalesLine."Document Source"::POS:
+            begin
+              SaleLinePOS.SetRange("Retail ID",NpRvSalesLine."Retail ID");
+              if not SaleLinePOS.FindFirst then
+                exit;
 
-        if SaleLinePOS."Amount Including VAT" <= 0 then
-          exit;
+              if SaleLinePOS."Amount Including VAT" <= 0 then
+                exit;
+            end;
+          NpRvSalesLine."Document Source"::"Payment Line":
+            begin
+              if not MagentoPaymentLine.Get(DATABASE::"Sales Invoice Header",0,NpRvSalesLine."Posting No.",NpRvSalesLine."Document Line No.") then begin
+                if not MagentoPaymentLine.Get(DATABASE::"Sales Header",NpRvSalesLine."Document Type",NpRvSalesLine."Document No.",NpRvSalesLine."Document Line No.") then
+                  exit;
+              end;
 
-        Voucher.Get(SaleLinePOSVoucher."Voucher No.");
+              if MagentoPaymentLine.Amount <= 0 then
+                exit;
+            end;
+          else
+            exit;
+        end;
+        //+NPR5.55 [402015]
+
+        Voucher.Get(NpRvSalesLine."Voucher No.");
 
         VoucherEntry.Init;
         VoucherEntry."Entry No." := 0;
         VoucherEntry."Voucher No." := Voucher."No.";
         VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::Payment;
         VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-        VoucherEntry.Amount := -SaleLinePOS."Amount Including VAT";
+        //-NPR5.55 [402015]
+        case NpRvSalesLine."Document Source" of
+          NpRvSalesLine."Document Source"::POS:
+            begin
+              VoucherEntry."Document Type" := VoucherEntry."Document Type"::"POS Entry";
+              VoucherEntry."Register No." := SaleLinePOS."Register No.";
+              VoucherEntry."Document No." := SaleLinePOS."Sales Ticket No.";
+              VoucherEntry."Posting Date" := SaleLinePOS.Date;
+              VoucherEntry.Amount := -SaleLinePOS."Amount Including VAT";
+            end;
+          NpRvSalesLine."Document Source"::"Payment Line":
+            begin
+              VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
+              VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
+              VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
+              VoucherEntry.Amount := -MagentoPaymentLine.Amount;
+            end;
+        end;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := SaleLinePOS.Date;
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
-        VoucherEntry."Register No." := SaleLinePOS."Register No.";
-        //-NPR5.48 [302179]
-        VoucherEntry."Document Type" := VoucherEntry."Document Type"::"Audit Roll";
-        //+NPR5.48 [302179]
-        VoucherEntry."Document No." := SaleLinePOS."Sales Ticket No.";
         VoucherEntry."User ID" := UserId;
         VoucherEntry."Closed by Entry No." := 0;
+        //+NPR5.55 [402015]
         //-NPR5.49 [342811]
         if NpRvVoucherType.Get(Voucher."Voucher Type") then
           VoucherEntry."Partner Code" := NpRvVoucherType."Partner Code";
         //+NPR5.49 [342811]
         //-NPR5.50 [356003]
-        OnBeforeInsertPaymentVoucherEntry(VoucherEntry, SaleLinePOSVoucher);
+        OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
         //+NPR5.50 [356003]
         VoucherEntry.Insert;
 
@@ -726,53 +530,11 @@ codeunit 6151010 "NpRv Voucher Mgt."
         ArchiveClosedVoucher(Voucher);
 
         //-NPR5.50 [356003]
-        SaleLinePOSVoucher.Posted := true;
-        SaleLinePOSVoucher.Modify;
+        if NpRvSalesLine2.Get(NpRvSalesLine.Id) and not NpRvSalesLine2.Posted then begin
+          NpRvSalesLine2.Posted := true;
+          NpRvSalesLine2.Modify;
+        end;
         //+NPR5.50 [356003]
-    end;
-
-    local procedure PostMagentoPayment(PaymentLine: Record "Magento Payment Line";NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line")
-    var
-        Voucher: Record "NpRv Voucher";
-        VoucherEntry: Record "NpRv Voucher Entry";
-        i: Integer;
-    begin
-        //-NPR5.48 [302179]
-        if PaymentLine.Amount <= 0 then
-          exit;
-
-        Voucher.Get(NpRvExtVoucherSalesLine."Voucher No.");
-
-        VoucherEntry.Init;
-        VoucherEntry."Entry No." := 0;
-        VoucherEntry."Voucher No." := Voucher."No.";
-        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::Payment;
-        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-        VoucherEntry.Amount := -PaymentLine.Amount;
-        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
-        VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := PaymentLine."Posting Date";
-        VoucherEntry.Open := VoucherEntry.Amount <> 0;
-        VoucherEntry."Register No." := '';
-        VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
-        VoucherEntry."Document No." := PaymentLine."Document No.";
-        VoucherEntry."External Document No." := PaymentLine."External Reference No.";
-        VoucherEntry."User ID" := UserId;
-        VoucherEntry."Closed by Entry No." := 0;
-        VoucherEntry.Insert;
-
-        ApplyEntry(VoucherEntry);
-
-        ArchiveClosedVoucher(Voucher);
-        //+NPR5.48 [302179]
-        //-NPR5.53 [380284]
-        if not Voucher.Find then
-          exit;
-
-        Voucher.CalcFields(Amount);
-        if Voucher.Amount > 0 then
-          SendVoucher(Voucher);
-        //+NPR5.53 [380284]
     end;
 
     procedure ApplyEntry(var VoucherEntry: Record "NpRv Voucher Entry")
@@ -884,10 +646,11 @@ codeunit 6151010 "NpRv Voucher Mgt."
         ArchiveClosedVoucher(Voucher);
     end;
 
-    local procedure ArchiveClosedVoucher(var Voucher: Record "NpRv Voucher")
+    procedure ArchiveClosedVoucher(var Voucher: Record "NpRv Voucher")
     var
         VoucherEntry: Record "NpRv Voucher Entry";
         VoucherType: Record "NpRv Voucher Type";
+        NpRvSendingLog: Record "NpRv Sending Log";
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         //-NPR5.53 [380284]
@@ -917,7 +680,15 @@ codeunit 6151010 "NpRv Voucher Mgt."
           until VoucherEntry.Next = 0;
           VoucherEntry.DeleteAll;
         end;
-
+        //-NPR5.55 [407070]
+        NpRvSendingLog.SetRange("Voucher No.",Voucher."No.");
+        if NpRvSendingLog.FindSet then begin
+          repeat
+            InsertArchivedSendingLog(Voucher,NpRvSendingLog);
+          until NpRvSendingLog.Next = 0;
+          NpRvSendingLog.DeleteAll;
+        end;
+        //+NPR5.55 [407070]
         Voucher.Delete;
     end;
 
@@ -1001,6 +772,30 @@ codeunit 6151010 "NpRv Voucher Mgt."
         OnBeforeInsertArchiveEntry(ArchVoucherEntry, VoucherEntry);
         //+NPR5.50 [356003]
         ArchVoucherEntry.Insert;
+    end;
+
+    local procedure InsertArchivedSendingLog(Voucher: Record "NpRv Voucher";NpRvSendingLog: Record "NpRv Sending Log")
+    var
+        NpRvArchSendingLog: Record "NpRv Arch. Sending Log";
+    begin
+        //-NPR5.55 [407070]
+        NpRvArchSendingLog.Init;
+        NpRvArchSendingLog."Entry No." := 0;
+        NpRvArchSendingLog."Arch. Voucher No." := Voucher."Arch. No.";;
+        NpRvArchSendingLog."Sending Type" := NpRvSendingLog."Sending Type";
+        NpRvArchSendingLog."Log Message" := NpRvSendingLog."Log Message";
+        NpRvArchSendingLog."Log Date" := NpRvSendingLog."Log Date";
+        NpRvArchSendingLog."Sent to" := NpRvSendingLog."Sent to";
+        NpRvArchSendingLog.Amount := NpRvSendingLog.Amount;
+        NpRvArchSendingLog."User ID" := NpRvSendingLog."User ID";
+        NpRvArchSendingLog."Error during Send" := NpRvSendingLog."Error during Send";
+        if NpRvSendingLog."Error Message".HasValue then begin
+          NpRvSendingLog.CalcFields("Error Message");
+          NpRvArchSendingLog."Error Message" := NpRvSendingLog."Error Message";
+        end;
+        NpRvArchSendingLog."Original Entry No." := NpRvSendingLog."Entry No.";
+        NpRvArchSendingLog.Insert;
+        //+NPR5.55 [407070]
     end;
 
     procedure "--- Validation"()
@@ -1091,24 +886,20 @@ codeunit 6151010 "NpRv Voucher Mgt."
     begin
     end;
 
-    local procedure SetSaleLinePOSVoucherFilter(SaleLinePOS: Record "Sale Line POS";var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    local procedure SetSalesLineFilter(SaleLinePOS: Record "Sale Line POS";var NpRvSalesLine: Record "NpRv Sales Line")
     begin
-        Clear(SaleLinePOSVoucher);
-        SaleLinePOSVoucher.SetRange("Register No.",SaleLinePOS."Register No.");
-        SaleLinePOSVoucher.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSVoucher.SetRange("Sale Type",SaleLinePOS."Sale Type");
-        SaleLinePOSVoucher.SetRange("Sale Date",SaleLinePOS.Date);
-        SaleLinePOSVoucher.SetRange("Sale Line No.",SaleLinePOS."Line No.");
+        //-NPR5.55 [402015]
+        Clear(NpRvSalesLine);
+        NpRvSalesLine.SetRange("Document Source",NpRvSalesLine."Document Source"::POS);
+        NpRvSalesLine.SetRange("Retail ID",SaleLinePOS."Retail ID");
+        //+NPR5.55 [402015]
     end;
 
-    procedure SetSaleLinePOSReferenceFilter(SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";var SaleLinePOSReference: Record "NpRv Sale Line POS Reference")
+    procedure SetSalesLineReferenceFilter(NpRvSalesLine: Record "NpRv Sales Line";var NpRvSalesLineReference: Record "NpRv Sales Line Reference")
     begin
-        SaleLinePOSReference.SetRange("Register No.",SaleLinePOSVoucher."Register No.");
-        SaleLinePOSReference.SetRange("Sales Ticket No.",SaleLinePOSVoucher."Sales Ticket No.");
-        SaleLinePOSReference.SetRange("Sale Type",SaleLinePOSVoucher."Sale Type");
-        SaleLinePOSReference.SetRange("Sale Date",SaleLinePOSVoucher."Sale Date");
-        SaleLinePOSReference.SetRange("Sale Line No.",SaleLinePOSVoucher."Sale Line No.");
-        SaleLinePOSReference.SetRange("Voucher Line No.",SaleLinePOSVoucher."Line No.");
+        //-NPR5.55 [402015]
+        NpRvSalesLineReference.SetRange("Sales Line Id",NpRvSalesLine.Id);
+        //+NPR5.55 [402015]
     end;
 
     local procedure "--- Generate Reference No"()
@@ -1323,31 +1114,25 @@ codeunit 6151010 "NpRv Voucher Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NpRv Voucher";SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NpRv Voucher";SaleLinePOSVoucher: Record "NpRv Sales Line")
     begin
         //-+NPR5.50 [356003]
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertIssuedVoucherEntry(var VoucherEntry: Record "NpRv Voucher Entry";Voucher: Record "NpRv Voucher";SaleLinePOS: Record "Sale Line POS")
+    local procedure OnBeforeInsertIssuedVoucherEntry(var VoucherEntry: Record "NpRv Voucher Entry";Voucher: Record "NpRv Voucher";NpRvSalesLine: Record "NpRv Sales Line")
     begin
         //-+NPR5.50 [356003]
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertPaymentVoucherEntry(var VoucherEntry: Record "NpRv Voucher Entry";SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    local procedure OnBeforeInsertPaymentVoucherEntry(var VoucherEntry: Record "NpRv Voucher Entry";SaleLinePOSVoucher: Record "NpRv Sales Line")
     begin
         //-+NPR5.50 [356003]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertArchiveEntry(var ArchVoucherEntry: Record "NpRv Arch. Voucher Entry";NpRvVoucherEntry: Record "NpRv Voucher Entry")
-    begin
-        //-+NPR5.50 [356003]
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostPartnerIssueVoucher(var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
     begin
         //-+NPR5.50 [356003]
     end;

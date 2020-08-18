@@ -4,6 +4,7 @@ page 6151385 "CS Stock-Takes List"
     // NPR5.52/CLVA/20190905  CASE 364063 Added field "Journal Qty. (Calculated)"
     // NPR5.54/CLVA/20200217  CASE 391080 Added field "Adjust Inventory","Unknown Entries" and action "Tag Data"
     // NPR5.54/CLVA/20200227  CASE 389224 Added action "Approved Data" and "Batch Data" and ActionGroup "Process"
+    // NPR5.55/CLVA/20200710  CASE 414210 Added action group "Manual Posting"
 
     Caption = 'CS Stock-Takes List';
     CardPageID = "CS Stock-Takes Card";
@@ -298,6 +299,54 @@ page 6151385 "CS Stock-Takes List"
                     end;
                 }
             }
+            group(ActionGroup6014437)
+            {
+                Caption = 'Manual Posting';
+                action("Post Approve Counting")
+                {
+                    Caption = 'Post Approve Counting';
+                    Image = Post;
+
+                    trigger OnAction()
+                    var
+                        RecRef: RecordRef;
+                        CSPost: Codeunit "CS Post";
+                    begin
+                        TestField("Adjust Inventory",true);
+
+                        if Approved = 0DT then
+                          Error(Err_NotApproved);
+
+                        RecRef.Open(DATABASE::"CS Stock-Takes");
+                        RecRef.Get(Rec.RecordId);
+
+                        CSPost.PostStoreApprovel(RecRef);
+                    end;
+                }
+                action("Post Store Counting")
+                {
+                    Caption = 'Post Store Counting';
+                    Image = Post;
+
+                    trigger OnAction()
+                    var
+                        RecRef: RecordRef;
+                        CSPost: Codeunit "CS Post";
+                        ItemJournalBatch: Record "Item Journal Batch";
+                    begin
+                        TestField("Journal Posted",false);
+
+                        if Approved = 0DT then
+                          Error(Err_NotApproved);
+
+                        ItemJournalBatch.Get("Journal Template Name","Journal Batch Name");
+                        RecRef.GetTable(ItemJournalBatch);
+                        RecRef.FindFirst();
+
+                        CSPost.PostItemJournal(RecRef);
+                    end;
+                }
+            }
         }
     }
 
@@ -306,5 +355,6 @@ page 6151385 "CS Stock-Takes List"
         Err_MissingLocation: Label 'Location is missing on POS Store';
         Err_MissingData: Label 'There is none approved data';
         Err_PostingIsScheduled: Label 'Phy. Inventory Journal is scheduled for posting: %1 %2. Delete the entry from the Posting Buffer before Schedule Posting.';
+        Err_NotApproved: Label 'Counting has not yet been approved';
 }
 

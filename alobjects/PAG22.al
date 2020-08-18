@@ -1,4 +1,4 @@
-pageextension 6014423 pageextension6014423 extends "Customer List"
+pageextension 6014426 pageextension6014426 extends "Customer List" 
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // PN1.08/TTH/10122015 CASE 229069 Added Customer Statement Sending
@@ -16,6 +16,7 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
     // NPR5.42/THRO/20180516 CASE 308179 Removed code from Action SendAsPdf and EmailLog
     // NPR5.51/MAOT/20190717 CASE 359891 Added column 'E-Mail'
     // NPR5.54/ZESO/20200303 CASE 358656 Added Page Action Customer Anonymization
+    // NPR5.55/ZESO/20200512 CASE 388813 Use Rec instead of Record Variable Cust.
     layout
     {
         addafter(Name)
@@ -231,9 +232,16 @@ pageextension 6014423 pageextension6014423 extends "Customer List"
                     GDPRManagement: Codeunit "NP GDPR Management";
                 begin
                     //+NPR5.54 [358656]
-                    CurrPage.SetSelectionFilter(Cust);
-                    Cust.TestField(Anonymized, false);
-                    if (GDPRManagement.DoAnonymization(Cust."No.", ReasonText)) then
+                    //-NPR5.55 [388813]
+                    //CurrPage.SETSELECTIONFILTER(Cust);
+                    //Cust.TESTFIELD(Anonymized,FALSE);
+                    //IF (GDPRManagement.DoAnonymization(Cust."No.",ReasonText)) THEN
+
+                    Rec.TestField(Anonymized,false);
+                    Clear(GDPRManagement);
+                    Clear(ReasonText);
+                    if (GDPRManagement.DoAnonymization(Rec."No.",ReasonText)) then
+                    //+NPR5.55 [388813]
                         if (not Confirm(Text000, false)) then
                             Error('');
 

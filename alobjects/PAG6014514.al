@@ -2,7 +2,7 @@ page 6014514 "Warranty Catalog"
 {
     // 
     // // 3.0j ved Nicolai Esbensen
-    //   Tilf�jet kommentar relation.
+    //   Tilf¢jet kommentar relation.
     // 
     // NPR5.23/TS/20160518  CASE 240748  Renamed Page and Added Actions
     // NPR5.41/TS  /20180105 CASE 300893 Removed Action History as Page 6014591 does not exist.

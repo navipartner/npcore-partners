@@ -2,137 +2,137 @@ report 6014440 "Sales Doc Confirmation A4"
 {
     // NPR5.52/MAOT/20190715 CASE 351209 Created object
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Doc Confirmation A4.rdlc';
+    RDLCLayout = './layouts/Sales Doc Confirmation A4.rdlc';
 
     Caption = 'Sales Doc Confirmation A4';
     PreviewMode = PrintLayout;
 
     dataset
     {
-        dataitem("Audit Roll";"Audit Roll")
+        dataitem("Audit Roll"; "Audit Roll")
         {
-            column(Picture_CompanyInformation;CompanyInformation.Picture)
+            column(Picture_CompanyInformation; CompanyInformation.Picture)
             {
             }
-            column(RegisterNo_AuditRoll;"Audit Roll"."Register No.")
+            column(RegisterNo_AuditRoll; "Audit Roll"."Register No.")
             {
             }
-            column(SalesTicketNo_AuditRoll;"Audit Roll"."Sales Ticket No.")
+            column(SalesTicketNo_AuditRoll; "Audit Roll"."Sales Ticket No.")
             {
             }
-            column(SaleDate_AuditRoll;AuditRollSale."Sale Date")
+            column(SaleDate_AuditRoll; AuditRollSale."Sale Date")
             {
             }
-            column(CopyNo_AuditRoll;"Audit Roll"."Copy No.")
+            column(CopyNo_AuditRoll; "Audit Roll"."Copy No.")
             {
             }
-            column(Name_SalespersonPurchaser;SalespersonPurchaser.Name)
+            column(Name_SalespersonPurchaser; SalespersonPurchaser.Name)
             {
             }
-            column(RegisterNo_Register;Register."Register No.")
+            column(RegisterNo_Register; Register."Register No.")
             {
             }
-            column(Name_Register;Register.Name)
+            column(Name_Register; Register.Name)
             {
             }
-            column(Addres_Register;Register.Address)
+            column(Addres_Register; Register.Address)
             {
             }
-            column(City_Register;Register.City)
+            column(City_Register; Register.City)
             {
             }
-            column(PostCode_Register;Register."Post Code")
+            column(PostCode_Register; Register."Post Code")
             {
             }
-            column(Telephone_Register;Register."Phone No.")
+            column(Telephone_Register; Register."Phone No.")
             {
             }
-            column(Email_Register;Register."E-mail")
+            column(Email_Register; Register."E-mail")
             {
             }
-            column(Website_Register;Register.Website)
+            column(Website_Register; Register.Website)
             {
             }
-            column(VATRegNo;CompanyInformation."VAT Registration No.")
+            column(VATRegNo; CompanyInformation."VAT Registration No.")
             {
             }
-            column(BankAccNo;CompanyInformation."Bank Account No.")
+            column(BankAccNo; CompanyInformation."Bank Account No.")
             {
             }
-            column(IBANNo;CompanyInformation.IBAN)
+            column(IBANNo; CompanyInformation.IBAN)
             {
             }
-            column(ContactNo;ContactNo)
+            column(ContactNo; ContactNo)
             {
             }
-            column(ContactName;ContactName)
+            column(ContactName; ContactName)
             {
             }
-            column(ContactAddress;ContactAddress)
+            column(ContactAddress; ContactAddress)
             {
             }
-            column(ContactCity;ContactCity)
+            column(ContactCity; ContactCity)
             {
             }
-            column(ContactPostCode;ContactPostCode)
+            column(ContactPostCode; ContactPostCode)
             {
             }
-            dataitem(AuditRollSale;"Audit Roll")
+            dataitem(AuditRollSale; "Audit Roll")
             {
-                DataItemLink = "Register No."=FIELD("Register No."),"Sales Ticket No."=FIELD("Sales Ticket No.");
-                DataItemTableView = SORTING("Sales Ticket No.","Line No.") WHERE("Sale Type"=FILTER("Debit Sale"));
-                column(LineNo_AuditRollSale;"Line No.")
+                DataItemLink = "Register No." = FIELD("Register No."), "Sales Ticket No." = FIELD("Sales Ticket No.");
+                DataItemTableView = SORTING("Sales Ticket No.", "Line No.") WHERE("Sale Type" = FILTER("Debit Sale"));
+                column(LineNo_AuditRollSale; "Line No.")
                 {
                 }
-                column(Type_AuditRollSale;Type)
+                column(Type_AuditRollSale; Type)
                 {
                 }
-                column(AmountLine;AmountLine)
+                column(AmountLine; AmountLine)
                 {
                 }
-                column(DescriptionLine;DescriptionLine)
+                column(DescriptionLine; DescriptionLine)
                 {
                 }
-                column(DescriptionLine2;DescriptionLine2)
+                column(DescriptionLine2; DescriptionLine2)
                 {
                 }
-                column(ItemInfo;ItemInfo)
+                column(ItemInfo; ItemInfo)
                 {
                 }
-                column(ItemNo;ItemNo)
+                column(ItemNo; ItemNo)
                 {
                 }
-                column(UnitOfMeasure;UnitOfMeasure)
+                column(UnitOfMeasure; UnitOfMeasure)
                 {
                 }
-                column(VariantCode;VariantCode)
+                column(VariantCode; VariantCode)
                 {
                 }
-                column(LineDiscountPct;LineDiscountPct)
+                column(LineDiscountPct; LineDiscountPct)
                 {
                 }
-                column(LineDiscountPctLine;LineDiscountPctLine)
+                column(LineDiscountPctLine; LineDiscountPctLine)
                 {
                 }
-                column(QuantityLine;QuantityLine)
+                column(QuantityLine; QuantityLine)
                 {
                 }
-                column(SerialNo_AuditrollSale;"Serial No.")
+                column(SerialNo_AuditrollSale; "Serial No.")
                 {
                 }
-                column(SerialNoNotCreate_AuditRollSale;"Serial No. not Created")
+                column(SerialNoNotCreate_AuditRollSale; "Serial No. not Created")
                 {
                 }
-                column(SeriealNoTxt;SerialNoTxt)
+                column(SeriealNoTxt; SerialNoTxt)
                 {
                 }
-                column(VariantDesc;VariantDesc)
+                column(VariantDesc; VariantDesc)
                 {
                 }
-                column(UnitPriceExclDiscountLine;UnitPriceExclDiscountLine)
+                column(UnitPriceExclDiscountLine; UnitPriceExclDiscountLine)
                 {
                 }
-                column(UnitPriceInclDiscountLine;UnitPriceInclDiscountLine)
+                column(UnitPriceInclDiscountLine; UnitPriceInclDiscountLine)
                 {
                 }
 
@@ -143,21 +143,21 @@ report 6014440 "Sales Doc Confirmation A4"
                     DescriptionLine := Description;
 
                     if (Type = Type::Item) then begin
-                      ItemNo := "No.";
-                      UnitOfMeasure := "Unit of Measure Code";
-                      DescriptionLine2 := "Description 2";
-                      VariantCode := "Variant Code";
-                      LineDiscountPct := "Line Discount %";
-                      LineDiscountPctLine := Format(LineDiscountPct);
-                      AuditRollTotals."VAT %" := "VAT %";
+                        ItemNo := "No.";
+                        UnitOfMeasure := "Unit of Measure Code";
+                        DescriptionLine2 := "Description 2";
+                        VariantCode := "Variant Code";
+                        LineDiscountPct := "Line Discount %";
+                        LineDiscountPctLine := Format(LineDiscountPct);
+                        AuditRollTotals."VAT %" := "VAT %";
 
-                      if (Quantity <> 0) then begin
-                        UnitPriceExclDiscountLine := Format(("Amount Including VAT" + "Line Discount Amount") / Quantity);
-                        UnitPriceInclDiscountLine := Format("Amount Including VAT" / Quantity);
-                        QuantityLine := Format(Quantity);
+                        if (Quantity <> 0) then begin
+                            UnitPriceExclDiscountLine := Format(("Amount Including VAT" + "Line Discount Amount") / Quantity);
+                            UnitPriceInclDiscountLine := Format("Amount Including VAT" / Quantity);
+                            QuantityLine := Format(Quantity);
                         end;
 
-                      AmountLine := "Amount Including VAT";
+                        AmountLine := "Amount Including VAT";
                     end;
 
                     PrintLineVariantDesc(AuditRollSale);
@@ -178,47 +178,49 @@ report 6014440 "Sales Doc Confirmation A4"
                 AuditRollTotals."Line Discount Amount" := 0;
 
                 if Customer.Get("Customer No.") and ("Customer Type" = "Customer Type"::"Ord.") then
-                  PrintCustomerInfo
-                else if Contact.Get("Customer No.") and ("Customer Type" = "Customer Type"::Cash) then
-                  PrintContactInfo
-                else if Customer.Get("Customer No.") and ("Customer Type" = "Customer Type"::"Ord.") then
-                  PrintStaffSaleInfo;
+                    PrintCustomerInfo
+                else
+                    if Contact.Get("Customer No.") and ("Customer Type" = "Customer Type"::Cash) then
+                        PrintContactInfo
+                    else
+                        if Customer.Get("Customer No.") and ("Customer Type" = "Customer Type"::"Ord.") then
+                            PrintStaffSaleInfo;
             end;
         }
-        dataitem("Integer";"Integer")
+        dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number=CONST(1));
-            column(Number_Integer;Integer.Number)
+            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            column(Number_Integer; Integer.Number)
             {
             }
-            column(LCYCode_GeneralLedgerSetup;StrSubstNo(Total,GeneralLedgerSetup."LCY Code"))
+            column(LCYCode_GeneralLedgerSetup; StrSubstNo(Total, GeneralLedgerSetup."LCY Code"))
             {
             }
-            column(TotalAmountInclVAT;AuditRollTotals."Amount Including VAT")
+            column(TotalAmountInclVAT; AuditRollTotals."Amount Including VAT")
             {
             }
-            column(TotalDiscountPct;TotalDiscountPct)
+            column(TotalDiscountPct; TotalDiscountPct)
             {
             }
-            column(TotalLineDiscount;AuditRollTotals."Line Discount Amount")
+            column(TotalLineDiscount; AuditRollTotals."Line Discount Amount")
             {
             }
-            column(TotalAmountExclVAT;AuditRollTotals.Amount)
+            column(TotalAmountExclVAT; AuditRollTotals.Amount)
             {
             }
-            column(TotalVATAmount;AuditRollTotals."Amount Including VAT" - AuditRollTotals.Amount)
+            column(TotalVATAmount; AuditRollTotals."Amount Including VAT" - AuditRollTotals.Amount)
             {
             }
-            column(Reference_AuditRoll;"Audit Roll".Reference)
+            column(Reference_AuditRoll; "Audit Roll".Reference)
             {
             }
-            column(ShowAmountInclVatPayment;ShowAmountInclVatPayment)
+            column(ShowAmountInclVatPayment; ShowAmountInclVatPayment)
             {
             }
-            column(ShowAdditionalInfo;ShowAdditionalInfo)
+            column(ShowAdditionalInfo; ShowAdditionalInfo)
             {
             }
-            column(VATPct;Format(AuditRollTotals."VAT %") + ' %')
+            column(VATPct; Format(AuditRollTotals."VAT %") + ' %')
             {
             }
 
@@ -227,7 +229,7 @@ report 6014440 "Sales Doc Confirmation A4"
                 if GeneralLedgerSetup.Get then;
 
                 if (AuditRollTotals."Line Discount Amount") <> 0 then
-                  TotalDiscountPct := Format(Round((AuditRollTotals."Line Discount Amount" * 100) / (AuditRollTotals."Line Discount Amount" + AuditRollTotals."Amount Including VAT"),0.1) ) + ' %';
+                    TotalDiscountPct := Format(Round((AuditRollTotals."Line Discount Amount" * 100) / (AuditRollTotals."Line Discount Amount" + AuditRollTotals."Amount Including VAT"), 0.1)) + ' %';
             end;
         }
     }
@@ -363,11 +365,11 @@ report 6014440 "Sales Doc Confirmation A4"
     begin
         if (Customer."Customer Price Group" = RetailSetup."Staff Price Group") or
            (Customer."Customer Disc. Group" = RetailSetup."Staff Disc. Group") then begin
-          ContactNo := Text0001;
-          ContactName := Customer.Name;
-          ContactAddress := Customer."No.";
-          ContactPostCode := '';
-          ContactCity := '';
+            ContactNo := Text0001;
+            ContactName := Customer.Name;
+            ContactAddress := Customer."No.";
+            ContactPostCode := '';
+            ContactCity := '';
         end;
     end;
 
@@ -376,14 +378,14 @@ report 6014440 "Sales Doc Confirmation A4"
         ItemVariant: Record "Item Variant";
     begin
         with AuditRoll do begin
-          //Variety
-          if ItemVariant.Get("No.", "Variant Code") and
-             ((ItemVariant."Variety 1" <> '') or
-              (ItemVariant."Variety 2" <> '') or
-              (ItemVariant."Variety 3" <> '') or
-              (ItemVariant."Variety 4" <> '')) then begin
-            VariantDesc := ItemVariant.Description;
-          end;
+            //Variety
+            if ItemVariant.Get("No.", "Variant Code") and
+               ((ItemVariant."Variety 1" <> '') or
+                (ItemVariant."Variety 2" <> '') or
+                (ItemVariant."Variety 3" <> '') or
+                (ItemVariant."Variety 4" <> '')) then begin
+                VariantDesc := ItemVariant.Description;
+            end;
         end;
     end;
 
@@ -412,12 +414,12 @@ report 6014440 "Sales Doc Confirmation A4"
     procedure AuditRollSalesOnAfterGetRecord(var AuditRollSales: Record "Audit Roll") DoNotSkip: Boolean
     begin
         with AuditRollSales do begin
-          if (Type = Type::Item) and Item.Get("No.") and Item."No Print on Reciept" then
-             exit(false);
+            if (Type = Type::Item) and Item.Get("No.") and Item."No Print on Reciept" then
+                exit(false);
 
-         //* If there is a returned item, display the return receipt *
-          if Quantity < 0 then
-            FlagReturnSale := true;
+            //* If there is a returned item, display the return receipt *
+            if Quantity < 0 then
+                FlagReturnSale := true;
         end;
 
         CalcSaleLineTotals(AuditRollSales);

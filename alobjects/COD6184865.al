@@ -1,26 +1,38 @@
 codeunit 6184865 "External Storage Job Queue"
 {
     // NPR5.54/ALST/20200324 CASE 394895 Object created
+    // NPR5.55/ALST/20200324 CASE 394895 fixed conflict with AL
+    // NPR5.55/AlST/20200609 CASE 387570 added Job dependency
 
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
     begin
-        Code(Rec);
+        //-NPR5.55
+        //Run(Rec);
+        ExecuteCodeunit(Rec);
+        //+NPR5.55
     end;
 
     var
         LengthExceededErr: Label 'Parameter string must be less than or equal to 250 charracters';
         MandatoryParameterErr: Label 'Parameter value cannot be empty in job queue, please select "%1"';
         ParameterNrErr: Label 'Wrong number of parameters in "%1" opertion %2 takes %3 parameters';
+        JobIDErr: Label 'Job ID is not the correct format, please check dependency in the parameter string';
+        JobQueueNotExistErr: Label 'The job set as dependency for the current entry does not exist, please check dependency in the parameter string';
 
-    local procedure Code(JobQueueEntry: Record "Job Queue Entry")
+    local procedure ExecuteCodeunit(JobQueueEntry: Record "Job Queue Entry")
     var
         TempStorageOperationType: Record "Storage Operation Type" temporary;
         TempStorageOperationParameter: Record "Storage Operation Parameter" temporary;
         ExternalStorageInterface: Codeunit "External Storage Interface";
     begin
         JobQueueEntry.TestField("Parameter String");
+
+        //-NPR5.55 [387570]
+        if not CheckDependencyJobStatusSuccessful(GetDependency(JobQueueEntry."Parameter String")) then
+          exit;
+        //+NPR5.55 [387570]
 
         GetOperationParameters(JobQueueEntry, TempStorageOperationParameter);
 
@@ -70,6 +82,42 @@ codeunit 6184865 "External Storage Job Queue"
         until TempStorageOperationParameter.Next = 0;
 
         TempStorageOperationParameter.FindSet;
+    end;
+
+    local procedure GetDependency(var ParameterString: Text) JobID: Guid
+    var
+        JobIDPosition: Integer;
+    begin
+        //-NPR5.55 [387570]
+        JobIDPosition := StrPos(ParameterString, '{');
+        if JobIDPosition = 0 then
+          exit;
+
+        if not Evaluate(JobID, CopyStr(ParameterString, JobIDPosition)) then
+          Error(JobIDErr);
+
+        ParameterString := CopyStr(ParameterString, 1, JobIDPosition - 1);
+        //+NPR5.55 [387570]
+    end;
+
+    local procedure CheckDependencyJobStatusSuccessful(JobID: Guid): Boolean
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueLogEntry: Record "Job Queue Log Entry";
+    begin
+        //-NPR5.55 [387570]
+        if not JobQueueEntry.Get(JobID) then
+          Error(JobQueueNotExistErr);
+
+        if JobQueueEntry.Status = JobQueueEntry.Status::"On Hold" then
+          exit;
+
+        JobQueueLogEntry.SetRange(ID, JobID);
+        if not JobQueueLogEntry.FindLast then
+          exit(true);
+
+        exit(JobQueueLogEntry.Status = JobQueueLogEntry.Status::Success);
+        //+NPR5.55 [387570]
     end;
 
     procedure GenerateJobQueueParameter(StorageID: Text; var StorageOperationType: Record "Storage Operation Type"; var TempStorageOperationParameter: Record "Storage Operation Parameter" temporary) JobQParam: Text

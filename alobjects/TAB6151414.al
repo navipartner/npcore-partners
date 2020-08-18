@@ -1,4 +1,4 @@
-table 6151414 "Magento Item Group"
+table 6151414 "Magento Category"
 {
     // MAG1.00/MH  /20150113  CASE 199932 Refactored Object from Web Integration
     // MAG1.01/MH  /20150115  CASE 199932 Updated Picture Lookup and NaviEditor Plugin
@@ -15,16 +15,18 @@ table 6151414 "Magento Item Group"
     // MAG2.17/TS  /20181031  CASE 333862 Seo Link should be filled as well
     // MAG2.20/BHR /20190409  CASE 346352 Field 130 "Short Description"
     // MAG2.22/MHA /20190614  CASE 358258 Extended field 6060021 "Meta Title" from 70 to 100
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
-    Caption = 'Magento Item Group';
-    DrillDownPageID = "Magento Item Group List";
-    LookupPageID = "Magento Item Group List";
+    Caption = 'Magento Category';
+    DrillDownPageID = "Magento Category List";
+    LookupPageID = "Magento Category List";
 
     fields
     {
-        field(1;"No.";Code[20])
+        field(1;Id;Code[20])
         {
-            Caption = 'No.';
+            Caption = 'Id';
+            Description = 'MAG2.26';
             NotBlank = true;
         }
         field(2;Name;Text[50])
@@ -39,14 +41,15 @@ table 6151414 "Magento Item Group"
                 //+MAG2.17 [333862]
             end;
         }
-        field(4;"Parent Item Group No.";Code[20])
+        field(4;"Parent Category Id";Code[20])
         {
-            Caption = 'Parent Item Group No.';
-            TableRelation = "Magento Item Group";
+            Caption = 'Parent Category Id';
+            Description = 'MAG2.26';
+            TableRelation = "Magento Category";
 
             trigger OnValidate()
             var
-                Overgruppe: Record "Magento Item Group";
+                Overgruppe: Record "Magento Category";
                 "---": Integer;
                 ok: Boolean;
             begin
@@ -63,8 +66,9 @@ table 6151414 "Magento Item Group"
         }
         field(25;"Has Child Groups";Boolean)
         {
-            CalcFormula = Exist("Magento Item Group" WHERE ("Parent Item Group No."=FIELD("No.")));
+            CalcFormula = Exist("Magento Category" WHERE ("Parent Category Id"=FIELD(Id)));
             Caption = 'Has Child Groups';
+            Description = 'MAG2.26';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -129,7 +133,7 @@ table 6151414 "Magento Item Group"
         }
         field(1000;"Item Count";Integer)
         {
-            CalcFormula = Count("Magento Item Group Link" WHERE ("Item Group"=FIELD("No.")));
+            CalcFormula = Count("Magento Category Link" WHERE ("Category Id"=FIELD(Id)));
             Caption = 'Item Count';
             Editable = false;
             FieldClass = FlowField;
@@ -193,7 +197,7 @@ table 6151414 "Magento Item Group"
 
     keys
     {
-        key(Key1;"No.")
+        key(Key1;Id)
         {
         }
         key(Key2;Path)
@@ -207,32 +211,41 @@ table 6151414 "Magento Item Group"
 
     trigger OnDelete()
     var
-        ItemGroups: Record "Magento Item Group";
-        MagentoItemGroupLink: Record "Magento Item Group Link";
+        MagentoCategory: Record "Magento Category";
+        MagentoCategoryLink: Record "Magento Category Link";
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
         if (not SilentDelete) and (not GuiAllowed) then
           if not Confirm(Text000,false) then
             Error('');
 
-        ItemGroups.SetRange("Parent Item Group No.","No.");
-        ItemGroups.SetSilentDelete(true);
-        if ItemGroups.FindSet then repeat
-          ItemGroups.Delete(true);
-        until ItemGroups.Next = 0;
+        MagentoCategory.SetRange("Parent Category Id",Id);
+        MagentoCategory.SetSilentDelete(true);
+        if MagentoCategory.FindSet then repeat
+          MagentoCategory.Delete(true);
+        until MagentoCategory.Next = 0;
 
+        //-MAG2.26 [404580]
+        if (not SilentDelete) and (not GuiAllowed) then
+        //+MAG2.26 [404580]
         //-MAG1.20
-        if not Confirm(Text000,false) then
-          Error('');
-        MagentoItemGroupLink.SetRange("Item Group","No.");
-        if MagentoItemGroupLink.FindSet then repeat
-           MagentoItemGroupLink.Delete(true);
-        until MagentoItemGroupLink.Next = 0;
+          if not Confirm(Text000,false) then
+            Error('');
+        MagentoCategoryLink.SetRange("Category Id",Id);
+        if MagentoCategoryLink.FindSet then repeat
+           MagentoCategoryLink.Delete(true);
+        until MagentoCategoryLink.Next = 0;
         //+MAG1.20
     end;
 
     trigger OnInsert()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
-        TestField(Name);
+        //-MAG2.26 [404580]
+        if MagentoSetupMgt.HasSetupCategories() then
+          exit;
+        //+MAG2.26 [404580]
 
         Path := GetPath();
         //-MAG1.21
@@ -241,8 +254,13 @@ table 6151414 "Magento Item Group"
     end;
 
     trigger OnModify()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
-        TestField(Name);
+        //-MAG2.26 [404580]
+        if MagentoSetupMgt.HasSetupCategories() then
+          exit;
+        //+MAG2.26 [404580]
 
         Path := GetPath();
         //-MAG1.21
@@ -253,58 +271,56 @@ table 6151414 "Magento Item Group"
 
     var
         NaviConnectFunctions: Codeunit "Magento Functions";
-        Text000: Label 'Do you wish to delete this category , its subcategories and all the item links  ?';
+        Text000: Label 'Do you wish to delete this category with its subcategories and all the item links?';
         SilentDelete: Boolean;
-        Error001: Label 'Renamed is not allowed';
-        Error002: Label 'Child Item Groups must be numbered with the same start number as the parent (%1##)';
 
     procedure GetChildrenCount() ChildrenCount: Integer
     var
-        ItemGroup: Record "Magento Item Group";
+        MagentoCategory: Record "Magento Category";
     begin
-        ItemGroup.SetRange("Parent Item Group No.","No.");
-        ChildrenCount := ItemGroup.Count;
-        if ItemGroup.FindSet then
+        MagentoCategory.SetRange("Parent Category Id",Id);
+        ChildrenCount := MagentoCategory.Count;
+        if MagentoCategory.FindSet then
           repeat
-            ChildrenCount += ItemGroup.GetChildrenCount();
-          until ItemGroup.Next = 0;
+            ChildrenCount += MagentoCategory.GetChildrenCount();
+          until MagentoCategory.Next = 0;
 
         exit(ChildrenCount);
     end;
 
     procedure GetNewChildGroupNo() NewChildGroupNo: Code[20]
     var
-        ItemGroup: Record "Magento Item Group";
+        MagentoCategory: Record "Magento Category";
     begin
-        ItemGroup.SetRange("Parent Item Group No.","No.");
-        if not ItemGroup.FindLast then
-          exit("No." + '00');
+        MagentoCategory.SetRange("Parent Category Id",Id);
+        if not MagentoCategory.FindLast then
+          exit(Id + '00');
 
-        exit(IncStr(ItemGroup."No."));
+        exit(IncStr(MagentoCategory.Id));
     end;
 
-    procedure GetPath() ItemGroupPath: Text[250]
+    procedure GetPath() MagentoCategoryPath: Text[250]
     var
-        ItemGroup: Record "Magento Item Group";
+        MagentoCategory: Record "Magento Category";
     begin
-        ItemGroupPath := "No.";
-        if ItemGroup.Get("Parent Item Group No.") then repeat
-          ItemGroupPath := ItemGroup."No." + '/' + ItemGroupPath;
-        until (not ItemGroup.Get(ItemGroup."Parent Item Group No.")) or (ItemGroup."No." = '');
+        MagentoCategoryPath := Id;
+        if MagentoCategory.Get("Parent Category Id") then repeat
+          MagentoCategoryPath := MagentoCategory.Id + '/' + MagentoCategoryPath;
+        until (not MagentoCategory.Get(MagentoCategory."Parent Category Id")) or (MagentoCategory.Id = '');
 
-        exit(ItemGroupPath);
+        exit(MagentoCategoryPath);
     end;
 
     local procedure GetRootNo() RootNo: Code[20]
     var
-        ItemGroup: Record "Magento Item Group";
+        MagentoCategory: Record "Magento Category";
     begin
         //-MAG1.21
         if Root then
-          exit("No.");
+          exit(Id);
 
-        if ItemGroup.Get("Parent Item Group No.") then;
-          exit(ItemGroup."Root No.");
+        if MagentoCategory.Get("Parent Category Id") then;
+          exit(MagentoCategory."Root No.");
 
         exit('');
         //+MAG1.21
@@ -317,24 +333,25 @@ table 6151414 "Magento Item Group"
 
     procedure UpdateChildPath()
     var
-        ItemGroup: Record "Magento Item Group";
+        MagentoCategory: Record "Magento Category";
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         NewPath: Text;
     begin
-        ItemGroup.SetRange("Parent Item Group No.","No.");
-        if ItemGroup.FindSet then
+        MagentoCategory.SetRange("Parent Category Id",Id);
+        if MagentoCategory.FindSet then
           repeat
             //-MAG1.21
-            //ItemGroup.Path := Path + '/' + ItemGroup."No.";
-            //ItemGroup.MODIFY;
-            NewPath := Path + '/' + ItemGroup."No.";
-            if (ItemGroup.Path <> NewPath) or (ItemGroup."Root No." <> "Root No.") then begin
-              ItemGroup.Path := NewPath;
-              ItemGroup."Root No." := "Root No.";
-              ItemGroup.Modify;
+            //MagentoCategory.Path := Path + '/' + MagentoCategory.Id;
+            //MagentoCategory.MODIFY;
+            NewPath := Path + '/' + MagentoCategory.Id;
+            if (MagentoCategory.Path <> NewPath) or (MagentoCategory."Root No." <> "Root No.") then begin
+              MagentoCategory.Path := NewPath;
+              MagentoCategory."Root No." := "Root No.";
+              MagentoCategory.Modify;
             end;
             //+MAG1.21
-            ItemGroup.UpdateChildPath();
-          until ItemGroup.Next = 0;
+            MagentoCategory.UpdateChildPath();
+          until MagentoCategory.Next = 0;
     end;
 }
 

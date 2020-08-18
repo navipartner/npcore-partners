@@ -1,6 +1,7 @@
 codeunit 6184532 "EFT NETSCloud Integration"
 {
     // NPR5.54/MMV /20200129 CASE 364340 Created object
+    // NPR5.55/MMV /20200525 CASE 405984 Fixed frontend resume behaviour after lookup prompt.
 
 
     trigger OnRun()
@@ -268,8 +269,10 @@ codeunit 6184532 "EFT NETSCloud Integration"
         if not EFTTransactionRequest.IsType(IntegrationType()) then
           exit;
 
+        //-NPR5.55 [405984]
         with EFTTransactionRequest do
-          Skip := ("Processing Type" in ["Processing Type"::SETUP, "Processing Type"::VOID, "Processing Type"::LOOK_UP, "Processing Type"::AUXILIARY, "Processing Type"::CLOSE]);
+          Skip := ("Processing Type" in ["Processing Type"::SETUP, "Processing Type"::VOID, "Processing Type"::AUXILIARY, "Processing Type"::CLOSE])
+        //+NPR5.55 [405984]
     end;
 
     procedure HandleProtocolResponse(var EftTransactionRequest: Record "EFT Transaction Request")

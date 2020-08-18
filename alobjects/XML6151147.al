@@ -3,6 +3,8 @@ xmlport 6151147 "M2 Item Availability By Period"
     // NPR5.49/TSA /20190305 CASE 345373 Initial Version
     // NPR5.50/TSA /20190528 CASE 345373 Fixed Location Code Filter
     // MAG2.25/TSA /20200303 CASE 380946 Changed request params to lessen data set, increase performance
+    // MAG2.26/TSA /20200428 CASE 401839 Added PlannedReleases and ProjectedInventory for working with reservations
+    // MAG2.26/TSA /20200430 CASE 402599 Added EstimateDateFromVendor, FromVendorCode, EstimatedDateFromLocation, FromLocationCode to the list section as well
 
     Caption = 'Item Availability By Period';
     Encoding = UTF8;
@@ -27,6 +29,7 @@ xmlport 6151147 "M2 Item Availability By Period"
                 }
                 textelement(ViewBy)
                 {
+                    MaxOccurs = Once;
 
                     trigger OnAfterAssignVariable()
                     begin
@@ -163,6 +166,24 @@ xmlport 6151147 "M2 Item Availability By Period"
                                             TxtScheduledInboundStart := Format (ScheduledRcpt, 0, 9);
                                         end;
                                     }
+                                    textattribute(txtplannedreleasesstart)
+                                    {
+                                        XmlName = 'PlannedReleases';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            TxtPlannedReleasesStart := Format (PlannedOrderReleases, 0, 9); //-+MAG2.26 [401839]
+                                        end;
+                                    }
+                                    textattribute(txtplannedreceiptsstart)
+                                    {
+                                        XmlName = 'PlannedReceipts';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            TxtPlannedReceiptsStart := Format (PlannedOrderRcpt, 0, 9); //-+MAG2.26 [401839]
+                                        end;
+                                    }
                                     textattribute(txtavailableinventorystart)
                                     {
                                         XmlName = 'AvailableInventory';
@@ -179,6 +200,15 @@ xmlport 6151147 "M2 Item Availability By Period"
                                         trigger OnBeforePassVariable()
                                         begin
                                             TxtExpectedInventoryStart := Format (ExpectedInventory, 0, 9);
+                                        end;
+                                    }
+                                    textattribute(txtprojectedinventorystart)
+                                    {
+                                        XmlName = 'ProjectedInventory';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            TxtProjectedInventoryStart := Format (ProjAvailableBalance, 0, 9); //-+MAG2.26 [401839]
                                         end;
                                     }
                                     textattribute(txtinventorystart)
@@ -313,6 +343,24 @@ xmlport 6151147 "M2 Item Availability By Period"
                                             TxtScheduledInbound := Format (ScheduledRcpt, 0, 9);
                                         end;
                                     }
+                                    textattribute(txtplannedreleases)
+                                    {
+                                        XmlName = 'PlannedReleases';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            TxtPlannedReleases := Format (PlannedOrderReleases, 0, 9); //-+MAG2.26 [401839]
+                                        end;
+                                    }
+                                    textattribute(txtplannedreceipts)
+                                    {
+                                        XmlName = 'PlannedReceipts';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            TxtPlannedReceipts := Format (PlannedOrderRcpt, 0, 9); //-+MAG2.26 [401839]
+                                        end;
+                                    }
                                     textattribute(txtavailableinventory)
                                     {
                                         XmlName = 'AvailableInventory';
@@ -329,6 +377,15 @@ xmlport 6151147 "M2 Item Availability By Period"
                                         trigger OnBeforePassVariable()
                                         begin
                                             TxtExpectedInventory := Format (ExpectedInventory, 0, 9);
+                                        end;
+                                    }
+                                    textattribute(txtprojectedinventory)
+                                    {
+                                        XmlName = 'ProjectedInventory';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            TxtProjectedInventory := Format (ProjAvailableBalance, 0, 9); //-+MAG2.26 [401839]
                                         end;
                                     }
                                     textattribute(txtinventory)
@@ -367,6 +424,22 @@ xmlport 6151147 "M2 Item Availability By Period"
                                             TxtQtyOnPurchaseOrder := Format (ItemByPeriod."Qty. on Purch. Order");
                                         end;
                                     }
+                                    textattribute(estimatedatefromvendor)
+                                    {
+                                        XmlName = 'EstimatedDateFromVendor';
+                                    }
+                                    textattribute(fromvendorcode)
+                                    {
+                                        XmlName = 'FromVendorCode';
+                                    }
+                                    textattribute(estimateddatefromlocation)
+                                    {
+                                        XmlName = 'EstimatedDateFromLocation';
+                                    }
+                                    textattribute(fromlocationcode)
+                                    {
+                                        XmlName = 'FromLocationCode';
+                                    }
 
                                     trigger OnAfterGetRecord()
                                     var
@@ -395,6 +468,17 @@ xmlport 6151147 "M2 Item Availability By Period"
                                           ProjAvailableBalance,
                                           ExpectedInventory,
                                           QtyAvailable);
+
+                                        //-MAG2.26 [402599]
+                                        M2ServiceLibrary.GetEstimatedDeliveryDate (
+                                          TmpItemResponse."Item No.",
+                                          CustomerNumberIn,
+                                          NormalDate (ItemAvailabilityByPeriod."Period End"),
+                                          EstimateDateFromVendor,
+                                          FromVendorCode,
+                                          EstimatedDateFromLocation,
+                                          FromLocationCode);
+                                        //+MAG2.26 [402599]
                                     end;
                                 }
                             }
@@ -461,7 +545,7 @@ xmlport 6151147 "M2 Item Availability By Period"
 
         //-MAG2.25 [380946]
         if (CustomerNumberIn <> '') then
-          if (Customer.Get ()) then
+          if (Customer.Get (CustomerNumberIn)) then
             if (Customer."Location Code" <> '') then
               if (LocationCodeIn = '') then
                 LocationCodeIn := Customer."Location Code";

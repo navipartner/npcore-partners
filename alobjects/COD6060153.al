@@ -17,6 +17,11 @@ codeunit 6060153 "Event Email Management"
     // NPR5.43/TJ  /20180322 CASE 262079 Adding ticket URLs to e-mail body
     // NPR5.45/TJ  /20180530 CASE 317448 Changed TryFunction property of function ProcessMailItem from Yes to default
     //                                   Adjusted other code to reflect TryFunction change
+    // NPR5.55/TJ  /20200204 CASE 374887 Removed unnecessary record get
+    //                                   Added parameter CalledFromFieldNo to function SendEmail
+    //                                   Sending an e-mail without a template now triggers a confirmation
+    //                                   Updated older not properly versioned code
+    //                                   New functions SetEventExcIntTemplate and SetAskOnce
 
 
     trigger OnRun()
@@ -32,6 +37,8 @@ codeunit 6060153 "Event Email Management"
         NoReportLayout: Label 'There is no report layout. Please create one either from Words Layout page or Report Layout Selection and set it as a default.';
         UseTemplate: Boolean;
         EventExchIntTemplate: Record "Event Exch. Int. Template";
+        NoEmailTemplate: Label 'No email template was found/selected. Email will be sent without one. Do you want to continue?';
+        EmailCounter: Integer;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterInsertEvent', '', false, false)]
     local procedure JobOnAfterInsert(var Rec: Record Job;RunTrigger: Boolean)
@@ -77,15 +84,22 @@ codeunit 6060153 "Event Email Management"
         Rec.Modify;
     end;
 
-    procedure SendEMail(var Job: Record Job;MailFor: Option Customer,Team)
+    procedure SendEMail(var Job: Record Job;MailFor: Option Customer,Team;CalledFromFieldNo: Integer)
     var
         StatusWarning: Label 'Event is in status %1. Do you still want to send e-mail?';
         RecRef: RecordRef;
         Processed: Boolean;
     begin
+        //-NPR5.55 [374887]
+        if EmailCounter = 0 then
+        //+NPR5.55 [374887]
         if not Confirm(ConfirmSendMail) then
           exit;
         
+        //-NPR5.55 [374887]
+        EventEWSMgt.SetSkipLookup(CalledFromFieldNo <> 0);
+        if CalledFromFieldNo = 0 then
+        //+NPR5.55 [374887]
         if not EventEWSMgt.CheckStatus(Job,false) then
           if not Confirm(StrSubstNo(StatusWarning,Format(Job."Event Status"))) then
             exit;
@@ -93,9 +107,18 @@ codeunit 6060153 "Event Email Management"
         if MailFor = MailFor::Customer then
           Job.TestField("Bill-to E-Mail");
         
-        //-277938 [277938]
+        //-NPR5.55 [374887]
+        if not UseTemplate then
+        //+NPR5.55 [374887]
+        //-NPR5.34 [277938]
         UseTemplate := EventEWSMgt.UseTemplate(Job,MailFor,0,EventExchIntTemplate);
-        //+277938 [277938]
+        //+NPR5.34 [277938]
+        
+        //-NPR5.55 [374887]
+        if not UseTemplate then
+          if not Confirm(NoEmailTemplate) then
+            exit;
+        //+NPR5.55 [374887]
         
         JobsSetup.Get();
         //-NPR5.38 [285194]
@@ -138,7 +161,9 @@ codeunit 6060153 "Event Email Management"
         //IF ProcessMailItemWithLog(RecRef,MailFor) THEN
         Processed := ProcessMailItemWithLog(RecRef,MailFor);
         RecRef.SetTable(Job);
-        Job.Get(Job."No.");
+        //-NPR5.55 [374887]
+        //Job.GET(Job."No.");
+        //+NPR5.55 [374887]
         if Processed then
         //+NPR5.34 [277938]
         
@@ -150,7 +175,9 @@ codeunit 6060153 "Event Email Management"
         //-NPR5.32 [275946]
         //END;
         //+NPR5.32 [275946]
-        
+        //-NPR5.55 [374887]
+        if CalledFromFieldNo = 0 then
+        //+NPR5.55 [374887]
         Job.Modify;
 
     end;
@@ -169,9 +196,9 @@ codeunit 6060153 "Event Email Management"
         JobsSetup.Get();
         Job.Get(JobPlanningLine."Job No.");
         
-        //-277938 [277938]
+        //-NPR5.34 [277938]
         UseTemplate := EventEWSMgt.UseTemplate(Job,1,0,EventExchIntTemplate);
-        //+277938 [277938]
+        //+NPR5.34 [277938]
         
         //-NPR5.38 [285194]
         //-NPR5.32 [275946]
@@ -413,8 +440,12 @@ codeunit 6060153 "Event Email Management"
           //ERROR('');
           exit(false);
           //+NPR5.45 [317448]
-        if RecRef.Number = DATABASE::Job then
-          RecRef.Get(Job.RecordId);
+        //-NPR5.55 [374887]
+        /*
+        IF RecRef.NUMBER = DATABASE::Job THEN
+          RecRef.GET(Job.RECORDID);
+        */
+        //+NPR5.55 [374887]
         //+NPR5.32 [275946]
         FileMgt.DeleteServerFile(FileName);
         //-NPR5.45 [317448]
@@ -483,6 +514,21 @@ codeunit 6060153 "Event Email Management"
     local procedure EMailMessageSendAndSaveCopy(EmailMessage: DotNet npNetEmailMessage)
     begin
         EmailMessage.SendAndSaveCopy();
+    end;
+
+    procedure SetEventExcIntTemplate(EventExchIntTemplateHere: Record "Event Exch. Int. Template")
+    begin
+        //-NPR5.55 [374887]
+        UseTemplate := true;
+        EventExchIntTemplate := EventExchIntTemplateHere;
+        //+NPR5.55 [374887]
+    end;
+
+    procedure SetAskOnce(EmailCounterHere: Integer)
+    begin
+        //-NPR5.55 [374887]
+        EmailCounter := EmailCounterHere;
+        //+NPR5.55 [374887]
     end;
 }
 

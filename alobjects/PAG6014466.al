@@ -14,6 +14,7 @@ page 6014466 "Quantity Discount Card"
     // source expression to the control's property you want to change.
     // NPR5.30/BHR /20170223  CASE 265244 Copy Discount Functionality
     // NPR5.46/JDH /20180927 CASE 294354 Send to retail journal recoded
+    // NPR5.55/TJ  /20200420 CASE 400524 Added dimension action with ActionContainer = RelatedInformation
 
     Caption = 'Multiple Price Header';
     SourceTable = "Quantity Discount Header";
@@ -83,6 +84,18 @@ page 6014466 "Quantity Discount Card"
 
     actions
     {
+        area(navigation)
+        {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID"=CONST(6014439),
+                              "No."=FIELD("Main No.");
+                ShortCutKey = 'Shift+Ctrl+D';
+            }
+        }
         area(processing)
         {
             group(Functions)

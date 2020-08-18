@@ -198,7 +198,7 @@ codeunit 6151019 "NpRv Module Validate - Global"
     end;
 
     [EventSubscriber(ObjectType::Table, 6151015, 'OnBeforeDeleteEvent', '', true, true)]
-    local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NpRv Sale Line POS Voucher";RunTrigger: Boolean)
+    local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NpRv Sales Line";RunTrigger: Boolean)
     begin
         //-NPR5.49 [342811]
         if Rec.IsTemporary then
@@ -209,11 +209,11 @@ codeunit 6151019 "NpRv Module Validate - Global"
     end;
 
     [TryFunction]
-    local procedure TryCancelReservation(NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher")
+    local procedure TryCancelReservation(NpRvSaleLinePOSVoucher: Record "NpRv Sales Line")
     var
         NpRvGlobalVoucherSetup: Record "NpRv Global Voucher Setup";
         NpRvVoucherType: Record "NpRv Voucher Type";
-        SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
+        SaleLinePOSReference: Record "NpRv Sales Line Reference";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         Credential: DotNet npNetNetworkCredential;
         HttpWebRequest: DotNet npNetHttpWebRequest;

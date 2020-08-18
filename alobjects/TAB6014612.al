@@ -4,6 +4,7 @@ table 6014612 "Retail Campaign Items"
     // NPR5.41/JKL /20180419 CASE 299278  added campaign profit calc + vendor item no from item + units pr. parcel + unit purchase price
     // NPR5.42/JKL /20180523 CASE 299272  changed calc for profit + current purchprice
     // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() and removed redundant VAT calculation
+    // NPR5.55/ALST/20200508 CASE 397967 calculating quantity sold
 
     Caption = 'Period Discount Items';
 
@@ -376,8 +377,8 @@ table 6014612 "Retail Campaign Items"
             RetailComment.SETRANGE("No.",Code);
             RetailComment.SETRANGE("No. 2","Item No.");
             {FORMREF
-            NPRBem�rkningslinjeFrm.SETTABLEVIEW(NPRBem�rkningslinjeRec);
-            NPRBem�rkningslinjeFrm.RUNMODAL;
+            NPRBemærkningslinjeFrm.SETTABLEVIEW(NPRBemærkningslinjeRec);
+            NPRBemærkningslinjeFrm.RUNMODAL;
             }
           END;
         */
@@ -467,6 +468,9 @@ table 6014612 "Retail Campaign Items"
                                     if RetailComment.FindFirst then
                                         "Comment 2" := CopyStr(RetailComment.Comment, 1, 50);
                                     CalcProfit;
+                      //-NPR5.55 [397967]
+                      "Quantity Sold" := GetQuantitySold;
+                      //+NPR5.55 [397967]
                                     if Insert then;
                                 until PeriodDiscountLine.Next = 0;
                             end;
@@ -531,7 +535,9 @@ table 6014612 "Retail Campaign Items"
                                     "Item Discount Qty." := MixedDiscount."Item Discount Qty.";
                                     "Item Discount %" := MixedDiscount."Item Discount %";
                                     "Mix Type" := MixedDiscount."Mix Type" + 1;
-
+                      //-NPR5.55 [397967]
+                      "Quantity Sold" := GetQuantitySold;
+                      //+NPR5.55 [397967]
                                     if Insert then;
                                 until MixedDiscountLine.Next = 0;
                             end;
@@ -599,6 +605,34 @@ table 6014612 "Retail Campaign Items"
         //+NPR5.42 [299272]
 
         //+NPR5.41 [299278]
+    end;
+
+    local procedure GetQuantitySold() QuantitySold: Decimal
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        //-NPR5.55 [397967]
+        ItemLedgerEntry.SetRange("Item No.", "Item No.");
+        ItemLedgerEntry.SetFilter("Document Date", '%1..%2', "Starting Date", "Ending Date");
+        ItemLedgerEntry.SetFilter(Quantity, '<0');
+        case "Disc. Type" of
+          "Disc. Type"::Periodic:
+            ItemLedgerEntry.SetRange("Discount Type", ItemLedgerEntry."Discount Type"::Period);
+          "Disc. Type"::Mix:
+            ItemLedgerEntry.SetRange("Discount Type", ItemLedgerEntry."Discount Type"::Mixed);
+          else
+            exit;
+        end;
+        ItemLedgerEntry.SetRange("Discount Code", "Disc. Code");
+        ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
+
+        if not ItemLedgerEntry.FindSet then
+          exit;
+
+        repeat
+          QuantitySold -= ItemLedgerEntry.Quantity;
+        until ItemLedgerEntry.Next = 0;
+        //+NPR5.55 [397967]
     end;
 }
 

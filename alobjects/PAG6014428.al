@@ -2,10 +2,10 @@ page 6014428 "Salesperson Card"
 {
     // 
     // //-3.1a Ved Nikolai Pedersen
-    //   Tilf�jet F9 �bern form 5117
+    //   Tilf¢jet F9 åbern form 5117
     // 
-    // //-NPR3.c d.25.05.05 v. Simon Sch�bel
-    //   Overs�ttelse
+    // //-NPR3.c d.25.05.05 v. Simon Sch¢bel
+    //   Oversættelse
     // NPR4.14/TS/20150818 CASE 220962 Removed field Item Filter,Item Group Filter,Global Dim 1 Filter
     // NPR5.26/TS/20160809 CASE 248269 Removed Actions Add to Staff Sale and Related Customer
     // NPR5.26/CLVA/20160902 CASE 48272 Added actions Camera and Identify. Added field Picture

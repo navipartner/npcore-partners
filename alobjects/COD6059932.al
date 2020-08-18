@@ -8,6 +8,8 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     // NPR5.33/BR/20170216 CASE 266527 Added functions for FTP and local file export
     // NPR5.33/BR/20170420 CASE 266527 Added functions and subscribers to support more export buttons
     // NPR5.54/THRO/20200212 CASE 389951 Close connection to ftp after last action
+    // NPR5.55/THRO/20200618 CASE 410350 Removed DisconnectFTP. Always setting KeepAlive to False, Removed the Keepalive parameter in InitFTPWebRequest
+    //                                   Added tryfunctions to get ftp filelist using NLST and LIST command. Retrive ftp-file in tryfunction
 
     Permissions = TableData "Sales Invoice Header" = m;
 
@@ -160,46 +162,60 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.29 [263705]
         //Get file list
-        if UpperCase(CopyStr(FTPserver, 1, 4)) <> 'FTP://' then
+        //-NPR5.55 [410350]
+        //IF UPPERCASE(COPYSTR(FTPserver,1,4)) <> 'FTP://' THEN
+        if UpperCase(CopyStr(FTPserver,1,6)) <> 'FTP://' then
+        //+NPR5.55 [410350]
             FTPserver := 'FTP://' + FTPserver;
         if FTPFileMask = '' then
             FTPFileMask := '*.*';
+        //-NPR5.55 [410350]
         //-NPR5.54 [389951]
-        InitFTPWebRequest(FtpWebRequest, 'LIST', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFileMask, FTPUsePassive, true);
+        //InitFTPWebRequest(FtpWebRequest,'LIST',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFileMask,FTPUsePassive,TRUE);
         //+NPR5.54 [389951]
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        Stream := FtpWebResponse.GetResponseStream;
-        StreamReader := StreamReader.StreamReader(Stream);
+        // FtpWebResponse := FtpWebRequest.GetResponse;
+        // Stream := FtpWebResponse.GetResponseStream;
+        // StreamReader := StreamReader.StreamReader(Stream);
+        //
+        // FileCounter := 0;
+        // //Store list of files, Maximum of 20 per execution
+        // WHILE (NOT (StreamReader.EndOfStream)) AND (FileCounter < 20) DO BEGIN
+        //  FileName := StreamReader.ReadLine;
+        //  IF STRLEN(FileName) > 56 THEN BEGIN
+        //    FileName := COPYSTR(FileName,56);
+        //    IF COPYSTR(FileName,1,1) <> '.' THEN BEGIN
+        //      FileCounter := FileCounter + 1;
+        //      FileNameList[FileCounter] := FileName;
+        //    END;
+        //  END;
+        // END;
+        // FtpWebResponse.Close;
+        // StreamReader.Close;
+        // Stream.Close;
+        //
+        // IF FileCounter = 0 THEN
+        //  EXIT;
+        //
+        // SLEEP(2000); //Allow 2 secs between retrieving the file list so that anything writing to the FTP can finish writing file
+        // I:=0;
+        // REPEAT
+        //  I := I + 1;
+        //  ImportFTPFile(FTPserver,FTPUsername,FTPPassword,FTPFolder,FileNameList[I],FTPArchiveFolder,FTPUsePassive,CreateDocument);
+        // UNTIL I >= FileCounter;
+        // //-NPR5.29 [263705]
+        // //-NPR5.54 [389951]
+        // DisconnectFTP(FTPserver,FTPUsername,FTPPassword,FTPUsePassive);
+        // //+NPR5.54 [389951]
 
-        FileCounter := 0;
-        //Store list of files, Maximum of 20 per execution
-        while (not (StreamReader.EndOfStream)) and (FileCounter < 20) do begin
-            FileName := StreamReader.ReadLine;
-            if StrLen(FileName) > 56 then begin
-                FileName := CopyStr(FileName, 56);
-                if CopyStr(FileName, 1, 1) <> '.' then begin
-                    FileCounter := FileCounter + 1;
-                    FileNameList[FileCounter] := FileName;
-                end;
-            end;
+        if not GetFtpFileList(FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFileMask,FTPUsePassive,FileNameList) then
+          exit;
+        CompressArray(FileNameList);
+        FileCounter := 1;
+        while FileNameList[FileCounter] <> '' do begin
+          ImportFTPFile(FTPserver,FTPUsername,FTPPassword,FTPFolder,FileNameList[FileCounter],FTPArchiveFolder,FTPUsePassive,CreateDocument);
+          FileCounter += 1;
         end;
-        FtpWebResponse.Close;
-        StreamReader.Close;
-        Stream.Close;
-
-        if FileCounter = 0 then
-            exit;
-
-        Sleep(2000); //Allow 2 secs between retrieving the file list so that anything writing to the FTP can finish writing file
-        I := 0;
-        repeat
-            I := I + 1;
-            ImportFTPFile(FTPserver, FTPUsername, FTPPassword, FTPFolder, FileNameList[I], FTPArchiveFolder, FTPUsePassive, CreateDocument);
-        until I >= FileCounter;
-        //-NPR5.29 [263705]
-        //-NPR5.54 [389951]
-        DisconnectFTP(FTPserver, FTPUsername, FTPPassword, FTPUsePassive);
-        //+NPR5.54 [389951]
+        //+NPR5.55 [410350]
     end;
 
     local procedure ImportFTPFile(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFilename: Text; FTPArchiveFolder: Text; FTPUsePassive: Boolean; CreateDocument: Boolean)
@@ -222,10 +238,14 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.29 [263705]
         //Download file and store in Blob
+        //-NPR5.55 [410350]
         //-NPR5.54 [389951]
-        InitFTPWebRequest(FtpWebRequest, 'RETR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive, true);
+        InitFTPWebRequest(FtpWebRequest,'RETR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive);
         //+NPR5.54 [389951]
-        FtpWebResponse := FtpWebRequest.GetResponse;
+        //FtpWebResponse := FtpWebRequest.GetResponse;
+        if not GetFtpResponse(FtpWebRequest,FtpWebResponse) then
+          exit;
+        //+NPR5.55 [410350]
         Stream := FtpWebResponse.GetResponseStream;
         MemoryStream := MemoryStream.MemoryStream();
         TempBlob.CreateOutStream(OStream);
@@ -247,7 +267,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
             //If imported: Archive file
             if FTPArchiveFolder <> '' then begin
                 //-NPR5.54 [389951]
-                InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPArchiveFolder, FTPFilename, FTPUsePassive, true);
+            //-NPR5.55 [410350]
+            InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPArchiveFolder,FTPFilename,FTPUsePassive);
+            //+NPR5.55 [410350]
                 //+NPR5.54 [389951]
                 TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
                 IStream.Read(FileText);
@@ -264,7 +286,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
             //If imported: Delete file
             //-NPR5.54 [389951]
-            InitFTPWebRequest(FtpWebRequest, 'DELE', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive, true);
+          //-NPR5.55 [410350]
+          InitFTPWebRequest(FtpWebRequest,'DELE',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive);
+          //+NPR5.55 [410350]
             //+NPR5.54 [389951]
             FtpWebResponse := FtpWebRequest.GetResponse;
             FtpWebResponse.Close;
@@ -274,7 +298,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //+NPR5.29 [263705]
     end;
 
-    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest; FTPMethod: Text; FTPServerName: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileNameOrMask: Text; FTPusePassive: Boolean; FTPKeepAlive: Boolean)
+    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest;FTPMethod: Text;FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean)
     var
         NetworkCredential: DotNet npNetNetworkCredential;
     begin
@@ -284,26 +308,14 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         FtpWebRequest.Method := FTPMethod;
         //-NPR5.54 [389951]
         //FtpWebRequest.KeepAlive := TRUE;
-        FtpWebRequest.KeepAlive := FTPKeepAlive;
+        //-NPR5.55 [410350]
+        FtpWebRequest.KeepAlive := false;
+        //+NPR5.55 [410350]
         //+NPR5.54 [389951]
         FtpWebRequest.UseBinary := true;
         if FTPusePassive then
             FtpWebRequest.UsePassive := false;
         //+NPR5.29 [263705]
-    end;
-
-    local procedure DisconnectFTP(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPUsePassive: Boolean)
-    var
-        FtpWebRequest: DotNet npNetFtpWebRequest;
-        FtpWebResponse: DotNet npNetFtpWebResponse;
-    begin
-        //-NPR5.54 [389951]
-        if UpperCase(CopyStr(FTPserver, 1, 4)) <> 'FTP://' then
-            FTPserver := 'FTP://' + FTPserver;
-        InitFTPWebRequest(FtpWebRequest, 'PWD', FTPserver, FTPUsername, FTPPassword, '', '*.*', FTPUsePassive, false);
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        FtpWebResponse.Close;
-        //+NPR5.54 [389951]
     end;
 
     local procedure GetFTPPath(FTPServerName: Text; FTPFolder: Text; FTPFileNameOrMask: Text): Text
@@ -317,6 +329,82 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         else
             exit(FTPServerName + FTPStructureDelimiter + FTPFileNameOrMask);
         //+NPR5.29 [263705]
+    end;
+
+    local procedure GetFtpFileList(FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean;var FileNameList: array [20] of Text): Boolean
+    begin
+        //-NPR5.55 [410350]
+        if FtpNLST(FTPServerName, FTPUsername, FTPPassword,FTPFolder, FTPFileNameOrMask, FTPusePassive, FileNameList) then
+          exit(true);
+        if FtpLIST(FTPServerName, FTPUsername, FTPPassword,FTPFolder, FTPFileNameOrMask, FTPusePassive, FileNameList) then
+          exit(true);
+        exit(false);
+        //+NPR5.55 [410350]
+    end;
+
+    [TryFunction]
+    local procedure FtpNLST(FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean;var FileNameList: array [20] of Text)
+    var
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        FileCounter: Integer;
+    begin
+        //-NPR5.55 [410350]
+        InitFTPWebRequest(FtpWebRequest,'NLST',FTPServerName,FTPUsername,FTPPassword,FTPFolder,FTPFileNameOrMask,FTPusePassive);
+        FtpWebResponse := FtpWebRequest.GetResponse;
+        Stream := FtpWebResponse.GetResponseStream;
+        StreamReader := StreamReader.StreamReader(Stream);
+
+        FileCounter := 0;
+        while (not (StreamReader.EndOfStream)) and (FileCounter < ArrayLen(FileNameList)) do begin
+          FileCounter := FileCounter + 1;
+          FileNameList[FileCounter] := StreamReader.ReadLine;
+        end;
+        FtpWebResponse.Close;
+        StreamReader.Close;
+        Stream.Close;
+        //+NPR5.55 [410350]
+    end;
+
+    [TryFunction]
+    local procedure FtpLIST(FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean;var FileNameList: array [20] of Text)
+    var
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        FileCounter: Integer;
+        FileName: Text;
+    begin
+        //-NPR5.55 [410350]
+        InitFTPWebRequest(FtpWebRequest,'LIST',FTPServerName,FTPUsername,FTPPassword,FTPFolder,FTPFileNameOrMask,FTPusePassive);
+        FtpWebResponse := FtpWebRequest.GetResponse;
+        Stream := FtpWebResponse.GetResponseStream;
+        StreamReader := StreamReader.StreamReader(Stream);
+
+        FileCounter := 0;
+        while (not (StreamReader.EndOfStream)) and (FileCounter < ArrayLen(FileNameList)) do begin
+          FileName := StreamReader.ReadLine;
+          if (StrLen(FileName) > 56) and (LowerCase(CopyStr(FileName,1,1)) <> 'd') then begin
+            FileName := CopyStr(FileName,56);
+            if CopyStr(FileName,1,1) <> '.' then begin
+              FileCounter := FileCounter + 1;
+              FileNameList[FileCounter] := FileName;
+            end;
+          end;
+        end;
+        FtpWebResponse.Close;
+        StreamReader.Close;
+        Stream.Close;
+        //-NPR5.55 [410350]
+    end;
+
+    [TryFunction]
+    local procedure GetFtpResponse(FtpWebRequest: DotNet npNetFtpWebRequest;FtpWebResponse: DotNet npNetFtpWebResponse)
+    begin
+        FtpWebResponse := FtpWebRequest.GetResponse;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', false, false)]
@@ -1105,7 +1193,10 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
         if FTPServer = '' then
             exit;
-        if UpperCase(CopyStr(FTPServer, 1, 4)) <> 'FTP://' then
+        //-NPR5.55 [410350]
+        //IF UPPERCASE(COPYSTR(FTPServer,1,4)) <> 'FTP://' THEN
+        if UpperCase(CopyStr(FTPServer,1,6)) <> 'FTP://' then
+        //+NPR5.55 [410350]
             FTPServer := 'FTP://' + FTPServer;
         Sleep(1000);
         ExportFTPFile(FTPServer, FTPUsername, FTPPassword, FTPFolder, FTPFileName, FTPUsePassive, ServerFilePath);
@@ -1133,7 +1224,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
         //Upload file
         //-NPR5.54 [389951]
-        InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive, false);
+        //-NPR5.55 [410350]
+        InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive);
+        //+NPR5.55 [410350]
         //+NPR5.54 [389951]
         FileMgt.BLOBImportFromServerFile(TempBlob, ServerFilePath);
         TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);

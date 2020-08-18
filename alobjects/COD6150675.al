@@ -3,6 +3,8 @@ codeunit 6150675 "NPRE Restaurant Setup Proxy"
     // The purpose of this codeunit is to abstract retrieval of setup.
     // 
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
 
     trigger OnRun()
@@ -10,10 +12,12 @@ codeunit 6150675 "NPRE Restaurant Setup Proxy"
     end;
 
     var
-        HospitalitySetup: Record "NPRE Restaurant Setup";
+        NPRESetup: Record "NPRE Restaurant Setup";
         Restaurant: Record "NPRE Restaurant";
+        Seating: Record "NPRE Seating";
         SeatingLocation: Record "NPRE Seating Location";
         Initialized: Boolean;
+        NPRESetupRead: Boolean;
 
     procedure SetRestaurant(NewRestaurantCode: Code[20])
     begin
@@ -25,6 +29,17 @@ codeunit 6150675 "NPRE Restaurant Setup Proxy"
           Clear(Restaurant);
         Clear(SeatingLocation);
         Initialized := false;
+    end;
+
+    procedure SetSeating(NewSeatingCode: Code[10])
+    begin
+        if NewSeatingCode = Seating.Code then
+          exit;
+        if NewSeatingCode <> '' then begin
+          Seating.Get(NewSeatingCode);
+          SetSeatingLocation(Seating."Seating Location");
+        end else
+          InitializeDefault();
     end;
 
     procedure SetSeatingLocation(NewSeatingLocation: Code[10])
@@ -39,17 +54,15 @@ codeunit 6150675 "NPRE Restaurant Setup Proxy"
             Clear(Restaurant);
         end else
           Clear(SeatingLocation);
+        if Seating."Seating Location" <> SeatingLocation.Code then
+          Clear(Seating);
         Initialized := false;
     end;
 
     procedure InitializeUsingWaiterPad(var WaiterPad: Record "NPRE Waiter Pad")
-    var
-        Seating: Record "NPRE Seating";
     begin
         WaiterPad.CalcFields("Current Seating FF");
-        if not Seating.Get(WaiterPad."Current Seating FF") then
-          Seating.Init;
-        SetSeatingLocation(Seating."Seating Location");
+        SetSeating(WaiterPad."Current Seating FF");
     end;
 
     procedure InitializeDefault()
@@ -59,33 +72,35 @@ codeunit 6150675 "NPRE Restaurant Setup Proxy"
 
     local procedure InitializeSetup()
     begin
-        if not HospitalitySetup.Get then
-          HospitalitySetup.Init;
+        GetNPRESetup();
 
         if Restaurant."Auto Send Kitchen Order" = Restaurant."Auto Send Kitchen Order"::Default then
-          Restaurant."Auto Send Kitchen Order" := HospitalitySetup."Auto Send Kitchen Order" + 1;
+          Restaurant."Auto Send Kitchen Order" := NPRESetup."Auto Send Kitchen Order" + 1;
         if SeatingLocation."Auto Send Kitchen Order" = SeatingLocation."Auto Send Kitchen Order"::Default then
           SeatingLocation."Auto Send Kitchen Order" := Restaurant."Auto Send Kitchen Order";
 
         if Restaurant."Resend All On New Lines" = Restaurant."Resend All On New Lines"::Default then
-          Restaurant."Resend All On New Lines" := HospitalitySetup."Resend All On New Lines" + 1;
+          Restaurant."Resend All On New Lines" := NPRESetup."Resend All On New Lines" + 1;
         if SeatingLocation."Resend All On New Lines" = SeatingLocation."Resend All On New Lines"::Default then
           SeatingLocation."Resend All On New Lines" := Restaurant."Resend All On New Lines";
 
         if Restaurant."Kitchen Printing Active" = Restaurant."Kitchen Printing Active"::Default then
-          if HospitalitySetup."Kitchen Printing Active" then
+          if NPRESetup."Kitchen Printing Active" then
             Restaurant."Kitchen Printing Active" := Restaurant."Kitchen Printing Active"::Yes
           else
             Restaurant."Kitchen Printing Active" := Restaurant."Kitchen Printing Active"::No;
 
         if Restaurant."KDS Active" = Restaurant."KDS Active"::Default then
-          if HospitalitySetup."KDS Active" then
+          if NPRESetup."KDS Active" then
             Restaurant."KDS Active" := Restaurant."KDS Active"::Yes
           else
             Restaurant."KDS Active" := Restaurant."KDS Active"::No;
 
         if Restaurant."Order ID Assign. Method" = Restaurant."Order ID Assign. Method"::Default then
-          Restaurant."Order ID Assign. Method" := HospitalitySetup."Order ID Assign. Method" + 1;
+          Restaurant."Order ID Assign. Method" := NPRESetup."Order ID Assign. Method" + 1;
+
+        if Restaurant."Service Flow Profile" = '' then
+          Restaurant."Service Flow Profile" := NPRESetup."Default Service Flow Profile";
 
         Initialized := true;
     end;
@@ -94,6 +109,15 @@ codeunit 6150675 "NPRE Restaurant Setup Proxy"
     begin
         if not Initialized then
           InitializeSetup;
+    end;
+
+    local procedure GetNPRESetup()
+    begin
+        if NPRESetupRead then
+          exit;
+        if not NPRESetup.Get then
+          NPRESetup.Init;
+        NPRESetupRead := true;
     end;
 
     procedure AutoSendKitchenOrder(): Integer
@@ -124,6 +148,19 @@ codeunit 6150675 "NPRE Restaurant Setup Proxy"
     begin
         MakeSureIsInitialized;
         exit(Restaurant."Order ID Assign. Method");
+    end;
+
+    procedure GetServiceFlowProfile(var ServiceFlowProfileOut: Record "NPRE Service Flow Profile")
+    begin
+        MakeSureIsInitialized;
+        if not ServiceFlowProfileOut.Get(Restaurant."Service Flow Profile") then
+          Clear(ServiceFlowProfileOut.Code);
+    end;
+
+    procedure ServingStepDiscoveryMethod(): Integer
+    begin
+        GetNPRESetup();
+        exit(NPRESetup."Serving Step Discovery Method");
     end;
 }
 

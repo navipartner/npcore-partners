@@ -3,6 +3,7 @@ report 6014490 "Advanced Sales Statistics"
     // NPR70.00.00.00/LS/280613 CASE 186853 : Convert Report to Nav 2013
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.55/BHR/20200728  CASE 361515 remove Key reference not used in AL
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Advanced Sales Statistics.rdlc';
 
@@ -168,7 +169,7 @@ report 6014490 "Advanced Sales Statistics"
                 UpdateSortKey;
                 if not Buffer.Find('-') then begin
                  if CurrReport.Language = 1030 then
-                  Error('Der er kun tomme linjer p� rapporten.')
+                  Error('Der er kun tomme linjer på rapporten.')
                  else
                   Error('There is only empty lines on the report.');
                 end;
@@ -363,7 +364,7 @@ report 6014490 "Advanced Sales Statistics"
         
         case Type of
           Type::Period : begin Record.Open(DATABASE::Date);
-                                    // Datoen skal starte p� Periodestart
+                                    // Datoen skal starte på Periodestart
                                     FilterField := Record.Field(DateRecord.FieldNo("Period Start") );
                                     FilterField.SetFilter( StrSubstNo( '%1..',
                                                                Periodestart ) );
@@ -429,7 +430,7 @@ report 6014490 "Advanced Sales Statistics"
               ProjektKodeSlut  := EndRef.Value;
             end;
         
-            // F�rst beregner vi dette �r
+            // F¢rst beregner vi dette år
             SetValueEntryFilter( ValueEntry, false,  Format(Field.Value) );
             ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
         
@@ -455,7 +456,7 @@ report 6014490 "Advanced Sales Statistics"
               Buffer."Profit %" := 0;
         
         
-            // Dern�st sidste �r
+            // Dernæst sidste år
             SetValueEntryFilter( ValueEntry, true,  Format(Field.Value) );
             ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
         
@@ -534,7 +535,9 @@ report 6014490 "Advanced Sales Statistics"
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry";LastYear: Boolean;"Code": Code[20])
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
 
         case Type of

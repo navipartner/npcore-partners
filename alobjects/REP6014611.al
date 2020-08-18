@@ -3,6 +3,7 @@ report 6014611 "Sales Statistics w/ Variants"
     // NPR4.14/KN/20152408 CASE  221163  Added report ID and version.
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Statistics w Variants.rdlc';
 

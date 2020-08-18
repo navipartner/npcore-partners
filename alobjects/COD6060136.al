@@ -21,6 +21,8 @@ codeunit 6060136 "MM Member Notification"
     // MM1.42/TSA /20191220 CASE 382728 Refactored usage of Member."Notification Method"
     // MM1.43/TSA /20200214 CASE 390938 Fixed notification issue with Wallet_Update
     // MM1.43/TSA /20200214 CASE 390938 Changed variable name FieldNo and Count because they are reserved words
+    // MM1.44/TSA /20200416 CASE 400601 Adding support for get password directly from welcome email
+    // MM1.44/TSA /20200424 CASE 401434 Added guard for overflow when assigning USERID
 
 
     trigger OnRun()
@@ -94,7 +96,10 @@ codeunit 6060136 "MM Member Notification"
         end;
 
         MembershipNotification."Notification Processed At" := CurrentDateTime;
-        MembershipNotification."Notification Processed By User" := UserId;
+        //-MM1.44 [401434]
+        //MembershipNotification."Notification Processed By User" := USERID;
+        MembershipNotification."Notification Processed By User" := CopyStr (UserId, 1, MaxStrLen (MembershipNotification."Notification Processed By User"));
+        //+MM1.44 [401434]
         MembershipNotification.Modify();
         Commit;
     end;
@@ -333,6 +338,15 @@ codeunit 6060136 "MM Member Notification"
                     MemberNotificationEntry."Notification Token" := MembershipRole."Notification Token";
                     //+MM1.38 [355234]
 
+              //-MM1.44 [400601]
+              MemberNotificationEntry."Magento Get Password URL" := NotificationSetup."Fallback Magento PW URL";
+              if (Member."E-Mail Address" <> '') then
+                MemberNotificationEntry."Magento Get Password URL" := StrSubstNo ('%1?email=%2', NotificationSetup."Fallback Magento PW URL", Member."E-Mail Address");
+              if (NotificationSetup."Generate Magento PW URL") then begin
+                 RequestMagentoPasswordUrl (Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
+              end;
+              //-MM1.44 [400601]
+
                     if (MemberNotificationEntry.Insert()) then;
                 end;
             until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
@@ -419,7 +433,10 @@ codeunit 6060136 "MM Member Notification"
 
                 MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
                 MemberNotificationEntry2."Notification Sent At" := CurrentDateTime();
-                MemberNotificationEntry2."Notification Sent By User" := UserId;
+            //-MM1.44 [401434]
+            // MemberNotificationEntry2."Notification Sent By User" := USERID;
+            MemberNotificationEntry2."Notification Sent By User" := CopyStr (UserId, 1, MaxStrLen (MemberNotificationEntry2."Notification Sent By User"));
+            //+MM1.44 [401434]
                 MemberNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(MemberNotificationEntry2."Failed With Message"));
                 MemberNotificationEntry2."Notification Send Status" := SendStatus;
                 MemberNotificationEntry2.Modify();
@@ -643,7 +660,10 @@ codeunit 6060136 "MM Member Notification"
             repeat
                 MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
                 MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := UserId;
+            //-MM1.44 [401434]
+            // MembershipNotification."Notification Processed By User" := USERID;
+            MembershipNotification."Notification Processed By User" := CopyStr (UserId, 1, MaxStrLen (MembershipNotification."Notification Processed By User"));
+            //+MM1.44 [401434]
                 MembershipNotification.Modify();
             until (MembershipNotification.Next() = 0);
         end;
@@ -906,6 +926,112 @@ codeunit 6060136 "MM Member Notification"
         exit(template);
     end;
 
+    local procedure "---Magento"()
+    begin
+    end;
+
+    local procedure RequestMagentoPasswordUrl(CustomerNo: Code[20];ContactNo: Code[20];EmailAddress: Text[200];var ResponseUrl: Text[200];var ReasonText: Text): Boolean
+    var
+        Customer: Record Customer;
+        Contact: Record Contact;
+        MessageText: Text;
+        Body: DotNet npNetJToken;
+        Response: DotNet npNetJToken;
+        StartPos: Integer;
+        EndPos: Integer;
+        ResponseText: Text;
+    begin
+        //-MM1.44 [400601]
+
+        if (not Customer.Get (CustomerNo)) then
+          exit;
+
+        if (not Contact.Get (ContactNo)) then
+          exit;
+
+        if (not Contact."Magento Contact") then
+          exit;
+
+        MessageText := StrSubstNo ('{"id":"%1","storecode":"%2"}', ContactNo, Customer."Magento Store Code");
+        Body := Body.Parse (StrSubstNo ('{"account": {"email":"%1", "accounts":[%2]}}', EmailAddress, MessageText));
+
+        if (not MagentoApiPost ('password-reset-link', Body, Response)) then begin
+          ReasonText := CopyStr (GetLastErrorText,1, MaxStrLen (ReasonText));
+          exit;
+        end;
+
+        if (not GetMagentoMessageUrl (Response, ResponseText)) then begin
+          ReasonText := CopyStr (GetLastErrorText,1, MaxStrLen (ReasonText));
+          exit;
+        end;
+
+        ResponseUrl := ResponseText;
+
+        exit (true);
+        //+MM1.44 [400601]
+    end;
+
+    [TryFunction]
+    local procedure GetMagentoMessageUrl(Json: DotNet npNetJToken;var Url: Text)
+    begin
+
+        //-MM1.44 [400601]
+        Url := Json.Item('messages').Item('success').Item(0).Item('message').ToString();
+        //+MM1.44 [400601]
+    end;
+
+    [TryFunction]
+    procedure MagentoApiPost(Method: Text;var Body: DotNet npNetJToken;var Result: DotNet npNetJToken)
+    var
+        MagentoSetup: Record "Magento Setup";
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        StreamReader: DotNet npNetStreamReader;
+        Response: Text;
+        ReqStream: DotNet npNetStream;
+        ReqStreamWriter: DotNet npNetStreamWriter;
+    begin
+
+        //-MM1.44 [400601]
+        Clear(Response);
+        if Method = '' then
+          exit;
+
+        MagentoSetup.Get;
+        MagentoSetup.TestField("Api Url");
+        if MagentoSetup."Api Url"[StrLen(MagentoSetup."Api Url")] <> '/' then
+          MagentoSetup."Api Url" += '/';
+
+        if (CopyStr (MagentoSetup."Api Url", StrLen (MagentoSetup."Api Url" ) - (StrLen ('naviconnect/')) + 1) = 'naviconnect/') then
+          MagentoSetup."Api Url" := CopyStr (MagentoSetup."Api Url", 1, StrLen (MagentoSetup."Api Url" ) - (StrLen ('naviconnect/'))) + 'b2b_customer/';
+
+        HttpWebRequest := HttpWebRequest.Create(MagentoSetup."Api Url"+ Method);
+        HttpWebRequest.Timeout := 1000 * 60;
+
+        HttpWebRequest.Method := 'POST';
+        MagentoSetup.Get;
+        if MagentoSetup."Api Authorization" <> '' then
+          HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization")
+        else
+          HttpWebRequest.Headers.Add('Authorization','Basic ' + MagentoSetup.GetBasicAuthInfo());
+
+        HttpWebRequest.ContentType ('naviconnect/json');
+
+        ReqStream := HttpWebRequest.GetRequestStream;
+        ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
+        ReqStreamWriter.Write (Body.ToString());
+        ReqStreamWriter.Flush;
+        ReqStreamWriter.Close;
+        Clear (ReqStreamWriter);
+        Clear (ReqStream);
+
+        HttpWebResponse := HttpWebRequest.GetResponse();
+
+        StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream);
+        Response := StreamReader.ReadToEnd;
+        Result := Result.Parse(Response);
+    end;
+
     local procedure "---Inline Notifications"()
     begin
     end;
@@ -916,6 +1042,8 @@ codeunit 6060136 "MM Member Notification"
         MembershipSetup: Record "MM Membership Setup";
         NotificationSetup: Record "MM Member Notification Setup";
         MembershipNotification: Record "MM Membership Notification";
+        MembershipRole: Record "MM Membership Role";
+        NotificationTriggerType: Integer;
     begin
 
         //-MM1.36 [328141]

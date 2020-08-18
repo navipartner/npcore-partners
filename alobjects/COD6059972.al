@@ -21,6 +21,7 @@ codeunit 6059972 "Variety Clone Data"
     // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018
     // NPR5.48/JDH /20181214 CASE 338542 Moved codesection about Description for Item Cross reference to CU Description Control
     // NPR5.53/SARA/20191023 CASE 345108 Insert Unit of Measure in Item Cross Reference
+    // NPR5.55/BHR /20200219 CASE 361515 Change Key as it's not supported in extension
 
 
     trigger OnRun()
@@ -1156,7 +1157,10 @@ codeunit 6059972 "Variety Clone Data"
     begin
         //-NPR5.29 [263917]
         Clear(ItemVariant);
-        ItemVar.SetCurrentKey("Item No.","Variety 1 Value","Variety 2 Value","Variety 3 Value","Variety 4 Value");
+        //-NPR5.55 [361515]
+        //ItemVar.SETCURRENTKEY("Item No.","Variety 1 Value","Variety 2 Value","Variety 3 Value","Variety 4 Value");
+        ItemVar.SetCurrentKey("Item No.",Code);
+        //+NPR5.55 [361515]
         ItemVar.SetRange("Item No.", ItemNo);
         ItemVar.SetRange("Variety 1 Value", VRT1);
         ItemVar.SetRange("Variety 2 Value", VRT2);

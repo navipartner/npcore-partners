@@ -4,6 +4,7 @@ table 6150652 "POS End of Day Profile"
     // NPR5.52/SARA/20190823 CASE 363578 New field 'SMS Profile'
     // NPR5.53/TSA /20191107 CASE 376170 Added number series for Z & X reports
     // NPR5.53/TSA /20191219 CASE 383012 Added field "Show Zero Amount Lines"
+    // NPR5.55/TSA /20200511 CASE 401889 Added "Posting Error Handling"
 
     Caption = 'POS End of Day Profile';
     DrillDownPageID = "POS End of Day Profiles";
@@ -85,6 +86,12 @@ table 6150652 "POS End of Day Profile"
         field(60;"Show Zero Amount Lines";Boolean)
         {
             Caption = 'Show Zero Amount Lines';
+        }
+        field(70;"Posting Error Handling";Option)
+        {
+            Caption = 'Posting Error Handling';
+            OptionCaption = 'With Message,With Error,Silent';
+            OptionMembers = WITH_MESSAGE,WITH_ERROR,SILENT;
         }
     }
 

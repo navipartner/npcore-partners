@@ -1,6 +1,7 @@
 codeunit 6151494 "Raptor Send Data"
 {
     // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
+    // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor
 
     TableNo = "Job Queue Entry";
 
@@ -9,11 +10,15 @@ codeunit 6151494 "Raptor Send Data"
         Process(Rec);
     end;
 
+    var
+        RaptorSetup: Record "Raptor Setup";
+        IncorrectFunctionCallErr: Label 'Function call on a non-temporary variable. This is a critical programming error. Please contact system vendor.';
+        SalespersonTmp: Record "Salesperson/Purchaser" temporary;
+
     local procedure Process(var JobQueueEntry: Record "Job Queue Entry")
     var
         TempDataLog: Record "Data Log Record" temporary;
         ItemLedger: Record "Item Ledger Entry";
-        RaptorSetup: Record "Raptor Setup";
         DataLogSubscriberMgt: Codeunit "Data Log Subscriber Mgt.";
         RaptorMgt: Codeunit "Raptor Management";
         RecRef: RecordRef;
@@ -38,10 +43,13 @@ codeunit 6151494 "Raptor Send Data"
           if RecRef.Get(TempDataLog."Record ID") then
             if RecRef.Number = DATABASE::"Item Ledger Entry" then begin
               RecRef.SetTable(ItemLedger);
-              if (ItemLedger."Entry Type" = ItemLedger."Entry Type"::Sale) and
-                 (ItemLedger."Source Type" = ItemLedger."Source Type"::Customer) and
-                 (ItemLedger."Source No." <> '')
-              then
+              //-NPR5.55 [400925]-revoked
+              //IF (ItemLedger."Entry Type" = ItemLedger."Entry Type"::Sale) AND
+              //   (ItemLedger."Source Type" = ItemLedger."Source Type"::Customer) AND
+              //   (ItemLedger."Source No." <> '')
+              //THEN
+              //+NPR5.55 [400925]-revoked
+              if ItemLedgerIsEligibleForSending(ItemLedger) then
                 SendItemLedgerEntry(ItemLedger,SessionGUID);
             end;
         until TempDataLog.Next = 0;
@@ -53,8 +61,76 @@ codeunit 6151494 "Raptor Send Data"
         RaptorMgt: Codeunit "Raptor Management";
     begin
         GenerateParameters(Parameters,ItemLedger,SessionGUID);
-        OnBeforeILESendRaptorTrackingRequest(Parameters,ItemLedger);
+        OnBeforeILESendRaptorTrackingRequest(Parameters,ItemLedger,false);
         RaptorMgt.SendRaptorTrackingRequest(Parameters);
+    end;
+
+    procedure Test_ShowItemLedgerRaptorParameters(ItemLedger: Record "Item Ledger Entry")
+    var
+        Parameters: Record "Name/Value Buffer" temporary;
+        DummySessionGUID: Guid;
+    begin
+        //-NPR5.55 [400925]
+        GenerateParameters(Parameters,ItemLedger,DummySessionGUID);
+        OnBeforeILESendRaptorTrackingRequest(Parameters,ItemLedger,true);
+        PAGE.RunModal(PAGE::"Name/Value Lookup",Parameters);
+        //+NPR5.55 [400925]
+    end;
+
+    local procedure ItemLedgerIsEligibleForSending(ItemLedger: Record "Item Ledger Entry"): Boolean
+    var
+        Eligible: Boolean;
+        Handled: Boolean;
+    begin
+        //-NPR5.55 [400925]
+        OnCheckIfItemLedgerIsEligibleForSending(ItemLedger,Eligible,Handled);
+        if Handled then
+          exit(Eligible);
+
+        Eligible :=
+          (ItemLedger."Entry Type" = ItemLedger."Entry Type"::Sale) and
+          (ItemLedger."Source Type" = ItemLedger."Source Type"::Customer) and
+          (ItemLedger."Source No." <> '');
+
+        if not Eligible then
+          exit(false);
+
+        Eligible := not RaptorSetup."Exclude Webshop Sales" or (RaptorSetup."Webshop Salesperson Filter" = '');
+        if not Eligible then begin
+          SalespersonTmp.Reset;
+          if SalespersonTmp.IsEmpty then
+            CreateTmpSalespersonList(SalespersonTmp);
+          SalespersonTmp.SetFilter(Code,RaptorSetup."Webshop Salesperson Filter");
+          SalespersonTmp.Code := ItemLedger."Salesperson Code";
+          Eligible := not SalespersonTmp.Find;
+        end;
+
+        exit(Eligible);
+        //+NPR5.55 [400925]
+    end;
+
+    procedure CreateTmpSalespersonList(var SalespersonTmp: Record "Salesperson/Purchaser")
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+        EmptyNameML: Label '<w/out salesperson>';
+    begin
+        //-NPR5.55 [400925]
+        if not SalespersonTmp.IsTemporary then
+          Error(IncorrectFunctionCallErr);
+
+        Clear(SalespersonTmp);
+        SalespersonTmp.DeleteAll;
+        if Salesperson.FindSet then
+          repeat
+            SalespersonTmp := Salesperson;
+            SalespersonTmp.Insert;
+          until Salesperson.Next = 0;
+        SalespersonTmp.Init;
+        SalespersonTmp.Code := '';
+        SalespersonTmp.Name := CopyStr(EmptyNameML,1,MaxStrLen(SalespersonTmp.Name));
+        if not SalespersonTmp.Find then
+          SalespersonTmp.Insert;
+        //+NPR5.55 [400925]
     end;
 
     local procedure GenerateParameters(var Parameters: Record "Name/Value Buffer";ItemLedger: Record "Item Ledger Entry";SessionGUID: Guid)
@@ -114,12 +190,17 @@ codeunit 6151494 "Raptor Send Data"
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeILESendRaptorTrackingRequest(var Parameters: Record "Name/Value Buffer";ItemLedger: Record "Item Ledger Entry")
+    procedure OnBeforeILESendRaptorTrackingRequest(var Parameters: Record "Name/Value Buffer";ItemLedger: Record "Item Ledger Entry";IsMock: Boolean)
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
     procedure OnProcessDataLogEntries(var TempDataLog: Record "Data Log Record";SessionGUID: Guid)
+    begin
+    end;
+
+    [IntegrationEvent(TRUE, false)]
+    procedure OnCheckIfItemLedgerIsEligibleForSending(ItemLedger: Record "Item Ledger Entry";var Eligible: Boolean;var Handled: Boolean)
     begin
     end;
 }

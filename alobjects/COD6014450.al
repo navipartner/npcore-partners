@@ -33,6 +33,7 @@ codeunit 6014450 "E-mail Management"
     // NPR5.48/THRO/20181119  CASE 336330 Publisher to allow Changing sender Email
     // NPR5.48/MHA /20190123  CASE 341711 Replaced function ParseEmailText() with MergeMailContent() and removed green code
     // NPR5.51/THRO/20190703  CASE 358470 Use Email address from Custom Report Selection
+    // NPR5.55/THRO/20200511  CASE 343266 Multiple Providers for SmartEmail
 
 
     trigger OnRun()
@@ -262,7 +263,7 @@ codeunit 6014450 "E-mail Management"
             exit(Text004);
         UseTransactionalEmailCode := '';
         TransactionalType := 0;
-        if (EmailTemplateHeader."Transactional E-mail" = EmailTemplateHeader."Transactional E-mail"::"Campaign Monitor Transactional") then begin
+        if (EmailTemplateHeader."Transactional E-mail" = EmailTemplateHeader."Transactional E-mail"::"Smart Email") then begin
             TransactionalType := TransactionalType::Classic;
             TransactionalEmailRecipient := EmailTemplateHeader."Default Recipient Address";
             if EmailTemplateHeader."Transactional E-mail Code" <> '' then begin
@@ -338,7 +339,7 @@ codeunit 6014450 "E-mail Management"
     procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
     var
         TransactionalEmail: Record "Smart Email";
-        CampaignMonitorMgt: Codeunit "CampaignMonitor Mgt.";
+        TransactionalEmailMgt: Codeunit "Transactional Email Mgt.";
         InStream: InStream;
         HandledByTransactional: Boolean;
         FromName: Text;
@@ -346,15 +347,19 @@ codeunit 6014450 "E-mail Management"
     begin
         if TransactionalType = TransactionalType::Smart then
             if TransactionalEmail.Get(UseTransactionalEmailCode) then begin
-                ErrorMessage := CopyStr(CampaignMonitorMgt.SendSmartEmailWAttachment(TransactionalEmail, TransactionalEmailRecipient, SmtpMessage.CC, SmtpMessage.Bcc, RecRef, AttachmentBuffer, Silent), 1, MaxStrLen(ErrorMessage));
+            //-NPR5.55 [343266]
+            ErrorMessage := CopyStr(TransactionalEmailMgt.SendSmartEmailWAttachment(TransactionalEmail,TransactionalEmailRecipient,SmtpMessage.CC,SmtpMessage.Bcc,RecRef,AttachmentBuffer,Silent),1,MaxStrLen(ErrorMessage));
+            //+NPR5.55 [343266]
                 HandledByTransactional := true;
             end;
         if TransactionalType = TransactionalType::Classic then begin
             FromName := SmtpMessage.FromName;
             FromAddress := SmtpMessage.FromAddress;
-            if (FromName <> '') and (FromName <> FromAddress) then
-                FromAddress := StrSubstNo('%1 %2', FromName, FromAddress);
-            ErrorMessage := CampaignMonitorMgt.SendClasicMail(TransactionalEmailRecipient, SmtpMessage.CC, SmtpMessage.Bcc, SmtpMessage.Subject, SmtpMessage.Body, '', FromAddress, '', true, true, '', '', AttachmentBuffer, Silent);
+          //-NPR5.55 [343266]
+          //IF (FromName <> '') AND (FromName <> FromAddress) THEN
+          //  FromAddress := STRSUBSTNO('%1 %2',FromName,FromAddress);
+          ErrorMessage := TransactionalEmailMgt.SendClassicMail(TransactionalEmailRecipient,SmtpMessage.CC,SmtpMessage.Bcc,SmtpMessage.Subject,SmtpMessage.Body,'',FromAddress, FromName, '',true,true,'','',AttachmentBuffer,Silent);
+          //+NPR5.55 [343266]
             HandledByTransactional := true;
         end;
 

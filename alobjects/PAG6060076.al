@@ -6,6 +6,7 @@ page 6060076 "MM Membership Setup Card"
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.42/TSA /20191105 CASE 375381 Added Auto-Renew setup fields
     // MM1.43/TSA /20200319 CASE 337112 Moved the ticket print setting to ticket tab
+    // MM1.44/TSA /20200529 CASE 407401 Add Age Verification
 
     Caption = 'Membership Setup Card';
     PageType = Card;
@@ -65,6 +66,16 @@ page 6060076 "MM Membership Setup Card"
                 }
                 field("Recurring Payment Code";"Recurring Payment Code")
                 {
+                }
+                group("Age Verification")
+                {
+                    Caption = 'Age Verification';
+                    field("Enable Age Verification";"Enable Age Verification")
+                    {
+                    }
+                    field("Validate Age Against";"Validate Age Against")
+                    {
+                    }
                 }
             }
             group(Print)
@@ -207,6 +218,7 @@ page 6060076 "MM Membership Setup Card"
             action("Recurring Payment Setup")
             {
                 Caption = 'Recurring Payment Setup';
+                Image = PaymentHistory;
                 RunObject = Page "MM Recurring Payment Setup";
             }
         }

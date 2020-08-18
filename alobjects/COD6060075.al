@@ -2,6 +2,7 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 {
     // NPR5.29/BR /20161201  CASE 258697 Created CU based on Codeunit 1207 to keep 1207 standard (additions marked with //-NPR and //+NPR)
     // NPR5.38/MHA /20180105  CASE 301053 Changed type of variable, DocumentType, from Option to Integer in GetDocumentType() to prepare for V2
+    // NPR5.55/THRO/20200609  CASE 390973 Added Publisher to allow external identification of Item on PurchaseLine
 
     TableNo = "Data Exch.";
 
@@ -709,10 +710,13 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
                 if not FindItemCrossReferenceFromAltNo(EntryNo,HeaderRecordNo,RecordNo,VendorNo) then
                   if not FindItemCrossReferenceFromItemNo(EntryNo,HeaderRecordNo,RecordNo,VendorNo) then
                     if not FindItemCrossReferenceFromItem(EntryNo,HeaderRecordNo,RecordNo,VendorNo) then
-                      if not CreateItemWorksheetLine(EntryNo,HeaderRecordNo,RecordNo,VendorNo) then
+                        //-NPR5.55 [390973]
+                      if not FindItemCrossReferenceFromSubscriber(EntryNo,HeaderRecordNo,RecordNo,VendorNo) then
+                        //+NPR5.55 [390973]
+                        if not CreateItemWorksheetLine(EntryNo,HeaderRecordNo,RecordNo,VendorNo) then
               //+NPR
-                        if not FindGLAccountForLine(EntryNo,HeaderRecordNo,RecordNo) then
-                          LogErrorIfItemNotFound(EntryNo,HeaderRecordNo,RecordNo,VendorNo);
+                          if not FindGLAccountForLine(EntryNo,HeaderRecordNo,RecordNo) then
+                            LogErrorIfItemNotFound(EntryNo,HeaderRecordNo,RecordNo,VendorNo);
           ResolveUnitOfMeasure(EntryNo,HeaderRecordNo,RecordNo);
           ValidateLineDiscount(EntryNo,HeaderRecordNo,RecordNo);
         end;
@@ -1376,6 +1380,18 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
     local procedure RequiredNearness(): Integer
     begin
         exit(95)
+    end;
+
+    local procedure FindItemCrossReferenceFromSubscriber(EntryNo: Integer;HeaderRecordNo: Integer;RecordNo: Integer;VendorNo: Code[20]) Identified: Boolean
+    begin
+        //-NPR5.55 [390973]
+        OnMapCrossRecerenceToPurchaseLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo, Identified);
+        //+NPR5.55 [390973]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnMapCrossRecerenceToPurchaseLine(EntryNo: Integer;HeaderRecordNo: Integer;RecordNo: Integer;VendorNo: Code[20];var Identified: Boolean)
+    begin
     end;
 }
 

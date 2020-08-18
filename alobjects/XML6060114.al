@@ -10,6 +10,7 @@ xmlport 6060114 "TM Ticket Reservation"
     // TM1.26/TSA /20171109 CASE 295981 Added an error result path rather then a success path
     // TM1.36/TSA/20180830  CASE 323737 Transport TM1.36 - 30 August 2018
     // TM1.45/TSA /20191206 CASE 380754 Add waitinglist_ref_code attribute
+    // TM1.48/TSA /20200722 CASE 415894 Added expiry utc time to response
 
     Caption = 'Ticket Reservation';
     Encoding = UTF8;
@@ -106,6 +107,18 @@ xmlport 6060114 "TM Ticket Reservation"
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
+                    textattribute(atutc)
+                    {
+                        XmlName = 'utc';
+
+                        trigger OnBeforePassVariable()
+                        begin
+
+                            //-TM1.48 [415894]
+                            AtUTC := Format (CurrentDateTime () + (tmpTicketReservationResponse."Exires (Seconds)" -1) * 1000, 0, 9);
+                            //+TM1.48 [415894]
+                        end;
+                    }
                 }
                 fieldelement(message;tmpTicketReservationResponse."Response Message")
                 {

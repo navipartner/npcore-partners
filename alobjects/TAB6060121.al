@@ -15,7 +15,8 @@ table 6060121 "TM Ticket Admission BOM"
     // TM1.42/TSA /20190411 CASE 351050 Added field "Revisit Condition (Statistics)"
     // TM1.45/TSA /20191120 CASE 378212 Added Sales cut-off dates
     // TM1.45/TSA /20191216 CASE 382535 Added "Admission Inclusion", "Admission Unit Price"
-    // TM90.1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
+    // TM1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
+    // TM1.48/TSA /20200629 CASE 411704 Added "Percentage of Adm. Capacity"
 
     Caption = 'Ticket Admission BOM';
 
@@ -64,6 +65,15 @@ table 6060121 "TM Ticket Admission BOM"
             Caption = 'Prefered Sales Display Method';
             OptionCaption = ' ,Schedule,Calendar';
             OptionMembers = DEFAULT,SCHEDULE,CALENDAR;
+        }
+        field(20;"Percentage of Adm. Capacity";Decimal)
+        {
+            BlankNumbers = BlankZero;
+            Caption = 'Percentage of Adm. Capacity';
+            DecimalPlaces = 0:2;
+            InitValue = 100;
+            MaxValue = 100;
+            MinValue = 0;
         }
         field(45;"Duration Formula";DateFormula)
         {

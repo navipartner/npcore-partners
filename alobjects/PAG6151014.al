@@ -7,6 +7,9 @@ page 6151014 "NpRv Voucher Card"
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
     // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
     // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
+    // NPR5.55/MHA /20200427  CASE 402015 Removed field 85 "In-use Quantity (External)"
+    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
+    // NPR5.55/MHA /20200702  CASE 407070 Added Sending Log
 
     Caption = 'Retail Voucher Card';
     SourceTable = "NpRv Voucher";
@@ -76,9 +79,6 @@ page 6151014 "NpRv Voucher Card"
                     field("In-use Quantity";"In-use Quantity")
                     {
                     }
-                    field("In-use Quantity (External)";"In-use Quantity (External)")
-                    {
-                    }
                 }
             }
             group("Send Voucher")
@@ -113,6 +113,9 @@ page 6151014 "NpRv Voucher Card"
                     {
                     }
                     field("SMS Template Code";"SMS Template Code")
+                    {
+                    }
+                    field("No. Send";"No. Send")
                     {
                     }
                 }
@@ -154,6 +157,10 @@ page 6151014 "NpRv Voucher Card"
                     }
                     field("Phone No.";"Phone No.")
                     {
+                    }
+                    field("Language Code";"Language Code")
+                    {
+                        Importance = Additional;
                     }
                     field("Voucher Message";"Voucher Message")
                     {
@@ -264,6 +271,14 @@ page 6151014 "NpRv Voucher Card"
                 RunObject = Page "NpRv Voucher Entries";
                 RunPageLink = "Voucher No."=FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
+            }
+            action("Sending Log")
+            {
+                Caption = 'Sending Log';
+                Image = Log;
+                RunObject = Page "NpRv Sending Log";
+                RunPageLink = "Voucher No."=FIELD("No.");
+                ShortCutKey = 'Shift+Ctrl+F7';
             }
         }
     }

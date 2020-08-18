@@ -2,6 +2,7 @@ page 6151204 "NpCs Send to Store Orders"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190627  CASE 344264 Added Last Log fields
+    // NPR5.55/MHA /20200804  CASE 406591 Added Page Action "Archive"
 
     Caption = 'Send to Store Orders';
     InsertAllowed = false;
@@ -218,6 +219,31 @@ page 6151204 "NpCs Send to Store Orders"
                         NpCsWorkflowMgt.RunWorkflowPostProcessing(Rec);
                     end;
                 }
+                action(Archive)
+                {
+                    Caption = 'Archive';
+                    Image = Archive;
+
+                    trigger OnAction()
+                    var
+                        NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
+                    begin
+                        //-NPR5.55 [406591]
+                        if ("Processing Status" in ["Processing Status"::" ","Processing Status"::Pending,"Processing Status"::Confirmed]) and
+                          ("Delivery Status" in ["Delivery Status"::" ","Delivery Status"::Ready])
+                        then begin
+                          if not Confirm(Text002,false,"Document Type","Document No.") then
+                            exit;
+                        end;
+                        if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
+                          Message(Text003,"Document Type","Reference No.")
+                        else
+                          Message(Text004,"Document Type","Reference No.",GetLastErrorText);
+
+                        CurrPage.Update(false);
+                        //+NPR5.55 [406591]
+                    end;
+                }
             }
         }
         area(navigation)
@@ -250,5 +276,10 @@ page 6151204 "NpCs Send to Store Orders"
             }
         }
     }
+
+    var
+        Text002: Label 'Collect %1 %2 has not been delivered.\\Archive anyway?';
+        Text003: Label 'Collect %1 %2 has been archived.';
+        Text004: Label 'Collect %1 %2 could not be archived:\\%3';
 }
 

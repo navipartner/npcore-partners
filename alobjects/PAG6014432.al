@@ -2,13 +2,13 @@ page 6014432 "Audit Roll"
 {
     // //001
     // Henter den afslutningsbon der indholder afslutningsoplysningerne, dvs. den der henvises til i
-    // felterne "Afsluttet p� bonnr" og "P� kassenummer"
+    // felterne "Afsluttet på bonnr" og "På kassenummer"
     // 
-    // NPR4.000.005, NPK, 07-04-09, MH - Tilf�jet funktionen, SendAsPDF(), der sender den p�g�ldene kvittering som vedh�ftet via email.
+    // NPR4.000.005, NPK, 07-04-09, MH - Tilf¢jet funktionen, SendAsPDF(), der sender den pågældene kvittering som vedhæftet via email.
     //                                   Der benyttes "Mail And Document Handler"-modulet.
     // NPR4.000.006, NPK, 23-04-09, MH - Tilrettet variabelNavne og sortering i SendAsPDF().
     // NPR4.000.007, NPK, 23-04-09, MH - Fjernet funktionalitet i forhold til performance i SendAsPDF().
-    // NPR4.000.008, NPK, 11-06-09, MH - Tilf�jet feltet "Lock Code" (sag 65422).
+    // NPR4.000.008, NPK, 11-06-09, MH - Tilf¢jet feltet "Lock Code" (sag 65422).
     // NPR4.000.009, NPK, 06-07-09, MH - SendAsPDF(), flyttet til tabel, audit roll.
     // PN1.04/MH/20140819  NAV-AddOn: PDF2NAV
     //   - Added Menu Items on Function-button: "E-mail Log" and "Send as PDF".
@@ -203,12 +203,12 @@ page 6014432 "Audit Roll"
                 trigger OnValidate()
                 begin
                      /*
-                    CASE Bogf�rtfilter OF
-                      Bogf�rtfilter::" " :
+                    CASE Bogf¢rtfilter OF
+                      Bogf¢rtfilter::" " :
                         SETRANGE(Posted);
-                      Bogf�rtfilter::No :
+                      Bogf¢rtfilter::No :
                         SETRANGE(Posted,FALSE);
-                      Bogf�rtfilter::Yes :
+                      Bogf¢rtfilter::Yes :
                         SETRANGE(Posted,TRUE);
                     END;
                     */
@@ -569,7 +569,7 @@ page 6014432 "Audit Roll"
                         //IF (NPconfig."Balancing Posting Type" = NPconfig."Balancing Posting Type"::SAMLET) AND (Revisionsrulle."Balanced on Sales Ticket No."<>'') THEN BEGIN
                         //  Revisionsrulle.SETRANGE("Register No.","On Register No.");
                         //  Revisionsrulle.SETRANGE("Sales Ticket No.","Balanced on Sales Ticket No.");
-                        //  Revisionsrulle.SETRANGE("Sale Type","Sale Type"::Bem�rkning);
+                        //  Revisionsrulle.SETRANGE("Sale Type","Sale Type"::Bemærkning);
                         //  Revisionsrulle.SETRANGE("Line No.","Line No.");
                         //  Revisionsrulle.SETRANGE("No.","On Register No.");
                         //  Revisionsrulle.SETRANGE("Sale Date","Sale Date");
@@ -1059,7 +1059,7 @@ page 6014432 "Audit Roll"
         
         /*IF NOT extFilters THEN BEGIN
           CASE Filter[2] OF
-            Filter::H�ngende : BEGIN
+            Filter::Hængende : BEGIN
               Filter[2] := Filter::" ";
               Rec.COPYFILTERS(tRec[1]);
               //CurrForm."Register No.".ACTIVATE;
@@ -1067,7 +1067,7 @@ page 6014432 "Audit Roll"
               //CurrForm.UPDATE(TRUE);
               CurrPage.UPDATE(TRUE);
             END;
-            Filter::H�ngende2 : BEGIN
+            Filter::Hængende2 : BEGIN
               Filter[2] := Filter::" ";
               Rec.COPYFILTERS(tRec[1]);
               //CurrForm."Register No.".ACTIVATE;
@@ -1189,9 +1189,9 @@ page 6014432 "Audit Roll"
     var
         NPRetail: Record "Retail Setup";
     begin
-        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::H�ngende);
-        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::H�ngende);
-        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::H�ngende);
+        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::Hængende);
+        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::Hængende);
+        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::Hængende);
         //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
 
         case Filter[2] of
@@ -1226,9 +1226,9 @@ page 6014432 "Audit Roll"
     var
         NPRetail: Record "Retail Setup";
     begin
-        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::H�ngende2);
-        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::H�ngende2);
-        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::H�ngende2);
+        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::Hængende2);
+        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::Hængende2);
+        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::Hængende2);
         //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
 
         case Filter[2] of

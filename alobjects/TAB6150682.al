@@ -1,6 +1,7 @@
 table 6150682 "NPRE Kitchen Station"
 {
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Kitchen Station';
     DrillDownPageID = "NPRE Kitchen Stations";
@@ -37,6 +38,28 @@ table 6150682 "NPRE Kitchen Station"
 
     fieldgroups
     {
+        fieldgroup(DropDown;"Code",Description,"Description 2","Restaurant Code")
+        {
+        }
     }
+
+    procedure ShowKitchenRequests()
+    var
+        KitchenRequest: Record "NPRE Kitchen Request";
+        KitchenRequests: Page "NPRE Kitchen Requests";
+    begin
+        KitchenRequest.SetRange("Line Status",
+          KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Planned);
+        KitchenRequest.SetRange("Production Status",
+          KitchenRequest."Production Status"::"Not Started", KitchenRequest."Production Status"::"On Hold");
+        KitchenRequest.SetRange("Production Restaurant Filter", "Restaurant Code");
+        KitchenRequest.SetRange("Kitchen Station Filter", Code);
+        KitchenRequest.SetRange("Applicable for Kitchen Station",true);
+
+        Clear(KitchenRequests);
+        KitchenRequests.SetViewMode(1);
+        KitchenRequests.SetTableView(KitchenRequest);
+        KitchenRequests.Run;
+    end;
 }
 

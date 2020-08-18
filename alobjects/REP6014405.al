@@ -1,7 +1,7 @@
 report 6014405 "Salesperson/Item Group Top"
 {
     // NPR70.00.00.00/LS/051212 CASE143252 : Convert Report to Nav 2013
-    // NPR4.18/KN/20150818 CASE 220285 Removed field with 'NAVIPARTNER K�benhavn 2000' caption from footer
+    // NPR4.18/KN/20150818 CASE 220285 Removed field with 'NAVIPARTNER K¢benhavn 2000' caption from footer
     // NPR4.18/LS/20151005 CASE 233997 Modifying report
     // NPR4.21/JLK/20160304  CASE 222741 Hidden Tablix Table_SalesPerson5
     //                                      Added Row Visibility Condition on Tablix102 (Row 3)
@@ -9,6 +9,8 @@ report 6014405 "Salesperson/Item Group Top"
     //                                      renamed the report caption/name/displayname from "Sales code/Item group top" to "Salesperson/Item Group Top"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.54/YAHA/20200306 CASE  394854 Set Visibility to FALSE for logo
+    // NPR5.55/ANPA/20200505  CASE 402933 Added more space to the CompanyName
+    // NPR5.55/BHR /20200414  CASE 361515 Rework report to remove use of Flowfields
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/SalespersonItem Group Top.rdlc';
 
@@ -81,10 +83,10 @@ report 6014405 "Salesperson/Item Group Top"
             column(Name_SalespersonPurchaser;"Salesperson/Purchaser".Name)
             {
             }
-            column(SalesLCY_SalespersonPurchaser;"Salesperson/Purchaser"."Sales (LCY)")
+            column(SalesLCY_SalespersonPurchaser;SalesLCY)
             {
             }
-            column(ProfitLCY_SalespersonPurchaser;"Salesperson/Purchaser"."Sales (LCY)"-"Salesperson/Purchaser"."COGS (LCY)")
+            column(ProfitLCY_SalespersonPurchaser;SalesLCY-CogsLCY)
             {
             }
             column(ProfitPctSalesperson;ProfitPctSalesperson)
@@ -113,13 +115,13 @@ report 6014405 "Salesperson/Item Group Top"
                 column(Description_ItemGroup;"Item Group".Description)
                 {
                 }
-                column(SaleLCY_ItemGroup;"Item Group"."Sales (LCY)")
+                column(SaleLCY_ItemGroup;SalesLCYGP)
                 {
                 }
                 column(SalesPct;SalesPct)
                 {
                 }
-                column(CB_ItemGroup;"Item Group"."Sales (LCY)"-"Item Group"."Consumption (Amount)")
+                column(CB_ItemGroup;SalesLCYGP-CogsLCYGP)
                 {
                 }
                 column(dg_ItemGroup;dg)
@@ -131,22 +133,49 @@ report 6014405 "Salesperson/Item Group Top"
                     Clear(dg);
                     Clear(SalesPct);
 
-                    if not("Sales (LCY)" <> 0) then
+                    //-NPR5.55 [361515]
+                    SalesLCYGP := 0;
+                    CogsLCYGP := 0;
+                    ValueEntryGP.Reset;
+                    ValueEntryGP.SetRange("Item Ledger Entry Type",ValueEntryGP."Item Ledger Entry Type"::Sale);
+                    ValueEntryGP.SetRange("Salespers./Purch. Code","Salesperson/Purchaser".Code);
+                    ValueEntryGP.SetRange("Item Group No.","Item Group"."No.");
+                    ValueEntryGP.SetFilter("Posting Date",SPDateFilter );
+                    ValueEntryGP.SetFilter("Global Dimension 1 Code",SPGlobalDim1Filter);
+
+                    if ValueEntryGP.FindSet then
+                      repeat
+                        SalesLCYGP  += ValueEntryGP."Sales Amount (Actual)";
+                        CogsLCYGP  +=-ValueEntryGP."Cost Amount (Actual)";
+                      until ValueEntryGP.Next = 0;
+
+                    // IF NOT("Sales (LCY)" <> 0) THEN
+                    //  CurrReport.SKIP;
+                    //
+                    // IF NOT ("Sales (LCY)"<>0) THEN
+                    //  CurrReport.SKIP;
+                    //
+                    // IF "Sales (LCY)" <> 0 THEN
+                    //  dg := (("Sales (LCY)"-"Consumption (Amount)")/"Sales (LCY)")*100;
+                    //
+                    // IF "Salesperson/Purchaser"."Sales (LCY)" <> 0 THEN
+                    //  SalesPct := ("Sales (LCY)"/"Salesperson/Purchaser"."Sales (LCY)"*100);
+                    if SalesLCYGP = 0 then
                       CurrReport.Skip;
 
-                    if not ("Sales (LCY)"<>0) then
-                      CurrReport.Skip;
+                    if SalesLCYGP <> 0 then
+                      dg := ((SalesLCYGP-CogsLCYGP )/SalesLCYGP)*100;
 
-                    if "Sales (LCY)" <> 0 then
-                      dg := (("Sales (LCY)"-"Consumption (Amount)")/"Sales (LCY)")*100;
-
-                    if "Salesperson/Purchaser"."Sales (LCY)" <> 0 then
-                      SalesPct := ("Sales (LCY)"/"Salesperson/Purchaser"."Sales (LCY)"*100);
-
+                    if SalesLCY <> 0 then
+                      SalesPct := (SalesLCYGP / SalesLCY *100);
+                    //+NPR5.55 [361515]
                     if sortSalesPerson then begin
                       ItemAmount.Init;
-                      ItemAmount.Amount := -"Sales (LCY)";
-                      ItemAmount."Amount 2" := "Consumption (Amount)";
+                      //-NPR5.55 [361515]
+                      //ItemAmount.Amount := -"Sales (LCY)";
+                      ItemAmount.Amount := -SalesLCYGP;
+                      //+NPR5.55 [361515]
+                      ItemAmount."Amount 2" := CogsLCYGP ;
                       ItemAmount."Item No." := "No.";
                       ItemAmount.Insert;
 
@@ -157,6 +186,13 @@ report 6014405 "Salesperson/Item Group Top"
                         ItemAmount.Delete;
                       end;
                     end;
+                end;
+
+                trigger OnPreDataItem()
+                begin
+                    //-NPR5.55 [361515]
+                    "Item Group".SetFilter("No.",SPItemGroupFilter);
+                    //+NPR5.55 [361515]
                 end;
             }
             dataitem("Integer";"Integer")
@@ -171,13 +207,13 @@ report 6014405 "Salesperson/Item Group Top"
                 column(Description1_ItemGroup;"Item Group".Description)
                 {
                 }
-                column(SaleLCY1_ItemGroup;"Item Group"."Sales (LCY)")
+                column(SaleLCY1_ItemGroup;SalesLCYGPINT)
                 {
                 }
                 column(SalesPct1;SalesPct)
                 {
                 }
-                column(CB1_ItemGroup;"Item Group"."Sales (LCY)"-"Item Group"."Consumption (Amount)")
+                column(CB1_ItemGroup;SalesLCYGPINT-CogsLCYGPINT)
                 {
                 }
                 column(dg1_ItemGroup;dg)
@@ -196,36 +232,85 @@ report 6014405 "Salesperson/Item Group Top"
                       if ItemAmount.Next = 0 then
                         CurrReport.Break;
 
+                    //-NPR5.55 [361515]
                     "Item Group".Get(ItemAmount."Item No.");
-                    "Item Group".CalcFields("Sales (LCY)", "Consumption (Amount)");
+                    //"Item Group".CALCFIELDS("Sales (LCY)", "Consumption (Amount)");
+                    SalesLCYGPINT := 0;
+                    CogsLCYGPINT := 0;
+                    ValueEntryGP.Reset;
+                    ValueEntryGP.SetRange("Item Ledger Entry Type",ValueEntryGP."Item Ledger Entry Type"::Sale);
+                    ValueEntryGP.SetRange("Salespers./Purch. Code","Salesperson/Purchaser".Code);
+                    ValueEntryGP.SetRange("Item Group No.",ItemAmount."Item No.");
+                    ValueEntryGP.SetFilter("Posting Date",SPDateFilter );
+                    ValueEntryGP.SetFilter("Global Dimension 1 Code",SPGlobalDim1Filter);
+                    if ValueEntryGP.FindSet then
+                      repeat
+                        SalesLCYGPINT  += ValueEntryGP."Sales Amount (Actual)";
+                        CogsLCYGPINT += -ValueEntryGP."Cost Amount (Actual)";
+                      until ValueEntryGP.Next = 0;
+
 
                     Clear(dg);
                     Clear(SalesPct);
 
-                    if "Item Group"."Sales (LCY)" <> 0 then
-                      dg := (("Item Group"."Sales (LCY)"-"Item Group"."Consumption (Amount)")/"Item Group"."Sales (LCY)")*100;
+                    // IF "Item Group"."Sales (LCY)" <> 0 THEN
+                    //  dg := (("Item Group"."Sales (LCY)"-"Item Group"."Consumption (Amount)")/"Item Group"."Sales (LCY)")*100;
+                    //
+                    // IF "Salesperson/Purchaser"."Sales (LCY)" <> 0 THEN
+                    //  SalesPct := "Item Group"."Sales (LCY)"/"Salesperson/Purchaser"."Sales (LCY)"*100;
+                    if SalesLCYGPINT <> 0 then
+                      dg := ((SalesLCYGPINT-CogsLCYGPINT )/SalesLCYGPINT)*100;
 
-                    if "Salesperson/Purchaser"."Sales (LCY)" <> 0 then
-                      SalesPct := "Item Group"."Sales (LCY)"/"Salesperson/Purchaser"."Sales (LCY)"*100;
+                    if SalesLCY <> 0 then
+                      SalesPct := SalesLCYGPINT/SalesLCY*100;
+                    //+NPR5.55 [361515]
                 end;
             }
 
             trigger OnAfterGetRecord()
             begin
-                "Item Group".CalcFields("Sales (LCY)");
+                //-NPR5.55 [361515]
+                SalesLCY := 0;
+                CogsLCY := 0;
+                ValueEntry.Reset;
+                ValueEntry.SetRange("Item Ledger Entry Type",ValueEntry."Item Ledger Entry Type"::Sale);
+                ValueEntry.SetRange("Salespers./Purch. Code","Salesperson/Purchaser".Code);
+                CopyFilter("Date Filter",ValueEntry."Posting Date");
+                CopyFilter("Item Group Filter",ValueEntry."Item Group No.");
+                CopyFilter("Global Dimension 1 Filter",ValueEntry."Global Dimension 1 Code");
+
+                if ValueEntry.FindSet then
+                  repeat
+                    SalesLCY += ValueEntry."Sales Amount (Actual)";
+                    CogsLCY += -ValueEntry."Cost Amount (Actual)"
+                  until ValueEntry.Next = 0;
+                //  "Item Group".CALCFIELDS("Sales (LCY)");
+                //+NPR5.55 [361515]
+
+
                 ItemAmount.DeleteAll;
 
                 Clear(i);
                 Clear(ProfitPctSalesperson);
                 Clear(db);
+                //-NPR5.55 [361515]
+                // IF "Sales (LCY)" <> 0 THEN BEGIN
+                //  ProfitPctSalesperson := (("Sales (LCY)"-"COGS (LCY)")/"Sales (LCY)")*100;
+                //  db := "Sales (LCY)" - "COGS (LCY)";
+                // END;
+                //
+                // IF  "Sales (LCY)" = 0 THEN
+                //  CurrReport.SKIP;
 
-                if "Sales (LCY)" <> 0 then begin
-                  ProfitPctSalesperson := (("Sales (LCY)"-"COGS (LCY)")/"Sales (LCY)")*100;
-                  db := "Sales (LCY)" - "COGS (LCY)";
-                end;
+                 if SalesLCY <> 0 then begin
+                  ProfitPctSalesperson := ((SalesLCY-CogsLCY)/SalesLCY)*100;
+                  db := SalesLCY - CogsLCY;
+                 end;
 
-                if  "Sales (LCY)" = 0 then
+                 if  SalesLCY  = 0 then
                   CurrReport.Skip;
+
+                //+NPR5.55 [361515]
 
                 if sortSalesPerson then
                   SortingText := Trans0001
@@ -239,6 +324,11 @@ report 6014405 "Salesperson/Item Group Top"
                   SortingText := Trans0001
                 else
                   SortingText := '';
+                //-NPR5.55 [361515]
+                SPDateFilter := "Salesperson/Purchaser".GetFilter("Date Filter");
+                SPGlobalDim1Filter := "Salesperson/Purchaser".GetFilter("Global Dimension 1 Code");
+                SPItemGroupFilter := "Salesperson/Purchaser".GetFilter("Item Group Filter");
+                //+NPR5.55 [361515]
             end;
         }
     }
@@ -356,5 +446,19 @@ report 6014405 "Salesperson/Item Group Top"
         sortSalesPersonVisible: Boolean;
         [InDataSet]
         ShowQtyVisible: Boolean;
+        ValueEntry: Record "Value Entry";
+        SalesLCY: Decimal;
+        CogsLCY: Decimal;
+        ConsumptionAmt: Decimal;
+        ValueEntryGP: Record "Value Entry";
+        SalesLCYGP: Decimal;
+        CogsLCYGP: Decimal;
+        ConsumptionAmtGP: Decimal;
+        SalesLCYGPINT: Decimal;
+        CogsLCYGPINT: Decimal;
+        ConsumptionAmtINT: Decimal;
+        SPDateFilter: Text;
+        SPGlobalDim1Filter: Text;
+        SPItemGroupFilter: Text;
 }
 

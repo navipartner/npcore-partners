@@ -4,6 +4,7 @@ page 6151386 "CS Stock-Takes Card"
     // NPR5.52/CLVA/20190905  CASE 364063 Added field "Journal Template Name","Journal Batch Name","Inventory Calculated" and "Journal Qty. (Calculated)"
     // NPR5.54/CLVA/20200217  CASE 391080 Added fields "Unknown Entries" and "Manuel Posting". Added action "Tag Data"
     // NPR5.54/CLVA/20200225  CASE 392901 Added action "Update Predicted Qty."
+    // NPR5.55/ALST/20200727  CASE 415521 added action "Update Unknown Entries"
 
     Caption = 'CS Stock-Takes Card';
     DelayedInsert = false;
@@ -254,6 +255,16 @@ page 6151386 "CS Stock-Takes Card"
                           Modify;
                         end;
                     end;
+                }
+                action("Update Unknown Entries")
+                {
+                    Caption = 'Update Unknown Entries';
+                    Image = Links;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = Process;
+                    RunObject = Page "CS Upd. Unknown Entries";
+                    RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
+                    RunPageView = WHERE("Item No."=CONST(''));
                 }
             }
         }

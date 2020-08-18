@@ -118,9 +118,6 @@ End Function
         <Field Name="InuseQuantity_NpRvVoucher">
           <DataField>InuseQuantity_NpRvVoucher</DataField>
         </Field>
-        <Field Name="InuseQuantityExternal_NpRvVoucher">
-          <DataField>InuseQuantityExternal_NpRvVoucher</DataField>
-        </Field>
         <Field Name="EmailTemplateCode_NpRvVoucher">
           <DataField>EmailTemplateCode_NpRvVoucher</DataField>
         </Field>
@@ -204,6 +201,15 @@ End Function
         </Field>
         <Field Name="IssueUserID_NpRvVoucher">
           <DataField>IssueUserID_NpRvVoucher</DataField>
+        </Field>
+        <Field Name="StartingDate_DateFormat">
+          <DataField>StartingDate_DateFormat</DataField>
+        </Field>
+        <Field Name="EndingDate_DateFormat">
+          <DataField>EndingDate_DateFormat</DataField>
+        </Field>
+        <Field Name="IssuedDate_DateFormat">
+          <DataField>IssuedDate_DateFormat</DataField>
         </Field>
       </Fields>
       <Query>

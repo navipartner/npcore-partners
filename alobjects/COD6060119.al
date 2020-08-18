@@ -58,6 +58,7 @@ codeunit 6060119 "TM Ticket Request Manager"
     // TM1.45/TSA /20191204 CASE 380754 Waiting List adoption
     // TM1.45/TSA /20191216 CASE 382535 Added assignment of Admission Inclusion when request is created
     // TM1.45/TSA /20200121 CASE 382535 Had to refactor IssueTicket() function break it down in smaller reusable units
+    // TM1.47/TSA/20200611  CASE 382535-01 Transport TM1.47 - 11 June 2020
 
 
     trigger OnRun()
@@ -219,6 +220,9 @@ codeunit 6060119 "TM Ticket Request Manager"
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "TM Ticket Reservation Request"; FailWithError: Boolean; var ResponseMessage: Text) ResponseCode: Integer
     var
         Ticket: Record "TM Ticket";
+        TicketBOM: Record "TM Ticket Admission BOM";
+        AdmissionUnitPrice: Decimal;
+        AdmissionCount: Decimal;
     begin
 
         TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
@@ -239,21 +243,34 @@ codeunit 6060119 "TM Ticket Request Manager"
 
         with TicketReservationRequest do begin
 
-          //IF (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) THEN
-            ResponseCode := IssueTicketOriginal ("Item No.","Variant Code", Quantity, "Entry No.", FailWithError, ResponseMessage);
+          //-TM1.47 [382535]
+          //ResponseCode := IssueTicketOriginal ("Item No.","Variant Code", Quantity, "Entry No.", FailWithError, ResponseMessage);
+          if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then
+            // IssueTicketOriginal ("Item No.","Variant Code", Quantity, "Entry No.", FailWithError, ResponseMessage);
+            ResponseCode := _IssueNewTickets("Item No.","Variant Code", Quantity, "Entry No.", FailWithError, AdmissionUnitPrice, ResponseMessage);
 
-        //  IF (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) THEN BEGIN
-        //    Ticket.SETFILTER ("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-        //    IF (Ticket.FINDSET ()) THEN BEGIN
-        //      REPEAT
-        //
-        //        ResponseCode := _IssueAdmissionsAppendToTicket (Ticket, 1, TicketReservationRequest, FailWithError, ResponseMessage);
-        //        IF (ResponseCode <> 0) THEN
-        //          EXIT (ResponseCode);
-        //
-        //      UNTIL (Ticket.NEXT () = 0);
-        //    END;
-        //  END;
+          if ((TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) and
+              (not TicketReservationRequest."Admission Created")) then begin
+
+            Ticket.SetFilter ("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            if (Ticket.FindSet ()) then begin
+              AdmissionCount := 0;
+              repeat
+                AdmissionCount += 1;
+                ResponseCode := _IssueOneAdmission (FailWithError, TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionUnitPrice, ResponseMessage);
+                if (ResponseCode <> 0) then
+                  exit (ResponseCode);
+
+              until (Ticket.Next () = 0);
+
+              if (AdmissionUnitPrice > 0) then begin
+
+              end;
+
+            end;
+
+          end;
+          //+TM1.47 [382535]
 
         end;
         //+TM1.45 [382535]
@@ -495,7 +512,7 @@ codeunit 6060119 "TM Ticket Request Manager"
             Window.Close();
     end;
 
-    local procedure _IssueNewTickets(ItemNo: Code[20];VariantCode: Code[10];Quantity: Integer;RequestEntryNo: Integer;FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    local procedure _IssueNewTickets(ItemNo: Code[20];VariantCode: Code[10];Quantity: Integer;RequestEntryNo: Integer;FailWithError: Boolean;AdditionCost: Decimal;var ResponseMessage: Text) ResponseCode: Integer
     var
         Item: Record Item;
         TicketType: Record "TM Ticket Type";
@@ -518,6 +535,7 @@ codeunit 6060119 "TM Ticket Request Manager"
         Window: Dialog;
         WaitingListReferenceCode: Code[10];
         CreateAdmission: Boolean;
+        AdditionalAdmissionCosts: Decimal;
     begin
 
         //-TM1.45 [382535] - refactored
@@ -568,8 +586,9 @@ codeunit 6060119 "TM Ticket Request Manager"
         ReservationRequest.Modify ();
 
         for i := 1 to Abs (NumberOfTickets) do begin
+          AdditionalAdmissionCosts := 0;
 
-          ResponseCode := _IssueOneTicket (ItemNo, VariantCode, TicketQuantity, TicketType, ReservationRequest, FailWithError, ResponseMessage);
+          ResponseCode := _IssueOneTicket (ItemNo, VariantCode, TicketQuantity, TicketType, ReservationRequest, FailWithError, AdditionalAdmissionCosts, ResponseMessage);
           if (ResponseCode <> 0) then begin
             if (GetShowProgressBar()) then
               Window.Close ();
@@ -580,6 +599,8 @@ codeunit 6060119 "TM Ticket Request Manager"
             if (i mod 10 = 0) then
               Window.Update (1, Round (i / NumberOfTickets * 10000, 1));
 
+          AdditionCost += AdditionalAdmissionCosts;
+
         end;
 
         if (GetShowProgressBar()) then
@@ -587,7 +608,7 @@ codeunit 6060119 "TM Ticket Request Manager"
         //+TM1.45 [382535]
     end;
 
-    local procedure _IssueOneTicket(ItemNo: Code[20];VariantCode: Code[10];QuantityPerTicket: Integer;TicketType: Record "TM Ticket Type";ReservationRequest: Record "TM Ticket Reservation Request";FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    local procedure _IssueOneTicket(ItemNo: Code[20];VariantCode: Code[10];QuantityPerTicket: Integer;TicketType: Record "TM Ticket Type";ReservationRequest: Record "TM Ticket Reservation Request";FailWithError: Boolean;var AdditionalAdmissionCosts: Decimal;var ResponseMessage: Text) ResponseCode: Integer
     var
         Ticket: Record "TM Ticket";
         TicketBom: Record "TM Ticket Admission BOM";
@@ -620,7 +641,7 @@ codeunit 6060119 "TM Ticket Request Manager"
         TicketManagement.SetTicketProperties (Ticket, Today);
         Ticket.Insert(true);
 
-        ResponseCode := _IssueAdmissionsAppendToTicket (Ticket, QuantityPerTicket, ReservationRequest, FailWithError, ResponseMessage);
+        ResponseCode := _IssueAdmissionsAppendToTicket (Ticket, QuantityPerTicket, ReservationRequest, FailWithError, AdditionalAdmissionCosts, ResponseMessage);
 
         // Update ticket valid from / to dates based on contents
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
@@ -637,9 +658,10 @@ codeunit 6060119 "TM Ticket Request Manager"
         //+TM1.45 [382535]
     end;
 
-    local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "TM Ticket";QuantityPerTicket: Integer;ReservationRequest: Record "TM Ticket Reservation Request";FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "TM Ticket";QuantityPerTicket: Integer;ReservationRequest: Record "TM Ticket Reservation Request";FailWithError: Boolean;var AdditionalAdmissionCosts: Decimal;var ResponseMessage: Text) ResponseCode: Integer
     var
         TicketBom: Record "TM Ticket Admission BOM";
+        AdmissionUnitPrice: Decimal;
     begin
 
         //-TM1.45 [382535] - refactored
@@ -656,16 +678,19 @@ codeunit 6060119 "TM Ticket Request Manager"
           end;
 
           repeat
-            ResponseCode := _IssueOneAdmission (FailWithError, ReservationRequest, Ticket, TicketBom."Admission Code", QuantityPerTicket, true, ResponseMessage);
+            AdmissionUnitPrice := 0;
+
+            ResponseCode := _IssueOneAdmission (FailWithError, ReservationRequest, Ticket, TicketBom."Admission Code", QuantityPerTicket, true, AdmissionUnitPrice, ResponseMessage);
             if (ResponseCode <> 0) then
               exit (ResponseCode);
 
+            AdditionalAdmissionCosts += AdmissionUnitPrice;
           until (TicketBom.Next () = 0);
         end;
         //+TM1.45 [382535]
     end;
 
-    local procedure _IssueOneAdmission(FailWithError: Boolean;SourceRequest: Record "TM Ticket Reservation Request";Ticket: Record "TM Ticket";AdmissionCode: Code[20];QuantityPerTicket: Integer;ValidateWaitinglistReference: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    local procedure _IssueOneAdmission(FailWithError: Boolean;SourceRequest: Record "TM Ticket Reservation Request";Ticket: Record "TM Ticket";AdmissionCode: Code[20];QuantityPerTicket: Integer;ValidateWaitinglistReference: Boolean;var AdmissionUnitPrice: Decimal;var ResponseMessage: Text) ResponseCode: Integer
     var
         AdmissionSchEntry: Record "TM Admission Schedule Entry";
         ReservationRequest: Record "TM Ticket Reservation Request";
@@ -739,6 +764,10 @@ codeunit 6060119 "TM Ticket Request Manager"
         end;
 
         ResponseCode := TicketManagement.CreateAdmissionAccessEntry (FailWithError, Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry, ResponseMessage);
+
+        AdmissionUnitPrice := TicketBom."Admission Unit Price";
+        if ((TicketBom."Admission Inclusion" <> SourceRequest."Admission Inclusion") and (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::NOT_SELECTED)) then
+          AdmissionUnitPrice *= -1;
 
         exit (ResponseCode);
         //+TM1.45 [382535]
@@ -1640,9 +1669,7 @@ codeunit 6060119 "TM Ticket Request Manager"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then begin
             repeat
-                TicketReservationRequest."Receipt No." := ReceiptNo;
-                TicketReservationRequest."Line No." := LineNumber;
-                TicketReservationRequest.Modify();
+
 
             until (TicketReservationRequest.Next() = 0);
             exit(true);

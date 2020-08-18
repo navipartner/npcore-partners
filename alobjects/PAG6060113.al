@@ -27,12 +27,15 @@ page 6060113 "TM Ticket Make Reservation"
     // TM90.1.46/TSA /20200123 CASE 386850 Added SetIgnoreScheduleSelectionFilter() to show all schedules rather then applying the POS schedule filter
     // TM90.1.46/TSA /20200127 CASE 387138 Ticket Server - show eTicket notification address field
     // TM90.1.46/TSA /20200304 CASE 399138 Make sure deliver-to field is displayed when allocation changes to waitinglist
+    // TM1.47/TSA/20200611  CASE 382535-01 Transport TM1.47 - 11 June 2020
+    // TM1.48/TSA /20200629 CASE 411704 Changed from GetAdmissionCapacity() to GetTicketCapacity()
+    // TM1.48/TSA /20200630 CASE 412015 Changed dialog type from ListPlus to StandardDialog (for operation on mobile devices)
 
     Caption = 'Make your reservation';
     DataCaptionExpression = StrSubstNo ('%1  - %2', Today, Time);
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = ListPlus;
+    PageType = StandardDialog;
     SourceTable = "TM Ticket Reservation Request";
     SourceTableTemporary = true;
 
@@ -57,51 +60,6 @@ page 6060113 "TM Ticket Make Reservation"
                         //+TM1.45 [379541]
                     end;
                 }
-                field("Customer No.";"Customer No.")
-                {
-                    Visible = gBatchTicketCreateMode;
-
-                    trigger OnValidate()
-                    begin
-
-                        ModifyAll ("Customer No.", "Customer No.");
-                        CurrPage.Update (false);
-
-                        //-TM1.45 [379541]
-                        gReservationEdited := true;
-                        //+TM1.45 [379541]
-                    end;
-                }
-                field("External Order No.";"External Order No.")
-                {
-                    Visible = gBatchTicketCreateMode;
-
-                    trigger OnValidate()
-                    begin
-
-                        ModifyAll ("External Order No.", "External Order No.");
-                        CurrPage.Update (false);
-
-                        //-TM1.45 [379541]
-                        gReservationEdited := true;
-                        //+TM1.45 [379541]
-                    end;
-                }
-                field("Payment Option";"Payment Option")
-                {
-                    Visible = false;
-
-                    trigger OnValidate()
-                    begin
-
-                        ModifyAll ("Payment Option", "Payment Option");
-                        CurrPage.Update (false);
-
-                        //-TM1.45 [379541]
-                        gReservationEdited := true;
-                        //+TM1.45 [379541]
-                    end;
-                }
                 field("Admission Code";"Admission Code")
                 {
                     Editable = false;
@@ -109,6 +67,26 @@ page 6060113 "TM Ticket Make Reservation"
                     StyleExpr = gVisualQueueUnfavorable;
 
                     trigger OnDrillDown()
+                    begin
+
+                        SelectSchedule ();
+                        CurrPage.Update (false);
+                    end;
+                }
+                field("Scheduled Time Description";"Scheduled Time Description")
+                {
+                    Editable = false;
+                    Style = Unfavorable;
+                    StyleExpr = gVisualQueueUnfavorable;
+
+                    trigger OnDrillDown()
+                    begin
+
+                        SelectSchedule ();
+                        CurrPage.Update (false);
+                    end;
+
+                    trigger OnLookup(var Text: Text): Boolean
                     begin
 
                         SelectSchedule ();
@@ -124,6 +102,32 @@ page 6060113 "TM Ticket Make Reservation"
                     trigger OnDrillDown()
                     begin
                         SelectSchedule ();
+                        CurrPage.Update (false);
+                    end;
+                }
+                field(Quantity;Quantity)
+                {
+                    Editable = gAllowQuantityChange;
+                    Style = Unfavorable;
+                    StyleExpr = gVisualQueueUnfavorable;
+
+                    trigger OnValidate()
+                    var
+                        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+                        ResponseMessage: Text;
+                    begin
+
+                        //-TM1.45 [382535]
+                        if ("Admission Inclusion" = "Admission Inclusion"::NOT_SELECTED) then
+                          Error (QTY_NOT_EDITABLE);
+                        //+TM1.45 [382535]
+
+                        if (Quantity < 1) then
+                          Error (QTY_MUST_BE_GT_ZERO);
+
+                        if (xRec.Quantity <> Quantity) then
+                          ChangeQuantity (Quantity);
+
                         CurrPage.Update (false);
                     end;
                 }
@@ -169,50 +173,49 @@ page 6060113 "TM Ticket Make Reservation"
                         //+TM1.45 [382535]
                     end;
                 }
-                field(Quantity;Quantity)
+                field("Customer No.";"Customer No.")
                 {
-                    Editable = gAllowQuantityChange;
-                    Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
+                    Visible = gBatchTicketCreateMode;
 
                     trigger OnValidate()
-                    var
-                        TicketRequestManager: Codeunit "TM Ticket Request Manager";
-                        ResponseMessage: Text;
                     begin
 
-                        //-TM1.45 [382535]
-                        if ("Admission Inclusion" = "Admission Inclusion"::NOT_SELECTED) then
-                          Error (QTY_NOT_EDITABLE);
-                        //+TM1.45 [382535]
-
-                        if (Quantity < 1) then
-                          Error (QTY_MUST_BE_GT_ZERO);
-
-                        if (xRec.Quantity <> Quantity) then
-                          ChangeQuantity (Quantity);
-
+                        ModifyAll ("Customer No.", "Customer No.");
                         CurrPage.Update (false);
+
+                        //-TM1.45 [379541]
+                        gReservationEdited := true;
+                        //+TM1.45 [379541]
                     end;
                 }
-                field("Scheduled Time Description";"Scheduled Time Description")
+                field("External Order No.";"External Order No.")
                 {
-                    Editable = false;
-                    Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
+                    Visible = gBatchTicketCreateMode;
 
-                    trigger OnDrillDown()
+                    trigger OnValidate()
                     begin
 
-                        SelectSchedule ();
+                        ModifyAll ("External Order No.", "External Order No.");
                         CurrPage.Update (false);
+
+                        //-TM1.45 [379541]
+                        gReservationEdited := true;
+                        //+TM1.45 [379541]
                     end;
+                }
+                field("Payment Option";"Payment Option")
+                {
+                    Visible = false;
 
-                    trigger OnLookup(var Text: Text): Boolean
+                    trigger OnValidate()
                     begin
 
-                        SelectSchedule ();
+                        ModifyAll ("Payment Option", "Payment Option");
                         CurrPage.Update (false);
+
+                        //-TM1.45 [379541]
+                        gReservationEdited := true;
+                        //+TM1.45 [379541]
                     end;
                 }
                 field("Waiting List Reference Code";"Waiting List Reference Code")
@@ -338,8 +341,12 @@ page 6060113 "TM Ticket Make Reservation"
     trigger OnModifyRecord(): Boolean
     begin
 
-        if ("Admission Created") then
+        //-TM1.47 [382535]
+        //IF ("Admission Created") THEN
+        //  ERROR ('Confirmed admissions can not be altered.');
+        if (("Request Status" = "Request Status"::CONFIRMED) and ("Admission Created")) then
           Error ('Confirmed admissions can not be altered.');
+        //+TM1.47 [382535]
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -534,7 +541,10 @@ page 6060113 "TM Ticket Make Reservation"
 
 
             //-TM1.20 [269171]
-            TicketManagement.GetMaxCapacity (AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl);
+            //-TM1.48 [411704]
+            //TicketManagement.GetAdmissionCapacity (AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl);
+            TicketManagement.GetTicketCapacity (gTicketItemNo, gTicketVariantCode, AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl);
+            //+TM1.48 [411704]
 
             case CapacityControl of
               Admission."Capacity Control"::ADMITTED : Remaining := MaxCapacity - AdmissionSchEntry."Open Admitted" - AdmissionSchEntry."Open Reservations";
@@ -631,6 +641,7 @@ page 6060113 "TM Ticket Make Reservation"
     procedure FinalizeReservationRequest(FailWithError: Boolean;var ResponseMessage: Text): Integer
     var
         TicketReservationRequest: Record "TM Ticket Reservation Request";
+        TicketBOM: Record "TM Ticket Admission BOM";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         TicketWaitingListMgr: Codeunit "TM Ticket Waiting List Mgr.";
     begin
@@ -690,6 +701,19 @@ page 6060113 "TM Ticket Make Reservation"
               TicketReservationRequest."Payment Option" := Rec."Payment Option";
               TicketReservationRequest."Customer No." := Rec."Customer No.";
             end;
+
+            //-TM1.47 [382535]
+            TicketReservationRequest."Admission Inclusion Status" := TicketReservationRequest."Admission Inclusion Status"::NO_CHANGE;
+            if (TicketBOM.Get (Rec."Item No.", Rec."Variant Code", Rec."Admission Code")) then begin
+              TicketReservationRequest."Admission Inclusion Status" := TicketReservationRequest."Admission Inclusion Status"::NO_CHANGE;
+              if (TicketReservationRequest."Admission Inclusion" <> Rec."Admission Inclusion") then
+                case Rec."Admission Inclusion" of
+                  Rec."Admission Inclusion"::NOT_SELECTED : TicketReservationRequest."Admission Inclusion Status" := TicketReservationRequest."Admission Inclusion Status"::REMOVE;
+                  Rec."Admission Inclusion"::SELECTED     : TicketReservationRequest."Admission Inclusion Status" := TicketReservationRequest."Admission Inclusion Status"::ADD;
+                 end;
+            end;
+            //-TM1.47 [382535]
+
             TicketReservationRequest."Waiting List Reference Code" := Rec."Waiting List Reference Code"; //-+TM1.45 [380754]
             TicketReservationRequest."Admission Inclusion" := Rec."Admission Inclusion"; //-+TM1.45 [382535]
 

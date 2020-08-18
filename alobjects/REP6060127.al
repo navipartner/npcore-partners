@@ -1,9 +1,9 @@
-report 6060127 "MM Member Card Print"
+report 6060127 "MM Member Card Print QR"
 {
     // MM80.1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
     // MM1.37/TJ  /20190201  CASE 350288 Using POS View Profile for register picture
     DefaultLayout = RDLC;
-    RDLCLayout = './layouts/MM Member Card Print.rdlc';
+    RDLCLayout = './layouts/MM Member Card Print QR.rdlc';
 
     Caption = 'Member Card Print';
 

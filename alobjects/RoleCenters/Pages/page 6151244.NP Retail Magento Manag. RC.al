@@ -458,7 +458,7 @@ page 6151244 "NP Retail Magento Manag. RC"
             action("Item Groups")
             {
                 Caption = 'Item Groups';
-                RunObject = Page "Magento Item Groups";
+                RunObject = Page "Magento Categories";
             }
             action("Sale Orders")
             {

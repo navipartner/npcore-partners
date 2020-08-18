@@ -35,6 +35,7 @@ codeunit 6014531 "Retail Logo Mgt."
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
     // NPR5.40/MMV /20180306 CASE 284505 Added fields for permanent storage of ESCPOS specific constants per logo.
     // NPR5.46/BHR /20180906 CASE 327525 Export Logo
+    // NPR5.55/MITH/20200617 CASE 404276 Added 1bit BMP option for boca print and changed var name for 32 conversion
 
 
     trigger OnRun()
@@ -96,15 +97,21 @@ codeunit 6014531 "Retail Logo Mgt."
     procedure UploadLogoFromBitmap(var Bitmap: DotNet npNetBitmap): Boolean
     var
         ESCPOS: Text;
+        OneBitBitmap: DotNet npNetBitmap;
     begin
+        //-NPR5.55 [404276]
+        ConvertTo1bitBitmap(Bitmap, OneBitBitmap);
+        //+NPR5.55 [404276]
         ConvertToNonIndexed32bit(Bitmap);
 
         ESCPOS := ConvertToESCPOS(Bitmap);
 
         if StrLen(ESCPOS) > 65523 then
             Error(Error000001, Format(StrLen(ESCPOS)));
-
-        CreateRecord(Bitmap, ESCPOS);
+        //-NPR5.55 [404276]
+        //CreateRecord(Bitmap,ESCPOS);
+        CreateRecord(Bitmap,ESCPOS, OneBitBitmap);
+        //+NPR5.55 [404276]
 
         exit(true);
     end;
@@ -225,7 +232,7 @@ codeunit 6014531 "Retail Logo Mgt."
         end;
     end;
 
-    local procedure CreateRecord(var Bitmap: DotNet npNetBitmap; ESCPOS: Text)
+    local procedure CreateRecord(var Bitmap: DotNet npNetBitmap;ESCPOS: Text;var OneBitBitmap: DotNet npNetBitmap)
     var
         RetailLogo: Record "Retail Logo";
         OutStream: OutStream;
@@ -262,10 +269,18 @@ codeunit 6014531 "Retail Logo Mgt."
         MemoryStream := MemoryStream.MemoryStream;
         MemoryStream.Write(ByteArray, 0, ByteArray.Length);
         MemoryStream.WriteTo(OutStream);
+        //-NPR5.55 [404276]
+        Clear(OutStream);
+        RetailLogo.OneBitLogo.CreateOutStream(OutStream);
+        MemoryStream := MemoryStream.MemoryStream;
+        OneBitBitmap.Save(MemoryStream, ImageFormat.Bmp);
+        RetailLogo.OneBitLogoByteSize := MemoryStream.ToArray().Length; // Get bytesize
+        OneBitBitmap.Save(OutStream, ImageFormat.Bmp); // Store logo
+        //+NPR5.55 [404276]
         RetailLogo.Modify;
     end;
 
-    local procedure ConvertToNonIndexed32bit(var BitmapIn: DotNet npNetBitmap)
+    local procedure ConvertToNonIndexed32bit(var BitmapOut: DotNet npNetBitmap)
     var
         Bitmap: DotNet npNetBitmap;
         Graphics: DotNet npNetGraphics;
@@ -278,12 +293,12 @@ codeunit 6014531 "Retail Logo Mgt."
         Width: Integer;
         PaddedHeight: Integer;
     begin
-        if BitmapIn.Width < 513 then begin
-            Width := BitmapIn.Width;
-            Height := BitmapIn.Height;
+        if BitmapOut.Width < 513 then begin
+          Width  := BitmapOut.Width;
+          Height := BitmapOut.Height;
         end else begin
-            Ratio := 512 / BitmapIn.Width;
-            Height := Round(BitmapIn.Height * Ratio, 1, '=');
+          Ratio  := 512 / BitmapOut.Width;
+          Height := Round(BitmapOut.Height*Ratio,1,'=');
             Width := 512;
         end;
 
@@ -299,9 +314,9 @@ codeunit 6014531 "Retail Logo Mgt."
         Graphics := Graphics.FromImage(Bitmap);
         Graphics.Clear(Color.White);
         Graphics.PixelOffsetMode := PixelOffsetMode.HighQuality;
-        Graphics.DrawImage(BitmapIn, Rectangle);
+        Graphics.DrawImage(BitmapOut, Rectangle);
 
-        BitmapIn := Bitmap;
+        BitmapOut := Bitmap;
     end;
 
     procedure ExportImageBMP(RetailLogo: Record "Retail Logo")
@@ -316,6 +331,20 @@ codeunit 6014531 "Retail Logo Mgt."
             FileManagement.BLOBExport(TempBlob, RetailLogo.Keyword + Format(RetailLogo.Sequence) + '.bmp', true);
         end;
         //-NPR5.46 [327525]
+    end;
+
+    local procedure ConvertTo1bitBitmap(BitmapIn: DotNet npNetBitmap;var BitmapOut: DotNet npNetBitmap)
+    var
+        Bitmap: DotNet npNetBitmap;
+        Graphics: DotNet npNetGraphics;
+        PixelFormat: DotNet npNetPixelFormat;
+        PixelOffsetMode: DotNet npNetPixelOffsetMode;
+        Rectangle: DotNet npNetRectangle;
+    begin
+        //-NPR5.55 [404276]
+        BitmapOut := Bitmap.Bitmap(BitmapIn);
+        BitmapOut := BitmapOut.Clone(Rectangle.Rectangle(0,0, BitmapIn.Width, BitmapIn.Height), PixelFormat.Format1bppIndexed);
+        //+NPR5.55 [404276]
     end;
 }
 

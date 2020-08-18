@@ -3,6 +3,7 @@ page 6151439 "Magento Store Item List"
     // MAG1.21/MHA /20151118  CASE 227354 Object created
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG9.00.2.11/TS  /20180301  CASE 305585 Added field Visibility.
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
     Caption = 'Webshops';
     PageType = ListPlus;
@@ -60,8 +61,9 @@ page 6151439 "Magento Store Item List"
                     group(Control6150623)
                     {
                         ShowCaption = false;
-                        part(MagentoItemGroupLinks;"Magento Item Group Link")
+                        part(MagentoCategoryLinks;"Magento Category Links")
                         {
+                            Caption = 'Magento Category Links';
                             SubPageLink = "Item No."=FIELD("Item No.");
                         }
                     }
@@ -385,7 +387,7 @@ page 6151439 "Magento Store Item List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.MagentoItemGroupLinks.PAGE.SetRootNo("Root Item Group No.");
+        CurrPage.MagentoCategoryLinks.PAGE.SetRootNo("Root Item Group No.");
     end;
 }
 

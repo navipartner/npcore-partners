@@ -1,18 +1,18 @@
 table 6014426 "Retail Document Lines"
 {
     // //-NPR3.0k ved Nikolai Pedersen
-    //   tilf�jet vat %
+    //   tilf¢jet vat %
     // //-NPR3.0l ved Nikolai Pedersen
-    //   tilf�jet bel�b incl. moms
+    //   tilf¢jet bel¢b incl. moms
     // //-NPR3.0m ved Nikolai Pedersen
     //   varenummer -> onvalidate udregner nu moms efter varen og hovedet
     // //-NPR3.0n ved Nikolai Pedersen
-    //    Overf�rFraEkspLinie-> moms udregnes efter ekspeditionen og hovedet
-    // //-NPR3.0p ved Simon Sch�bel
-    //   Tilf�jet feltet"date of rental"
+    //    Overf¢rFraEkspLinie-> moms udregnes efter ekspeditionen og hovedet
+    // //-NPR3.0p ved Simon Sch¢bel
+    //   Tilf¢jet feltet"date of rental"
     // 
-    // NPR4.001.003, 11-06-09, MH, Tilf�jet feltet "Lock Code" (sag 65422).
-    // NPR4.001.004, 08-07-09, MH, Tilf�jet overf�rsel af feltet "Lock Code" i forbindelse med Sale2RetailDocument (sag 65422).
+    // NPR4.001.003, 11-06-09, MH, Tilf¢jet feltet "Lock Code" (sag 65422).
+    // NPR4.001.004, 08-07-09, MH, Tilf¢jet overf¢rsel af feltet "Lock Code" i forbindelse med Sale2RetailDocument (sag 65422).
     // NPR5.23/JDH /20160513 CASE 240916 Removed old VariaX Solution
     // NPR5.29/TJ/20161223 CASE 249720 Replaced calling of standard codeunit 7000 Sales Price Calc. Mgt. with our own codeunit 6014453 POS Sales Price Calc. Mgt.
     // NPR5.32/JLK /20170428  CASE 272861  Removed Validate because trigger is calling for Item Unit Price instead of Sales Line POS price

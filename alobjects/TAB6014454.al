@@ -76,7 +76,7 @@ table 6014454 "Shoe Shelves"
             Placement := Shelve."No."+'-'+padstr2(newNumber,4,'0');
             exit(Placement);
           end else
-            Error('Fejl i ops�tning af reoler!');
+            Error('Fejl i opsætning af reoler!');
         end;
     end;
 
@@ -219,7 +219,7 @@ table 6014454 "Shoe Shelves"
             ShelfCreatedCounter += 1;
           end;
         until item.Next = 0;
-        Message('K�rsel afsluttet.\Der blev oprettet %1 nye hylder\Der er %2 varer uden placeringsnummer',
+        Message('K¢rsel afsluttet.\Der blev oprettet %1 nye hylder\Der er %2 varer uden placeringsnummer',
         ShelfCreatedCounter,NoShelfNoCounter);
 
     end;
@@ -350,7 +350,7 @@ table 6014454 "Shoe Shelves"
           end;
         
         until itemGroup.Next = 0;
-        Message('K�rsel afsluttet.\Der blev oprettet %1 nye hylder',
+        Message('K¢rsel afsluttet.\Der blev oprettet %1 nye hylder',
         ShelfCreatedCounter);
 
     end;

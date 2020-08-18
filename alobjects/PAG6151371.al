@@ -24,6 +24,10 @@ page 6151371 "CS Setup"
     // NPR5.53/CLVA/20191128 CASE 379973 Added field "Earliest Start Date/Time"
     // NPR5.53/CLVA/20191125 CASE 377467 Added action "Counting Supervisor"
     // NPR5.54/CLVA/20202003 CASE 389224 Added field "Batch Size"
+    // NPR5.55/CLVA/20200604 CASE 379709 Added Group "Ship & Receive"
+    // NPR5.55/CLVA/20200608 CASE 379709 Added action "Update Item Cross. Ref."
+    // NPR5.55/ALST/20200727 CASE 415521 added field Disregard Unknown RFID Tags
+    // NPR5.55/ALPO/20200729 CASE 404663 Added action "Whse. Activity Type Setup"
 
     Caption = 'CS Setup';
     PageType = Card;
@@ -83,6 +87,19 @@ page 6151371 "CS Setup"
                 {
                 }
                 field("Batch Size"; "Batch Size")
+                {
+                }
+                field("Disregard Unknown RFID Tags";"Disregard Unknown RFID Tags")
+                {
+                }
+            }
+            group("Ship & Receive")
+            {
+                Caption = 'Ship & Receive';
+                field("Import Tags to Shipping Doc.";"Import Tags to Shipping Doc.")
+                {
+                }
+                field("Use Whse. Receipt";"Use Whse. Receipt")
                 {
                 }
             }
@@ -188,6 +205,12 @@ page 6151371 "CS Setup"
                 PromotedIsBig = true;
                 RunObject = Page "CS Posting Buffer";
             }
+            action("Whse. Activity Type Setup")
+            {
+                Caption = 'Whse. Activity Type Setup';
+                Image = SetupLines;
+                RunObject = Page "CS Warehouse Activity Setup";
+            }
             group(Stores)
             {
                 Caption = 'Stores';
@@ -268,6 +291,20 @@ page 6151371 "CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "CS Stock-Takes Data";
+                }
+                action("Update Item Cross. Ref.")
+                {
+                    Caption = 'Update Item Cross. Ref.';
+                    Image = UpdateDescription;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = Process;
+
+                    trigger OnAction()
+                    var
+                        CSHelperFunctions: Codeunit "CS Helper Functions";
+                    begin
+                        CSHelperFunctions.UpdateItemCrossRef();
+                    end;
                 }
             }
         }

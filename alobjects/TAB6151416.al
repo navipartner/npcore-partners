@@ -10,6 +10,7 @@ table 6151416 "Magento Brand"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
     // MAG2.22/MHA /20190614  CASE 358258 Extended field 110 "Meta Title" from 50 to 100
     // MAG2.23/BHR /20190730  CASE 362728 Created New Field 15 Short Description
+    // MAG2.26/MHA /20200601  CASE 404580 Renamed Field 1 from "Code" to "Id"
 
     Caption = 'Magento Brand';
     DrillDownPageID = "Magento Brands";
@@ -17,9 +18,10 @@ table 6151416 "Magento Brand"
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1;Id;Code[20])
         {
-            Caption = 'Code';
+            Caption = 'Id';
+            Description = 'MAG2.26';
             NotBlank = true;
         }
         field(2;Name;Text[32])
@@ -106,7 +108,7 @@ table 6151416 "Magento Brand"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1;Id)
         {
         }
         key(Key2;Name)
@@ -127,13 +129,20 @@ table 6151416 "Magento Brand"
         // Item.SETRANGE("Webshop Manufacturer",Code);
         // Item.MODIFYALL("Webshop Manufacturer",'',FALSE);
         // //+MAG1.04
-        Item.SetRange("Magento Brand",Code);
+        Item.SetRange("Magento Brand",Id);
         Item.ModifyAll("Magento Brand",'',false);
         //+MAG2.00
     end;
 
     trigger OnInsert()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
+        //-MAG2.26 [404580]
+        if MagentoSetupMgt.HasSetupBrands() then
+          exit;
+        //+MAG2.26 [404580]
+
         TestField(Name);
 
         //-MAG1.02
@@ -144,7 +153,14 @@ table 6151416 "Magento Brand"
     end;
 
     trigger OnModify()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
+        //-MAG2.26 [404580]
+        if MagentoSetupMgt.HasSetupBrands() then
+          exit;
+        //+MAG2.26 [404580]
+
         TestField(Name);
 
         //-MAG1.02
@@ -155,7 +171,14 @@ table 6151416 "Magento Brand"
     end;
 
     trigger OnRename()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
+        //-MAG2.26 [404580]
+        if MagentoSetupMgt.HasSetupBrands() then
+          exit;
+        //+MAG2.26 [404580]
+
         TestField(Name);
     end;
 

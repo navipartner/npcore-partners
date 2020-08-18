@@ -1,4 +1,4 @@
-pageextension 6014455 pageextension6014455 extends "Purch. Invoice Subform" 
+pageextension 6014459 pageextension6014459 extends "Purch. Invoice Subform" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // NPR4.13/MMV /20150724 CASE 214173 Changed "No." to variable to handle barcode scanning OnValidate trigger.

@@ -300,11 +300,11 @@ codeunit 6014438 "Scanner - Functions"
 
     procedure initPurchJnl(var initIL: Record "Requisition Line")
     begin
-        //initIndk�bskladde
+        //initIndk¢bskladde
 
         Kladdetypenavn := initIL."Worksheet Template Name";
         Kladdenavn := initIL."Journal Batch Name";
-        RecNo := 246;  /*Indk�bskladde*/
+        RecNo := 246;  /*Indk¢bskladde*/
         GoGet;
 
     end;

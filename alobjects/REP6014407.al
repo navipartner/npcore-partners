@@ -11,6 +11,7 @@ report 6014407 "Sales Ticket Statistics A4"
     // NPR5.31/JLK /20170411  CASE 271517 Added Register Filter
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TSA /20180327 CASE 301544 Dereferenced cu 6014452 from OnInitReport and OnPreReport
+    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Ticket Statistics A4.rdlc';
 
@@ -111,6 +112,9 @@ report 6014407 "Sales Ticket Statistics A4"
             {
             }
             column(ItemQtyLine2_PaymentTypePeriod;Divider(NoOfItemsInAuditRollLastYr,(PaymentLastYr."No. of Sales in Audit Roll"+PaymentLastYr."No. of Deb. Sales in Aud. Roll")))
+            {
+            }
+            column(CurrReportPageNoCaption;CurrReportPageNoCaptionLbl)
             {
             }
             dataitem(PaymentLastYr;"Payment Type POS")
@@ -572,6 +576,7 @@ report 6014407 "Sales Ticket Statistics A4"
         AuditRoll: Record "Audit Roll";
         NoOfItemsInAuditRollLastYr: Decimal;
         AuditRollLastYr: Record "Audit Roll";
+        CurrReportPageNoCaptionLbl: Label 'Page';
 
     local procedure "Pct."(Tal1: Decimal;Tal2: Decimal): Decimal
     begin

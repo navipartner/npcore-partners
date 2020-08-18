@@ -2,6 +2,7 @@ page 6151580 "Event Exch. Int. Template Card"
 {
     // NPR5.36/TJ  /20170912 CASE 287800 New object
     // NPR5.43/NPKNAV/20180629  CASE 262079 Transport NPR5.43 - 29 June 2018
+    // NPR5.55/TJ  /20200129 CASE 374887 New fields "Auto. Send. Enabled (E-Mail)" and "Auto.Send.Event Status(E-Mail)" under new group "Automatic Sending"
 
     Caption = 'Event Exch. Int. Template Card';
     PageType = Card;
@@ -37,6 +38,16 @@ page 6151580 "Event Exch. Int. Template Card"
                 field("Ticket URL Placeholder(E-Mail)";"Ticket URL Placeholder(E-Mail)")
                 {
                     Caption = 'Ticket URL Placeholder';
+                }
+                group("Automatic Sending")
+                {
+                    Caption = 'Automatic Sending';
+                    field("Auto. Send. Enabled (E-Mail)";"Auto. Send. Enabled (E-Mail)")
+                    {
+                    }
+                    field("Auto.Send.Event Status(E-Mail)";"Auto.Send.Event Status(E-Mail)")
+                    {
+                    }
                 }
             }
             group(Calendar)

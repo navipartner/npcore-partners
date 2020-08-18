@@ -2,6 +2,7 @@ page 6151217 "NpCs Open. Hour Set Subpage"
 {
     // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
     // NPR5.52/MHA /20191021  CASE 362443 Adjusted caption of Period Group to signal intentional spaces to control width
+    // NPR5.55/MHA /20200731  CASE 417003 Updated layout for better BC WebClient experience
 
     AutoSplitKey = true;
     Caption = 'Opening Hours';
@@ -13,37 +14,33 @@ page 6151217 "NpCs Open. Hour Set Subpage"
     {
         area(content)
         {
-            grid(Control6014404)
+            group(Control6014416)
             {
                 ShowCaption = false;
-                group(Control6014416)
+                repeater(Group)
                 {
-                    ShowCaption = false;
-                    repeater(Group)
+                    field("Entry Type";"Entry Type")
                     {
-                        field("Entry Type";"Entry Type")
-                        {
-                        }
-                        field("Start Time";"Start Time")
-                        {
-                            Enabled = "Entry Type" = 0;
-                        }
-                        field("End Time";"End Time")
-                        {
-                            Enabled = "Entry Type" = 0;
-                        }
-                        field("Period Type";"Period Type")
-                        {
-                        }
-                        field("Period Description";"Period Description")
-                        {
-                            Editable = false;
-                        }
+                    }
+                    field("Start Time";"Start Time")
+                    {
+                        Editable = "Entry Type" = 0;
+                    }
+                    field("End Time";"End Time")
+                    {
+                        Editable = "Entry Type" = 0;
+                    }
+                    field("Period Type";"Period Type")
+                    {
+                    }
+                    field("Period Description";"Period Description")
+                    {
+                        Editable = false;
                     }
                 }
                 group(Period)
                 {
-                    Caption = 'Period        _';
+                    Caption = 'Period';
                     group(Control6014409)
                     {
                         ShowCaption = false;

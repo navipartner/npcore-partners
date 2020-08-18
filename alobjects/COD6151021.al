@@ -4,6 +4,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     // NPR5.48/MHA /20190123  CASE 341711 Added "Send via E-mail" and "Send via SMS"
     // NPR5.52/MHA /20191015  CASE 372315 Added functions GetVouchersByCustomerNo(), GetVouchersByEmail()
     // NPR5.53/MHA /20191118  CASE 372315 Added "Allow Top-up" to Voucher2Buffer()
+    // NPR5.55/MHA /20200427  CASE 402015 Sale Line POS Voucher is now used instead of separate shadow table
 
 
     trigger OnRun()
@@ -138,23 +139,72 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         NpRvVoucher: Record "NpRv Voucher";
         NpRvVoucherEntry: Record "NpRv Voucher Entry";
         NpRvVoucherType: Record "NpRv Voucher Type";
+        NpRvSalesLine: Record "NpRv Sales Line";
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
+        TempNpRvVoucher: Record "NpRv Voucher" temporary;
+        NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         Amount: Decimal;
     begin
-        NpRvExtVoucherBuffer.TestField("Voucher Type");
+        //-NPR5.55 [402015]
+        NpRvSalesLine.SetRange("External Document No.",NpRvExtVoucherBuffer."Document No.");
+        NpRvSalesLine.SetRange("Reference No.",NpRvExtVoucherBuffer."Reference No.");
+        if NpRvSalesLine.FindFirst then begin
+          VoucherSalesLine2Buffer(NpRvSalesLine,NpRvExtVoucherBuffer);
+          exit;
+        end;
+
         if NpRvExtVoucherBuffer."Reference No." <> '' then begin
           if FindVoucher(NpRvExtVoucherBuffer."Voucher Type",NpRvExtVoucherBuffer."Reference No.",NpRvVoucher) then begin
+            NpRvVoucher.TestField("Allow Top-up");
             Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
+
+            NpRvSalesLine.Init;
+            NpRvSalesLine.Id := CreateGuid;
+            NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
+            NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+            NpRvSalesLine."External Document No." := NpRvExtVoucherBuffer."Document No.";
+            Buffer2VoucherSalesLine(NpRvExtVoucherBuffer,NpRvSalesLine);
+            NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+            NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+            NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+            NpRvSalesLine.Description := NpRvVoucher.Description;
+            NpRvSalesLine.Insert(true);
+
+            exit;
+          end;
+          if FindSalesVoucher(NpRvExtVoucherBuffer."Voucher Type",NpRvExtVoucherBuffer."Reference No.",NpRvSalesLine) then begin
+            VoucherSalesLine2Buffer(NpRvSalesLine,NpRvExtVoucherBuffer);
             exit;
           end;
         end;
 
-        NpRvVoucher.Init;
-        NpRvVoucher."No." := '';
-        NpRvVoucher."Reference No." := NpRvExtVoucherBuffer."Reference No.";
-        Buffer2Voucher(NpRvExtVoucherBuffer,NpRvVoucher);
-        NpRvVoucher.Insert(true);
+        NpRvExtVoucherBuffer.TestField("Voucher Type");
+        NpRvVoucherType.Get(NpRvExtVoucherBuffer."Voucher Type");
+        NpRvVoucherMgt.GenerateTempVoucher(NpRvVoucherType,TempNpRvVoucher);
+        Buffer2Voucher(NpRvExtVoucherBuffer,TempNpRvVoucher);
+        TempNpRvVoucher.Insert;
 
-        Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
+        NpRvSalesLine.Init;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."External Document No." := NpRvExtVoucherBuffer."Document No.";
+        Buffer2VoucherSalesLine(NpRvExtVoucherBuffer,NpRvSalesLine);
+        NpRvSalesLine."Voucher No." := TempNpRvVoucher."No.";
+        NpRvSalesLine."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLine."Voucher Type" := TempNpRvVoucher."Voucher Type";
+        NpRvSalesLine.Description := TempNpRvVoucher.Description;
+        NpRvSalesLine.Insert(true);
+
+        NpRvSalesLineReference.Init;
+        NpRvSalesLineReference.Id := CreateGuid;
+        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
+        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+        NpRvSalesLineReference.Insert(true);
+
+        VoucherSalesLine2Buffer(NpRvSalesLine,NpRvExtVoucherBuffer);
+        //+NPR5.55 [402015]
     end;
 
     local procedure "--- Reserve Voucher"()
@@ -183,8 +233,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     local procedure ReserveVoucher(var NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NpRv Voucher";
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
-        LineNo: Integer;
+        NpRvSalesLine: Record "NpRv Sales Line";
         Timestamp: DateTime;
         InUseQty: Integer;
     begin
@@ -197,13 +246,15 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
 
         InUseQty := NpRvVoucher.CalcInUseQty();
         if InUseQty > 0 then begin
-          NpRvExtVoucherSalesLine.SetRange("External Document No.",NpRvExtVoucherBuffer."Document No.");
-          NpRvExtVoucherSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
-          NpRvExtVoucherSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
-          if InUseQty = NpRvExtVoucherSalesLine.Count then begin
+          //-NPR5.55 [402015]
+          NpRvSalesLine.SetRange("External Document No.",NpRvExtVoucherBuffer."Document No.");
+          NpRvSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
+          NpRvSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
+          if InUseQty = NpRvSalesLine.Count then begin
             Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
             exit;
           end;
+          //+NPR5.55 [402015]
 
           Error(Text001,NpRvExtVoucherBuffer."Reference No.");
         end;
@@ -215,19 +266,18 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         if (NpRvVoucher."Ending Date" < Timestamp) and (NpRvVoucher."Ending Date" <> 0DT) then
           Error(Text005,NpRvExtVoucherBuffer."Reference No.");
 
-        NpRvExtVoucherSalesLine.SetRange("External Document No.",NpRvExtVoucherBuffer."Document No.");
-        if NpRvExtVoucherSalesLine.FindLast then;
-        LineNo := NpRvExtVoucherSalesLine."Line No." + 10000;
-
-        NpRvExtVoucherSalesLine.Init;
-        NpRvExtVoucherSalesLine."External Document No." := NpRvExtVoucherBuffer."Document No.";
-        NpRvExtVoucherSalesLine."Line No." := LineNo;
-        NpRvExtVoucherSalesLine.Type := NpRvExtVoucherSalesLine.Type::Payment;
-        NpRvExtVoucherSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
-        NpRvExtVoucherSalesLine."Voucher No." := NpRvVoucher."No.";
-        NpRvExtVoucherSalesLine."Reference No." := NpRvExtVoucherBuffer."Reference No.";
-        NpRvExtVoucherSalesLine.Description := NpRvVoucher.Description;
-        NpRvExtVoucherSalesLine.Insert;
+        //-NPR5.55 [402015]
+        NpRvSalesLine.Init;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."External Document No." := NpRvExtVoucherBuffer."Document No.";
+        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+        NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+        NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+        NpRvSalesLine."Reference No." := NpRvExtVoucherBuffer."Reference No.";
+        NpRvSalesLine.Description := NpRvVoucher.Description;
+        NpRvSalesLine.Insert;
+        //+NPR5.55 [402015]
 
         Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
     end;
@@ -257,21 +307,23 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     local procedure CancelVoucherReservation(var NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NpRv Voucher";
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+        NpRvSalesLine: Record "NpRv Sales Line";
     begin
         if not FindVoucher(NpRvExtVoucherBuffer."Voucher Type",NpRvExtVoucherBuffer."Reference No.",NpRvVoucher) then
           Error(Text000,NpRvExtVoucherBuffer."Reference No.");
 
-        NpRvExtVoucherSalesLine.SetRange("Reference No.",NpRvExtVoucherBuffer."Reference No.");
-        NpRvExtVoucherSalesLine.SetRange(Type,NpRvExtVoucherSalesLine.Type::Payment);
-        if NpRvExtVoucherSalesLine.FindSet then
+        //-NPR5.55 [402015]
+        NpRvSalesLine.SetRange("Reference No.",NpRvExtVoucherBuffer."Reference No.");
+        NpRvSalesLine.SetRange(Type,NpRvSalesLine.Type::Payment);
+        if NpRvSalesLine.FindSet then
           repeat
-            if NpRvExtVoucherSalesLine."External Document No." <> NpRvExtVoucherBuffer."Document No." then
+            if NpRvSalesLine."External Document No." <> NpRvExtVoucherBuffer."Document No." then
               Error(Text006,NpRvExtVoucherBuffer."Reference No.");
-            if NpRvExtVoucherSalesLine."Document No." <> '' then
-              Error(Text007,NpRvExtVoucherBuffer."Reference No.",NpRvExtVoucherSalesLine."Document No.");
-            NpRvExtVoucherSalesLine.Delete;
-          until NpRvExtVoucherSalesLine.Next = 0;
+            if NpRvSalesLine."Document No." <> '' then
+              Error(Text007,NpRvExtVoucherBuffer."Reference No.",NpRvSalesLine."Document No.");
+            NpRvSalesLine.Delete;
+          until NpRvSalesLine.Next = 0;
+        //+NPR5.55 [402015]
 
         Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
     end;
@@ -282,12 +334,30 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
 
     [Scope('Personalization')]
     procedure FindVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var Voucher: Record "NpRv Voucher"): Boolean
-    var
-        VoucherType: Record "NpRv Voucher Type";
     begin
+        //-NPR5.55 [402015]
+        if ReferenceNo = '' then
+          exit(false);
+
         Voucher.SetFilter("Voucher Type",UpperCase(VoucherTypeFilter));
         Voucher.SetRange("Reference No.",ReferenceNo);
+        if Voucher.FindLast then
+          exit(true);
+
+        Voucher.SetRange("Voucher Type");
         exit(Voucher.FindLast);
+        //+NPR5.55 [402015]
+    end;
+
+    [Scope('Personalization')]
+    procedure FindSalesVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var NpRvSalesLine: Record "NpRv Sales Line"): Boolean
+    begin
+        //-NPR5.55 [402015]
+        NpRvSalesLine.SetFilter("Voucher Type",UpperCase(VoucherTypeFilter));
+        NpRvSalesLine.SetRange("Reference No.",ReferenceNo);
+        NpRvSalesLine.SetRange("Document Source",NpRvSalesLine."Document Source"::"Sales Document");
+        exit(NpRvSalesLine.FindLast);
+        //+NPR5.55 [402015]
     end;
 
     local procedure Voucher2Buffer(var NpRvVoucher: Record "NpRv Voucher";var NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer")
@@ -329,16 +399,71 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         NpRvExtVoucherBuffer.Modify;
     end;
 
+    local procedure Buffer2VoucherSalesLine(var NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer";var NpRvSalesLine: Record "NpRv Sales Line")
+    begin
+        //-NPR5.55 [402015]
+        NpRvSalesLine.Name := NpRvExtVoucherBuffer.Name;
+        NpRvSalesLine."Name 2" := NpRvExtVoucherBuffer."Name 2";
+        NpRvSalesLine.Address := NpRvExtVoucherBuffer.Address;
+        NpRvSalesLine."Address 2" := NpRvExtVoucherBuffer."Address 2";
+        NpRvSalesLine."Post Code" := NpRvExtVoucherBuffer."Post Code";
+        NpRvSalesLine.City := NpRvExtVoucherBuffer.City;
+        NpRvSalesLine.County := NpRvExtVoucherBuffer.County;
+        NpRvSalesLine."Country/Region Code" := NpRvExtVoucherBuffer."Country/Region Code";
+        NpRvSalesLine."E-mail" := NpRvExtVoucherBuffer."E-mail";
+        NpRvSalesLine."Phone No." := NpRvExtVoucherBuffer."Phone No.";
+        NpRvSalesLine."Send via Print" := NpRvExtVoucherBuffer."Send via Print";
+        NpRvSalesLine."Send via E-mail" := NpRvExtVoucherBuffer."Send via E-mail";
+        NpRvSalesLine."Send via SMS" := NpRvExtVoucherBuffer."Send via SMS";
+        if (not NpRvSalesLine."Send via Print") and (not NpRvSalesLine."Send via SMS") and (NpRvSalesLine."E-mail" <> '') then
+          NpRvSalesLine."Send via E-mail" := true;
+        if NpRvExtVoucherBuffer."Voucher Message" <> '' then
+          NpRvSalesLine."Voucher Message" := NpRvExtVoucherBuffer."Voucher Message";
+        //+NPR5.55 [402015]
+    end;
+
+    local procedure VoucherSalesLine2Buffer(var NpRvSalesLine: Record "NpRv Sales Line";var NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer")
+    var
+        NpRvVoucherType: Record "NpRv Voucher Type";
+    begin
+        //-NPR5.55 [402015]
+        NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
+
+        NpRvExtVoucherBuffer."Reference No." := NpRvSalesLine."Reference No.";
+        NpRvExtVoucherBuffer."Voucher Type" := NpRvSalesLine."Voucher Type";
+        NpRvExtVoucherBuffer.Description := NpRvSalesLine.Description;
+        NpRvExtVoucherBuffer."Starting Date" := NpRvSalesLine."Starting Date";
+        NpRvExtVoucherBuffer."Ending Date" := 0DT;
+        NpRvExtVoucherBuffer."Account No." := NpRvVoucherType."Account No.";
+        NpRvExtVoucherBuffer."Allow Top-up" := NpRvVoucherType."Allow Top-up";
+        NpRvExtVoucherBuffer.Open := false;
+        NpRvExtVoucherBuffer."In-use Quantity" := 0;
+        NpRvExtVoucherBuffer.Amount := 0;
+        NpRvExtVoucherBuffer.Name := NpRvSalesLine.Name;
+        NpRvExtVoucherBuffer."Name 2" := NpRvSalesLine."Name 2";
+        NpRvExtVoucherBuffer.Address := NpRvSalesLine.Address;
+        NpRvExtVoucherBuffer."Address 2" := NpRvSalesLine."Address 2";
+        NpRvExtVoucherBuffer."Post Code" := NpRvSalesLine."Post Code";
+        NpRvExtVoucherBuffer.City := NpRvSalesLine.City;
+        NpRvExtVoucherBuffer.County := NpRvSalesLine.County;
+        NpRvExtVoucherBuffer."Country/Region Code" := NpRvSalesLine."Country/Region Code";
+        NpRvExtVoucherBuffer."E-mail" := NpRvSalesLine."E-mail";
+        NpRvExtVoucherBuffer."Phone No." := NpRvSalesLine."Phone No.";
+        NpRvExtVoucherBuffer."Send via Print" := NpRvSalesLine."Send via Print";
+        NpRvExtVoucherBuffer."Send via E-mail" := NpRvSalesLine."Send via E-mail";
+        NpRvExtVoucherBuffer."Send via SMS" := NpRvSalesLine."Send via SMS";
+        NpRvExtVoucherBuffer."Voucher Message" := NpRvSalesLine."Voucher Message";
+        NpRvExtVoucherBuffer."Issue Date" := 0D;
+        NpRvExtVoucherBuffer."Issue Register No." := '';
+        NpRvExtVoucherBuffer."Issue Sales Ticket No." := '';
+        NpRvExtVoucherBuffer."Issue User ID" := '';
+        NpRvExtVoucherBuffer.Modify;
+        //+NPR5.55 [402015]
+    end;
+
     local procedure Buffer2Voucher(var NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer";var NpRvVoucher: Record "NpRv Voucher")
     begin
-        NpRvVoucher."Starting Date" := NpRvExtVoucherBuffer."Starting Date";
-        NpRvVoucher.Validate("Voucher Type",NpRvExtVoucherBuffer."Voucher Type");
-        if NpRvExtVoucherBuffer.Description <> '' then
-          NpRvVoucher.Description := NpRvExtVoucherBuffer.Description;
-        if NpRvExtVoucherBuffer."Ending Date" <> 0DT then
-          NpRvVoucher."Ending Date" := NpRvExtVoucherBuffer."Ending Date";
-        if NpRvExtVoucherBuffer."Account No." <> '' then
-          NpRvVoucher."Account No." := NpRvExtVoucherBuffer."Account No.";
+        //-NPR5.55 [402015]
         NpRvVoucher.Name := NpRvExtVoucherBuffer.Name;
         NpRvVoucher."Name 2" := NpRvExtVoucherBuffer."Name 2";
         NpRvVoucher.Address := NpRvExtVoucherBuffer.Address;
@@ -349,19 +474,14 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         NpRvVoucher."Country/Region Code" := NpRvExtVoucherBuffer."Country/Region Code";
         NpRvVoucher."E-mail" := NpRvExtVoucherBuffer."E-mail";
         NpRvVoucher."Phone No." := NpRvExtVoucherBuffer."Phone No.";
-        //-NPR5.48 [341711]
         NpRvVoucher."Send via Print" := NpRvExtVoucherBuffer."Send via Print";
         NpRvVoucher."Send via E-mail" := NpRvExtVoucherBuffer."Send via E-mail";
         NpRvVoucher."Send via SMS" := NpRvExtVoucherBuffer."Send via SMS";
         if (not NpRvVoucher."Send via Print") and (not NpRvVoucher."Send via SMS") and (NpRvVoucher."E-mail" <> '') then
           NpRvVoucher."Send via E-mail" := true;
-        //+NPR5.48 [341711]
         if NpRvExtVoucherBuffer."Voucher Message" <> '' then
           NpRvVoucher."Voucher Message" := NpRvExtVoucherBuffer."Voucher Message";
-        NpRvVoucher."Issue Date" := NpRvExtVoucherBuffer."Issue Date";
-        NpRvVoucher."Issue Register No." := NpRvExtVoucherBuffer."Issue Register No.";
-        NpRvVoucher."Issue Document No." := NpRvExtVoucherBuffer."Issue Sales Ticket No.";
-        NpRvVoucher."Issue User ID" := NpRvExtVoucherBuffer."Issue User ID";
+        //+NPR5.55 [402015]
     end;
 
     local procedure SetGlobalLanguage(LanguageUsername: Text)

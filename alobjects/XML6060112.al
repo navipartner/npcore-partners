@@ -280,7 +280,7 @@ xmlport 6060112 "TM List Ticket Items"
     local procedure GetFirstMagentoURL(ItemNo: Code[20]): Text
     var
         MagentoSetup: Record "Magento Setup";
-        MagentoItemGroupLink: Record "Magento Item Group Link";
+        MagentoItemGroupLink: Record "Magento Category Link";
         Item: Record Item;
     begin
 
@@ -298,24 +298,24 @@ xmlport 6060112 "TM List Ticket Items"
 
         exit (StrSubstNo ('%1%2%3',
           MagentoSetup."Magento Url",
-          GetMagentoPath (MagentoItemGroupLink."Root No.", MagentoItemGroupLink."Item Group"),
+          GetMagentoPath (MagentoItemGroupLink."Root No.", MagentoItemGroupLink."Category Id"),
           Item."Seo Link"));
     end;
 
     local procedure GetMagentoPath(RootNodeNo: Code[20];ParentCode: Code[20]): Text
     var
-        MagentoItemGroup: Record "Magento Item Group";
+        MagentoItemGroup: Record "Magento Category";
     begin
 
-        MagentoItemGroup.SetFilter ("No.", '=%1', ParentCode);
+        MagentoItemGroup.SetFilter (Id, '=%1', ParentCode);
         if (not MagentoItemGroup.FindFirst ()) then
           exit ('');
 
-        if (RootNodeNo = MagentoItemGroup."Parent Item Group No.") then
+        if (RootNodeNo = MagentoItemGroup."Parent Category Id") then
           exit ('');
 
         exit (StrSubstNo ('%1%2/',
-          GetMagentoPath (RootNodeNo, MagentoItemGroup."Parent Item Group No."),
+          GetMagentoPath (RootNodeNo, MagentoItemGroup."Parent Category Id"),
           MagentoItemGroup."Seo Link"));
     end;
 }

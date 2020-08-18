@@ -45,7 +45,7 @@
                   <Width>0.51042in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.68274in</Width>
+                  <Width>0.73171in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -76,6 +76,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -112,6 +122,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -146,6 +166,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -180,6 +210,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -214,6 +254,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -248,6 +298,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -282,6 +342,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -316,6 +386,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -350,6 +430,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -361,7 +451,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.25in</Height>
+                  <Height>0.1875in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -374,7 +464,7 @@
                                 <TextRun>
                                   <Value>=Fields!Code_DimensionValue.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -405,7 +495,7 @@
                                 <TextRun>
                                   <Value>=Fields!Name_DimensionValue.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -436,7 +526,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocQty_DimensionValue.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocQty_DimensionValueFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -468,7 +558,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocCost.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocCostFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -500,7 +590,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocSales.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocSalesFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -532,7 +622,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalSalesPerc.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalSalesPercFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -564,7 +654,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocPrevYearPerc.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocPrevYearPercFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -596,7 +686,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalProfit.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalProfitFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -628,7 +718,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalProfitSalesPerc.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalProfitSalesPercFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -660,7 +750,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalProfitPerc.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalProfitPercFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -684,7 +774,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.25in</Height>
+                  <Height>0.17708in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -697,7 +787,7 @@
                                 <TextRun>
                                   <Value>=Parameters!LastYear_Caption.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -728,7 +818,7 @@
                                 <TextRun>
                                   <Value />
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -759,7 +849,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocLastYearTotalQty.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocLastYearTotalQtyFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -791,7 +881,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocLastYearTotalCost.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocLastYearTotalCostFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -823,7 +913,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocLastYearTotalSales.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocLastYearTotalSalesFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -855,7 +945,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocLastYearTotalSalesPerc.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocLastYearTotalSalesPercFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -887,7 +977,7 @@
                                 <TextRun>
                                   <Value />
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -918,7 +1008,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocLastYearTotalProfit.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocLastYearTotalProfitFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -950,7 +1040,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocLastYearTotalProfSalePerc.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocLastYearTotalProfSalePercFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -982,7 +1072,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELocLastYearTotalProfitPerc.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELocLastYearTotalProfitPercFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1056,10 +1146,10 @@
                 </FilterValues>
               </Filter>
             </Filters>
-            <Top>0.13209in</Top>
-            <Left>0in</Left>
-            <Height>0.75in</Height>
-            <Width>7.26305in</Width>
+            <Top>0.00709in</Top>
+            <Left>0.0029in</Left>
+            <Height>0.61458in</Height>
+            <Width>7.31202in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1097,7 +1187,7 @@
                   <Width>0.51042in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.67984in</Width>
+                  <Width>0.73171in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -1459,6 +1549,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1496,6 +1591,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1516,7 +1616,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalQuantity_FooterTotal.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalQuantity_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1534,6 +1634,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1554,7 +1659,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalCost_FooterTotal.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalCost_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1572,6 +1677,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1592,7 +1702,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalSales_FooterTotal.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalSales_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1610,6 +1720,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1630,7 +1745,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalSalesPerc_FooterTotal.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalSalesPerc_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1648,6 +1763,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1668,7 +1788,7 @@
                                 <TextRun>
                                   <Value>=iif(Fields!VETotalPrevYeasPerc_FooterTotal.Value&lt;&gt;0,Fields!VETotalPrevYeasPerc_FooterTotal.Value,"")</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalPrevYeasPerc_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1686,6 +1806,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1706,7 +1831,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalProfit_FooterTotal.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalProfit_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1724,6 +1849,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1744,7 +1874,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalProfitSalesPerc_FooterTotal.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalProfitSalesPerc_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1762,6 +1892,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1782,7 +1917,7 @@
                                 <TextRun>
                                   <Value>=Fields!VETotalProfitPerc_FooterTotal.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VETotalProfitPerc_FooterTotalFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -1800,6 +1935,11 @@
                               <Style>Solid</Style>
                               <Width>1pt</Width>
                             </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -1854,10 +1994,10 @@
                 </FilterValues>
               </Filter>
             </Filters>
-            <Top>0.89167in</Top>
+            <Top>0.66945in</Top>
             <Left>0in</Left>
             <Height>0.2883in</Height>
-            <Width>7.26305in</Width>
+            <Width>7.31492in</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -1897,7 +2037,7 @@
                   <Width>0.51042in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.67984in</Width>
+                  <Width>0.73171in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -2254,6 +2394,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2286,6 +2436,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2306,7 +2466,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELastYearTotalQty_FooterTotalLY.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELastYearTotalQty_FooterTotalLYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -2319,6 +2479,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2339,7 +2509,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELastYearTotalCost_FooterTotalLY.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELastYearTotalCost_FooterTotalLYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -2352,6 +2522,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2372,7 +2552,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELastYearTotalSales_FooterTotalLY.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELastYearTotalSales_FooterTotalLYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -2385,6 +2565,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2405,7 +2595,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELastYearTotalSalesPerc_FooterTotalLY.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELastYearTotalSalesPerc_FooterTotalLYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -2418,6 +2608,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2450,6 +2650,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2470,7 +2680,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELastYearTotalProfit_FooterTotalLY.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELastYearTotalProfit_FooterTotalLYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -2483,6 +2693,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2503,7 +2723,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELastYearTotalProfitSalesPerc_FooterTotalLY.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELastYearTotalProfitSalesPerc_FooterTotalLYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -2516,6 +2736,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2536,7 +2766,7 @@
                                 <TextRun>
                                   <Value>=Fields!VELastYearTotalProfitPerc_FooterTotalLY.Value</Value>
                                   <Style>
-                                    <FontSize>7pt</FontSize>
+                                    <FontSize>6pt</FontSize>
                                     <Format>=Fields!VELastYearTotalProfitPerc_FooterTotalLYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
@@ -2549,6 +2779,16 @@
                             <Border>
                               <Style>None</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
                             <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -2606,10 +2846,10 @@
                 </FilterValues>
               </Filter>
             </Filters>
-            <Top>1.18691in</Top>
+            <Top>1.02719in</Top>
             <Left>0in</Left>
             <Height>0.2883in</Height>
-            <Width>7.26305in</Width>
+            <Width>7.31492in</Width>
             <ZIndex>2</ZIndex>
             <Style>
               <Border>
@@ -2619,13 +2859,13 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>3.86292cm</Height>
+        <Height>3.41313cm</Height>
         <Style />
       </Body>
-      <Width>18.44815cm</Width>
+      <Width>18.5799cm</Width>
       <Page>
         <PageHeader>
-          <Height>3.30729cm</Height>
+          <Height>2.14312cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -2645,8 +2885,7 @@
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>0.0635cm</Top>
-              <Left>0.0635cm</Left>
+              <Top>0.04445cm</Top>
               <Height>0.92302cm</Height>
               <Width>15.28368cm</Width>
               <Style>
@@ -2661,28 +2900,26 @@
                     <TextRun>
                       <Value>=Globals!ExecutionTime</Value>
                       <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
-                        <Format>dd-MM-yyyy</Format>
+                        <Format>D</Format>
                       </Style>
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Left</TextAlign>
+                    <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.12153cm</Top>
-              <Left>0.0635cm</Left>
+              <Top>0.11823cm</Top>
+              <Left>15.46007cm</Left>
               <Height>0.423cm</Height>
-              <Width>2.67375cm</Width>
+              <Width>2.80232cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <Border />
                 <VerticalAlign>Middle</VerticalAlign>
                 <PaddingLeft>5pt</PaddingLeft>
-                <PaddingRight>5pt</PaddingRight>
               </Style>
             </Textbox>
             <Textbox Name="UserIdTextBox">
@@ -2693,26 +2930,25 @@
                     <TextRun>
                       <Value>=User!UserID</Value>
                       <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Left</TextAlign>
+                    <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.11705cm</Top>
-              <Left>2.93132cm</Left>
+              <Top>0.60325cm</Top>
+              <Left>15.46007cm</Left>
               <Height>0.423cm</Height>
-              <Width>5.77709cm</Width>
+              <Width>2.80232cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
+                <Border />
                 <VerticalAlign>Middle</VerticalAlign>
                 <PaddingLeft>5pt</PaddingLeft>
-                <PaddingRight>5pt</PaddingRight>
               </Style>
             </Textbox>
             <Textbox Name="CompanyName16">
@@ -2723,8 +2959,7 @@
                     <TextRun>
                       <Value>=First(Fields!COMPANYNAME.Value, "DataSet_Result")</Value>
                       <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
+                        <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2734,15 +2969,15 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.11705cm</Top>
-              <Left>9.20231cm</Left>
+              <Top>1.098cm</Top>
               <Height>0.423cm</Height>
               <Width>5.37064cm</Width>
               <ZIndex>3</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Middle</VerticalAlign>
-                <PaddingLeft>5pt</PaddingLeft>
-                <PaddingRight>5pt</PaddingRight>
               </Style>
             </Textbox>
             <Textbox Name="CompanyName17">
@@ -2764,8 +2999,8 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.65294cm</Top>
-              <Left>13.21994cm</Left>
+              <Top>1.63389cm</Top>
+              <Left>13.15644cm</Left>
               <Height>0.423cm</Height>
               <Width>4.39708cm</Width>
               <ZIndex>4</ZIndex>
@@ -2775,13 +3010,13 @@
                 <PaddingRight>5pt</PaddingRight>
               </Style>
             </Textbox>
-            <Textbox Name="CurrReport_PAGENOCaption1">
+            <Textbox Name="CurrReport_PAGENOCaption2">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!Page_Caption.Value</Value>
+                      <Value EvaluationMode="Auto">=First(Fields!FilterList.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                       </Style>
@@ -2790,24 +3025,62 @@
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>2.03746cm</Top>
-              <Left>8.31532cm</Left>
+              <Top>1.63389cm</Top>
               <Height>0.423cm</Height>
-              <Width>0.75cm</Width>
+              <Width>14.65651cm</Width>
               <ZIndex>5</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="PageNumberTextBox">
+          </ReportItems>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+          </Style>
+        </PageHeader>
+        <PageFooter>
+          <Height>0.8465cm</Height>
+          <PrintOnFirstPage>true</PrintOnFirstPage>
+          <PrintOnLastPage>true</PrintOnLastPage>
+          <ReportItems>
+            <Textbox Name="CompanyName18">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Globals!PageNumber</Value>
+                      <Value EvaluationMode="Auto">="Side "&amp; Globals!PageNumber</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Center</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0.40536cm</Top>
+              <Left>0.00737cm</Left>
+              <Height>0.423cm</Height>
+              <Width>18.57253cm</Width>
+              <Style>
+                <VerticalAlign>Middle</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyName19">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Parameters!Footer_Caption.Value</Value>
+                      <Style>
+                        <FontSize>6pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -2816,57 +3089,22 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>2.03746cm</Top>
-              <Left>9.06533cm</Left>
-              <Height>0.423cm</Height>
-              <Width>0.45cm</Width>
-              <ZIndex>6</ZIndex>
+              <Top>0.03528cm</Top>
+              <Left>11.99392cm</Left>
+              <Height>0.37008cm</Height>
+              <Width>6.58598cm</Width>
+              <ZIndex>1</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="CurrReport_PAGENOCaption2">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=First(Fields!FilterList.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.57385cm</Top>
-              <Left>0.17673cm</Left>
-              <Height>0.423cm</Height>
-              <Width>14.65651cm</Width>
-              <ZIndex>7</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Line Name="Line1">
-              <Top>3.11891cm</Top>
-              <Height>0cm</Height>
-              <Width>18.44815cm</Width>
-              <ZIndex>8</ZIndex>
-              <Style>
-                <Border>
-                  <Style>Solid</Style>
-                </Border>
-              </Style>
-            </Line>
           </ReportItems>
           <Style>
             <Border>
               <Style>None</Style>
             </Border>
           </Style>
-        </PageHeader>
+        </PageFooter>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>
         <LeftMargin>1cm</LeftMargin>
@@ -2969,11 +3207,20 @@
       </DefaultValue>
       <Prompt>Page_Caption</Prompt>
     </ReportParameter>
+    <ReportParameter Name="Footer_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Footer_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Footer_Caption</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>10</NumberOfRows>
+      <NumberOfRows>11</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -3024,6 +3271,11 @@
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>9</RowIndex>
           <ParameterName>Page_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>10</RowIndex>
+          <ParameterName>Footer_Caption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>

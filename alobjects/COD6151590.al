@@ -19,6 +19,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
     // NPR5.51/MHA /20190626  CASE 355406 Coupon Events are now triggered for posting and cancel
     // NPR5.51/MHA /20190724  CASE 343352 Introduced "In-use Quantity (External)" on Coupons
     // NPR5.53/MHA /20191029  CASE 374605 OnCancelDiscountApplication() might delete SaleLinePOSCoupon by itself
+    // NPR5.55/ALPO/20200518  CASE 387376 Possibility to define sequence in which discount coupons are applied
 
 
     trigger OnRun()
@@ -160,6 +161,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
             exit;
         end;
 
+        SaleLinePOSCoupon.SetCurrentKey("Register No.","Sales Ticket No.","Sale Type","Sale Date","Application Sequence No.");  //NPR5.55 [387376]
         SaleLinePOSCoupon.FindSet;
         repeat
             Handled := false;
@@ -274,7 +276,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
         SaleLinePOSCoupon.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
         SaleLinePOSCoupon.SetRange("Sale Type",SalePOS."Sale type");
         SaleLinePOSCoupon.SetRange("Sale Date",SalePOS.Date);
-        SaleLinePOSCoupon.SetRange(Type,SaleLinePOSCoupon.Type::Coupon);
+        //SaleLinePOSCoupon.SETRANGE(Type,SaleLinePOSCoupon.Type::Coupon);  //NPR5.55 [387376]-revoked
         SaleLinePOSCoupon.ModifyAll("Discount Amount",0);
         //+NPR5.51 [355406]
     end;
@@ -938,7 +940,8 @@ codeunit 6151590 "NpDc Coupon Mgt."
         SaleLinePOSCoupon."Sale Line No." := SaleLinePOS."Line No.";
         SaleLinePOSCoupon."Line No." := 10000;
         SaleLinePOSCoupon.Type := SaleLinePOSCoupon.Type::Coupon;
-        SaleLinePOSCoupon."Coupon Type" := Coupon."Coupon Type";
+        //SaleLinePOSCoupon."Coupon Type" := Coupon."Coupon Type";  //NPR5.55 [387376]-revoked
+        SaleLinePOSCoupon.Validate("Coupon Type",Coupon."Coupon Type");  //NPR5.55 [387376]
         SaleLinePOSCoupon."Coupon No." := Coupon."No.";
         SaleLinePOSCoupon.Description := Coupon.Description;
         SaleLinePOSCoupon."Discount Amount" := GetAmountPerQty(Coupon);

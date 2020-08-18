@@ -1,6 +1,7 @@
 page 6184880 "FTP Setup"
 {
     // NPR5.54/ALST/20200212 CASE 383718 Object created
+    // NPR5.55/ALST/20200709 CASE 408285 added port number
 
     Caption = 'FTP Setup';
     PageType = List;
@@ -37,6 +38,9 @@ page 6184880 "FTP Setup"
                     begin
                         HandlePassword(Password);
                     end;
+                }
+                field("Port Number";"Port Number")
+                {
                 }
                 field("Storage On Server"; "Storage On Server")
                 {

@@ -61,7 +61,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
         "S & R Setup": Record "Sales & Receivables Setup";
         Item: Record Item;
     begin
-        //Bogf�rVaresalg
+        //Bogf¢rVaresalg
 
         with TempPost do begin
             SetRange("Sale Date", TempPost."Sale Date");
@@ -109,7 +109,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
         CurrentPost: Record "HC Audit Roll Posting" temporary;
         BankAccount: Record "Bank Account";
     begin
-        //Bogf�rKasseBev�gelser()
+        //Bogf¢rKasseBevægelser()
 
         GeneralLedgerSetup.Get;
 
@@ -168,7 +168,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
         Betalingsvalg: Record "HC Payment Type POS";
         BankAccount: Record "Bank Account";
     begin
-        //Bogf�rKassebev�gelserPrPost
+        //Bogf¢rKassebevægelserPrPost
 
         GeneralLedgerSetup.Get;
 
@@ -328,7 +328,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
     var
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
-        //Bogf�rDagensFinansposteringer();
+        //Bogf¢rDagensFinansposteringer();
 
         HCRetailSetup.Get;
         Clear(Counter);
@@ -369,7 +369,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
 
     procedure PostTodaysItemEntries(var TempPost: Record "HC Audit Roll Posting" temporary)
     begin
-        //Bogf�rDagensFinansposteringer();
+        //Bogf¢rDagensFinansposteringer();
 
         HCRetailSetup.Get;
         Clear(Counter);
@@ -829,7 +829,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
         PosterFremValDifferencer(Rec);
 
         // ********************************
-        //  Overf�r til Bank
+        //  Overf¢r til Bank
         // ********************************
 
         if Rec."Transferred to Balance Account" <> 0 then begin
@@ -877,7 +877,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
 
 
         // ********************************
-        //  Overf�r til Vekselkasse
+        //  Overf¢r til Vekselkasse
         // ********************************
 
         if Rec."Change Register" <> 0 then begin
@@ -941,7 +941,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
         ln11: Label ' Posting G/L Entries      @10@@@@@@@@@@@@@@@@@ \';
         ln12: Label ' Posting Item Entries     @11@@@@@@@@@@@@@@@@@ \\';
     begin
-        //StatusVindue�ben()
+        //StatusVindueÅben()
 
         WindowIsOpen := true;
 
@@ -1576,7 +1576,7 @@ codeunit 6150902 "HC Post Temp Audit Roll"
         nTotal: Integer;
         Linie: Record "HC Audit Roll Posting" temporary;
     begin
-        //FjernH�ngendeUdbetalingerTemp
+        //FjernHængendeUdbetalingerTemp
 
         Rulle.SetCurrentKey("Sale Type", Type, "No.");
         Rulle.SetRange("Sale Type", Rulle."Sale Type"::"Out payment");

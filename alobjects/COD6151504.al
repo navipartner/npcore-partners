@@ -8,6 +8,7 @@ codeunit 6151504 "Nc Import Mgt."
     // NC2.06/BR  /20170921  CASE 290771 Changed TryFunction call to support NAV 2017
     // NC2.12/MHA /20180502  CASE 313362 Bumped Version List to remove NPR5.36
     // NC2.23/MHA /20190927  CASE 369170 SendErrorMail() is no longer a Try function as it contains MODIFY transaction
+    // NPR5.55/MHA /20200604  CASE 408100 Removed transaction in SendErrorMail() to conform as Try function
 
     TableNo = "Nc Import Entry";
 
@@ -144,7 +145,9 @@ codeunit 6151504 "Nc Import Mgt."
             exit('');
 
         NcImportEntry.CalcFields("Last Error Message");
-        NcImportEntry."Last Error Message".CreateInStream(InStream);
+        //-NPR5.55 [408100]
+        NcImportEntry."Last Error Message".CreateInStream(InStream,TEXTENCODING::UTF8);
+        //+NPR5.55 [408100]
         StreamReader := StreamReader.StreamReader(InStream);
         ErrorText := StreamReader.ReadToEnd();
         if not HtmlFormat then
@@ -220,7 +223,7 @@ codeunit 6151504 "Nc Import Mgt."
     end;
 
     [TryFunction]
-    procedure SendErrorMail(var NcImportEntry: Record "Nc Import Entry")
+    procedure SendErrorMail(NcImportEntry: Record "Nc Import Entry")
     var
         NcImportType: Record "Nc Import Type";
         SMTPMailSetup: Record "SMTP Mail Setup";
@@ -259,10 +262,6 @@ codeunit 6151504 "Nc Import Mgt."
             SMTPMail.AddAttachmentStream(InStream, NcImportEntry."Document Name");
         end;
         SMTPMail.Send;
-
-        NcImportEntry."Last Error E-mail Sent at" := CurrentDateTime;
-        NcImportEntry."Last Error E-mail Sent to" := NcImportType."E-mail address on Error";
-        NcImportEntry.Modify;
         //+NC2.02 [262318]
     end;
 
