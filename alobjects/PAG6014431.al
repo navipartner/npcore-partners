@@ -1,7 +1,7 @@
 page 6014431 "Gift Voucher List"
 {
     // //-NPR3.0c ved Nikolai Pedersen
-    //   tilf�jet find, active ved start
+    //   tilf¢jet find, active ved start
     // NPR4.14/TSA /20150731  CASE 219602 - Cleaned CRLF from NOR Caption on "Offline - No." field
     // NPR4.14/TSA /20150731  CASE 219602 - Changes to Comply to Critical Guidelines
     // NPR5.29/TS  /20161220  CASE 255679 Added COPY of Gift Voucher

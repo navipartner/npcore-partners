@@ -11,6 +11,7 @@ table 6014462 "E-mail Template Header"
     // NPR5.38/MHA /20180104  CASE 301054 Deleted blank Global Text Constant ErrorExistingLines
     // NPR5.38/THRO/20180108  CASE 286713 Added Transactional E-mail setup fields (field 80 + 82)
     // NPR5.43/THRO/20180626  CASE 318935 Added field 90 + 92 "Fieldnumber Start Tag" and "Fieldnumber End Tag"
+    // NPR5.55/THRO/20200511  CASE 343266 Renamed option values for Transactional E-mail
 
     Caption = 'E-mail Template Header';
     DrillDownPageID = "E-mail Templates";
@@ -95,8 +96,8 @@ table 6014462 "E-mail Template Header"
         field(80;"Transactional E-mail";Option)
         {
             Caption = 'Transactional E-mail';
-            OptionCaption = ' ,Campaign Monitor Transactional';
-            OptionMembers = " ","Campaign Monitor Transactional";
+            OptionCaption = ' ,Smart Email';
+            OptionMembers = " ","Smart Email";
 
             trigger OnValidate()
             begin
@@ -109,7 +110,7 @@ table 6014462 "E-mail Template Header"
         field(82;"Transactional E-mail Code";Code[20])
         {
             Caption = 'Transactional E-mail Code';
-            TableRelation = IF ("Transactional E-mail"=CONST("Campaign Monitor Transactional")) "Smart Email" WHERE ("Merge Table ID"=FIELD("Table No."));
+            TableRelation = IF ("Transactional E-mail"=CONST("Smart Email")) "Smart Email" WHERE ("Merge Table ID"=FIELD("Table No."));
         }
         field(90;"Fieldnumber Start Tag";Text[10])
         {

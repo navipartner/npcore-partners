@@ -2,6 +2,7 @@ codeunit 6151011 "NpRv Module Mgt."
 {
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
     // NPR5.49/MHA /20190228  CASE 342811 Changed signature of function OnRunValidateVoucher()
+    // NPR5.55/MHA /20200603  CASE 363864 Added interface for Sales Document Payments
 
 
     trigger OnRun()
@@ -70,8 +71,15 @@ codeunit 6151011 "NpRv Module Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRunApplyPayment(FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session";VoucherType: Record "NpRv Voucher Type";SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";var Handled: Boolean)
+    procedure OnRunApplyPayment(FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session";VoucherType: Record "NpRv Voucher Type";SaleLinePOSVoucher: Record "NpRv Sales Line";var Handled: Boolean)
     begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnRunApplyPaymentSalesDoc(VoucherType: Record "NpRv Voucher Type";SalesHeader: Record "Sales Header";var NpRvSalesLine: Record "NpRv Sales Line";var Handled: Boolean)
+    begin
+        //-NPR5.55 [363864]
+        //+NPR5.55 [363864]
     end;
 }
 

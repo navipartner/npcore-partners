@@ -22,6 +22,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
     // MAG2.16/MHA /20181002  CASE 330552 Added Round in GetTotalAmountInclVat()
     // MAG2.17/MHA /20180920  CASE 302179 Added publisher functions OnCheckPayment(), OnBeforePostPaymentLine(), OnAfterPostMagentoPayment()
     // MAG2.21/MHA /20190523  CASE 355176 Error during Payment Capture/Refund should not result in Hard Error
+    // MAG2.26/MHA /20200428  CASE 401902 Zero amount lines should be ignored in InsertPaymentLines()
+    // MAG2.26/MHA /20200522  CASE 384262 Added validation to Bal. Account No. in SetupGenJnlLineInvoice() to init proper VAT Posting Setup
+    // NPR5.55/MHA /20200605  CASE 402013 Added Delete trigger to SalesHeaderOnDelete()
 
 
     trigger OnRun()
@@ -235,7 +238,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
         //+MAG2.02 [2664711]
 
         //+MAG2.01 [253877]
-        PaymentLine.DeleteAll;
+        //-NPR5.55 [402013]
+        PaymentLine.DeleteAll(true);
+        //+NPR5.55 [402013]
     end;
 
     local procedure "--- Checks"()
@@ -328,9 +333,11 @@ codeunit 6151416 "Magento Pmt. Mgt."
         PaymentLine.SetRange("Document Table No.", DocTableNo);
         PaymentLine.SetRange("Document Type", DocType);
         PaymentLine.SetRange("Document No.", DocNo);
-        //-MAG2.03 [268154]
-        PaymentLine.SetFilter(Amount, '<>%1', 0);
-        //+MAG2.03 [268154]
+        //-MAG2.26 [401902]
+        // //-MAG2.03 [268154]
+        // PaymentLine.SETFILTER(Amount,'<>%1',0);
+        // //+MAG2.03 [268154]
+        //+MAG2.26 [401902]
         exit(PaymentLine.FindFirst);
     end;
 
@@ -497,6 +504,14 @@ codeunit 6151416 "Magento Pmt. Mgt."
         if PaymentLine."Date Captured" <> 0D then
             exit;
 
+        //-MAG2.26 [401902]
+        if PaymentLine.Amount = 0 then begin
+          PaymentLine."Date Captured" := Today;
+          PaymentLine.Modify(true);
+          exit;
+        end;
+        //+MAG2.26 [401902]
+
         //-MAG2.01 [242551]
         //IF PaymentLine."Document Table No." <> DATABASE::"Sales Invoice Header" THEN
         //  EXIT;
@@ -539,7 +554,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
         PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Invoice Header");
         PaymentLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
-        PaymentLine.SetFilter(Amount, '<>%1', 0);
+        //-MAG2.26 [401902]
+        //PaymentLine.SETFILTER(Amount,'<>%1',0);
+        //+MAG2.26 [401902]
         PaymentLine.SetRange("Date Captured", 0D);
         if PaymentLine.FindSet then
             repeat
@@ -579,6 +596,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
             PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
             PaymentLine.SetRange("Document Type", "Document Type");
             PaymentLine.SetRange("Document No.", "No.");
+          //-MAG2.26 [401902]
+          PaymentLine.SetFilter(Amount,'<>%1',0);
+          //+MAG2.26 [401902]
             if PaymentLine.FindSet(true) then
                 repeat
                     //-MAG2.02 [264711]
@@ -654,6 +674,14 @@ codeunit 6151416 "Magento Pmt. Mgt."
         if PaymentLine.Posted then
             exit;
 
+        //-MAG2.26 [401902]
+        if PaymentLine.Amount = 0 then begin
+          PaymentLine.Posted := true;
+          PaymentLine.Modify(true);
+          exit;
+        end;
+        //+MAG2.26 [401902]
+
         //-MAG2.01 [256733]
         PaymentLine.TestField("Account No.");
         //-MAG2.07 [289527]
@@ -701,7 +729,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
                     PaymentLine.SetRange("Document Type", 0);
                     PaymentLine.SetRange("Document No.", DocNo);
                     PaymentLine.SetFilter("Account No.", '<>%1', '');
-                    PaymentLine.SetFilter(Amount, '<>%1', 0);
+              //-MAG2.26 [401902]
+              // PaymentLine.SETFILTER(Amount,'<>%1',0);
+              //+MAG2.26 [401902]
                     if not PaymentLine.FindSet then
                         exit;
                     repeat
@@ -739,7 +769,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
             GenJnlLine."Dimension Set ID" := "Dimension Set ID";
             GenJnlLine."Reason Code" := "Reason Code";
             GenJnlLine."Account Type" := GenJnlLine."Account Type"::Customer;
-            GenJnlLine."Account No." := "Bill-to Customer No.";
+          //-MAG2.26 [384262]
+          GenJnlLine.Validate("Account No.","Bill-to Customer No.");
+          //+MAG2.26 [384262]
             GenJnlLine."Document Type" := GenJnlLine."Document Type"::Payment;
             if PaymentLine.Amount < 0 then
                 GenJnlLine."Document Type" := GenJnlLine."Document Type"::Refund;
@@ -751,7 +783,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
                 PaymentLine."Account Type"::"Bank Account":
                     GenJnlLine."Bal. Account Type" := GenJnlLine."Bal. Account Type"::"Bank Account";
             end;
-            GenJnlLine."Bal. Account No." := PaymentLine."Account No.";
+          //-MAG2.26 [384262]
+          GenJnlLine.Validate("Bal. Account No.",PaymentLine."Account No.");
+          //+MAG2.26 [384262]
             GenJnlLine."Currency Code" := "Currency Code";
             GenJnlLine.Amount := -PaymentLine.Amount;
             GenJnlLine."Source Currency Code" := "Currency Code";
@@ -811,6 +845,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
             PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
             PaymentLine.SetRange("Document Type", "Document Type");
             PaymentLine.SetRange("Document No.", "No.");
+          //-MAG2.26 [401902]
+          PaymentLine.SetFilter(Amount,'<>%1',0);
+          //+MAG2.26 [401902]
             if PaymentLine.FindSet(true) then
                 repeat
                     //-MAG2.02 [264711]
@@ -866,6 +903,13 @@ codeunit 6151416 "Magento Pmt. Mgt."
     begin
         if PaymentLine."Date Refunded" <> 0D then
             exit;
+        //-MAG2.26 [401902]
+        if PaymentLine.Amount = 0 then begin
+          PaymentLine."Date Refunded" := Today;
+          PaymentLine.Modify(true);
+          exit;
+        end;
+        //+MAG2.26 [401902]
         if PaymentLine."Payment Gateway Code" = '' then
             exit;
         if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
@@ -895,7 +939,9 @@ codeunit 6151416 "Magento Pmt. Mgt."
         PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Cr.Memo Header");
         PaymentLine.SetRange("Document No.", SalesCrMemoHeader."No.");
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
-        PaymentLine.SetFilter(Amount, '<>%1', 0);
+        //-MAG2.26 [401902]
+        //PaymentLine.SETFILTER(Amount,'<>%1',0);
+        //+MAG2.26 [401902]
         PaymentLine.SetRange("Date Refunded", 0D);
         if PaymentLine.FindSet then
             repeat
@@ -923,6 +969,10 @@ codeunit 6151416 "Magento Pmt. Mgt."
             exit;
         if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
             exit;
+        //-MAG2.26 [401902]
+        if PaymentLine.Amount = 0 then
+          exit;
+        //+MAG2.26 [401902]
         if PaymentGateway."Cancel Codeunit Id" = 0 then
             exit;
 

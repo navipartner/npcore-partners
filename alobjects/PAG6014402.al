@@ -1,7 +1,7 @@
 page 6014402 "Retail Item Journal"
 {
     // NPR7.100.000/LS/220114  : Retail Merge : Added actions : Matrix, Print EAN,  Import from Scanner
-    //                           NPR3.0e d.06-12-2005 v.Simon Sch�bel
+    //                           NPR3.0e d.06-12-2005 v.Simon Sch¢bel
     //                           Det indtastede varenummer bliver omskrevet hvis det findes som alt.varenummer.
     //                           NPR4.0a, NPK, DL, 17-01-08, Added read from scanner function
     //                           NPR4.000.001, Added VariaX functionality
@@ -16,14 +16,18 @@ page 6014402 "Retail Item Journal"
     // NPR5.30/TJ  /20170222 CASE 266258 Creating template for new page ID if doesn't allready exist
     // NPR5.30/TJ  /20170227 CASE 267424 Using GetItem function from RetailItemJnlMgt
     // NPR5.53/SARA/20191119 CASE 377622 Added Print Price Label function
+    // NPR5.55/YAHA/20200623 CASE 408295 Caption Changed to Retail Item Journal
 
+    ApplicationArea = Basic,Suite;
     AutoSplitKey = true;
-    Caption = 'Item Journal';
+    Caption = 'Retail Item Journal';
     DataCaptionFields = "Journal Batch Name";
     DelayedInsert = true;
     PageType = Worksheet;
+    QueryCategory = '#Basic,#Suite';
     SaveValues = true;
     SourceTable = "Item Journal Line";
+    UsageCategory = Tasks;
 
     layout
     {

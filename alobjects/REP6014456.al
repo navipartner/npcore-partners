@@ -136,7 +136,7 @@ report 6014456 "Sales per week year/Last year"
                 else
                   IsDisplay:=false;
 
-                if (Format(CurrentDate,0,'<Weekday Text>') = 's�ndag') or ((CurrentDate = EndDate)) then begin
+                if (Format(CurrentDate,0,'<Weekday Text>') = 's¢ndag') or ((CurrentDate = EndDate)) then begin
                   TotalOutput := WeekTotal;
                   WeekTotal := 0;
                   TotalOutputLastYear := WeekTotalLastYear;

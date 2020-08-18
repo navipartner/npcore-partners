@@ -1,4 +1,4 @@
-page 6151416 "Magento Item Groups"
+page 6151416 "Magento Categories"
 {
     // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
     // MAG1.01/MH/20150115  CASE 199932 Added Shortkey F5 to Action, Setup Item Group Tree
@@ -11,12 +11,14 @@ page 6151416 "Magento Item Groups"
     // MAG1.21/TR/20151028  CASE 225601 Shortcut to Display Config added
     // MAG1.22/MHA/20151120 CASE 227359 Removed InsertAllowed, changed sorting to Path and added Indentation based on Level
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
-    Caption = 'Magento Item Groups';
-    CardPageID = "Magento Item Group";
+    Caption = 'Magento Categories';
+    CardPageID = "Magento Category Card";
+    Editable = false;
     InsertAllowed = false;
     PageType = List;
-    SourceTable = "Magento Item Group";
+    SourceTable = "Magento Category";
     SourceTableView = SORTING(Path);
     UsageCategory = Lists;
 
@@ -27,15 +29,15 @@ page 6151416 "Magento Item Groups"
             repeater(Group)
             {
                 IndentationColumn = Level;
-                IndentationControls = "No.",Name;
+                IndentationControls = Id,Name;
                 ShowAsTree = true;
-                field("No.";"No.")
+                field(Id;Id)
                 {
                 }
                 field(Name;Name)
                 {
                 }
-                field("Parent Item Group No.";"Parent Item Group No.")
+                field("Parent Category Id";"Parent Category Id")
                 {
                     Visible = false;
                 }
@@ -47,15 +49,33 @@ page 6151416 "Magento Item Groups"
                     Visible = false;
                 }
             }
-            part(Control6150613;"Magento Item Group Links")
-            {
-                SubPageLink = "Item Group"=FIELD("No.");
-            }
         }
     }
 
     actions
     {
+        area(processing)
+        {
+            action("Setup Categories")
+            {
+                Caption = 'Setup Categories';
+                Image = Setup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Visible = HasSetupCategories;
+
+                trigger OnAction()
+                var
+                    MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
+                begin
+                    //-MAG2.26 [404580]
+                    MagentoSetupMgt.TriggerSetupCategories();
+                    Message(Text000);
+                    //+MAG2.26 [404580]
+                end;
+            }
+        }
         area(navigation)
         {
             action("Display Config")
@@ -76,19 +96,39 @@ page 6151416 "Magento Item Groups"
                     //+MAG1.21
                 end;
             }
+            action(Items)
+            {
+                Caption = 'Items';
+                Image = Item;
+
+                trigger OnAction()
+                var
+                    MagentoCategoryMgt: Codeunit "Magento Category Mgt.";
+                begin
+                    //-MAG2.26 [404580]
+                    MagentoCategoryMgt.ItemCountDrillDown(Rec);
+                    //+MAG2.26 [404580]
+                end;
+            }
         }
     }
 
     trigger OnOpenPage()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
+        //-MAG2.26 [404580]
+        HasSetupCategories := MagentoSetupMgt.HasSetupCategories();
+        //+MAG2.26 [404580]
         //-MAG1.21
         SetDisplayConfigVisible;
         //+MAG1.21
     end;
 
     var
-        MagentoItemGroupMgt: Codeunit "Magento Item Group Mgt.";
         DisplayConfigVisible: Boolean;
+        HasSetupCategories: Boolean;
+        Text000: Label 'Category update initiated';
 
     local procedure SetDisplayConfigVisible()
     var

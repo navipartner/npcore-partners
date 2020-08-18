@@ -42,7 +42,7 @@ page 6151443 "Magento Display Config"
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ItemList: Page "Item List";
-                        ItemGroups: Page "Magento Item Group List";
+                        ItemGroups: Page "Magento Category List";
                         Brands: Page "Magento Brands";
                     begin
                         case Type of
@@ -127,7 +127,7 @@ page 6151443 "Magento Display Config"
     end;
 
     var
-        ItemGroup: Record "Magento Item Group";
+        ItemGroup: Record "Magento Category";
         Manufactur: Record "Magento Brand";
         Item: Record Item;
         ItemTypeFilter: Option Item,"Item Group",Brand,"None";
@@ -204,7 +204,7 @@ page 6151443 "Magento Display Config"
           ItemTypeFilter::"Item Group":
             begin
               SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table,6059852);
-              ItemGroup."No." := NumberFilter;
+              ItemGroup.Id := NumberFilter;
             end;
         end;
 

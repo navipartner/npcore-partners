@@ -1,8 +1,9 @@
 table 6150662 "NPRE Seating - Waiter Pad Link"
 {
-    // NPR5.34/ANEN  /2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN /20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
+    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.35/JDH /20170828 CASE 288314 Seating Code changed to code 10
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Seating - Waiter Pad Link';
 
@@ -40,11 +41,19 @@ table 6150662 "NPRE Seating - Waiter Pad Link"
             Caption = 'Waiter Pad Description';
             FieldClass = FlowField;
         }
+        field(20;Closed;Boolean)
+        {
+            Caption = 'Closed';
+            Description = 'NPR5.55';
+        }
     }
 
     keys
     {
         key(Key1;"Seating Code","Waiter Pad No.")
+        {
+        }
+        key(Key2;Closed)
         {
         }
     }

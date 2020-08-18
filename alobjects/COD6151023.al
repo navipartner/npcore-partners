@@ -1,6 +1,7 @@
 codeunit 6151023 "NpRv POS Action Top-up"
 {
     // NPR5.50/MHA /20190426  CASE 353079 Object created - Top-up functionality for NaviPartner Retail Vouchers
+    // NPR5.55/MHA /20200427  CASE 402015 New Primary Key on Sale Line POS Voucher
 
 
     trigger OnRun()
@@ -176,7 +177,7 @@ codeunit 6151023 "NpRv POS Action Top-up"
     var
         NpRvVoucher: Record "NpRv Voucher";
         SaleLinePOS: Record "Sale Line POS";
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
         POSSaleLine: Codeunit "POS Sale Line";
         VoucherNo: Text;
         DiscountType: Text;
@@ -222,26 +223,30 @@ codeunit 6151023 "NpRv POS Action Top-up"
         SaleLinePOS.Modify(true);
         POSSession.RequestRefreshData();
 
-        SaleLinePOSVoucher.Init;
-        SaleLinePOSVoucher."Register No." := SaleLinePOS."Register No.";
-        SaleLinePOSVoucher."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSVoucher."Sale Type" := SaleLinePOS."Sale Type";
-        SaleLinePOSVoucher."Sale Date" := SaleLinePOS.Date;
-        SaleLinePOSVoucher."Sale Line No." := SaleLinePOS."Line No.";
-        SaleLinePOSVoucher."Line No." := 10000;
-        SaleLinePOSVoucher.Type := SaleLinePOSVoucher.Type::"Top-up";
-        SaleLinePOSVoucher."Voucher No." := NpRvVoucher."No.";
-        SaleLinePOSVoucher."Voucher Type" := NpRvVoucher."Voucher Type";
-        SaleLinePOSVoucher.Description := NpRvVoucher.Description;
-        SaleLinePOSVoucher."Starting Date" := CurrentDateTime;
-        SaleLinePOSVoucher."Send via Print" := NpRvVoucher."Send via Print";
-        SaleLinePOSVoucher."Send via E-mail" := NpRvVoucher."Send via E-mail";
-        SaleLinePOSVoucher."Send via SMS" := NpRvVoucher."Send via SMS";
+        NpRvSalesLine.Init;
+        //-NPR5.55 [402015]
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
+        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
+        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
+        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
+        NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+        NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+        NpRvSalesLine.Description := NpRvVoucher.Description;
+        NpRvSalesLine."Starting Date" := CurrentDateTime;
+        NpRvSalesLine."Send via Print" := NpRvVoucher."Send via Print";
+        NpRvSalesLine."Send via E-mail" := NpRvVoucher."Send via E-mail";
+        NpRvSalesLine."Send via SMS" := NpRvVoucher."Send via SMS";
         if NpRvVoucher."Send via E-mail" then
-          SaleLinePOSVoucher."E-mail" := NpRvVoucher."E-mail";
+          NpRvSalesLine."E-mail" := NpRvVoucher."E-mail";
         if NpRvVoucher."Send via SMS" then
-          SaleLinePOSVoucher."Phone No." := NpRvVoucher."Phone No.";
-        SaleLinePOSVoucher.Insert;
+          NpRvSalesLine."Phone No." := NpRvVoucher."Phone No.";
+        NpRvSalesLine.Insert(true);
+        //+NPR5.55 [402015]
     end;
 
     local procedure "--- Constants"()

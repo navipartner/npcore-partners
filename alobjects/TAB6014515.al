@@ -1,7 +1,7 @@
 table 6014515 "Retail Contract Setup"
 {
     // //-NPR3.0c
-    //   tilf�jet feltet email p� modtager af forsikringsoplysninger
+    //   tilf¢jet feltet email på modtager af forsikringsoplysninger
     // NPR5.30/MHA /20170201  CASE 264918 Object renamed from Photo Setup to Retail Contract Setup and Unused fields deleted
     // NPR5.46/JAVA/20180918  CASE 328652 Fix 'DataLength' property of the field 1000 "Warranty No. Series" (20 => 10).
 

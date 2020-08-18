@@ -479,7 +479,7 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
           if (xRec."No." <> '') and (xRec."No." <> "No.") then
             exit;
 
-          //Salgsm�ngderabatkode := "No.";
+          //Salgsmængderabatkode := "No.";
           if (CopyStr("No.",1,1) = '*') and ("No." <> '**') then begin
             if StrLen("No.") > 1 then
               EndNo := CopyStr("No.",2,StrLen("No.") - 1);
@@ -574,7 +574,7 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
                   Error(Text001);
               end;
               //-NPR4.04
-              //IF ("Size Group"='') AND (Ops�tning."Size Code on Creation") THEN BEGIN
+              //IF ("Size Group"='') AND (Opsætning."Size Code on Creation") THEN BEGIN
               //  IF PAGE.RUNMODAL(PAGE::"Variation Size Groups",Str,Str."Size Code") = ACTION::LookupOK THEN BEGIN
               //    "Size Group":=Str."Size Code";
               //  END;
@@ -594,11 +594,11 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
                 if ItemGroup.Get("Item Group") then
                   Description := ItemGroup.Description;
               Validate(Description);
-              //Salgsm�ngderabatkode := "No.";
+              //Salgsmængderabatkode := "No.";
             end;
           end;
 
-        //  Salgsm�ngderabatkode := "No.";
+        //  Salgsmængderabatkode := "No.";
           //+NPR5.26 [248288]
           ////Checker ISBN-nummer
           //GetRetailSetup();

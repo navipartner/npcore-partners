@@ -2,6 +2,7 @@ page 6059822 "Smart Email Card"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
     // NPR5.44/THRO/20180723 CASE 310042 Added "NpXml Template Code"
+    // NPR5.55/THRO/20200511 CASE 343266 Added Provider
 
     Caption = 'Smart Email Card';
     PageType = Card;
@@ -16,6 +17,16 @@ page 6059822 "Smart Email Card"
                 field("Code";Code)
                 {
                 }
+                field(Provider;Provider)
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-NPR5.55 [343266]
+                        ShowMergeLanguage := Provider = Provider::Mailchimp;
+                        //+NPR5.55 [343266]
+                    end;
+                }
                 field(Description;Description)
                 {
                 }
@@ -27,6 +38,7 @@ page 6059822 "Smart Email Card"
                 }
                 field("Smart Email ID";"Smart Email ID")
                 {
+                    ShowMandatory = true;
                 }
                 field("NpXml Template Code";"NpXml Template Code")
                 {
@@ -38,10 +50,18 @@ page 6059822 "Smart Email Card"
                         //+NPR5.44 [310042]
                     end;
                 }
+                group(Control6014402)
+                {
+                    ShowCaption = false;
+                    Visible = ShowMergeLanguage;
+                    field("Merge Language (Mailchimp)";"Merge Language (Mailchimp)")
+                    {
+                    }
+                }
             }
-            group("Campaign Monitor")
+            group(TemplateDetails)
             {
-                Caption = 'Campaign Monitor';
+                Caption = 'Template Details';
                 Editable = false;
                 field("Smart Email Name";"Smart Email Name")
                 {
@@ -61,18 +81,27 @@ page 6059822 "Smart Email Card"
                 {
                 }
             }
-            part(Control6150629;"Smart Email Variables")
+            part(Control6014403;"Smart Email Variables")
             {
                 SubPageLink = "Transactional Email Code"=FIELD(Code);
                 Visible = ShowVariablesSubPage;
             }
-            group(Control6150617)
+            group(Preview)
             {
-                ShowCaption = false;
+                Caption = 'Preview';
                 field("Preview Url";"Preview Url")
                 {
                     Editable = false;
                     ExtendedDatatype = URL;
+
+                    trigger OnDrillDown()
+                    var
+                        TransactionalEmailMgt: Codeunit "Transactional Email Mgt.";
+                    begin
+                        //-NPR5.55 [343266]
+                        TransactionalEmailMgt.PreviewSmartEmail(Rec);
+                        //+NPR5.55 [343266]
+                    end;
                 }
             }
         }
@@ -87,9 +116,13 @@ page 6059822 "Smart Email Card"
         //-NPR5.44 [310042]
         ShowVariablesSubPage := "NpXml Template Code" = '';
         //+NPR5.44 [310042]
+        //-NPR5.55 [343266]
+        ShowMergeLanguage := Provider = Provider::Mailchimp;
+        //+NPR5.55 [343266]
     end;
 
     var
         ShowVariablesSubPage: Boolean;
+        ShowMergeLanguage: Boolean;
 }
 

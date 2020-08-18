@@ -25,6 +25,8 @@ page 6060136 "MM Member Card"
     // MM1.42/ALPO/20191125 CASE 377727 Raptor integration
     // MM1.42/TSA /20191205 CASE 372557 Added Wallet Create and Welcome message create to member card
     // MM1.42/TSA /20191219 CASE 382728 Added Preferred Com. Methods related action
+    // MM1.44/TSA /20200512 CASE 383842 Fixed attribute lookup reference issue
+    // MM1.45/TSA /20200717 CASE 415293 Added a warning when updating external number
 
     Caption = 'Member Card';
     DataCaptionExpression = "External Member No.";
@@ -42,6 +44,16 @@ page 6060136 "MM Member Card"
                 field("External Member No.";"External Member No.")
                 {
                     Importance = Promoted;
+
+                    trigger OnValidate()
+                    begin
+
+                        //-MM1.45 [415293]
+                        if ((Rec."External Member No." <> xRec."External Member No.") and (xRec."External Member No." <> '')) then
+                          if (not Confirm (EXT_NO_CHANGE, false)) then
+                            Error ('');
+                        //+MM1.45 [415293]
+                    end;
                 }
                 field("Display Name";"Display Name")
                 {
@@ -788,6 +800,7 @@ page 6060136 "MM Member Card"
         NPRAttrVisible10: Boolean;
         RaptorEnabled: Boolean;
         NO_ENTRIES: Label 'No entries found for member %1.';
+        EXT_NO_CHANGE: Label 'Please note that changing the external number requires re-printing of documents where this number is used. Do you want to continue?';
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
@@ -833,9 +846,12 @@ page 6060136 "MM Member Card"
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
 
+        //-MM1.44 [383842]
         //-MM1.40 [360242]
-        NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, Format (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
+        //NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, FORMAT (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
+        NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, Format ("Entry No.",0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
         //+MM1.40 [360242]
+        //+MM1.44 [383842]
     end;
 }
 

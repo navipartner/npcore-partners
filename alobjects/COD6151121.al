@@ -4,6 +4,7 @@ codeunit 6151121 "MM GDPR Management"
     // MM1.33/TSA /20180731 CASE 323694 GDPR membership migration
     // MM1.33/TSA /20180801 CASE 323776 Allowing a blank agreement number not to cause an error
     // MM1.39/TSA/20190529  CASE 350968 Transport MM1.38.01 - 29 May 2019
+    // MM1.44/TSA /20200416 CASE 391607 Handling of inconsistent data
 
 
     trigger OnRun()
@@ -492,7 +493,11 @@ codeunit 6151121 "MM GDPR Management"
         if (GDPRAgreementNo = '') and (MembershipRole."GDPR Agreement No." = '') then
           exit;
 
-        if ((MembershipRole."GDPR Agreement No." <> MembershipSetup."GDPR Agreement No.") or (MembershipRole."GDPR Data Subject Id" = '')) then begin
+
+        //-MM1.44 [391607]
+        //IF ((MembershipRole."GDPR Agreement No." <> MembershipSetup."GDPR Agreement No.") OR (MembershipRole."GDPR Data Subject Id" = '')) THEN BEGIN
+        if ((MembershipRole."GDPR Agreement No." <> MembershipSetup."GDPR Agreement No.") or (MembershipRole."GDPR Data Subject Id" = '') or (MembershipRole."GDPR Agreement No." = '')) then begin
+        //+MM1.44 [391607]
           MembershipRole."GDPR Agreement No." := GDPRAgreementNo;
           if (MembershipRole."GDPR Data Subject Id" = '') then
             MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));

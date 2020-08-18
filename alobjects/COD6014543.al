@@ -103,6 +103,7 @@ codeunit 6014543 "RP Epson V Device Library"
     // NPR5.40/MMV /20180305 CASE 284505 Moved from global string buffer to global blob buffer for performance.
     //                                   Removed excessive usage of escape command library for performance.
     // NPR5.54/MMV /20200207 CASE 389961 Removed .NET interop in SetFontStretch
+    // NPR5.55/MITH/20200210 CASE 387982 Added "DPI" to device settings to handle different DPIs (m30 uses 300 dpi)
 
     EventSubscriberInstance = Manual;
 
@@ -127,6 +128,8 @@ codeunit 6014543 "RP Epson V Device Library"
         Encoding: Option "Windows-1252","Windows-1256";
         PrintBuffer: Codeunit "Temp Blob";
         PrintBufferOutStream: OutStream;
+        DPI: Option "200","300";
+        SETTING_DPI: Label 'DPI of device.';
 
     local procedure "// Interface implementation"()
     begin
@@ -278,6 +281,11 @@ codeunit 6014543 "RP Epson V Device Library"
                     'ENCODING':
                         if DeviceSettings.Value = 'Windows-1256' then
                             Encoding := Encoding::"Windows-1256";
+            //-NPR5.55 [387982]
+            'DPI' :
+              if DeviceSettings.Value = '300' then
+                DPI := DPI::"300";
+            //+NPR5.55 [387982]
                     else
                         Error(Error_InvalidDeviceSetting, DeviceSettings.Value);
                 end;
@@ -1165,90 +1173,90 @@ codeunit 6014543 "RP Epson V Device Library"
     begin
         case MediaWidth of
             MediaWidth::"80mm":
+            //-NPR5.55 [387982]
+            case DPI of
+              DPI::"200":
+            //+NPR5.55 [387982]
                 case FontFace[1] of
-                    'A':
-                        case FontFace[2] of
-                            '1':
-                                exit(42);
-                            '2':
-                                exit(21);
-                            '3':
-                                exit(14);
-                            '4':
-                                exit(10);
-                            '5':
-                                exit(8);
-                            '6':
-                                exit(7);
-                            '7':
-                                exit(6);
-                            '8':
-                                exit(5);
-                        end;
-                    'B':
-                        case FontFace[2] of
-                            '1':
-                                exit(56);
-                            '2':
-                                exit(28);
-                            '3':
-                                exit(18);
-                            '4':
-                                exit(14);
-                            '5':
-                                exit(11);
-                            '6':
-                                exit(9);
-                            '7':
-                                exit(8);
-                            '8':
-                                exit(7);
-                        end;
+                  'A' :
+                    case FontFace[2] of
+                      '1' : exit(42);
+                      '2' : exit(21);
+                      '3' : exit(14);
+                      '4' : exit(10);
+                      '5' : exit(8);
+                      '6' : exit(7);
+                      '7' : exit(6);
+                      '8' : exit(5);
+                    end;
+                  'B' :
+                    case FontFace[2] of
+                      '1' : exit(56);
+                      '2' : exit(28);
+                      '3' : exit(18);
+                      '4' : exit(14);
+                      '5' : exit(11);
+                      '6' : exit(9);
+                      '7' : exit(8);
+                      '8' : exit(7);
+                    end;
                 end;
-            //-NPR5.37 [291769]
-            MediaWidth::"58mm":
+            //-NPR5.55 [387982]
+              DPI::"300":
                 case FontFace[1] of
-                    'A':
-                        case FontFace[2] of
-                            '1':
-                                exit(32);
-                            '2':
-                                exit(16);
-                            '3':
-                                exit(10);
-                            '4':
-                                exit(8);
-                            '5':
-                                exit(6);
-                            '6':
-                                exit(5);
-                            '7':
-                                exit(4);
-                            '8':
-                                exit(4);
-                        end;
-                    'B':
-                        case FontFace[2] of
-                            '1':
-                                exit(42);
-                            '2':
-                                exit(21);
-                            '3':
-                                exit(14);
-                            '4':
-                                exit(10);
-                            '5':
-                                exit(8);
-                            '6':
-                                exit(7);
-                            '7':
-                                exit(6);
-                            '8':
-                                exit(5);
-                        end;
+                  'A' :
+                    case FontFace[2] of
+                      '1' : exit(47);
+                      '2' : exit(23);
+                      '3' : exit(16);
+                      '4' : exit(12);
+                      '5' : exit(9);
+                      '6' : exit(7);
+                      '7' : exit(6);
+                      '8' : exit(6);
+                    end;
+                  'B' :
+                    case FontFace[2] of
+                      '1' : exit(56);
+                      '2' : exit(28);
+                      '3' : exit(19);
+                      '4' : exit(14);
+                      '5' : exit(11);
+                      '6' : exit(9);
+                      '7' : exit(8);
+                      '8' : exit(7);
+                    end;
                 end;
-        //MediaWidth::"58mm" : ERROR('Not implemented');
-        //+NPR5.37 [291769]
+            end;
+            //+NPR5.55 [387982]
+          //-NPR5.37 [291769]
+          MediaWidth::"58mm" :
+            case FontFace[1] of
+              'A' :
+                case FontFace[2] of
+                  '1' : exit(32);
+                  '2' : exit(16);
+                  '3' : exit(10);
+                  '4' : exit(8);
+                  '5' : exit(6);
+                  '6' : exit(5);
+                  '7' : exit(4);
+                  '8' : exit(4);
+                end;
+              'B' :
+                case FontFace[2] of
+                  '1' : exit(42);
+                  '2' : exit(21);
+                  '3' : exit(14);
+                  '4' : exit(10);
+                  '5' : exit(8);
+                  '6' : exit(7);
+                  '7' : exit(6);
+                  '8' : exit(5);
+                end;
+            end;
+          //MediaWidth::"58mm" : ERROR('Not implemented');
+          //+NPR5.37 [291769]
         end;
     end;
 
@@ -1400,6 +1408,13 @@ codeunit 6014543 "RP Epson V Device Library"
                         tmpDeviceSetting.Options := 'Windows-1252,Windows-1256';
                     end;
             //+NPR5.37 [290904]
+            //-NPR5.55 [387982]
+            'DPI' :
+              begin
+                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                tmpDeviceSetting.Options := '200,300';
+              end;
+            //+NPR5.55 [387982]
             end;
             exit(tmpDeviceSetting.Insert);
         end;
@@ -1432,6 +1447,9 @@ codeunit 6014543 "RP Epson V Device Library"
         //-NPR5.37 [290904]
         AddOption(tmpRetailList, SETTING_ENCODING, 'ENCODING');
         //+NPR5.37 [290904]
+        //-NPR5.55 [387982]
+        AddOption(tmpRetailList, SETTING_DPI, 'DPI');
+        //+NPR5.55 [387982]
     end;
 
     procedure AddOption(var RetailList: Record "Retail List" temporary; Choice: Text; Value: Text)

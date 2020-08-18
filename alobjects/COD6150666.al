@@ -3,6 +3,8 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
     // NPR5.45/MHA /20180827 CASE 318369 Object created
     // NPR5.50/TJ  /20190530 CASE 346384 New parameter added
     // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Use preselected Waiterpad No. and Seating Code as well as Number of Guests
+    // NPR5.55/ALPO/20200623 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (filter seatings by restaurant)
 
 
     trigger OnRun()
@@ -20,10 +22,8 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.50 [346384]
-        //EXIT ('1.0');
+        exit('1.2');  //NPR5.55 [399170]
         exit ('1.1');
-        //+NPR5.50 [346384]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -90,6 +90,7 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
             //-NPR5.50 [346384]
             RegisterBooleanParameter('ShowOnlyActiveWaiPad',false);
             //+NPR5.50 [346384]
+            RegisterBooleanParameter('ReturnToDefaultView',false);  //NPR5.55 [399170]
           end;
         end;
     end;
@@ -135,13 +136,19 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
         NPRESeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
         NPREWaiterPad: Record "NPRE Waiter Pad";
         SalePOS: Record "Sale POS";
-        NPREWaiterPadPOSMgt: Codeunit "NPRE Waiter Pad POS Management";
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
         POSSale: Codeunit "POS Sale";
+        POSSetup: Codeunit "POS Setup";
         ConfirmString: Text;
     begin
         //-NPR5.53 [380609]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
+        //-NPR5.55 [414938]
+        POSSession.GetSetup(POSSetup);
+
+        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
+        //+NPR5.55 [414938]
 
         if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
           NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
@@ -158,7 +165,8 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
           NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
           if SalePOS."NPRE Pre-Set Seating Code" <> '' then
             if not NPRESeatingWaiterPadLink.Get(NPRESeating.Code,NPREWaiterPad."No.") then
-              NPREWaiterPadPOSMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);
+              //NPREWaiterPadPOSMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);  //NPR5.55 [399170]-revoked
+              WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);  //NPR5.55 [399170]
           JSON.SetContext('waiterPadNo',SalePOS."NPRE Pre-Set Waiter Pad No.");
         end;
 
@@ -188,9 +196,11 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
         NPRESeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
         NPREWaiterPad: Record "NPRE Waiter Pad";
         NPREWaiterPadPOSMgt: Codeunit "NPRE Waiter Pad POS Management";
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON,NPRESeating);
-        NPREWaiterPadPOSMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);
+        //NPREWaiterPadPOSMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);  //NPR5.55 [399170]-revoked
+        WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);  //NPR5.55 [399170]
     end;
 
     local procedure OnActionSelectWaiterPad(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management")
@@ -217,42 +227,89 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
         POSSale: Codeunit "POS Sale";
         WaiterPadNo: Code[20];
         OpenWaiterPad: Boolean;
+        ReturnToDefaultView: Boolean;
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON,NPRESeating);
         JSON.SetScope('/',true);
         WaiterPadNo := JSON.GetString('waiterPadNo',true);
         NPREWaiterPad.Get(WaiterPadNo);
-
+        
         OpenWaiterPad := JSON.GetBooleanParameter('OpenWaiterPad',false);
-
+        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView',false);  //NPR5.55 [399170]
+        
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-
+        
+        //-NPR5.55 [399170]-revoked
+        /*
         NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS,NPREWaiterPad);
         //-NPR5.53 [380609]
-        SalePOS.Find;
-        NPREWaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS,false);
+        SalePOS.FIND;
+        NPREWaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS,FALSE);
+        */
+        //+NPR5.55 [399170]-revoked
+        NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS,NPREWaiterPad,true);  //NPR5.55 [399170]
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true,false);
         //+NPR5.53 [380609]
-
+        
         Commit;
         POSSession.RequestRefreshData();
-
+        
         if OpenWaiterPad then
           NPREWaiterPadPOSMgt.UIShowWaiterPad(NPREWaiterPad);
+        
+        //-NPR5.55 [399170]
+        if ReturnToDefaultView then
+          POSSale.SelectViewForEndOfSale(POSSession);
+        //+NPR5.55 [399170]
+
     end;
 
     local procedure GetConfirmString(NPRESeating: Record "NPRE Seating") ConfirmString: Text
     var
         NPRESeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
     begin
+        //+NPR5.55 [399170]
+        NPRESeatingWaiterPadLink.SetCurrentKey(Closed);
+        NPRESeatingWaiterPadLink.SetRange(Closed, false);
+        //+NPR5.55 [399170]
         NPRESeatingWaiterPadLink.SetRange("Seating Code",NPRESeating.Code);
         if NPRESeatingWaiterPadLink.FindFirst then
           exit('');
 
         ConfirmString := StrSubstNo(Text001,NPRESeating.Code);
         exit(ConfirmString);
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', true, false)]
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    var
+        CaptionReturnToDefaultView: Label 'Return to Default View on Finish';
+    begin
+        //-NPR5.55 [399170]
+        if POSParameterValue."Action Code" <> ActionCode then
+          exit;
+
+        case POSParameterValue.Name of
+          'ReturnToDefaultView': Caption := CaptionReturnToDefaultView;
+        end;
+        //+NPR5.55 [399170]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', true, false)]
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    var
+        DescReturnToDefaultView: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed';
+    begin
+        //-NPR5.55 [399170]
+        if POSParameterValue."Action Code" <> ActionCode then
+          exit;
+
+        case POSParameterValue.Name of
+          'ReturnToDefaultView': Caption := DescReturnToDefaultView;
+        end;
+        //+NPR5.55 [399170]
     end;
 }
 

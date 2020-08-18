@@ -1,8 +1,8 @@
 page 6014585 "Advanced Sales Statistics"
 {
-    // //-NPR3.0b v.Simon Sch�bel
-    //    Overs�ttelser
-    // 001, NPK, MIM, 25-07-07: Tilf�jet update af subforme.
+    // //-NPR3.0b v.Simon Sch¢bel
+    //    Oversættelser
+    // 001, NPK, MIM, 25-07-07: Tilf¢jet update af subforme.
     // NPR7.000.000,TS-26.10.12 : There were codes that were written on the Activate Trigger of the Subforms.
     // NPR4.13/BHR/20150715 CASE 217113 Add "report Advanced Sales Statistics" 6014490
     // 
@@ -16,6 +16,7 @@ page 6014585 "Advanced Sales Statistics"
     // NPR5.50/ZESO/20190430 CASE 353384 Removed Product Group Code filter
     // NPR5.51/ZESO/20190620 CASE 358271 Flow Item Group Filter to Item Group Statistics
     // NPR5.51/YAHA/20190822 CASE 365732 Flow Item Category Filter to Item Statistics
+    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
 
     Caption = 'Advanced Sales Statistics';
     DeleteAllowed = false;
@@ -160,8 +161,8 @@ page 6014585 "Advanced Sales Statistics"
 
                         // Periode
                         //CurrForm."Periode LastYear Sale (Qty.)".VISIBLE( ShowLastYear );
-                        //CurrForm."Periode LastYear Sale (�)".VISIBLE( ShowLastYear );
-                        //CurrForm."Periode LastYear Profit (�)".VISIBLE( ShowLastYear );
+                        //CurrForm."Periode LastYear Sale (£)".VISIBLE( ShowLastYear );
+                        //CurrForm."Periode LastYear Profit (£)".VISIBLE( ShowLastYear );
                         //CurrForm."Periode LastYear Profit %".VISIBLE( ShowLastYear );
                         PLYSaleQty := ShowLastYear;
                         PLYSale := ShowLastYear;
@@ -172,7 +173,7 @@ page 6014585 "Advanced Sales Statistics"
                         //CurrForm.SubItemGroup.FORM.ShowLastYear( ShowLastYear );
                         //CurrPage.ItemGroupStatisticsSubpage.PAGE.ShowLastYear(ShowLastYear);
 
-                        // S�lger
+                        // Sælger
                         //CurrForm.SubSalesperson.FORM.ShowLastYear( ShowLastYear );
                         //CurrPage.SalespersonStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
                         // Vare
@@ -519,7 +520,7 @@ page 6014585 "Advanced Sales Statistics"
         //CurrForm.SubItemGroup.FORM.ShowLastYear( ShowLastYear );
         //CurrPage.ItemGroupStatisticsSubpage.PAGE.ShowLastYear(ShowLastYear);
 
-        // S�lger
+        // Sælger
         //CurrForm.SubSalesperson.FORM.ShowLastYear( ShowLastYear );
         //CurrPage.SalespersonStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
         // Vare
@@ -697,7 +698,9 @@ page 6014585 "Advanced Sales Statistics"
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
         if not LastYear then
           ValueEntry.SetFilter( "Posting Date", '%1..%2', "Period Start", "Period End" )

@@ -6,6 +6,8 @@ report 6014420 "Item Group Top"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.54/YAHA/20200324  CASE 394883 Removed footer NaviPartner  text
+    // NPR5.55/BHR /20200720  CASE 361515 Rework Report to Exclude Flowfields not used in AL
+    // NPR5.55/ANPA/20200506  CASE 401593 Limit item on 'date filter'
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Item Group Top.rdlc';
 
@@ -26,42 +28,68 @@ report 6014420 "Item Group Top"
 
                 trigger OnAfterGetRecord()
                 begin
-                    CalcFields("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
-                    db := "Sales (LCY)" - "Consumption (Amount)";
+                    //-NPR5.55 [361515]
 
-                    if "Sales (LCY)" <> 0 then
-                      dg := (db/"Sales (LCY)") * 100
+                    IleSalesQty := 0;
+                    IleSalesLCY := 0;
+                    IleCostAmtActual := 0;
+
+                    ItemLedgerEntry.Reset;
+                    ItemLedgerEntry.SetRange("Item Group No.","No.");
+                    ItemLedgerEntry.SetRange("Entry Type",ItemLedgerEntry."Entry Type"::Sale);
+                    ItemLedgerEntry.SetFilter("Vendor No.","Item Group".GetFilter("Vendor Filter"));
+                    ItemLedgerEntry.SetFilter("Posting Date","Item Group".GetFilter("Date Filter"));
+                    ItemLedgerEntry.SetFilter("Global Dimension 1 Code","Item Group".GetFilter("Global Dimension 1 Filter"));
+                    ItemLedgerEntry.SetFilter("Global Dimension 2 Code","Item Group".GetFilter("Global Dimension 2 Filter"));
+                    if ItemLedgerEntry.FindSet then repeat
+                      IleSalesQty  += -ItemLedgerEntry.Quantity;
+                    until ItemLedgerEntry.Next=0;
+
+
+                    ValueEntry.Reset;
+                    ValueEntry.SetRange("Item Group No.","No.");
+                    ValueEntry.SetRange("Item Ledger Entry Type",ValueEntry."Item Ledger Entry Type"::Sale);
+                    ValueEntry.SetFilter("Vendor No.","Item Group".GetFilter("Vendor Filter"));
+                    ValueEntry.SetFilter("Posting Date","Item Group".GetFilter("Date Filter"));
+                    ValueEntry.SetFilter("Global Dimension 1 Code","Item Group".GetFilter("Global Dimension 1 Filter"));
+                    ValueEntry.SetFilter("Global Dimension 2 Code","Item Group".GetFilter("Global Dimension 2 Filter"));
+                    ValueEntry.SetFilter("Salespers./Purch. Code","Item Group".GetFilter("Salesperson Filter"));
+
+                    if ValueEntry.FindSet then repeat
+                      IleSalesLCY += ValueEntry."Sales Amount (Actual)";
+                      IleCostAmtActual += -ValueEntry."Cost Amount (Actual)";
+                    until ValueEntry.Next=0;
+
+                    //+NPR5.55 [361515]
+
+
+                    //CALCFIELDS("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
+                    //db := "Sales (LCY)" - "Consumption (Amount)";
+
+                    //IF "Sales (LCY)" <> 0 THEN
+                     // dg := (db/"Sales (LCY)") * 100
+                    //ELSE
+                     // dg := 0;
+
+                    db := IleSalesLCY - IleCostAmtActual;
+
+                    if IleSalesLCY  <> 0 then
+                      dg := (db/IleSalesLCY ) * 100
                     else
                       dg := 0;
                     //+NPR5.25
-                    //CASE ShowType OF
-                    //  ShowType::ant :  ItemGroupTemp.Amount := -"Sales (Qty.)";             //Text10600000 :  Varegruppetemp.Amount := -"Sales (Qty.)";
-                    //  ShowType::ant :  ItemGroupTemp."Amount 2" := -"Sale (LCY)";          //Text10600000 :  Varegruppetemp."Amount 2" := -"Sale (LCY)";
-                    //  ShowType::sal :  ItemGroupTemp.Amount := -"Sale (LCY)";             //Text10600003 :  Varegruppetemp.Amount := -"Sale (LCY)";
-                    //  ShowType::sal :  ItemGroupTemp."Amount 2" := -"Sales (Qty.)";     //Text10600003 :  Varegruppetemp."Amount 2" := -"Sales (Qty.)";
-                    //  ShowType::db  :  ItemGroupTemp.Amount := -db;                  //Text10600004 :  Varegruppetemp.Amount := -db;
-                    //  ShowType::db  :  ItemGroupTemp."Amount 2" := -"Sale (LCY)";    //Text10600004 :  Varegruppetemp."Amount 2" := -"Sale (LCY)";
-                    //  ShowType::dg  :  ItemGroupTemp.Amount := -dg;                 //'dg'         : Varegruppetemp.Amount := -dg;
-                    //END;
 
-                    //ItemGroupTemp.INSERT;
-
-                    //IF (i = 0) OR (i < ShowQty) THEN
-                    //  i := i + 1
-                    //ELSE BEGIN
-                    //  ItemGroupTemp.FIND('+');
-                    //  ItemGroupTemp.DELETE;
-                    //END;
-
+                    //+#397617 [397617]
                     TempNPRBufferSort.Init;
                     TempNPRBufferSort.Template := "No.";
                     TempNPRBufferSort."Line No." := 0;
                     case SortType of
                       SortType::ant :  begin
-                        TempNPRBufferSort."Decimal 1" := "Sales (Qty.)";
+                        //TempNPRBufferSort."Decimal 1" := "Sales (Qty.)";
+                        TempNPRBufferSort."Decimal 1" := IleSalesQty ;
                       end;
                       SortType::sal :  begin
-                        TempNPRBufferSort."Decimal 1" := "Sales (LCY)";
+                        TempNPRBufferSort."Decimal 1" := IleSalesLCY ;
                       end;
                       SortType::db  :  begin
                         TempNPRBufferSort."Decimal 1" := db;
@@ -87,7 +115,12 @@ report 6014420 "Item Group Top"
                     //-NPR5.25
                     "Item Group".SetFilter("Item Group"."Global Dimension 1 Filter", "Dimension Value".Code);
 
+                    //-NPR5.55 [401593]
+                    "Item Group".CopyFilter("Date Filter", Item."Date Filter");
+                    //+NPR5.55 [401593]
+
                     Item.SetFilter("Global Dimension 1 Filter", "Dimension Value".Code);
+
                     Item.SetRange("Item Group",'');
                     if Item.Find('-') then repeat
                       Item.CalcFields("Sales (Qty.)", "Sales (LCY)");
@@ -114,10 +147,10 @@ report 6014420 "Item Group Top"
                 column(Description_ItemGroup;"Item Group".Description)
                 {
                 }
-                column(SalesQty_ItemGroup;"Item Group"."Sales (Qty.)")
+                column(SalesQty_ItemGroup;IleSalesQty)
                 {
                 }
-                column(SaleLCY_ItemGroup;"Item Group"."Sales (LCY)")
+                column(SaleLCY_ItemGroup;IleSalesLCY)
                 {
                 }
                 column(db;db)
@@ -168,13 +201,56 @@ report 6014420 "Item Group Top"
                     i += 1;
                     //-NPR5.25
 
-                    "Item Group".SetFilter("Item Group"."Global Dimension 1 Filter", "Dimension Value".Code);
-                    if "Item Group".Get(TempNPRBufferSort.Template) then
-                      "Item Group".CalcFields("Sales (Qty.)","Sales (LCY)", "Consumption (Amount)");
 
-                    db := "Item Group"."Sales (LCY)" - "Item Group"."Consumption (Amount)";
-                    if "Item Group"."Sales (LCY)" <> 0 then
-                      dg := (db/"Item Group"."Sales (LCY)") * 100
+
+                    "Item Group".SetFilter("Item Group"."Global Dimension 1 Filter", "Dimension Value".Code);
+                    if "Item Group".Get(TempNPRBufferSort.Template) then begin
+                      //"Item Group".CALCFIELDS("Sales (Qty.)","Sales (LCY)", "Consumption (Amount)");
+                      //-NPR5.55 [361515]
+
+                        IleSalesQty := 0;
+                        IleSalesLCY := 0;
+                        IleCostAmtActual := 0;
+
+                        ItemLedgerEntry.Reset;
+                        ItemLedgerEntry.SetRange("Item Group No.","Item Group"."No.");
+                        ItemLedgerEntry.SetRange("Entry Type",ItemLedgerEntry."Entry Type"::Sale);
+                        ItemLedgerEntry.SetFilter("Vendor No.","Item Group".GetFilter("Vendor Filter"));
+                        ItemLedgerEntry.SetFilter("Posting Date","Item Group".GetFilter("Date Filter"));
+                        ItemLedgerEntry.SetFilter("Global Dimension 1 Code","Item Group".GetFilter("Global Dimension 1 Filter"));
+                        ItemLedgerEntry.SetFilter("Global Dimension 2 Code","Item Group".GetFilter("Global Dimension 2 Filter"));
+
+                        if ItemLedgerEntry.FindSet then repeat
+                          IleSalesQty  += -ItemLedgerEntry.Quantity;
+                        until ItemLedgerEntry.Next=0;
+
+
+                        ValueEntry.Reset;
+                        ValueEntry.SetRange("Item Group No.","Item Group"."No.");
+                        ValueEntry.SetRange("Item Ledger Entry Type",ValueEntry."Item Ledger Entry Type"::Sale);
+                        ValueEntry.SetFilter("Vendor No.","Item Group".GetFilter("Vendor Filter"));
+                        ValueEntry.SetFilter("Posting Date","Item Group".GetFilter("Date Filter"));
+                        ValueEntry.SetFilter("Global Dimension 1 Code","Item Group".GetFilter("Global Dimension 1 Filter"));
+                        ValueEntry.SetFilter("Global Dimension 2 Code","Item Group".GetFilter("Global Dimension 2 Filter"));
+                        ValueEntry.SetFilter("Salespers./Purch. Code","Item Group".GetFilter("Salesperson Filter"));
+
+                        if ValueEntry.FindSet then repeat
+                          IleSalesLCY += ValueEntry."Sales Amount (Actual)";
+                          IleCostAmtActual += -ValueEntry."Cost Amount (Actual)";
+                        until ValueEntry.Next=0;
+                      //-#397617 [397617]
+
+                    end;
+
+                    // db := "Item Group"."Sales (LCY)" - "Item Group"."Consumption (Amount)";
+                    // IF "Item Group"."Sales (LCY)" <> 0 THEN
+                    //  dg := (db/"Item Group"."Sales (LCY)") * 100
+                    // ELSE
+                    //  dg := 0;
+
+                    db := IleSalesLCY - IleCostAmtActual;
+                    if IleSalesLCY  <> 0 then
+                      dg := (db/IleSalesLCY ) * 100
                     else
                       dg := 0;
 
@@ -313,5 +389,10 @@ report 6014420 "Item Group Top"
         CountDimValue: Integer;
         TempNPRBufferSort: Record "NPR - TEMP Buffer" temporary;
         FiltersDimValue: Text;
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        ValueEntry: Record "Value Entry";
+        IleSalesQty: Decimal;
+        IleSalesLCY: Decimal;
+        IleCostAmtActual: Decimal;
 }
 

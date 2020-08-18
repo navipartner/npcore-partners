@@ -12,6 +12,7 @@ table 6014412 "Mixed Discount Line"
     // NPR5.39/BHR /20180109  CASE 299276 Add fields "Vendor No" and "Vendor Item No".
     // NPR5.40/MMV /20180213  CASE 294655 Performance optimization, new fields, new key, field 8 changed from flow to real field.
     // NPR5.48/TS  /20181128  CASE 337806 Made Global Variable Mixed Discount as Local Variable
+    // NPR5.55/ALST.20200608  CASE 407796 added possibility to find item by cross reference
 
     Caption = 'Mixed Discount Line';
 
@@ -206,6 +207,31 @@ table 6014412 "Mixed Discount Line"
                 //-NPR5.26 [246594]
                 BarcodeLibrary.CallCrossRefNoLookupMixDiscount(Rec);
                 //+NPR5.26 [246594]
+            end;
+
+            trigger OnValidate()
+            var
+                ItemCrossReference: Record "Item Cross Reference";
+            begin
+                //-NPR5.55 [407796]
+                if "Disc. Grouping Type" <> "Disc. Grouping Type"::Item then
+                  Validate("Disc. Grouping Type", "Disc. Grouping Type"::Item);
+
+                if "No." = '' then begin
+                  ItemCrossReference.SetRange("Cross-Reference No.", "Cross-Reference No.");
+                  if ItemCrossReference.Count >  1 then begin
+                    ItemCrossReference.SetFilter("Cross-Reference Type",'%1',ItemCrossReference."Cross-Reference Type"::"Bar Code");
+                    ItemCrossReference.SetFilter("Cross-Reference Type No.",'%1','');
+
+                    if PAGE.RunModal(PAGE::"Cross Reference List", ItemCrossReference) <> ACTION::LookupOK then
+                      exit;
+                  end else
+                    ItemCrossReference.FindFirst;
+
+                  "No." := ItemCrossReference."Item No.";
+                  "Variant Code" := ItemCrossReference."Variant Code";
+                end;
+                //+NPR5.55 [407796]
             end;
         }
         field(300;"Starting Date";Date)

@@ -152,7 +152,7 @@ page 6151334 "NP Retail Resturant RC"
                 action(Action6014418)
                 {
                     Caption = 'Print Category';
-                    RunObject = Page "NPRE Print Categories";
+                    RunObject = Page "NPRE Select Print Categories";
                 }
                 action("Seating list")
                 {

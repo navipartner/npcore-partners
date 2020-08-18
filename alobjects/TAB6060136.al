@@ -12,6 +12,8 @@ table 6060136 "MM Membership Alteration Setup"
     // MM1.40/TSA /20190730 CASE 360275 Added field 85 "Auto-Admit Member On Sale"
     // MM1.41/TSA /20191016 CASE 373297 Added Grace Period Preset
     // MM1.43/TSA /20200331 CASE 398328 Added new field "Presentation Order" and key
+    // MM1.44/TSA /20200427 CASE 397911 Added new option to "Alteration Activate From"::Back-to-Back
+    // MM1.44/TSA /20200529 CASE 407401 Added Age verification setup
 
     Caption = 'Membership Alteration Setup';
 
@@ -66,12 +68,28 @@ table 6060136 "MM Membership Alteration Setup"
         field(20;"Alteration Activate From";Option)
         {
             Caption = 'Alteration Activate From';
-            OptionCaption = 'As soon as possible,Date Formula';
-            OptionMembers = ASAP,DF;
+            OptionCaption = 'As soon as possible,Date Formula,Back-to-Back';
+            OptionMembers = ASAP,DF,B2B;
         }
         field(25;"Alteration Date Formula";DateFormula)
         {
             Caption = 'Alteration Date Formula';
+        }
+        field(26;"Age Constraint Type";Option)
+        {
+            Caption = 'Age Constraint Type';
+            OptionCaption = ' ,Less Than,Less Than or Equal,Greater Than,Greater Than or Equal,Equal';
+            OptionMembers = NA,LT,LTE,GT,GTE,E;
+        }
+        field(27;"Age Constraint (Years)";Integer)
+        {
+            Caption = 'Age Constraint (Years)';
+        }
+        field(28;"Age Constraint Applies To";Option)
+        {
+            Caption = 'Age Constraint Applies To';
+            OptionCaption = 'All Members,Youngest Member,Oldest Member,Administrators,Dependants';
+            OptionMembers = ALL,YOUNGEST,OLDEST,ADMINS,DEPENDANTS;
         }
         field(30;"Activate Grace Period";Boolean)
         {

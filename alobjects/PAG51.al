@@ -1,4 +1,4 @@
-pageextension 6014450 pageextension6014450 extends "Purchase Invoice" 
+pageextension 6014454 pageextension6014454 extends "Purchase Invoice" 
 {
     // NPR4.15/TS/20151013 CASE 224751 Added NpAttribute Factbox
     // NPR4.18/TS/20151211  CASE 228030 Added field Posting Description
@@ -7,6 +7,7 @@ pageextension 6014450 pageextension6014450 extends "Purchase Invoice"
     // NPR5.23/JDH /20160513 CASE 240916 Deleted old VariaX Matrix Action
     // NPR5.24/JDH/20160720 CASE 241848 Added a Name to Posting Description, so Powershell didnt triggered a mergeConflicts in databases where its already used standard
     // NPR5.30/TJ  /20170202 CASE 262533 Removed actions Labels and Invert selection. Instead added actions Retail Print and Price Label
+    // NPR5.55/CLVA/20200610 CASE Added Action "Show Imported File"
     layout
     {
         addafter(Status)
@@ -26,6 +27,22 @@ pageextension 6014450 pageextension6014450 extends "Purchase Invoice"
     }
     actions
     {
+        addafter(RemoveIncomingDoc)
+        {
+            action("Show Imported File")
+            {
+                Caption = 'Show Imported File';
+
+                trigger OnAction()
+                var
+                    NcImportListPg: Page "Nc Import List";
+                begin
+                    //-366790 [366790]
+                    NcImportListPg.ShowFormattedDocByDocNo("Vendor Invoice No.");
+                    //+366790 [366790]
+                end;
+            }
+        }
         addafter("P&osting")
         {
             group(Print)

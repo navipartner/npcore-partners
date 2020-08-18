@@ -2,8 +2,13 @@ table 6151369 "CS Rfid Lines"
 {
     // NPR5.53/CLVA  /20191121  CASE 377563 Object created - NP Capture Service
     // NPR5.54/JAKUBV/20200408  CASE 379709 Transport NPR5.54 - 8 April 2020
+    // NPR5.55/CLVA  /20200326  CASE 379709 Added field "Approved", "Approved By" and "Combined key"
+    // NPR5.55/CLVA  /20200506  CASE 379709 Changed DataPerCompany to No
 
     Caption = 'CS Rfid Lines';
+    DataPerCompany = false;
+    DrillDownPageID = "CS RFID Lines Subpage";
+    LookupPageID = "CS RFID Lines Subpage";
 
     fields
     {
@@ -94,6 +99,29 @@ table 6151369 "CS Rfid Lines"
         field(22;"Transferred By";Code[20])
         {
             Caption = 'Transferred By';
+        }
+        field(23;Approved;DateTime)
+        {
+            Caption = 'Handled';
+        }
+        field(24;"Approved By";Code[10])
+        {
+            Caption = 'Approved By';
+        }
+        field(25;"Combined key";Code[30])
+        {
+            Caption = 'Combined key';
+        }
+        field(26;"Transferred to Whse. Receipt";Boolean)
+        {
+        }
+        field(27;"Tag Shipped";Boolean)
+        {
+            Caption = 'Tag Shipped';
+        }
+        field(28;"Tag Received";Boolean)
+        {
+            Caption = 'Tag Received';
         }
     }
 

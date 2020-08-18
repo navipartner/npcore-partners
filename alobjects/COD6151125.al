@@ -14,6 +14,8 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     //                                       moved out from CU 6151127 and CU 6151128 to avoid excessive code dublication
     //                                     - Functions InitScriptAddOnLines(), InitScriptLabels(), InsertPOSAddOnLine() marked as local
     //                                   (+deleted old commented lines)
+    // NPR5.55/ALPO/20200506 CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
+    // NPR5.55/ALPO/20200803 CASE 417118 Related entries in "NpIa Sale Line POS AddOn" table were not removed, if an Item Add-on dependent Sale POS line was deleted
 
 
     trigger OnRun()
@@ -29,6 +31,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         POSWindowTitle: Label 'Item configuration';
         IncorrectFunctionCallMsg: Label '%1: incorrect function call. %2. This indicates a programming bug, not a user error.';
         MustBeTempMsg: Label 'Must be called with temporary record variable';
+        IsAutoSplitKeyRecord: Boolean;
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "Sale Line POS"; RunTrigger: Boolean)
@@ -80,8 +83,13 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         if Rec.IsTemporary then
           exit;
 
-        //Find and delete all dependent POS sales lines
         FilterSaleLinePOS2ItemAddOnPOSLine(Rec,SaleLinePOSAddOn);
+        //-NPR5.55 [417118]
+        if not SaleLinePOSAddOn.IsEmpty then  //Is dependent line
+          SaleLinePOSAddOn.DeleteAll;
+        //+NPR5.55 [417118]
+
+        //Find and delete all dependent POS sales lines
         SaleLinePOSAddOn.SetRange("Sale Line No.");
         SaleLinePOSAddOn.SetRange("Applies-to Line No.",Rec."Line No.");
         if SaleLinePOSAddOn.FindSet then
@@ -460,6 +468,22 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
             if NpIaItemAddOnLine.Quantity <= 0 then
                 exit(false);
 
+          //-NPR5.55 [417118]
+          //Find last dependent line of current base line in order to insert new lines after it
+          POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+          FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+          SaleLinePOSAddOn.SetRange("Sale Line No.");
+          SaleLinePOSAddOn.SetRange("Applies-to Line No.", AppliesToLineNo);
+          if SaleLinePOSAddOn.FindLast then
+            SaleLinePOS.Get(
+              SaleLinePOSAddOn."Register No.",
+              SaleLinePOSAddOn."Sales Ticket No.",
+              SaleLinePOSAddOn."Sale Date",
+              SaleLinePOSAddOn."Sale Type",
+              SaleLinePOSAddOn."Sale Line No.");
+          LineNo := SaleLinePOS."Line No.";
+          POSSaleLine.ForceInsertWithAutoSplitKey(true);
+          //+NPR5.55 [417118]
           //POSSession.GetSaleLine(POSSaleLine);  //NPR5.54 [374666]-revoked
             POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
@@ -469,19 +493,29 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
             SaleLinePOS.Validate("No.", NpIaItemAddOnLine."Item No.");
             SaleLinePOS.Description := NpIaItemAddOnLine.Description;
             SaleLinePOS.Validate(Quantity, NpIaItemAddOnLine.Quantity);
-            if NpIaItemAddOnLine."Unit Price" <> 0 then begin
+          //IF NpIaItemAddOnLine."Unit Price" <> 0 THEN BEGIN  //NPR5.55 [402585]-revoked
+          if (NpIaItemAddOnLine."Unit Price" <> 0) or (NpIaItemAddOnLine."Use Unit Price" = NpIaItemAddOnLine."Use Unit Price"::Always) then begin  //NPR5.55 [402585]
                 SaleLinePOS."Manual Item Sales Price" := true;
                 SaleLinePOS.Validate("Unit Price", NpIaItemAddOnLine."Unit Price");
             end;
             SaleLinePOS.Validate(Quantity, NpIaItemAddOnLine.Quantity);
             SaleLinePOS.Validate("Discount %", NpIaItemAddOnLine."Discount %");
+          SaleLinePOS."Line No." := LineNo;  //NPR5.55 [417118] (we'll get incorrect AutoSplitLineNo result otherwise, because of double run)
             POSSaleLine.InsertLine(SaleLinePOS);
+          //-NPR5.55 [417118]
+          if not IsAutoSplitKeyRecord then
+            IsAutoSplitKeyRecord := POSSaleLine.InsertedWithAutoSplitKey();
+          POSSaleLine.ForceInsertWithAutoSplitKey(false);
+          //+NPR5.55 [417118]
 
-          SaleLinePOSAddOn.SetRange("Register No.",SaleLinePOS."Register No.");
-          SaleLinePOSAddOn.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
-          SaleLinePOSAddOn.SetRange("Sale Type",SaleLinePOS."Sale Type");
-          SaleLinePOSAddOn.SetRange("Sale Date",SaleLinePOS.Date);
-          SaleLinePOSAddOn.SetRange("Sale Line No.",SaleLinePOS."Line No.");
+          //-NPR5.55 [417118]-revoked
+          //SaleLinePOSAddOn.SETRANGE("Register No.",SaleLinePOS."Register No.");
+          //SaleLinePOSAddOn.SETRANGE("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
+          //SaleLinePOSAddOn.SETRANGE("Sale Type",SaleLinePOS."Sale Type");
+          //SaleLinePOSAddOn.SETRANGE("Sale Date",SaleLinePOS.Date);
+          //SaleLinePOSAddOn.SETRANGE("Sale Line No.",SaleLinePOS."Line No.");
+          //+NPR5.55 [417118]-revoked
+          FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);  //NPR5.55 [417118]
           if not SaleLinePOSAddOn.FindLast then
             SaleLinePOSAddOn."Line No." := 0;
             LineNo := SaleLinePOSAddOn."Line No." + 10000;
@@ -513,7 +547,8 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         SaleLinePOS."Variant Code" := NpIaItemAddOnLine."Variant Code";
         SaleLinePOS.Validate("No.", NpIaItemAddOnLine."Item No.");
         SaleLinePOS.Description := NpIaItemAddOnLine.Description;
-        if NpIaItemAddOnLine."Unit Price" <> 0 then begin
+        //IF NpIaItemAddOnLine."Unit Price" <> 0 THEN BEGIN  //NPR5.55 [402585]-revoked
+        if (NpIaItemAddOnLine."Unit Price" <> 0) or (NpIaItemAddOnLine."Use Unit Price" = NpIaItemAddOnLine."Use Unit Price"::Always) then begin  //NPR5.55 [402585]
             SaleLinePOS."Manual Item Sales Price" := true;
             SaleLinePOS.Validate("Unit Price", NpIaItemAddOnLine."Unit Price");
         end;
@@ -615,6 +650,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
               NpIaItemAddOnLine."Unit Price" := NpIaItemAddOnLineOption."Unit Price";
               NpIaItemAddOnLine."Discount %" := NpIaItemAddOnLineOption."Discount %";
               NpIaItemAddOnLine."Per Unit" := NpIaItemAddOnLineOption."Per Unit";
+              NpIaItemAddOnLine."Use Unit Price" := NpIaItemAddOnLineOption."Use Unit Price";  //NPR5.55 [402585]
                 end;
         end;
     end;
@@ -982,6 +1018,13 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
             ToNpIaItemAddOnLine.Insert;
           until FromNpIaItemAddOnLine.Next = 0;
         //+NPR5.54 [374666]
+    end;
+
+    procedure InsertedWithAutoSplitKey(): Boolean
+    begin
+        //-NPR5.55 [417118]
+        exit(IsAutoSplitKeyRecord);
+        //+NPR5.55 [417118]
     end;
 }
 

@@ -15,6 +15,8 @@ page 6059812 "Retail Activities"
     // NPR5.33/LS  /20170605  CASE 279274 Re-ordered Cues + made some Visible = False + Deleted control action "Page Sales Return Order"
     // NPR5.40/MHA /20180328  CASE 308907 Added Non-visible Bridge Part for Geolocation Tracking
     // NPR5.42/CLVA/20180508 CASE 313575 Combined the collection of client ip address and geolocation in a single api.ipstack.com request
+    // NPR5.55/ZESO/20200730 CASE 416669 Change Image Property on field "Sales Orders" from Stack to None.
+    // NPR5.55/YAHA/20200731 CASE 416999 Image Property on all cues set to None
 
     Caption = 'Retail Activities';
     PageType = CardPart;
@@ -30,14 +32,17 @@ page 6059812 "Retail Activities"
                 field("Sales Orders"; "Sales Orders")
                 {
                     DrillDownPageID = "Sales Order List";
+                    Image = "None";
                 }
                 field("Daily Sales Orders"; "Daily Sales Orders")
                 {
                     DrillDownPageID = "Sales Order List";
+                    Image = "None";
                 }
                 field("Import Pending"; "Import Pending")
                 {
                     DrillDownPageID = "Nc Import List";
+                    Image = "None";
                 }
 
                 actions
@@ -61,14 +66,17 @@ page 6059812 "Retail Activities"
                 ShowCaption = false;
                 field("Pending Inc. Documents"; "Pending Inc. Documents")
                 {
+                    Image = "None";
                 }
                 field("Processed Error Tasks"; "Processed Error Tasks")
                 {
                     DrillDownPageID = "Nc Task List";
+                    Image = "None";
                 }
                 field("Failed Webshop Payments"; "Failed Webshop Payments")
                 {
                     DrillDownPageID = "Magento Payment Line List";
+                    Image = "None";
                 }
             }
             cuegroup(Depreciated)
@@ -78,27 +86,32 @@ page 6059812 "Retail Activities"
                 field("Sales Quotes"; "Sales Quotes")
                 {
                     DrillDownPageID = "Sales Quotes";
+                    Image = "None";
                     Visible = false;
                 }
                 field("Sales Return Orders"; "Sales Return Orders")
                 {
                     DrillDownPageID = "Sales Return Order List";
+                    Image = "None";
                     Visible = false;
                 }
                 field("Magento Orders"; "Magento Orders")
                 {
                     DrillDownPageID = "Sales Order List";
+                    Image = "None";
                     Visible = false;
                 }
                 field("Daily Sales Invoices"; "Daily Sales Invoices")
                 {
                     Caption = 'Daily Sales Invoices';
                     DrillDownPageID = "Posted Sales Invoices";
+                    Image = "None";
                     Visible = false;
                 }
                 field("Tasks Unprocessed"; "Tasks Unprocessed")
                 {
                     DrillDownPageID = "Nc Task List";
+                    Image = "None";
                     Visible = false;
                 }
             }

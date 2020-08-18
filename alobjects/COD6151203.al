@@ -5,6 +5,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
     // NPR5.51/MHA /20190718  CASE 362329 Updated StrSubStNo on DeliveryText in InsertDocumentReference()
     // NPR5.51/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
     // NPR5.53/MHA /20191128  CASE 378895 Added Parameter 'Sorting'
+    // NPR5.55/MHA /20200526  CASE 406591 Added Data Binding for Processed Order count
 
 
     trigger OnRun()
@@ -30,6 +31,9 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
 
     local procedure ActionVersion(): Text
     begin
+        //-NPR5.55 [406591]
+        exit('1.2');
+        //+NPR5.55 [406591]
         //-NPR5.53 [378895]
         exit('1.1');
         //+NPR5.53 [378895]
@@ -50,6 +54,10 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         Sender.RegisterWorkflowStep('select_document','respond();');
         Sender.RegisterWorkflowStep('deliver_document','if(context.entry_no) {respond();}');
         Sender.RegisterWorkflow(false);
+        //-NPR5.55 [406591]
+        Sender.RegisterDataSourceBinding('BUILTIN_SALE');
+        Sender.RegisterCustomJavaScriptLogic('enable','return row.getField("CollectInStore.ProcessedOrdersExists").rawValue;');
+        //+NPR5.55 [406591]
 
         Sender.RegisterOptionParameter('Location From','POS Store,Location Filter Parameter','POS Store');
         Sender.RegisterTextParameter('Location Filter','');
@@ -591,6 +599,120 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         end;
 
         exit(LocationFilter);
+    end;
+
+    local procedure "--- POS Data Source"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
+    local procedure OnGetExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    var
+        DataType: DotNet npNetDataType;
+    begin
+        //-NPR5.55 [406591]
+        if DataSourceName <> 'BUILTIN_SALE' then
+          exit;
+        if ExtensionName <> 'CollectInStore' then
+          exit;
+
+        Handled := true;
+
+        DataSource.AddColumn('ProcessedOrdersExists','Processed Orders Exists',DataType.Boolean,false);
+        DataSource.AddColumn('ProcessedOrdersQty','Processed Orders Qty.',DataType.Integer,false);
+        //+NPR5.55 [406591]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
+    local procedure OnReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    var
+        ProcessedOrdersExists: Boolean;
+        LocationFilter: Text;
+    begin
+        //-NPR5.55 [406591]
+        if DataSourceName <> 'BUILTIN_SALE' then
+          exit;
+        if ExtensionName <> 'CollectInStore' then
+          exit;
+
+        Handled := true;
+
+        LocationFilter := GetPOSMenuButtonLocationFilter(POSSession);
+        ProcessedOrdersExists := GetProcessedOrdersExists(LocationFilter);
+        DataRow.Fields.Add('ProcessedOrdersExists',ProcessedOrdersExists);
+        if ProcessedOrdersExists then
+          DataRow.Fields.Add('ProcessedOrdersQty',GetProcessedOrdersQty(LocationFilter))
+        else
+          DataRow.Fields.Add('ProcessedOrdersQty',0);
+        //+NPR5.55 [406591]
+    end;
+
+    local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "POS Session") LocationFilter: Text
+    var
+        POSStore: Record "POS Store";
+        POSMenuButton: Record "POS Menu Button";
+        POSParameterValue: Record "POS Parameter Value";
+        SalePOS: Record "Sale POS";
+        POSSale: Codeunit "POS Sale";
+    begin
+        //-NPR5.55 [406591]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSMenuButton.SetRange("Action Code",ActionCode());
+        POSMenuButton.SetRange("Register No.",SalePOS."Register No.");
+        if not POSMenuButton.FindFirst then
+          POSMenuButton.SetRange("Register No.");
+        if not POSMenuButton.FindFirst then
+          exit('');
+
+        if not POSParameterValue.Get(DATABASE::"POS Menu Button",POSMenuButton."Menu Code",POSMenuButton.ID,POSMenuButton.RecordId,'Location From') then
+          exit('');
+        case POSParameterValue.Value of
+          'POS Store':
+            begin
+              if POSStore.Get(SalePOS."POS Store Code") then;
+              exit(POSStore."Location Code");
+            end;
+          'Location Filter Parameter':
+            begin
+              Clear(POSParameterValue);
+              if POSParameterValue.Get(DATABASE::"POS Menu Button",POSMenuButton."Menu Code",POSMenuButton.ID,POSMenuButton.RecordId,'Location Filter') then;
+              exit(POSParameterValue.Value);
+            end;
+        end;
+
+        exit('');
+        //+NPR5.55 [406591]
+    end;
+
+    local procedure GetProcessedOrdersExists(LocationFilter: Text): Boolean
+    var
+        NpCsDocument: Record "NpCs Document";
+    begin
+        //-NPR5.55 [406591]
+        SetProcessedFilter(LocationFilter,NpCsDocument);
+        exit(NpCsDocument.FindFirst);
+        //+NPR5.55 [406591]
+    end;
+
+    local procedure GetProcessedOrdersQty(LocationFilter: Text): Integer
+    var
+        NpCsDocument: Record "NpCs Document";
+    begin
+        //-NPR5.55 [406591]
+        SetProcessedFilter(LocationFilter,NpCsDocument);
+        exit(NpCsDocument.Count);
+        //+NPR5.55 [406591]
+    end;
+
+    local procedure SetProcessedFilter(LocationFilter: Text;var NpCsDocument: Record "NpCs Document")
+    begin
+        //-NPR5.55 [406591]
+        NpCsDocument.SetRange(Type,NpCsDocument.Type::"Collect in Store");
+        NpCsDocument.SetRange("Processing Status",NpCsDocument."Processing Status"::Confirmed);
+        NpCsDocument.SetRange("Delivery Status",NpCsDocument."Delivery Status"::Ready);
+        NpCsDocument.SetFilter("Location Code",LocationFilter);
+        //+NPR5.55 [406591]
     end;
 }
 

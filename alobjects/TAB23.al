@@ -8,6 +8,7 @@ tableextension 6014424 tableextension6014424 extends Vendor
     // NPR70.00.03.00/MH/20150216  CASE 204110 Removed NaviShop References (WS).
     // NPR4.14/RMT/20150824 CASE 221274 - Added TDC lookup option
     // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
+    // NPR5.55/ANPA/20200625  CASE 388517 Changed calculation of Sales(Qty) to be limited to value entries where 'item ledger entry type' is set to 'Sale'
     fields
     {
         field(6014400;"Sales (LCY)";Decimal)
@@ -48,7 +49,8 @@ tableextension 6014424 tableextension6014424 extends Vendor
         }
         field(6014404;"Sales (Qty.)";Decimal)
         {
-            CalcFormula = -Sum("Value Entry"."Invoiced Quantity" WHERE ("Vendor No."=FIELD("No."),
+            CalcFormula = -Sum("Value Entry"."Invoiced Quantity" WHERE ("Item Ledger Entry Type"=CONST(Sale),
+                                                                        "Vendor No."=FIELD("No."),
                                                                         "Global Dimension 1 Code"=FIELD("Global Dimension 1 Filter"),
                                                                         "Posting Date"=FIELD("Date Filter"),
                                                                         "Item Group No."=FIELD("Item Group Filter"),

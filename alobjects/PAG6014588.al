@@ -6,6 +6,7 @@ page 6014588 "Item Statistics Subpage"
     // NPR5.51/RA  /20190628 CASE 338480 Added Function GetGlobals
     // NPR5.51/YAHA/20190822 CASE 365732 Flow Item Category Filter From Advanced Sales Statistics to Item Statistics
     // NPR5.53/YAHA/20200107 CASE 384124 Adding vendor no - to be used in filters
+    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
 
     Caption = 'Item Statistics Subform';
     Editable = false;
@@ -264,7 +265,9 @@ page 6014588 "Item Statistics Subpage"
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
         ValueEntry.SetRange( "Item No.", "No." );
         if not LastYear then

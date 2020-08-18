@@ -1,6 +1,7 @@
 table 6059829 "Transactional JSON Result"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
+    // NPR5.55/THRO/20200511 CASE 343266 Added Provider
 
     Caption = 'Transactional JSON Result';
     DrillDownPageID = "Transactional JSON Result";
@@ -11,6 +12,12 @@ table 6059829 "Transactional JSON Result"
         field(1;"Entry No";Integer)
         {
             Caption = 'Entry No';
+        }
+        field(3;Provider;Option)
+        {
+            Caption = 'Provider';
+            OptionCaption = 'Campaign Monitor,Mailchimp';
+            OptionMembers = "Campaign Monitor",Mailchimp;
         }
         field(10;ID;Text[50])
         {

@@ -70,10 +70,16 @@ codeunit 6059784 "TM Ticket Management"
     // TM1.45/TSA /20191121 CASE 378339 Added ValidateAdmSchEntryForSales()
     // TM1.45/TSA /20191127 CASE 379766 Deligates ticket activation method to Ticket BOM
     // TM1.45/TSA /20191202 CASE 357359 Tickets
-    // #380754/TSA /20191204 CASE 380754 Waiting list adoption
-    // #385922/TSA /20200116 CASE 385922 refactored CheckAdmissionCapacityExceeded() to also check for concurrent capacity
-    // TM90.1.46/TSA /20200127 CASE 387138 DiyPrint URL via mail
-    // TM90.1.46/TSA /20200214 CASE 391018 Fixed a problem with admission capacity controll NONE
+    // TM1.45/TSA /20191204 CASE 380754 Waiting list adoption
+    // TM1.45/TSA /20200116 CASE 385922 refactored CheckAdmissionCapacityExceeded() to also check for concurrent capacity
+    // TM1.46/TSA /20200127 CASE 387138 DiyPrint URL via mail
+    // TM1.46/TSA /20200214 CASE 391018 Fixed a problem with admission capacity controll NONE
+    // TM1.47/TSA /20200611 CASE 408958 Fixed date range include same day
+    // TM1.48/TSA /20200626 CASE 411704 Renamed GetMaxCapacity() to GetAdmissionCapacity(), added GetTicketCapacity()
+    // TM1.48/TSA /20200629 CASE 411704 Renamed CheckTicketCapacityExceeded() to CheckTicketConstraintsExceeded()
+    // TM1.48/TSA /20200629 CASE 411704 Renamed CheckAdmissionCapacityExceeded() to CheckTicketAdmissionCapacityExceeded()
+    // TM1.48/TSA /20200629 CASE 411704 Added Ticket record as parameter to CheckReservationCapacityExceeded()
+    // TM1.48/TSA /20200716 CASE 415186 Implement Navigate for tickets
 
 
     trigger OnRun()
@@ -552,11 +558,12 @@ codeunit 6059784 "TM Ticket Management"
         if (MessageNumber <> 0) then
             exit(RaiseError(FailWithError, ResponseMessage, ResponseMessage, ''));
 
-        if (CheckTicketCapacityExceeded(FailWithError, TicketAccessEntryNo, ResponseMessage)) then
+        if (CheckTicketConstraintsExceeded (FailWithError, TicketAccessEntryNo, ResponseMessage)) then
             exit(RaiseError(FailWithError, ResponseMessage, ResponseMessage, ''));
 
         //IF (CheckAdmissionCapacityExceeded (FailWithError, AdmissionScheduleEntryNo, ResponseMessage)) THEN
-        MessageNumber := CheckAdmissionCapacityExceeded(FailWithError, AdmissionScheduleEntryNo, ResponseMessage);
+        //MessageNumber := CheckAdmissionCapacityExceeded (FailWithError, AdmissionScheduleEntryNo, ResponseMessage);
+        MessageNumber := CheckTicketAdmissionCapacityExceeded (FailWithError, Ticket, AdmissionScheduleEntryNo, ResponseMessage); //-+TM1.48 [411704]
         if (MessageNumber <> 0) then
             exit(RaiseError(FailWithError, ResponseMessage, ResponseMessage, ''));
 
@@ -614,7 +621,7 @@ codeunit 6059784 "TM Ticket Management"
                     Ticket."Valid To Date" := Ticket."Valid From Date";
                     if (Format(TicketType."Duration Formula") <> '') then begin
                         Ticket."Valid To Date" := CalcDate(TicketType."Duration Formula", ValidFromDate);
-                        if (Ticket."Valid To Date" <= Ticket."Valid From Date") then
+                if (Ticket."Valid To Date" < Ticket."Valid From Date") then //-+TM90.1.47 [408958]
                             Error(GREATER_THAN, Ticket.FieldCaption("Valid To Date"), Ticket.FieldCaption("Valid From Date"));
                     end;
                 end;
@@ -623,7 +630,7 @@ codeunit 6059784 "TM Ticket Management"
                 begin
                     TicketType.TestField("Duration Formula");
                     Ticket."Valid To Date" := CalcDate(TicketType."Duration Formula", ValidFromDate);
-                    if (Ticket."Valid To Date" <= Ticket."Valid From Date") then
+              if (Ticket."Valid To Date" < Ticket."Valid From Date") then //-+TM90.1.47 [408958]
                         Error(GREATER_THAN, Ticket.FieldCaption("Valid To Date"), Ticket.FieldCaption("Valid From Date"));
                 end;
             else
@@ -737,19 +744,19 @@ codeunit 6059784 "TM Ticket Management"
 
         if (Admission.Type = Admission.Type::OCCASION) then begin
             RegisterReservation_Worker(TicketAccessEntry."Entry No.", AdmissionSchEntry."Entry No.");
-            ResponseCode := CheckReservationCapacityExceeded(FailWithError, AdmissionSchEntry, ResponseMessage);
+          //ResponseCode := CheckReservationCapacityExceeded (FailWithError, AdmissionSchEntry, ResponseMessage);
+          ResponseCode := CheckReservationCapacityExceeded (FailWithError, Ticket, AdmissionSchEntry, ResponseMessage); //-+TM1.48 [411704]
             if (ResponseCode <> 0) then
                 exit(ResponseCode);
         end;
 
-        if (GetMaxCapacity(AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl)) then
+        if (GetAdmissionCapacity (AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl)) then
             if (CapacityControl = Admission."Capacity Control"::SALES) then begin
-                ResponseCode := CheckAdmissionCapacityExceeded(FailWithError, AdmissionSchEntry."Entry No.", ResponseMessage);
+            //ResponseCode := CheckAdmissionCapacityExceeded (FailWithError, AdmissionSchEntry."Entry No.", ResponseMessage);
+            ResponseCode := CheckTicketAdmissionCapacityExceeded (FailWithError, Ticket, AdmissionSchEntry."Entry No.", ResponseMessage); //-+TM1.48 [411704]
                 if (ResponseCode <> 0) then
                     exit(ResponseCode);
             end;
-        //    IF (CheckAdmissionCapacityExceeded (FailWithError, AdmissionSchEntry."Entry No.", ResponseMessage)) THEN
-        //      EXIT (RaiseError (FailWithError, ResponseMessage, ResponseMessage, CAPACITY_EXCEEDED_NO));
 
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
             ResponseCode := CheckTicketAdmissionReservationDate(FailWithError, TicketAccessEntry."Entry No.", AdmissionSchEntry."Entry No.", ResponseMessage);
@@ -757,11 +764,9 @@ codeunit 6059784 "TM Ticket Management"
                 exit(ResponseCode);
         end;
 
-        //-TM1.28 [305707]
         ResponseCode := CheckTicketBaseCalendar(FailWithError, TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", AdmissionSchEntry."Admission Start Date", ResponseMessage);
         if (ResponseCode <> 0) then
             exit(ResponseCode);
-        //+TM1.28 [305707]
 
         exit(0);
     end;
@@ -2062,7 +2067,25 @@ codeunit 6059784 "TM Ticket Management"
         exit(Ticket.FindFirst());
     end;
 
-    procedure GetMaxCapacity(AdmissionCode: Code[20]; ScheduleCode: Code[20]; AdmissionScheduleEntryNo: Integer; var MaxCapacity: Integer; var CapacityControl: Option): Boolean
+    procedure GetTicketCapacity(TicketItemNo: Code[20];TicketVariantCode: Code[10];AdmissionCode: Code[20];ScheduleCode: Code[20];AdmissionScheduleEntryNo: Integer;var MaxCapacity: Integer;var CapacityControl: Option): Boolean
+    var
+        TicketAdmissionBOM: Record "TM Ticket Admission BOM";
+    begin
+
+        //-TM1.48 [411704]
+        if (not GetAdmissionCapacity (AdmissionCode, ScheduleCode, AdmissionScheduleEntryNo, MaxCapacity, CapacityControl)) then
+          exit (false);
+
+        if (not TicketAdmissionBOM.Get (TicketItemNo, TicketVariantCode, AdmissionCode)) then
+          exit (false);
+
+        MaxCapacity := Round (MaxCapacity * TicketAdmissionBOM."Percentage of Adm. Capacity" / 100, 1);
+
+        exit (true);
+        //+TM1.48 [411704]
+    end;
+
+    procedure GetAdmissionCapacity(AdmissionCode: Code[20];ScheduleCode: Code[20];AdmissionScheduleEntryNo: Integer;var MaxCapacity: Integer;var CapacityControl: Option): Boolean
     var
         Admission: Record "TM Admission";
         Schedule: Record "TM Admission Schedule";
@@ -2138,7 +2161,11 @@ codeunit 6059784 "TM Ticket Management"
             if (not TicketBOM.Get(TicketItemNo, TicketVariantCode, "Admission Code")) then
                 TicketBOM.Init();
 
-            GetMaxCapacity("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+          //-TM1.48 [411704]
+          // GetAdmissionCapacity ("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+          GetTicketCapacity (TicketItemNo, TicketVariantCode, "Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+          //+TM1.48 [411704]
+
             RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntry."Entry No.");
 
             with AdmissionScheduleEntry do
@@ -2213,7 +2240,7 @@ codeunit 6059784 "TM Ticket Management"
         //+TM1.45 [378339]
     end;
 
-    local procedure CheckAdmissionCapacityExceeded(FailWithError: Boolean; AdmissionScheduleEntryNo: Integer; var ResponseMessage: Text): Integer
+    local procedure CheckTicketAdmissionCapacityExceeded(FailWithError: Boolean;Ticket: Record "TM Ticket";AdmissionScheduleEntryNo: Integer;var ResponseMessage: Text): Integer
     var
         Admission: Record "TM Admission";
         DetailedTicketAccessEntry: Record "TM Det. Ticket Access Entry";
@@ -2228,6 +2255,9 @@ codeunit 6059784 "TM Ticket Management"
         CapacityControl: Option;
         ResultCode: Integer;
     begin
+
+        //-TM1.48 [411704] Renamed, Ticket param added
+
         //-#385922 [385922] Refactored
         //-NPR4.16 - New Function
         // This function should be called after the entry transaction have been created
@@ -2238,7 +2268,10 @@ codeunit 6059784 "TM Ticket Management"
         Schedule.Get(AdmissionScheduleEntry."Schedule Code");
         AdmissionSchedule.Get(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code");
 
-        GetMaxCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntryNo, MaxCapacity, CapacityControl);
+        //-TM1.48 [411704]
+        //GetAdmissionCapacity (AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntryNo, MaxCapacity, CapacityControl);
+        GetTicketCapacity (Ticket."Item No.", Ticket."Variant Code", AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntryNo, MaxCapacity, CapacityControl);
+        //+TM1.48 [411704]
 
         //-TM90.1.46 [391018]
         if (CapacityControl = Admission."Capacity Control"::NONE) then
@@ -2396,7 +2429,7 @@ codeunit 6059784 "TM Ticket Management"
         //+#385922 [385922]
     end;
 
-    local procedure CheckTicketCapacityExceeded(FailWithError: Boolean; TicketAccessEntryNo: Integer; var ResponseMessage: Text): Boolean
+    local procedure CheckTicketConstraintsExceeded(FailWithError: Boolean;TicketAccessEntryNo: Integer;var ResponseMessage: Text): Boolean
     var
         Ticket: Record "TM Ticket";
         TicketType: Record "TM Ticket Type";
@@ -2522,7 +2555,7 @@ codeunit 6059784 "TM Ticket Management"
         exit(false);
     end;
 
-    local procedure CheckReservationCapacityExceeded(FailWithError: Boolean; AdmissionScheduleEntry: Record "TM Admission Schedule Entry"; var ResponseMessage: Text): Integer
+    local procedure CheckReservationCapacityExceeded(FailWithError: Boolean;Ticket: Record "TM Ticket";AdmissionScheduleEntry: Record "TM Admission Schedule Entry";var ResponseMessage: Text): Integer
     var
         Admission: Record "TM Admission";
         AdmissionText: Record "TM Admission";
@@ -2543,7 +2576,11 @@ codeunit 6059784 "TM Ticket Management"
         Schedule.Get(AdmissionScheduleEntry."Schedule Code");
         AdmissionSchedule.Get(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code");
 
-        GetMaxCapacity(Admission."Admission Code", Schedule."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
+        //-TM1.48 [411704]
+        // GetAdmissionCapacity (Admission."Admission Code", Schedule."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
+        GetTicketCapacity (Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code", Schedule."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
+        //+TM1.48 [411704]
+
         AdmissionText."Capacity Control" := CapacityControl;
 
         case CapacityControl of
@@ -3009,6 +3046,66 @@ codeunit 6059784 "TM Ticket Management"
     [IntegrationEvent(false, false)]
     local procedure OnDetailedTicketEvent(DetTicketAccessEntry: Record "TM Det. Ticket Access Entry")
     begin
+    end;
+
+    local procedure "--Subscribers"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateFindRecords', '', true, true)]
+    local procedure OnAfterNavigateFindRecordsSubscriber(var DocumentEntry: Record "Document Entry";DocNoFilter: Text;PostingDateFilter: Text)
+    var
+        Ticket: Record "TM Ticket";
+    begin
+
+        //-#414208 [414208]
+        if (Ticket.ReadPermission ()) then begin
+          if (not Ticket.SetCurrentKey ("Sales Receipt No.")) then ;
+          Ticket.SetFilter ("Sales Receipt No.", '%1', DocNoFilter);
+          InsertIntoDocEntry (DocumentEntry, DATABASE::"TM Ticket", 0, CopyStr (DocNoFilter, 1, 20), Ticket.TableCaption, Ticket.Count ());
+        end;
+        //+#414208 [414208]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateShowRecords', '', true, true)]
+    local procedure OnAfterNavigateShowRecordsSubscriber(TableID: Integer;DocNoFilter: Text;PostingDateFilter: Text;ItemTrackingSearch: Boolean)
+    var
+        Ticket: Record "TM Ticket";
+    begin
+
+        //-#414208 [414208]
+        if (TableID = DATABASE::"TM Ticket") then begin
+          if (not Ticket.SetCurrentKey ("Sales Receipt No.")) then ;
+          Ticket.SetFilter ("Sales Receipt No.", DocNoFilter);
+          if (Ticket.IsEmpty()) then
+            exit;
+
+          PAGE.Run (PAGE::"TM Ticket List", Ticket);
+
+        end;
+        //+#414208 [414208]
+    end;
+
+    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary;DocTableID: Integer;DocType: Integer;DocNoFilter: Code[20];DocTableName: Text[1024];DocNoOfRecords: Integer): Integer
+    begin
+
+        //-#414208 [414208]
+        if (DocNoOfRecords = 0) then
+          exit (DocNoOfRecords);
+
+        with DocumentEntry do begin
+          Init;
+          "Entry No." := "Entry No." + 1;
+          "Table ID" := DocTableID;
+          "Document Type" := DocType;
+          "Document No." := DocNoFilter;
+          "Table Name" := CopyStr(DocTableName,1,MaxStrLen("Table Name"));
+          "No. of Records" := DocNoOfRecords;
+          Insert;
+        end;
+
+        exit (DocNoOfRecords);
+        //+#414208 [414208]
     end;
 }
 

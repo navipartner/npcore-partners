@@ -1,6 +1,7 @@
 codeunit 6184538 "EFT NETSCloud Response Parser"
 {
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
+    // NPR5.55/MMV /20200525 CASE 405984 Fixed undocumented breaking change in NETS backend update.
 
 
     trigger OnRun()
@@ -141,8 +142,11 @@ codeunit 6184538 "EFT NETSCloud Response Parser"
           EFTTransactionRequest."Result Display Text" := CopyStr((EFTTransactionRequest."Result Display Text" + JToken.ToString() + ' '), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
         end;
 
-        TrySelectToken(JObject, 'localModeEventArgs', JToken, true);
-        ParseLocalModeArgs(JToken, EFTTransactionRequest);
+        //-NPR5.55 [405984]
+        if TrySelectToken(JObject, 'localModeEventArgs', JToken, false) then begin
+          ParseLocalModeArgs(JToken, EFTTransactionRequest);
+        end;
+        //+NPR5.55 [405984]
 
         ParseTransactionReceipts(JObject, EFTTransactionRequest);
     end;
@@ -214,13 +218,16 @@ codeunit 6184538 "EFT NETSCloud Response Parser"
         end;
 
         if TrySelectToken(JObject, 'CVM', JToken, false) then begin
-          Evaluate(CVM, JToken.ToString());
-          case CVM of
-            0 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::PIN;
-            1 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::Signature;
-            2 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::None;
-            3 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::Loyalty;
-            4 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::ConsumerDevice;
+        //-NPR5.55 [405984]
+          if Evaluate(CVM, JToken.ToString()) then begin //CVM was suddenly observed as an empty string rather than an integer after NETS backend upgrade.
+        //+NPR5.55 [405984]
+            case CVM of
+              0 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::PIN;
+              1 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::Signature;
+              2 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::None;
+              3 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::Loyalty;
+              4 : EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::ConsumerDevice;
+            end;
           end;
 
           if (EFTTransactionRequest."Authentication Method" = EFTTransactionRequest."Authentication Method"::Signature) and

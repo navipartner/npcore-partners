@@ -27,6 +27,8 @@ xmlport 6151401 "Magento Sales Order Import"
     // MAG2.20/MHA /20190411  CASE 349994 Added <use_customer_salesperson>
     // MAG2.20/MHA /20190417  CASE 352201 Added <store_code>
     // MAG2.22/BHR /20190604  CASE 350006 Added <requested_delivery_date>
+    // MAG2.26/MHA /20200526  CASE 406591 Added <collect_in_store> under <shipment> and fixed min/max occurences on several elements
+    // NPR5.55/MHA /20200730  CASE 412507 Added <prices_excluding_vat>, <unit_price_excl_vat>, <line_amount_excl_vat>
 
     Caption = 'Magento Sales Order Import';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/sales_order';
@@ -186,6 +188,11 @@ xmlport 6151401 "Magento Sales Order Import"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                 }
+                textelement(prices_excluding_vat)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
                 textelement(payments)
                 {
                     tableelement(temppaymentline;"Magento Payment Line")
@@ -232,7 +239,7 @@ xmlport 6151401 "Magento Sales Order Import"
                         }
                         fieldelement(transaction_id;TempPaymentLine."External Reference No.")
                         {
-                            MaxOccurs = Unbounded;
+                            MinOccurs = Zero;
                         }
                         fieldelement(payment_amount;TempPaymentLine.Amount)
                         {
@@ -287,6 +294,36 @@ xmlport 6151401 "Magento Sales Order Import"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                     }
+                    tableelement(tempnpcsdocument;"NpCs Document")
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        XmlName = 'collect_in_store';
+                        UseTemporary = true;
+                        fieldattribute(store_code;TempNpCsDocument."To Store Code")
+                        {
+                        }
+                        fieldelement(allow_partial_delivery;TempNpCsDocument."Allow Partial Delivery")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(notify_customer_via_email;TempNpCsDocument."Notify Customer via E-mail")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(notify_customer_via_sms;TempNpCsDocument."Notify Customer via Sms")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(customer_email;TempNpCsDocument."Customer E-mail")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(customer_phone;TempNpCsDocument."Customer Phone No.")
+                        {
+                            MinOccurs = Zero;
+                        }
+                    }
 
                     trigger OnBeforeInsertRecord()
                     begin
@@ -296,8 +333,11 @@ xmlport 6151401 "Magento Sales Order Import"
                 }
                 textelement(comments)
                 {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
                     tableelement(tempitem;Item)
                     {
+                        MinOccurs = Zero;
                         XmlName = 'comment_line';
                         UseTemporary = true;
                         fieldattribute(type;TempItem.Description)
@@ -306,6 +346,7 @@ xmlport 6151401 "Magento Sales Order Import"
                         }
                         textelement(comment)
                         {
+                            MaxOccurs = Once;
 
                             trigger OnBeforePassVariable()
                             var
@@ -432,6 +473,10 @@ xmlport 6151401 "Magento Sales Order Import"
                         fieldelement(unit_price_incl_vat;TempSalesLine."Unit Price")
                         {
                         }
+                        fieldelement(unit_price_excl_vat;TempSalesLine."Unit Cost (LCY)")
+                        {
+                            MinOccurs = Zero;
+                        }
                         fieldelement(quantity;TempSalesLine.Quantity)
                         {
                         }
@@ -453,6 +498,10 @@ xmlport 6151401 "Magento Sales Order Import"
                         }
                         fieldelement(line_amount_incl_vat;TempSalesLine."Line Amount")
                         {
+                        }
+                        fieldelement(line_amount_excl_vat;TempSalesLine.Amount)
+                        {
+                            MinOccurs = Zero;
                         }
                         textelement(gift_vouchers)
                         {

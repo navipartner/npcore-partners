@@ -1,4 +1,4 @@
-tableextension 6014454 tableextension6014454 extends "Inventory Profile" 
+tableextension 6014455 tableextension6014455 extends "Inventory Profile" 
 {
     // NPR5.38.01/JKL/20180112/ Case 289017 added function TransferFromRetailReplnmDemand
     // NPR5.40/TJ  /20180303  CASE 307053 Removed function separator <<--NP FUNC--> and renumbered function TransferFromRetailReplnmDemand from id 25

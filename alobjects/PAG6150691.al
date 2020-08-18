@@ -1,6 +1,8 @@
 page 6150691 "NPRE Kitchen Request List"
 {
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200420 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Kitchen Request List';
     Editable = false;
@@ -60,15 +62,9 @@ page 6150691 "NPRE Kitchen Request List"
                 {
                     Visible = false;
                 }
-                field("Source Document Type";"Source Document Type")
+                field("SeatingCode()";SeatingCode())
                 {
-                }
-                field("Source Document No.";"Source Document No.")
-                {
-                }
-                field("Source Document Line No.";"Source Document Line No.")
-                {
-                    Visible = false;
+                    Caption = 'Seating Code';
                 }
             }
         }

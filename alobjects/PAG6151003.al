@@ -4,8 +4,10 @@ page 6151003 "POS Quote Card"
     // NPR5.48/MHA /20181129  CASE 336498 Added Customer info fields
     // NPR5.48/MHA /20181130  CASE 338208 Added Action "View POS Sales Data"
     // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
+    // NPR5.55/ALPO/20200722  CASE 392042 POS quote cleanup: removed legacy functionality with load from hardcoded fields
 
     Caption = 'POS Quote Card';
+    Editable = false;
     SourceTable = "POS Quote Entry";
 
     layout

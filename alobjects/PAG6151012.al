@@ -5,6 +5,7 @@ page 6151012 "NpRv Voucher Type Card"
     // NPR5.49/MHA /20190228  CASE 342811 Added field 60 "Partner Code"
     // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
     // NPR5.53/THRO/20191216  CASE 382232 Added "Minimum Amount Issue"
+    // NPR5.55/MHA /20200525  CASE 400120 Added field 1010 "Voucher Qty. (Closed)"
 
     Caption = 'Retail Voucher Type Card';
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
@@ -32,6 +33,9 @@ page 6151012 "NpRv Voucher Type Card"
                 {
                     ShowCaption = false;
                     field("Voucher Qty. (Open)";"Voucher Qty. (Open)")
+                    {
+                    }
+                    field("Voucher Qty. (Closed)";"Voucher Qty. (Closed)")
                     {
                     }
                     field("Arch. Voucher Qty.";"Arch. Voucher Qty.")

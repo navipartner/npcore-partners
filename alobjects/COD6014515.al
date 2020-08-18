@@ -24,7 +24,7 @@ codeunit 6014515 "Send Register Balance"
         Txt001: Label '%5 register %6: At %2 the %1 the amount is %3. No. of transactions are %4, user: %7, difference: %8';
         RegisterEndDate: Date;
     begin
-        //Sender SMS med bruttooms�tning
+        //Sender SMS med bruttoomsætning
         with SalePOS do begin
         RetailSetup.Get;
         if RetailSetup."Receive Register Turnover" <> RetailSetup."Receive Register Turnover"::None then begin

@@ -1,6 +1,7 @@
 table 6059823 "Smart Email Variable"
 {
     // NPR5.38/THRO/20171018 CASE 286713 Object created
+    // NPR5.55/THRO/20200511 CASE 343266 Added field "Variable Type" - used in Mandrill integration
 
     Caption = 'Smart Email Variable';
 
@@ -18,6 +19,12 @@ table 6059823 "Smart Email Variable"
         field(10;"Variable Name";Text[100])
         {
             Caption = 'Variable Name';
+        }
+        field(20;"Variable Type";Option)
+        {
+            Caption = 'Variable Type';
+            OptionCaption = ' ,Mailchimp,Handlebars';
+            OptionMembers = " ",Mailchimp,Handlebars;
         }
         field(50;"Merge Table ID";Integer)
         {

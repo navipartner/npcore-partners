@@ -51,6 +51,7 @@ tableextension 6014427 tableextension6014427 extends Item
     // NPR5.51/BHR /20190730  CASE 361929 Increase size of fiels season from 3 to 10
     // NPR5.51/BHR /20190801  CASE 363493 Set property Width of Field Description to 50
     // NPR5.51/ZESO/20190828  CASE 365796 Added field 6014642 Shelf Label Type
+    // NPR5.55/ALPO/20200708  CASE 382428 Added field 6014514 Rest. Item Routing Profile
     LookupPageID = "Retail Item List";
     DrillDownPageID = "Retail Item List";
     fields
@@ -177,6 +178,12 @@ tableextension 6014427 tableextension6014427 extends Item
         field(6014513; "Print Tags"; Text[100])
         {
             Caption = 'Print Tags';
+        }
+        field(6014514;"NPRE Item Routing Profile";Code[20])
+        {
+            Caption = 'Rest. Item Routing Profile';
+            Description = 'NPR5.55';
+            TableRelation = "NPRE Item Routing Profile";
         }
         field(6014609; "Has Variants"; Boolean)
         {

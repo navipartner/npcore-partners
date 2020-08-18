@@ -4,7 +4,8 @@ page 6060079 "TM Ticket Setup"
     // TM1.27/TSA /20171218 CASE 300395 added field "Timeout (ms)"
     // TM1.38/TSA /20181012 CASE 332109 Added NP-Pass fields
     // TM1.38/TSA /20181026 CASE 308962 Added setup fields for prepaid and postpaid ticket create process
-    // TM90.1.46/TSA /20200326 CASE 397084 Added wizard fields
+    // TM1.46/TSA /20200326 CASE 397084 Added wizard fields
+    // TM1.48/TSA /20200623 CASE 399259 Added description control
 
     Caption = 'Ticket Setup';
     PageType = Card;
@@ -36,6 +37,27 @@ page 6060079 "TM Ticket Setup"
                 }
                 field("Timeout (ms)";"Timeout (ms)")
                 {
+                }
+                group("Description Selection")
+                {
+                    field("Store Code";"Store Code")
+                    {
+                    }
+                    field("Ticket Title";"Ticket Title")
+                    {
+                    }
+                    field("Ticket Sub Title";"Ticket Sub Title")
+                    {
+                    }
+                    field("Ticket Name";"Ticket Name")
+                    {
+                    }
+                    field("Ticket Description";"Ticket Description")
+                    {
+                    }
+                    field("Ticket Full Description";"Ticket Full Description")
+                    {
+                    }
                 }
             }
             group(eTicket)

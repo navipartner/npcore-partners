@@ -1,4 +1,4 @@
-pageextension 6014436 pageextension6014436 extends "Sales Order" 
+pageextension 6014440 pageextension6014440 extends "Sales Order" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //                     - Added Action Items: EmailLog and SendAsPDF
@@ -35,6 +35,10 @@ pageextension 6014436 pageextension6014436 extends "Sales Order"
     // NPR5.42/THRO/20180516 CASE 308179 Removed code from Action SendAsPdf and EmailLog
     // NPR5.49/MHA /20190228 CASE 344166 Added Retail Vouchers action
     // NPR5.50/JAVA/20190607 CASE 359371 Remove "Your Reference" control (our control) as MS added in BC13 this field.
+    // NPR5.55/MHA /20200427 CASE 402013 Added Retail Vouchers action group
+    // NPR5.55/MHA /20200601 CASE 402014 Added Page action "Issue Voucher"
+    // NPR5.55/MHA /20200427 CASE 402015 Updated voucher table in SetHasRetailVouchers()
+    // NPR5.55/CLVA/20200506 CASE Added ShowCaptureService and action "RFID Document"
     layout
     {
         addafter("Sell-to Customer Name")
@@ -128,6 +132,19 @@ pageextension 6014436 pageextension6014436 extends "Sales Order"
                 Caption = 'POS Entry';
                 Image = Entry;
             }
+            action("RFID Document")
+            {
+                Caption = 'RFID Document';
+                Image = Delivery;
+                Visible = ShowCaptureService;
+
+                trigger OnAction()
+                var
+                    CSRfidHeader: Record "CS Rfid Header";
+                begin
+                    CSRfidHeader.OpenRfidSalesDoc(0,"No.","Sell-to Customer No.",'');
+                end;
+            }
         }
         addafter(History)
         {
@@ -141,24 +158,11 @@ pageextension 6014436 pageextension6014436 extends "Sales Order"
 
                     trigger OnAction()
                     var
-                        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
-                        NpRvVoucher: Record "NpRv Voucher";
-                        TempNpRvVoucher: Record "NpRv Voucher" temporary;
+                        NpRvSalesDocMgt: Codeunit "NpRv Sales Doc. Mgt.";
                     begin
-                        //-NPR5.49 [344166]
-                        NpRvExtVoucherSalesLine.SetRange("Document Type","Document Type");
-                        NpRvExtVoucherSalesLine.SetRange("Document No.","No.");
-                        if NpRvExtVoucherSalesLine.FindSet then
-                          repeat
-                            if NpRvVoucher.Get(NpRvExtVoucherSalesLine."Voucher No.") and (not TempNpRvVoucher.Get(NpRvVoucher."No.")) then begin
-                              TempNpRvVoucher.Init;
-                              TempNpRvVoucher := NpRvVoucher;
-                              TempNpRvVoucher.Insert;
-                            end;
-                          until NpRvExtVoucherSalesLine.Next = 0;
-
-                        PAGE.Run(0,TempNpRvVoucher);
-                        //+NPR5.49 [344166]
+                        //-NPR5.55 [402013]
+                        NpRvSalesDocMgt.ShowRelatedVouchersAction(Rec);
+                        //+NPR5.55 [402013]
                     end;
                 }
             }
@@ -184,6 +188,26 @@ pageextension 6014436 pageextension6014436 extends "Sales Order"
                 Caption = 'Insert Line with Item';
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
+            }
+        }
+        addafter("Request Approval")
+        {
+            group("Retail Voucher")
+            {
+                action("Issue Voucher")
+                {
+                    Caption = 'Issue Voucher';
+                    Image = PostedPayableVoucher;
+
+                    trigger OnAction()
+                    var
+                        NpRvSalesDocMgt: Codeunit "NpRv Sales Doc. Mgt.";
+                    begin
+                        //-NPR5.55 [402014]
+                        NpRvSalesDocMgt.IssueVoucherAction(Rec);
+                        //+NPR5.55 [402014]
+                    end;
+                }
             }
         }
         addafter(PostAndSend)
@@ -257,6 +281,8 @@ pageextension 6014436 pageextension6014436 extends "Sales Order"
 
     var
         HasRetailVouchers: Boolean;
+        ShowCaptureService: Boolean;
+        CSHelperFunctions: Codeunit "CS Helper Functions";
 
 
     //Unsupported feature: Code Modification on "OnAfterGetCurrRecord".
@@ -285,15 +311,45 @@ pageextension 6014436 pageextension6014436 extends "Sales Order"
         */
     //end;
 
+
+    //Unsupported feature: Code Modification on "OnOpenPage".
+
+    //trigger OnOpenPage()
+    //>>>> ORIGINAL CODE:
+    //begin
+        /*
+        if UserMgt.GetSalesFilter <> '' then begin
+          FilterGroup(2);
+          SetRange("Responsibility Center",UserMgt.GetSalesFilter);
+        #4..18
+        if ("No." <> '') and ("Sell-to Customer No." = '') then
+          DocumentIsPosted := (not Get("Document Type","No."));
+        PaymentServiceVisible := PaymentServiceSetup.IsPaymentServiceVisible;
+        */
+    //end;
+    //>>>> MODIFIED CODE:
+    //begin
+        /*
+        #1..21
+
+        //-NPR5.55 [379709]
+        ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
+        //+NPR5.55 [379709]
+        */
+    //end;
+
     local procedure SetHasRetailVouchers()
     var
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+        NpRvSaleLinePOSVoucher: Record "NpRv Sales Line";
     begin
-        //-NPR5.49 [344166]
-        NpRvExtVoucherSalesLine.SetRange("Document Type","Document Type");
-        NpRvExtVoucherSalesLine.SetRange("Document No.","No.");
-        HasRetailVouchers := NpRvExtVoucherSalesLine.FindFirst;
-        //+NPR5.49 [344166]
+        //-NPR5.55 [402015]
+        if "No." = '' then
+          exit;
+
+        NpRvSaleLinePOSVoucher.SetRange("Document Type","Document Type");
+        NpRvSaleLinePOSVoucher.SetRange("Document No.","No.");
+        HasRetailVouchers := NpRvSaleLinePOSVoucher.FindFirst;
+        //+NPR5.55 [402015]
     end;
 }
 

@@ -4,10 +4,10 @@ report 6014430 "Item Sales Statistics/Provider"
     // NPR4.16/TS/20151028  CASE 226008 Changed Report Caption
     // NPR5.25/LS/20160129  CASE 226251 Changed formatting codes/Dataset names/Variables name
     //                                  Changed Report caption from DAN=Saelger oms pr. varegruppe;ENU=Sales Person Trn. by Item Gr.;NOR=Saelger oms pr. varegruppe
-    //                                                        to DAN=Vare salgsstatistik/leverand�ropdelt;ENU=Item sales statistics/provider split
+    //                                                        to DAN=Vare salgsstatistik/leverand¢ropdelt;ENU=Item sales statistics/provider split
     // NPR5.25/JLK /20160627 CASE 226251 Removed field "Belong to item gr no."
     //                                   Adjusted fields "Sales Qty" to contain decimal places and moved Total to left
-    //                                   Changed Qty_cap from DAN=Forventet tilgang;ENU=Anticipated acces to DAN=Antal i k�bsordre;ENU=Qty. on Purch. Order
+    //                                   Changed Qty_cap from DAN=Forventet tilgang;ENU=Anticipated acces to DAN=Antal i k¢bsordre;ENU=Qty. on Purch. Order
     //                                   Corrected Total Issue
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer in Request Page
     // NPR5.38/JLK /20180125  CASE 303595 Removed Spaced on Request Page Caption
@@ -16,6 +16,7 @@ report 6014430 "Item Sales Statistics/Provider"
     // NPR5.49/BHR /20190212  CASE 345313 Correct Report As per OMA
     // NPR5.54/LS  /20200206  CASE 389134 Correct Report Caption from 'Sales Person Trn. by Item Gr.' to 'Item Sales Statistics/Provider'
     // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Logo
+    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Item Sales StatisticsProvider.rdlc';
 

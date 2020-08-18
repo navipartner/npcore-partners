@@ -1,7 +1,9 @@
 codeunit 6150668 "NPRE POS Action - Split Wa."
 {
-    // NPR5.45/MHA /20180827  CASE 318369 Object created
-    // NPR5.50/TJ  /20190530  CASE 346384 New parameter added
+    // NPR5.45/MHA /20180827 CASE 318369 Object created
+    // NPR5.50/TJ  /20190530 CASE 346384 New parameter added
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (filter seatings by restaurant)
 
 
     trigger OnRun()
@@ -35,27 +37,34 @@ codeunit 6150668 "NPRE POS Action - Split Wa."
             Type::Generic,
             "Subscriber Instances Allowed"::Multiple)
           then begin
+            RegisterWorkflowStep('addPresetValuesToContext','respond();');  //NPR5.55 [399170]
             RegisterWorkflowStep('seatingInput',
-              'if (param.FixedSeatingCode) {' +
-              '  context.seatingCode = param.FixedSeatingCode;' +
-              '  respond();' +
-              '} else {' +
-              '  switch(param.InputType + "") {' +
-              '    case "0":' +
-              '      stringpad(labels["InputTypeLabel"]).respond("seatingCode");' +
-              '      break;' +
-              '    case "1":' +
-              '      intpad(labels["InputTypeLabel"]).respond("seatingCode");' +
-              '      break;' +
-              '    case "2":' +
-              '      respond();' +
-              '      break;' +
-              '  }' +
+              'if (!context.seatingCode) {' +  //NPR5.55 [399170]
+              '  if (param.FixedSeatingCode) {' +
+              '    context.seatingCode = param.FixedSeatingCode;' +
+              '    respond();' +
+              '  } else {' +
+              '    switch(param.InputType + "") {' +
+              '      case "0":' +
+              //'      stringpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.55 [399170]-revoked
+              '        stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.55 [399170]
+              '        break;' +
+              '      case "1":' +
+              //'      intpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.55 [399170]-revoked
+              '        intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.55 [399170]
+              '        break;' +
+              '      case "2":' +
+              '        respond();' +
+              '        break;' +
+              '    }' +
+              '  }' +  //NPR5.55 [399170]
               '}'
             );
             RegisterWorkflowStep('selectWaiterPad',
-              'if (context.seatingCode) {' +
-              '  respond();' +
+              'if (!context.waiterPadNo) {' +  //NPR5.55 [399170]
+              '  if (context.seatingCode) {' +
+              '    respond();' +
+              '  }' +  //NPR5.55 [399170]
               '}'
             );
             RegisterWorkflowStep('splitWaiterPad',
@@ -94,6 +103,10 @@ codeunit 6150668 "NPRE POS Action - Split Wa."
 
         JSON.InitializeJObjectParser(Context,FrontEnd);
         case WorkflowStep of
+          //-NPR5.55 [399170]
+          'addPresetValuesToContext':
+            OnActionAddPresetValuesToContext(JSON,FrontEnd,POSSession);
+          //+NPR5.55 [399170]
           'seatingInput':
             OnActionSeatingInput(JSON,FrontEnd);
           'selectWaiterPad':
@@ -103,6 +116,45 @@ codeunit 6150668 "NPRE POS Action - Split Wa."
         end;
 
         Handled := true;
+    end;
+
+    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session")
+    var
+        NPRESeating: Record "NPRE Seating";
+        NPRESeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
+        NPREWaiterPad: Record "NPRE Waiter Pad";
+        SalePOS: Record "Sale POS";
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
+        WaiterPadPOSMgt: Codeunit "NPRE Waiter Pad POS Management";
+        POSSale: Codeunit "POS Sale";
+        POSSetup: Codeunit "POS Setup";
+        ConfirmString: Text;
+    begin
+        //-NPR5.55 [399170]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        //-NPR5.55 [414938]
+        POSSession.GetSetup(POSSetup);
+
+        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
+        //+NPR5.55 [414938]
+
+        if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
+          NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
+          JSON.SetContext('seatingCode',SalePOS."NPRE Pre-Set Seating Code");
+        end;
+
+        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
+          NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
+          if SalePOS."NPRE Pre-Set Seating Code" <> '' then
+            if not NPRESeatingWaiterPadLink.Get(NPRESeating.Code,NPREWaiterPad."No.") then
+              WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);
+          WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS,NPREWaiterPad,false);
+          JSON.SetContext('waiterPadNo',SalePOS."NPRE Pre-Set Waiter Pad No.");
+        end;
+
+        FrontEnd.SetActionContext(ActionCode(),JSON);
+        //+NPR5.55 [399170]
     end;
 
     local procedure OnActionSeatingInput(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management")
@@ -137,7 +189,6 @@ codeunit 6150668 "NPRE POS Action - Split Wa."
         NPRESeating: Record "NPRE Seating";
         NPREWaiterPad: Record "NPRE Waiter Pad";
         NPREWaiterPadPOSMgt: Codeunit "NPRE Waiter Pad POS Management";
-        POSSaleLine: Codeunit "POS Sale Line";
         WaiterPadNo: Code[20];
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON,NPRESeating);
@@ -145,10 +196,11 @@ codeunit 6150668 "NPRE POS Action - Split Wa."
         WaiterPadNo := JSON.GetString('waiterPadNo',true);
         NPREWaiterPad.Get(WaiterPadNo);
 
-        POSSession.GetSaleLine(POSSaleLine);
-
-        NPREWaiterPadPOSMgt.SplitBill(NPREWaiterPad,POSSaleLine);
-
+        //-NPR5.55 [399170]-revoked
+        //POSSession.GetSaleLine(POSSaleLine);
+        //NPREWaiterPadPOSMgt.SplitBill(NPREWaiterPad,POSSaleLine);
+        //+NPR5.55 [399170]-revoked
+        NPREWaiterPadPOSMgt.SplitBill(NPREWaiterPad,POSSession,1,true);  //NPR5.55 [399170]
         POSSession.RequestRefreshData();
     end;
 }

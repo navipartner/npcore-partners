@@ -1,11 +1,11 @@
 codeunit 6014414 "Post Temp Audit Roll"
 {
     // 
-    // 001 NPK,MSP Rettelse s�ledes at man p� betalingsvalg lade udvalgte bev�gelser
-    // bogf�re p� debitorposter i stedet som normalt p� finanskontier
-    // //-002 Henrik, Overf�r SeO til varekldlinie.
+    // 001 NPK,MSP Rettelse således at man på betalingsvalg lade udvalgte bevægelser
+    // bogf¢re på debitorposter i stedet som normalt på finanskontier
+    // //-002 Henrik, Overf¢r SeO til varekldlinie.
     // 
-    // 13-07-04 Opdateret til at k�re med temporer bogf�ring
+    // 13-07-04 Opdateret til at k¢re med temporer bogf¢ring
     // 
     // NPR3.03e OHM 260107 - Posting type sale if item
     // 
@@ -92,7 +92,7 @@ codeunit 6014414 "Post Temp Audit Roll"
     var
         "S & R Setup": Record "Sales & Receivables Setup";
     begin
-        //Bogf�rVaresalg
+        //Bogf¢rVaresalg
 
         with TempPost do begin
             SetRange("Sale Date", TempPost."Sale Date");
@@ -134,7 +134,7 @@ codeunit 6014414 "Post Temp Audit Roll"
     var
         CurrentPost: Record "Audit Roll Posting" temporary;
     begin
-        //Bogf�rKasseBev�gelser()
+        //Bogf¢rKasseBevægelser()
 
         RetailSetup.Get;
 
@@ -198,7 +198,7 @@ codeunit 6014414 "Post Temp Audit Roll"
     var
         Betalingsvalg: Record "Payment Type POS";
     begin
-        //Bogf�rKassebev�gelserPrPost
+        //Bogf¢rKassebevægelserPrPost
 
         with RevRulle do begin
             //-NPR5.42 [315194]
@@ -263,7 +263,7 @@ codeunit 6014414 "Post Temp Audit Roll"
         Bogf2: Label 'Paind on %1 Register %2';
         ItemGL: Record Item;
     begin
-        //PosterBev�gelse
+        //PosterBevægelse
         Kasse.Get(Kassenr);
         Clear(FinKldLinie);
         Finkllbr += 1;
@@ -382,7 +382,7 @@ codeunit 6014414 "Post Temp Audit Roll"
         NrSerieStyring: Codeunit NoSeriesManagement;
         FinKldNavn: Record "Gen. Journal Batch";
     begin
-        //Bogf�rDagensFinansposteringer();
+        //Bogf¢rDagensFinansposteringer();
 
         RetailSetup.Get;
         Clear(Counter);
@@ -462,7 +462,7 @@ codeunit 6014414 "Post Temp Audit Roll"
 
     procedure PostTodaysItemEntries(var TempPost: Record "Audit Roll Posting" temporary)
     begin
-        //Bogf�rDagensFinansposteringer();
+        //Bogf¢rDagensFinansposteringer();
 
         RetailSetup.Get;
         Clear(Counter);
@@ -1008,7 +1008,7 @@ codeunit 6014414 "Post Temp Audit Roll"
         PosterFremValDifferencer(Rec);
 
         // ********************************
-        //  Overf�r til Bank
+        //  Overf¢r til Bank
         // ********************************
 
         if Rec."Transferred to Balance Account" <> 0 then begin
@@ -1063,7 +1063,7 @@ codeunit 6014414 "Post Temp Audit Roll"
 
 
         // ********************************
-        //  Overf�r til Vekselkasse
+        //  Overf¢r til Vekselkasse
         // ********************************
 
         if Rec."Change Register" <> 0 then begin
@@ -1125,7 +1125,7 @@ codeunit 6014414 "Post Temp Audit Roll"
         ln11: Label ' Posting G/L Entries      @10@@@@@@@@@@@@@@@@@ \';
         ln12: Label ' Posting Item Entries     @11@@@@@@@@@@@@@@@@@ \\';
     begin
-        //StatusVindue�ben()
+        //StatusVindueÅben()
 
         WindowIsOpen := true;
 
@@ -1174,7 +1174,7 @@ codeunit 6014414 "Post Temp Audit Roll"
     var
         txtPos: Label 'POS %1-%2';
     begin
-        //Bogf�rtBilagsNrFkt
+        //Bogf¢rtBilagsNrFkt
 
         if PostOnlySalesTicketNo then
             if GlobalPostingNo = '' then
@@ -1837,7 +1837,7 @@ codeunit 6014414 "Post Temp Audit Roll"
         nTotal: Integer;
         Linie: Record "Audit Roll Posting" temporary;
     begin
-        //FjernH�ngendeUdbetalingerTemp
+        //FjernHængendeUdbetalingerTemp
 
         Rulle.SetCurrentKey("Sale Type", Type, "No.");
         Rulle.SetRange("Sale Type", Rulle."Sale Type"::"Out payment");

@@ -1,8 +1,10 @@
-table 6150672 "NPRE W.Pad Print Buffer"
+table 6150672 "NPRE W.Pad Line Output Buffer"
 {
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
+    //                                   - fields Output Type, "Serving Step" added to primary key
 
-    Caption = 'Waiter Pad Print Buffer';
+    Caption = 'Waiter Pad Line Output Buffer';
 
     fields
     {
@@ -19,7 +21,20 @@ table 6150672 "NPRE W.Pad Print Buffer"
         field(3;"Print Category Code";Code[20])
         {
             Caption = 'Print Category Code';
-            TableRelation = "NPRE Print Category";
+            TableRelation = "NPRE Print/Prod. Category";
+        }
+        field(4;"Serving Step";Code[10])
+        {
+            Caption = 'Serving Step';
+            Description = 'NPR5.55';
+            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(WaiterPadLineMealFlow));
+        }
+        field(5;"Output Type";Option)
+        {
+            Caption = 'Output Type';
+            Description = 'NPR5.55';
+            OptionCaption = 'Print,KDS';
+            OptionMembers = Print,KDS;
         }
         field(10;"Waiter Pad Line No.";Integer)
         {
@@ -30,7 +45,7 @@ table 6150672 "NPRE W.Pad Print Buffer"
 
     keys
     {
-        key(Key1;"Waiter Pad No.","Print Template Code","Print Category Code","Waiter Pad Line No.")
+        key(Key1;"Output Type","Waiter Pad No.","Print Template Code","Serving Step","Print Category Code","Waiter Pad Line No.")
         {
         }
     }

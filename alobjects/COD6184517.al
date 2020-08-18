@@ -15,6 +15,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     // NPR5.53/MMV /20200131 CASE 377533 Copy payment information onto void record for correct posting & log.
     // NPR5.54/MMV /20200218 CASE 387990 Set recoverable false at the same time as external response received for acquire card.
     // NPR5.54/MMV /20200414 CASE 364340 Handle card data correctly for voids
+    // NPR5.55/MMV /20200421 CASE 386254 Parameter controlled model GUI & unattended support
 
 
     trigger OnRun()
@@ -274,7 +275,9 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         if AcquireCardBeforeTransaction(EftTransactionRequest) then
             exit;
 
-        EFTAdyenCloudProtocol.SendEftDeviceRequest(EftTransactionRequest);
+        //-NPR5.55 [386254]
+        EFTAdyenCloudProtocol.SendEftDeviceRequest(EftTransactionRequest, true);
+        //+NPR5.55 [386254]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterFinancialCommit', '', false, false)]
@@ -385,10 +388,12 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         EFTPaymentMapping: Codeunit "EFT Payment Mapping";
         PaymentTypePOS: Record "Payment Type POS";
     begin
-        //-NPR5.53 [377533]
-        if not EftTransactionRequest.Successful then
+        //-NPR5.55 [386254]
+        if (not EftTransactionRequest.Successful) and
+          ((not EftTransactionRequest."Self Service") or (not EftTransactionRequest."External Result Known")) then begin
             Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
-
+        end;
+        //+NPR5.55 [386254]
 
         if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
             EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
@@ -396,7 +401,6 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         end;
         EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
         EftTransactionRequest.Modify;
-        //+NPR5.53 [377533]
     end;
 
     local procedure HandleVoidResponse(var EftTransactionRequest: Record "EFT Transaction Request")
@@ -406,43 +410,39 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         POSPaymentLine: Codeunit "POS Payment Line";
         EFTPaymentMapping: Codeunit "EFT Payment Mapping";
     begin
-        //-NPR5.53 [377533]
-        //-NPR5.53 [377533]
         if EftTransactionRequest.Successful then begin
+          //-NPR5.55 [386254]
+          if (not EftTransactionRequest."Self Service") then
+          //+NPR5.55 [386254]
             Message(VOID_SUCCESS, EftTransactionRequest."Entry No.");
 
-            //-NPR5.54 [364340]
             if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
                 EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
                 EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
             end;
             EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
             EftTransactionRequest.Modify;
-            //+NPR5.54 [364340]
 
-            //+NPR5.53 [377533]
         end else begin
+          //-NPR5.55 [386254]
+          if (not EftTransactionRequest."Self Service") or (not EftTransactionRequest."External Result Known") then
+          //+NPR5.55 [386254]
             Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         end;
-        //+NPR5.53 [377533]
     end;
 
     local procedure HandleSetupResponse(var EftTransactionRequest: Record "EFT Transaction Request")
     begin
-        //-NPR5.53 [377533]
         if EftTransactionRequest.Successful then
             Message(EftTransactionRequest."Result Display Text")
         else
             Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
-        //+NPR5.53 [377533]
     end;
 
     local procedure HandleDetectShopperResponse(var EftTransactionRequest: Record "EFT Transaction Request")
     begin
-        //-NPR5.53 [377533]
         if not EftTransactionRequest.Successful then
             Message(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
-        //+NPR5.53 [377533]
     end;
 
     local procedure HandleClearShopperContractResponse(var EftTransactionRequest: Record "EFT Transaction Request")
@@ -570,6 +570,16 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         //+NPR5.53 [377533]
     end;
 
+    procedure GetUnattended(EFTSetupIn: Record "EFT Setup"): Boolean
+    var
+        EFTAdyenPaymentTypeSetup: Record "EFT Adyen Payment Type Setup";
+    begin
+        //-NPR5.55 [386254]
+        GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
+        exit(EFTAdyenPaymentTypeSetup.Unattended);
+        //+NPR5.55 [386254]
+    end;
+
     local procedure "// Aux"()
     begin
     end;
@@ -587,6 +597,10 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
 
         if not GetCashbackAllowed(EFTSetup) then
             EFTTransactionRequest.TestField("Cashback Amount", 0);
+
+        //-NPR5.55 [386254]
+        EFTTransactionRequest."Self Service" := GetUnattended(EFTSetup);
+        //+NPR5.55 [386254]
     end;
 
     procedure VoidTransactionAfterSignatureDecline(EFTTransactionRequest: Record "EFT Transaction Request")
@@ -752,7 +766,9 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         EFTPaymentTransactionRequest.Recoverable := true;
         EFTPaymentTransactionRequest.Modify;
         Commit;
-        EFTAdyenCloudProtocol.SendEftDeviceRequest(EFTPaymentTransactionRequest);
+        //-NPR5.55 [386254]
+        EFTAdyenCloudProtocol.SendEftDeviceRequest(EFTPaymentTransactionRequest, true);
+        //+NPR5.55 [386254]
         ContinueOnTransactionEntryNo := EFTPaymentTransactionRequest."Entry No.";
         exit(true);
         //+NPR5.53 [377533]

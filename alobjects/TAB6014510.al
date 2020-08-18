@@ -1,7 +1,7 @@
 table 6014510 "I-Comm"
 {
     // //-NPR3.0s
-    //   tilf�jet path to smtpmail.exe, bruges f.eks. ved japanphoto forsikringudl�sning
+    //   tilf¢jet path to smtpmail.exe, bruges f.eks. ved japanphoto forsikringudlæsning
     // //4.001 - NPE
     //   added field 121
     // 
@@ -83,7 +83,7 @@ table 6014510 "I-Comm"
         field(56;"SMS Type";Option)
         {
             Caption = 'Sms type';
-            Description = 'NAS1.1o: om der sendes ved hj�lp af mail(turbosms), dll(smsdriver) eller http(Eclub)';
+            Description = 'NAS1.1o: om der sendes ved hjælp af mail(turbosms), dll(smsdriver) eller http(Eclub)';
             OptionCaption = 'Mail,Dll,Eclub,Endpoint';
             OptionMembers = Mail,Dll,Eclub,Endpoint;
         }
@@ -99,7 +99,7 @@ table 6014510 "I-Comm"
         field(61;"Tunnel URL Address";Text[100])
         {
             Caption = 'Tunnel URL Address';
-            Description = 'Adressen til tdc p� nettet';
+            Description = 'Adressen til tdc på nettet';
         }
         field(62;"Clearing - SQL";Boolean)
         {

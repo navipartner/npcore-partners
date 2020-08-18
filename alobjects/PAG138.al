@@ -11,6 +11,7 @@ pageextension 6014411 pageextension6014411 extends "Posted Purchase Invoice"
     // PN1.10/MHA/20160314 CASE 236653 Updated Record Specific Pdf2Nav functions with general Variant functions
     // NPR5.42/THRO/20180518 CASE 308179 Removed code from Action SendAsPdf and EmailLog
     // NPR5.51/BHR /20190614 CASE 357407 Add action For RetailPrint and Price Label
+    // NPR5.55/CLVA/20200610 CASE Added Action "Show Imported File"
 
     //Unsupported feature: Property Insertion (Permissions) on ""Posted Purchase Invoice"(Page 138)".
 
@@ -47,6 +48,22 @@ pageextension 6014411 pageextension6014411 extends "Posted Purchase Invoice"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
+            }
+            action("Show Imported File")
+            {
+                Caption = 'Show Imported File';
+                Image = DocInBrowser;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    NcImportListPg: Page "Nc Import List";
+                begin
+                    //-366790 [366790]
+                    NcImportListPg.ShowFormattedDocByDocNo("Vendor Invoice No.");
+                    //+366790 [366790]
+                end;
             }
             group(PDF2NAV)
             {

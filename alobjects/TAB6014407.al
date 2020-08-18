@@ -2,10 +2,10 @@ table 6014407 "Audit Roll"
 {
     // //----MG 14/9-01 rettelse til udskrivrecords
     // 
-    // //-0023 : Henrik, Bonudskrivning af forskellig rapport afh�ngig af kasse.
+    // //-0023 : Henrik, Bonudskrivning af forskellig rapport afhængig af kasse.
     // 
     // //-NPK3.0a Ved Nikolai Pedersen
-    //   Tilf�jet funktionen Sletning der sletter frem til indtastede dato
+    //   Tilf¢jet funktionen Sletning der sletter frem til indtastede dato
     // 
     // //-NPR3.1r NE
     //   Incrementcount rettet.
@@ -15,7 +15,7 @@ table 6014407 "Audit Roll"
     // 
     //     Is only required if the time analysis module is active... otherwise it can be switched off
     // 
-    // NPR4.002.002, 11-06-09, MH, Tilf�jet feltet "Lock Code" (sag 65422).
+    // NPR4.002.002, 11-06-09, MH, Tilf¢jet feltet "Lock Code" (sag 65422).
     // NPR4.004.003, 01-12-09, MH, Added function, SendLatestAsPDF - Sends the latest audit by email (Job 79125).
     // NPR4.004.004, 03-12-09, MH, Added "Label No." (job 59317).
     // PN1.04/MH/20140819  NAV-AddOn: PDF2NAV
@@ -541,18 +541,18 @@ table 6014407 "Audit Roll"
         field(201;"Reversed by Salesperson Code";Code[10])
         {
             Caption = 'Reversed by Salesperson Code';
-            Description = 'Udfyldes med s�lgerkoden der tilbagef�rer bon''en';
+            Description = 'Udfyldes med sælgerkoden der tilbagef¢rer bon''en';
             TableRelation = "Salesperson/Purchaser";
         }
         field(202;"Reverseing Sales Ticket No.";Code[20])
         {
             Caption = 'Reverseing Sales Ticket No.';
-            Description = 'Peger p� det bonnummer som den aktuelle bon tilbagef�rer';
+            Description = 'Peger på det bonnummer som den aktuelle bon tilbagef¢rer';
         }
         field(203;"Reversed by Sales Ticket No.";Code[20])
         {
             Caption = 'Reversed by Sales Ticket No.';
-            Description = 'Peger p� det bonnummer som tilbagef�rte aktuel bonnummer';
+            Description = 'Peger på det bonnummer som tilbagef¢rte aktuel bonnummer';
         }
         field(300;"Cancelled No. Of Items";Decimal)
         {
@@ -790,7 +790,7 @@ table 6014407 "Audit Roll"
         field(6055;Send;Date)
         {
             Caption = 'Send';
-            Description = 'Bruges ifm. replikering til at afg�ren om det felt er udl�st eller ej';
+            Description = 'Bruges ifm. replikering til at afg¢ren om det felt er udlæst eller ej';
         }
         field(6060;"Offline receipt no.";Code[20])
         {

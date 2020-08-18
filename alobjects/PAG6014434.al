@@ -12,6 +12,7 @@ page 6014434 "Payment Type - List"
     // NPR5.27/TSA/20160928 CASE 253683 removed field "Amount in Audit Roll" from page. visible false seems not to be work
     // NPR5.29/TJ  /20170123 CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
     // NPR5.47/TS  /20181022 CASE 309123 Removed unused fields
+    // NPR5.55/TJ  /20200430 CASE 399242 Removed Dimensions action (with entire RelatedInformation group) as it is no longer supported for this table
 
     Caption = 'Payment Type List';
     CardPageID = "Payment Type - Card";
@@ -75,44 +76,6 @@ page 6014434 "Payment Type - List"
 
     actions
     {
-        area(navigation)
-        {
-            group(Dimension)
-            {
-                Caption = 'Dimensions';
-                Image = Dimensions;
-                action("Dimensions-Single")
-                {
-                    Caption = 'Dimensions-Single';
-                    Image = Dimensions;
-                    RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014402),
-                                  "No."=FIELD("No.");
-                    ShortCutKey = 'Shift+Ctrl+D';
-                }
-                action("Dimensions-Mulitple")
-                {
-                    Caption = 'Dimensions-Mulitple';
-                    Image = DimensionSets;
-                    Visible = false;
-
-                    trigger OnAction()
-                    var
-                        PaymentType: Record "Payment Type POS";
-                        DefaultDimMultiple: Page "Default Dimensions-Multiple";
-                    begin
-                        //-NPR5.29 [263787]
-                        /*
-                        CurrPage.SETSELECTIONFILTER(PaymentType);
-                        DefaultDimMultiple.SetMultiPaymentTypePOS(PaymentType);
-                        DefaultDimMultiple.RUNMODAL;
-                        */
-                        //+NPR5.29 [263787]
-
-                    end;
-                }
-            }
-        }
     }
 
     var

@@ -1,4 +1,4 @@
-page 6151414 "Magento Item Group"
+page 6151414 "Magento Category Card"
 {
     // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
     // MAG1.01/MH/20150115  CASE 199932 Updated Layout
@@ -11,11 +11,12 @@ page 6151414 "Magento Item Group"
     // MAG2.17/TS  /20181017  CASE 324862 Added Icon Picture
     // MAG2.17/TS  /20181112  CASE 333862 Seo Link Should not be updated if No is selected.
     // MAG2.20/BHR /20190409  CASE 346352 Field 130 "Short Description"
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
-    Caption = 'Item Group';
+    Caption = 'Magento Category Card';
     DelayedInsert = true;
     InsertAllowed = false;
-    SourceTable = "Magento Item Group";
+    SourceTable = "Magento Category";
 
     layout
     {
@@ -28,7 +29,7 @@ page 6151414 "Magento Item Group"
                 {
                     Enabled = (NOT Root);
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field(Id;Id)
                     {
                     }
                     field(Name;Name)
@@ -121,11 +122,11 @@ page 6151414 "Magento Item Group"
                     }
                 }
             }
-            part(MagentoItemGroupSubform;"Magento Item Group Subform")
+            part(MagentoChildCategories;"Magento Child Categories")
             {
-                Caption = 'Child Item Groups';
+                Caption = 'Child Categories';
                 ShowFilter = false;
-                SubPageLink = "Parent Item Group No."=FIELD(FILTER("No."));
+                SubPageLink = "Parent Category Id"=FIELD(FILTER(Id));
                 Visible = MagentoItemGroupSubformVisible;
             }
         }
@@ -135,6 +136,7 @@ page 6151414 "Magento Item Group"
             {
                 SubPageLink = Type=CONST("Item Group"),
                               Name=FIELD(Picture);
+                Visible = (NOT HasSetupCategories);
             }
             part(IconPictureDragDropAddin;"Magento DragDropPic. Addin")
             {
@@ -143,6 +145,7 @@ page 6151414 "Magento Item Group"
                 ShowFilter = false;
                 SubPageLink = Type=CONST("Item Group"),
                               Name=FIELD(Icon);
+                Visible = (NOT HasSetupCategories);
             }
         }
     }
@@ -164,7 +167,7 @@ page 6151414 "Magento Item Group"
                 begin
                     //-MAG1.21
                     MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::"Item Group");
-                    MagentoDisplayConfig.SetRange("No.","No.");
+                    MagentoDisplayConfig.SetRange("No.",Id);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                     MagentoDisplayConfigPage.Run;
                     //+MAG1.21
@@ -176,16 +179,23 @@ page 6151414 "Magento Item Group"
     trigger OnAfterGetCurrRecord()
     begin
         MagentoItemGroupSubformVisible := Find;
-        CurrPage.MagentoItemGroupSubform.PAGE.SetParentItemGroup(Rec);
+        CurrPage.MagentoChildCategories.PAGE.SetParentItemGroup(Rec);
         //-MAG2.17 [324862]
         //CurrPage.PictureDragDropAddin.PAGE.SetItemGroupNo("No.");
-        CurrPage.PictureDragDropAddin.PAGE.SetItemGroupNo("No.",false);
-        CurrPage.IconPictureDragDropAddin.PAGE.SetItemGroupNo("No.",true);
+        CurrPage.PictureDragDropAddin.PAGE.SetItemGroupNo(Id,false);
+        CurrPage.IconPictureDragDropAddin.PAGE.SetItemGroupNo(Id,true);
         //+MAG2.17 [324862]
     end;
 
     trigger OnOpenPage()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
+        //-MAG2.26 [404580]
+        HasSetupCategories := MagentoSetupMgt.HasSetupCategories();
+        CurrPage.Editable(not HasSetupCategories);
+        //+MAG2.26 [404580]
+
         //-MAG1.21
         ////-MAG1.17
         //SetStoreVisible;
@@ -202,6 +212,7 @@ page 6151414 "Magento Item Group"
         Text001: Label 'Update Seo Link?';
         DisplayConfigVisible: Boolean;
         MagentoItemGroupSubformVisible: Boolean;
+        HasSetupCategories: Boolean;
 
     local procedure SetDisplayConfigVisible()
     var

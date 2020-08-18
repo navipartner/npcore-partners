@@ -2497,7 +2497,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="kostv�rdi">
+                        <Textbox Name="kostværdi">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2518,7 +2518,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>kostv�rdi</rd:DefaultName>
+                          <rd:DefaultName>kostværdi</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>

@@ -5012,6 +5012,7 @@
                                               <PaddingBottom>2pt</PaddingBottom>
                                             </Style>
                                           </Textbox>
+                                          <rd:Selected>true</rd:Selected>
                                         </CellContents>
                                       </TablixCell>
                                       <TablixCell>
@@ -5399,7 +5400,7 @@
                                   <TablixMember>
                                     <Group Name="POS_Payment_Line">
                                       <GroupExpressions>
-                                        <GroupExpression>=Fields!POS_Entry_No_POS_Payment_Line.Value</GroupExpression>
+                                        <GroupExpression>=Fields!Line_No_POS_Payment_Line.Value</GroupExpression>
                                       </GroupExpressions>
                                       <Filters>
                                         <Filter>

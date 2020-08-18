@@ -16,6 +16,7 @@ codeunit 6150629 "POS Entry Management"
     // NPR5.51/ALPO/20190802  CASE 362747 Handle check of allowed number of receipt reprints
     // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
     // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved here from CUs 6150798 and 6150821 to avoid code duplication
+    // NPR5.55/SARA/20200608 CASE 401473 Update Discount Amount in POS Entry
 
 
     trigger OnRun()
@@ -82,6 +83,9 @@ codeunit 6150629 "POS Entry Management"
                 else
                   CalcReturnSalesQty += POSSalesLine.Quantity;
               end;
+               //-NPR5.55 [401473]
+              CalcDiscountAmount += POSSalesLine."Line Discount Amount Excl. VAT";
+              //+NPR5.55 [401473]
             end;
           until POSSalesLine.Next = 0;
 

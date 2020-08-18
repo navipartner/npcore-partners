@@ -20,14 +20,14 @@ codeunit 6060132 "MM Import Members"
     begin
 
         if GuiAllowed then begin
-          SuggestFileName := '';
-          FileName := FileManagement.OpenFileDialog (SELECT_FILE_CAPTION, SuggestFileName, FILE_FILTER);
+            SuggestFileName := '';
+            FileName := FileManagement.OpenFileDialog(SELECT_FILE_CAPTION, SuggestFileName, FILE_FILTER);
 
-          if (SuggestFileName = FileName) then
-            Error ('');
+            if (SuggestFileName = FileName) then
+                Error('');
 
-          Serverfilename := FileManagement.UploadFileSilent(FileName);
-          SetFileName (Serverfilename);
+            Serverfilename := FileManagement.UploadFileSilent(FileName);
+            SetFileName(Serverfilename);
 
         end;
 
@@ -49,7 +49,7 @@ codeunit 6060132 "MM Import Members"
         AsciiStr: Text[250];
         AnsiStr: Text[250];
         InternalVars: Boolean;
-        CharVar: array [32] of Char;
+        CharVar: array[32] of Char;
         "--FileFields": Integer;
         FldMemberNo: Text;
         FldFirstName: Text;
@@ -109,74 +109,74 @@ codeunit 6060132 "MM Import Members"
     begin
 
         // xxx
-        if (IComm.Get ()) then
-          if (IComm."Config Request (Customer)" <> IComm."Config Request (Customer)"::None) or IComm."Use Auto. Cust. Lookup" then
-            if not Confirm ('Warning: %1 is setup and may interfer with customer creation when importing members. Has the %1 been configured correctly?', false, IComm.TableCaption()) then
-              Error ('');
+        if (IComm.Get()) then
+            if (IComm."Config Request (Customer)" <> IComm."Config Request (Customer)"::None) or IComm."Use Auto. Cust. Lookup" then
+                if not Confirm('Warning: %1 is setup and may interfer with customer creation when importing members. Has the %1 been configured correctly?', false, IComm.TableCaption()) then
+                    Error('');
 
         REQUIRED := 1;
         OPTIONAL := 2;
         GDateMask := 'YYYYMMDD'; // Should be setup or parameter
 
-        TxtFile.TextMode (true);
-        TxtFile.Open (GFileName);
-        TxtFile.CreateInStream (IStream);
+        TxtFile.TextMode(true);
+        TxtFile.Open(GFileName);
+        TxtFile.CreateInStream(IStream);
 
-        MemberInfoCapture.SetFilter ("Originates From File Import", '=%1', true);
-        if (MemberInfoCapture.FindLast ()) then ;
-        LowEntryNo := MemberInfoCapture."Entry No." +1;
+        MemberInfoCapture.SetFilter("Originates From File Import", '=%1', true);
+        if (MemberInfoCapture.FindLast()) then;
+        LowEntryNo := MemberInfoCapture."Entry No." + 1;
 
         RunMode := 1;
 
         if GuiAllowed then
-          Window.Open (IMPORT_MESSAGE_DIALOG);
+            Window.Open(IMPORT_MESSAGE_DIALOG);
 
         while (not IStream.EOS) do begin
 
-          if (IStream.ReadText (Fileline) > 0)  then begin
-            Fileline := Ansi2Ascii (Fileline);
+            if (IStream.ReadText(Fileline) > 0) then begin
+                Fileline := Ansi2Ascii(Fileline);
 
-            // UTF-8 files start with some bytes identifying the format, get rid of those bytes
-            //IF (lineCount = 1) THEN WHILE (fileline[1] <> '"') DO fileline := COPYSTR (fileline, 2);
+                // UTF-8 files start with some bytes identifying the format, get rid of those bytes
+                //IF (lineCount = 1) THEN WHILE (fileline[1] <> '"') DO fileline := COPYSTR (fileline, 2);
 
-            decodeLine (Fileline);
-            if GuiAllowed then
-              if ((GLineCount mod 50) = 0) then Window.Update (1, StrSubstNo (PROCESS_INFO, GLineCount, FldFirstName, FldLastName));
+                decodeLine(Fileline);
+                if GuiAllowed then
+                    if ((GLineCount mod 50) = 0) then Window.Update(1, StrSubstNo(PROCESS_INFO, GLineCount, FldFirstName, FldLastName));
 
-            GLineCount += 1;
+                GLineCount += 1;
 
-            if (GLineCount <> 1) then begin
-              if (isValidMember () and (RunMode = 1)) then
-                insertMember (GMemberInfo."Entry No.");
+                if (GLineCount <> 1) then begin
+                    if (isValidMember() and (RunMode = 1)) then
+                        insertMember(GMemberInfo."Entry No.");
+                end;
+
             end;
 
-          end;
-
-          // break
-          // IF lineCount > 35 THEN EXIT;
+            // break
+            // IF lineCount > 35 THEN EXIT;
 
         end;
 
-        TxtFile.Close ();
+        TxtFile.Close();
         if GuiAllowed then
-          Window.Close ();
+            Window.Close();
 
         //IF (runmode = 2) THEN
         //  ERROR ('Import was run in test mode, nothing has been imported.');
 
         MemberInfoCapture.Reset();
-        MemberInfoCapture.SetFilter ("Originates From File Import", '=%1', true);
-        MemberInfoCapture.SetFilter ("Entry No.", '%1..', LowEntryNo);
-        if (MemberInfoCapture.Count () > 0) then begin
-          if (GuiAllowed) then begin
-            if (Confirm (UNSUCCESSFULL_IMPORT, true)) then begin
-              MemberInfoCapturePage.SetTableView (MemberInfoCapture);
-              MemberInfoCapturePage.SetShowImportAction ();
-              MemberInfoCapturePage.Run ();
+        MemberInfoCapture.SetFilter("Originates From File Import", '=%1', true);
+        MemberInfoCapture.SetFilter("Entry No.", '%1..', LowEntryNo);
+        if (MemberInfoCapture.Count() > 0) then begin
+            if (GuiAllowed) then begin
+                if (Confirm(UNSUCCESSFULL_IMPORT, true)) then begin
+                    MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+                    MemberInfoCapturePage.SetShowImportAction();
+                    MemberInfoCapturePage.Run();
+                end;
             end;
-          end;
         end else begin
-          Message (SUCCESS_MSG, GLineCount -1);
+            Message(SUCCESS_MSG, GLineCount - 1);
         end;
     end;
 
@@ -184,35 +184,35 @@ codeunit 6060132 "MM Import Members"
     begin
 
         // -- member
-        FldMemberNo := nextField (PLine);
-        FldFirstName := nextField (PLine);
-        FldMiddleName := nextField (PLine);
-        FldLastName := nextField (PLine);
-        FldPhone := nextField (PLine);
-        FldSSN := nextField (PLine);
-        FldAddress := nextField (PLine);
-        FldPostCode := nextField (PLine);
-        FldCountryCode := nextField (PLine);
-        FldCountry := nextField (PLine);
-        FldGender := nextField (PLine);
-        FldBirthDate := nextField (PLine);
-        FldEmail := LowerCase (nextField (PLine));
-        FldNotificationMethod := nextField (PLine);
-        FldNewsLetter := nextField (PLine);
-        FldPictureB64 := nextField (PLine);
+        FldMemberNo := nextField(PLine);
+        FldFirstName := nextField(PLine);
+        FldMiddleName := nextField(PLine);
+        FldLastName := nextField(PLine);
+        FldPhone := nextField(PLine);
+        FldSSN := nextField(PLine);
+        FldAddress := nextField(PLine);
+        FldPostCode := nextField(PLine);
+        FldCountryCode := nextField(PLine);
+        FldCountry := nextField(PLine);
+        FldGender := nextField(PLine);
+        FldBirthDate := nextField(PLine);
+        FldEmail := LowerCase(nextField(PLine));
+        FldNotificationMethod := nextField(PLine);
+        FldNewsLetter := nextField(PLine);
+        FldPictureB64 := nextField(PLine);
 
         // -- membership
-        FldExternalMembershipNo := nextField (PLine);
-        FldPurchaseDate  := nextField (PLine);
-        FldValidFromDate := nextField (PLine);
-        FldValidUntilDate := nextField (PLine);
-        FldRole := nextField (PLine);
-        FldNAVMembershipCode := nextField (PLine);
-        FldLoyaltyPoints := nextField (PLine); //-+MM1.25 [301612]
+        FldExternalMembershipNo := nextField(PLine);
+        FldPurchaseDate := nextField(PLine);
+        FldValidFromDate := nextField(PLine);
+        FldValidUntilDate := nextField(PLine);
+        FldRole := nextField(PLine);
+        FldNAVMembershipCode := nextField(PLine);
+        FldLoyaltyPoints := nextField(PLine); //-+MM1.25 [301612]
 
         // -- card
-        FldExternalCardNo := nextField (PLine);
-        FldExternalCardNoValidUntilDate := nextField (PLine);
+        FldExternalCardNo := nextField(PLine);
+        FldExternalCardNoValidUntilDate := nextField(PLine);
     end;
 
     local procedure isValidMember() isValid: Boolean
@@ -223,136 +223,144 @@ codeunit 6060132 "MM Import Members"
         Community: Record "MM Member Community";
     begin
 
-        Clear (GMemberInfo);
+        Clear(GMemberInfo);
 
-        GMemberInfo."External Member No" := validateTextField (FldMemberNo, MaxStrLen (GMemberInfo."External Member No"), REQUIRED, GMemberInfo.FieldCaption ("External Member No"));
+        GMemberInfo."External Member No" := validateTextField(FldMemberNo, MaxStrLen(GMemberInfo."External Member No"), REQUIRED, GMemberInfo.FieldCaption("External Member No"));
 
-        GMemberInfo."First Name" := validateTextField (FldFirstName, MaxStrLen (GMemberInfo."First Name"), REQUIRED, GMemberInfo.FieldCaption ("First Name"));
-        GMemberInfo."Middle Name" := validateTextField (FldMiddleName, MaxStrLen (GMemberInfo."Middle Name"), OPTIONAL, GMemberInfo.FieldCaption ("Middle Name"));
-        GMemberInfo."Last Name" := validateTextField (FldLastName, MaxStrLen (GMemberInfo."Last Name"), REQUIRED, GMemberInfo.FieldCaption ("Last Name"));
+        GMemberInfo."First Name" := validateTextField(FldFirstName, MaxStrLen(GMemberInfo."First Name"), REQUIRED, GMemberInfo.FieldCaption("First Name"));
+        GMemberInfo."Middle Name" := validateTextField(FldMiddleName, MaxStrLen(GMemberInfo."Middle Name"), OPTIONAL, GMemberInfo.FieldCaption("Middle Name"));
+        GMemberInfo."Last Name" := validateTextField(FldLastName, MaxStrLen(GMemberInfo."Last Name"), REQUIRED, GMemberInfo.FieldCaption("Last Name"));
 
-        GMemberInfo."Phone No." := validateTextField (FldPhone, MaxStrLen (GMemberInfo."Phone No."), OPTIONAL, GMemberInfo.FieldCaption ("Phone No."));
-        GMemberInfo."Social Security No." := validateTextField (FldSSN, MaxStrLen (GMemberInfo."Social Security No."), OPTIONAL, GMemberInfo.FieldCaption ("Social Security No."));
-        GMemberInfo.Address := validateTextField (FldAddress, MaxStrLen (GMemberInfo.Address), OPTIONAL, GMemberInfo.FieldCaption (Address));
-        GMemberInfo."Country Code" := validateTextField (FldCountryCode, MaxStrLen (GMemberInfo."Country Code"), OPTIONAL, GMemberInfo.FieldCaption ("Country Code"));
-        GMemberInfo.Validate ("Post Code Code", validateTextField (FldPostCode, MaxStrLen (GMemberInfo."Post Code Code"), OPTIONAL, GMemberInfo.FieldCaption ("Post Code Code")));
-        GMemberInfo.Country := validateTextField (FldCountry, MaxStrLen (GMemberInfo.Country), OPTIONAL, GMemberInfo.FieldCaption (Country));
+        GMemberInfo."Phone No." := validateTextField(FldPhone, MaxStrLen(GMemberInfo."Phone No."), OPTIONAL, GMemberInfo.FieldCaption("Phone No."));
+        GMemberInfo."Social Security No." := validateTextField(FldSSN, MaxStrLen(GMemberInfo."Social Security No."), OPTIONAL, GMemberInfo.FieldCaption("Social Security No."));
+        GMemberInfo.Address := validateTextField(FldAddress, MaxStrLen(GMemberInfo.Address), OPTIONAL, GMemberInfo.FieldCaption(Address));
+        GMemberInfo."Country Code" := validateTextField(FldCountryCode, MaxStrLen(GMemberInfo."Country Code"), OPTIONAL, GMemberInfo.FieldCaption("Country Code"));
+        GMemberInfo.Validate("Post Code Code", validateTextField(FldPostCode, MaxStrLen(GMemberInfo."Post Code Code"), OPTIONAL, GMemberInfo.FieldCaption("Post Code Code")));
+        GMemberInfo.Country := validateTextField(FldCountry, MaxStrLen(GMemberInfo.Country), OPTIONAL, GMemberInfo.FieldCaption(Country));
 
-        case LowerCase (FldGender) of
-          ''           : GMemberInfo.Gender := GMemberInfo.Gender::NOT_SPECIFIED;
-          'k','female' : GMemberInfo.Gender := GMemberInfo.Gender::FEMALE;
-          'm','male'   : GMemberInfo.Gender := GMemberInfo.Gender::MALE;
-          else
-            GMemberInfo.Gender := GMemberInfo.Gender::OTHER;
+        case LowerCase(FldGender) of
+            '':
+                GMemberInfo.Gender := GMemberInfo.Gender::NOT_SPECIFIED;
+            'k', 'female':
+                GMemberInfo.Gender := GMemberInfo.Gender::FEMALE;
+            'm', 'male':
+                GMemberInfo.Gender := GMemberInfo.Gender::MALE;
+            else
+                GMemberInfo.Gender := GMemberInfo.Gender::OTHER;
         end;
-        GMemberInfo.Birthday := validateDateField (FldBirthDate, GDateMask, OPTIONAL, GMemberInfo.FieldCaption (Birthday));
+        GMemberInfo.Birthday := validateDateField(FldBirthDate, GDateMask, OPTIONAL, GMemberInfo.FieldCaption(Birthday));
 
         GMemberInfo."E-Mail Address" := FldEmail;
-        case LowerCase (FldNotificationMethod) of
-          'email'  : GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::EMAIL;
-          'manual' : GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::MANUAL;
-          'sms'    : GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::SMS; //-+MM1.42 [372557]
-          else
-            GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
+        case LowerCase(FldNotificationMethod) of
+            'email':
+                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::EMAIL;
+            'manual':
+                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::MANUAL;
+            'sms':
+                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::SMS; //-+MM1.42 [372557]
+            else
+                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
         end;
-        case LowerCase (FldNewsLetter) of
-          'no'  : GMemberInfo."News Letter" := GMemberInfo."News Letter"::NO;
-          'yes' : GMemberInfo."News Letter" := GMemberInfo."News Letter"::YES;
-          else
-            GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
+        case LowerCase(FldNewsLetter) of
+            'no':
+                GMemberInfo."News Letter" := GMemberInfo."News Letter"::NO;
+            'yes':
+                GMemberInfo."News Letter" := GMemberInfo."News Letter"::YES;
+            else
+                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
         end;
 
         // -- Membership
         //-MM1.24 [298666]
         //GMemberInfo."External Membership No." := validateTextField (GMemberInfo."External Membership No.", MAXSTRLEN (GMemberInfo."External Membership No."), OPTIONAL, GMemberInfo.FIELDCAPTION ("External Membership No."));
-        GMemberInfo."External Membership No." := validateTextField (FldExternalMembershipNo, MaxStrLen (GMemberInfo."External Membership No."), OPTIONAL, GMemberInfo.FieldCaption ("External Membership No."));
+        GMemberInfo."External Membership No." := validateTextField(FldExternalMembershipNo, MaxStrLen(GMemberInfo."External Membership No."), OPTIONAL, GMemberInfo.FieldCaption("External Membership No."));
         //+MM1.24 [298666]
 
         // fldRole
-        GMemberInfo."Membership Code" := validateTextField (FldNAVMembershipCode, MaxStrLen (GMemberInfo."Membership Code"), REQUIRED, GMemberInfo.FieldCaption ("Membership Code"));
+        GMemberInfo."Membership Code" := validateTextField(FldNAVMembershipCode, MaxStrLen(GMemberInfo."Membership Code"), REQUIRED, GMemberInfo.FieldCaption("Membership Code"));
 
         //-MM1.25 [298666]
-        MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+        MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
         //+MM1.25 [298666]
 
-        MembershipSalesSetup.SetFilter ("Membership Code", '=%1', GMemberInfo."Membership Code");
-        if not (MembershipSalesSetup.FindFirst ()) then
-          Error (INVALID_VALUE, GMemberInfo."Membership Code", GMemberInfo.FieldCaption ("Membership Code"), GLineCount);
+        MembershipSalesSetup.SetFilter("Membership Code", '=%1', GMemberInfo."Membership Code");
+        if not (MembershipSalesSetup.FindFirst()) then
+            Error(INVALID_VALUE, GMemberInfo."Membership Code", GMemberInfo.FieldCaption("Membership Code"), GLineCount);
 
         GMemberInfo."Item No." := MembershipSalesSetup."No.";
 
         // fldValidFromDate
         // fldValidUntilDate
         if (FldPurchaseDate = '') then begin
-          if ((FldValidFromDate = '') and (FldValidUntilDate = '')) then
-            validateDateField (FldPurchaseDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption ("Document Date"));
+            if ((FldValidFromDate = '') and (FldValidUntilDate = '')) then
+                validateDateField(FldPurchaseDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption("Document Date"));
 
-          if (FldValidFromDate <> '') then begin
-            GMemberInfo."Document Date" := validateDateField (FldValidFromDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption ("Document Date"));
-          end else begin
-            GMemberInfo."Document Date" := validateDateField (FldValidUntilDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption ("Document Date"));
-            GMemberInfo."Document Date" := GMemberInfo."Document Date" - (CalcDate (MembershipSalesSetup."Duration Formula", Today) - Today);
-          end;
+            if (FldValidFromDate <> '') then begin
+                GMemberInfo."Document Date" := validateDateField(FldValidFromDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption("Document Date"));
+            end else begin
+                GMemberInfo."Document Date" := validateDateField(FldValidUntilDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption("Document Date"));
+                GMemberInfo."Document Date" := GMemberInfo."Document Date" - (CalcDate(MembershipSalesSetup."Duration Formula", Today) - Today);
+            end;
 
         end else begin
-          GMemberInfo."Document Date" := validateDateField (FldPurchaseDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption ("Document Date"));
+            GMemberInfo."Document Date" := validateDateField(FldPurchaseDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption("Document Date"));
         end;
 
         //-MM1.25 [301612]
-        GMemberInfo."Initial Loyalty Point Count" := validateIntegerField (FldLoyaltyPoints, OPTIONAL, GMemberInfo.FieldCaption ("Initial Loyalty Point Count"));
+        GMemberInfo."Initial Loyalty Point Count" := validateIntegerField(FldLoyaltyPoints, OPTIONAL, GMemberInfo.FieldCaption("Initial Loyalty Point Count"));
         //+MM1.25 [301612]
 
         // -- Card
-        GMemberInfo."External Card No." := validateTextField (FldExternalCardNo, MaxStrLen (GMemberInfo."External Card No."), OPTIONAL, GMemberInfo.FieldCaption ("External Card No."));
-        GMemberInfo."Valid Until" :=  validateDateField (FldExternalCardNoValidUntilDate, GDateMask, OPTIONAL, GMemberInfo.FieldCaption ("Valid Until"));
+        GMemberInfo."External Card No." := validateTextField(FldExternalCardNo, MaxStrLen(GMemberInfo."External Card No."), OPTIONAL, GMemberInfo.FieldCaption("External Card No."));
+        GMemberInfo."Valid Until" := validateDateField(FldExternalCardNoValidUntilDate, GDateMask, OPTIONAL, GMemberInfo.FieldCaption("Valid Until"));
 
         GMemberInfo."Originates From File Import" := true;
-        GMemberInfo.Insert ();
+        GMemberInfo.Insert();
 
-        if (StrLen (FldFirstName+FldLastName) = 0) then exit (false);
-        if (GMemberInfo."Item No." = '') then exit (false);
+        if (StrLen(FldFirstName + FldLastName) = 0) then exit(false);
+        if (GMemberInfo."Item No." = '') then exit(false);
 
-        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
-        Community.Get (MembershipSetup."Community Code");
+        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+        Community.Get(MembershipSetup."Community Code");
 
-        Member.Reset ();
+        Member.Reset();
         case Community."Member Unique Identity" of
-          Community."Member Unique Identity"::NONE :
-            if (FldMemberNo <> '') then begin
-              Member.SetFilter ("External Member No.", '=%1', FldMemberNo);
-            end else begin
-              exit (true);
-            end;
+            Community."Member Unique Identity"::NONE:
+                if (FldMemberNo <> '') then begin
+                    Member.SetFilter("External Member No.", '=%1', FldMemberNo);
+                end else begin
+                    exit(true);
+                end;
 
-          Community."Member Unique Identity"::EMAIL :
-            if (FldEmail <> '') then begin
-              Member.SetFilter ("E-Mail Address", '=%1', FldEmail);
-            end else begin
-              exit (false);
-            end;
+            Community."Member Unique Identity"::EMAIL:
+                if (FldEmail <> '') then begin
+                    Member.SetFilter("E-Mail Address", '=%1', FldEmail);
+                end else begin
+                    exit(false);
+                end;
 
-          Community."Member Unique Identity"::PHONENO :
-            if (FldPhone <> '') then begin
-              Member.SetFilter ("Phone No.", '=%1', FldPhone);
-            end else begin
-              exit (false);
-            end;
+            Community."Member Unique Identity"::PHONENO:
+                if (FldPhone <> '') then begin
+                    Member.SetFilter("Phone No.", '=%1', FldPhone);
+                end else begin
+                    exit(false);
+                end;
 
-          Community."Member Unique Identity"::SSN :
-            if (FldSSN <> '') then begin
-              Member.SetFilter ("Social Security No.", '=%1', FldSSN);
-            end else begin
-              exit (false);
-            end;
+            Community."Member Unique Identity"::SSN:
+                if (FldSSN <> '') then begin
+                    Member.SetFilter("Social Security No.", '=%1', FldSSN);
+                end else begin
+                    exit(false);
+                end;
 
-          else
-            Error (NOT_IMPLEMENTED, Community.FieldCaption ("Member Unique Identity"), Community."Member Unique Identity");
+            else
+                Error(NOT_IMPLEMENTED, Community.FieldCaption("Member Unique Identity"), Community."Member Unique Identity");
         end;
 
-        if (Member.FindFirst ()) then
-          exit (false);
+        if (Member.FindFirst()) then
+            exit(false);
 
-        exit (true);
+        exit(true);
     end;
 
     procedure insertMember(EntryNo: Integer)
@@ -368,27 +376,27 @@ codeunit 6060132 "MM Import Members"
         ResponseMessage: Text;
     begin
 
-        MemberInfoCapture.Get (EntryNo);
+        MemberInfoCapture.Get(EntryNo);
 
-        MembershipSalesSetup.Get (MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
+        MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
 
         MembershipEntryNo := 0;
         if (MemberInfoCapture."External Membership No." <> '') then
-          MembershipEntryNo := MemberManagement.GetMembershipFromExtMembershipNo (MemberInfoCapture."External Membership No.");
+            MembershipEntryNo := MemberManagement.GetMembershipFromExtMembershipNo(MemberInfoCapture."External Membership No.");
 
         if (MembershipEntryNo = 0) then
-          MembershipEntryNo := MemberManagement.CreateMembership (MembershipSalesSetup, MemberInfoCapture, true);
+            MembershipEntryNo := MemberManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, true);
 
         //-MM1.25 [301612]
         if ((MembershipEntryNo <> 0) and (GMemberInfo."Initial Loyalty Point Count" > 0)) then
-          LoyaltyPointManagement.ManualAddSalePoints (MembershipEntryNo, 'Import',GMemberInfo."Initial Loyalty Point Count", 0, 'Import');
+            LoyaltyPointManagement.ManualAddSalePoints(MembershipEntryNo, 'Import', GMemberInfo."Initial Loyalty Point Count", 0, 'Import');
         //+MM1.25 [301612]
 
         //MemberEntryNo := MemberManagement.AddMemberAndCard (MembershipEntryNo, MemberInfoCapture, FALSE);
-        MemberManagement.AddMemberAndCard (true, MembershipEntryNo, MemberInfoCapture, false, MemberEntryNo, ResponseMessage);
+        MemberManagement.AddMemberAndCard(true, MembershipEntryNo, MemberInfoCapture, false, MemberEntryNo, ResponseMessage);
 
-        if (not (Member.Get (MemberEntryNo))) then
-          exit;
+        if (not (Member.Get(MemberEntryNo))) then
+            exit;
 
         // Add comments.
         CRLF[1] := 13;
@@ -398,101 +406,101 @@ codeunit 6060132 "MM Import Members"
         MemberInfoCapture.Delete;
     end;
 
-    local procedure validateTextField(fieldValue: Text;fieldMaxLength: Integer;fieldValueIs: Integer;fieldCaptionName: Text): Text
+    local procedure validateTextField(fieldValue: Text; fieldMaxLength: Integer; fieldValueIs: Integer; fieldCaptionName: Text): Text
     begin
 
-        if (StrLen (fieldValue) > fieldMaxLength) then
-          Error (INVALID_LENGTH, fieldValue, fieldMaxLength, fieldCaptionName, GLineCount);
+        if (StrLen(fieldValue) > fieldMaxLength) then
+            Error(INVALID_LENGTH, fieldValue, fieldMaxLength, fieldCaptionName, GLineCount);
 
         if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
-          Error (VALUE_REQUIRED, fieldCaptionName, GLineCount);
+            Error(VALUE_REQUIRED, fieldCaptionName, GLineCount);
 
-        exit (fieldValue);
+        exit(fieldValue);
     end;
 
-    local procedure validateDateField(fieldValue: Text;dateMask: Code[20];fieldValueIs: Integer;fieldCaptionName: Text) rDate: Date
+    local procedure validateDateField(fieldValue: Text; dateMask: Code[20]; fieldValueIs: Integer; fieldCaptionName: Text) rDate: Date
     begin
 
         rDate := 0D;
 
         if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
-          Error (VALUE_REQUIRED, fieldCaptionName, GLineCount);
+            Error(VALUE_REQUIRED, fieldCaptionName, GLineCount);
 
         if ((fieldValue = '') and (fieldValueIs = OPTIONAL)) then
-          exit (0D);
+            exit(0D);
 
-        if (StrLen (fieldValue) <> StrLen (dateMask)) then
-          Error (INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
+        if (StrLen(fieldValue) <> StrLen(dateMask)) then
+            Error(INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
 
-        case UpperCase (dateMask) of
-          'YYYYMMDD'   :
-            if (not Evaluate (rDate, StrSubstNo ('%1-%2-%3', CopyStr (fieldValue, 1, 4), CopyStr (fieldValue, 5, 2), CopyStr (fieldValue, 7, 2)), 9)) then
-              Error (INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
+        case UpperCase(dateMask) of
+            'YYYYMMDD':
+                if (not Evaluate(rDate, StrSubstNo('%1-%2-%3', CopyStr(fieldValue, 1, 4), CopyStr(fieldValue, 5, 2), CopyStr(fieldValue, 7, 2)), 9)) then
+                    Error(INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
 
-          'YYYY-MM-DD' :
-            if (not Evaluate (rDate, StrSubstNo ('%1-%2-%3', CopyStr (fieldValue, 1, 4), CopyStr (fieldValue, 6, 2), CopyStr (fieldValue, 9, 2)), 9)) then
-              Error (INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
+            'YYYY-MM-DD':
+                if (not Evaluate(rDate, StrSubstNo('%1-%2-%3', CopyStr(fieldValue, 1, 4), CopyStr(fieldValue, 6, 2), CopyStr(fieldValue, 9, 2)), 9)) then
+                    Error(INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
 
-          else
-            Error (DATE_MASK_ERROR, dateMask);
+            else
+                Error(DATE_MASK_ERROR, dateMask);
         end;
 
-        exit (rDate);
+        exit(rDate);
     end;
 
-    local procedure validateDecimalField(fieldValue: Text;fieldValueIs: Integer;fieldCaptionName: Text) rDecimal: Decimal
+    local procedure validateDecimalField(fieldValue: Text; fieldValueIs: Integer; fieldCaptionName: Text) rDecimal: Decimal
     begin
 
         rDecimal := 0.0;
 
         if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
-          Error (VALUE_REQUIRED, fieldCaptionName, GLineCount);
+            Error(VALUE_REQUIRED, fieldCaptionName, GLineCount);
 
         if ((fieldValue = '') and (fieldValueIs = OPTIONAL)) then
-          exit (0.0);
+            exit(0.0);
 
-        if not (Evaluate (rDecimal, fieldValue)) then
-          Error (INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
+        if not (Evaluate(rDecimal, fieldValue)) then
+            Error(INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
 
-        exit (rDecimal);
+        exit(rDecimal);
     end;
 
-    local procedure validateIntegerField(fieldValue: Text;fieldValueIs: Integer;fieldCaptionName: Text) rInteger: Integer
+    local procedure validateIntegerField(fieldValue: Text; fieldValueIs: Integer; fieldCaptionName: Text) rInteger: Integer
     begin
 
         rInteger := 0;
 
         if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
-          Error (VALUE_REQUIRED, fieldCaptionName, GLineCount);
+            Error(VALUE_REQUIRED, fieldCaptionName, GLineCount);
 
         if ((fieldValue = '') and (fieldValueIs = OPTIONAL)) then
-          exit (0);
+            exit(0);
 
-        if not (Evaluate (rInteger, fieldValue)) then
-          Error (INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
+        if not (Evaluate(rInteger, fieldValue)) then
+            Error(INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
 
-        exit (rInteger);
+        exit(rInteger);
     end;
 
-    local procedure text2Money(pCents: Text[30];pCurrency: Text[30]) rMoney: Decimal
+    local procedure text2Money(pCents: Text[30]; pCurrency: Text[30]) rMoney: Decimal
     begin
-        if ('' = pCents) then exit (0);
+        if ('' = pCents) then exit(0);
 
-        Evaluate (rMoney, pCents);
+        Evaluate(rMoney, pCents);
 
         // Lookup currency to determinate decimal places...
         rMoney := rMoney / 100;
 
-        exit (rMoney);
+        exit(rMoney);
     end;
 
     local procedure nextField(var VarLineOfText: Text[1024]) rField: Text[1024]
     begin
 
-        exit (forwardTokenizer (VarLineOfText, ';', '"'));
+        exit(forwardTokenizer(VarLineOfText, ';', '"'));
     end;
 
-    local procedure forwardTokenizer(var VarText: Text[1024];PSeparator: Char;PQuote: Char) RField: Text[1024]
+    local procedure forwardTokenizer(var VarText: Text[1024]; PSeparator: Char; PQuote: Char) RField: Text[1024]
     var
         Separator: Char;
         Quote: Char;
@@ -520,10 +528,10 @@ codeunit 6060132 "MM Import Members"
         //  separator is protected by quoting string
         //  the separator is omitted from the resulting strings
 
-        if ((VarText[1] = PQuote) and (StrLen (VarText) = 1)) then begin
-          VarText := '';
-          RField := '';
-          exit (RField);
+        if ((VarText[1] = PQuote) and (StrLen(VarText) = 1)) then begin
+            VarText := '';
+            RField := '';
+            exit(RField);
         end;
 
         IsQuoted := false;
@@ -533,21 +541,21 @@ codeunit 6060132 "MM Import Members"
         InputText := VarText;
 
         if (PQuote = InputText[NextFieldPos]) then IsQuoted := true;
-        while ((NextFieldPos <= StrLen (InputText)) and (not IsNextField)) do begin
-          if (PSeparator = InputText[NextFieldPos]) then IsNextField := true;
-          if (IsQuoted and IsNextField) then IsNextField := (InputText[NextFieldPos-1] = PQuote);
+        while ((NextFieldPos <= StrLen(InputText)) and (not IsNextField)) do begin
+            if (PSeparator = InputText[NextFieldPos]) then IsNextField := true;
+            if (IsQuoted and IsNextField) then IsNextField := (InputText[NextFieldPos - 1] = PQuote);
 
-          NextByte[1] := InputText[NextFieldPos];
-          if (not IsNextField) then RField += NextByte;
-          NextFieldPos += 1;
+            NextByte[1] := InputText[NextFieldPos];
+            if (not IsNextField) then RField += NextByte;
+            NextFieldPos += 1;
         end;
-        if (IsQuoted) then RField := CopyStr (RField, 2, StrLen (RField)-2);
+        if (IsQuoted) then RField := CopyStr(RField, 2, StrLen(RField) - 2);
 
-        VarText := CopyStr (InputText, NextFieldPos);
-        exit (RField);
+        VarText := CopyStr(InputText, NextFieldPos);
+        exit(RField);
     end;
 
-    local procedure reverseTokenizer(var varText: Text[1024];pSeparator: Char;pQuote: Char) rField: Text[1024]
+    local procedure reverseTokenizer(var varText: Text[1024]; pSeparator: Char; pQuote: Char) rField: Text[1024]
     var
         Separator: Char;
         Quote: Char;
@@ -563,24 +571,24 @@ codeunit 6060132 "MM Import Members"
         //  the separator is omitted from the resulting strings
 
         IsQuoted := false;
-        NextFieldPos := StrLen (varText);
+        NextFieldPos := StrLen(varText);
         IsNextField := false;
 
         LText := varText;
 
         if (pQuote = LText[NextFieldPos]) then IsQuoted := true;
-        while ((NextFieldPos <= StrLen (LText)) and (not IsNextField)) do begin
-          if (pSeparator = LText[NextFieldPos]) then IsNextField := true;
-          if (IsQuoted and IsNextField) then IsNextField := (LText[NextFieldPos+1] = pQuote);
+        while ((NextFieldPos <= StrLen(LText)) and (not IsNextField)) do begin
+            if (pSeparator = LText[NextFieldPos]) then IsNextField := true;
+            if (IsQuoted and IsNextField) then IsNextField := (LText[NextFieldPos + 1] = pQuote);
 
-          AByte[1] := LText[NextFieldPos];
-          if (not IsNextField) then rField := AByte + rField;
-          NextFieldPos -= 1;
+            AByte[1] := LText[NextFieldPos];
+            if (not IsNextField) then rField := AByte + rField;
+            NextFieldPos -= 1;
         end;
-        if (IsQuoted) then rField := CopyStr (rField, 2, StrLen (rField)-2);
+        if (IsQuoted) then rField := CopyStr(rField, 2, StrLen(rField) - 2);
 
-        varText := CopyStr (LText, 1, NextFieldPos);
-        exit (rField);
+        varText := CopyStr(LText, 1, NextFieldPos);
+        exit(rField);
     end;
 
     local procedure "--Tools"()
@@ -591,16 +599,16 @@ codeunit 6060132 "MM Import Members"
     begin
         //Ansi2Ascii
         if not InternalVars then
-          MakeVars;
-        exit(ConvertStr(_Text,AnsiStr,AsciiStr));
+            MakeVars;
+        exit(ConvertStr(_Text, AnsiStr, AsciiStr));
     end;
 
     procedure Ascii2Ansi(_Text: Text): Text
     begin
         //Ascii2Ansi
         if not InternalVars then
-          MakeVars;
-        exit(ConvertStr(_Text,AsciiStr,AnsiStr));
+            MakeVars;
+        exit(ConvertStr(_Text, AsciiStr, AnsiStr));
     end;
 
     local procedure MakeVars()
@@ -805,8 +813,8 @@ codeunit 6060132 "MM Import Members"
 
     local procedure MakeVars2()
     begin
-        AsciiStr := '����������������������������������������������������ݵ�����++��++--+-+��++--�-+';
-        AsciiStr := AsciiStr +'������i���++�_���������������������=�������������';
+        AsciiStr := 'ÆüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»¦¦¦¦¦ÁÂÀ©¦¦++¢¥++--+-+ãÃ++--¦-+';
+        AsciiStr := AsciiStr + '¤ðÐÊËÈiÍÎÏ++¦_¦Ì¯ÓßÔÒõÕµþÞÚÛÙýÝ¯´­±=¾¶§÷¸°¨·¹³²¦ ';
         CharVar[1] := 196;
         CharVar[2] := 197;
         CharVar[3] := 201;
@@ -839,18 +847,18 @@ codeunit 6060132 "MM Import Members"
         CharVar[30] := 185;
         CharVar[31] := 179;
         CharVar[32] := 178;
-        AnsiStr  := '��������������'+Format(CharVar[1])+Format(CharVar[2])+Format(CharVar[3])+ '����'+Format(CharVar[4]);
-        AnsiStr := AnsiStr + '����'+Format(CharVar[5])+'���׃�����Ѫ'+Format(CharVar[6])+Format(CharVar[7]);
-        AnsiStr := AnsiStr + '���'+Format(CharVar[8])+'��'+Format(CharVar[9])+'___��' + Format(CharVar[10])+Format(CharVar[11]);
-        AnsiStr := AnsiStr + Format(CharVar[12]) + '���++��++--+-+�' + Format(CharVar[13]) + '++--�-+���';
-        AnsiStr  :=  AnsiStr +Format(CharVar[14])+Format(CharVar[15])+Format(CharVar[16])+'i'+Format(CharVar[17])+Format(CharVar[18]);
-        AnsiStr  :=  AnsiStr + '�++__�' + Format(CharVar[19])+Format(CharVar[20])+'�'+Format(CharVar[21])+'���';
-        AnsiStr  :=  AnsiStr + Format(CharVar[22]) + '�' + Format(CharVar[23]) + '�' + Format(CharVar[24])+ Format(CharVar[25]);
-        AnsiStr  :=  AnsiStr + Format(CharVar[26]) + '�ݯ' + Format(CharVar[27]) + '�' + Format(CharVar[28]) +'=�����'+ Format(CharVar[29]);
-        AnsiStr  :=  AnsiStr + '��' + Format(CharVar[30]) +Format(CharVar[31]) +Format(CharVar[32]) +'_ ';
+        AnsiStr := 'Ã³ÚÔõÓÕþÛÙÞ´¯ý' + FORMAT(CharVar[1]) + FORMAT(CharVar[2]) + FORMAT(CharVar[3]) + 'µã¶÷' + FORMAT(CharVar[4]);
+        AnsiStr := AnsiStr + '¹¨ Í' + FORMAT(CharVar[5]) + '°úÏÎâßÝ¾·±Ð¬' + FORMAT(CharVar[6]) + FORMAT(CharVar[7]);
+        AnsiStr := AnsiStr + '«¼¢' + FORMAT(CharVar[8]) + 'í½' + FORMAT(CharVar[9]) + '___ªª' + FORMAT(CharVar[10]) + FORMAT(CharVar[11]);
+        AnsiStr := AnsiStr + FORMAT(CharVar[12]) + '®ªª++óÑ++--+-+Ò' + FORMAT(CharVar[13]) + '++--ª-+ñ­ð';
+        AnsiStr := AnsiStr + FORMAT(CharVar[14]) + FORMAT(CharVar[15]) + FORMAT(CharVar[16]) + 'i' + FORMAT(CharVar[17]) + FORMAT(CharVar[18]);
+        AnsiStr := AnsiStr + '¤++__ª' + FORMAT(CharVar[19]) + FORMAT(CharVar[20]) + 'Ë' + FORMAT(CharVar[21]) + 'ÈÊ§';
+        AnsiStr := AnsiStr + FORMAT(CharVar[22]) + 'Á' + FORMAT(CharVar[23]) + 'Ì' + FORMAT(CharVar[24]) + FORMAT(CharVar[25]);
+        AnsiStr := AnsiStr + FORMAT(CharVar[26]) + '²¦»' + FORMAT(CharVar[27]) + '¡' + FORMAT(CharVar[28]) + '=¥Âº¸©' + FORMAT(CharVar[29]);
+        AnsiStr := AnsiStr + '¿À' + FORMAT(CharVar[30]) + FORMAT(CharVar[31]) + FORMAT(CharVar[32]) + '_ ';
     end;
 
-    local procedure MakeNote(Member: Record "MM Member";CommentText: Text)
+    local procedure MakeNote(Member: Record "MM Member"; CommentText: Text)
     var
         RecordLink: Record "Record Link";
         OutStr: OutStream;
@@ -858,16 +866,16 @@ codeunit 6060132 "MM Import Members"
         Encoding: DotNet npNetEncoding;
     begin
 
-        RecordLink.Get (Member.AddLink ('', 'Notes'));
+        RecordLink.Get(Member.AddLink('', 'Notes'));
 
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Note.CreateOutStream (OutStr);
+        RecordLink.Note.CreateOutStream(OutStr);
 
         Encoding := Encoding.UTF8;
-        BinaryWriter := BinaryWriter.BinaryWriter(OutStr,Encoding);
+        BinaryWriter := BinaryWriter.BinaryWriter(OutStr, Encoding);
         BinaryWriter.Write(CommentText);
 
-        RecordLink.Modify ();
+        RecordLink.Modify();
     end;
 
     local procedure TextToNote(CommentText: Text) NoteText: Text
@@ -878,12 +886,12 @@ codeunit 6060132 "MM Import Members"
     begin
         TextLength := StrLen(CommentText);
         if (TextLength <= 255) then begin
-          Char1 := TextLength;
-          NoteText := Format(Char1) + CommentText;
+            Char1 := TextLength;
+            NoteText := Format(Char1) + CommentText;
         end else begin
-          Char1 := 128 + (TextLength - 256) mod 128;
-          Char2 := 2 + (TextLength - 256) div 128;
-          NoteText := Format(Char1) + Format(Char2) + CommentText;
+            Char1 := 128 + (TextLength - 256) mod 128;
+            Char2 := 2 + (TextLength - 256) div 128;
+            NoteText := Format(Char1) + Format(Char2) + CommentText;
         end;
     end;
 }

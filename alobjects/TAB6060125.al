@@ -11,6 +11,8 @@ table 6060125 "MM Membership Sales Setup"
     // MM1.32/TSA /20180711 CASE 318132 Added Member Card Type and Member Card Type Selection
     // MM1.40/TSA /20190726 CASE 356090 New field "Magento M2 Membership Sign-up"
     // MM1.40/TSA /20190730 CASE 360275 Corrected spelling on field and caption for field 80
+    // MM1.44/TSA /20200529 CASE 407401 Added Age verification setup
+    // MM1.45/TSA /20200728 CASE 407401 Added "Requires Guardian"
 
     Caption = 'Membership Sales Setup';
     DrillDownPageID = "MM Membership Sales Setup";
@@ -49,6 +51,26 @@ table 6060125 "MM Membership Sales Setup"
         field(16;"Blocked At";DateTime)
         {
             Caption = 'Blocked At';
+        }
+        field(25;"Requires Guardian";Boolean)
+        {
+            Caption = 'Requires Guardian';
+        }
+        field(26;"Age Constraint Type";Option)
+        {
+            Caption = 'Age Constraint Type';
+            OptionCaption = ' ,Less Than,Less Than or Equal,Greater Than,Greater Than or Equal,Equal';
+            OptionMembers = NA,LT,LTE,GT,GTE,E;
+        }
+        field(27;"Age Constraint (Years)";Integer)
+        {
+            Caption = 'Age Constraint (Years)';
+        }
+        field(28;"Age Constraint Applies To";Option)
+        {
+            Caption = 'Age Constraint Applies To';
+            OptionCaption = 'All Members,Youngest Member,Oldest Member,Administrators,Dependants';
+            OptionMembers = ALL,YOUNGEST,OLDEST,ADMINS,DEPENDANTS;
         }
         field(40;"Valid From Base";Option)
         {

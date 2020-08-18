@@ -19,6 +19,8 @@ report 6014411 "Sale Time Report"
     // NPR5.43/EMGO/20180619  CASE 318293 Make Time Filter editable in Request Page + SaveValues set to Yes
     // NPR5.46/ZESO/20181001  CASE 327839 Fix bug where Cash Register No Filter was not being applied to data.
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
+    // NPR5.55/ZESO/20200601  CASE 403608 Format TidNumber and TidNumberPlus1 in dataset to text.
+    // NPR5.55/YAHA/20200807  CASE 412334 Corrections to make field Sales Amount and Net Sales with Excl VAT
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sale Time Report.rdlc';
 
@@ -83,7 +85,7 @@ report 6014411 "Sale Time Report"
             column(TextSaleExp;TextSaleExp)
             {
             }
-            column(TextAmount;"Audit Roll".FieldCaption(Amount))
+            column(TextAmount;TextSalesAmt)
             {
             }
             column(TextReturn;TextReturn)
@@ -121,10 +123,10 @@ report 6014411 "Sale Time Report"
             column(Number_Integer;Integer.Number)
             {
             }
-            column(TidNumber;TimeArray[Number])
+            column(TidNumber;Format(TimeArray[Number]))
             {
             }
-            column(TidNumberPlus1;TimeArray[Number+1])
+            column(TidNumberPlus1;Format(TimeArray[Number+1]))
             {
             }
             column(Values_Number_1;Values[Number][1])
@@ -175,7 +177,7 @@ report 6014411 "Sale Time Report"
                 if Values[Number][3] <> 0 then
                   Values[Number][10] := Round((Values[Number][9] / Values[Number][3]) * 100,0.01);
 
-                //Oms�tning pr. ekspedition
+                //Omsætning pr. ekspedition
                 if Values[Number][1] <> 0 then
                   Values[Number][3] := Round((Values[Number][3] / Values[Number][1]),0.01)
                 else
@@ -316,7 +318,7 @@ report 6014411 "Sale Time Report"
 
     labels
     {
-        Margin_Caption = 'Margin';
+        Margin_Caption = 'Margin on Total Sales';
     }
 
     trigger OnInitReport()
@@ -430,7 +432,7 @@ report 6014411 "Sale Time Report"
         Text10600008: Label 'Period Overview ';
         Divider_14_3: Decimal;
         Divider_14_1: Decimal;
-        Text10600010: Label 'Sales are excluding VAT, Net sales are exclusive. Debit sales';
+        Text10600010: Label 'Note : All figures are exclusive of VAT';
         Report_Caption: Label 'Sale Time Report';
         Page_Caption: Label 'Page ';
         TextTime: Label 'Time';
@@ -443,11 +445,12 @@ report 6014411 "Sale Time Report"
         TextReturn: Label 'Return Amt';
         TextNetSales: Label 'Net Sales';
         TextDiscount: Label 'Discount Amt';
-        TextDebit: Label 'Debit';
+        TextDebit: Label 'Debit Sales Amt';
         TextDb: Label 'Margin %';
         TextDg: Label 'Dg';
         TextCancelled: Label 'Cancelled';
         TextOther: Label 'Other';
+        TextSalesAmt: Label 'Sales Amt';
 
     procedure Calc()
     var
@@ -527,11 +530,20 @@ report 6014411 "Sale Time Report"
           PaymentTypePOS.CalcFields("Normal Sale in Audit Roll","Debit Sale in Audit Roll","Norm. Sales in Audit Excl. VAT","Cost Amount in Audit Roll",
            "Debit Sales in Audit Excl. VAT","Debit Cost Amount Audit Roll","No. of Sales in Audit Roll","No. of Deb. Sales in Aud. Roll","No. of Sale Lines in Aud. Roll","No. of Item Lines in Aud. Deb.");
 
-          NetSalesAmt := PaymentTypePOS."Normal Sale in Audit Roll";
+          //-NPR5.55 [412334]
+          //NetSalesAmt := PaymentTypePOS."Normal Sale in Audit Roll";
+          NetSalesAmt := PaymentTypePOS."Norm. Sales in Audit Excl. VAT";
+          //+NPR5.55 [412334]
           NetSalesExcVAT := PaymentTypePOS."Norm. Sales in Audit Excl. VAT";
-          DebitAmt := PaymentTypePOS."Debit Sale in Audit Roll";
+          //-NPR5.55 [412334]
+          //DebitAmt := PaymentTypePOS."Debit Sale in Audit Roll";
+          DebitAmt := PaymentTypePOS."Debit Sales in Audit Excl. VAT";
+          //+NPR5.55 [412334]
           CostAmt := PaymentTypePOS."Cost Amount in Audit Roll";
-          DebitCostAmt := PaymentTypePOS."Debit Cost Amount Audit Roll";
+          //-NPR5.55 [412334]
+          //DebitCostAmt := PaymentTypePOS."Debit Cost Amount Audit Roll";
+          DebitCostAmt := PaymentTypePOS."Debit Sales in Audit Excl. VAT";
+          //+NPR5.55 [412334]
           DebitExcVat := PaymentTypePOS."Debit Sales in Audit Excl. VAT";
 
           db := (NetSalesExcVAT + DebitExcVat)-(CostAmt + DebitCostAmt);
@@ -595,7 +607,7 @@ report 6014411 "Sale Time Report"
           SalesReturnAmt := ReturnChangeAmt + ExchangedItemAmt + CorrectedAmt + AuditRollAmt;
           ItemSalesAmt := NetSalesAmt + SalesReturnAmt;
 
-          //Linierabatbel�b
+          //Linierabatbel¢b
           AuditRoll1.SetRange("No.");
           AuditRoll1.SetRange(Type, AuditRoll1.Type::Item);
           AuditRoll1.SetRange("Sale Type", AuditRoll1."Sale Type"::Sale);

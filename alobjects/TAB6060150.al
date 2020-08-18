@@ -4,6 +4,7 @@ table 6060150 "Event Exch. Int. Template"
     // NPR5.35/TJ  /20170822 CASE 281185 Added fields "Reminder Enabled (Calendar)" and "Reminder (Minutes) (Calendar)"
     // NPR5.36/TJ  /20170912 CASE 287800 Added field "First Day Only (Appointment)"
     // NPR5.43/TJ  /20180322 CASE 262079 New field "Ticket URL Placeholder(E-Mail)"
+    // NPR5.55/TJ  /20200129 CASE 374887 New fields "Auto. Send. Enabled (E-Mail)" and "Auto.Send.Event Status(E-Mail)"
 
     Caption = 'Event Exch. Int. Template';
     LookupPageID = "Event Exch. Int. Templates";
@@ -113,6 +114,18 @@ table 6060150 "Event Exch. Int. Template"
         {
             Caption = 'Ticket URL Placeholder(E-Mail)';
             Description = 'NPR5.43';
+        }
+        field(110;"Auto. Send. Enabled (E-Mail)";Boolean)
+        {
+            Caption = 'Enabled';
+            Description = 'NPR5.55';
+        }
+        field(120;"Auto.Send.Event Status(E-Mail)";Option)
+        {
+            Caption = 'For Event Status';
+            Description = 'NPR5.55';
+            OptionCaption = 'Planning,Quote,Order,Completed,,,,,,Postponed,Cancelled,Ready to be Invoiced';
+            OptionMembers = Planning,Quote,"Order",Completed,,,,,,Postponed,Cancelled,"Ready to be Invoiced";
         }
     }
 

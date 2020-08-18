@@ -1,13 +1,13 @@
 codeunit 6014435 "Retail Form Code"
 {
     // //-NPR3.08a d.14-09-05 v.Simon
-    //    Overs�ttelser
+    //    Oversættelser
     // 
-    // 001 NPK,MSP 27-06-03 Gavekort rabat h�ndtering, �ndringer lavet ifm. rabat p� gavekort
+    // 001 NPK,MSP 27-06-03 Gavekort rabat håndtering, ændringer lavet ifm. rabat på gavekort
     // 002 NPK, MG 250205. Sletter den lokale kopi af et fremmed gavekort, hvis ekspeditionen forkastes
     // 
     // //-NPR3.03, Nikolai Pedersen dec04
-    //    �ndret DanBonFraTilbud s� der returneres nummer p� det tilbud der hentes, -1 hvis ikke noget
+    //    Ændret DanBonFraTilbud så der returneres nummer på det tilbud der hentes, -1 hvis ikke noget
     // 
     // 003 NPK,OHM - Not nessesary reg. to credit cards etc.
     // 
@@ -16,20 +16,20 @@ codeunit 6014435 "Retail Form Code"
     // //NPR3.08x d. 13/12-2005 : Rettet 13 stedder, hvor Shortcut. dim. 1 var udfyldt, men ikke dim. 2 - her er dim. 2 blevet indsat.
     // 
     // //-NPR-PrintRetailDoc1.0
-    //   FormAfslutKasse: Tilf�jet funktionalitet til afslutning af kassen
+    //   FormAfslutKasse: Tilf¢jet funktionalitet til afslutning af kassen
     // 
-    // NPR3.12i, NPK, DL, 12-04-07, Tilf�jet k�rsel af rapport til lagerbogf�ring
-    // NPR3.12j, NPK, DL, 26-04-07, Tilf�jet k�rsel af rapport til kostpris regulering
+    // NPR3.12i, NPK, DL, 12-04-07, Tilf¢jet k¢rsel af rapport til lagerbogf¢ring
+    // NPR3.12j, NPK, DL, 26-04-07, Tilf¢jet k¢rsel af rapport til kostpris regulering
     // 
-    // NPR3.12om NPK, KSL 18-07-07, Tilf�jet InvoizGuid til audit roll
+    // NPR3.12om NPK, KSL 18-07-07, Tilf¢jet InvoizGuid til audit roll
     // 
-    // 004 NPK,MIJ 30/07-08: printLabel_retailJournal: Lavet check p� om qty <> 0
-    // NPR3.12q NPK, MIJ, 06-08-08, ItemUnitPriceAfterValidate: Tilf�jet support for standard varianter
+    // 004 NPK,MIJ 30/07-08: printLabel_retailJournal: Lavet check på om qty <> 0
+    // NPR3.12q NPK, MIJ, 06-08-08, ItemUnitPriceAfterValidate: Tilf¢jet support for standard varianter
     // NPR4.001.020, 25-05-09, MH - Hvis kunden er emailkunde, laves der en faktura.
-    // NPR4.001.023, 11-06-09, MH - Tilf�jet feltet "Lock Code", der f�res med fra salgslinie til revisionrulle (Se Sag 65422).
-    // NPR4.000.024, 07-07-09, MH - Tilf�jet kode, der kigger p� Contact.Invoice i forhold til udskrivning af kvittering ved salg
+    // NPR4.001.023, 11-06-09, MH - Tilf¢jet feltet "Lock Code", der f¢res med fra salgslinie til revisionrulle (Se Sag 65422).
+    // NPR4.000.024, 07-07-09, MH - Tilf¢jet kode, der kigger på Contact.Invoice i forhold til udskrivning af kvittering ved salg
     //                              ved salg fra kassen.
-    //                              Desuden er der oprettet et felt i "NP Retail Configuration"."Receipt type", der afg�r, hvorvidt
+    //                              Desuden er der oprettet et felt i "NP Retail Configuration"."Receipt type", der afg¢r, hvorvidt
     //                              en bon skal udskrives, mailes eller begge dele.
     // NPR4.003.033, 03-12-09, MH - Added transfer of "Label No." (job 59317).
     // 
@@ -60,9 +60,9 @@ codeunit 6014435 "Retail Form Code"
     // MM1.05/TSA/20160121  CASE 232485 Added Crete memberships
     // TM1.00/TSA/20151124  CASE 219658 Added handling for ticket sales
     // NPR5.20/RMT/20160225 CASE 233336 change local text const t012 in trigger GiftVoucherPush from
-    //                                     DAN=Gavekort �-pris:;ENU=Gift Voucher unit price:
+    //                                     DAN=Gavekort …-pris:;ENU=Gift Voucher unit price:
     //                                     to
-    //                                     DAN=Gavekort �-pris:;ENU=Gift Voucher unit price:
+    //                                     DAN=Gavekort á-pris:;ENU=Gift Voucher unit price:
     // NPR5.22/JDH/20160330 CASE 237821 changed check on receipt no. (Due to error -> 9999 > 10000 on code field due to sorting)
     // NPR5.22/MMV/20160420 CASE 237743 Updated references to label library CU.
     // NPR5.23/BHR/20160524 CASE 242341 Popup to display no series and to reuse a GiftVoucher
@@ -1619,7 +1619,7 @@ codeunit 6014435 "Retail Form Code"
         Register: Record Register;
         RetailSetup: Record "Retail Setup";
     begin
-        //Inds�tRevRulleBem�rkning()
+        //IndsætRevRulleBemærkning()
         //-NPR5.38 [302761]
         RetailSetup.Get;
         if RetailSetup."Create POS Entries Only" then
@@ -1660,7 +1660,7 @@ codeunit 6014435 "Retail Form Code"
         if RetailSetup."Create POS Entries Only" then
             exit;
         //+NPR5.38 [302761]
-        //inds�treturbel�bafrunding
+        //indsætreturbel¢bafrunding
         with SalePOS do begin
             if IsRounding then begin
                 Register.Get("Register No.");

@@ -1,6 +1,7 @@
 table 6151072 "GDPR Anonymization Request"
 {
     // NPR5.54/TSA /20200324 CASE 389817 Initial Version
+    // NPR5.55/TSA /20200715 CASE 388813 Added status Approved, Declined, Rejected
 
     Caption = 'GDPR Anonymization Request';
 
@@ -28,8 +29,8 @@ table 6151072 "GDPR Anonymization Request"
         field(20;Status;Option)
         {
             Caption = 'Status';
-            OptionCaption = 'New,Pending,Anonymized';
-            OptionMembers = NEW,PENDING,ANONYMIZED;
+            OptionCaption = 'New,Pending,Anonymized,Approved,Declined,Rejected';
+            OptionMembers = NEW,PENDING,ANONYMIZED,APPROVED,DECLINED,REJECTED;
         }
         field(25;"Request Received";DateTime)
         {

@@ -5,6 +5,8 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
     // MAG2.22/MHA /20190625  CASE 359285 Adjusted SetupTemplate() to delete existing Template if Version Id belongs to Magento
     // MAG2.22/MHA /20190708  CASE 352201 Added function SetupTemplateCollectStore
     // MAG2.25/MHA /20200416  CASE 400486 Cleared Api Credentials in SetupTemplate() because Bearer Auth is used instead
+    // MAG2.26/MHA /20200501  CASE 402488 Stock NpXml Template is set on Magento Setup SetupTemplateItemInventory()
+    // MAG2.26/MHA /20200601  CASE 404580 Magento Categories and -Brands can now be managed externally
 
 
     trigger OnRun()
@@ -24,6 +26,16 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
     begin
         MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.Update", UpdateCode);
         MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.Delete", DeleteCode);
+    end;
+
+    local procedure RemoveNpXmlTemplate(TemplateCode: Code[20])
+    var
+        NpXmlTemplate: Record "NpXml Template";
+    begin
+        //-MAG2.26 [404580]
+        if NpXmlTemplate.Get(TemplateCode) then
+            NpXmlTemplate.Delete(true);
+        //+MAG2.26 [404580]
     end;
 
     procedure InitNpXmlTemplateSetup(var TempBlob: Codeunit "Temp Blob")
@@ -281,9 +293,17 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
     procedure SetupTemplateItemGroup(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         NodePath: Text;
     begin
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemGroup" + '/';
+        //-MAG2.26 [404580]
+        if MagentoSetupMgt.HasSetupBrands() then begin
+            RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"));
+            RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"));
+            exit;
+        end;
+        //+MAG2.26 [404580]
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
@@ -291,7 +311,9 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
     procedure SetupTemplateItemInventory(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         NpXmlTemplate: Record "NpXml Template";
+        MagentoSetup: Record "Magento Setup";
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
+        MagentoItemMgt: Codeunit "Magento Item Mgt.";
         String: DotNet npNetString;
         NodePath: Text;
         TemplateCode: Text;
@@ -303,14 +325,31 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         String := NpXmlTemplate."API Url";
         NpXmlTemplate."API Url" := String.Replace('stock_updates', 'stock');
         NpXmlTemplate.Modify;
+
+        //-MAG2.26 [402488]
+        MagentoSetup.Get;
+        if TemplateCode <> MagentoSetup."Stock NpXml Template" then begin
+            MagentoSetup.Validate("Stock NpXml Template", TemplateCode);
+            MagentoSetup.Modify(true);
+        end;
+        MagentoItemMgt.UpsertStockTriggers();
+        //+MAG2.26 [402488]
     end;
 
     procedure SetupTemplateBrand(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         NodePath: Text;
     begin
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Brand" + '/';
+        //-MAG2.26 [404580]
+        if MagentoSetupMgt.HasSetupBrands() then begin
+            RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"));
+            RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"));
+            exit;
+        end;
+        //+MAG2.26 [404580]
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;

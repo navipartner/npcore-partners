@@ -1,6 +1,7 @@
 page 6014602 "NPR Item Variants"
 {
     // NPR5.40/TSA /20180329 CASE 308522 Added Inventory and NetChange
+    // NPR5.55/ANPA/20200505  CASE 401161 Changed visibility setting of "description 2" to true
 
     Caption = 'NPR Item Variants';
     DataCaptionFields = "Item No.";
@@ -26,7 +27,7 @@ page 6014602 "NPR Item Variants"
                 }
                 field("Description 2";"Description 2")
                 {
-                    Visible = false;
+                    Visible = true;
                 }
                 field(Inventory;Inventory)
                 {

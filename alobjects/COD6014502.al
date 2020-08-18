@@ -10,6 +10,8 @@ codeunit 6014502 SMS
     // NPR5.51/THRO/20190710 CASE 360944 Added option to send sms to Nc Endpoint
     // NPR5.53/ZESO/20200110 CASE 382779 Change in Credentials Old UserName : navipartner, Old password : n4vipartner
     // NPR5.54/ZESO/20200309 CASE 382779 Change in URL, '+'no longer accepted in Phone Nos by LinkMobility
+    // NPR5.55/BHR /20200504 CASE 400915 Add Publisher OnSendSMS
+    // NPR5.55/ZESO/20200512 CASE 403305 Cater for special characters.
 
 
     trigger OnRun()
@@ -90,7 +92,13 @@ codeunit 6014502 SMS
         Util: Codeunit Utility;
         ServiceCode: Code[20];
         ForeignPhone: Boolean;
+        SMSHandled: Boolean;
     begin
+        //-[NPR5.55] [400951]
+        OnSendSMS(SMSHandled,PhoneNo,From,SMSMessage);
+        if SMSHandled then
+          exit;
+        //+[NPR5.55] [400951]
         if (PhoneNo = '') or (SMSMessage = '') then
           Error(ErrEmpty);
 
@@ -127,13 +135,19 @@ codeunit 6014502 SMS
                                             'username=2517_12D8'+
                                             '&password=W36nshJ8'+
                                             '&to=' + PhoneNo +
-                                            '&message=' + SMSMessage +
+                                            //-NPR5.55 [403305]
+                                            //'&message=' + SMSMessage +
+                                            '&message=' + SMSMessage + '&charset=utf-8' +
+                                            //+NPR5.55 [403305]
                                             '&from=' + From);
           //+NPR5.54 [382779]
           HttpRequest.Timeout := 10000;
           HttpRequest.UseDefaultCredentials(true);
           HttpRequest.Method := 'POST';
-          HttpRequest.ContentType := 'text/xml; charset=utf-8';
+          //-NPR5.55 [403305]
+          //HttpRequest.ContentType := 'text/xml; charset=utf-8';
+          HttpRequest.ContentType := 'text/xml';
+          //+NPR5.55 [403305]
           HttpRequest.GetResponse();
           Clear(HttpRequest);
         end;
@@ -187,6 +201,11 @@ codeunit 6014502 SMS
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGenerateEndpointOutputFile(NcEndpointCode: Code[20];Sender: Text[40];ToPhone: Code[20];SmsMessage: Text[250];var FileContent: Text;var Filename: Text[250])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSendSMS(var Handled: Boolean;PhoneNo: Text;Sender: Text;SMSMessage: Text)
     begin
     end;
 }

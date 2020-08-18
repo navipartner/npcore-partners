@@ -2,15 +2,15 @@
 codeunit 6014417 "Call Terminal Integration"
 {
     // Stor opdatering startet 090703 af AP-NPK
-    //   - St�rre oprydning og effektivisering.
-    //   - Dankortl�sning kassestyret.
+    //   - St¢rre oprydning og effektivisering.
+    //   - Dankortl¢sning kassestyret.
     // 
     // //-1.1c ved Nikolai Pedersen
-    //   Tilf�jet mulighed for at bruge sagem p� server
+    //   Tilf¢jet mulighed for at bruge sagem på server
     // //1.1d
-    //   tilf�jet mulighed for at v�lge den norske Steria terminal
+    //   tilf¢jet mulighed for at vælge den norske Steria terminal
     // //-1.1e ved Nicolai Esbensen
-    //   tilf�jet valg til .NET integration ad Sagem Flexiterminal
+    //   tilf¢jet valg til .NET integration ad Sagem Flexiterminal
     // 
     // NPR70.00.00.06/MMV/20150126 CASE 199445 Prevented call to terminal ticket codeunit if there is no ticket to print.
     // 
@@ -75,7 +75,7 @@ codeunit 6014417 "Call Terminal Integration"
             exit;
         end;
 
-        //Starten p� noget nyt! af AP, 090703
+        //Starten på noget nyt! af AP, 090703
         case RegisterGlobal."Credit Card Solution" of
 
             //-NPR5.00
@@ -565,16 +565,16 @@ codeunit 6014417 "Call Terminal Integration"
 
             //-NPR5.00
             /*
-            "KasseOps�t"."Credit Card Solution"::"SAGEM Flexiterm via console":
+            "KasseOpsæt"."Credit Card Solution"::"SAGEM Flexiterm via console":
             BEGIN
-            //"Flexi-DK-dialog".Init("Bel�b inkl. moms", Rec);
+            //"Flexi-DK-dialog".Init("Bel¢b inkl. moms", Rec);
             //"Flexi-DK-dialog".RUNMODAL;
             "DK-Codeunit".RemoveOldFlex(ConnectionProfileMgt.GetCreditCardExtension(), Rec);
-            //RunModal := SHELL(Ops�tning."Credit Card Path" + 'NPFlexiConsole.exe'
+            //RunModal := SHELL(Opsætning."Credit Card Path" + 'NPFlexiConsole.exe'
             //                                           , FORMAT("Amount Including VAT" * 100,0,1), ConnectionProfileMgt.GetCreditCardExtension()
             //                                           , FORMAT("Register No.") + ' - ' + FORMAT("Sales Ticket No."));
         
-            RunModal:= Utility.RunCmdModal("Ops�tning"."Credit Card Path" + 'NPFlexiConsole.exe'+''+
+            RunModal:= Utility.RunCmdModal("Opsætning"."Credit Card Path" + 'NPFlexiConsole.exe'+''+
                                       FORMAT("Amount Including VAT" * 100,0,1)+''+ConnectionProfileMgt.GetCreditCardExtension()+''+FORMAT("Register No.")+''+' - ' + FORMAT("Sales Ticket No."));
             IF ("DK-Codeunit".ReadFlexiReciept(Rec, ConnectionProfileMgt.GetCreditCardExtension())) THEN;
             IF ("DK-Codeunit".CheckFlexiResult(Rec, ConnectionProfileMgt.GetCreditCardExtension(), FlexiResult, ActionCode)) THEN;
@@ -591,17 +591,17 @@ codeunit 6014417 "Call Terminal Integration"
                 Filter := Dankorttransaktion.Text;
                 Len := STRLEN(Filter);
                 WHILE Len > 0 DO BEGIN
-                  "Pr�fixList".SETRANGE( Prefix, Filter );
-                  IF "Pr�fixList".FIND('-') THEN BEGIN
-                    "Pr�fixList".SETRANGE("Global Dimension 1 Code","KasseOps�t"."Global Dimension 1 Code");
-                    IF NOT "Pr�fixList".FIND('-') THEN BEGIN
-                      "Pr�fixList".SETFILTER("Register No.",'');
-                      IF "Pr�fixList".FIND('-') THEN;
+                  "PræfixList".SETRANGE( Prefix, Filter );
+                  IF "PræfixList".FIND('-') THEN BEGIN
+                    "PræfixList".SETRANGE("Global Dimension 1 Code","KasseOpsæt"."Global Dimension 1 Code");
+                    IF NOT "PræfixList".FIND('-') THEN BEGIN
+                      "PræfixList".SETFILTER("Register No.",'');
+                      IF "PræfixList".FIND('-') THEN;
                     END;
         
                     Betalingsvalg.RESET;
                     Betalingsvalg.SETCURRENTKEY( "No.", "Via terminal" );
-                    Betalingsvalg.SETRANGE( "No.", "Pr�fixList"."Payment Type" );
+                    Betalingsvalg.SETRANGE( "No.", "PræfixList"."Payment Type" );
                     Betalingsvalg.SETRANGE( "Via terminal", TRUE );
                     IF Betalingsvalg.FIND('-') AND NOT ("Cash Terminal Approved") THEN BEGIN
                       "No."              := Betalingsvalg."No.";
@@ -632,7 +632,7 @@ codeunit 6014417 "Call Terminal Integration"
             DkTrans.FILTERGROUP := 0;
             DkTrans.SETRANGE("No. Printed", 0);
             //-NPR70.00.00.06
-            IF (NOT "KasseOps�t"."Terminal Auto Print") AND (NOT DkTrans.ISEMPTY) THEN
+            IF (NOT "KasseOpsæt"."Terminal Auto Print") AND (NOT DkTrans.ISEMPTY) THEN
               DkTrans.UdskrivBon(FALSE);
             //+NPR70.00.00.06
           END;
@@ -986,10 +986,10 @@ codeunit 6014417 "Call Terminal Integration"
         Filnavn := StrSubstNo(ConnectionProfileMgt.GetCreditCardExtension() + 'dankort.txt');
         if Exists(Filnavn) then Erase(Filnavn);
 
-        // Filnavn := STRSUBSTNO(Ops�tning."Dankort extension"+'besked.txt');
+        // Filnavn := STRSUBSTNO(Opsætning."Dankort extension"+'besked.txt');
         // IF EXISTS(Filnavn) THEN ERASE(Filnavn);
 
-        // Filnavn := STRSUBSTNO(Ops�tning."Sti til Dankort"+'belob.txt');
+        // Filnavn := STRSUBSTNO(Opsætning."Sti til Dankort"+'belob.txt');
         // IF EXISTS(Filnavn) THEN ERASE(Filnavn);
     end;
 

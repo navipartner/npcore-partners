@@ -38,7 +38,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
     // <F9>  Small OCRB        (13x20)         | Boxsize: (13x22)
     // <F10> Prestige          (25x41)         | Boxsize: (28x41)          This is a bold Prestige font containing the condensed German and British character sets.
     // <F11> Script            (25x49)         | Boxsize: (26x49)          This is a Script font.
-    // <F12> Orator            (46x91)         | Boxsize: (47x91)          Orator font for tall, bold lettering. The �lower� case characters are supported from font SA00 and newer.
+    // <F12> Orator            (46x91)         | Boxsize: (47x91)          Orator font for tall, bold lettering. The šlower› case characters are supported from font SA00 and newer.
     // <F13> Courier           (20x40)         | Boxsize: (20x42)          Courier styled international character set (223 characters).
     // <F14>                   (9x20)          | Boxsize: (10x22)          For Miltope users only
     // <F15>                   (18x24)         | Boxsize: (20x26)          For Miltope users only
@@ -87,6 +87,8 @@ codeunit 6014601 "RP Boca FGL Device Library"
     // 
     // ----------------------------------------------------------------------------------
     // NPR5.54/JAKUBV/20200408  CASE 369235 Transport NPR5.54 - 8 April 2020
+    // NPR5.55/MITH/20200511  CASE 403786 Added centering of barcode functionality
+    // NPR5.55/MITH/20200511  CASE 404276 Added print of bitmap from Retail logo functionality
 
     EventSubscriberInstance = Manual;
 
@@ -99,7 +101,7 @@ codeunit 6014601 "RP Boca FGL Device Library"
         kc1: Char;
         kc2: Char;
     begin
-        //PrintMethodMgt.PrintBytesLocal('Boca (redirected 28)','<SP200,60><RC600,280><RL><F8><HW1,1>ab �� bc �� cd �� - $��<p>','ibm850');
+        //PrintMethodMgt.PrintBytesLocal('Boca (redirected 28)','<SP200,60><RC600,280><RL><F8><HW1,1>ab æÆ bc ¢¥ cd åÅ - $£<p>','ibm850');
     end;
 
     var
@@ -289,52 +291,52 @@ codeunit 6014601 "RP Boca FGL Device Library"
         BarcodeNo: Integer;
         StringLib: Codeunit "String Library";
     begin
-        /**IF UPPERCASE(FontType) = 'CONTROL' THEN
-          PrintControlChar(COPYSTR(Data,1,1))**/
         if UpperCase(FontType) = 'COMMAND' then
             SendCommand(Data)
         else
             if IsBarcodeFont(FontType) then
-                PrintBarcode(FontType, Data, Width, 10)
-            /**ELSE IF FontType = 'Logo' THEN
-              PrintBitmapFromKeyword(Data, '')**/
-            else begin
-                if Column = 1 then begin
-                    AddTextToBuffer(StrSubstNo('<RC%1,%2>', PageWidth, yCoord));
-                    AddTextToBuffer('<RL>'); // Orientation, perhaps set this as an option later?
-                end;
-                StringLib.Construct(FontType);
-                AddTextToBuffer('<' + StringLib.SelectStringSep(1, ' ') + '>');
-
-                AddTextToBuffer(StrSubstNo('<HW%1,%2>', HeightModifier, WidthModifier)); // text modifier
-
-                if Column = 1 then begin
-                    case Align of
-                        1:
-                            AddTextToBuffer(StrSubstNo('<CTR%1>~', PageWidth));
-                    //2 : AddTextToBuffer(STRSUBSTNO('<RTJ%1>~', PageWidth));
+                PrintBarcode(FontType, Data, Width, 10, Align)
+            //-NPR5.55 [404276]
+            else
+                if FontType = 'Logo' then
+                    PrintBitmapFromKeyword(Data, '')
+                //+NPR5.55 [404276]
+                else begin
+                    if Column = 1 then begin
+                        AddTextToBuffer(StrSubstNo('<RC%1,%2>', PageWidth, yCoord));
+                        AddTextToBuffer('<RL>'); // Orientation, perhaps set this as an option later?
                     end;
-                end;
+                    StringLib.Construct(FontType);
+                    AddTextToBuffer('<' + StringLib.SelectStringSep(1, ' ') + '>');
 
-                AddTextToBuffer(Data);
+                    AddTextToBuffer(StrSubstNo('<HW%1,%2>', HeightModifier, WidthModifier)); // text modifier
 
-                if Column = 1 then begin
-                    case Align of
-                        1:
-                            AddTextToBuffer('~');
-                    //2 : AddTextToBuffer('~');
+                    if Column = 1 then begin
+                        case Align of
+                            1:
+                                AddTextToBuffer(StrSubstNo('<CTR%1>~', PageWidth));
+                        //2 : AddTextToBuffer(STRSUBSTNO('<RTJ%1>~', PageWidth));
+                        end;
                     end;
+
+                    AddTextToBuffer(Data);
+
+                    if Column = 1 then begin
+                        case Align of
+                            1:
+                                AddTextToBuffer('~');
+                        //2 : AddTextToBuffer('~');
+                        end;
+                    end;
+
+                    if Data <> '' then
+                        ySpace := FontHeight
+                    else
+                        ySpace := 0;
                 end;
-
-                if Data <> '' then
-                    ySpace := FontHeight
-                else
-                    ySpace := 0;
-            end;
-
     end;
 
-    procedure PrintBarcode(BarcodeType: Text[30]; Text: Text; Width: Integer; Height: Integer)
+    procedure PrintBarcode(BarcodeType: Text[30]; Text: Text; Width: Integer; Height: Integer; Alignment: Integer)
     var
         Int: Integer;
         Code128: Text;
@@ -356,6 +358,13 @@ codeunit 6014601 "RP Boca FGL Device Library"
 
         // TEMP
         AddTextToBuffer(StrSubstNo('<RC%1,%2>', BarcodeXCoord, yCoord));
+        //-NPR5.55 [403786]
+        // Alignment, will only work on new firmware 150+
+        case Alignment of
+            1:
+                AddTextToBuffer(StrSubstNo('<CTR%1>', PageWidth));
+        end;
+        //+NPR5.55 [403786]
         AddTextToBuffer('<BI>');
 
         if Width > 1 then
@@ -487,83 +496,30 @@ codeunit 6014601 "RP Boca FGL Device Library"
     local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
     var
         RetailLogoMgt: Codeunit "Retail Logo Mgt.";
-        ESCPOS: Text;
+        LogoAsText: Text;
         InStream: InStream;
         MemoryStream: DotNet npNetMemoryStream;
         Encoding: DotNet npNetEncoding;
         RetailLogo: Record "Retail Logo";
         StreamReader: DotNet npNetStreamReader;
     begin
-        RetailLogo.SetAutoCalcFields(ESCPOSLogo);
+        //-NPR5.55 [404276]
+        RetailLogo.SetAutoCalcFields(OneBitLogo);
 
         if RetailLogoMgt.GetRetailLogo(Keyword, RegisterNo, RetailLogo) then
             repeat
-                if RetailLogo.ESCPOSLogo.HasValue then begin
-                    RetailLogo.ESCPOSLogo.CreateInStream(InStream);
-                    //-NPR5.40 [248505]
-                    //      MemoryStream := MemoryStream.MemoryStream;
-                    //      COPYSTREAM(MemoryStream, InStream);
-                    //      ByteArray := MemoryStream.ToArray;
-                    //      Encoding := Encoding.GetEncoding('utf-8');
-                    //      ESCPOS := Encoding.GetString(ByteArray);
-                    //
-                    //      PrintBitmapFromESCPOS(ESCPOS, RetailLogo.Height);
+                if RetailLogo.OneBitLogo.HasValue then begin
+                    RetailLogo.OneBitLogo.CreateInStream(InStream);
                     MemoryStream := InStream;
                     MemoryStream.Position := 0;
-                    StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
-                    ESCPOS := StreamReader.ReadToEnd();
-                    PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
-                    //+NPR5.40 [284505]
+                    StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.GetEncoding('ibm850'));
+                    LogoAsText := StreamReader.ReadToEnd();
+
+                    AddTextToBuffer(StrSubstNo('<SP%1,%2><RL><bmp><G%3>%4', (PageWidth div 1.077), yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future
+                    yCoord += RetailLogo.Height + 30; // Might need to make this dynamic in the future
                 end;
             until RetailLogo.Next = 0;
-    end;
-
-    procedure PrintBitmapFromESCPOS(ESCPOS: Text; hL: Integer; hH: Integer; cmdL: Integer; cmdH: Integer)
-    var
-        HeightLowByte: Integer;
-        HeightHighByte: Integer;
-        CommandLowByte: Integer;
-        CommandHighByte: Integer;
-        RetailLogo: Record "Retail Logo";
-    begin
-        if ESCPOS = '' then
-            exit;
-
-        //-NPR5.40 [284505]
-        // ByteArray      := BitConverter.GetBytes(Height);
-        // HeightLowByte  := ByteArray.GetValue(0);
-        // HeightHighByte := ByteArray.GetValue(1);
-        //
-        // ByteArray       := BitConverter.GetBytes(STRLEN(ESCPOS) + 10); //10 is the constant number of bytes before the variable length image data in this command.
-        // CommandLowByte  := ByteArray.GetValue(0);
-        // CommandHighByte := ByteArray.GetValue(1);
-        //
-        // StoreGraphicsInBuffer(CommandLowByte, CommandHighByte, 48, 112, 48, 1, 1, 49, 0, 2, HeightLowByte, HeightHighByte, ESCPOS); // 0/2 is always the low/high width bytes since 512px is assumed constant.
-        //StoreGraphicsInBuffer(cmdL, cmdH, 48, 112, 48, 1, 1, 49, 0, 2, hL, hH, ESCPOS); // 0/2 is always the low/high width bytes since 512px is assumed constant.
-        //+NPR5.40 [284505]
-        //LineFeed;
-        PrintGraphicsInBuffer();
-        //LineFeed;
-    end;
-
-    local procedure PrintGraphicsInBuffer()
-    var
-        m: Char;
-        fn: Char;
-    begin
-        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=98
-        //-NPR5.40 [284505]
-        // pL := 2;
-        // pH := 0;
-        // m  := 48;
-        // fn := 50;
-        //
-        // TempPattern := 'GS ( L %1 %2 %3 %4';
-        // AddToBuffer(STRSUBSTNO(TempPattern,FORMAT(pL),FORMAT(pH),FORMAT(m),FORMAT(fn)));
-        m := 48;
-        fn := 50;
-        AddTextToBuffer(ESC.GS + '(' + 'L' + ESC."02" + ESC.NUL + Format(m) + Format(fn));
-        //+NPR5.40 [284505]
+        //+NPR5.55 [404276]
     end;
 
     procedure "// Info Functions"()

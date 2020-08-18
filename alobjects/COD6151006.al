@@ -6,6 +6,8 @@ codeunit 6151006 "POS Quote Mgt."
     //                                    Otherwise someone working day shift can have POS quotes living forever.
     // NPR5.53/ALPO/20191127  CASE 379255 Include "Retail Cross Reference" into scope
     // NPR5.54/ALPO/20200203  CASE 364658 Preserve current values of Device/Host/User from being overwritten by the ones from saved sale
+    // NPR5.55/MHA /20200512  CASE 402015 Added Retail ID to Retail Voucher and changed voucher payment to voucher reference
+    // NPR5.55/ALPO/20200710  CASE 413786 Sale dates were not updated in auxiliary tables, while retrieving a saved sale
 
 
     trigger OnRun()
@@ -84,16 +86,16 @@ codeunit 6151006 "POS Quote Mgt."
         NpDcSaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
         NpDcSaleLinePOSNewCoupon: Record "NpDc Sale Line POS New Coupon";
         NpIaSaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
-        NpRvSaleLinePOSReference: Record "NpRv Sale Line POS Reference";
-        NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
+        NpRvSalesLine: Record "NpRv Sales Line";
         POSInfoTransaction: Record "POS Info Transaction";
         RetailCrossReference: Record "Retail Cross Reference";
         SaleLinePOS: Record "Sale Line POS";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
         NpIaSaleLinePOSAddOnFieldBuffer: Record "Field" temporary;
-        NpRvSaleLinePOSReferenceFieldBuffer: Record "Field" temporary;
-        NpRvSaleLinePOSVoucherFieldBuffer: Record "Field" temporary;
+        NpRvSalesLineReferenceFieldBuffer: Record "Field" temporary;
+        NpRvSalesLineFieldBuffer: Record "Field" temporary;
         POSInfoTransactionFieldBuffer: Record "Field" temporary;
         RetailCrossReferenceFieldBuffer: Record "Field" temporary;
         SalePOSFieldBuffer: Record "Field" temporary;
@@ -104,6 +106,8 @@ codeunit 6151006 "POS Quote Mgt."
         XmlElement2: DotNet npNetXmlElement;
         XmlElement3: DotNet npNetXmlElement;
         XmlElement4: DotNet npNetXmlElement;
+        XmlElement5: DotNet npNetXmlElement;
+        XmlElement6: DotNet npNetXmlElement;
         RecRef: RecordRef;
     begin
         //-NPR5.48 [338208]
@@ -119,11 +123,11 @@ codeunit 6151006 "POS Quote Mgt."
         RecRef.GetTable(NpIaSaleLinePOSAddOn);
         FindFields(RecRef, false, NpIaSaleLinePOSAddOnFieldBuffer);
 
-        RecRef.GetTable(NpRvSaleLinePOSVoucher);
-        FindFields(RecRef, false, NpRvSaleLinePOSVoucherFieldBuffer);
+        RecRef.GetTable(NpRvSalesLine);
+        FindFields(RecRef,false,NpRvSalesLineFieldBuffer);
 
-        RecRef.GetTable(NpRvSaleLinePOSReference);
-        FindFields(RecRef, false, NpRvSaleLinePOSReferenceFieldBuffer);
+        RecRef.GetTable(NpRvSalesLineReference);
+        FindFields(RecRef,false,NpRvSalesLineReferenceFieldBuffer);
 
         RecRef.GetTable(NpDcSaleLinePOSCoupon);
         FindFields(RecRef, false, NpDcSaleLinePOSCouponFieldBuffer);
@@ -189,33 +193,29 @@ codeunit 6151006 "POS Quote Mgt."
                     until NpIaSaleLinePOSAddOn.Next = 0;
                 end;
 
-                NpRvSaleLinePOSVoucher.SetRange("Register No.", SaleLinePOS."Register No.");
-                NpRvSaleLinePOSVoucher.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                NpRvSaleLinePOSVoucher.SetRange("Sale Type", SaleLinePOS."Sale Type");
-                NpRvSaleLinePOSVoucher.SetRange("Sale Date", SaleLinePOS.Date);
-                NpRvSaleLinePOSVoucher.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-                if NpRvSaleLinePOSVoucher.FindSet then begin
-                    NpXmlDomMgt.AddElement(XmlElement2, 'retail_vouchers', XmlElement3);
-                    repeat
-                        NpXmlDomMgt.AddElement(XmlElement3, 'retail_voucher', XmlElement4);
-                        RecRef.GetTable(NpRvSaleLinePOSVoucher);
-                        RecRef2Xml(RecRef, XmlElement4, NpRvSaleLinePOSVoucherFieldBuffer);
-                    until NpRvSaleLinePOSVoucher.Next = 0;
-                end;
+            //-NPR5.55 [402015]
+            NpRvSalesLine.SetRange("Retail ID",SaleLinePOS."Retail ID");
+           //+NPR5.55 [402015]
+            if NpRvSalesLine.FindSet then begin
+              NpXmlDomMgt.AddElement(XmlElement2,'retail_vouchers',XmlElement3);
+              repeat
+                NpXmlDomMgt.AddElement(XmlElement3,'retail_voucher',XmlElement4);
+                RecRef.GetTable(NpRvSalesLine);
+                RecRef2Xml(RecRef,XmlElement4,NpRvSalesLineFieldBuffer);
 
-                NpRvSaleLinePOSReference.SetRange("Register No.", SaleLinePOS."Register No.");
-                NpRvSaleLinePOSReference.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                NpRvSaleLinePOSReference.SetRange("Sale Type", SaleLinePOS."Sale Type");
-                NpRvSaleLinePOSReference.SetRange("Sale Date", SaleLinePOS.Date);
-                NpRvSaleLinePOSReference.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-                if NpRvSaleLinePOSReference.FindSet then begin
-                    NpXmlDomMgt.AddElement(XmlElement2, 'retail_voucher_payments', XmlElement3);
-                    repeat
-                        NpXmlDomMgt.AddElement(XmlElement3, 'retail_voucher_payment', XmlElement4);
-                        RecRef.GetTable(NpRvSaleLinePOSReference);
-                        RecRef2Xml(RecRef, XmlElement4, NpRvSaleLinePOSReferenceFieldBuffer);
-                    until NpRvSaleLinePOSReference.Next = 0;
+                //-NPR5.55 [402015]
+                NpRvSalesLineReference.SetRange("Sales Line Id",NpRvSalesLine.Id);
+                if NpRvSalesLineReference.FindSet then begin
+                  NpXmlDomMgt.AddElement(XmlElement4,'references',XmlElement5);
+                  repeat
+                    NpXmlDomMgt.AddElement(XmlElement5,'reference',XmlElement6);
+                    RecRef.GetTable(NpRvSalesLineReference);
+                    RecRef2Xml(RecRef,XmlElement6,NpRvSalesLineReferenceFieldBuffer);
+                  until NpRvSalesLineReference.Next = 0;
                 end;
+                //+NPR5.55 [402015]
+              until NpRvSalesLine.Next = 0;
+            end;
 
                 NpDcSaleLinePOSCoupon.SetRange("Register No.", SaleLinePOS."Register No.");
                 NpDcSaleLinePOSCoupon.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
@@ -387,22 +387,23 @@ codeunit 6151006 "POS Quote Mgt."
         NpDcSaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
         NpDcSaleLinePOSNewCoupon: Record "NpDc Sale Line POS New Coupon";
         NpIaSaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
-        NpRvSaleLinePOSReference: Record "NpRv Sale Line POS Reference";
-        NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
+        NpRvSalesLine: Record "NpRv Sales Line";
         POSInfoTransaction: Record "POS Info Transaction";
         RetailCrossReference: Record "Retail Cross Reference";
         SaleLinePOS: Record "Sale Line POS";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
         NpIaSaleLinePOSAddOnFieldBuffer: Record "Field" temporary;
-        NpRvSaleLinePOSReferenceFieldBuffer: Record "Field" temporary;
-        NpRvSaleLinePOSVoucherFieldBuffer: Record "Field" temporary;
+        NpRvSalesLineReferenceFieldBuffer: Record "Field" temporary;
+        NpRvSalesLineFieldBuffer: Record "Field" temporary;
         POSInfoTransactionFieldBuffer: Record "Field" temporary;
         RetailCrossReferenceFieldBuffer: Record "Field" temporary;
         SalePOSFieldBuffer: Record "Field" temporary;
         SaleLinePOSFieldBuffer: Record "Field" temporary;
         XmlElement: DotNet npNetXmlElement;
         XmlElement2: DotNet npNetXmlElement;
+        XmlElement3: DotNet npNetXmlElement;
         XmlRoot: DotNet npNetXmlElement;
         RecRef: RecordRef;
         PrevRec: Text;
@@ -439,11 +440,11 @@ codeunit 6151006 "POS Quote Mgt."
         RecRef.GetTable(NpIaSaleLinePOSAddOn);
         FindFields(RecRef, false, NpIaSaleLinePOSAddOnFieldBuffer);
 
-        RecRef.GetTable(NpRvSaleLinePOSVoucher);
-        FindFields(RecRef, false, NpRvSaleLinePOSVoucherFieldBuffer);
+        RecRef.GetTable(NpRvSalesLine);
+        FindFields(RecRef,false,NpRvSalesLineFieldBuffer);
 
-        RecRef.GetTable(NpRvSaleLinePOSReference);
-        FindFields(RecRef, false, NpRvSaleLinePOSReferenceFieldBuffer);
+        RecRef.GetTable(NpRvSalesLineReference);
+        FindFields(RecRef,false,NpRvSalesLineReferenceFieldBuffer);
 
         RecRef.GetTable(NpDcSaleLinePOSCoupon);
         FindFields(RecRef, false, NpDcSaleLinePOSCouponFieldBuffer);
@@ -469,6 +470,7 @@ codeunit 6151006 "POS Quote Mgt."
             RecRef.SetTable(POSInfoTransaction);
             POSInfoTransaction."Register No." := SalePOS."Register No.";
             POSInfoTransaction."Sales Ticket No." := SalePOS."Sales Ticket No.";
+          POSInfoTransaction."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
             POSInfoTransaction."Sales Line No." := 0;
             POSInfoTransaction.Insert(true);
         end;
@@ -482,6 +484,7 @@ codeunit 6151006 "POS Quote Mgt."
             RecRef.SetTable(SaleLinePOS);
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
+          SaleLinePOS.Date := SalePOS.Date;  //NPR5.55 [413786]
             SaleLinePOS.Insert(true);
 
             foreach XmlElement2 in XmlElement.SelectNodes('pos_info_transactions/pos_info_transaction') do begin
@@ -491,6 +494,7 @@ codeunit 6151006 "POS Quote Mgt."
                 RecRef.SetTable(POSInfoTransaction);
                 POSInfoTransaction."Register No." := SalePOS."Register No.";
                 POSInfoTransaction."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            POSInfoTransaction."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
                 POSInfoTransaction.Insert(true);
             end;
 
@@ -501,28 +505,35 @@ codeunit 6151006 "POS Quote Mgt."
                 RecRef.SetTable(NpIaSaleLinePOSAddOn);
                 NpIaSaleLinePOSAddOn."Register No." := SalePOS."Register No.";
                 NpIaSaleLinePOSAddOn."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            NpIaSaleLinePOSAddOn."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
                 NpIaSaleLinePOSAddOn.Insert(true);
             end;
 
             foreach XmlElement2 in XmlElement.SelectNodes('retail_vouchers/retail_voucher') do begin
-                NpRvSaleLinePOSVoucher.Init;
-                RecRef.GetTable(NpRvSaleLinePOSVoucher);
-                Xml2RecRef(XmlElement2, NpRvSaleLinePOSVoucherFieldBuffer, RecRef);
-                RecRef.SetTable(NpRvSaleLinePOSVoucher);
-                NpRvSaleLinePOSVoucher."Register No." := SalePOS."Register No.";
-                NpRvSaleLinePOSVoucher."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                NpRvSaleLinePOSVoucher.Insert(true);
-            end;
+            NpRvSalesLine.Init;
+            RecRef.GetTable(NpRvSalesLine);
+            Xml2RecRef(XmlElement2,NpRvSalesLineFieldBuffer,RecRef);
+            RecRef.SetTable(NpRvSalesLine);
+            //-NPR5.55 [402015]
+            NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+            //+NPR5.55 [402015]
+            NpRvSalesLine."Register No." := SalePOS."Register No.";
+            NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            NpRvSalesLine."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
+            NpRvSalesLine.Insert(true);
 
-            foreach XmlElement2 in XmlElement.SelectNodes('retail_voucher_payments/retail_voucher_payment') do begin
-                NpRvSaleLinePOSReference.Init;
-                RecRef.GetTable(NpRvSaleLinePOSReference);
-                Xml2RecRef(XmlElement2, NpRvSaleLinePOSReferenceFieldBuffer, RecRef);
-                RecRef.SetTable(NpRvSaleLinePOSReference);
-                NpRvSaleLinePOSReference."Register No." := SalePOS."Register No.";
-                NpRvSaleLinePOSReference."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                NpRvSaleLinePOSReference.Insert(true);
+            //-NPR5.55 [402015]
+            foreach XmlElement3 in XmlElement2.SelectNodes('references/reference') do begin
+              NpRvSalesLineReference.Init;
+              RecRef.GetTable(NpRvSalesLineReference);
+              Xml2RecRef(XmlElement2,NpRvSalesLineReferenceFieldBuffer,RecRef);
+              RecRef.SetTable(NpRvSalesLineReference);
+              NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+              NpRvSalesLineReference.Id := NpRvSalesLine."Register No.";
+              NpRvSalesLineReference.Insert(true);
             end;
+            //+NPR5.55 [402015]
+          end;
 
             foreach XmlElement2 in XmlElement.SelectNodes('discount_coupons/discount_coupon') do begin
                 NpDcSaleLinePOSCoupon.Init;
@@ -531,6 +542,7 @@ codeunit 6151006 "POS Quote Mgt."
                 RecRef.SetTable(NpDcSaleLinePOSCoupon);
                 NpDcSaleLinePOSCoupon."Register No." := SalePOS."Register No.";
                 NpDcSaleLinePOSCoupon."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            NpDcSaleLinePOSCoupon."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
                 NpDcSaleLinePOSCoupon.Insert(true);
             end;
 
@@ -541,6 +553,7 @@ codeunit 6151006 "POS Quote Mgt."
                 RecRef.SetTable(NpDcSaleLinePOSNewCoupon);
                 NpDcSaleLinePOSNewCoupon."Register No." := SalePOS."Register No.";
                 NpDcSaleLinePOSNewCoupon."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            NpDcSaleLinePOSNewCoupon."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
                 NpDcSaleLinePOSNewCoupon.Insert(true);
             end;
 

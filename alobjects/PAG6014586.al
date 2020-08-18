@@ -2,6 +2,7 @@ page 6014586 "Salesperson Statistics Retail"
 {
     // NPR4.21/TS/20160225  CASE 226010 Changed from ListPart to CardPart
     // NPR5.31/BR/20172021  CASE 272890 Changed from CardPart to Card (for export to Excel) and made non-editable
+    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
 
     Caption = 'Salesperson Statistics';
     DeleteAllowed = false;
@@ -223,7 +224,9 @@ page 6014586 "Salesperson Statistics Retail"
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
         ValueEntry.SetRange( "Salespers./Purch. Code", Code );
         //ValueEntry.SETFILTER( "Posting Date", DateFilter );

@@ -5,6 +5,7 @@ page 6151128 "NpIa Item AddOn Line Options"
     //                                    Possibility to predefine unit price and line discount % for Item AddOn entries set as select options
     //                                    Set whether or not specified quantity is per unit of main item
     //                                    (new controls: "Fixed Quantity", "Unit Price", "Discount %", "Per Unit")
+    // NPR5.55/ALPO/20200506  CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
 
     AutoSplitKey = true;
     Caption = 'Item AddOn Line Options';
@@ -40,6 +41,9 @@ page 6151128 "NpIa Item AddOn Line Options"
                 {
                 }
                 field("Unit Price";"Unit Price")
+                {
+                }
+                field("Use Unit Price";"Use Unit Price")
                 {
                 }
                 field("Discount %";"Discount %")

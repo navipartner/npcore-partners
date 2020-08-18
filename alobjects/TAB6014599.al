@@ -20,7 +20,7 @@ table 6014599 "Connection Profile"
         field(10;"Hosting type";Option)
         {
             Caption = 'Hosting Type';
-            Description = 'Ops�tter printervalg afh�ngig af hostingtype.';
+            Description = 'Opsætter printervalg afhængig af hostingtype.';
             OptionCaption = 'Client,Citrix,Terminal Server,Terminal Server 2008,Web Client';
             OptionMembers = Client,Citrix,"Terminal Server","Terminal Server 2008",WebClient;
         }

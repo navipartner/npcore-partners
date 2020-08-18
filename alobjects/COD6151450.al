@@ -12,6 +12,7 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
     // MAG2.22/MHA /20190625  CASE 359285 Adjusted SetupTemplate() to delete existing Template if Version Id belongs to Magento
     // MAG2.22/MHA /20190708  CASE 352201 Added collect stores to InitNpXmlTemplateSetup()
     // MAG2.22/MHA /20190709  CASE 355079 Content-Type and Accept are explicitly set in SetupTemplate()
+    // MAG2.26/MHA /20200501  CASE 402488 Stock NpXml Template is set on Magento Setup in SetupTemplateItemInventory()
 
 
     trigger OnRun()
@@ -306,12 +307,25 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
 
     procedure SetupTemplateItemInventory(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
     var
+        MagentoSetup: Record "Magento Setup";
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
+        MagentoItemMgt: Codeunit "Magento Item Mgt.";
         NodePath: Text;
+        TemplateCode: Code[20];
     begin
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemInventory" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+
+        //-MAG2.26 [402488]
+        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob,NodePath + "ElementName.Update");
+        MagentoSetup.Get;
+        if TemplateCode <> MagentoSetup."Stock NpXml Template" then begin
+          MagentoSetup.Validate("Stock NpXml Template",TemplateCode);
+          MagentoSetup.Modify(true);
+        end;
+        MagentoItemMgt.UpsertStockTriggers();
+        //+MAG2.26 [402488]
     end;
 
     procedure SetupTemplateBrand(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)

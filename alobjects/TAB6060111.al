@@ -4,7 +4,8 @@ table 6060111 "TM Ticket Setup"
     // TM1.27/TSA /20171218 CASE 300395 Added field Timeout (ms)
     // TM1.38/TSA /20181012 CASE 332109 Adding NP-Pass for tickets
     // TM1.38/TSA /20181026 CASE 308962 Added some boolean fields to control prepaid / postpaid ticket creation flow
-    // TM90.1.46/TSA /20200320 CASE 397084 Added needed setup field in ordet to create tickets from a simple wizard
+    // TM1.46/TSA /20200320 CASE 397084 Added needed setup field in ordet to create tickets from a simple wizard
+    // TM1.48/TSA /20200623 CASE 399259 Added controll of description fields exported to ticket server
 
     Caption = 'Ticket Setup';
 
@@ -13,6 +14,41 @@ table 6060111 "TM Ticket Setup"
         field(1;"Code";Code[10])
         {
             Caption = 'Code';
+        }
+        field(70;"Store Code";Code[32])
+        {
+            Caption = 'Store Code';
+            TableRelation = "Magento Store";
+        }
+        field(75;"Ticket Title";Option)
+        {
+            Caption = 'Ticket Title';
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+        }
+        field(76;"Ticket Name";Option)
+        {
+            Caption = 'Ticket Name';
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+        }
+        field(77;"Ticket Description";Option)
+        {
+            Caption = 'Ticket Description';
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+        }
+        field(78;"Ticket Full Description";Option)
+        {
+            Caption = 'Ticket Full Description';
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+        }
+        field(79;"Ticket Sub Title";Option)
+        {
+            Caption = 'Ticket Sub Title';
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
         }
         field(100;"Print Server Generator URL";Text[200])
         {

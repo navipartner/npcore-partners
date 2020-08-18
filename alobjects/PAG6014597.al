@@ -4,6 +4,7 @@ page 6014597 "Product Group Code Statistics"
     // NPR5.31/BR  /20170425  CASE 272890 Show all records on blank filter
     // NPR5.48/TJ  /20181115  CASE 330832 Increased Length of variable ItemCategoryCode and parameter ItemCategoryFilter in function SetFilter from 10 to 20
     // NPR5.48/TJ  /20190102  CASE 340615 Removed field "Product Group Code" and usages
+    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
 
     Caption = 'Product Group Code Statistics';
     Editable = false;
@@ -274,7 +275,9 @@ page 6014597 "Product Group Code Statistics"
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
         ValueEntry.SetRange( "Item No.", "No." );
         if not LastYear then

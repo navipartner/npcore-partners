@@ -14,6 +14,7 @@ xmlport 6151402 "Magento Document Export"
     // MAG2.22/TSA /20190531 CASE 345376 Added shipment method code on the related document section
     // MAG2.25/TSA /20200210 CASE 390073 Added Sell-to Contact and Your Reference, Due Date and Remaining Amount
     // MAG2.25/TSA /20200218 CASE 388058 Added Quotes to magento service
+    // MAG2.26/TSA /20200506 CASE 403511 Removed duplicate entry in case statement
 
     Caption = 'Magento Document Export';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/naviconnect/documents';
@@ -1157,18 +1158,18 @@ xmlport 6151402 "Magento Document Export"
     begin
 
         case LocalSalesHeader."Document Type" of
-            LocalSalesHeader."Document Type"::"Blanket Order":
-                exit('Blank Order');
-            LocalSalesHeader."Document Type"::"Credit Memo":
-                exit('Credit Memo');
-            LocalSalesHeader."Document Type"::Invoice:
-                exit('Invoice');
-            LocalSalesHeader."Document Type"::Quote:
-                exit('Quote');
-            LocalSalesHeader."Document Type"::Order:
-                exit('Order');
-            LocalSalesHeader."Document Type"::"Return Order":
-                exit('Return Order');
+          LocalSalesHeader."Document Type"::"Blanket Order" : exit ('Blank Order');
+          LocalSalesHeader."Document Type"::"Credit Memo"   : exit ('Credit Memo');
+          LocalSalesHeader."Document Type"::Invoice         : exit ('Invoice');
+          LocalSalesHeader."Document Type"::Quote           : exit ('Quote');
+          LocalSalesHeader."Document Type"::Order           : exit ('Order');
+          LocalSalesHeader."Document Type"::"Return Order"  : exit ('Return Order');
+          //-MAG2.26 [403511]
+          // //-MAG2.25 [388058]
+          //LocalSalesHeader."Document Type"::Quote           : EXIT ('Quote');
+          ////+MAG2.25 [388058]
+          //+MAG2.26 [403511]
+
         end;
     end;
 }

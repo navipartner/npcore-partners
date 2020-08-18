@@ -1,7 +1,7 @@
 table 6014504 "Customer Repair"
 {
     // //-NPR3.0m ved Nikolai Pedersen
-    //   Afdelingskode indsat p� onInsert
+    //   Afdelingskode indsat på onInsert
     // 
     // //-NPR3.0p  Henrik Ohm
     //   customer.onInsert has NameAndNumbers lookup, so not needed here

@@ -1,6 +1,7 @@
 codeunit 6060094 "MM Alteration Jnl Mgmt"
 {
     // MM1.25/TSA /20171219 CASE 299783 Initial Version
+    // MM1.44/TSA/20200611  CASE 401040 Transport MM1.44 - 11 June 2020
 
     TableNo = "MM Member Info Capture";
 
@@ -15,6 +16,7 @@ codeunit 6060094 "MM Alteration Jnl Mgmt"
     var
         NOT_SUPPORTED: Label '%1 %2 is not supported.';
         RequestUserConfirmation: Boolean;
+        NOT_FOUND: Label '%1 %2 was not found.';
 
     procedure AlterMembership(var MemberInfoCapture: Record "MM Member Info Capture")
     begin
@@ -64,7 +66,13 @@ codeunit 6060094 "MM Alteration Jnl Mgmt"
     begin
 
         MemberInfoCapture.Get (MemberInfoCaptureEntryNo);
-        Membership.Get (MemberInfoCapture."Membership Entry No.");
+        //-MM1.44 [401040]
+        //Membership.GET (MemberInfoCapture."Membership Entry No.");
+        if (not Membership.Get (MemberInfoCapture."Membership Entry No.")) then begin
+          ReasonMessage := StrSubstNo (NOT_FOUND, Membership.TableCaption, MemberInfoCapture."External Membership No.");
+          exit (false);
+        end;
+        //+MM1.44 [401040]
 
         case MemberInfoCapture."Information Context" of
 

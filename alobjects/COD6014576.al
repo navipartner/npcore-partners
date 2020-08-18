@@ -19,6 +19,7 @@ codeunit 6014576 "Report - Retail Warranty"
     // NPR5.37/TJ  /20171018 CASE 286283 Translated variables with danish specific letters into english
     // NPR5.51/AlST/20190620 CASE 356129 allow for automatic printing of warranty on pos line creation
     // NPR5.52/AlST/20191024 CASE 373793 focus on appropriate line for printing workflow
+    // NPR5.55/MMV /20200504 CASE 395393 Moved workflow step to separate object.
 
     TableNo = "Sale Line POS";
 
@@ -261,7 +262,7 @@ codeunit 6014576 "Report - Retail Warranty"
                                +CopyStr(SaleLinePOS.Description, StrPos(SaleLinePOS.Description,' ')+1);
           until StrPos(SaleLinePOS.Description, ' ') = 0;
 
-        //"Beregner" kodepris udefra "K�bspris kodeord"
+        //"Beregner" kodepris udefra "K¢bspris kodeord"
         if RetailConfiguration."Purchace Price Code"<>'' then
           begin
         //-NOK1.0
@@ -270,7 +271,7 @@ codeunit 6014576 "Report - Retail Warranty"
         //+NPK1.0
             KommaKodePris := ConvertStr(KodePris,'0123456789',RetailConfiguration."Purchace Price Code");
           end
-        //"Beregner" kodepris, n�r "K�bspris kodeord" er blankt
+        //"Beregner" kodepris, når "K¢bspris kodeord" er blankt
         else begin
           if SaleLinePOS.Quantity<>0 then
           KodePris:=DelChr(DelChr(Format(Round(100*SaleLinePOS."Amount Including VAT"/SaleLinePOS.Quantity,1),12),'=','.'));
@@ -307,50 +308,6 @@ codeunit 6014576 "Report - Retail Warranty"
         RetailConfiguration.Get;
         CompanyInformation.Get;
         CompanyInformation.CalcFields(Picture);
-    end;
-
-    local procedure "--Subscriptions--"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure PrintWarrantyAfterSaleLine(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SaleLinePOS: Record "Sale Line POS")
-    var
-        Item: Record Item;
-    begin
-        //-NPR5.51
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"Report - Retail Warranty" then
-          exit;
-
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
-          exit;
-
-        Item.Get(SaleLinePOS."No.");
-
-        if not Item."Guarantee voucher" then
-          exit;
-
-        //-NPR5.52 [373793]
-        SaleLinePOS.SetRecFilter;
-        //+NPR5.52 [373793]
-
-        if not TryAutoPrintWarranty(SaleLinePOS) and GuiAllowed then
-          Message(WarrantyPrintCaption, GetLastErrorText);
-        //+NPR5.51
-    end;
-
-    [TryFunction]
-    local procedure TryAutoPrintWarranty(var SaleLinePOS: Record "Sale Line POS")
-    var
-        ReportSelectionRetail: Record "Report Selection Retail";
-        RetailReportSelectionMgt: Codeunit "Retail Report Selection Mgt.";
-        RecRef: RecordRef;
-    begin
-        //-NPR5.51
-        RecRef.GetTable(SaleLinePOS);
-        RetailReportSelectionMgt.SetRegisterNo(SaleLinePOS."Register No.");
-        RetailReportSelectionMgt.RunObjects(RecRef,ReportSelectionRetail."Report Type"::"Warranty Certificate");
-        //+NPR5.51
     end;
 }
 

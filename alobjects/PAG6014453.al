@@ -1,12 +1,12 @@
 page 6014453 "Campaign Discount"
 {
     // 001:  NPK-Henrik Ohm, 21-01-2003
-    //       Medtage ikke varer med salgspris = 0.  Er tilf�jet p� ALLE punkter under dropdownknap funktioner undtagen UDSKRIV
+    //       Medtage ikke varer med salgspris = 0.  Er tilf¢jet på ALLE punkter under dropdownknap funktioner undtagen UDSKRIV
     // //-NPR3.0e ved Simon 2005.08.02
     //   Oversaettelser
     // 
     // //-NPR3.0f ved Anders 2006.08.14
-    //   Tilf�jet funktion til kopiering af rabat til alle andre regnskaber
+    //   Tilf¢jet funktion til kopiering af rabat til alle andre regnskaber
     // 
     // //-NPR 280509 Ny menupunkt under funktion Sag 70115
     // Send to Retail Journal
@@ -32,6 +32,7 @@ page 6014453 "Campaign Discount"
     // NPR5.45/TS  /20180803  CASE 308194 Removed Quantity Sold and Turnover
     // NPR5.46/JDH /20180928 CASE 294354  Added Retail Print Actions, and removed the old ones
     // NPR5.53/ALPO/20191029 CASE 369115 New control added: "Block Custom Disc."
+    // NPR5.55/TJ  /20200421 CASE 400524 Recreated Dimensions action under new action group RelatedInformation
 
     Caption = 'Period Discount';
     PageType = Card;
@@ -149,29 +150,29 @@ page 6014453 "Campaign Discount"
 
     actions
     {
+        area(navigation)
+        {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID"=CONST(6014413),
+                              "No."=FIELD(Code);
+                ShortCutKey = 'Shift+Ctrl+D';
+
+                trigger OnAction()
+                var
+                    NPRDimMgt: Codeunit NPRDimensionManagement;
+                begin
+                    RetailSetup.Get;
+                    if RetailSetup."Use Adv. dimensions" then
+                      NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"Period Discount",Code);
+                end;
+            }
+        }
         area(processing)
         {
-            group(DimBtn)
-            {
-                Caption = 'D&imension';
-                Image = Dimensions;
-                Visible = DimBtnVisible;
-                action("Default Dimensions")
-                {
-                    Caption = 'Default Dimensions';
-                    Image = DefaultDimension;
-                    ShortCutKey = 'Shift+Ctrl+D';
-
-                    trigger OnAction()
-                    var
-                        NPRDimMgt: Codeunit NPRDimensionManagement;
-                    begin
-                        RetailSetup.Get;
-                        if RetailSetup."Use Adv. dimensions" then
-                            NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"Period Discount", Code);
-                    end;
-                }
-            }
             group("Lin&e")
             {
                 Caption = 'Lin&e';

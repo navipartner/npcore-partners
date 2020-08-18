@@ -8,14 +8,14 @@ codeunit 6014480 "Retail Document Handling"
     //   Transfers the given "Sale" to a Retail Document of the Type specified in
     //   "Sale"."Retail Document Type". Forms are run modal in this function.
     // 
-    // "RetailDocument2Sale(VAR Sale : Record "Sale POS";VAR PermS�lger : Code[20])"
+    // "RetailDocument2Sale(VAR Sale : Record "Sale POS";VAR PermSælger : Code[20])"
     //   Transfers a document of type "Sale"."Retail Document Type" to the sale indicated
     //   by the "Sale" Forms are run modal in this function.
     // 
     // "CashRetailDocument("Retail Document Type" : Integer;"Retail Document No." : Code[20])"
     //   Marks the document as cashed. Should be called when the document is processed.
     // 
-    // NPR4.000.004, 11-06-09, MH, Tilf�jet overf�rsel af feltet "Lock Code" i forbindelse med RetailDocument2Sale (sag 65422).
+    // NPR4.000.004, 11-06-09, MH, Tilf¢jet overf¢rsel af feltet "Lock Code" i forbindelse med RetailDocument2Sale (sag 65422).
     // 
     // NPR4.10/VB/20150602 CASE 213003 Support for Web Client (JavaScript) client
     // NPRx.xx/VB/20160105  CASE 230373 Refactoring due to client-side formatting of decimal and date/time values

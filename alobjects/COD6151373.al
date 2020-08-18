@@ -21,6 +21,8 @@ codeunit 6151373 "CS Helper Functions"
     // NPR5.53/CLVA/20191203 CASE 375919 Added Counting Supervisor functionality. Added function CreateNewCountingV2
     // NPR5.53/CLVA/20200207 CASE 389864 Changed code to support version specific changes (NAV 2018+).
     // NPR5.54/CLVA/20200220 CASE 384506 Added Supervisor and POS user filter on GetStoreDataV2 and GetStoreDataByStoreUser;
+    // NPR5.55/CLVA/20200520 CASE 379709 Added function CaptureServiceStatus and UpdateItemCrossRef
+    // NPR5.55/ALST/20200728 CASE 415521 added UpdateItemCrossRefFromRecord
 
 
     trigger OnRun()
@@ -1246,6 +1248,45 @@ codeunit 6151373 "CS Helper Functions"
         CSStockTakes.Note := Txt_CountingCancelled;
 
         CSStockTakes.Modify(true);
+    end;
+
+    procedure CaptureServiceStatus(): Boolean
+    var
+        CSSetup: Record "CS Setup";
+    begin
+        if not CSSetup.Get then
+          exit(false);
+
+        if not CSSetup."Enable Capture Service" then
+          exit(false);
+
+        exit(true);
+    end;
+
+    procedure UpdateItemCrossRef()
+    var
+        ItemCrossReference: Record "Item Cross Reference";
+    begin
+        //-NPR5.55 [379709]
+        Clear(ItemCrossReference);
+        ItemCrossReference.SetRange("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
+        ItemCrossReference.SetRange("Is Retail Serial No.", true);
+        if ItemCrossReference.FindFirst then begin
+          repeat
+            CreateCSRfidOfflineDataRecord(ItemCrossReference);
+          until ItemCrossReference.Next = 0;
+        end;
+        //+NPR5.55 [379709]
+    end;
+
+    procedure UpdateItemCrossRefFromRecord(var ItemCrossReference: Record "Item Cross Reference")
+    begin
+        //-NPR5.55 [415521]
+        ItemCrossReference.TestField("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
+        ItemCrossReference.TestField("Is Retail Serial No.", true);
+
+        CreateCSRfidOfflineDataRecord(ItemCrossReference);
+        //+NPR5.55 [415521]
     end;
 
     local procedure "-- Subscribers"()

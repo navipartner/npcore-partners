@@ -1,6 +1,7 @@
 page 6150683 "NPRE Restaurants"
 {
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200803 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Restaurants';
     CardPageID = "NPRE Restaurant Card";
@@ -61,8 +62,62 @@ page 6150683 "NPRE Restaurants"
                     RunObject = Page "NPRE Kitchen Station Selection";
                     RunPageLink = "Restaurant Code"=FIELD(Code);
                 }
+                action(ShowKitchenRequests)
+                {
+                    Caption = 'Kitchen Requests (Expedite View)';
+                    Image = BlanketOrder;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Scope = Repeater;
+                    Visible = ShowRequests;
+
+                    trigger OnAction()
+                    var
+                        KitchenRequest: Record "NPRE Kitchen Request";
+                        KitchenRequests: Page "NPRE Kitchen Requests";
+                    begin
+                        Rec.ShowKitchenRequests();  //NPR5.55 [382428]
+                    end;
+                }
+            }
+            group("Layout")
+            {
+                Caption = 'Layout';
+                action(Locations)
+                {
+                    Caption = 'Locations';
+                    Image = Zones;
+                    RunObject = Page "NPRE Seating Location";
+                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                }
+                action(Seatings)
+                {
+                    Caption = 'Seatings';
+                    Image = Lot;
+
+                    trigger OnAction()
+                    var
+                        Seating: Record "NPRE Seating";
+                        SeatingMgt: Codeunit "NPRE Seating Management";
+                    begin
+                        //-NPR5.55 [382428]
+                        TestField(Code);
+                        Seating.SetFilter("Seating Location", SeatingMgt.RestaurantSeatingLocationFilter(Code));
+                        PAGE.Run(0, Seating);
+                        //+NPR5.55 [382428]
+                    end;
+                }
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        ShowRequests := not CurrPage.LookupMode;  //NPR5.55 [382428]
+    end;
+
+    var
+        ShowRequests: Boolean;
 }
 

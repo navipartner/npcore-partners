@@ -13,6 +13,8 @@ codeunit 6059940 "SMS Management"
     // NPR5.48/BHR /20181115 CASE 331217 Show correct template
     // NPR5.51/SARA/20190819 CASE 363578 Sending an SMS with the turnover based on the POS Workshift Checkpoint
     // NPR5.52/SARA/20190912 CASE 368395 Move SMS profile from POS Unit to POS End of day Profile
+    // NPR5.55/ZESO/20200511 CASE 403740 Use New API from LinkMobility,'\n'is for inserting new line.
+    // NPR5.55/SARA/20200305 CASE 389275 Send SMS for 'Cash Register Turnover Mobile 2' and 'Cash Register Turnover Mobile 3'
 
 
     trigger OnRun()
@@ -55,6 +57,7 @@ codeunit 6059940 "SMS Management"
         ServiceCode: Code[20];
         Result: Text;
         ErrorHandled: Boolean;
+        ResponseString: Text;
     begin
         OnSendSMS(SMSHandled, PhoneNo, Sender, SMSMessage);
         if SMSHandled then
@@ -85,15 +88,19 @@ codeunit 6059940 "SMS Management"
             IComm.TestField("E-Club Sender");
             Sender := IComm."E-Club Sender";
         end;
-        if ServiceCalc.useService(ServiceCode) then begin
-            StringContent := StringContent.StringContent(MakeSMSBody(PhoneNo, Sender, SMSMessage), Encoding.UTF8, 'text/xml');
 
-            if CallRestWebService('http://api.linkmobility.dk/',
-                                  StrSubstNo('v2/message.xml?apikey=%1', GetAPIKey),
-                                  'POST',
-                                  StringContent,
-                                  HttpResponseMessage) then begin
-                Result := HttpResponseMessage.Content.ReadAsStringAsync.Result;
+        if ServiceCalc.useService(ServiceCode) then begin
+          //-NPR5.55 [403740]
+          //StringContent := StringContent.StringContent(MakeSMSBody(PhoneNo,Sender,SMSMessage),Encoding.UTF8,'text/xml');
+
+          //IF CallRestWebService('http://api.linkmobility.dk/',
+                                //STRSUBSTNO('v2/message.xml?apikey=%1',GetAPIKey),
+                                //'POST',
+                                //StringContent,
+                                //HttpResponseMessage) THEN BEGIN
+            //Result := HttpResponseMessage.Content.ReadAsStringAsync.Result;
+          if CallRestWebServiceNew('https://wsx.sp247.net/sms/send',Sender,PhoneNo,SMSMessage,ResponseString) then begin
+            //+NPR5.55 [403740]
                 OnSMSSendSuccess(PhoneNo, Sender, SMSMessage, Result);
             end else begin
                 ErrorHandled := false;
@@ -523,10 +530,14 @@ codeunit 6059940 "SMS Management"
         TemplateLine: Record "SMS Template Line";
         MergeRecord: Boolean;
         CRLF: Text[2];
+        NewLine: Text;
     begin
         SMSMessage := '';
-        CRLF[1] := 13;
-        CRLF[2] := 10;
+        //-NPR5.55 [403740]
+        //CRLF[1] := 13;
+        //CRLF[2] := 10;
+        NewLine := '\n';
+        //+NPR5.55 [403740]
         if DataTypeManagement.GetRecordRef(RecordVariant, RecRef) then
             MergeRecord := not IsRecRefEmpty(RecRef);
 
@@ -537,7 +548,10 @@ codeunit 6059940 "SMS Management"
                     SMSMessage += MergeDataFields(TemplateLine."SMS Text", RecRef, Template."Report ID")
                 else
                     SMSMessage += TemplateLine."SMS Text";
-                SMSMessage += CRLF;
+            //-NPR5.55 [403740]
+            //SMSMessage += CRLF;
+            SMSMessage += NewLine;
+            //+NPR5.55 [403740]
             until TemplateLine.Next = 0;
         exit(SMSMessage);
     end;
@@ -628,14 +642,23 @@ codeunit 6059940 "SMS Management"
         //+NPR5.30 [263182]
     end;
 
-    local procedure GetDefaultSenderTo(): Text
+    local procedure GetDefaultSenderTo(i: Integer): Text
     var
         IComm: Record "I-Comm";
     begin
         //-NPR5.51 [363578]
         IComm.Get;
-        IComm.TestField("Reg. Turnover Mobile No.");
-        exit(IComm."Reg. Turnover Mobile No.");
+        case i of
+          1: //Default
+            begin
+              IComm.TestField("Reg. Turnover Mobile No.");
+              exit(IComm."Reg. Turnover Mobile No.");
+            end;
+          //-NPR5.55 [389275]
+          2: exit(IComm."Register Turnover Mobile 2"); //Option 2
+          3: exit(IComm."Register Turnover Mobile 3"); //Option 3
+          //+NPR5.55 [389275]
+        end;
         //-NPR5.51 [363578]
     end;
 
@@ -732,6 +755,7 @@ codeunit 6059940 "SMS Management"
         Sender: Text;
         SendTo: Text;
         SMSManagement: Codeunit "SMS Management";
+        i: Integer;
     begin
         //-NPR5.51 [363578]
         if Successful then begin
@@ -751,9 +775,16 @@ codeunit 6059940 "SMS Management"
                     Sender := SMSTemplateHeader."Alt. Sender";
                     if Sender = '' then
                         Sender := GetDefaultSender;
-                    SendTo := GetDefaultSenderTo;
-                    SendSMS(SendTo, Sender, SMSBodyText);
-                end;
+            //-NPR5.55 [389275]
+            //SendTo := GetDefaultSenderTo;
+            //SendSMS(SendTo,Sender,SMSBodyText);
+            for i := 1 to 3 do begin
+              SendTo := GetDefaultSenderTo(i);
+              if SendTo <> '' then
+                SendSMS(SendTo,Sender,SMSBodyText);
+            end;
+            //+NPR5.55 [389275]
+          end;
         end;
         //+NPR5.51 [363578]
     end;
@@ -902,6 +933,60 @@ codeunit 6059940 "SMS Management"
         //-NPR5.40 [304312]
         exit('<<AFReportLink>>');
         //+NPR5.40 [304312]
+    end;
+
+    [TryFunction]
+    local procedure CallRestWebServiceNew(RequestURL: Text;Sender: Text;Destination: Text;SMSMessage: Text;var ResponseString: Text)
+    var
+        RequestString: Text;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        ReqStream: DotNet npNetStream;
+        ReqStreamWriter: DotNet npNetStreamWriter;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        ResponseStream: DotNet npNetStream;
+        ResponseStreamReader: DotNet npNetStreamReader;
+    begin
+        RequestURL :='https://wsx.sp247.net/sms/send';
+        RequestString := '{';
+        RequestString += '"source":"' + Sender+ '",';
+        RequestString += '"destination": "' + Destination+ '",';
+        RequestString += '"userData": "' + SMSMessage+ '",';
+        RequestString += '"platformId": "COOL",';
+        RequestString += '"platformPartnerId": "2035",';
+        RequestString += '"useDeliveryReport": false}';
+
+
+        HttpWebRequest := HttpWebRequest.Create(RequestURL);
+        HttpWebRequest.ContentType('application/json;charset=utf-8');
+        HttpWebRequest.Headers.Add('Authorization','Basic ' + GetBasicAuthInfo('O7LbM2B6' , 'OujrSE78'));
+        HttpWebRequest.Method('POST');
+
+        ReqStream := HttpWebRequest.GetRequestStream;
+
+        ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
+        ReqStreamWriter.Write(RequestString);
+        ReqStreamWriter.Flush;
+        ReqStreamWriter.Close;
+        Clear(ReqStreamWriter);
+        Clear(ReqStream);
+
+
+
+        HttpWebResponse := HttpWebRequest.GetResponse;
+        ResponseStream := HttpWebResponse.GetResponseStream;
+        ResponseStreamReader := ResponseStreamReader.StreamReader(ResponseStream);
+        ResponseString := ResponseStreamReader.ReadToEnd;
+        if HttpWebResponse.StatusCode <> 200 then
+          Error('%1 - %2 - %3',HttpWebResponse.StatusCode, HttpWebResponse.StatusDescription, ResponseString );
+    end;
+
+    procedure GetBasicAuthInfo(Username: Text;Password: Text): Text
+    var
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
+    begin
+
+        exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(Username + ':' + Password)));
     end;
 }
 

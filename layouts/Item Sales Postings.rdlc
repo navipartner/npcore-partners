@@ -10,12 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <Field Name="ShowVendorNo_">
-    <DataField>ShowVendorNo_</DataField>
-  </Field>
-  <Field Name="VendorNo_">
-    <DataField>VendorNo_</DataField>
-  </Field>
   <ReportSections>
     <ReportSection>
       <Body>

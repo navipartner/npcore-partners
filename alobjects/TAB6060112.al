@@ -115,7 +115,7 @@ table 6060112 "RC Ticket Cues"
                 EventCount += 1;
                 //-#310669 [310669]
                 Capacity := 0;
-                TicketManagement.GetMaxCapacity (AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", Capacity, CapacityControl);
+                TicketManagement.GetAdmissionCapacity (AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", Capacity, CapacityControl);
                 MaxCapacity += Capacity;
                 if (Capacity = 0) then
                   Capacity := 1;

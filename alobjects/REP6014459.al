@@ -2,6 +2,7 @@ report 6014459 "Balancing Report -A4 - POS"
 {
     // NPR5.42/ZESO/20180518  CASE 310459 Object Created
     // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
+    // NPR5.55/BHR /20200525 CASE 404681 Replace POSEntry."POS Store Code" with POSEntry."POS Unit No."
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Balancing Report -A4 - POS.rdlc';
 
@@ -350,7 +351,7 @@ report 6014459 "Balancing Report -A4 - POS"
             column(TotalDiscountPerclbl_;"POS Workshift Checkpoint".FieldCaption("Total Discount %"))
             {
             }
-            column(StoreCode_;POSEntry."POS Store Code")
+            column(StoreCode_;POSEntry."POS Unit No.")
             {
             }
             column(DocumentNo_;POSEntry."Document No.")

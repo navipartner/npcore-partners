@@ -320,7 +320,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
         foreach ReceiptLine in Lines do begin
           Util.Ansi2Ascii(ReceiptLine);
-          ReceiptLine := StrSubstNo ('%1',ConvertStr(ReceiptLine,'���������','�����ԙ��'));
+          ReceiptLine := StrSubstNo ('%1',ConvertStr(ReceiptLine,'–µ¹°•˜´÷”','Ææ¥¢Å¯ÖöÄ'));
           OStream.Write (ReceiptLine);
 
           CreditCardTransaction."Entry No." := EntryNo;

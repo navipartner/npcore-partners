@@ -1,6 +1,7 @@
 page 6151461 "Magento Customer Mapping"
 {
     // MAG2.22/MHA /20190710  CASE 360098 Object created
+    // MAG2.26/MHA /20200429  CASE 402247 Added field 30 "Fixed Customer No."
 
     Caption = 'Magento Customer Mapping';
     DelayedInsert = true;
@@ -31,6 +32,9 @@ page 6151461 "Magento Customer Mapping"
                 {
                 }
                 field("Config. Template Code";"Config. Template Code")
+                {
+                }
+                field("Fixed Customer No.";"Fixed Customer No.")
                 {
                 }
             }

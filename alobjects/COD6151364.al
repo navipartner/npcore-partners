@@ -7,6 +7,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
     // NPR5.53/CLVA/20191118  CASE 377888 Changed posting to background posting
     // NPR5.53/CLVA/20191121  CASE 377462 Changed No. Serie to TODAY. Added Qty validation
     // NPR5.53/CLVA/20191211  CASE 381606 Changed background posting to journal line
+    // NPR5.55/CLVA/20200513 CASE 379709 Added Journal line/Bin check
 
     TableNo = "CS UI Header";
 
@@ -375,6 +376,9 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
     var
         QtyToHandle: Decimal;
         BinContent: Record "Bin Content";
+        CSSetup: Record "CS Setup";
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
     begin
         if InputValue = '' then begin
             Remark := Text009;
@@ -385,6 +389,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
             Remark := Text008;
             exit;
         end;
+
 
         Clear(BinContent);
         BinContent.SetRange("Location Code", CSItemReclassHandlingPlaceholder."Location Code");
@@ -400,6 +405,24 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
           exit;
         end;
         //+NPR5.53 [381606]
+
+        //-NPR5.55 [379709]
+        if CSItemReclassHandlingPlaceholder."Item No." <> '' then begin
+            CSSetup.Get;
+            if ItemJournalBatch.Get(CSSetup."Item Reclass. Jour Temp Name",CSSetup."Item Reclass. Jour Batch Name") then begin
+              Clear(ItemJournalLine);
+              ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+              ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+              ItemJournalLine.SetRange("Item No.",CSItemReclassHandlingPlaceholder."Item No.");
+              ItemJournalLine.SetRange("Variant Code",CSItemReclassHandlingPlaceholder."Variant Code");
+              ItemJournalLine.SetRange("Bin Code",InputValue);
+              if ItemJournalLine.FindFirst then begin
+                Remark := StrSubstNo(Text029,CSItemReclassHandlingPlaceholder."Item No.",CSItemReclassHandlingPlaceholder."Variant Code",InputValue);
+                exit;
+              end;
+            end;
+        end;
+        //+NPR5.55 [379709]
 
         CSItemReclassHandlingPlaceholder."Bin Code" := InputValue;
         //-NPR5.51 [355694]

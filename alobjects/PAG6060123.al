@@ -5,6 +5,7 @@ page 6060123 "TM Det. Ticket Access Entry"
     // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
     // TM1.17/NPKNAV/20161026  CASE 256152 Transport TM1.17
     // TM1.28/TSA /20180130 CASE 301222 Added button to un-consume an item
+    // TM1.48/TSA /20200727 CASE 416096 Changed properties and name on Schedule Entry button, added ticket request button
 
     Caption = 'Detailed Ticket Access Entry';
     DeleteAllowed = false;
@@ -22,10 +23,10 @@ page 6060123 "TM Det. Ticket Access Entry"
             {
                 field("Entry No.";"Entry No.")
                 {
-                    Visible = false;
                 }
                 field("Posting Date";"Posting Date")
                 {
+                    Visible = false;
                 }
                 field("Ticket No.";"Ticket No.")
                 {
@@ -70,14 +71,32 @@ page 6060123 "TM Det. Ticket Access Entry"
     {
         area(navigation)
         {
-            action("Schedule Entry")
+            action("Admission Schedule Entry")
             {
-                Caption = 'Schedule Entry';
+                Caption = 'Admission Schedule Entry';
+                Ellipsis = true;
                 Image = WorkCenterLoad;
                 Promoted = true;
+                PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "TM Admission Schedule Entry";
                 RunPageLink = "External Schedule Entry No."=FIELD("External Adm. Sch. Entry No.");
+            }
+            action("Ticket Request")
+            {
+                Caption = 'Ticket Request';
+                Ellipsis = true;
+                Image = Navigate;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                begin
+                    //-TM1.48 [416096]
+                    OpenTicketRequest (Rec);
+                    //+TM1.48 [416096]
+                end;
             }
         }
         area(processing)
@@ -118,6 +137,23 @@ page 6060123 "TM Det. Ticket Access Entry"
         TestField (Type, Type::CONSUMED);
         if (Type = Type::CONSUMED) then
           Delete;
+    end;
+
+    local procedure OpenTicketRequest(DetTicketAccessEntry: Record "TM Det. Ticket Access Entry")
+    var
+        Ticket: Record "TM Ticket";
+        TicketReservationRequest: Record "TM Ticket Reservation Request";
+        TicketRequest: Page "TM Ticket Request";
+    begin
+
+        //-TM1.48 [416096]
+        Ticket.Get (DetTicketAccessEntry."Ticket No.");
+        TicketReservationRequest.Get (Ticket."Ticket Reservation Entry No.");
+
+        TicketReservationRequest.SetFilter ("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+        TicketRequest.SetTableView (TicketReservationRequest);
+        TicketRequest.Run ();
+        //+TM1.48 [416096]
     end;
 }
 

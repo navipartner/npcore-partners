@@ -2,62 +2,62 @@ report 6014514 "Retail Journal List"
 {
     // NPR5.53/TJ  /20191118 CASE 375557 New report recreated from version 2009
     DefaultLayout = RDLC;
-    RDLCLayout = './Retail Journal List.rdlc';
+    RDLCLayout = './layouts/Retail Journal List.rdlc';
 
     Caption = 'Retail Journal List';
     PreviewMode = PrintLayout;
 
     dataset
     {
-        dataitem("Retail Journal Line";"Retail Journal Line")
+        dataitem("Retail Journal Line"; "Retail Journal Line")
         {
-            DataItemTableView = SORTING("No.","Line No.");
-            column(ItemNo_RetailJournalLine;"Retail Journal Line"."Item No.")
+            DataItemTableView = SORTING("No.", "Line No.");
+            column(ItemNo_RetailJournalLine; "Retail Journal Line"."Item No.")
             {
                 IncludeCaption = true;
             }
-            column(Description_RetailJournalLine;"Retail Journal Line".Description)
+            column(Description_RetailJournalLine; "Retail Journal Line".Description)
             {
                 IncludeCaption = true;
             }
-            column(Inventory_RetailJournalLine;"Retail Journal Line".Inventory)
+            column(Inventory_RetailJournalLine; "Retail Journal Line".Inventory)
             {
                 IncludeCaption = true;
             }
-            column(LastDirectCost_RetailJournalLine;"Retail Journal Line"."Last Direct Cost")
+            column(LastDirectCost_RetailJournalLine; "Retail Journal Line"."Last Direct Cost")
             {
                 IncludeCaption = true;
             }
-            column(UnitPrice_RetailJournalLine;"Retail Journal Line"."Unit Price")
+            column(UnitPrice_RetailJournalLine; "Retail Journal Line"."Unit Price")
             {
                 IncludeCaption = true;
             }
-            column(VendorItemNo_RetailJournalLine;"Retail Journal Line"."Vendor Item No.")
+            column(VendorItemNo_RetailJournalLine; "Retail Journal Line"."Vendor Item No.")
             {
                 IncludeCaption = true;
             }
-            column(VendorName_RetailJournalLine;"Retail Journal Line"."Vendor Name")
+            column(VendorName_RetailJournalLine; "Retail Journal Line"."Vendor Name")
             {
                 IncludeCaption = true;
             }
-            column(UnitPrice_Item;Item."Unit Price")
+            column(UnitPrice_Item; Item."Unit Price")
             {
             }
-            column(QtyOnSalesOrder_Item;Item."Qty. on Sales Order")
+            column(QtyOnSalesOrder_Item; Item."Qty. on Sales Order")
             {
             }
-            column(QtyOnPurchOrder_Item;Item."Qty. on Purch. Order")
+            column(QtyOnPurchOrder_Item; Item."Qty. on Purch. Order")
             {
             }
-            column(CompanyName;CompanyName)
+            column(CompanyName; CompanyName)
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 if not Item.Get("Retail Journal Line"."Item No.") then
-                  Clear(Item);
-                Item.CalcFields("Qty. on Sales Order","Qty. on Purch. Order");
+                    Clear(Item);
+                Item.CalcFields("Qty. on Sales Order", "Qty. on Purch. Order");
             end;
         }
     }

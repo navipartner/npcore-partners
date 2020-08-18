@@ -7,6 +7,7 @@ codeunit 6059969 "Description Control"
     // NPR5.47/MMV /20181019 CASE 332824 Fixed case 284550 approach
     // NPR5.48/JDH /20181214 CASE 338542 Created a function to get the description for Item Cross references, and 2 subscribers to update description on ICR table
     // NPR5.51/ALST/20190731 CASE 351999 POS will now try to find a description in the current user's language, when creating the sales line, and using it
+    // NPR5.55/ALST/20200624 CASE 370006 modifications to description variables
 
 
     trigger OnRun()
@@ -112,7 +113,7 @@ codeunit 6059969 "Description Control"
         end;
     end;
 
-    local procedure GetDescription(var Desc1: Text[50];var Desc2: Text[50];ItemNo: Code[20];VariantCode: Code[10];LanguageCode: Code[10];DescControlCode: Code[10])
+    local procedure GetDescription(var Desc1: Text;var Desc2: Text;ItemNo: Code[20];VariantCode: Code[10];LanguageCode: Code[10];DescControlCode: Code[10])
     var
         Description1: Text[50];
         Description2: Text[50];
@@ -146,12 +147,14 @@ codeunit 6059969 "Description Control"
         end;
     end;
 
-    local procedure GetDescriptionSimple(var Desc1: Text[50];var Desc2: Text[50];ItemNo: Code[20];VariantCode: Code[10];Desc1Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo;Desc2Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo)
+    local procedure GetDescriptionSimple(var Desc1: Text;var Desc2: Text;ItemNo: Code[20];VariantCode: Code[10];Desc1Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo;Desc2Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo)
     var
         Description1: Text[50];
         Description2: Text[50];
         Item: Record Item;
         ItemVariant: Record "Item Variant";
+        "Field": Record "Field";
+        FieldNo: Integer;
     begin
         if not Item.Get(ItemNo) then
           exit;
@@ -177,8 +180,37 @@ codeunit 6059969 "Description Control"
           Desc2Setup::VendorItemNo:        Description2 := Item."Vendor Item No.";
         end;
 
-        Desc1 := Description1;
-        Desc2 := Description2;
+        //-NPR5.55 [370006]
+        // Desc1 := Description1;
+        // Desc2 := Description2;
+        case Desc1Setup of
+          Desc1Setup::ItemDescription1,
+          Desc1Setup::VariantDescription1:
+            FieldNo := Item.FieldNo(Description);
+          Desc1Setup::ItemDescription2,
+          Desc1Setup::VariantDescription2:
+            FieldNo := Item.FieldNo("Description 2");
+          Desc1Setup::VendorItemNo:
+            FieldNo := Item.FieldNo("Vendor Item No.");
+        end;
+
+        Field.Get(DATABASE::Item, FieldNo);
+        Desc1 := CopyStr(Description1, 1, Field.Len);
+
+        case Desc2Setup of
+          Desc2Setup::ItemDescription1,
+          Desc2Setup::VariantDescription1:
+            FieldNo := Item.FieldNo(Description);
+          Desc2Setup::ItemDescription2,
+          Desc2Setup::VariantDescription2:
+            FieldNo := Item.FieldNo("Description 2");
+          Desc2Setup::VendorItemNo:
+            FieldNo := Item.FieldNo("Vendor Item No.");
+        end;
+
+        Field.Get(DATABASE::Item, FieldNo);
+        Desc2 := CopyStr(Description2, 1, Field.Len);
+        //+370006# [370006]
     end;
 
     local procedure InitDescriptionControl()

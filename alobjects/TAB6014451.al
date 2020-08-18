@@ -1,6 +1,6 @@
 table 6014451 "Retail Journal Header"
 {
-    // //-NPR3.0e overs�ttelser v.simon
+    // //-NPR3.0e oversættelser v.simon
     // NPR5.41/NPKNAV/20180427  CASE 309131 Transport NPR5.41 - 27 April 2018
     // NPR5.46/JDH /20181002 CASE 294354  Renamed Variables. Cleanup, and more functionality to support easier usage of Retail Journal
     // NPR5.49/BHR /20190220 CASE 344000  Update Retail Journal Lines

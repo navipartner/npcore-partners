@@ -7,6 +7,7 @@ codeunit 6150826 "POS Action - Sale Dimension"
     // NPR5.44/MHA /20180702 CASE 320474 Added function LookupDimensionValue()
     // NPR5.44/TSA /20180709 CASE 321303 Added RequestRefreshData
     // NPR5.44/TSA /20180709 CASE 309900 Added StatisticsFrequency parameter to set on when this workflow is configured in the OnBeforePaymentView workflow
+    // NPR5.55/ALPO/20200528 CASE 406971 Sales view were not updated after a dimension change, if there were more than one line in the sale
 
 
     trigger OnRun()
@@ -195,6 +196,7 @@ codeunit 6150826 "POS Action - Sale Dimension"
 
         POSSale.RefreshCurrent();
 
+        POSSale.SetModified;  //NPR5.55 [406971]
         //-NPR5.44 [321303]
         POSSession.RequestRefreshData();
         //+NPR5.44 [321303]

@@ -1,7 +1,7 @@
 codeunit 6014662 "Stock-Take Manager"
 {
     // 
-    // //001 - ohm - samment�llingslok. kun
+    // //001 - ohm - sammentællingslok. kun
     // //002 - ohm
     // NPR6.000.005 20130620 LJJ - CASE 158433: Handling of dimensions.
     // NPR6.000.006 20130626 LJJ - CASE 158804: Handling of Phys. Inv. Journal Templates.
@@ -17,13 +17,14 @@ codeunit 6014662 "Stock-Take Manager"
     // NPR5.29/TSA /20161221  CASE 257297 Changed the suggested templates created on default to something useful suggested by Jackie.
     // NPR5.38/MHA /20180105  CASE 301053 Removed unused code from OnRum()
     // NPR5.29/TJ /20170123 CASE 263879 - Changed subtype of report variable CalcQtyOnHand from 790 to 6014663 and removed same unused variable from function TransferHandler
-    // NPR5.40/TJ  /20180208  CASE 302634 Removed unused variables Ops�tning and Lagerv�rditemp
+    // NPR5.40/TJ  /20180208  CASE 302634 Removed unused variables Opsætning and Lagerværditemp
     // NPR5.40/TSA /20180307  CASE 307353 Fixing overflow in ItemJnlLine.Description assignment
     // NPR5.46/TSA /20180925 CASE 328623 Eliminating duplicate messages after transfer to inventory journal
     // NPR5.46/TSA /20181001 CASE 329899 Added RetailPrint() and FillRetailJournalLine()
     // NPR5.48/TSA /20181022 CASE 332846 Added AreaTopUp()
     // NPR5.48/CLVA/20181024 CASE 332846 Added added value
     // NPR5.51/JAKUBV/20190903  CASE 359375 Transport NPR5.51 - 3 September 2019
+    // NPR5.55/ZESO/20200713 CASE 412140 Added OnAfterTranslateBarcode
 
     TableNo = "Gift Voucher";
 
@@ -418,6 +419,9 @@ codeunit 6014662 "Stock-Take Manager"
               StockTakeWorksheetLine."Session DateTime" := sessionDatetime;
               StockTakeWorksheetLine."Session ID" := sessionGuid;
               TranslateBarcode (StockTakeWorksheetLine);
+              //-NPR5.55 [412140]
+              OnAfterTranslateBarcode(StockTakeWorksheetLine);
+              //+NPR5.55 [412140]
               AssignItemCost (StockTakeWorksheetLine);
               CreateDefaultDim (StockTakeWorksheetLine);
             end;
@@ -2128,6 +2132,13 @@ codeunit 6014662 "Stock-Take Manager"
         //
         // COMMIT;
         // PAGE.RUNMODAL(PAGE::"Retail Journal Print", RetailJournalLine);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTranslateBarcode(var StockTakeWorksheetLine: Record "Stock-Take Worksheet Line")
+    begin
+        //-NPR5.55 [412140]
+        //+NPR5.55 [412140]
     end;
 }
 

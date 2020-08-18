@@ -19,6 +19,8 @@ codeunit 6014455 "POS Sales Discount Calc. Mgt."
     // NPR5.48/MMV /20181217  CASE 340154 Added doc and removed old comments.
     // NPR5.53/MHA /20190103  CASE 382816 Quantity changes should also trigger update in UpdateDiscOnSalesLine()
     // NPR5.53/ALPO/20200128  CASE 387544 Fixed a bug where an attempt was made to change an old version of a Sale Line record.
+    // NPR5.55/TJ  /20200420  CASE 400524 Applying dimensions after discounts have been set
+    // NPR5.55/ALPO/20200703  CASE 380979 Incorrect mix discount calculation for customers with prices set to be vat-excluding
     // 
     // This module is invoked by the sale line wrapper codeunit in transcendence inside insert,modify,delete functions.
     // It is specifically not invoked from table field validations or table subscribers to prevent unnecessary cascading.
@@ -222,6 +224,7 @@ codeunit 6014455 "POS Sales Discount Calc. Mgt."
     local procedure UpdateDiscOnSalesLine(var TempSaleLinePOS: Record "Sale Line POS" temporary;RecalculateAllLines: Boolean)
     var
         SaleLinePOS: Record "Sale Line POS";
+        NPRDimMgt: Codeunit NPRDimensionManagement;
     begin
         Clear(TempSaleLinePOS);
         if TempSaleLinePOS.IsEmpty then
@@ -250,6 +253,14 @@ codeunit 6014455 "POS Sales Discount Calc. Mgt."
               SaleLinePOS := TempSaleLinePOS;
               SaleLinePOS.Insert;
             end;
+            //-NPR5.55 [400524]
+            SaleLinePOS.CreateDim(
+              NPRDimMgt.TypeToTableNPR(SaleLinePOS.Type),SaleLinePOS."No.",
+              NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"),SaleLinePOS."Discount Code",
+              DATABASE::"NPRE Seating",SaleLinePOS."NPRE Seating Code",
+              0,'');
+            SaleLinePOS.Modify;
+            //+NPR5.55 [400524]
           end;
         until TempSaleLinePOS.Next = 0;
     end;
@@ -356,6 +367,7 @@ codeunit 6014455 "POS Sales Discount Calc. Mgt."
           TempSaleLinePOS."Discount Amount" := 0;
           TempSaleLinePOS."MR Anvendt antal" := 0;
           TempSaleLinePOS."Custom Disc Blocked" := false;
+          TempSaleLinePOS.UpdateLineVatAmounts(TempSaleLinePOS, 0, 0, 0, 0);  //NPR5.55 [380979]
           TempSaleLinePOS.Insert;
         until SaleLinePOS.Next = 0;
     end;

@@ -29,6 +29,9 @@ codeunit 6014416 "Mixed Discount Management"
     // NPR5.53/SARA/20191128  CASE 378232 Fixed Mix discount applied to wrong priority
     // NPR5.53/SARA/20200122  CASE 380979 New feature with Mixed Discount with Customer having Price Incl VAT = False
     // NPR5.54/SARA/20200320  CASE 396777 Fix Exit Variable in fonction FindPriority
+    // NPR5.55/ALPO/20200521  CASE 404403 Reversed 380979: Error in Mix Discount calculations with prices set to be VAT-excluding
+    // NPR5.55/ALPO/20200703  CASE 380979 Incorrect mix discount calculation for customers with prices set to be vat-excluding
+    // NPR5.55/ALPO/20200714  CASE 412946 Mixed Discount enhancement: support for multiple discount amount levels
 
 
     trigger OnRun()
@@ -557,6 +560,93 @@ codeunit 6014416 "Mixed Discount Management"
         //+NPR5.31 [262964]
     end;
 
+    local procedure CalcLineMultiLevelDiscAmount(MixedDiscount: Record "Mixed Discount";MixedDiscountLevel: Record "Mixed Discount Level";SaleLinePOSApply: Record "Sale Line POS";QtyToApply: Decimal;var RemainderAmt: Decimal): Decimal
+    var
+        LineDiscountAmount: Decimal;
+    begin
+        //-NPR5.55 [412946]
+        if MixedDiscount."Discount Type" <> MixedDiscount."Discount Type"::"Multiple Discount Levels" then
+          exit(0);
+
+        case true of
+          MixedDiscountLevel."Discount Amount" > 0: begin
+            LineDiscountAmount := MixedDiscountLevel."Discount Amount" / MixedDiscountLevel.Quantity * QtyToApply;
+            if AmountExclVat(MixedDiscount) then
+              LineDiscountAmount := LineDiscountAmount * (1 + SaleLinePOSApply."VAT %" / 100);
+            if LineDiscountAmount <> 0 then
+              LineDiscountAmount := LineDiscountAmount + RemainderAmt;
+          end;
+
+          MixedDiscountLevel."Discount %" > 0: begin
+            LineDiscountAmount := SaleLinePOSApply."Unit Price" * QtyToApply * MixedDiscountLevel."Discount %" / 100;
+          end;
+        end;
+
+        if LineDiscountAmount > SaleLinePOSApply."Amount Including VAT" then
+          LineDiscountAmount := SaleLinePOSApply."Amount Including VAT";
+
+        exit(LineDiscountAmount);
+        //+NPR5.55 [412946]
+    end;
+
+    local procedure GetMixDiscountLevels(MixedDiscount: Record "Mixed Discount";MaxQty: Decimal;var MixedDiscountLevelTmp: Record "Mixed Discount Level")
+    var
+        MixedDiscountLevel: Record "Mixed Discount Level";
+        QtyFactor: Integer;
+    begin
+        //-NPR5.55 [412946]
+        if not MixedDiscountLevelTmp.IsTemporary then
+          exit;
+        MixedDiscountLevelTmp.DeleteAll;
+
+        MixedDiscountLevel.SetRange("Mixed Discount Code", MixedDiscount.Code);
+        MixedDiscountLevel.SetRange("Multiple Of", false);
+        if MixedDiscountLevel.FindSet then
+          repeat
+            CopyMixDiscountLevel(MixedDiscountLevel, MixedDiscountLevelTmp, 1);
+          until MixedDiscountLevel.Next = 0;
+
+        MixedDiscountLevel.SetRange("Multiple Of", true);
+        MixedDiscountLevel.Ascending(false);
+        if MixedDiscountLevel.FindSet then
+          repeat
+            QtyFactor := 1;
+            while MixedDiscountLevel.Quantity * QtyFactor <= MaxQty do begin
+              CopyMixDiscountLevel(MixedDiscountLevel, MixedDiscountLevelTmp, QtyFactor);
+              QtyFactor += 1;
+            end;
+          until MixedDiscountLevel.Next = 0;
+        //+NPR5.55 [412946]
+    end;
+
+    local procedure CopyMixDiscountLevel(FromMixDiscountLevel: Record "Mixed Discount Level";var ToMixDiscountLevel: Record "Mixed Discount Level";QtyFactor: Integer)
+    begin
+        //-NPR5.55 [412946]
+        ToMixDiscountLevel := FromMixDiscountLevel;
+        with ToMixDiscountLevel do begin
+          Quantity := Quantity * QtyFactor;
+          if Find or (Quantity <= 0) then
+            exit;
+          if "Discount Amount" <> 0 then
+            "Discount Amount" := "Discount Amount" * QtyFactor;
+          Insert;
+        end;
+        //+NPR5.55 [412946]
+    end;
+
+    local procedure FindApplicableMixDiscountLevel(var MixDiscountLevel: Record "Mixed Discount Level";QtyToApply: Decimal): Boolean
+    begin
+        //-NPR5.55 [412946]
+        if not MixDiscountLevel.IsTemporary then
+          exit(false);
+
+        MixDiscountLevel.SetFilter(Quantity, '>%1', QtyToApply);
+        MixDiscountLevel.DeleteAll;
+        MixDiscountLevel.SetRange(Quantity);
+        exit(MixDiscountLevel.FindLast);
+        //+NPR5.55 [412946]
+    end;
+
     local procedure "--- Apply"()
     begin
     end;
@@ -622,12 +712,15 @@ codeunit 6014416 "Mixed Discount Management"
             //-NPR5.31 [262964]
             TempSaleLinePOSApplyNew."Invoice (Qty)" := TempSaleLinePOSApplyNew."MR Anvendt antal";
             //+NPR5.31 [262964]
-            //-NPR5.53 [380979]
-            if TempSaleLinePOSApplyNew."Price Includes VAT" then
-              TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal"
-            else
-              TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal"*(1 + TempSaleLinePOSApplyNew."VAT %" / 100);
-            //+NPR5.53 [380979]
+            //-NPR5.55 [404403]
+            TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal";
+        //    //-NPR5.53 [380979]
+        //    IF TempSaleLinePOSApplyNew."Price Includes VAT" THEN
+        //      TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal"
+        //    ELSE
+        //      TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal"*(1 + TempSaleLinePOSApplyNew."VAT %" / 100);
+        //    //+NPR5.53 [380979]
+            //+NPR5.55 [404403]
             TempSaleLinePOSApplyNew.Insert;
 
             QtyToApply -= TempSaleLinePOSApplyCopy."MR Anvendt antal";
@@ -697,6 +790,7 @@ codeunit 6014416 "Mixed Discount Management"
         TempSaleLinePOSApply: Record "Sale Line POS" temporary;
         TotalAmount: Decimal;
         BatchQty: Decimal;
+        LastLineNo: Integer;
     begin
         //-NPR5.31 [262904]
         TempSaleLinePOSApply.DeleteAll;
@@ -708,8 +802,17 @@ codeunit 6014416 "Mixed Discount Management"
         //-NPR5.31 [262964]
         AdjustDiscQty(BatchQty,TempMixedDiscount,TempMixedDiscountLine,TempSaleLinePOSApply);
         //+NPR5.31 [262964]
-        TotalDiscAmount := ApplyMixDiscountOnLines(BatchQty,TempMixedDiscount,TempMixedDiscountLine,TempSaleLinePOSApply);
-        TransferAppliedDiscountToSale(TempSaleLinePOSApply,TempSaleLinePOS);
+        //-NPR5.55 [412946]
+        Clear(TempSaleLinePOS);
+        if TempSaleLinePOS.FindLast then
+          LastLineNo := TempSaleLinePOS."Line No.";
+        if TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Multiple Discount Levels" then
+          TotalDiscAmount := ApplylMultiLevelMixDiscountOnLines(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, LastLineNo)
+        else
+        //+NPR5.55 [412946]
+          TotalDiscAmount := ApplyMixDiscountOnLines(BatchQty,TempMixedDiscount,TempMixedDiscountLine,TempSaleLinePOSApply);
+        //TransferAppliedDiscountToSale(TempSaleLinePOSApply,TempSaleLinePOS);  //NPR5.55 [412946]-revoked
+        TransferAppliedDiscountToSale(TempSaleLinePOSApply, TempSaleLinePOS, LastLineNo);  //NPR5.55 [412946]
 
         exit(TotalDiscAmount);
         //+NPR5.31 [262904]
@@ -782,6 +885,118 @@ codeunit 6014416 "Mixed Discount Management"
 
         exit(TotalDiscAmount);
         //+NPR5.31 [262904]
+    end;
+
+    local procedure ApplylMultiLevelMixDiscountOnLines(var SaleLinePOSApply: Record "Sale Line POS";MixedDiscount: Record "Mixed Discount";var MixedDiscountLine: Record "Mixed Discount Line";var LastLineNo: Integer): Decimal
+    var
+        MixedDiscountLevelTmp: Record "Mixed Discount Level" temporary;
+        PriorityBufferTmp: Record "Mixed Discount Priority Buffer" temporary;
+        SaleLinePOSApply2: Record "Sale Line POS";
+        CurrentQtyToApply: Decimal;
+        LineDiscountAmt: Decimal;
+        RemainderAmt: Decimal;
+        TotalAppliedDiscountAmt: Decimal;
+        TotalQtyToApply: Decimal;
+        InsertReminderLine: Boolean;
+        NothingLeftToApply: Boolean;
+    begin
+        //-NPR5.55 [412946]
+        if MixedDiscount."Discount Type" <> MixedDiscount."Discount Type"::"Multiple Discount Levels" then
+          exit(0);
+        if SaleLinePOSApply.IsEmpty then
+          exit(0);
+        SaleLinePOSApply.CalcSums("MR Anvendt antal");
+        TotalQtyToApply := SaleLinePOSApply."MR Anvendt antal";
+
+        GetMixDiscountLevels(MixedDiscount, TotalQtyToApply, MixedDiscountLevelTmp);
+        if MixedDiscountLevelTmp.IsEmpty then
+          exit(0);
+
+        TransferSaleLinePOS2PriorityBuffer(SaleLinePOSApply, MixedDiscount, MixedDiscountLine, PriorityBufferTmp);
+        if PriorityBufferTmp.IsEmpty then
+          exit(0);
+
+        while not NothingLeftToApply do begin
+          if CurrentQtyToApply = 0 then begin
+            if FindApplicableMixDiscountLevel(MixedDiscountLevelTmp, TotalQtyToApply) then begin
+              CurrentQtyToApply := MixedDiscountLevelTmp.Quantity;
+              TotalQtyToApply := TotalQtyToApply - CurrentQtyToApply;
+              RemainderAmt := 0;
+            end else
+              NothingLeftToApply := true;
+          end;
+
+          if CurrentQtyToApply > 0 then begin
+            PriorityBufferTmp.FindSet;
+            repeat
+              SaleLinePOSApply.SetRange(Type, SaleLinePOSApply.Type::Item);
+              SaleLinePOSApply.SetRange("No.", PriorityBufferTmp."Item No.");
+              SaleLinePOSApply.SetRange("Variant Code", PriorityBufferTmp."Variant Code");
+              SaleLinePOSApply.SetRange("Unit Price", PriorityBufferTmp."Unit Price");
+              SaleLinePOSApply.SetRange("Discount Type", SaleLinePOSApply."Discount Type"::Mix);
+              SaleLinePOSApply.SetRange("Discount Code", MixedDiscount.Code);
+              SaleLinePOSApply.SetFilter(Quantity, '>%1', 0);
+              if SaleLinePOSApply.FindSet then
+                repeat
+                  if SaleLinePOSApply."Discount Amount" = 0 then begin
+                    if CurrentQtyToApply >= SaleLinePOSApply."MR Anvendt antal" then
+                      CurrentQtyToApply := CurrentQtyToApply - SaleLinePOSApply."MR Anvendt antal"
+                    else begin
+                      SaleLinePOSApply2 := SaleLinePOSApply;
+                      SaleLinePOSApply."MR Anvendt antal" := CurrentQtyToApply;
+                      SaleLinePOSApply.Quantity := CurrentQtyToApply;
+                      SaleLinePOSApply2."MR Anvendt antal" := SaleLinePOSApply2."MR Anvendt antal" - SaleLinePOSApply."MR Anvendt antal";
+                      SaleLinePOSApply2.Quantity := SaleLinePOSApply2.Quantity - SaleLinePOSApply.Quantity;
+                      CurrentQtyToApply := 0;
+                      InsertReminderLine := true;
+                    end;
+
+                    SaleLinePOSApply."Invoice (Qty)" := SaleLinePOSApply."MR Anvendt antal";
+                    SaleLinePOSApply."Discount Type" := SaleLinePOSApply."Discount Type"::Mix;
+                    SaleLinePOSApply."Discount Code" := MixedDiscount.Code;
+                    SaleLinePOSApply."Custom Disc Blocked" := MixedDiscount."Block Custom Discount";
+                    LineDiscountAmt :=
+                      CalcLineMultiLevelDiscAmount(MixedDiscount, MixedDiscountLevelTmp, SaleLinePOSApply, SaleLinePOSApply."MR Anvendt antal", RemainderAmt);
+                    SaleLinePOSApply."Discount Amount" := Round(LineDiscountAmt, 0.01);
+                    SaleLinePOSApply.Modify;
+
+                    TotalAppliedDiscountAmt += SaleLinePOSApply."Discount Amount";
+                    RemainderAmt := LineDiscountAmt - SaleLinePOSApply."Discount Amount";
+
+                    if InsertReminderLine then begin
+                      InsertNewSaleLine(
+                        SaleLinePOSApply, SaleLinePOSApply2, SaleLinePOSApply2.Quantity, SaleLinePOSApply2."Discount Type"::Mix, SaleLinePOSApply2."Discount Code", LastLineNo);
+
+                      SaleLinePOSApply."MR Anvendt antal" := SaleLinePOSApply2."MR Anvendt antal";
+                      SaleLinePOSApply."Invoice (Qty)" := 0;
+                      if not SaleLinePOSApply."Price Includes VAT" and
+                          (SaleLinePOSApply.Amount <> 0) and
+                          (SaleLinePOSApply.Amount <> SaleLinePOSApply."Amount Including VAT")
+                      then
+                        SaleLinePOSApply."Unit Price" :=
+                          SaleLinePOSApply."Unit Price" / SaleLinePOSApply.Amount * SaleLinePOSApply."Amount Including VAT";
+                      SaleLinePOSApply."Amount Including VAT" := SaleLinePOSApply."MR Anvendt antal" * SaleLinePOSApply."Unit Price";
+                      SaleLinePOSApply."VAT Base Amount" := SaleLinePOSApply."Amount Including VAT" - SaleLinePOSApply."Amount Including VAT" / (1 + SaleLinePOSApply."VAT %" / 100);
+                      SaleLinePOSApply.Amount := SaleLinePOSApply."Amount Including VAT" - SaleLinePOSApply."VAT Base Amount";
+                      SaleLinePOSApply.Modify;
+
+                      InsertReminderLine := false;
+                    end;
+                  end;
+
+                  if CurrentQtyToApply = 0 then
+                    MixedDiscountLevelTmp.Delete;
+                until (SaleLinePOSApply.Next = 0) or (CurrentQtyToApply = 0);
+              until (PriorityBufferTmp.Next = 0) or (CurrentQtyToApply = 0);
+          end;
+
+          if not NothingLeftToApply then
+            NothingLeftToApply := TotalQtyToApply = 0;
+        end;
+
+        SaleLinePOSApply.Reset;
+        exit(TotalAppliedDiscountAmt);
+        //+NPR5.55 [412946]
     end;
 
     local procedure FilterSaleLinePOS(var TempMixedDiscountLine: Record "Mixed Discount Line" temporary;var TempSaleLinePOS: Record "Sale Line POS" temporary): Boolean
@@ -1029,12 +1244,23 @@ codeunit 6014416 "Mixed Discount Management"
         //    TempSaleLinePOSApply."Unit Price" := TempSaleLinePOS."Unit Price";
         //+NPR5.46 [331487]
             //+NPR5.38 [300637]
-            //-NPR5.53 [380979]
-            if TempSaleLinePOSApply."Price Includes VAT" then
-              TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price"
-            else
-              TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price" * (1 + TempSaleLinePOSApply."VAT %" / 100);
-            //+NPR5.53 [380979]
+            //-NPR5.55 [380979]
+            if not TempSaleLinePOSApply."Price Includes VAT" and
+               (TempSaleLinePOSApply.Amount <> 0) and
+               (TempSaleLinePOSApply.Amount <> TempSaleLinePOSApply."Amount Including VAT")
+            then
+              TempSaleLinePOSApply."Unit Price" :=
+                TempSaleLinePOSApply."Unit Price" / TempSaleLinePOSApply.Amount * TempSaleLinePOSApply."Amount Including VAT";
+            //+NPR5.55 [380979]
+            //-NPR5.55 [404403]
+            TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price";
+        //    //-NPR5.53 [380979]
+        //    IF TempSaleLinePOSApply."Price Includes VAT" THEN
+        //      TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price"
+        //    ELSE
+        //      TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price" * (1 + TempSaleLinePOSApply."VAT %" / 100);
+        //    //+NPR5.53 [380979]
+            //+NPR5.55 [404403]
             //-NPR5.40 [306304]
             TempSaleLinePOSApply."VAT Base Amount" := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."Amount Including VAT" / (1 + TempSaleLinePOSApply."VAT %" / 100);
             TempSaleLinePOSApply.Amount := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."VAT Base Amount";
@@ -1049,36 +1275,50 @@ codeunit 6014416 "Mixed Discount Management"
         //+NPR5.31 [262904]
     end;
 
-    local procedure TransferAppliedDiscountToSale(var TempSaleLinePOSApply: Record "Sale Line POS" temporary;var TempSaleLinePOS: Record "Sale Line POS" temporary)
+    local procedure TransferAppliedDiscountToSale(var TempSaleLinePOSApply: Record "Sale Line POS" temporary;var TempSaleLinePOS: Record "Sale Line POS" temporary;LastLineNo: Integer)
     var
         SaleLinePOS: Record "Sale Line POS";
         TempSaleLinePOS2: Record "Sale Line POS" temporary;
         RemainingQty: Decimal;
         NonDiscQty: Decimal;
-        LineNo: Integer;
     begin
         //-NPR5.31 [262904]
         if TempSaleLinePOSApply.IsEmpty then
           exit;
-
-        Clear(TempSaleLinePOS);
-        if TempSaleLinePOS.FindLast then;
-        LineNo := TempSaleLinePOS."Line No.";
-
+        
+        //-NPR5.55 [412946]-revoked
+        //CLEAR(TempSaleLinePOS);
+        //IF TempSaleLinePOS.FINDLAST THEN;
+        //LineNo := TempSaleLinePOS."Line No.";
+        //+NPR5.55 [412946]-revoked
+        
         TempSaleLinePOSApply.FindSet;
         repeat
           //-NPR5.40 [294655]
           //Item.GET(TempSaleLinePOSApply."No.");
           //+NPR5.40 [294655]
-
-          TempSaleLinePOS.Get(TempSaleLinePOSApply."Register No.",TempSaleLinePOSApply."Sales Ticket No.",TempSaleLinePOSApply.Date,TempSaleLinePOSApply."Sale Type",TempSaleLinePOSApply."Line No.");
-          RemainingQty := TempSaleLinePOS.Quantity - TempSaleLinePOSApply."MR Anvendt antal";
+        
+          if not  //NPR5.55 [412946]
+          TempSaleLinePOS.Get(TempSaleLinePOSApply."Register No.",TempSaleLinePOSApply."Sales Ticket No.",TempSaleLinePOSApply.Date,TempSaleLinePOSApply."Sale Type",TempSaleLinePOSApply."Line No.")
+          //-NPR5.55 [412946]
+          then begin
+            TempSaleLinePOS := TempSaleLinePOSApply;
+            TempSaleLinePOS.Insert;
+          end;
+          //+NPR5.55 [412946]
+          //-NPR5.55 [380979]
+          if not TempSaleLinePOS."Price Includes VAT" then
+            TempSaleLinePOSApply."Discount Amount" := TempSaleLinePOSApply."Discount Amount" / (1 + TempSaleLinePOS."VAT %" / 100);
+          //+NPR5.55 [380979]
+          //RemainingQty := TempSaleLinePOS.Quantity - TempSaleLinePOSApply."MR Anvendt antal";  //NPR5.55 [412946]-revoked
+          RemainingQty := TempSaleLinePOSApply.Quantity - TempSaleLinePOSApply."MR Anvendt antal";  //NPR5.55 [412946] (need this for "Multiple Discount Levels" type of discounts)
           TempSaleLinePOS.Validate(Quantity,TempSaleLinePOSApply."MR Anvendt antal");
           //-NPR5.31 [262964]
           NonDiscQty := 0;
           if TempSaleLinePOSApply."Invoice (Qty)" > 0 then begin
             NonDiscQty := TempSaleLinePOSApply."MR Anvendt antal" - TempSaleLinePOSApply."Invoice (Qty)";
-            TempSaleLinePOS.Validate(Quantity,TempSaleLinePOSApply."Invoice (Qty)");
+            if TempSaleLinePOS.Quantity <> TempSaleLinePOSApply."Invoice (Qty)" then  //NPR5.55 [412946]
+              TempSaleLinePOS.Validate(Quantity,TempSaleLinePOSApply."Invoice (Qty)");
           end;
           //+NPR5.31 [262964]
           TempSaleLinePOS."Discount Type" := TempSaleLinePOSApply."Discount Type";
@@ -1090,15 +1330,21 @@ codeunit 6014416 "Mixed Discount Management"
           //TempSaleLinePOS.GetAmount(TempSaleLinePOS,Item,TempSaleLinePOSApply."Unit Price");
           //+NPR5.40 [294655]
           TempSaleLinePOS.Modify;
-
+        
+          //-NPR5.55 [412946]
+          InsertNewSaleLine(TempSaleLinePOS, TempSaleLinePOSApply, NonDiscQty, TempSaleLinePOSApply."Discount Type", TempSaleLinePOSApply."Discount Code", LastLineNo);
+          InsertNewSaleLine(TempSaleLinePOS, TempSaleLinePOSApply, RemainingQty, TempSaleLinePOS."Discount Type"::" ", '', LastLineNo);
+          //+NPR5.55 [412946]
+          //-NPR5.55 [412946]-revoked (moved to a subfunction)
+          /*
           //-NPR5.31 [262964]
-          if NonDiscQty > 0 then begin
+          IF NonDiscQty > 0 THEN BEGIN
             LineNo += 10000;
-
+        
             //-NPR5.43 [321284]
             TempSaleLinePOS2 := TempSaleLinePOS;
             //+NPR5.43 [321284]
-            TempSaleLinePOS.Init;
+            TempSaleLinePOS.INIT;
             TempSaleLinePOS := TempSaleLinePOSApply;
             //-NPR5.43 [321284]
             TempSaleLinePOS."Sales Document Type" := TempSaleLinePOS2."Sales Document Type";
@@ -1106,25 +1352,25 @@ codeunit 6014416 "Mixed Discount Management"
             TempSaleLinePOS."Retail Document No." := TempSaleLinePOS2."Retail Document No.";
             //+NPR5.43 [321284]
             TempSaleLinePOS."Line No." := LineNo;
-            TempSaleLinePOS.Validate(Quantity,NonDiscQty);
+            TempSaleLinePOS.VALIDATE(Quantity,NonDiscQty);
             TempSaleLinePOS."Discount Type" := TempSaleLinePOSApply."Discount Type";
             TempSaleLinePOS."Discount Code" := TempSaleLinePOSApply."Discount Code";
             TempSaleLinePOS."Discount %" := 0;
             TempSaleLinePOS."Discount Amount" := 0;
-            TempSaleLinePOS."Custom Disc Blocked" := false;
+            TempSaleLinePOS."Custom Disc Blocked" := FALSE;
             //-NPR5.40 [294655]
             //TempSaleLinePOS.GetAmount(TempSaleLinePOS,Item,TempSaleLinePOSApply."Unit Price");
             //+NPR5.40 [294655]
-            TempSaleLinePOS.Insert;
-          end;
+            TempSaleLinePOS.INSERT;
+          END;
           //+NPR5.31 [262964]
-          if RemainingQty > 0 then begin
+          IF RemainingQty > 0 THEN BEGIN
             LineNo += 10000;
-
+        
             //-NPR5.43 [321284]
             TempSaleLinePOS2 := TempSaleLinePOS;
             //+NPR5.43 [321284]
-            TempSaleLinePOS.Init;
+            TempSaleLinePOS.INIT;
             TempSaleLinePOS := TempSaleLinePOSApply;
             //-NPR5.43 [321284]
             TempSaleLinePOS."Sales Document Type" := TempSaleLinePOS2."Sales Document Type";
@@ -1132,19 +1378,50 @@ codeunit 6014416 "Mixed Discount Management"
             TempSaleLinePOS."Retail Document No." := TempSaleLinePOS2."Retail Document No.";
             //+NPR5.43 [321284]
             TempSaleLinePOS."Line No." := LineNo;
-            TempSaleLinePOS.Validate(Quantity,RemainingQty);
+            TempSaleLinePOS.VALIDATE(Quantity,RemainingQty);
             TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::" ";
             TempSaleLinePOS."Discount Code" := '';
             TempSaleLinePOS."Discount %" := 0;
             TempSaleLinePOS."Discount Amount" := 0;
-            TempSaleLinePOS."Custom Disc Blocked" := false;
+            TempSaleLinePOS."Custom Disc Blocked" := FALSE;
             //-NPR5.40 [294655]
             //TempSaleLinePOS.GetAmount(TempSaleLinePOS,Item,TempSaleLinePOSApply."Unit Price");
             //+NPR5.40 [294655]
-            TempSaleLinePOS.Insert;
-          end;
+            TempSaleLinePOS.INSERT;
+          END;
+          */
+          //+NPR5.55 [412946]-revoked
         until TempSaleLinePOSApply.Next = 0;
         //+NPR5.31 [262904]
+
+    end;
+
+    local procedure InsertNewSaleLine(var SaleLinePOS: Record "Sale Line POS";FromSaleLinePOS: Record "Sale Line POS";Qty: Decimal;DiscountType: Integer;DiscountCode: Code[20];var LastLineNo: Integer)
+    var
+        SaleLinePOS2: Record "Sale Line POS";
+    begin
+        //-NPR5.55 [412946]
+        if Qty <= 0 then
+          exit;
+
+        SaleLinePOS2 := SaleLinePOS;
+
+        SaleLinePOS.Init;
+        SaleLinePOS := FromSaleLinePOS;
+        SaleLinePOS."Sales Document Type" := SaleLinePOS2."Sales Document Type";
+        SaleLinePOS."Sales Document No." := SaleLinePOS2."Sales Document No.";
+        SaleLinePOS."Retail Document No." := SaleLinePOS2."Retail Document No.";
+        SaleLinePOS."Line No." := LastLineNo + 10000;
+        SaleLinePOS.Validate(Quantity, Qty);
+        SaleLinePOS."Discount Type" := DiscountType;
+        SaleLinePOS."Discount Code" := DiscountCode;
+        SaleLinePOS."Discount %" := 0;
+        SaleLinePOS."Discount Amount" := 0;
+        SaleLinePOS."Custom Disc Blocked" := false;
+        SaleLinePOS.Insert;
+
+        LastLineNo := SaleLinePOS."Line No.";
+        //+NPR5.55 [412946]
     end;
 
     local procedure AmountExclVat(TempMixedDiscount: Record "Mixed Discount" temporary): Boolean
@@ -1153,7 +1430,13 @@ codeunit 6014416 "Mixed Discount Management"
         if not TempMixedDiscount."Total Amount Excl. VAT" then
           exit(false);
 
-        exit(TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Total Amount per Min. Qty.");
+        //EXIT(TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Total Amount per Min. Qty.");  //NPR5.55 [412946]-revoked
+        //-NPR5.55 [412946]
+        exit(
+          TempMixedDiscount."Discount Type" in
+            [TempMixedDiscount."Discount Type"::"Total Amount per Min. Qty.",
+             TempMixedDiscount."Discount Type"::"Multiple Discount Levels"]);
+        //+NPR5.55 [412946]
         //+NPR5.40 [306304]
     end;
 

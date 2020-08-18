@@ -1,6 +1,7 @@
 codeunit 6184860 "Dropbox API Mgt."
 {
     // NPR5.54/ALST/20200212 CASE 383718 Object created
+    // NPR5.55/ALST/20200609 CASE 387570 added incoming document boolean parameter
 
 
     trigger OnRun()
@@ -32,6 +33,8 @@ codeunit 6184860 "Dropbox API Mgt."
         UploadAllDescCaption: Label '(Optional)  logical (1/0 or true/false or t/f) case true, all files on the NAV server directory will be uploaded, else Overview table will be consulted for new files only. Default is false.';
         DataExchTypeCaption: Label 'Data exchange type';
         DataExchTypeDescCaption: Label '(Optional) Providing the Data Exchange Type (see Data Exchange Types page, Code field) will create an incoming document instead of downloading it to the server';
+        IncomingDocumentCaption: Label 'Create Incoming Document';
+        IncDocumentDescCaption: Label '(Optional) logical (1/0 or true/false or t/f) parameter to send file to the incoming document table instead of the physical location on server, default set to false';
 
     procedure StorageType(): Code[20]
     begin
@@ -142,6 +145,16 @@ codeunit 6184860 "Dropbox API Mgt."
             "Parameter Name" := DataExchTypeCaption;
             Description := DataExchTypeDescCaption;
             if Insert then;
+
+          //-NPR5.55 [387570]
+          Init;
+          "Storage Type" := StorageType();
+          "Operation Code" := DownloadCaption;
+          "Parameter Key" := 300;
+          "Parameter Name" := IncomingDocumentCaption;
+          Description := IncDocumentDescCaption;
+          if Insert then;
+          //+NPR5.55 [387570]
 
             Init;
             "Storage Type" := StorageType();

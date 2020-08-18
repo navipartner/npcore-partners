@@ -92,6 +92,7 @@ codeunit 6014549 "RP Line Print Mgt."
     // NPR5.44/MMV /20180706 CASE 315362 Changed function signatuer in data join buffer.
     //                                   Cleanup and refactoring.
     // NPR5.54/MITH/20200207 CASE 369235 Changed length of FontName(input) in SetFont and CurrentFont(var) from 10 to 30.
+    // NPR5.55/MMV /20200220 CASE 391841 Added support for skipping remaining columns on a line if blank.
 
     SingleInstance = true;
 
@@ -122,6 +123,8 @@ codeunit 6014549 "RP Line Print Mgt."
         Error_InvalidTableAttribute: Label 'Cannot print attributes from table %1';
         LineBuffer: Text;
         DecimalRounding: Option "2","3","4","5";
+        SkipColumnsAboveNo: Integer;
+        SkipRemainingColumns: Boolean;
 
     procedure AddTextField(Column: Integer;Align: Integer;Text: Text)
     begin
@@ -487,6 +490,22 @@ codeunit 6014549 "RP Line Print Mgt."
         DecimalBuffer: Decimal;
         i: Integer;
     begin
+        //-NPR5.55 [391841]
+        if TemplateLine."Template Column No." < 1 then begin
+          TemplateLine."Template Column No." := 1;
+        end;
+
+        if SkipRemainingColumns then begin
+          if (not TemplateLine."Prefix Next Line") then begin
+            if TemplateLine."Template Column No." > SkipColumnsAboveNo then begin
+              exit;
+            end else begin
+              SkipRemainingColumns := false;
+            end;
+          end;
+        end;
+        //+NPR5.55 [391841]
+
         case TemplateLine.Type of
           TemplateLine.Type::Data :
             begin
@@ -549,9 +568,6 @@ codeunit 6014549 "RP Line Print Mgt."
         if TemplateLine."Start Char" > 0 then
           TemplateLine."Processing Value" := CopyStr(TemplateLine."Processing Value", TemplateLine."Start Char");
 
-        if TemplateLine."Template Column No." < 1 then
-          TemplateLine."Template Column No." := 1;
-
         if TemplateLine."Blank Zero" then
           if Evaluate(DecimalBuffer, TemplateLine."Processing Value", 9) then
             if DecimalBuffer = 0 then
@@ -570,6 +586,10 @@ codeunit 6014549 "RP Line Print Mgt."
               Buffer.DeleteAll;
               Buffer.SetRange("Line No.");
             end;
+        //-NPR5.55 [391841]
+            SkipColumnsAboveNo := TemplateLine."Template Column No.";
+            SkipRemainingColumns := true;
+        //+NPR5.55 [391841]
           end;
           if (StrLen(LineBuffer) = 0) then begin
             Clear(LineBuffer);
@@ -758,6 +778,10 @@ codeunit 6014549 "RP Line Print Mgt."
         Clear(FourColumnDistribution);
         Clear(LineBuffer);
         Clear(DecimalRounding);
+        //-NPR5.55 [391841]
+        Clear(SkipColumnsAboveNo);
+        Clear(SkipRemainingColumns);
+        //+NPR5.55 [391841]
     end;
 
     local procedure "// Publishers"()

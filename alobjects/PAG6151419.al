@@ -10,6 +10,7 @@ page 6151419 "Magento Brand Card"
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.09/TS  /20180108  CASE 300893 Removed Caption on Action Container
     // MAG2.23/BHR /20190730  CASE 362728 Add Short Description
+    // MAG2.26/MHA /20200601  CASE 404580 Magento Brands can now be managed externally
 
     Caption = 'Brand Card';
     DelayedInsert = true;
@@ -22,7 +23,7 @@ page 6151419 "Magento Brand Card"
             group(Control6150613)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field(Id;Id)
                 {
                 }
                 field(Name;Name)
@@ -137,7 +138,7 @@ page 6151419 "Magento Brand Card"
                     MagentoDisplayConfig: Record "Magento Display Config";
                 begin
                     //-MAG1.21
-                    MagentoDisplayConfig.SetRange("No.",Code);
+                    MagentoDisplayConfig.SetRange("No.",Id);
                     MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::Brand);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                     MagentoDisplayConfigPage.Run;
@@ -149,12 +150,19 @@ page 6151419 "Magento Brand Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.PictureDragDropAddin.PAGE.SetBrandCode(Code,false);
-        CurrPage.LogoPictureDragDropAddin.PAGE.SetBrandCode(Code,true);
+        CurrPage.PictureDragDropAddin.PAGE.SetBrandCode(Id,false);
+        CurrPage.LogoPictureDragDropAddin.PAGE.SetBrandCode(Id,true);
     end;
 
     trigger OnOpenPage()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
+        //-MAG2.26 [404580]
+        HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
+        CurrPage.Editable(not HasSetupBrands);
+        //+MAG2.26 [404580]
+
         //-MAG1.21
         SetDisplayConfigVisible;
         //+MAG1.21
@@ -165,6 +173,7 @@ page 6151419 "Magento Brand Card"
         Text001: Label 'Update Seo Link?';
         PictureViewerReady: Boolean;
         DisplayConfigVisible: Boolean;
+        HasSetupBrands: Boolean;
 
     local procedure SetDisplayConfigVisible()
     var

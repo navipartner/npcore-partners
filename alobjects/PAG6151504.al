@@ -30,74 +30,25 @@ page 6151504 "Nc Import List"
     // NC2.23/MHA /20190927  CASE 369170 Removed Gambit integration
     // NC2.24/MHA /20191108  CASE 373525 Changed extension filter for Import File to reflect "Document Name"
     // NPR5.54/CLVA/20200127 CASE 366790 Added function ShowFormattedDocumentSource
+    // NPR5.55/CLVA/20200506 CASE 366790 Changed error handling. Added function ShowFormattedDocByDocNo
+    // NPR5.55/MHA /20200604  CASE 408100 Reworked layout for better Web Client experience
 
     Caption = 'Import List';
     DelayedInsert = true;
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,Navigate,NaviPartner';
     SourceTable = "Nc Import Entry";
+    SourceTableView = SORTING("Entry No.")
+                      ORDER(Descending);
     UsageCategory = Tasks;
 
     layout
     {
         area(content)
         {
-            grid(Control6150639)
-            {
-                GridLayout = Rows;
-                ShowCaption = false;
-                group(Filters)
-                {
-                    Caption = 'Filters';
-                    field("COUNT"; Count)
-                    {
-                        Caption = 'Quantity';
-                        Editable = false;
-                    }
-                    field(FilterImportType; FilterImportType)
-                    {
-                        Caption = 'Import Type';
-                        TableRelation = "Nc Import Type";
-
-                        trigger OnValidate()
-                        begin
-                            SetPresetFilters();
-                        end;
-                    }
-                    field("Show Exported"; ShowImported)
-                    {
-                        Caption = 'Show Imported';
-
-                        trigger OnValidate()
-                        begin
-                            SetPresetFilters();
-                        end;
-                    }
-                }
-                group(Control6150632)
-                {
-                    ShowCaption = false;
-                    field(Control6150622; '')
-                    {
-                        Caption = 'Error Message:                                                                                                                                                                                                                                                                                _';
-                        HideValue = true;
-                        ShowCaption = false;
-                    }
-                    field(ErrorText; ErrorText)
-                    {
-                        Editable = false;
-                        MultiLine = true;
-                        ShowCaption = false;
-                    }
-                }
-            }
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Entry No."; "Entry No.")
-                {
-                    Editable = false;
-                }
                 field(Date; Date)
                 {
                     Editable = false;
@@ -123,6 +74,21 @@ page 6151504 "Nc Import List"
                 }
                 field("Runtime Error"; "Runtime Error")
                 {
+                    Visible = false;
+                }
+                field("Error Message";"Error Message")
+                {
+                    DrillDown = true;
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    var
+                        NcImportMgt: Codeunit "Nc Import Mgt.";
+                    begin
+                        //-NPR5.55 [408100]
+                        Message(NcImportMgt.GetErrorMessage(Rec,false));
+                        //+NPR5.55 [408100]
+                    end;
                 }
                 field("Last Error E-mail Sent at"; "Last Error E-mail Sent at")
                 {
@@ -134,15 +100,44 @@ page 6151504 "Nc Import List"
                 }
                 field("Import Started at"; "Import Started at")
                 {
-                    Visible = false;
                 }
                 field("Import Completed at"; "Import Completed at")
                 {
-                    Visible = false;
                 }
                 field("Import Duration"; "Import Duration")
                 {
+                }
+                field("Import Count";"Import Count")
+                {
+                }
+                field("Import Started by";"Import Started by")
+                {
                     Visible = false;
+                }
+                field("Server Instance Id";"Server Instance Id")
+                {
+                    Visible = false;
+                }
+                field("Session Id";"Session Id")
+                {
+                    Visible = false;
+                }
+                field("Earliest Import Datetime";"Earliest Import Datetime")
+                {
+                    Visible = false;
+                }
+                field("Entry No.";"Entry No.")
+                {
+                    Editable = false;
+                }
+            }
+            group(Control6014407)
+            {
+                ShowCaption = false;
+                field("COUNT";Count)
+                {
+                    Caption = 'Quantity';
+                    Editable = false;
                 }
             }
         }
@@ -316,14 +311,12 @@ page 6151504 "Nc Import List"
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        UpdateErrorText();
-    end;
-
     trigger OnOpenPage()
     begin
-        SetPresetFilters();
+        //-NPR5.55 [408100]
+        SetRange(Imported,false);
+        if FindFirst then;
+        //+NPR5.55 [408100]
 
         //-NC1.14
         WebClient := IsWebClient();
@@ -331,18 +324,15 @@ page 6151504 "Nc Import List"
     end;
 
     var
-        FilterImportType: Code[20];
         Text001: Label 'No Input';
         Text002: Label 'The %1 selected Import Entries will be scheduled for re-import\Continue?';
         Text003: Label 'No Documents';
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        SyncMgt: Codeunit "Nc Sync. Mgt.";
-        ErrorText: Text;
-        ShowImported: Boolean;
-        Text004: Label '%1 Order(s) has been imported \\%2 Orders contained errors.';
+        Text004: Label '%1 Documents have been imported\\%2 Documents failed.';
         WebClient: Boolean;
         Text005: Label 'Import File';
         Text006: Label 'XML Stylesheet is empty for Import Type: %1';
+        Text007: Label 'No Import Filenames matched %1';
 
     local procedure AddFile()
     var
@@ -372,29 +362,6 @@ page 6151504 "Nc Import List"
         //+NC2.08 [297159]
     end;
 
-    local procedure SetPresetFilters()
-    var
-        CurrentEntryNo: BigInteger;
-    begin
-        CurrentEntryNo := "Entry No.";
-        FilterGroup(2);
-
-        Reset;
-        if ShowImported then
-            SetRange(Imported)
-        else
-            SetRange(Imported, false);
-
-        if FilterImportType = '' then
-            SetRange("Import Type")
-        else
-            SetRange("Import Type", FilterImportType);
-
-        FilterGroup(0);
-        if Get(CurrentEntryNo) then;
-        CurrPage.Update(false);
-    end;
-
     local procedure IsWebClient(): Boolean
     var
         ActiveSession: Record "Active Session";
@@ -404,30 +371,11 @@ page 6151504 "Nc Import List"
         exit(false);
     end;
 
-    local procedure UpdateErrorText()
-    var
-        NcImportMgt: Codeunit "Nc Import Mgt.";
-    begin
-        //-NC2.02 [262318]
-        // LF := 10;
-        // CR := 13;
-        // ErrorText := '';
-        // CALCFIELDS("Last Error Message");
-        // "Last Error Message".CREATEINSTREAM(InStream);
-        // WHILE NOT InStream.EOS DO BEGIN
-        //  InStream.READTEXT(Line);
-        //  IF ErrorText <> '' THEN
-        //    ErrorText += FORMAT(CR) + FORMAT(LF);
-        //  ErrorText += Line;
-        // END;
-        ErrorText := NcImportMgt.GetErrorMessage(Rec, false);
-        //+NC2.02 [262318]
-    end;
-
     local procedure EditFile()
     var
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
+        SyncMgt: Codeunit "Nc Sync. Mgt.";
         f: File;
         InStr: InStream;
         OutStr: OutStream;
@@ -460,15 +408,20 @@ page 6151504 "Nc Import List"
     local procedure ImportSelected()
     var
         ImportEntry: Record "Nc Import Entry";
-        NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
         ImportedCount: Integer;
     begin
         //-NC1.21
         ImportedCount := 0;
         CurrPage.SetSelectionFilter(ImportEntry);
+        //-NPR5.55 [408100]
+        ImportEntry.ModifyAll("Earliest Import Datetime",0DT);
+        Commit;
+        //+NPR5.55 [408100]
         if ImportEntry.FindSet then
             repeat
-                NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
+            //-NPR5.55 [408100]
+            CODEUNIT.Run(CODEUNIT::"Nc Import Processor",ImportEntry);
+            //+NPR5.55 [408100]
                 ImportEntry.Get(ImportEntry."Entry No.");
                 ImportedCount += 1;
             until ImportEntry.Next = 0;
@@ -480,6 +433,7 @@ page 6151504 "Nc Import List"
     local procedure RescheduleSelectedforImport()
     var
         ImportEntry: Record "Nc Import Entry";
+        NcImportProcessor: Codeunit "Nc Import Processor";
     begin
         CurrPage.SetSelectionFilter(ImportEntry);
         if Confirm(StrSubstNo(Text002, ImportEntry.Count), true) then begin
@@ -488,6 +442,14 @@ page 6151504 "Nc Import List"
             ImportEntry.ModifyAll(Imported, false, false);
             ImportEntry.ModifyAll("Runtime Error", false, false);
             //+NC2.16 [313184]
+          //-NPR5.55 [408100]
+          ImportEntry.ModifyAll("Earliest Import Datetime",0DT);
+          Commit;
+          if ImportEntry.FindSet then
+          repeat
+            NcImportProcessor.ScheduleImport(ImportEntry);
+          until ImportEntry.Next = 0;
+          //+NPR5.55 [408100]
             CurrPage.Update(false);
         end;
     end;
@@ -529,7 +491,7 @@ page 6151504 "Nc Import List"
         //+NC2.12 [308107]
     end;
 
-    local procedure ShowFormattedDocumentSource()
+    procedure ShowFormattedDocumentSource()
     var
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
@@ -554,11 +516,13 @@ page 6151504 "Nc Import List"
 
             NcImportType.CalcFields("XML Stylesheet");
             if not NcImportType."XML Stylesheet".HasValue then
-                Error(Text006);
+            //-NPR5.55 [366790]
+            //ERROR(Text006);
+            Error(Text006,"Import Type");
+            //+NPR5.55 [366790]
 
             TempBlob.FromRecord(NcImportType, NcImportType.FieldNo("XML Stylesheet"));
             XMLStylesheetPath := FileMgt.BLOBExport(TempBlob, 'Stylesheet.xslt', false);
-            //HYPERLINK(XMLStylesheetPath);
 
             XslCompiledTransform := XslCompiledTransform.XslCompiledTransform;
             XslCompiledTransform.Load(XMLStylesheetPath);
@@ -572,7 +536,7 @@ page 6151504 "Nc Import List"
 
             ServerFileName := FileMgt.UploadFileSilent(LocalTempFile);
 
-            HtmlContent := GetFormattedDocumentAsString(ServerFileName, true);//HYPERLINK(LocalTempFile);
+            HtmlContent := GetFormattedDocumentAsString(ServerFileName, true);
             PreviewFormattedDocument("Document Name", HtmlContent);
 
         end else
@@ -649,8 +613,35 @@ page 6151504 "Nc Import List"
 
             WinForm.Controls.Add(WebBrowser);
             WinForm.ShowDialog;
+          //-NPR5.55 [366790]
+          WinForm.Dispose();
+          Clear(WinForm);
+          //+NPR5.55 [366790]
         end;
         //+NPR5.54 [366790]
+    end;
+
+    procedure ShowFormattedDocByDocNo(DocNo: Text[100])
+    var
+        NcImportEntry: Record "Nc Import Entry";
+        NcImportListPg: Page "Nc Import List";
+    begin
+        //-NPR5.55 [366790]
+        if DocNo = '' then
+          Error(Text001);
+
+        NcImportEntry.SetFilter("Document Name",'%1','*' + DocNo + '*');
+        if NcImportEntry.FindSet then begin
+          if NcImportEntry.Count > 1 then begin
+            NcImportListPg.SetRecord(NcImportEntry);
+            NcImportListPg.RunModal();
+          end else begin
+           NcImportListPg.SetRecord(NcImportEntry);
+           NcImportListPg.ShowFormattedDocumentSource();
+          end;
+        end else
+         Error(Text007,DocNo);
+        //+NPR5.55 [366790]
     end;
 }
 

@@ -5,6 +5,7 @@ page 6151591 "NpDc Coupon Types"
     // NPR5.37/MHA /20171016  CASE 293531 Added Actions: How-to Videos
     // NPR5.39/MHA /20180214  CASE 305146 Added field 70 "Enabled"
     // NPR5.40/MHA /20180308  CASE 305859 Added Action "Comments"
+    // NPR5.55/ALPO/20200518  CASE 387376 Possibility to define sequence in which discount coupons are applied
 
     Caption = 'Coupon Types';
     CardPageID = "NpDc Coupon Type Card";
@@ -44,6 +45,9 @@ page 6151591 "NpDc Coupon Types"
                 {
                 }
                 field("Ending Date";"Ending Date")
+                {
+                }
+                field("Application Sequence No.";"Application Sequence No.")
                 {
                 }
                 field("Coupon Qty. (Open)";"Coupon Qty. (Open)")

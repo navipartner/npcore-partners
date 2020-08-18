@@ -26,6 +26,7 @@ table 6151551 "NpXml Template"
     // NC2.08 /MHA /20171206  CASE 265541 Added field 5405 "Use JSON Numbers"
     // NC2.11 /MHA /20180319  CASE 308403 Updated Hardcoded Dates with DMY2DATE to be Culture neutral in UpdateNaviConnectSetup()
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to fields 5310, 5315, 5320, 5400 and 5405
+    // NPR5.55/MHA /20200630  CASE #411410 Added field 5145 "FTP Filename (Fixed)"
 
     Caption = 'NpXml Template';
     DrillDownPageID = "NpXml Template List";
@@ -258,6 +259,11 @@ table 6151551 "NpXml Template"
         {
             Caption = 'FTP Directory';
             Description = 'NC1.21';
+        }
+        field(5145;"FTP Filename (Fixed)";Text[100])
+        {
+            Caption = 'FTP Filename (Fixed)';
+            Description = 'NPR5.55';
         }
         field(5150;"FTP Port";Integer)
         {

@@ -737,7 +737,7 @@ codeunit 6014537 "RP Epson Label Device Library"
         ByteArray: DotNet npNetArray;
     begin
         // Align     :   Alignment of text
-        // Rotate    :   Orientation,                [0,1,2,3] -> [0�,90�,180�,270�]
+        // Rotate    :   Orientation,                [0,1,2,3] -> [0º,90º,180º,270º]
         // Type      :   Font Type
         // Height    :   Character height
         // Width     :   Character width

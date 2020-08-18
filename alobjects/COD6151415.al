@@ -1,5 +1,7 @@
 codeunit 6151415 "Magento Nc Task Card Mgt."
 {
+    // MAG2.26/MHA /20200601  CASE 404580 Magento Categories cases in GetRelatedRecRef()
+
 
     trigger OnRun()
     begin
@@ -28,18 +30,16 @@ codeunit 6151415 "Magento Nc Task Card Mgt."
         MagentoAttributeLabel: Record "Magento Attribute Label";
         MagentoAttributeSet: Record "Magento Attribute Set";
         MagentoAttributeSetValue: Record "Magento Attribute Set Value";
+        MagentoCategoryLink: Record "Magento Category Link";
         MagentoCustomOption: Record "Magento Custom Option";
         MagentoCustomOptionValue: Record "Magento Custom Option Value";
         MagentoItemAttribute: Record "Magento Item Attribute";
         MagentoItemAttributeValue: Record "Magento Item Attribute Value";
         MagentoItemCustomOption: Record "Magento Item Custom Option";
         MagentoItemCustomOptValue: Record "Magento Item Custom Opt. Value";
-        MagentoItemGroup: Record "Magento Item Group";
-        MagentoItemGroupLink: Record "Magento Item Group Link";
         MagentoPictureLink: Record "Magento Picture Link";
         MagentoProductRelation: Record "Magento Product Relation";
         MagentoStoreItem: Record "Magento Store Item";
-        MagentoStoreItemGroup: Record "Magento Store Item Group";
         MagentoWebsiteLink: Record "Magento Website Link";
     begin
         case RecRef.Number of
@@ -91,14 +91,6 @@ codeunit 6151415 "Magento Nc Task Card Mgt."
               RecRefRelated.GetTable(Item);
               exit(true);
             end;
-          DATABASE::"Magento Item Group Link":
-            begin
-              RecRef.SetTable(MagentoItemGroupLink);
-              if not Item.Get(MagentoItemGroupLink."Item No.") then
-                exit(false);
-              RecRefRelated.GetTable(Item);
-              exit(true);
-            end;
           DATABASE::"Magento Picture Link" :
             begin
               RecRef.SetTable(MagentoPictureLink);
@@ -123,14 +115,6 @@ codeunit 6151415 "Magento Nc Task Card Mgt."
               RecRefRelated.GetTable(Item);
               exit(true);
             end;
-          DATABASE::"Magento Store Item Group":
-            begin
-              RecRef.SetTable(MagentoStoreItemGroup);
-              if not MagentoItemGroup.Get(MagentoStoreItemGroup."No.") then
-                exit(false);
-              RecRefRelated.GetTable(MagentoItemGroup);
-              exit(true);
-            end;
           DATABASE::"Magento Website Link":
             begin
               RecRef.SetTable(MagentoWebsiteLink);
@@ -145,6 +129,14 @@ codeunit 6151415 "Magento Nc Task Card Mgt."
               if not MagentoCustomOption.Get(MagentoCustomOptionValue) then
                 exit(false);
               RecRefRelated.GetTable(MagentoCustomOption);
+              exit(true);
+            end;
+          DATABASE::"Magento Category Link":
+            begin
+              RecRef.SetTable(MagentoCategoryLink);
+              if not Item.Get(MagentoCategoryLink."Item No.") then
+                exit(false);
+              RecRefRelated.GetTable(Item);
               exit(true);
             end;
         end;

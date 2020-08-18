@@ -4,6 +4,8 @@ page 6151022 "NpRv Arch. Vouchers"
     // NPR5.48/MHA /20180921  CASE 302179 Added field 1007 "Issue Document Type", 1013 "Issue External Document No."
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
     // NPR5.53/MHA /20191212  CASE 380284 Added "Initial Amount" and hidden "Amount"
+    // NPR5.55/BHR /20200511  CASE 404114 Set field Amount to visible
+    // NPR5.55/MHA /20200702  CASE 407070 Added Sending Log
 
     Caption = 'Archived Retail Vouchers';
     CardPageID = "NpRv Arch. Voucher Card";
@@ -35,7 +37,6 @@ page 6151022 "NpRv Arch. Vouchers"
                 }
                 field(Amount;Amount)
                 {
-                    Visible = false;
                 }
                 field("Starting Date";"Starting Date")
                 {
@@ -70,6 +71,10 @@ page 6151022 "NpRv Arch. Vouchers"
                 field("Partner Clearing";"Partner Clearing")
                 {
                 }
+                field("No. Send";"No. Send")
+                {
+                    Visible = false;
+                }
             }
         }
     }
@@ -85,6 +90,14 @@ page 6151022 "NpRv Arch. Vouchers"
                 RunObject = Page "NpRv Arch. Voucher Entries";
                 RunPageLink = "Arch. Voucher No."=FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
+            }
+            action("Arch. Sending Log")
+            {
+                Caption = 'Archived Sending Log';
+                Image = Log;
+                RunObject = Page "NpRv Arch. Sending Log";
+                RunPageLink = "Arch. Voucher No."=FIELD("No.");
+                ShortCutKey = 'Shift+Ctrl+F7';
             }
         }
     }

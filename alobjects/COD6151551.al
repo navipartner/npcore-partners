@@ -49,6 +49,7 @@ codeunit 6151551 "NpXml Mgt."
     // NC2.22/MHA /20190627  CASE 342115 Added SetTrustedCertificateValidation() in SendApi() and removed green code before 2.19
     // NC2.24/MHA /20191122  CASE 373950 Added ReplaceSpecialChar() to GetFilename()
     // NC2.25/MHA /20200311  CASE 392967 FilterGroups added to SetRecRefXmlFilter()
+    // NPR5.55/MHA /20200630  CASE 411410 Added FTP Filename (Fixed)
 
 
     trigger OnRun()
@@ -101,7 +102,10 @@ codeunit 6151551 "NpXml Mgt."
         OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code));
 
         if NpXmlTemplate2."Max Records per File" <= 0 then
-            NpXmlTemplate2."Max Records per File" := 10000;
+          //-NPR5.55 [411410]
+          //NpXmlTemplate2."Max Records per File" := 10000;
+          NpXmlTemplate2."Max Records per File" := 10000000;
+          //+NPR5.55 [411410]
 
         XmlEntityCount := 0;
         NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate2."Xml Root Name");
@@ -710,6 +714,11 @@ codeunit 6151551 "NpXml Mgt."
             exit;
         if NPXmlTemplate."FTP Server" = '' then
             exit;
+
+        //-NPR5.55 [411410]
+        if NPXmlTemplate."FTP Filename (Fixed)" <> '' then
+          Filename := NPXmlTemplate."FTP Filename (Fixed)";
+        //+NPR5.55 [411410]
 
         AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server");
 

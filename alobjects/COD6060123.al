@@ -29,7 +29,10 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     // TM1.45/TSA /20191025 CASE 374463 Playing with WF20
     // TM1.45/TSA /20191112 CASE 322432 Signature Change
     // TM1.45/TSA /20191203 CASE 380754 Signature Change
-    // TM90.1.46/TSA /20200129 CASE 387138 Signature change AquireTicketParticipant()
+    // TM1.46/TSA /20200129 CASE 387138 Signature change AquireTicketParticipant()
+    // TM1.47/TSA /20200424 CASE 401800 Unattended mode will not allow more than 100 tickets per line
+    // TM1.47/TSA /20200514 CASE 356582 New parameter for ticket arrival to inlcude print capability
+    // TM1.47/TSA /20200603 CASE 408018 Register Departure of ticket
 
 
     trigger OnRun()
@@ -50,6 +53,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         NotAGroupTicket: Label 'Ticket %1 is not a group ticket.';
         QtyNotSettable: Label 'Quantity for ticket %1 can''t be changed.';
         Welcome: Label 'Welcome.';
+        WelcomeBack: Label 'Have a nice day.';
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
         DELETE_SINGLE_ERROR: Label 'Changing quantiy on a return sale of tickets is not supported.\You may return either all tickets by keeping the line, or none by deleting the line.\Use the "Revoke Reservation" action to return individual tickets.';
         INVALID_QTY: Label 'Invalid quantity. Old quantity %1, new quantity %2.';
@@ -71,7 +75,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2.74');
+        exit ('1.1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -94,8 +98,10 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
                                     'Register Arrival,' +
                                     'Revoke Reservation,Edit Reservation,Reconfirm Reservation,' +
                                     'Edit Ticketholder,' +
-                                    'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership';
-            for N := 1 to 9 do
+                                  'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,'+
+                                  'Register Departure'; //-+TM1.47 [408018]
+
+          for N := 1 to 10 do
                 JSArr += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
             JSArr := StrSubstNo('var optionNames = [%1];', CopyStr(JSArr, 1, StrLen(JSArr) - 1));
 
@@ -112,6 +118,8 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             Sender.RegisterOptionParameter('Function', FunctionOptionString, 'Register Arrival');
             Sender.RegisterTextParameter('Admission Code', '');
             Sender.RegisterTextParameter('DefaultTicketNumber', '');
+          Sender.RegisterBooleanParameter ('PrintTicketOnArrival', false); //-+TM1.47 [356582]
+
         end;
 
         //-TM1.45 [374463]
@@ -125,8 +133,9 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
                                     'Register Arrival,' +
                                     'Revoke Reservation,Edit Reservation,Reconfirm Reservation,' +
                                     'Edit Ticketholder,' +
-                                    'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership';
-            for N := 1 to 9 do
+                                  'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,'+
+                                  'Register Departure'; //-+TM1.47 [408018]
+          for N := 1 to 10 do
                 OptionsNameArray += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
             OptionsNameArray := StrSubstNo('var optionNames = [%1];', CopyStr(OptionsNameArray, 1, StrLen(OptionsNameArray) - 1));
 
@@ -165,6 +174,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             Sender.RegisterOptionParameter('Function', FunctionOptionString, 'Register Arrival');
             Sender.RegisterTextParameter('Admission Code', '');
             Sender.RegisterTextParameter('DefaultTicketNumber', '');
+          Sender.RegisterBooleanParameter ('PrintTicketOnArrival', false); //-+TM1.47 [356582]
 
         end;
         //+TM1.45 [374463]
@@ -253,6 +263,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         ShowQtyDialog: Boolean;
         DefaultTicketNumber: Text;
         TicketReference: Code[20];
+        WithTicketPrint: Boolean;
     begin
 
         if (not Action.IsThisAction(ActionCode(''))) then
@@ -266,16 +277,25 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         AdmissionCode := JSON.GetStringParameter('Admission Code', false);
         DefaultTicketNumber := JSON.GetStringParameter('DefaultTicketNumber', false);
         TicketReference := CopyStr(GetInput(JSON, 'ticketreference'), 1, MaxStrLen(TicketReference));
+        WithTicketPrint := JSON.GetBooleanParameter ('PrintTicketOnArrival', false); //-+TM1.47 [356582]
+
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         if (DefaultTicketNumber = '') then begin
             ExternalTicketNumber := CopyStr(GetInput(JSON, 'ticketnumber'), 1, MaxStrLen(ExternalTicketNumber));
         end else begin
+          // From EAN Box or similar
             ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
             if (FunctionId = 1) then begin
                 JSON.SetContext('Verbose', true);
                 JSON.SetContext('VerboseMessage', Welcome);
             end;
+          //-TM1.47 [408018]
+          if (FunctionId = 9) then begin
+            JSON.SetContext ('Verbose', true);
+            JSON.SetContext ('VerboseMessage', WelcomeBack);
+          end;
+          //+TM1.47 [408018]
         end;
 
         if (WorkflowStep = 'ticketnumber') then begin
@@ -299,27 +319,25 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
                 1:
                     begin
                         SetGroupTicketConfirmedQuantity(POSSession, JSON, ExternalTicketNumber, AdmissionCode);
-                        RegisterArrival(ExternalTicketNumber, AdmissionCode);
-                    end;
-                2:
-                    RevokeTicketReservation(POSSession, ExternalTicketNumber);
-                3:
-                    EditReservation(POSSession, ExternalTicketNumber);
-                4:
-                    ReconfirmReservation(POSSession, ExternalTicketNumber);
-                5:
-                    EditTicketholder(POSSession, ExternalTicketNumber);
-                6:
-                    SetGroupTicketConfirmedQuantity(POSSession, JSON, ExternalTicketNumber, '');
-                7:
-                    PickupPreConfirmedTicket(POSSession, TicketReference);
-                8:
-                    ConvertToMembership(POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
-                else
-                    Error('Function with ID %1 is not implemented.', FunctionId);
-            end;
+                //-TM1.47 [356582]
+                // RegisterArrival (ExternalTicketNumber, AdmissionCode);
+                RegisterArrival (ExternalTicketNumber, AdmissionCode, WithTicketPrint);
+                //+TM1.47 [356582]
 
-            POSSession.RequestRefreshData();
+              end;
+            2 : RevokeTicketReservation (POSSession, ExternalTicketNumber);
+            3 : EditReservation (POSSession, ExternalTicketNumber);
+            4 : ReconfirmReservation (POSSession, ExternalTicketNumber);
+            5 : EditTicketholder (POSSession, ExternalTicketNumber);
+            6 : SetGroupTicketConfirmedQuantity (POSSession, JSON, ExternalTicketNumber, '');
+            7 : PickupPreConfirmedTicket (POSSession, TicketReference);
+            8 : ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
+            9 : RegisterDeparture (ExternalTicketNumber, AdmissionCode, WithTicketPrint); //-+TM1.47 [408018]
+          else
+            Error ('Function with ID %1 is not implemented.', FunctionId);
+          end;
+
+          POSSession.RequestRefreshData ();
 
         end;
 
@@ -365,27 +383,20 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             FunctionId := 1;
 
         case FunctionId of
-            0:
-                ShowTicketDialog := false; // Admission Count
-            1:
-                ShowTicketDialog := true; // Register Arrival
-            2:
-                ShowTicketDialog := true; // Revoke Reservation
-            3:
-                ShowTicketDialog := not (GetRequestToken(SalesReceiptNo, SaleLineNo, Token)); // Edit Reservation
-            4:
-                ShowTicketDialog := false; // Reconfirm Reservation
-            5:
-                ShowTicketDialog := not (GetRequestToken(SalesReceiptNo, SaleLineNo, Token)); // Edit Ticketholder
-            6:
-                begin // Change Confirmed Ticket Quantity
-                    ShowTicketDialog := true;
-                    ShowTicketQtyDialog := true;
-                end;
-            7:
-                ShowReferenceDialog := true; // Pick-up Ticket Reservation
-            8:
-                ShowTicketDialog := true; // Convert To Membership
+          0 : ShowTicketDialog := false; // Admission Count
+          1 : ShowTicketDialog := true; // Register Arrival
+          2 : ShowTicketDialog := true; // Revoke Reservation
+          3 : ShowTicketDialog := not (GetRequestToken (SalesReceiptNo, SaleLineNo, Token)); // Edit Reservation
+          4 : ShowTicketDialog := false; // Reconfirm Reservation
+          5 : ShowTicketDialog := not (GetRequestToken (SalesReceiptNo, SaleLineNo, Token)); // Edit Ticketholder
+          6 :
+            begin // Change Confirmed Ticket Quantity
+              ShowTicketDialog := true;
+              ShowTicketQtyDialog := true;
+            end;
+          7 : ShowReferenceDialog := true; // Pick-up Ticket Reservation
+          8 : ShowTicketDialog := true; // Convert To Membership
+          9 : ShowTicketDialog := true; // Register Departure //-+TM1.47 [408018]
         end;
 
         Context.SetContext('ShowTicketDialog', ShowTicketDialog and (DefaultTicketNumber = ''));
@@ -395,7 +406,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         //+TM1.45 [374463]
     end;
 
-    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "POS JSON Management"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[20]; TicketReference: Text)
+    local procedure DoWorkflowFunction(FunctionId: Integer;Context: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";AdmissionCode: Code[20];ExternalTicketNumber: Code[20];TicketReference: Text;WithTicketPrint: Boolean)
     begin
 
         case FunctionId of
@@ -404,24 +415,21 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             1:
                 begin
                     SetGroupTicketConfirmedQuantity(POSSession, Context, ExternalTicketNumber, AdmissionCode);
-                    RegisterArrival(ExternalTicketNumber, AdmissionCode);
-                end;
-            2:
-                RevokeTicketReservation(POSSession, ExternalTicketNumber);
-            3:
-                EditReservation(POSSession, ExternalTicketNumber);
-            4:
-                ReconfirmReservation(POSSession, ExternalTicketNumber);
-            5:
-                EditTicketholder(POSSession, ExternalTicketNumber);
-            6:
-                SetGroupTicketConfirmedQuantity(POSSession, Context, ExternalTicketNumber, '');
-            7:
-                PickupPreConfirmedTicket(POSSession, TicketReference);
-            8:
-                Error('WF20 support for EAN box is completed yet.'); //ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
-            else
-                Error('Function with ID %1 is not implemented.', FunctionId);
+              //-TM1.47 [356582]
+              // RegisterArrival (ExternalTicketNumber, AdmissionCode);
+              RegisterArrival (ExternalTicketNumber, AdmissionCode, WithTicketPrint);
+              //+TM1.47 [356582]
+            end;
+          2 : RevokeTicketReservation (POSSession, ExternalTicketNumber);
+          3 : EditReservation (POSSession, ExternalTicketNumber);
+          4 : ReconfirmReservation (POSSession, ExternalTicketNumber);
+          5 : EditTicketholder (POSSession, ExternalTicketNumber);
+          6 : SetGroupTicketConfirmedQuantity (POSSession, Context, ExternalTicketNumber, '');
+          7 : PickupPreConfirmedTicket (POSSession, TicketReference);
+          8 : Error ('WF20 support for EAN box is not completed yet.'); //ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
+          9 : RegisterDeparture (ExternalTicketNumber, AdmissionCode, WithTicketPrint); //-+TM1.47 [408018]
+        else
+          Error ('Function with ID %1 is not implemented.', FunctionId);
         end;
     end;
 
@@ -434,6 +442,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         ShowQtyDialog: Boolean;
         DefaultTicketNumber: Text;
         TicketReference: Code[20];
+        WithTicketPrint: Boolean;
     begin
 
         FunctionId := Context.GetIntegerParameter('Function', true);
@@ -442,6 +451,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
 
         AdmissionCode := Context.GetStringParameter('Admission Code', false);
         DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber', false);
+        WithTicketPrint := Context.GetBooleanParameter ('PrintTicketOnArrival', false); //-+TM1.47 [356582]
 
         Context.SetScope('', true);
         Context.SetScope('TicketReference', false);
@@ -472,8 +482,11 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
                 end;
             'DoAction':
                 begin
-                    Message('Do %1 with %2', FunctionId, ExternalTicketNumber);
-                    DoWorkflowFunction(FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference);
+              //-TM1.47 [356582]
+              // MESSAGE ('Do %1 with %2', FunctionId, ExternalTicketNumber);
+              //DoWorkflowFunction (FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference);
+              DoWorkflowFunction (FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference, WithTicketPrint);
+              //+TM1.47 [356582]
                 end;
         end;
     end;
@@ -613,6 +626,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         TicketType: Record "TM Ticket Type";
         Item: Record Item;
         Ticket: Record "TM Ticket";
+        POSUnit: Record "POS Unit";
         Token: Text[100];
         ResponseMessage: Text;
         ResponseCode: Integer;
@@ -627,7 +641,6 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
            ((SaleLinePOS.Quantity < 0) and (NewQuantity > 0)) then
             Error(INVALID_QTY, SaleLinePOS.Quantity, NewQuantity);
 
-
         //-TM1.38 [333413]
         // Dont do what I dont mean!
         if (StrLen(Format(Abs(NewQuantity))) > 14) then
@@ -640,9 +653,19 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             if (Abs(NewQuantity) > 20000) then
                 Error('%1 is a ridiculous number of tickets! Create them in batches of 20000, if you really want that many.', NewQuantity);
 
-            if (Abs(NewQuantity) > 100) then
+          //-TM1.47 [401800]
+          //  IF (ABS (NewQuantity) > 100) THEN
+          //    IF (NOT CONFIRM ('Do you really want to create %1 tickets?', TRUE, NewQuantity)) THEN
+          //      ERROR ('');
+          if (Abs (NewQuantity) > 100) then begin
+            if (POSUnit.Get (SaleLinePOS."Register No.")) then
+              if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
+                exit;
+
                 if (not Confirm('Do you really want to create %1 tickets?', true, NewQuantity)) then
                     Error('');
+          end;
+
         end;
         //+TM1.38 [333413]
 
@@ -823,11 +846,12 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         Error(ResponseMessage);
     end;
 
-    local procedure RegisterArrival(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])
+    local procedure RegisterArrival(ExternalTicketNumber: Code[50];AdmissionCode: Code[20];WithPrint: Boolean)
     var
         TicketManagement: Codeunit "TM Ticket Management";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         Admission: Record "TM Admission";
+        Ticket: Record "TM Ticket";
         ResponseMessage: Text;
     begin
 
@@ -841,6 +865,38 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
 
         if (TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1, false, ResponseMessage) <> 0) then
             Error(ResponseMessage);
+
+        //-TM1.47 [356582]
+        if (WithPrint) then begin
+          Ticket.SetFilter ("External Ticket No.", '=%1', ExternalTicketNumber);
+          if (not Ticket.FindFirst ()) then
+            exit;
+          Ticket.SetRecFilter ();
+          TicketManagement.PrintSingleTicket (Ticket);
+        end;
+        //+TM1.47 [356582]
+    end;
+
+    local procedure RegisterDeparture(ExternalTicketNumber: Code[50];AdmissionCode: Code[20];WithPrint: Boolean)
+    var
+        TicketManagement: Codeunit "TM Ticket Management";
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        Admission: Record "TM Admission";
+        Ticket: Record "TM Ticket";
+        ResponseMessage: Text;
+    begin
+
+        //-TM1.47 [408018]
+        if (AdmissionCode <> '') then
+          if (not Admission.Get (AdmissionCode)) then
+            Error (StrSubstNo (INVALID_ADMISSION, 'Admission Code', AdmissionCode));
+
+        TicketRequestManager.LockResources ();
+
+        if (TicketManagement.ValidateTicketForDeparture (1, ExternalTicketNumber, AdmissionCode, false, ResponseMessage) <> 0) then
+          Error (ResponseMessage);
+
+        //+TM1.47 [408018]
     end;
 
     local procedure ShowQuickStatistics(AdmissionCode: Code[20])

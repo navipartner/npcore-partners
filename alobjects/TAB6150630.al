@@ -3,6 +3,8 @@ table 6150630 "POS Workshift Tax Checkpoint"
     // NPR5.40/TSA /20180227 CASE 282251 Initial Version
     // NPR5.48/JDH /20181109 CASE 334163 Added captions to fields and object
     // NPR5.49/TSA /20190315 CASE 348458 Added "Consolidated With Entry No."
+    // NPR5.55/TSA /20200511 CASE 401889 Added Tax Jurisdiction Code, Tax Group Code
+    // NPR5.55/JAKUBV/20200807  CASE 400098 Transport NPR5.55 - 31 July 2020
 
     Caption = 'POS Workshift Tax Checkpoint';
 
@@ -17,6 +19,17 @@ table 6150630 "POS Workshift Tax Checkpoint"
         {
             Caption = 'Tax Area Code';
             TableRelation = "Tax Area";
+        }
+        field(5;"Tax Jurisdiction Code";Code[10])
+        {
+            Caption = 'Tax Jurisdiction Code';
+            TableRelation = "Tax Jurisdiction";
+        }
+        field(7;"Tax Group Code";Code[10])
+        {
+            Caption = 'Tax Group Code';
+            Editable = false;
+            TableRelation = "Tax Group";
         }
         field(8;"VAT Identifier";Code[10])
         {

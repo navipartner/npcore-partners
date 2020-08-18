@@ -1,4 +1,4 @@
-pageextension 6014466 pageextension6014466 extends "Posted Service Invoice" 
+pageextension 6014471 pageextension6014471 extends "Posted Service Invoice" 
 {
     // PN1.03/MH/20140814  NAV-AddOn: PDF2NAV
     //   - Added Menu Items on Function-button: "E-mail Log" and "Send as PDF".

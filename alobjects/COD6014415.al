@@ -4,7 +4,7 @@ codeunit 6014415 "Period Discount Management"
     // Rulle2 : Udbetaling, Salg, Indbetaling
     // Rulle3 : Afrunding
     // 
-    // Afrunding udregnes udfra betaling, derfor �ndring 001 den 1-6-2001
+    // Afrunding udregnes udfra betaling, derfor ændring 001 den 1-6-2001
     // NPR5.31/MHA /20170210  CASE 262904 Applied Event triggered Discount Calculation: OnInitDiscountPriority(),OnApplyDiscount(),IsSubscribedDiscount(),DiscSourceTableId(),DiscCalcCodeunitId()
     // NPR5.31/MHA /20170213  CASE 265229 Added "Customer Disc. Group Filter" to Condition and removed Global Dimensions and Location
     // NPR5.38/MHA /20171204  CASE 298276 Removed Discount Cache

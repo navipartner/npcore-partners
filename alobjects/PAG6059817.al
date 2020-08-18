@@ -7,6 +7,7 @@ page 6059817 "Retail Top 10 Salesperson"
     // NPR5.23.03/MHA/20160726  CASE 242557 Object renamed and re-versioned from NC1.22 to NPR5.23.03
     // NPR5.26/TS/20160825  CASE 249961 Removed Field Search Email
     // NPR5.29/BHR /20170116 CASE 262956 code to Filter on Specific date
+    // NPR5.55/YAHA/20200623 CASE 411267 Change filter From Year to Month
 
     Caption = 'Top 10 Sales Persons';
     CardPageID = "Salesperson Card";
@@ -146,7 +147,10 @@ page 6059817 "Retail Top 10 Salesperson"
 
     trigger OnOpenPage()
     begin
-        PeriodType := PeriodType::Year;
+        //-NPR5.55 [411267]
+        //PeriodType := PeriodType::Year;
+        PeriodType := PeriodType::Month;
+        //+NPR5.55 [411267]
         CurrDate := Today;
         UpdateList;
     end;

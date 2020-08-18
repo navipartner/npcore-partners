@@ -13,6 +13,7 @@ table 6060131 "MM Member Card"
     // MM1.25/TSA /20180117 CASE 300256 Card Expire and Renew functionality
     // MM1.29/TSA /20180503 CASE 313795 Added block option "ANONYMIZED"
     // MM1.29/TSA /20180522 CASE 316251 Added index on field "External Card No."
+    // MM1.44/TSA /20200508 CASE 402040 Added key, "Membership Entry No.", "Member Entry No."
 
     Caption = 'Member Card';
     DrillDownPageID = "MM Member Card List";
@@ -167,6 +168,9 @@ table 6060131 "MM Member Card"
         {
         }
         key(Key2;"External Card No.")
+        {
+        }
+        key(Key3;"Membership Entry No.","Member Entry No.")
         {
         }
     }

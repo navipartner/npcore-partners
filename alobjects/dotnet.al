@@ -213,35 +213,35 @@ dotnet
         {
         }
 
-        type("System.Text.RegularExpressions.Match"; "npNetMatch")
+        type("System.Text.RegularExpressions.MatchCollection";"npNetMatchCollection")
         {
         }
 
-        type("System.Diagnostics.FileVersionInfo"; "npNetFileVersionInfo")
+        type("System.ComponentModel.PropertyChangedEventArgs";"npNetPropertyChangedEventArgs")
         {
         }
 
-        type("System.Net.NetworkInformation.NetworkInterface"; "npNetNetworkInterface")
+        type("System.ComponentModel.PropertyChangingEventArgs";"npNetPropertyChangingEventArgs")
         {
         }
 
-        type("System.Text.RegularExpressions.MatchCollection"; "npNetMatchCollection")
+        type("System.Text.RegularExpressions.Match";"npNetMatch")
         {
         }
 
-        type("System.Net.WebResponse"; "npNetWebResponse")
+        type("System.Diagnostics.FileVersionInfo";"npNetFileVersionInfo")
         {
         }
 
-        type("System.Diagnostics.Stopwatch"; "npNetStopwatch")
+        type("System.Net.NetworkInformation.NetworkInterface";"npNetNetworkInterface")
         {
         }
 
-        type("System.ComponentModel.PropertyChangedEventArgs"; "npNetPropertyChangedEventArgs")
+        type("System.Net.WebResponse";"npNetWebResponse")
         {
         }
 
-        type("System.ComponentModel.PropertyChangingEventArgs"; "npNetPropertyChangingEventArgs")
+        type("System.Diagnostics.Stopwatch";"npNetStopwatch")
         {
         }
 
@@ -348,6 +348,10 @@ dotnet
         {
         }
 
+        type("System.TimeSpan";"npNetTimeSpan")
+        {
+        }
+
         type("System.Byte"; "npNetByte")
         {
         }
@@ -377,10 +381,6 @@ dotnet
         }
 
         type("System.Int32"; "npNetInt32")
-        {
-        }
-
-        type("System.TimeSpan"; "npNetTimeSpan")
         {
         }
 
@@ -955,14 +955,6 @@ dotnet
         type("Renci.SshNet.Sftp.SftpFile"; "npNetSftpFile")
         {
         }
-
-        type("Renci.SshNet.Common.ExceptionEventArgs"; "npNetExceptionEventArgs")
-        {
-        }
-
-        type("Renci.SshNet.Common.HostKeyEventArgs"; "npNetHostKeyEventArgs")
-        {
-        }
     }
 
     assembly("SFTPClientWrapper")
@@ -1168,10 +1160,14 @@ dotnet
         type("Newtonsoft.Json.Formatting"; "npNetFormatting")
         {
         }
-        type("Newtonsoft.Json.Linq.JTokenWriter"; "npNetJTokenWriter")
+        type("Newtonsoft.Json.Linq.JTokenType";"npNetJTokenType")
         {
         }
         type("Newtonsoft.Json.Linq.JProperty"; "npNetJProperty")
+        {
+        }
+
+        type("Newtonsoft.Json.Linq.JTokenWriter";"npNetJTokenWriter")
         {
         }
         type("Newtonsoft.Json.Linq.JContainer"; "npNetJContainer")

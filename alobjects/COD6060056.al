@@ -5,6 +5,7 @@ codeunit 6060056 "Item Wksht. Doc. Exchange"
     // NPR5.27/BR /20161004 CASE 252817 Do not create line if a line with the same Vendor Item No. is already in the Item Worksheet
     // NPR5.29/TJ/20161128 CASE 257500 Fixed a problem with wrong decimal formatting when writing into field from FieldRef
     // NPR5.29/BR /20161129 CASE 257500 Fixed issue with using log to create item worksheet
+    // NPR5.55/ALST/20200717 CASE 411831 added event after inserting worksheet line
 
 
     trigger OnRun()
@@ -85,6 +86,10 @@ codeunit 6060056 "Item Wksht. Doc. Exchange"
           Validate("Direct Unit Cost",DirectUnitCost);
           Modify(true);
         end;
+
+        //-NPR5.55 [411831]
+        OnAfterInsertItemWorksheetLine(ItemWorksheetLine);
+        //+NPR5.55 [411831]
     end;
 
     local procedure InsertItemWorksheetAttributeValues(ItemWorksheetLine: Record "Item Worksheet Line")
@@ -316,6 +321,11 @@ codeunit 6060056 "Item Wksht. Doc. Exchange"
           exit;
         Sender.TestField(Released,false);
         //+NPR5.29 [257500]
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterInsertItemWorksheetLine(var ItemWorksheetLine: Record "Item Worksheet Line")
+    begin
     end;
 }
 

@@ -92,7 +92,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     //  Set the "Order Type" for the sales header. Available values:
     //    - 00: blank
     //    - 01: Order (bestilling)
-    //    - 02: Lending (udl�n)
+    //    - 02: Lending (udlån)
     // 
     // NPR4.14/RMT /20150608  CASE 216519 New meta trigger 'SALESDOC_CR_MSG'
     // NPR4.14/RMT /20150625  CASE 216519 New meta trigger 'SALESDOC_RET_AMT'
@@ -162,6 +162,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     // NPR5.54/ALPO/20200206 CASE 389537 Sale header entry was not deleted from "Sales POS" table after Credit Sale has been posted
     // NPR5.54/ALPO/20200213 CASE 385837 Copy comment lines from POS Sale to Sales Order
     // NPR5.54/ALPO/20200228 CASE 392239 Possibility to use location code from POS store, POS sale or specific location as an alternative to using location from Register
+    // NPR5.55/ALPO/20200429 CASE 401616 Added support for sending intercompany sales order confirmation
+    // NPR5.55/MHA /20200605 CASE 402021 Retail Vouchers are now included
+    // NPR5.55/MHA /20200609 CASE 383018 Added support for LCY instead of blank Currency Code in CreateSalesHeader()
 
     Permissions = TableData "Audit Roll" = rimd;
     TableNo = "Sale POS";
@@ -299,6 +302,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         OnFinishCreditSaleDescription: Label 'On finish credit sale workflow';
         ERR_ORDER_SALE_SYNC: Label '%1 %2 was created successfully but an error occurred when syncing changes with POS, preventing POS sale from ending:\%3';
         ERR_DOC_MISSING: Label '%1 %2 is missing after page closed. Cannot sync with POS and end sale.';
+        SendICOrderConf: Boolean;
         UseLocationFrom: Option Register,"POS Store","POS Sale","Specific Location";
         UseLocationCode: Code[10];
 
@@ -486,6 +490,13 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.52 [352473]
     end;
 
+    procedure SetSendICOrderConf(Set: Boolean)
+    begin
+        //-NPR5.55 [401616]
+        SendICOrderConf := Set;
+        //+NPR5.55 [401616]
+    end;
+
     procedure Reset()
     begin
         Ask := false;
@@ -520,6 +531,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //-NPR5.52 [352473]
         SendDocument := false;
         //+NPR5.52 [352473]
+        SendICOrderConf := false;  //NPR5.55 [401616]
     end;
 
     procedure SetLocationSource(NewSource: Option Register,"POS Store","POS Sale","Specific Location";NewLocationCode: Code[10])
@@ -619,6 +631,11 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             if Post and (not Posted) then
                 Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
 
+          //-NPR5.55 [401616]
+          if not (Post and Posted) and SendICOrderConf then
+            SendICOrderConfirmation(SalesHeader);
+          //+NPR5.55 [401616]
+
             if WriteInAuditRoll then begin
                 CreateDocumentPostingAudit(SalesHeader, SalePOS, Posted);
                 if NPRetailSetup."Advanced POS Entries Activated" then begin
@@ -692,6 +709,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     procedure CreateSalesHeader(var SalePOS: Record "Sale POS"; var SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
+        GLSetup: Record "General Ledger Setup";
     begin
         //Register.GET(SalePOS."Register No.");  //NPR5.54 [392239]-revoked
 
@@ -709,7 +727,15 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             SalesHeader.Validate("Sell-to Customer No.", SalePOS."Customer No.");
         end;
 
+        //-NPR5.55 [383018]
+        SalesHeader.Validate("Sell-to Customer No.");
         SalesHeader.Validate("Currency Code", '');
+        if Customer.Get(SalesHeader."Bill-to Customer No.") then begin
+          GLSetup.Get;
+          if Customer."Currency Code" = GLSetup."LCY Code" then
+            SalesHeader.Validate("Currency Code",Customer."Currency Code");
+        end;
+        //+NPR5.55 [383018]
         SalesHeader."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
         SalesHeader."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
         SalesHeader."Dimension Set ID" := SalePOS."Dimension Set ID";
@@ -847,6 +873,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     var
         CreditVoucher: Record "Credit Voucher";
         GiftVoucher: Record "Gift Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
         SalesLine: Record "Sales Line";
         ReservationEntry: Record "Reservation Entry";
         Item: Record Item;
@@ -964,6 +991,18 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
                             SerialNoInfo.TestField(Blocked, false);
                     end;
                 end;
+          //-NPR5.55 [402021]
+          NpRvSalesLine.SetRange("Document Source",NpRvSalesLine."Document Source"::POS);
+          NpRvSalesLine.SetRange("Retail ID",SaleLinePOS."Retail ID");
+          if NpRvSalesLine.FindSet then
+            repeat
+              NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+              NpRvSalesLine."Document Type" := SalesLine."Document Type";
+              NpRvSalesLine."Document No." := SalesLine."Document No.";
+              NpRvSalesLine."Document Line No." := SalesLine."Line No.";
+              NpRvSalesLine.Modify(true);
+            until NpRvSalesLine.Next = 0;
+          //+NPR5.55 [402021]
             until SaleLinePOS.Next = 0;
     end;
 
@@ -1181,7 +1220,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         SalesLine.TestField(Type, SalesLine.Type::Item);
         SalesLine.TestField("Shipment Date");
 
-        //Calc qty�s
+        //Calc qtyÙs
         SalesLine.CalcFields("Reserved Quantity", "Reserved Qty. (Base)");
         if SalesLine."Document Type" = SalesLine."Document Type"::"Return Order" then begin
             SalesLine."Reserved Quantity" := -SalesLine."Reserved Quantity";
@@ -1803,6 +1842,35 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             exit(UseLocationCode);
         end;
         //+NPR5.54 [392239]
+    end;
+
+    local procedure SendICOrderConfirmation(var SalesHeader: Record "Sales Header")
+    var
+        ICPartner: Record "IC Partner";
+        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
+    begin
+        //-NPR5.55 [401616]
+        with SalesHeader do begin
+          if not (
+              ("Document Type" in ["Document Type"::Order,"Document Type"::"Return Order"]) and
+              ("IC Status" = "IC Status"::New) and "Send IC Document")
+          then
+            exit;
+
+          if (Status = Status::Open) and ApprovalsMgmt.IsSalesApprovalsWorkflowEnabled(SalesHeader) then  //must go through approval workflow first
+            exit;
+
+          if "Sell-to IC Partner Code" <> '' then
+            ICPartner.Get("Sell-to IC Partner Code")
+          else
+            ICPartner.Get("Bill-to IC Partner Code");
+          if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"No IC Transfer" then
+            exit;
+
+          ICInOutboxMgt.SendSalesDoc(SalesHeader,false);
+        end;
+        //+NPR5.55 [401616]
     end;
 
     local procedure "--- Audit Roll Transfer"()

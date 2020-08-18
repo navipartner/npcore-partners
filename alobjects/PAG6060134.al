@@ -35,6 +35,9 @@ page 6060134 "MM Member Info Capture"
     // MM1.34/TSA /20180906 CASE 327614 Added a test for maximum combined length of name fields
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
     // MM1.42/TSA /20191118 CASE 378202 Picture is not commited to DB, unless you commit the record and when a field is validated with code on the page, its not the same record - picture is removed.
+    // MM1.44/TSA /20200529 CASE 407401 Added Age Verification
+    // MM1.45/TSA /20200728 CASE 407401 Refactored GuardianMode
+    // MM1.45.01/TSA /20200529 CASE 407401 Age Verification, changed condition for mandatory
 
     Caption = 'Member Information';
     DataCaptionExpression = "External Member No";
@@ -159,10 +162,10 @@ page 6060134 "MM Member Info Capture"
             group(AddGuardian)
             {
                 Caption = 'Set Membership Guardian';
-                Visible = SetGuardianMode;
+                Visible = SetAddGuardianMode;
                 field(AddGuardianToExistingMembership;"Guardian External Member No.")
                 {
-                    ShowMandatory = SetGuardianMode;
+                    ShowMandatory = GuardianMandatory;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -380,6 +383,42 @@ page 6060134 "MM Member Info Capture"
                 field(Birthday;Birthday)
                 {
                     Importance = Additional;
+                    ShowMandatory = BirthDateMandatory;
+
+                    trigger OnValidate()
+                    var
+                        MembershipSalesSetup: Record "MM Membership Sales Setup";
+                        MembershipSetup: Record "MM Membership Setup";
+                        MembershipManagement: Codeunit "MM Membership Management";
+                        ReasonText: Text;
+                    begin
+
+                        //-MM1.44 [407401]
+                        if (BirthDateMandatory) then begin
+
+                          if (MembershipSalesSetup.Get (MembershipSalesSetup.Type::ITEM, "Item No.")) then begin
+                            MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+
+                            if (Rec.Birthday <> 0D) then
+                              if (not MembershipManagement.CheckAgeConstraint (
+                                  MembershipManagement.GetMembershipAgeConstraintDate (MembershipSalesSetup, Rec),
+                                  Rec.Birthday,
+                                  MembershipSetup."Validate Age Against",
+                                  MembershipSalesSetup."Age Constraint Type",
+                                  MembershipSalesSetup."Age Constraint (Years)")) then begin
+                                ReasonText :=
+                                  StrSubstNo (AGE_VERIFICATION, Rec."First Name", MembershipSalesSetup."Age Constraint (Years)") +
+                                  StrSubstNo (' {%5 must be %4 %3 => (%1 + %2)}', Rec.Birthday,
+                                    MembershipSalesSetup."Age Constraint (Years)",
+                                    CalcDate (StrSubstNo ('<+%1Y>',MembershipSalesSetup."Age Constraint (Years)"), Rec.Birthday),
+                                    Format (MembershipSalesSetup."Age Constraint Type"),
+                                    MembershipManagement.GetMembershipAgeConstraintDate (MembershipSalesSetup, Rec));
+                                Error (ReasonText);
+                              end;
+                          end;
+                        end;
+                        //+MM1.44 [407401]
+                    end;
                 }
                 field("E-Mail Address";"E-Mail Address")
                 {
@@ -393,7 +432,7 @@ page 6060134 "MM Member Info Capture"
                 }
                 field("Guardian External Member No.";"Guardian External Member No.")
                 {
-                    ShowMandatory = SetGuardianMode;
+                    ShowMandatory = GuardianMandatory;
 
                     trigger OnDrillDown()
                     var
@@ -555,6 +594,7 @@ page 6060134 "MM Member Info Capture"
             group(Attributes)
             {
                 Caption = 'Attributes';
+                Visible = ShowAttributesSection;
                 field(NPRAttrTextArray_01;NPRAttrTextArray[1])
                 {
                     CaptionClass = GetAttributeCaptionClass(1);
@@ -882,7 +922,9 @@ page 6060134 "MM Member Info Capture"
         PhoneNoMandatory: Boolean;
         SSNMandatory: Boolean;
         INVALID_VALUE: Label 'The %1 is invalid.';
+        BirthDateMandatory: Boolean;
         ExternalCardNoMandatory: Boolean;
+        GuardianMandatory: Boolean;
         ShowImportMemberAction: Boolean;
         ActivationDateEditable: Boolean;
         ActivationDateMandatory: Boolean;
@@ -898,12 +940,13 @@ page 6060134 "MM Member Info Capture"
         ShowReplaceCardSection: Boolean;
         ShowCardholderSection: Boolean;
         ShowQuantityField: Boolean;
+        ShowAttributesSection: Boolean;
         EditMemberCardType: Boolean;
         ExtraInfo: Text;
         ShowAutoRenew: Boolean;
         ExternalMembershipNoEditable: Boolean;
         AutoRenewPaymentMethodMandatory: Boolean;
-        SetGuardianMode: Boolean;
+        SetAddGuardianMode: Boolean;
         CardValidUntilMandatory: Boolean;
         INVALID_SETUP: Label 'The combination %1 %2 and %3 %4 is not supported.';
         GDPRMandatory: Boolean;
@@ -924,6 +967,7 @@ page 6060134 "MM Member Info Capture"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
+        AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
 
     local procedure CheckEmail()
     var
@@ -980,6 +1024,7 @@ page 6060134 "MM Member Info Capture"
         NameTotalLength: Integer;
         Customer: Record Customer;
         Member: Record "MM Member";
+        MembershipManagement: Codeunit "MM Membership Management";
     begin
 
         MissingInformation := false;
@@ -1007,6 +1052,23 @@ page 6060134 "MM Member Info Capture"
 
               if (ActivationDateEditable) and (MemberInfoCapture."Document Date" = 0D) then
                 SetMissingInfo (MissingInformation, MissingFields, FieldCaption("Document Date"), ("Document Date" = 0D));
+
+              //-MM1.44 [407401]
+              if (BirthDateMandatory) then begin
+                SetMissingInfo (MissingInformation, MissingFields, FieldCaption(Birthday), (MemberInfoCapture.Birthday = 0D));
+                if (MemberInfoCapture.Birthday <> 0D) then
+                  if (not MembershipManagement.CheckAgeConstraint (
+                      MembershipManagement.GetMembershipAgeConstraintDate (MembershipSalesSetup, MemberInfoCapture),
+                      MemberInfoCapture.Birthday,
+                      MembershipSetup."Validate Age Against",
+                      MembershipSalesSetup."Age Constraint Type",
+                      MembershipSalesSetup."Age Constraint (Years)")) then begin
+                    SetMissingInfo (MissingInformation, MissingFields, FieldCaption(Birthday), true);
+                    Message (AGE_VERIFICATION, MemberInfoCapture."First Name", MembershipSalesSetup."Age Constraint (Years)");
+                  end;
+              end;
+              //+MM1.44 [407401]
+
             end;
 
             if (ShowNewCardSection) then begin
@@ -1062,7 +1124,7 @@ page 6060134 "MM Member Info Capture"
         end else begin
           SetMissingInfo (MissingInformation, MissingFields, FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
 
-          if (SetGuardianMode) then begin
+          if (SetAddGuardianMode) then begin
             MissingInformation := false;
             SetMissingInfo (MissingInformation, MissingFields, FieldCaption("Guardian External Member No."), (MemberInfoCapture."Guardian External Member No." = ''));
           end;
@@ -1115,11 +1177,22 @@ page 6060134 "MM Member Info Capture"
 
             AutoRenewPaymentMethodMandatory := "Enable Auto-Renew";
 
+            //-MM1.44 [407401]
+            //-#407401 [407401]
+            //BirthDateMandatory := NOT (MembershipSetup."Validate Age Against" = MembershipSetup."Validate Age Against"::SALESDATE_Y)
+            BirthDateMandatory := MembershipSetup."Enable Age Verification";
+            //+#407401 [407401]
+            //+MM1.44 [407401]
+
           end;
         end else begin
           EmailMandatory := true;
           PhoneNoMandatory := false;
           SSNMandatory := false;
+          //-MM1.44 [407401]
+          BirthDateMandatory := false;
+          //+MM1.44 [407401]
+
         end;
     end;
 
@@ -1143,17 +1216,26 @@ page 6060134 "MM Member Info Capture"
         ShowQuantityField := false;
         EditMemberCardType := false;
 
+        //-MM1.45 [407401]
+        ShowAttributesSection := true;
+        GuardianMandatory := false;
+        //+MM1.45 [407401]
+
         Rec.Quantity := 1;
 
         ExternalMembershipNoEditable := ("External Membership No." = '');
 
-        if (SetGuardianMode) then begin
+        if (SetAddGuardianMode) then begin
           ShowAddToMembershipSection := false;
           ShowReplaceCardSection := false;
           ShowNewMemberSection := false;
           ShowCardholderSection := false;
           ShowNewCardSection := false;
           ShowQuantityField := false;
+          //-MM1.45 [407401]
+          ShowAttributesSection := false;
+          GuardianMandatory := true;
+          //+MM1.45 [407401]
         end;
 
         if ("Item No." <> '') then begin
@@ -1262,6 +1344,10 @@ page 6060134 "MM Member Info Capture"
                 end;
             end;
             //+MM1.29 [313795]
+
+            //-MM1.45 [407401]
+            GuardianMandatory := (MembershipSalesSetup."Requires Guardian");
+            //-MM1.45 [407401]
 
           end;
         end;
@@ -1439,7 +1525,7 @@ page 6060134 "MM Member Info Capture"
             MemberCardLookup (Member."Entry No.", false);
           end;
 
-          if (SetGuardianMode) then
+          if (SetAddGuardianMode) then
             "Guardian External Member No." := Member."External Member No.";
 
         end;
@@ -1483,7 +1569,7 @@ page 6060134 "MM Member Info Capture"
 
     procedure SetAddMembershipGuardianMode()
     begin
-        SetGuardianMode := true;
+        SetAddGuardianMode := true;
     end;
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)

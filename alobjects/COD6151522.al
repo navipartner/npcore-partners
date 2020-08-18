@@ -2,6 +2,7 @@ codeunit 6151522 "Nc Trigger Task Mgt."
 {
     // NC2.01/BR /20160825  CASE 247479 NaviConnect: Object created
     // NC2.03/BR /20170103  CASE 271242 Added field Error on Empty Output
+    // NPR5.55/MHA /20200611  CASE 409410 Changed ManualTransferOutput() from TryFunction to use AssertError
 
     TableNo = "Nc Task";
 
@@ -161,16 +162,24 @@ codeunit 6151522 "Nc Trigger Task Mgt."
     begin
     end;
 
-    [TryFunction]
-    procedure ManualTransferOutput(NcTriggerCode: Code[20];var NcTask: Record "Nc Task";var Output: Text;var Filename: Text;var Subject: Text;var Body: Text)
+    procedure ManualTransferOutput(NcTriggerCode: Code[20];var NcTask: Record "Nc Task";var Output: Text;var Filename: Text;var Subject: Text;var Body: Text): Boolean
     var
         Outstream: OutStream;
     begin
-        if Output <> '' then begin
-          NcTask."Data Output".CreateOutStream(Outstream,TEXTENCODING::UTF8);
-          Outstream.WriteText(Output);
+        //-NPR5.55 [409410]
+        Commit;
+        asserterror begin
+          if Output <> '' then begin
+            NcTask."Data Output".CreateOutStream(Outstream,TEXTENCODING::UTF8);
+            Outstream.WriteText(Output);
+          end;
+          Commit;
+          OnAfterGetOutputTriggerTask(NcTriggerCode,Output,NcTask,Filename,Subject,Body);
+          Commit;
+          Error('');
         end;
-        OnAfterGetOutputTriggerTask(NcTriggerCode,Output,NcTask,Filename,Subject,Body);
+        exit(GetLastErrorText = '');
+        //+NPR5.55 [409410]
     end;
 
     procedure VerifyNoEndpointTriggerLinksExist(EndpointTypeCode: Code[20];EndpointCode: Code[20])

@@ -12,6 +12,7 @@ report 6014439 "Item Sales Postings"
     // NPR5.50/ZESO/20190528 CASE 355450 Calculate Sales(Qty) and Sales Amount(Actual) directly from Value Entry
     // NPR5.51/ZESO/20190730 CASE 363111 Added Option to Show Vendor No
     // NPR5.51/ZESO/20190731 CASE 332037 Removed Option Print Sale Inc. VAT
+    // NPR5.55/BHR/20200728  CASE 361515 remove Key reference not used in AL
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Item Sales Postings.rdlc';
 
@@ -120,7 +121,9 @@ report 6014439 "Item Sales Postings"
                 ItemCOG := 0;
                 Profit := 0;
                 ValueEntry.Reset;
-                ValueEntry.SetCurrentKey("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code","Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
+                //-NPR5.55 [361515]
+                //ValueEntry.SETCURRENTKEY("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code","Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
+                //+NPR5.55 [361515]
                 ValueEntry.SetRange("Item Ledger Entry Type",ValueEntry."Item Ledger Entry Type"::Sale);
                 ValueEntry.SetFilter("Global Dimension 1 Code",GetFilter("Global Dimension 1 Code"));
                 ValueEntry.SetFilter("Global Dimension 2 Code",GetFilter("Global Dimension 2 Code"));

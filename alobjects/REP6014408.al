@@ -1,7 +1,7 @@
 report 6014408 "Item Group Overview"
 {
     // NPR70.00.00.00/LS : Convert Report to Nav 2013
-    // NPR4.14/KN/20150818 CASE 220292 Removed field with 'NAVIPARTNER K�benhavn 2000' caption from footer
+    // NPR4.14/KN/20150818 CASE 220292 Removed field with 'NAVIPARTNER K¢benhavn 2000' caption from footer
     // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on Caption name
     //                                    Obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL

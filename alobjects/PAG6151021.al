@@ -4,6 +4,8 @@ page 6151021 "NpRv Arch. Voucher Card"
     // NPR5.48/MHA /20180921  CASE 302179 Added fields 1005, 1007, 1010, 1013 and deleted field 80
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
     // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
+    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
+    // NPR5.55/MHA /20200702  CASE 407070 Added Sending Log
 
     Caption = 'Archived Retail Voucher Card';
     Editable = false;
@@ -51,6 +53,9 @@ page 6151021 "NpRv Arch. Voucher Card"
                     field("Partner Clearing";"Partner Clearing")
                     {
                     }
+                    field("Allow Top-up";"Allow Top-up")
+                    {
+                    }
                 }
                 group(Control6014422)
                 {
@@ -83,7 +88,25 @@ page 6151021 "NpRv Arch. Voucher Card"
                     field("Reference No.";"Reference No.")
                     {
                     }
+                    field("Send via Print";"Send via Print")
+                    {
+                    }
                     field("Print Template Code";"Print Template Code")
+                    {
+                    }
+                    field("Send via E-mail";"Send via E-mail")
+                    {
+                    }
+                    field("E-mail Template Code";"E-mail Template Code")
+                    {
+                    }
+                    field("Send via SMS";"Send via SMS")
+                    {
+                    }
+                    field("SMS Template Code";"SMS Template Code")
+                    {
+                    }
+                    field("No. Send";"No. Send")
                     {
                     }
                 }
@@ -125,6 +148,10 @@ page 6151021 "NpRv Arch. Voucher Card"
                     }
                     field("Phone No.";"Phone No.")
                     {
+                    }
+                    field("Language Code";"Language Code")
+                    {
+                        Importance = Additional;
                     }
                     field("Voucher Message";"Voucher Message")
                     {
@@ -174,6 +201,14 @@ page 6151021 "NpRv Arch. Voucher Card"
                 RunObject = Page "NpRv Arch. Voucher Entries";
                 RunPageLink = "Arch. Voucher No."=FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
+            }
+            action("Arch. Sending Log")
+            {
+                Caption = 'Archived Sending Log';
+                Image = Log;
+                RunObject = Page "NpRv Arch. Sending Log";
+                RunPageLink = "Arch. Voucher No."=FIELD("No.");
+                ShortCutKey = 'Shift+Ctrl+F7';
             }
         }
     }

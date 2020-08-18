@@ -4,6 +4,7 @@ page 6059988 "Sale Statistics Activities"
     // NPR5.31/TJ  /20170328 CASE 269797 Switched control addin to use version 10.0.0.0 instead of 9.0.0.0
     // NPR5.41/TS  /20180105 CASE 300893 ActionContainers cannot have captions
     // NPR5.50/JAVA/20190619 CASE 359388 Update addins references to point to the correct version (13.0.0.0 => 14.0.0.0).
+    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
 
     Caption = 'Sale Statistics';
     PageType = CardPart;
@@ -487,7 +488,9 @@ page 6059988 "Sale Statistics Activities"
     local procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
         if not LastYear then
           ValueEntry.SetFilter( "Posting Date", '%1..%2', Date."Period Start", Date."Period End" )

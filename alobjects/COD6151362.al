@@ -6,6 +6,8 @@ codeunit 6151362 "CS UI Stock Adjustment"
     // NPR5.53/SARA/20191030 CASE 375030 Added validation for Location = Directed PutAway and Pick
     // NPR5.53/CLVA/20191118 CASE 377721 Changed posting to background posting
     // NPR5.53/CLVA/20191128 CASE 379973 Handling duplicate entries
+    // NPR5.55/CLVA/20200513 CASE 379709 Added Journal line/Bin check
+    // NPR5.55/ALPO/20200723 CASE 384923 Stock adjustments for not bin-enabled locations
 
     TableNo = "CS UI Header";
 
@@ -67,6 +69,7 @@ codeunit 6151362 "CS UI Stock Adjustment"
         AdjustingFailedErr: Label 'Adjustment could not be done because posting failed. Error: %1';
         MissingBarcodeErr: Label 'Barcode must be scanned before adjustment can be done';
         Text029: Label 'Adjustment for item %1 : %2 to Bin %3 is already added for posting';
+        NoBinsForLocation: Label 'Bin Code must not be specified for location %1';
 
     local procedure ProcessInput()
     var
@@ -317,7 +320,8 @@ codeunit 6151362 "CS UI Stock Adjustment"
           exit;
         end;
 
-        CSWarehouseActivityHandling.CalcFields("Bin Base Qty.");
+        //CSWarehouseActivityHandling.CALCFIELDS("Bin Base Qty.");  //NPR5.55 [384923]-revoked
+        UpdateCurrentQtyOnStock(CSWarehouseActivityHandling);  //NPR5.55 [384923]
         CSWarehouseActivityHandling.Barcode := InputValue;
     end;
 
@@ -341,7 +345,24 @@ codeunit 6151362 "CS UI Stock Adjustment"
     local procedure CheckBin(var CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling";InputValue: Text)
     var
         Bin: Record Bin;
+        ItemJnlTemplate: Record "Item Journal Template";
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
     begin
+        //-NPR5.55 [384923]
+        if CSWarehouseActivityHandling."Location Code" = '' then begin
+          Remark := LocationCodeErr;
+          exit;
+        end;
+
+        if not IsBinEnabledLocation(CSWarehouseActivityHandling."Location Code") then begin
+          if InputValue <> '' then
+            Remark := StrSubstNo(NoBinsForLocation, CSWarehouseActivityHandling."Location Code");
+          CSWarehouseActivityHandling."Bin Code" := '';
+          exit;
+        end;
+        //+NPR5.55 [384923]
+
         if InputValue = '' then begin
           Remark := Text019;
           exit;
@@ -356,6 +377,28 @@ codeunit 6151362 "CS UI Stock Adjustment"
           Remark := StrSubstNo(BinCodeErr,InputValue);
           exit;
         end;
+
+        //-NPR5.55 [379709]
+        if CSWarehouseActivityHandling."Item No." <> '' then begin
+          ItemJnlTemplate.SetRange(Type,ItemJnlTemplate.Type::Item);
+          if ItemJnlTemplate.FindFirst then begin
+
+            if ItemJournalBatch.Get(ItemJnlTemplate.Name,UserId) then begin
+              Clear(ItemJournalLine);
+              ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+              ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+              ItemJournalLine.SetRange("Item No.",CSWarehouseActivityHandling."Item No.");
+              ItemJournalLine.SetRange("Variant Code",CSWarehouseActivityHandling."Variant Code");
+              ItemJournalLine.SetRange("Bin Code",InputValue);
+              if ItemJournalLine.FindFirst then begin
+                Remark := StrSubstNo(Text029,CSWarehouseActivityHandling."Item No.",CSWarehouseActivityHandling."Variant Code",InputValue);
+                exit;
+              end;
+            end;
+
+          end;
+        end;
+        //+NPR5.55 [379709]
 
         CSWarehouseActivityHandling."Bin Code" := InputValue;
     end;
@@ -418,9 +461,11 @@ codeunit 6151362 "CS UI Stock Adjustment"
           exit;
         end;
 
-        CSWarehouseActivityHandling.CalcFields("Bin Base Qty.");
-
-        OffsetQty := CSWarehouseActivityHandling.Qty - CSWarehouseActivityHandling."Bin Base Qty.";
+        //-NPR5.55 [384923]-revoked
+        //CSWarehouseActivityHandling.CALCFIELDS("Bin Base Qty.");
+        //OffsetQty := CSWarehouseActivityHandling.Qty - CSWarehouseActivityHandling."Bin Base Qty.";
+        //+NPR5.55 [384923]-revoked
+        OffsetQty := CSWarehouseActivityHandling.Qty - CSWarehouseActivityHandling."Qty. in Stock";  //NPR5.55 [384923]
         if OffsetQty = 0 then begin
           Remark := QuantityCoincideErr;
           exit;
@@ -513,9 +558,11 @@ codeunit 6151362 "CS UI Stock Adjustment"
           exit;
         end;
 
+        UpdateCurrentQtyOnStock(CSWarehouseActivityHandling);  //NPR5.55 [384923]
         Clear(CSWarehouseActivityHandling.Qty);
         Clear(CSWarehouseActivityHandling.Barcode);
-        CSWarehouseActivityHandling.Modify;
+        //CSWarehouseActivityHandling.MODIFY;  //NPR5.55 [384923]-revoked
+        Input(CSWarehouseActivityHandling, CSWarehouseActivityHandling.FieldNo(Barcode), 0);  //NPR5.55 [384923]
     end;
 
     local procedure Input(CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling";FldNo: Integer;Step: Integer)
@@ -638,6 +685,28 @@ codeunit 6151362 "CS UI Stock Adjustment"
           if CSFieldDefaults.FindFirst then
             CSWarehouseActivityHandling."Bin Code" := CSFieldDefaults.Value;
         end;
+    end;
+
+    local procedure IsBinEnabledLocation(LocationCode: Code[10]): Boolean
+    var
+        Location: Record Location;
+    begin
+        //-NPR5.55 [384923]
+        exit(Location.Get(LocationCode) and Location."Bin Mandatory");
+        //+NPR5.55 [384923]
+    end;
+
+    local procedure UpdateCurrentQtyOnStock(var CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling")
+    begin
+        //-NPR5.55 [384923]
+        if IsBinEnabledLocation(CSWarehouseActivityHandling."Location Code") then begin
+          CSWarehouseActivityHandling.CalcFields("Bin Base Qty.");
+          CSWarehouseActivityHandling."Qty. in Stock" := CSWarehouseActivityHandling."Bin Base Qty.";
+        end else begin
+          CSWarehouseActivityHandling.CalcFields(Inventory);
+          CSWarehouseActivityHandling."Qty. in Stock" := CSWarehouseActivityHandling.Inventory;
+        end;
+        //+NPR5.55 [384923]
     end;
 }
 

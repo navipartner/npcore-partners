@@ -9,6 +9,7 @@ codeunit 6150798 "POS Action - Reverse Sale"
     // NPR5.50/TSA /20190502 CASE 353680 Quantity Return Management is only supported when POS Entry is enabled
     // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved to CU 6150629 to avoid code duplication
     // NPR5.53/ALPO/20191218 CASE 387339 The sub-total on the POS Sales screen was not updated when using the POS Action.
+    // NPR5.55/ALPO/20200713 CASE 412184 Copy dimensions from POS Entry being reversed to current sale header
 
 
     trigger OnRun()
@@ -29,6 +30,7 @@ codeunit 6150798 "POS Action - Reverse Sale"
         COPIED_RECEIPT: Label 'This sales is copied from %1 and new return items can''t be added to the return sales.';
         QTY_ADJUSTED: Label 'Quantity was adjusted due to previous return sales.';
         POSEntryMgt: Codeunit "POS Entry Management";
+        DimsNotCopied: Label 'Dimension copy is only supported, when Advanced Posting is activated.\Dimensions were not copied from the original sale.';
 
     local procedure ActionCode(): Text
     begin
@@ -37,6 +39,7 @@ codeunit 6150798 "POS Action - Reverse Sale"
 
     local procedure ActionVersion(): Text
     begin
+        exit('1.3');  //NPR5.55 [412184]
         exit('1.2');
     end;
 
@@ -61,7 +64,7 @@ codeunit 6150798 "POS Action - Reverse Sale"
                 //-NPR5.49 [342244]
                 RegisterOptionParameter('ObfucationMethod', 'None,MI', 'None');
                 //+NPR5.49 [342244]
-
+            RegisterBooleanParameter('CopyHeaderDimensions', false);  //NPR5.55 [412184]
             end;
     end;
 
@@ -227,6 +230,14 @@ codeunit 6150798 "POS Action - Reverse Sale"
             Message(QTY_ADJUSTED);
         //+NPR5.49 [342090]
 
+        //-NPR5.55 [412184]
+        if JSON.GetBooleanParameter('CopyHeaderDimensions', false) then
+          if CopyDimensions(SalePOS, SalesTicketNo) then begin
+            POSSale.Refresh(SalePOS);
+            POSSale.SetModified();
+          end;
+        //+NPR5.55 [412184]
+
         POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
 
         POSSale.RefreshCurrent();
@@ -370,6 +381,40 @@ codeunit 6150798 "POS Action - Reverse Sale"
             MaxQuantity := 0;
 
         //+NPR5.49 [342090]
+    end;
+
+    local procedure CopyDimensions(var CurrentSalePOS: Record "Sale POS";OriginalSalesTicketNo: Code[20]): Boolean
+    var
+        POSEntry: Record "POS Entry";
+        RetailSetup: Record "NP Retail Setup";
+        OldDimSetID: Integer;
+    begin
+        //-NPR5.55 [412184]
+        RetailSetup.Get;
+        if not RetailSetup."Advanced Posting Activated" then begin
+          Message(DimsNotCopied);
+          exit(false);
+        end;
+
+        POSEntry.SetCurrentKey("Document No.");
+        POSEntry.SetRange("Document No.", OriginalSalesTicketNo);
+        if POSEntry.FindLast then
+          if CurrentSalePOS."Dimension Set ID" <> POSEntry."Dimension Set ID" then begin
+            OldDimSetID := CurrentSalePOS."Dimension Set ID";
+
+            CurrentSalePOS."Dimension Set ID" := POSEntry."Dimension Set ID";
+            CurrentSalePOS."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
+            CurrentSalePOS."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
+            CurrentSalePOS.Modify;
+
+            if CurrentSalePOS.SalesLinesExist then
+              CurrentSalePOS.UpdateAllLineDim(CurrentSalePOS."Dimension Set ID",OldDimSetID);
+
+            exit(true);
+          end;
+
+        exit(false);
+        //+NPR5.55 [412184]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, true)]

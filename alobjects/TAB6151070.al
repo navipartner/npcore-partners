@@ -1,6 +1,7 @@
 table 6151070 "Customer GDPR Log Entries"
 {
     // NPR5.52/ZESO/20190925 CASE 358656 Object Created
+    // NPR5.55/ZESO/20200427 CASE 401981 Added field 10 Open Journal Entries/Statement
 
     Caption = 'Customer GDPR Log Entries';
 
@@ -43,6 +44,10 @@ table 6151070 "Customer GDPR Log Entries"
         field(9;"Anonymized By";Code[50])
         {
             Caption = 'Anonymized By';
+        }
+        field(10;"Open Journal Entries/Statement";Boolean)
+        {
+            Caption = 'Open Journal Entries/Statement';
         }
     }
 

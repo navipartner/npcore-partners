@@ -42,6 +42,8 @@ codeunit 6150615 "POS Post Entries"
     // NPR5.53/SARA/20191205 CASE 380054 Change Account Type for Difference Amount posting
     // NPR5.53/TSA /20200124 CASE 386737 Fixed sales tax aggregation in batch mode posting
     // NPR5.54/TSA /20200224 CASE 389250 Posting negative bin transfers
+    // NPR5.55/TSA /20200701 CASE 410384 Changed logic to payment posting description
+    // NPR5.55/MMV /20200721 CASE 414671 Fixed pass by value in #375258 and remove use of WITH.
 
     TableNo = "POS Entry";
 
@@ -1216,7 +1218,10 @@ codeunit 6150615 "POS Post Entries"
                 POSPostingBuffer."VAT Bus. Posting Group" := POSPaymentLineToBeCompressed."VAT Bus. Posting Group";
                 //+NPR5.50 [354832]
 
-                PostingDescription := '';
+          //-NPR5.55 [410384]
+          // PostingDescription := '';
+          PostingDescription := POSPaymentLineToBeCompressed.Description;
+          //+NPR5.55 [410384]
                 if POSPaymentMethod.Get(POSPaymentLineToBeCompressed."POS Payment Method Code") then begin
                     if not POSPaymentMethod."Post Condensed" then begin
                         POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
@@ -1231,6 +1236,14 @@ codeunit 6150615 "POS Post Entries"
 
                     end else begin
                         //-NPR5.38 [294722]
+              if (POSPaymentMethod."Condensed Posting Description" = '') then
+                case Compressionmethod of
+                  Compressionmethod::Uncompressed              : POSPaymentMethod."Condensed Posting Description" := '%6 - %3';
+                  Compressionmethod::"Per POS Entry"           : POSPaymentMethod."Condensed Posting Description" := '%6 - %3';
+                  Compressionmethod::"Per POS Period Register" : POSPaymentMethod."Condensed Posting Description" := '%2/%1/%6 - %4/%3';
+                end;
+              //-NPR5.55 [410384]
+
                         if POSPaymentMethod."Condensed Posting Description" <> '' then
                             PostingDescription := CopyStr(StrSubstNo(POSPaymentMethod."Condensed Posting Description",
                                    POSPaymentLineToBeCompressed."POS Unit No.",
@@ -1244,42 +1257,51 @@ codeunit 6150615 "POS Post Entries"
                                    //+NPR5.52 [370654]
                                    ), 1, MaxStrLen(POSPostingBuffer.Description))
                         else
-                            //+NPR5.38 [294722]
+                //+NPR5.38 [294722]
                             PostingDescription := CopyStr(StrSubstNo(TextPaymentDescription, POSPaymentMethod.Code, POSEntry."Posting Date"), 1, MaxStrLen(POSPostingBuffer.Description));
+
                     end;
                 end;
 
-                case Compressionmethod of
-                    Compressionmethod::Uncompressed:
-                        begin
-                            POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
-                            POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
-                            POSPostingBuffer."Line No." := POSPaymentLineToBeCompressed."Line No.";
-                            if POSPeriodRegister."Document No." = '' then
-                                POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
-                            else
-                                POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                            if (PostingDescription = '') then //-+NPR5.51 [359403]
-                                PostingDescription := POSPaymentLineToBeCompressed.Description;
-                        end;
-                    Compressionmethod::"Per POS Entry":
-                        begin
-                            POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
-                            if POSPeriodRegister."Document No." = '' then
-                                POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
-                            else
-                                POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                            if (PostingDescription = '') then //-+NPR5.51 [359403]
-                                PostingDescription := StrSubstNo(TextDesc, POSEntry.TableCaption, POSPaymentLineToBeCompressed."POS Entry No.");
-                        end;
-                    Compressionmethod::"Per POS Period Register":
-                        begin
-                            POSPeriodRegister.TestField("Document No.");
-                            POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                            if (PostingDescription = '') then //-+NPR5.51 [359403]
-                                PostingDescription := StrSubstNo(TextDesc, POSPeriodRegister.TableCaption, POSPaymentLineToBeCompressed."POS Period Register No.");
-                        end;
-                end;
+          case Compressionmethod of
+            Compressionmethod::Uncompressed :
+              begin
+                POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
+                POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
+                POSPostingBuffer."Line No." := POSPaymentLineToBeCompressed."Line No.";
+                if POSPeriodRegister."Document No." = '' then
+                  POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
+                else
+                  POSPostingBuffer."Document No."  := POSPeriodRegister."Document No.";
+                //-NPR5.55 [410384]
+                // IF (PostingDescription = '') THEN //-+NPR5.51 [359403]
+                //  PostingDescription := POSPaymentLineToBeCompressed.Description;
+                //+NPR5.55 [410384]
+
+              end;
+            Compressionmethod::"Per POS Entry":
+              begin
+                POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
+                if POSPeriodRegister."Document No." = '' then
+                  POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
+                else
+                  POSPostingBuffer."Document No."  := POSPeriodRegister."Document No.";
+                //-NPR5.55 [410384]
+                // IF (PostingDescription = '') THEN //-+NPR5.51 [359403]
+                //   PostingDescription := STRSUBSTNO(TextDesc,POSEntry.TABLECAPTION,POSPaymentLineToBeCompressed."POS Entry No.");
+                //+NPR5.55 [410384]
+
+              end;
+            Compressionmethod::"Per POS Period Register":
+              begin
+                POSPeriodRegister.TestField("Document No.");
+                POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                //-NPR5.55 [410384]
+                // IF (PostingDescription = '') THEN //-+NPR5.51 [359403]
+                //  PostingDescription := STRSUBSTNO(TextDesc,POSPeriodRegister.TABLECAPTION,POSPaymentLineToBeCompressed."POS Period Register No.");
+                //+NPR5.55 [410384]
+              end;
+          end;
 
                 if not POSPostingBuffer.Find then begin
                     POSPostingBuffer.Amount := 0;
@@ -2155,7 +2177,7 @@ codeunit 6150615 "POS Post Entries"
     begin
     end;
 
-    local procedure CheckDimensions(POSEntry: Record "POS Entry")
+    local procedure CheckDimensions(var POSEntry: Record "POS Entry")
     var
         POSEntry2: Record "POS Entry";
         POSPostingControl: Codeunit "POS Posting Control";
@@ -2163,17 +2185,16 @@ codeunit 6150615 "POS Post Entries"
 
         //-NPR5.53 [375258]
         POSEntry2.Copy(POSEntry);
-        with POSEntry2 do begin
-            FilterGroup(-1);
-            SetRange("Post Entry Status", "Post Entry Status"::Unposted, "Post Entry Status"::"Error while Posting");
-            SetRange("Post Item Entry Status", "Post Item Entry Status"::Unposted, "Post Item Entry Status"::"Error while Posting");
-            FilterGroup(0);
-            if FindSet then
-                repeat
-                    POSPostingControl.CheckGlobalDimAndDimSetConsistency(RecordId, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID", 0);
-                until Next = 0;
-        end;
-        //+NPR5.53 [375258]
+        //-NPR5.55 [414671]
+        POSEntry2.FilterGroup(-1);
+        POSEntry2.SetRange("Post Entry Status", POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
+        POSEntry2.SetRange("Post Item Entry Status", POSEntry2."Post Item Entry Status"::Unposted, POSEntry2."Post Item Entry Status"::"Error while Posting");
+        POSEntry2.FilterGroup(0);
+        if POSEntry2.FindSet then
+          repeat
+            POSPostingControl.CheckGlobalDimAndDimSetConsistency(POSEntry2.RecordId, POSEntry2."Shortcut Dimension 1 Code", POSEntry2."Shortcut Dimension 2 Code", POSEntry2."Dimension Set ID", 0);
+          until POSEntry2.Next = 0;
+        //+NPR5.55 [414671]
     end;
 }
 

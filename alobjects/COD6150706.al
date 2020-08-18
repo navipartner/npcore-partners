@@ -48,6 +48,10 @@ codeunit 6150706 "POS Sale Line"
     // NPR5.53/TSA /20191219 CASE 382035 Added possibility to show item count as part of the sales summary on POS
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
     // NPR5.54/ALPO/20200331 CASE 398454 Price VAT recalculation using VAT parameters preset in passed line
+    // NPR5.55/ALPO/20200506 CASE 402585 Item AddOn: possibility to override Unit Price even if the price to apply = 0
+    // NPR5.55/TSA /20200525 CASE 406268 POS View Profile was not fetched correctly
+    // NPR5.55/ALPO/20200601 CASE 407793 Added possibility to refresh the xRec
+    // NPR5.55/ALPO/20200803 CASE 417118 Possibility to insert additional item add-on lines directly below their base lines instead of as last lines in the sale
 
 
     trigger OnRun()
@@ -72,12 +76,14 @@ codeunit 6150706 "POS Sale Line"
         CannotCalcPriceInclVATErr: Label 'Prices including VAT cannot be calculated when %1 is %2.';
         ItemCountWhenCalculatedBalance: Decimal;
         UseLinePriceVATParams: Boolean;
+        InsertWithAutoSplitKeyForced: Boolean;
+        IsAutoSplitKeyRecord: Boolean;
 
     [Scope('Personalization')]
     procedure Init(RegisterNo: Code[20];SalesTicketNo: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
     var
-        Register: Record Register;
         POSViewProfile: Record "POS View Profile";
+        POSUnit: Record "POS Unit";
     begin
         Clear(Rec);
         Clear(Sale);
@@ -96,11 +102,15 @@ codeunit 6150706 "POS Sale Line"
         Setup := SetupIn;
         FrontEnd := FrontEndIn;
 
-        if (Register.Get (RegisterNo)) then
-          //-NPR5.49 [335739]
-          //InsertLineWithAutoSplitKey := (Register."Line Order on Screen" = Register."Line Order on Screen"::AutoSplitKey);
-          InsertLineWithAutoSplitKey := (POSViewProfile."Line Order on Screen" = POSViewProfile."Line Order on Screen"::AutoSplitKey);
-          //+NPR5.49 [335739]
+        //-NPR5.55 [406268]
+        // IF (Register.GET (RegisterNo)) THEN
+        //  //-NPR5.49 [335739]
+        //  //InsertLineWithAutoSplitKey := (Register."Line Order on Screen" = Register."Line Order on Screen"::AutoSplitKey);
+        //  InsertLineWithAutoSplitKey := (POSViewProfile."Line Order on Screen" = POSViewProfile."Line Order on Screen"::AutoSplitKey);
+        //  //+NPR5.49 [335739]
+        Setup.GetPOSViewProfile (POSViewProfile);
+        InsertLineWithAutoSplitKey := (POSViewProfile."Line Order on Screen" = POSViewProfile."Line Order on Screen"::AutoSplitKey);
+        //+NPR5.55 [406268]
 
         //-NPR5.50 [300557]
         Initialized := true;
@@ -148,7 +158,11 @@ codeunit 6150706 "POS Sale Line"
     begin
 
         //-NPR5.40 [303065]
-        if ((InsertLineWithAutoSplitKey) and (Rec."Line No." <> 0)) then begin
+        //IF ((InsertLineWithAutoSplitKey) AND (Rec."Line No." <> 0)) THEN BEGIN  //NPR5.55 [417118]-revoked
+        //-NPR5.55 [417118]
+        IsAutoSplitKeyRecord := false;
+        if (InsertLineWithAutoSplitKey or InsertWithAutoSplitKeyForced) and (Rec."Line No." <> 0) then begin
+        //+NPR5.55 [417118]
           SaleLinePOS.SetCurrentKey ("Register No.","Sales Ticket No.","Line No.");
           SaleLinePOS.SetFilter ("Register No.", '=%1', Sale."Register No.");
           SaleLinePOS.SetFilter ("Sales Ticket No.", '=%1', Sale."Sales Ticket No.");
@@ -156,7 +170,11 @@ codeunit 6150706 "POS Sale Line"
           if (SaleLinePOS.FindFirst ()) then begin
             NextLineNo := Round ((SaleLinePOS."Line No." - Rec."Line No.") / 2, 1) + Rec."Line No.";
             SaleLinePOS.SetFilter ("Line No.", '=%1', NextLineNo);
-            if (SaleLinePOS.IsEmpty()) then
+            //IF (SaleLinePOS.ISEMPTY()) THEN  //NPR5.55 [417118]-revoked
+            //-NPR5.55 [417118]
+            IsAutoSplitKeyRecord := SaleLinePOS.IsEmpty();
+            if IsAutoSplitKeyRecord then
+            //+NPR5.55 [417118]
               exit (NextLineNo);
 
             Error (AUTOSPLIT_ERROR, NextLineNo);
@@ -316,7 +334,8 @@ codeunit 6150706 "POS Sale Line"
           end;
           //+NPR5.51 [363243]
           //-NPR5.40 [294655]
-          if Line."Unit Price" <> 0 then
+          //IF Line."Unit Price" <> 0 THEN  //NPR5.55 [402585]-revoked
+          if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" then  //NPR5.55 [402585]
             Validate("Unit Price", Line."Unit Price");
           //+NPR5.40 [294655]
           //+NPR5.34 [270255]
@@ -908,6 +927,13 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.51 [363243]
     end;
 
+    procedure RefreshxRec()
+    begin
+        //-NPR5.55 [407793]
+        xRec := Rec;
+        //+NPR5.55 [407793]
+    end;
+
     procedure GetxRec(var xSaleLinePOS: Record "Sale Line POS")
     begin
         //-NPR5.52 [354309]
@@ -920,6 +946,20 @@ codeunit 6150706 "POS Sale Line"
         //-NPR5.54 [398454]
         UseLinePriceVATParams := Use;
         //+NPR5.54 [398454]
+    end;
+
+    procedure ForceInsertWithAutoSplitKey(Set: Boolean)
+    begin
+        //-NPR5.55 [417118]
+        InsertWithAutoSplitKeyForced := Set;
+        //+NPR5.55 [417118]
+    end;
+
+    procedure InsertedWithAutoSplitKey(): Boolean
+    begin
+        //-NPR5.55 [417118]
+        exit(IsAutoSplitKeyRecord);
+        //+NPR5.55 [417118]
     end;
 }
 

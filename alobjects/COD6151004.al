@@ -8,6 +8,7 @@ codeunit 6151004 "POS Action - Save POS Quote"
     // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
     // NPR5.54/ALPO/20200203  CASE 364658 Part of the code moved from OnActionSaveAsQuote() to a separate global function CreatePOSQuote() to be able to call it from outside of the object
     // NPR5.54/MMV /20200320 CASE 364340 Added explicit "Retail ID" fields
+    // NPR5.55/ALPO/20200720 CASE 391678 Record a cancelled sales ticket to POS Entry on Sale POS park
 
 
     trigger OnRun()
@@ -18,6 +19,8 @@ codeunit 6151004 "POS Action - Save POS Quote"
         Text000: Label 'Save POS Sale as POS Quote';
         Text001: Label 'POS Quote';
         Text002: Label 'Save current Sale as POS Quote?';
+        SaleWasParkedTxt: Label 'Sale was saved as POS Quote (parked) at %1';
+        ErrorCancelling: Label 'System was not able to cancel current sale after parking. Please do it manually.';
 
     local procedure ActionCode(): Text
     begin
@@ -109,6 +112,7 @@ codeunit 6151004 "POS Action - Save POS Quote"
     var
         SalePOS: Record "Sale POS";
         POSQuoteEntry: Record "POS Quote Entry";
+        POSActionCancelSale: Codeunit "POS Action - Cancel Sale";
         POSSale: Codeunit "POS Sale";
         RPTemplateHeader: Record "RP Template Header";
         RPTemplateMgt: Codeunit "RP Template Mgt.";
@@ -145,6 +149,14 @@ codeunit 6151004 "POS Action - Save POS Quote"
         */
         //+NPR5.54 [364658]-revoked
         CreatePOSQuote(SalePOS,POSQuoteEntry);  //NPR5.54 [364658]
+        
+        //-NPR5.55 [391678]
+        Commit;
+        Clear(POSActionCancelSale);
+        POSActionCancelSale.SetAlternativeDescription(StrSubstNo(SaleWasParkedTxt, CurrentDateTime));
+        if not POSActionCancelSale.CancelSale(POSSession) then
+          Error(ErrorCancelling);
+        //+NPR5.55 [391678]
         
         Commit;
         POSSale.SelectViewForEndOfSale(POSSession);
@@ -188,7 +200,7 @@ codeunit 6151004 "POS Action - Save POS Quote"
             SaleLinePOS.Delete(true);
           until SaleLinePOS.Next = 0;
 
-        SalePOS.Delete(true);
+        //SalePOS.DELETE(TRUE);  //NPR5.55 [391678]-revoked
         //+NPR5.54 [364658]
     end;
 

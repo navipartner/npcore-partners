@@ -37,9 +37,12 @@ codeunit 6151401 "Magento Setup Mgt."
     // MAG2.22/MHA /20190625  CASE 359285 Added Picture Variety Type in SetupNpXmlTemplates()
     // MAG2.23/MHA /20191018  CASE 373610 Bumped version list in MagentoVersionNo()
     // MAG2.24/MHA /20191018  CASE 386235 Bumped version list in MagentoVersionNo()
-    // #374800/BHR /20200212  CASE 374800 Add confirmation box to prevent setup overide
+    // MAG2.25/BHR /20200212  CASE 374800 Add confirmation box to prevent setup overide
     // MAG2.25/MHA /20200214  CASE 390939 Member- and Ticket Template should only be created if Ticket Module is enabled
     // MAG2.25/MHA /20200416  CASE 400486 Bumped version list in MagentoVersionNo()
+    // MAG2.26/MHA /20200527  CASE 406591 Added function OnAfterModifyMagentoSetup()
+    // MAG2.26/MHA /20200601  CASE 404580 Added functions for setting up Categories and Brands
+    // MAG2.26/MHA /20200602  CASE 407764 Bumped version list
 
 
     trigger OnRun()
@@ -102,35 +105,35 @@ codeunit 6151401 "Magento Setup Mgt."
 
     local procedure CreateRootItemGroup(ItemGroupNo: Code[20]; ItemGroupName: Text[50])
     var
-        ItemGroup: Record "Magento Item Group";
+        ItemGroup: Record "Magento Category";
     begin
         if ItemGroup.Get(ItemGroupNo) then begin
-            if (ItemGroup.Name <> ItemGroupName) or (not ItemGroup.Root) or (ItemGroup."Root No." <> ItemGroup."No.") then begin
+          if (ItemGroup.Name <> ItemGroupName) or (not ItemGroup.Root) or (ItemGroup."Root No." <> ItemGroup.Id) then begin
                 //-MAG2.17 [333862]
                 //ItemGroup.Name := ItemGroupName;
                 ItemGroup.Validate(Name, ItemGroupName);
                 //+MAG2.17 [333862]
                 ItemGroup.Root := true;
-                ItemGroup."Root No." := ItemGroup."No.";
+            ItemGroup."Root No." := ItemGroup.Id;
                 ItemGroup.Modify(true);
             end;
             exit;
         end;
 
         ItemGroup.Init;
-        ItemGroup."No." := ItemGroupNo;
+        ItemGroup.Id := ItemGroupNo;
         //-MAG2.17 [333862]
         //ItemGroup.Name := ItemGroupName;
         ItemGroup.Validate(Name, ItemGroupName);
         //+MAG2.17 [333862]
         ItemGroup.Root := true;
-        ItemGroup."Root No." := ItemGroup."No.";
+        ItemGroup."Root No." := ItemGroup.Id;
         ItemGroup.Insert(true);
     end;
 
     procedure SetDefaultItemGroupRoots()
     var
-        ItemGroup: Record "Magento Item Group";
+        ItemGroup: Record "Magento Category";
         MagentoStore: Record "Magento Store";
         MagentoWebsite: Record "Magento Website";
     begin
@@ -143,14 +146,14 @@ codeunit 6151401 "Magento Setup Mgt."
         if not MagentoStore.FindFirst then
             exit;
 
-        ItemGroup.SetFilter("Parent Item Group No.", '=%1', '');
+        ItemGroup.SetFilter("Parent Category Id",'=%1','');
         ItemGroup.SetFilter("Root No.", '=%1', '');
         ItemGroup.SetRange(Root, false);
         if not ItemGroup.FindSet then
             exit;
 
         repeat
-            ItemGroup."Parent Item Group No." := MagentoStore."Root Item Group No.";
+          ItemGroup."Parent Category Id" := MagentoStore."Root Item Group No.";
             ItemGroup."Root No." := MagentoStore."Root Item Group No.";
             ItemGroup.Modify(true);
         until ItemGroup.Next = 0;
@@ -224,11 +227,11 @@ codeunit 6151401 "Magento Setup Mgt."
             NaviConnectImportType."Webservice Function" := 'ImportSalesOrders';
             NaviConnectImportType.Insert(true);
         end else begin
-            //-#374800 [374800]
+          //-MAG2.25 [374800]
             if GuiAllowed then
                 if not Confirm(Text10050, true) then
                     exit;
-            //+#374800 [374800]
+          //+MAG2.25 [374800]
             NaviConnectImportType.Description := 'magento_services';
             NaviConnectImportType."Import Codeunit ID" := CODEUNIT::"Magento Sales Order Mgt.";
             //-MAG2.08 [288763]
@@ -263,11 +266,11 @@ codeunit 6151401 "Magento Setup Mgt."
         end;
 
         PrevRec := Format(NcImportType);
-        //-#374800 [374800]
+          //-MAG2.25 [374800]
         if GuiAllowed then
             if not Confirm(Text10060, true) then
                 exit;
-        //+#374800 [374800]
+          //+MAG2.25 [374800]
         NcImportType.Description := 'magento_services';
         NcImportType."Import Codeunit ID" := CODEUNIT::"Magento Import Return Order";
         NcImportType."Lookup Codeunit ID" := CODEUNIT::"Magento Lookup Return Order";
@@ -630,6 +633,32 @@ codeunit 6151401 "Magento Setup Mgt."
             until VATProductPostingGroup.Next = 0;
     end;
 
+    procedure HasSetupCategories(): Boolean
+    var
+        MagentoSetupEventSub: Record "Magento Setup Event Sub.";
+    begin
+        //-MAG2.26 [404580]
+        MagentoSetupEventSub.SetRange(Type,MagentoSetupEventSub.Type::"Setup Categories");
+        MagentoSetupEventSub.SetFilter("Codeunit ID",'>%1',0);
+        MagentoSetupEventSub.SetFilter("Function Name",'<>%1','');
+        MagentoSetupEventSub.SetRange(Enabled,true);
+        exit(MagentoSetupEventSub.FindFirst);
+        //+MAG2.26 [404580]
+    end;
+
+    procedure HasSetupBrands(): Boolean
+    var
+        MagentoSetupEventSub: Record "Magento Setup Event Sub.";
+    begin
+        //-MAG2.26 [404580]
+        MagentoSetupEventSub.SetRange(Type,MagentoSetupEventSub.Type::"Setup Brands");
+        MagentoSetupEventSub.SetFilter("Codeunit ID",'>%1',0);
+        MagentoSetupEventSub.SetFilter("Function Name",'<>%1','');
+        MagentoSetupEventSub.SetRange(Enabled,true);
+        exit(MagentoSetupEventSub.FindFirst);
+        //+MAG2.26 [404580]
+    end;
+
     procedure "--- Setup Event Triggers"()
     begin
     end;
@@ -731,6 +760,28 @@ codeunit 6151401 "Magento Setup Mgt."
         //+MAG2.07 [286943]
     end;
 
+    procedure TriggerSetupCategories()
+    var
+        Handled: Boolean;
+    begin
+        //-MAG2.26 [404580]
+        OnSetupCategories(Handled);
+        if Handled then
+          exit;
+        //+MAG2.26 [404580]
+    end;
+
+    procedure TriggerSetupBrands()
+    var
+        Handled: Boolean;
+    begin
+        //-MAG2.26 [404580]
+        OnSetupBrands(Handled);
+        if Handled then
+          exit;
+        //+MAG2.26 [404580]
+    end;
+
     local procedure "--- Publishers"()
     begin
     end;
@@ -782,6 +833,20 @@ codeunit 6151401 "Magento Setup Mgt."
     begin
         //-MAG2.07 [286943]
         //+MAG2.07 [286943]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetupCategories(var Handled: Boolean)
+    begin
+        //-MAG2.26 [404580]
+        //+MAG2.26 [404580]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetupBrands(var Handled: Boolean)
+    begin
+        //-MAG2.26 [404580]
+        //+MAG2.26 [404580]
     end;
 
     local procedure "--- Subscribers"()
@@ -888,6 +953,33 @@ codeunit 6151401 "Magento Setup Mgt."
         Handled := true;
         SetupShipmentMethodMapping();
         //+MAG2.07 [286943]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6151401, 'OnAfterModifyEvent', '', true, true)]
+    local procedure OnAfterModifyMagentoSetup(var Rec: Record "Magento Setup";var xRec: Record "Magento Setup";RunTrigger: Boolean)
+    var
+        NpCsStore: Record "NpCs Store";
+        DataLogMgt: Codeunit "Data Log Management";
+        RecRef: RecordRef;
+    begin
+        //-MAG2.26 [406591]
+        if Rec.IsTemporary then
+          exit;
+        if not RunTrigger then
+          exit;
+
+        if xRec."NpCs From Store Code" <>  Rec."NpCs From Store Code" then begin
+          if (xRec."NpCs From Store Code" <> '') and NpCsStore.Get(xRec."NpCs From Store Code") then begin
+            RecRef.GetTable(NpCsStore);
+            DataLogMgt.OnDatabaseModify(RecRef);
+          end;
+
+          if (Rec."NpCs From Store Code" <> '') and NpCsStore.Get(Rec."NpCs From Store Code") then begin
+            RecRef.GetTable(NpCsStore);
+            DataLogMgt.OnDatabaseModify(RecRef);
+          end;
+        end;
+        //+MAG2.26 [406591]
     end;
 
     procedure "--- No. Mgt."()
@@ -1009,9 +1101,9 @@ codeunit 6151401 "Magento Setup Mgt."
 
     procedure MagentoVersionNo(): Code[20]
     begin
-        //-MAG2.25 [400486]
-        exit('2.25');
-        //+MAG2.25 [400486]
+        //-MAG2.26 [407764]
+        exit('2.26');
+        //+MAG2.26 [407764]
     end;
 
     procedure UpdateVersionNo(var MagentoSetup: Record "Magento Setup")

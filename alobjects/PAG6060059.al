@@ -3,6 +3,9 @@ page 6060059 "POS Inventory Overview"
     // NPR5.34/BR  /20170726   CASE 282748 Object Created
     // NPR5.52/ALPO/20191002 CASE 370333 New options to show inventory for current location only
     //                                   - Function SetParameters: new call parameter: OnlyCurentLocIn [boolean]
+    // NPR5.55/ALST/20200424 CASE 400277 added "Variant Code" column
+    // NPR5.55/SARA/20200519 CASE 404868 Show negative inventory
+    // NPR5.55/ANPA/2020050  CASE 401161 Added "Description 2" from item
 
     Caption = 'POS Inventory Overview';
     DelayedInsert = false;
@@ -113,6 +116,9 @@ page 6060059 "POS Inventory Overview"
             repeater(Group)
             {
                 Editable = false;
+                field("Variant Code";"Variant Code")
+                {
+                }
                 field("Variant Description";"Variant Description")
                 {
                     Visible = VariantVisible;
@@ -123,6 +129,10 @@ page 6060059 "POS Inventory Overview"
                 field(Quantity;Quantity)
                 {
                     DecimalPlaces = 0:2;
+                }
+                field("Item Description";"Item Description")
+                {
+                    Caption = 'Description 2';
                 }
             }
         }
@@ -215,7 +225,10 @@ page 6060059 "POS Inventory Overview"
             if ItemVariant.FindSet then repeat
               Item.SetFilter("Variant Filter",ItemVariant.Code);
               Item.CalcFields(Inventory);
-              if Item.Inventory > 0 then begin
+              //-NPR5.55 [404868]
+              //IF Item.Inventory > 0 THEN BEGIN
+              if Item.Inventory <> 0 then begin
+              //+NPR5.55 [404868]
                 "Item No." := Item."No.";
                 "Item Description" := Item.Description;
                 "Variant Code" := ItemVariant.Code;
@@ -231,7 +244,10 @@ page 6060059 "POS Inventory Overview"
           end else begin
             Item.SetFilter("Variant Filter",'');
             Item.CalcFields(Inventory);
-            if Item.Inventory > 0 then begin
+            //-NPR5.55 [404868]
+            //IF Item.Inventory > 0 THEN BEGIN
+            if Item.Inventory <> 0 then begin
+            //+NPR5.55 [404868]
               "Item No." := Item."No.";
               "Item Description" := Item.Description;
               "Location Code" := Location.Code;

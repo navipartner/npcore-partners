@@ -415,7 +415,7 @@ table 6150903 "HC Audit Roll Posting"
         field(6055;Send;Date)
         {
             Caption = 'Send';
-            Description = 'Bruges ifm. replikering til at afg�ren om det felt er udl�st eller ej';
+            Description = 'Bruges ifm. replikering til at afg¢ren om det felt er udlæst eller ej';
         }
         field(6060;"Offline receipt no.";Code[20])
         {

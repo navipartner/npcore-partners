@@ -72,6 +72,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
     // MAG2.25/MHA /20200204  CASE 387936 Added function SendOrderConfirmation()
     // MAG2.25/MHA /20200306  CASE 384262 Added import of <vat_percent> in InsertSalesLineRetailVoucher()
     // MAG2.25/MHA /20200323  CASE 372135 Retail Voucher Description is now used on Sales Line
+    // MAG2.26/MHA /20200428  CASE 402247 Added Option "Fixed" to field "Customer Update Mode"
+    // MAG2.26/MHA /20200505  CASE 402828 Added Website Sales Order No. Series in InsertSalesHeader()
+    // MAG2.26/MHA /20200515  CASE 401788 Added Publisher Events for extensibility purposes
+    // MAG2.26/MHA /20200526  CASE 406591 Reworked InsertCollectDocument() to use new element <sales_order/shipment/collect_in_store>
+    // MAG2.26/MHA /20200427  CASE 402013 Added issue of Return Retail Voucher in InsertRetailVoucherPayment()
+    // MAG2.26/MHA /20200427  CASE 402015 Voucher table updated
+    // NPR5.55/MHA /20200626  CASE 401059 Custom Option Type is now used to determine if Custom Option Lines are required
+    // NPR5.55/MHA /20200701  CASE 411513 Default Collect in Store Customer Notification is E-mail
+    // NPR5.55/MHA /20200729  CASE 416534 Skip Customer Posting fields when Config Template is defined in InsertCustomer()
+    // NPR5.55/MHA /20200730  CASE 412507 Support for prices excluding vat
 
     TableNo = "Nc Import Entry";
 
@@ -79,6 +89,12 @@ codeunit 6151413 "Magento Sales Order Mgt."
     var
         XmlDoc: DotNet npNetXmlDocument;
     begin
+        //-MAG2.26 [401788]
+        CurrImportEntry := Rec;
+        Clear(CurrImportType);
+        if CurrImportType.Get(CurrImportEntry."Import Type") then;
+        //+MAG2.26 [401788]
+
         if LoadXmlDoc(XmlDoc) then
           ImportSalesOrders(XmlDoc);
     end;
@@ -96,6 +112,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
+        CurrImportEntry: Record "Nc Import Entry";
+        CurrImportType: Record "Nc Import Type";
+        Text003: Label 'Voucher Payment Amount %1 exceeds Voucher Amount %2';
 
     local procedure ImportSalesOrders(XmlDoc: DotNet npNetXmlDocument)
     var
@@ -135,6 +154,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //-MAG2.22 [343352]
         UpdateExtCouponReservations(SalesHeader);
         //-MAG2.22 [343352]
+        //-MAG2.26 [401788]
+        OnBeforeRelease(CurrImportType,CurrImportEntry,XmlElement,SalesHeader);
+        //+MAG2.26 [401788]
         //-MAG2.19 [347974]
         if MagentoSetup."Release Order on Import" then
           ReleaseSalesDoc.PerformManualRelease(SalesHeader);
@@ -145,6 +167,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //-MAG2.23 [363864]
         UpdateRetailVoucherCustomerInfo(SalesHeader);
         //+MAG2.23 [363864]
+        //-MAG2.26 [401788]
+        OnBeforeCommit(CurrImportType,CurrImportEntry,XmlElement,SalesHeader);
+        //+MAG2.26 [401788]
         //-MAG2.25 [387936]
         Commit;
         if MagentoSetup."Send Order Confirmation" then
@@ -173,37 +198,58 @@ codeunit 6151413 "Magento Sales Order Mgt."
     local procedure InsertCollectDocument(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         NpCsWorkflow: Record "NpCs Workflow";
-        NpCsStoreWorkflowRelation: Record "NpCs Store Workflow Relation";
         NpCsDocument: Record "NpCs Document";
-        NpCsStore: Record "NpCs Store";
+        NpCsStoreFrom: Record "NpCs Store";
+        NpCsStoreTo: Record "NpCs Store";
         NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
+        XmlElementCollect: DotNet npNetXmlElement;
         StoreCode: Code[20];
     begin
-        //-MAG2.20 [352201]
-        StoreCode := NpXmlDomMgt.GetElementCode(XmlElement,'store_code',MaxStrLen(NpCsStore.Code),false);
+        //-MAG2.26 [406591]
+        if not NpXmlDomMgt.FindElement(XmlElement,'shipment/collect_in_store',false,XmlElementCollect) then
+          exit;
+
+        MagentoSetup.TestField("Collect in Store Enabled");
+        MagentoSetup.TestField("NpCs From Store Code");
+        MagentoSetup.TestField("NpCs Workflow Code");
+
+        StoreCode := NpXmlDomMgt.GetAttributeCode(XmlElementCollect,'','store_code',MaxStrLen(NpCsStoreTo.Code),true);
         if StoreCode = '' then
           exit;
 
-        NpCsStore.Get(StoreCode);
+        NpCsStoreTo.Get(StoreCode);
 
-        NpCsStoreWorkflowRelation.SetRange("Store Code",NpCsStore.Code);
-        NpCsStoreWorkflowRelation.FindFirst;
-        NpCsWorkflow.Get(NpCsStoreWorkflowRelation."Workflow Code");
-        NpCsCollectMgt.InitSendToStoreDocument(SalesHeader,NpCsStore,NpCsWorkflow,NpCsDocument);
+        NpCsWorkflow.Get(MagentoSetup."NpCs Workflow Code");
+        NpCsCollectMgt.InitSendToStoreDocument(SalesHeader,NpCsStoreTo,NpCsWorkflow,NpCsDocument);
 
-        NpCsStore.SetRange("Local Store",true);
-        NpCsStore.SetRange("Location Code",SalesHeader."Location Code");
-        if not NpCsStore.FindFirst then
-          NpCsStore.SetRange("Location Code");
-        NpCsStore.FindFirst;
-
-        NpCsDocument."From Store Code" := NpCsStore.Code;
+        NpCsStoreFrom.Get(MagentoSetup."NpCs From Store Code");
+        NpCsDocument."From Store Code" := NpCsStoreFrom.Code;
         NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
+
+        NpCsDocument."Allow Partial Delivery" := NpXmlDomMgt.GetElementBoolean(XmlElementCollect,'allow_partial_delivery',false);
+
+        NpCsDocument."Notify Customer via E-mail" := NpXmlDomMgt.GetElementBoolean(XmlElementCollect,'notify_customer_via_email',false);
+        NpCsDocument."Customer E-mail" :=
+          NpXmlDomMgt.GetElementText(XmlElementCollect,'customer_email',MaxStrLen(NpCsDocument."Customer E-mail"),false);
+        if NpCsDocument."Customer E-mail" = '' then
+          NpCsDocument."Customer E-mail" := NpXmlDomMgt.GetXmlText(XmlElement,'sell_to_customer/email',MaxStrLen(NpCsDocument."Customer E-mail"),true);
+
+        NpCsDocument."Notify Customer via Sms" := NpXmlDomMgt.GetElementBoolean(XmlElementCollect,'notify_customer_via_sms',false);
+        NpCsDocument."Customer Phone No." :=
+          NpXmlDomMgt.GetElementText(XmlElementCollect,'customer_phone',MaxStrLen(NpCsDocument."Customer Phone No."),false);
+        if NpCsDocument."Customer Phone No." = '' then
+          NpCsDocument."Customer Phone No." := NpXmlDomMgt.GetXmlText(XmlElement,'sell_to_customer/phone',MaxStrLen(NpCsDocument."Customer Phone No."),false);
+
+        //-NPR5.55 [411513]
+        if not NpCsDocument."Notify Customer via Sms" then
+          NpCsDocument."Notify Customer via E-mail" := true;
+        //+NPR5.55 [411513]
+
         NpCsDocument.Modify(true);
 
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
-        //+MAG2.20 [352201]
+        //+MAG2.26 [406591]
     end;
 
     local procedure InsertCommentLine(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
@@ -234,6 +280,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
           else
             BinaryWriter.Write(CommentLine);
           RecordLink.Modify(true);
+          //-MAG2.26 [401788]
+          OnAfterInsertCommentLine(CurrImportType,CurrImportEntry,XmlElement,SalesHeader,RecordLink);
+          //+MAG2.26 [401788]
         end;
     end;
 
@@ -265,6 +314,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         PrevCust: Text;
         EanNo: Text;
         CustTemplateCode: Code[10];
+        CustNo: Code[20];
     begin
         Initialize;
         ExternalCustomerNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'customer_no',false);
@@ -275,6 +325,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
         TaxClass := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'tax_class',true);
         NewCust := not GetCustomer(ExternalCustomerNo,XmlElement,Customer);
+
+        //-MAG2.26 [402247]
+        if NewCust and (MagentoSetup."Customer Update Mode" = MagentoSetup."Customer Update Mode"::Fixed) then begin
+          Customer."Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement,'post_code',MaxStrLen(Customer."Post Code"),true));
+          Customer."Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement,'country_code',MaxStrLen(Customer."Country/Region Code"),false));
+          CustNo := MagentoMgt.GetFixedCustomerNo(Customer);
+          Customer.Get(CustNo);
+          NewCust := false;
+        end;
+        //+MAG2.26 [402247]
 
         if NewCust then begin
           //-MAG2.22 [357662]
@@ -310,7 +370,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
             Customer."Payment Terms Code" := CustTemplate."Payment Terms Code";
             Customer."Payment Method Code" := CustTemplate."Payment Method Code";
             Customer."Shipment Method Code" := CustTemplate."Shipment Method Code";
-          end else begin
+          //-NPR5.55 [416534]
+          end else if ConfigTemplateCode = '' then begin
+          //+NPR5.55 [416534]
             Customer.Validate("Gen. Bus. Posting Group",VATBusPostingGroup);
             Customer.Validate("VAT Bus. Posting Group",VATBusPostingGroup);
             Customer.Validate("Customer Posting Group",MagentoSetup."Customer Posting Group");
@@ -328,7 +390,14 @@ codeunit 6151413 "Magento Sales Order Mgt."
             begin
               exit;
             end;
+          //-MAG2.26 [402247]
+          MagentoSetup."Customer Update Mode"::Fixed:
+            begin
+              exit;
+            end;
+          //+MAG2.26 [402247]
         end;
+
         //+MAG2.22 [357662]
         PrevCust := Format(Customer);
         //-MAG2.22 [360098]
@@ -371,7 +440,13 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Customer."VAT Registration No." := NpXmlDomMgt.GetXmlText(XmlElement,'vat_registration_no',MaxStrLen(Customer."VAT Registration No."),false);
         //+MAG2.09 [299976]
         Customer."Prices Including VAT" := true;
-
+        //-NPR5.55 [412507]
+        if NpXmlDomMgt.GetElementBoolean(XmlElement,'../prices_excluding_vat',false) then
+          Customer."Prices Including VAT" := false;
+        //+NPR5.55 [412507]
+        //-MAG2.26 [401788]
+        OnBeforeModifyCustomer(CurrImportType,CurrImportEntry,XmlElement,Customer);
+        //+MAG2.26 [401788]
         if PrevCust = Format(Customer) then
           exit;
         Customer.Modify(true);
@@ -548,14 +623,13 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
     local procedure InsertRetailVoucherPayment(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer): Boolean
     var
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+        NpRvSalesLine: Record "NpRv Sales Line";
         NpRvVoucher: Record "NpRv Voucher";
         NpRvGlobalVoucherWebservice: Codeunit "NpRv Global Voucher Webservice";
         PaymentLine: Record "Magento Payment Line";
+        NpRvSalesDocMgt: Codeunit "NpRv Sales Doc. Mgt.";
         ExternalReferenceNo: Text;
-        PrevRec: Text;
         Amount: Decimal;
-        LineNo2: Integer;
     begin
         //-MAG2.17 [302179]
         ExternalReferenceNo := NpXmlDomMgt.GetXmlText(XmlElement,'transaction_id',MaxStrLen(NpRvVoucher."Reference No."),true);
@@ -564,37 +638,36 @@ codeunit 6151413 "Magento Sales Order Mgt."
         if not NpRvGlobalVoucherWebservice.FindVoucher('',ExternalReferenceNo,NpRvVoucher) then
           Error(Text000,ExternalReferenceNo);
 
-        NpRvExtVoucherSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
-        NpRvExtVoucherSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
-        NpRvExtVoucherSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
-        NpRvExtVoucherSalesLine.SetRange(Type,NpRvExtVoucherSalesLine.Type::Payment);
-        if not NpRvExtVoucherSalesLine.FindFirst then begin
+        //-MAG2.26 [402013]
+        NpRvVoucher.CalcFields(Amount);
+        if NpRvVoucher.Amount < Amount then
+          Error(Text003,Amount,NpRvVoucher.Amount);
+        //+MAG2.26 [402013]
+
+        NpRvSalesLine.SetRange("Document Source",NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
+        NpRvSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
+        NpRvSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
+        NpRvSalesLine.SetRange(Type,NpRvSalesLine.Type::Payment);
+        if not NpRvSalesLine.FindFirst then begin
           if NpRvVoucher.CalcInUseQty() > 0 then
             Error(Text001,NpRvVoucher."Reference No.");
 
-          NpRvExtVoucherSalesLine.Reset;
-          NpRvExtVoucherSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
-          if NpRvExtVoucherSalesLine.FindLast then;
-          LineNo2 := NpRvExtVoucherSalesLine."Line No." + 10000;
-
-          NpRvExtVoucherSalesLine.Init;
-          NpRvExtVoucherSalesLine."External Document No." := SalesHeader."External Order No.";
-          NpRvExtVoucherSalesLine."Line No." := LineNo2;
-          NpRvExtVoucherSalesLine."Document Type" := SalesHeader."Document Type";
-          NpRvExtVoucherSalesLine."Document No." := SalesHeader."No.";
-          NpRvExtVoucherSalesLine.Type := NpRvExtVoucherSalesLine.Type::Payment;
-          NpRvExtVoucherSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
-          NpRvExtVoucherSalesLine."Voucher No." := NpRvVoucher."No.";
-          NpRvExtVoucherSalesLine."Reference No." := NpRvVoucher."Reference No.";
-          NpRvExtVoucherSalesLine.Description := NpRvVoucher.Description;
-          NpRvExtVoucherSalesLine.Insert;
+          //-MAG2.26 [402015]
+          NpRvSalesLine.Init;
+          NpRvSalesLine.Id := CreateGuid;
+          NpRvSalesLine."External Document No." := SalesHeader."External Order No.";
+          NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+          NpRvSalesLine."Document Type" := SalesHeader."Document Type";
+          NpRvSalesLine."Document No." := SalesHeader."No.";
+          NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+          NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+          NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+          NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+          NpRvSalesLine.Description := NpRvVoucher.Description;
+          NpRvSalesLine.Insert(true);
+          //+MAG2.26 [402015]
         end;
-
-        PrevRec := Format(NpRvExtVoucherSalesLine);
-        NpRvExtVoucherSalesLine."Document Type" := NpRvExtVoucherSalesLine."Document Type"::Order;
-        NpRvExtVoucherSalesLine."Document No." := SalesHeader."No.";
-        if PrevRec <> Format(NpRvExtVoucherSalesLine) then
-          NpRvExtVoucherSalesLine.Modify;
 
         LineNo += 10000;
         PaymentLine.Init;
@@ -613,6 +686,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
         PaymentLine.Amount := Amount;
         PaymentLine.Insert;
         //+MAG2.17 [302179]
+
+        //-MAG2.26 [402013]
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
+        NpRvSalesLine."Document Type" := SalesHeader."Document Type"::Order;
+        NpRvSalesLine."Document No." := SalesHeader."No.";
+        NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
+        NpRvSalesLine.Modify(true);
+
+        NpRvSalesDocMgt.ApplyPayment(SalesHeader,NpRvSalesLine);
+        //+MAG2.26 [402013]
     end;
 
     local procedure InsertPaymentLines(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
@@ -643,17 +726,22 @@ codeunit 6151413 "Magento Sales Order Mgt."
     local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
+        TempCustomer: Record Customer temporary;
         MagentoWebsite: Record "Magento Website";
         ShipmentMapping: Record "Magento Shipment Mapping";
         PaymentMapping: Record "Magento Payment Mapping";
+        MagentoMgt: Codeunit "Magento Mgt.";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
         XmlElement2: DotNet npNetXmlElement;
         RecRef: RecordRef;
         OrderNo: Code[20];
-        WebsiteCode: Code[20];
     begin
         Initialize;
         Clear(SalesHeader);
         OrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'order_no',true);
+        //-MAG2.26 [402828]
+        if MagentoWebsite.Get(NpXmlDomMgt.GetAttributeCode(XmlElement,'','website_code',MaxStrLen(MagentoWebsite.Code),true)) then;
+        //+MAG2.26 [402828]
 
         if not NpXmlDomMgt.FindNode(XmlElement,'sell_to_customer',XmlElement2) then
           Error(Error001);
@@ -661,6 +749,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesHeader.Init;
         SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
         SalesHeader."No." := '';
+        //-MAG2.26 [402828]
+        if MagentoWebsite."Sales Order No. Series" <> '' then
+          NoSeriesMgt.InitSeries(MagentoWebsite."Sales Order No. Series",SalesHeader."No. Series",Today,SalesHeader."No.",SalesHeader."No. Series");
+        //+MAG2.26 [402828]
         SalesHeader."External Order No." := CopyStr(OrderNo,1,MaxStrLen(SalesHeader."External Order No."));
         SalesHeader."External Document No." := NpXmlDomMgt.GetXmlText(XmlElement,'external_document_no',MaxStrLen(SalesHeader."External Document No."),false);
         if SalesHeader."External Document No." = '' then
@@ -677,7 +769,52 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesHeader."Sell-to Country/Region Code" := NpXmlDomMgt.GetElementCode(XmlElement2,'country_code',MaxStrLen(SalesHeader."Sell-to Country/Region Code"),false);
         SalesHeader."Sell-to Contact" := NpXmlDomMgt.GetElementText(XmlElement2,'contact',MaxStrLen(SalesHeader."Sell-to Contact"),false);
         //+MAG2.22 [357662]
+        //-MAG2.26 [402247]
+        RecRef.GetTable(SalesHeader);
+        SetFieldText(RecRef,171,NpXmlDomMgt.GetXmlText(XmlElement2,'phone',MaxStrLen(Customer."Phone No."),false));
+        SetFieldText(RecRef,13605,NpXmlDomMgt.GetXmlText(XmlElement2,'phone',MaxStrLen(Customer."Phone No."),false));
+        SetFieldText(RecRef,13635,NpXmlDomMgt.GetXmlText(XmlElement2,'phone',MaxStrLen(Customer."Phone No."),false));
+        SetFieldText(RecRef,172,NpXmlDomMgt.GetXmlText(XmlElement2,'email',MaxStrLen(Customer."E-Mail"),false));
+        SetFieldText(RecRef,13607,NpXmlDomMgt.GetXmlText(XmlElement2,'email',MaxStrLen(Customer."E-Mail"),false));
+        SetFieldText(RecRef,13637,NpXmlDomMgt.GetXmlText(XmlElement2,'email',MaxStrLen(Customer."E-Mail"),false));
+        SetFieldText(RecRef,13630,NpXmlDomMgt.GetXmlText(XmlElement2,'ean',MaxStrLen(Customer.GLN),false));
+        RecRef.SetTable(SalesHeader);
+        case MagentoSetup."Customer Update Mode" of
+          MagentoSetup."Customer Update Mode"::Fixed:
+            begin
+              TempCustomer."Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2,'post_code',MaxStrLen(Customer."Post Code"),true));
+              TempCustomer."Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2,'country_code',MaxStrLen(Customer."Country/Region Code"),false));
+              if SalesHeader."Sell-to Customer No." = MagentoMgt.GetFixedCustomerNo(TempCustomer) then begin
+                SalesHeader."Bill-to Name" := SalesHeader."Sell-to Customer Name";
+                SalesHeader."Bill-to Name 2" := SalesHeader."Sell-to Customer Name 2";
+                SalesHeader."Bill-to Address" := SalesHeader."Sell-to Address";
+                SalesHeader."Bill-to Address 2" := SalesHeader."Sell-to Address 2";
+                SalesHeader."Bill-to Post Code" := SalesHeader."Sell-to Post Code";
+                SalesHeader."Bill-to City" := SalesHeader."Sell-to City";
+                SalesHeader."Bill-to Company" := '';
+                SalesHeader."Bill-to Contact" := SalesHeader."Sell-to Contact";
+                SalesHeader."Bill-to Contact No." := SalesHeader."Sell-to Contact No.";
+                SalesHeader."Bill-to Country/Region Code" := SalesHeader."Sell-to Country/Region Code";
+                SalesHeader."Bill-to County" := SalesHeader."Sell-to County";
+                SalesHeader."Bill-to E-mail" := NpXmlDomMgt.GetXmlText(XmlElement2,'email',MaxStrLen(SalesHeader."Bill-to E-mail"),false);
+
+                SalesHeader."Ship-to Name" := SalesHeader."Sell-to Customer Name";
+                SalesHeader."Ship-to Name 2" := SalesHeader."Sell-to Customer Name 2";
+                SalesHeader."Ship-to Address" := SalesHeader."Sell-to Address";
+                SalesHeader."Ship-to Address 2" := SalesHeader."Sell-to Address 2";
+                SalesHeader."Ship-to Post Code" := SalesHeader."Sell-to Post Code";
+                SalesHeader."Ship-to City" := SalesHeader."Sell-to City";
+                SalesHeader."Ship-to Country/Region Code" := SalesHeader."Sell-to Country/Region Code";
+                SalesHeader."Ship-to Contact" := SalesHeader."Sell-to Contact";
+              end;
+            end;
+        end;
+        //+MAG2.26 [402247]
         SalesHeader."Prices Including VAT" := true;
+        //-NPR5.55 [412507]
+        if NpXmlDomMgt.GetElementBoolean(XmlElement,'prices_excluding_vat',false) then
+          SalesHeader."Prices Including VAT" := false;
+        //+NPR5.55 [412507]
 
         if NpXmlDomMgt.FindNode(XmlElement,'ship_to_customer',XmlElement2) then begin
           SalesHeader."Ship-to Name" := NpXmlDomMgt.GetXmlText(XmlElement2,'name',MaxStrLen(SalesHeader."Ship-to Name"),true);
@@ -731,8 +868,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
                 Clear(XmlElement2);
           until IsNull(XmlElement2) or (SalesHeader."Payment Method Code" <> '');
 
-        WebsiteCode := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'website_code',true);
-        if (MagentoWebsite.Get(WebsiteCode)) and (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
+        //-MAG2.26 [402828]
+        if (MagentoWebsite.Code <> '') and (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
+        //+MAG2.26 [402828]
           SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code",MagentoWebsite."Global Dimension 1 Code");
           SalesHeader.Validate("Shortcut Dimension 2 Code",MagentoWebsite."Global Dimension 2 Code");
         end;
@@ -741,6 +879,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesHeader.Validate("Currency Code",GetCurrencyCode(NpXmlDomMgt.GetElementCode(XmlElement,'currency_code',MaxStrLen(SalesHeader."Currency Code"),false)));
         //+MAG2.22 [359146]
         SalesHeader.Modify(true);
+
+        //-MAG2.26 [401788]
+        OnAfterInsertSalesHeader(CurrImportType,CurrImportEntry,XmlElement,SalesHeader);
+        //+MAG2.26 [401788]
     end;
 
     local procedure InsertSalesLines(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header")
@@ -781,6 +923,8 @@ codeunit 6151413 "Magento Sales Order Mgt."
     end;
 
     local procedure InsertSalesLine(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    var
+        SalesLine: Record "Sales Line";
     begin
         Initialize;
         //-MAG2.17 [302179]
@@ -813,6 +957,11 @@ codeunit 6151413 "Magento Sales Order Mgt."
           //+MAG2.17 [324190]
         end;
         //+MAG2.17 [302179]
+
+        //-MAG2.26 [401788]
+        if SalesLine.Get(SalesHeader."Document Type",LineNo) then
+          OnAfterInsertSalesLine(CurrImportType,CurrImportEntry,XmlElement,SalesHeader,SalesLine);
+        //+MAG2.26 [401788]
     end;
 
     local procedure InsertSalesLineComment(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
@@ -868,11 +1017,17 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
         if VariantCode <> '' then
           ItemVariant.Get(ItemNo,VariantCode);
-        Evaluate(UnitPrice,NpXmlDomMgt.GetXmlText(XmlElement,'unit_price_incl_vat',0,true),9);
-        Evaluate(Quantity,NpXmlDomMgt.GetXmlText(XmlElement,'quantity',0,true),9);
-        Evaluate(VatPct,NpXmlDomMgt.GetXmlText(XmlElement,'vat_percent',0,true),9);
-        Evaluate(LineAmount,NpXmlDomMgt.GetXmlText(XmlElement,'line_amount_incl_vat',0,true),9);
-        Evaluate(UnitofMeasure,NpXmlDomMgt.GetXmlText(XmlElement,'unit_of_measure',MaxStrLen(SalesLine."Unit of Measure Code"),false));
+        //-NPR5.55 [412507]
+        UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_incl_vat',true);
+        LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_incl_vat',true);
+        if not SalesHeader."Prices Including VAT" then begin
+          UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_excl_vat',true);
+          LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_excl_vat',true);
+        end;
+        Quantity := NpXmlDomMgt.GetElementDec(XmlElement,'quantity',true);
+        VatPct := NpXmlDomMgt.GetElementDec(XmlElement,'vat_percent',true);
+        UnitofMeasure := NpXmlDomMgt.GetElementCode(XmlElement,'unit_of_measure',MaxStrLen(SalesLine."Unit of Measure Code"),false);
+        //+NPR5.55 [412507]
         //-MAG2.22 [350006]
         RequestedDeliveryDate:=NpXmlDomMgt.GetElementDate(XmlElement,'requested_delivery_date',false);
         //+MAG2.22 [350006]
@@ -924,10 +1079,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
         VatPct: Decimal;
     begin
         //-MAG2.17 [302179]
-        Evaluate(UnitPrice,NpXmlDomMgt.GetXmlText(XmlElement,'unit_price_incl_vat',0,true),9);
-        Evaluate(Quantity,NpXmlDomMgt.GetXmlText(XmlElement,'quantity',0,true),9);
-        Evaluate(VatPct,NpXmlDomMgt.GetXmlText(XmlElement,'vat_percent',0,true),9);
-        Evaluate(LineAmount,NpXmlDomMgt.GetXmlText(XmlElement,'line_amount_incl_vat',0,true),9);
+        //-NPR5.55 [412507]
+        UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_incl_vat',true);
+        LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_incl_vat',true);
+        if not SalesHeader."Prices Including VAT" then begin
+          UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_excl_vat',true);
+          LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_excl_vat',true);
+        end;
+        Quantity := NpXmlDomMgt.GetElementDec(XmlElement,'quantity',true);
+        VatPct := NpXmlDomMgt.GetElementDec(XmlElement,'vat_percent',true);
+        //+NPR5.55 [412507]
 
         LineNo += 10000;
         SalesLine.Init;
@@ -961,6 +1122,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         LineAmount: Decimal;
         Quantity: Decimal;
         UnitPrice: Decimal;
+        VatPct: Decimal;
     begin
         //-MAG2.17 [302179]
         Evaluate(Quantity,NpXmlDomMgt.GetXmlText(XmlElement,'quantity',0,true),9);
@@ -976,7 +1138,12 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesCommentLine.Comment := NpXmlDomMgt.GetXmlText(XmlElement,'description',MaxStrLen(SalesLine.Description),true);
           SalesCommentLine.Insert(true);
         end else begin
-          Evaluate(UnitPrice,NpXmlDomMgt.GetXmlText(XmlElement,'unit_price_incl_vat',0,true),9);
+          //-NPR5.55 [412507]
+          UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_incl_vat',true);
+          VatPct := NpXmlDomMgt.GetElementDec(XmlElement,'vat_percent',true);
+          if not SalesHeader."Prices Including VAT" then
+            UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_excl_vat',true);
+          //+NPR5.55 [412507]
 
           LineNo += 10000;
           SalesLine.Init;
@@ -1014,6 +1181,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesLine.Validate("No.",ShipmentMapping."Shipment Fee No.");
           if Quantity <> 0 then
             SalesLine.Validate(Quantity,Quantity);
+          //-NPR5.55 [412507]
+          SalesLine.Validate("VAT %",VatPct);
+          //+NPR5.55 [412507]
 
           SalesLine.Validate("Unit Price",UnitPrice);
           SalesLine.Description := NpXmlDomMgt.GetXmlText(XmlElement,'description',MaxStrLen(SalesLine.Description),true);
@@ -1024,35 +1194,63 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
     local procedure InsertSalesLineRetailVoucher(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+        NpRvSalesLine: Record "NpRv Sales Line";
         NpRvVoucher: Record "NpRv Voucher";
+        NpRvVoucherType: Record "NpRv Voucher Type";
         SalesLine: Record "Sales Line";
+        NpRvGlobalVoucherWebservice: Codeunit "NpRv Global Voucher Webservice";
         ReferenceNo: Text;
         LineAmount: Decimal;
         Quantity: Decimal;
         UnitPrice: Decimal;
         VatPct: Decimal;
-        LineNo2: Integer;
+        PrevRec: Text;
     begin
-        //-MAG2.17 [302179]
+        //-MAG2.26 [402015]
         ReferenceNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement,'external_no',true),1,MaxStrLen(NpRvVoucher."Reference No."));
 
-        //-MAG2.24 [372315]
-        NpRvVoucher.SetRange("Reference No.",ReferenceNo);
-        NpRvVoucher.FindFirst;
-        NpRvVoucher.CalcFields("Issue Date");
-        if (NpRvVoucher."Issue Date" <> 0D) then
-          NpRvVoucher.TestField("Allow Top-up");
-        //+MAG2.24 [372315]
+        NpRvSalesLine.SetRange("Document Source",NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
+        NpRvSalesLine.SetRange("Reference No.",ReferenceNo);
+        NpRvSalesLine.SetFilter(Type,'%1|%2',NpRvSalesLine.Type::"New Voucher",NpRvSalesLine.Type::"Top-up");
+        if not NpRvSalesLine.FindFirst then begin
+          if NpRvGlobalVoucherWebservice.FindVoucher('',ReferenceNo,NpRvVoucher) then begin
+            NpRvSalesLine.Init;
+            NpRvSalesLine.Id := CreateGuid;
+            NpRvSalesLine."External Document No." := SalesHeader."External Order No.";
+            NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+            NpRvSalesLine."Document Type" := SalesHeader."Document Type";
+            NpRvSalesLine."Document No." := SalesHeader."No.";
+            NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
+            NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+            NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+            NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+            NpRvSalesLine.Description := NpRvVoucher.Description;
+            NpRvSalesLine.Insert(true);
+          end;
+        end;
+        NpRvSalesLine.FindFirst;
+        NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
+        NpRvVoucherType.TestField("Account No.");
+        if (NpRvSalesLine."Voucher No." <> '') and NpRvVoucher.Get(NpRvSalesLine."Voucher No.") then begin
+          NpRvVoucher.CalcFields("Issue Date");
+          if (NpRvVoucher."Issue Date" <> 0D) then
+            NpRvVoucher.TestField("Allow Top-up");
 
-        NpRvVoucher.TestField("Account No.");
+          if NpRvVoucher."Account No." <> '' then
+            NpRvVoucherType."Account No." := NpRvVoucher."Account No.";
+        end;
 
-        Evaluate(Quantity,NpXmlDomMgt.GetXmlText(XmlElement,'quantity',0,true),9);
-        Evaluate(UnitPrice,NpXmlDomMgt.GetXmlText(XmlElement,'unit_price_incl_vat',0,true),9);
-        Evaluate(LineAmount,NpXmlDomMgt.GetXmlText(XmlElement,'line_amount_incl_vat',0,true),9);
-        //-MAG2.25 [384262]
-        Evaluate(VatPct,NpXmlDomMgt.GetXmlText(XmlElement,'vat_percent',0,true),9);
-        //+MAG2.25 [384262]
+        //-NPR5.55 [412507]
+        Quantity := NpXmlDomMgt.GetElementDec(XmlElement,'quantity',true);
+        UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_incl_vat',true);
+        LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_incl_vat',true);
+        if not SalesHeader."Prices Including VAT" then begin
+          UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_excl_vat',true);
+          LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_excl_vat',true);
+        end;
+        VatPct := NpXmlDomMgt.GetElementDec(XmlElement,'vat_percent',true);
+        //+NPR5.55 [412507]
 
         LineNo += 10000;
         SalesLine.Init;
@@ -1062,9 +1260,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesLine.Insert(true);
 
         SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
-        SalesLine.Validate("No.",NpRvVoucher."Account No.");
+        SalesLine.Validate("No.",NpRvVoucherType."Account No.");
         //-MAG2.25 [372135]
-        SalesLine.Description := NpRvVoucher.Description;
+        SalesLine.Description := NpRvSalesLine.Description;
         //+MAG2.25 [372135]
         SalesLine.Validate(Quantity,Quantity);
         SalesLine.Validate("VAT %",VatPct);
@@ -1073,28 +1271,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesLine.Validate("Line Amount",LineAmount);
         SalesLine.Modify(true);
 
-        NpRvExtVoucherSalesLine.Reset;
-        NpRvExtVoucherSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
-        if NpRvExtVoucherSalesLine.FindLast then;
-        LineNo2 := NpRvExtVoucherSalesLine."Line No." + 10000;
+        PrevRec := Format(NpRvSalesLine);
 
-        NpRvExtVoucherSalesLine.Init;
-        NpRvExtVoucherSalesLine."External Document No." := SalesHeader."External Order No.";
-        NpRvExtVoucherSalesLine."Line No." := LineNo2;
-        NpRvExtVoucherSalesLine."Document Type" := SalesLine."Document Type";
-        NpRvExtVoucherSalesLine."Document No." := SalesLine."Document No.";
-        NpRvExtVoucherSalesLine."Document Line No." := SalesLine."Line No.";
-        NpRvExtVoucherSalesLine.Type := NpRvExtVoucherSalesLine.Type::"New Voucher";
-        //-MAG2.24 [372315]
-        if NpRvVoucher."Issue Date" <> 0D then
-          NpRvExtVoucherSalesLine.Type := NpRvExtVoucherSalesLine.Type::"Top-up";
-        //+MAG2.24 [372315]
-        NpRvExtVoucherSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
-        NpRvExtVoucherSalesLine."Voucher No." := NpRvVoucher."No.";
-        NpRvExtVoucherSalesLine."Reference No." := NpRvVoucher."Reference No.";
-        NpRvExtVoucherSalesLine.Description := NpRvVoucher.Description;
-        NpRvExtVoucherSalesLine.Insert;
-        //+MAG2.17 [302179]
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."Document Type" := SalesLine."Document Type";
+        NpRvSalesLine."Document No." := SalesLine."Document No.";
+        NpRvSalesLine."Document Line No." := SalesLine."Line No.";
+
+        if PrevRec <> Format(NpRvSalesLine) then
+          NpRvSalesLine.Modify(true);
+        //+MAG2.26 [402015]
     end;
 
     local procedure InsertSalesLinePaymentFee(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
@@ -1234,22 +1420,35 @@ codeunit 6151413 "Magento Sales Order Mgt."
           Evaluate(CustomOptionLineNo,CopyStr(ExternalItemNo,Position2 + 1,10),9);
         end;
         MagentoCustomOption.Get(CustomOptionNo);
-        if CustomOptionLineNo = 0 then begin
-          MagentoCustomOption.TestField("Sales No.");
-          SalesType := MagentoCustomOption."Sales Type";
-          SalesNo := MagentoCustomOption."Sales No.";
-        end else begin
-          MagentoCustomOptionValue.Get(CustomOptionNo,CustomOptionLineNo);
-          MagentoCustomOptionValue.TestField("Sales No.");
-          SalesType := MagentoCustomOptionValue."Sales Type";
-          SalesNo := MagentoCustomOptionValue."Sales No.";
+        //-NPR5.55 [401059]
+        case MagentoCustomOption.Type of
+          MagentoCustomOption.Type::SelectCheckbox,MagentoCustomOption.Type::SelectDropDown,
+          MagentoCustomOption.Type::SelectMultiple,MagentoCustomOption.Type::SelectRadioButtons:
+            begin
+              MagentoCustomOptionValue.Get(CustomOptionNo,CustomOptionLineNo);
+              MagentoCustomOptionValue.TestField("Sales No.");
+              SalesType := MagentoCustomOptionValue."Sales Type";
+              SalesNo := MagentoCustomOptionValue."Sales No.";
+            end
+          else begin
+            MagentoCustomOption.TestField("Sales No.");
+            SalesType := MagentoCustomOption."Sales Type";
+            SalesNo := MagentoCustomOption."Sales No.";
+          end;
         end;
+        //+NPR5.55 [401059]
 
-        Evaluate(UnitPrice,NpXmlDomMgt.GetXmlText(XmlElement,'unit_price_incl_vat',0,true),9);
-        Evaluate(Quantity,NpXmlDomMgt.GetXmlText(XmlElement,'quantity',0,true),9);
-        Evaluate(VatPct,NpXmlDomMgt.GetXmlText(XmlElement,'vat_percent',0,true),9);
-        Evaluate(LineAmount,NpXmlDomMgt.GetXmlText(XmlElement,'line_amount_incl_vat',0,true),9);
-        Evaluate(UnitofMeasure,NpXmlDomMgt.GetXmlText(XmlElement,'unit_of_measure',MaxStrLen(SalesLine."Unit of Measure Code"),false));
+        //-NPR5.55 [412507]
+        UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_incl_vat',true);
+        LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_incl_vat',true);
+        if not SalesHeader."Prices Including VAT" then begin
+          UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement,'unit_price_excl_vat',true);
+          LineAmount := NpXmlDomMgt.GetElementDec(XmlElement,'line_amount_excl_vat',true);
+        end;
+        Quantity := NpXmlDomMgt.GetElementDec(XmlElement,'quantity',true);
+        VatPct := NpXmlDomMgt.GetElementDec(XmlElement,'vat_percent',true);
+        UnitofMeasure := NpXmlDomMgt.GetElementCode(XmlElement,'unit_of_measure',MaxStrLen(SalesLine."Unit of Measure Code"),false);
+        //+NPR5.55 [412507]
         LineNo += 10000;
         SalesLine.Init;
         SalesLine."Document Type" := SalesHeader."Document Type";
@@ -1298,46 +1497,38 @@ codeunit 6151413 "Magento Sales Order Mgt."
     local procedure UpdateRetailVoucherCustomerInfo(SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
-        NpRvVoucher: Record "NpRv Voucher";
-        NpRvVoucherPrev: Record "NpRv Voucher";
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+        NpRvSalesLine: Record "NpRv Sales Line";
+        NpRvSalesLinePrev: Record "NpRv Sales Line";
     begin
-        //-MAG2.23 [363864]
-        NpRvExtVoucherSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
-        NpRvExtVoucherSalesLine.SetRange("Document Type",SalesHeader."Document Type");
-        NpRvExtVoucherSalesLine.SetRange("Document No.",SalesHeader."No.");
-        if not NpRvExtVoucherSalesLine.FindSet then
+        //-MAG2.26 [402015]
+        NpRvSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
+        NpRvSalesLine.SetRange("Document Type",SalesHeader."Document Type");
+        NpRvSalesLine.SetRange("Document No.",SalesHeader."No.");
+        if not NpRvSalesLine.FindSet then
           exit;
 
         repeat
-          NpRvVoucher.Get(NpRvExtVoucherSalesLine."Voucher No.");
-          NpRvVoucherPrev := NpRvVoucher;
+          NpRvSalesLinePrev := NpRvSalesLine;
 
-          //-MAG2.24 [378597]
-          NpRvVoucher."Customer No." := SalesHeader."Sell-to Customer No.";
-          //+MAG2.24 [378597]
+          NpRvSalesLine."Customer No." := SalesHeader."Sell-to Customer No.";
           case MagentoSetup."E-mail Retail Vouchers to" of
             MagentoSetup."E-mail Retail Vouchers to"::" ":
               begin
-                NpRvVoucher."E-mail" := NpRvVoucherPrev."E-mail";
-                //-MAG2.24 [378597]
-                NpRvVoucher."Phone No." := NpRvVoucherPrev."Phone No.";
-                //+MAG2.24 [378597]
+                NpRvSalesLine."E-mail" := NpRvSalesLinePrev."E-mail";
+                NpRvSalesLine."Phone No." := NpRvSalesLinePrev."Phone No.";
               end;
             MagentoSetup."E-mail Retail Vouchers to"::"Bill-to Customer":
               begin
-                //-MAG2.24 [378597]
                 Customer.Get(SalesHeader."Bill-to Customer No.");
-                NpRvVoucher."E-mail" := Customer."E-Mail";
-                NpRvVoucher."Phone No." := Customer."Phone No.";;
-                //+MAG2.24 [378597]
+                NpRvSalesLine."E-mail" := Customer."E-Mail";
+                NpRvSalesLine."Phone No." := Customer."Phone No.";;
               end;
           end;
 
-          if Format(NpRvVoucherPrev) <> Format(NpRvVoucher) then
-            NpRvVoucher.Modify(true);
-        until NpRvExtVoucherSalesLine.Next = 0;
-        //+MAG2.23 [363864]
+          if Format(NpRvSalesLinePrev) <> Format(NpRvSalesLine) then
+            NpRvSalesLine.Modify(true);
+        until NpRvSalesLine.Next = 0;
+        //+MAG2.26 [402015]
     end;
 
     local procedure "--- Post On Import"()
@@ -1441,14 +1632,17 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
     local procedure IsRetailVoucherLine(SalesLine: Record "Sales Line"): Boolean
     var
-        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+        NpRvSalesLine: Record "NpRv Sales Line";
     begin
+        //-MAG2.26 [402015]
         //-MAG2.23 [363864]
-        NpRvExtVoucherSalesLine.SetRange("Document Type",SalesLine."Document Type");
-        NpRvExtVoucherSalesLine.SetRange("Document No.",SalesLine."Document No.");
-        NpRvExtVoucherSalesLine.SetRange("Document Line No.",SalesLine."Line No.");
-        exit(NpRvExtVoucherSalesLine.FindFirst);
+        NpRvSalesLine.SetRange("Document Source",NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("Document Type",SalesLine."Document Type");
+        NpRvSalesLine.SetRange("Document No.",SalesLine."Document No.");
+        NpRvSalesLine.SetRange("Document Line No.",SalesLine."Line No.");
+        exit(NpRvSalesLine.FindFirst);
         //+MAG2.23 [363864]
+        //+MAG2.26 [402015]
     end;
 
     local procedure IsTicketLine(SalesLine: Record "Sales Line"): Boolean
@@ -1576,10 +1770,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
         exit(Customer.Get(ContBusRel."No."));
     end;
 
-    local procedure GetCustomer(ExternalCustomerNo: Code[20];XmlElement: DotNet npNetXmlElement;var Customer: Record Customer): Boolean
+    local procedure GetCustomer(ExternalCustomerNo: Code[20];XmlElement: DotNet npNetXmlElement;var Customer: Record Customer) Found: Boolean
     var
         CustNo: Code[20];
     begin
+        //-MAG2.26 [401788]
+        Clear(Customer);
+        OnBeforeGetCustomer(CurrImportType,CurrImportEntry,ExternalCustomerNo,XmlElement,Customer,Found);
+        if Found then
+          exit(Customer.Find);
+        //+MAG2.26 [401788]
         Initialize;
         Clear(Customer);
         //-MAG2.21 [355271]
@@ -1706,11 +1906,22 @@ codeunit 6151413 "Magento Sales Order Mgt."
     local procedure SetFieldText(var RecRef: RecordRef;FieldNo: Integer;Value: Text)
     var
         "Field": Record "Field";
+        FieldObsolete: Record "Field";
+        RecRefObsolete: RecordRef;
         FieldRef: FieldRef;
+        FieldRefObsolete: FieldRef;
     begin
         if not Field.Get(RecRef.Number,FieldNo) then
           exit;
 
+        //-MAG2.26 [402247]
+        RecRefObsolete.GetTable(Field);
+        if FieldObsolete.Get(RecRefObsolete.Number,25) then begin
+          FieldRefObsolete := RecRefObsolete.Field(25);
+          if Format(FieldRefObsolete.Value,0,2) <> '0' then
+            exit;
+        end;
+        //+MAG2.26 [402247]
         FieldRef := RecRef.Field(FieldNo);
         FieldRef.Value := Value;
     end;
@@ -1839,6 +2050,45 @@ codeunit 6151413 "Magento Sales Order Mgt."
           exit(Date2);
         exit(WorkDate);
         //+MAG2.23 [367219]
+    end;
+
+    local procedure "--- OnAfterEvents"()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCustomer(ImportType: Record "Nc Import Type";ImportEntry: Record "Nc Import Entry";ExternalCustomerNo: Code[20];Element: DotNet npNetXmlElement;var Customer: Record Customer;var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeModifyCustomer(ImportType: Record "Nc Import Type";ImportEntry: Record "Nc Import Entry";Element: DotNet npNetXmlElement;var Customer: Record Customer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertSalesHeader(ImportType: Record "Nc Import Type";ImportEntry: Record "Nc Import Entry";Element: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertSalesLine(ImportType: Record "Nc Import Type";ImportEntry: Record "Nc Import Entry";Element: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header";var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertCommentLine(ImportType: Record "Nc Import Type";ImportEntry: Record "Nc Import Entry";Element: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header";var RecordLink: Record "Record Link")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRelease(ImportType: Record "Nc Import Type";ImportEntry: Record "Nc Import Entry";Element: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCommit(ImportType: Record "Nc Import Type";ImportEntry: Record "Nc Import Entry";Element: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
+    begin
     end;
 }
 

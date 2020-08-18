@@ -1,8 +1,8 @@
 table 6014408 "Credit Voucher"
 {
-    // //NPR2.2m - Ohm - ny n�gle "indl�st den"
+    // //NPR2.2m - Ohm - ny n¢gle "indl¢st den"
     // 
-    // //NPR3.1c - NE - Tilf�jet det boolske flowfield comment.
+    // //NPR3.1c - NE - Tilf¢jet det boolske flowfield comment.
     // 
     // //NPK1.0 , 13-03-12, job 118881, JS - Modified the print function, so i only prints for a specific register.
     // NPR70.00.01.03/MH/20150113  CASE 199932 Removed Web references (WEB1.00).

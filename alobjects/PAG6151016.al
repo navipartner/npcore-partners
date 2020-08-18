@@ -4,6 +4,7 @@ page 6151016 "NpRv Voucher Entries"
     // NPR5.48/MHA /20180921  CASE 302179 Renamed field 55 "Sales Ticket No." to "Document No." and added fields 53 "Document Type", 60 "External Document No."
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
     // NPR5.54/ALST/20200220  CASE 387465 added navigation action
+    // NPR5.55/MHA /20200512  CASE 404116 Added SetDoc() to Navigation action
 
     Caption = 'Retail Voucher Entries';
     Editable = false;
@@ -70,7 +71,7 @@ page 6151016 "NpRv Voucher Entries"
 
     actions
     {
-        area(creation)
+        area(navigation)
         {
             action("Navi&gate")
             {
@@ -78,7 +79,16 @@ page 6151016 "NpRv Voucher Entries"
                 Image = Navigate;
                 Promoted = true;
                 PromotedIsBig = true;
-                RunObject = Page Navigate;
+
+                trigger OnAction()
+                var
+                    Navigate: Page Navigate;
+                begin
+                    //-NPR5.55 [404116]
+                    Navigate.SetDoc("Posting Date","Document No.");
+                    Navigate.Run;
+                    //+NPR5.55 [404116]
+                end;
             }
         }
     }

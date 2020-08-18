@@ -2,6 +2,8 @@ codeunit 6059831 "RFID Mgt."
 {
     // NPR5.48/MMV /20181205 CASE 327107 Created object
     // NPR5.53/MMV /20191114 CASE 377115 Removed confirm dialog. Added event instead for any future customization.
+    // NPR5.55/MMV /20200305 CASE 391561 Rolled back part of #377115
+    // NPR5.55/MMV /20200708 CASE 407265 Split insert item cross reference function into two to avoid locking reads.
 
 
     trigger OnRun()
@@ -13,36 +15,22 @@ codeunit 6059831 "RFID Mgt."
         ERR_RFID_CLASH: Label 'RFID value already exists';
         ERR_RFID_VALUE_LENGTH: Label 'RFID value %1 is longer than limit';
 
-    procedure SaveRFIDValues(var RecRef: RecordRef)
+    procedure LogRFIDPrint(var RetailJournalLine: Record "Retail Journal Line";BatchID: Guid)
     var
-        RetailJournalLine: Record "Retail Journal Line";
-        FieldRef: FieldRef;
+        RFIDPrintLog: Record "RFID Print Log";
     begin
-        //-NPR5.53 [377115]
-        // FieldRef := RecRef.FIELD(RetailJournalLine.FIELDNO("RFID Tag Value"));
-        // FieldRef.SETFILTER('<>%1', '');
-        // IF NOT RecRef.FINDSET THEN
-        //  EXIT;
-        //
-        // IF NOT CONFIRM(TXT_SAVE_RFID, TRUE) THEN
-        //  EXIT;
-        //
-        // REPEAT
-        //  RecRef.SETTABLE(RetailJournalLine);
-        //  InsertItemCrossReference(RetailJournalLine."Item No.", RetailJournalLine."Variant Code", RetailJournalLine."RFID Tag Value");
-        // UNTIL RecRef.NEXT = 0;
-
-        RecRef.SetTable(RetailJournalLine);
-        RetailJournalLine.SetFilter("RFID Tag Value", '<>%1', '');
-        if not RetailJournalLine.FindSet then
-          exit;
-
-        OnBeforeSaveItemCrossReferenceValues(RetailJournalLine);
-
-        repeat
-          InsertItemCrossReference(RetailJournalLine."Item No.", RetailJournalLine."Variant Code", RetailJournalLine."RFID Tag Value");
-        until RetailJournalLine.Next = 0;
-        //+NPR5.53 [377115]
+        //-NPR5.55 [407265]
+        RFIDPrintLog.Init;
+        RFIDPrintLog."Item No." := RetailJournalLine."Item No.";
+        RFIDPrintLog."Variant Code" := RetailJournalLine."Variant Code";
+        RFIDPrintLog.Barcode := RetailJournalLine.Barcode;
+        RFIDPrintLog.Description := RetailJournalLine.Description;
+        RFIDPrintLog."RFID Tag Value" := RetailJournalLine."RFID Tag Value";
+        RFIDPrintLog."Batch ID" := BatchID;
+        RFIDPrintLog."User ID" := UserId;
+        RFIDPrintLog."Printed At" := CurrentDateTime;
+        RFIDPrintLog.Insert;
+        //+NPR5.55 [407265]
     end;
 
     procedure GetNextRFIDValue(): Text
@@ -64,17 +52,22 @@ codeunit 6059831 "RFID Mgt."
         exit(RFIDSetup."RFID Hex Value Prefix" + PadLeft(HexValue,'0',RFIDSetup."RFID Hex Value Length"));
     end;
 
+    procedure CheckItemCrossReference(TagValue: Text)
+    var
+        ItemCrossReference: Record "Item Cross Reference";
+    begin
+        //-NPR5.55 [407265]
+        ItemCrossReference.SetCurrentKey("Cross-Reference No.");
+        ItemCrossReference.SetRange("Cross-Reference No.", TagValue);
+        if not ItemCrossReference.IsEmpty then
+          ItemCrossReference.FieldError("Cross-Reference No.", ERR_RFID_CLASH);
+        //+NPR5.55 [407265]
+    end;
+
     procedure InsertItemCrossReference(ItemNo: Text;VariantCode: Text;TagValue: Text)
     var
         ItemCrossReference: Record "Item Cross Reference";
     begin
-        ItemCrossReference.SetCurrentKey("Cross-Reference No.");
-        ItemCrossReference.SetRange("Cross-Reference No.", TagValue);
-        if ItemCrossReference.FindFirst then
-          ItemCrossReference.FieldError("Cross-Reference No.", ERR_RFID_CLASH);
-
-        ItemCrossReference.Reset;
-
         ItemCrossReference.Init;
         ItemCrossReference.Validate("Item No.", ItemNo);
         ItemCrossReference.Validate("Variant Code", VariantCode);
@@ -100,7 +93,7 @@ codeunit 6059831 "RFID Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSaveItemCrossReferenceValues(var RetailJournalLine: Record "Retail Journal Line")
+    procedure OnBeforeSaveItemCrossReferenceValue(var RetailJournalLine: Record "Retail Journal Line")
     begin
     end;
 }

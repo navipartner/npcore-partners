@@ -41,6 +41,11 @@ codeunit 6060150 "Event Management"
     //                                   New process to block deletion of events in specified status
     // NPR5.53/TJ  /20200206 CASE 385993 Fixed a bug preventing event delete with no setup
     // NPR5.54/TJ  /20200306 CASE 395153 Fixed a bug where forced inventory posting was allowing sales invoice modifications
+    // NPR5.55/TJ  /20200330 CASE 397741 Variable MsgToDisplay set as return value in functions CheckResTimeFrameAvailability and CheckResAvailability
+    //                                   New feature to check resource availability in bulk
+    //                                   Functions AllowOverCapacitateResource and CheckResAvailability are now set as global
+    //                                   Resource availability and capacity checks are getting skipped when we're creating lines from buffer
+    // NPR5.55/TJ  /20200129 CASE 374887 Automatically sending e-mails
 
     Permissions = TableData "Job Ledger Entry" = imd,
                   TableData "Job Register" = imd,
@@ -77,6 +82,7 @@ codeunit 6060150 "Event Management"
         POSDocProcessingErr: Label 'Document is currently being processed on POS. Please try again later.';
         POSDocErr: Label 'POS document %1 %2 no longer exists.';
         BlockDeleteErr: Label 'You can''t delete event %1 as it is in status %2. Please check %3 for blocked statuses.';
+        BufferMode: Boolean;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterInsertEvent', '', false, false)]
     local procedure JobOnAfterInsert(var Rec: Record Job; RunTrigger: Boolean)
@@ -194,6 +200,8 @@ codeunit 6060150 "Event Management"
     local procedure JobEventStatusOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     var
         JobPlanningLine: Record "Job Planning Line";
+        EventExchIntTemplate: Record "Event Exch. Int. Template";
+        EmailCounter: Integer;
     begin
         //-NPR5.31 [269162]
         /*
@@ -226,6 +234,20 @@ codeunit 6060150 "Event Management"
         //-NPR5.31 [269162]
         //END;
         //NPR5.31 [269162]
+        
+        //-NPR5.55 [374887]
+        if (CurrFieldNo = Rec.FieldNo("Event Status")) and (Rec."Event Status" <> xRec."Event Status") then begin
+          EventExchIntTemplate.SetRange("Auto. Send. Enabled (E-Mail)",true);
+          EventExchIntTemplate.SetRange("Auto.Send.Event Status(E-Mail)",Rec."Event Status");
+          if EventExchIntTemplate.FindSet then
+            repeat
+              EventEmailMgt.SetAskOnce(EmailCounter);
+              EventEmailMgt.SetEventExcIntTemplate(EventExchIntTemplate);
+              EventEmailMgt.SendEMail(Rec,EventExchIntTemplate."Template For",Rec.FieldNo("Event Status"));
+              EmailCounter += 1;
+            until EventExchIntTemplate.Next = 0;
+        end;
+        //+NPR5.55 [374887]
 
     end;
 
@@ -794,10 +816,9 @@ codeunit 6060150 "Event Management"
         end;
     end;
 
-    local procedure CheckResAvailability(Rec: Record "Job Planning Line"; xRec: Record "Job Planning Line")
+    procedure CheckResAvailability(Rec: Record "Job Planning Line";xRec: Record "Job Planning Line") MsgToDisplay: Text
     var
         Resource: Record Resource;
-        MsgToDisplay: Text;
         AvailCap: Decimal;
         TotalCapacity: Decimal;
         Text002: Label 'Resource %1 is over capacitated on %2.';
@@ -837,6 +858,10 @@ codeunit 6060150 "Event Management"
                 exit;
             if "Planning Date" = 0D then
                 exit;
+          //-NPR5.55 [397741]
+          if "Skip Cap./Avail. Check" then
+            exit;
+          //+NPR5.55 [397741]
             //-NPR5.35 [287270]
             /*
             //-NPR5.32 [275966]
@@ -852,6 +877,10 @@ codeunit 6060150 "Event Management"
                 MsgToDisplay := StrSubstNo(Text002, "No.", Format("Planning Date"));
                 if AvailCap > 0 then
                     MsgToDisplay := MsgToDisplay + ' ' + StrSubstNo(Text003, Format(AvailCap), "Unit of Measure Code");
+            //-NPR5.55 [397741]
+            if BufferMode then
+              exit(MsgToDisplay);
+            //+NPR5.55 [397741]
                 //-NPR5.32 [275966]
                 if OverCapacitateResourceSetupValue = JobsSetup."Over Capacitate Resource"::Disallow then
                     Error(MsgToDisplay);
@@ -860,7 +889,10 @@ codeunit 6060150 "Event Management"
                 if not Confirm(MsgToDisplay) then
                     Error('');
             end;
-            CheckResTimeFrameAvailability(Rec);
+          //-NPR5.55 [397741]
+          //CheckResTimeFrameAvailability(Rec);
+          MsgToDisplay := CheckResTimeFrameAvailability(Rec);
+          //+NPR5.55 [397741]
         end;
 
     end;
@@ -889,9 +921,8 @@ codeunit 6060150 "Event Management"
 
     end;
 
-    procedure CheckResTimeFrameAvailability(Rec: Record "Job Planning Line")
+    procedure CheckResTimeFrameAvailability(Rec: Record "Job Planning Line") MsgToDisplay: Text
     var
-        MsgToDisplay: Text;
         TimeFrameProblemMsg: Label 'Time frame %1 - %2 for resource %3 is allready partially/fully used on other event/line:\%4 If you keep current time frame, resource may have difficulties fulfilling all engagements.';
         OverCapacitateResourceSetupValue: Integer;
     begin
@@ -899,6 +930,10 @@ codeunit 6060150 "Event Management"
         if Rec.Type <> Rec.Type::Resource then
             exit;
         //+NPR5.49 [346780]
+        //-NPR5.55 [397741]
+        if Rec."Skip Cap./Avail. Check" then
+          exit;
+        //+NPR5.55 [397741]
         //-NPR5.35 [287270]
         if AllowOverCapacitateResource(Rec, OverCapacitateResourceSetupValue) then
             exit;
@@ -907,6 +942,10 @@ codeunit 6060150 "Event Management"
             //-NPR5.35 [287270]
             //MsgToDisplay := STRSUBSTNO(TimeFrameProblemMsg,FORMAT(Rec."Starting Time"),FORMAT(Rec."Ending Time"),Rec."No.",MsgToDisplay) + '\' + ContinueMsg;
             MsgToDisplay := StrSubstNo(TimeFrameProblemMsg, Format(Rec."Starting Time"), Format(Rec."Ending Time"), Rec."No.", MsgToDisplay);
+          //-NPR5.55 [397741]
+          if BufferMode then
+            exit(MsgToDisplay);
+          //+NPR5.55 [397741]
             if OverCapacitateResourceSetupValue = JobsSetup."Over Capacitate Resource"::Disallow then
                 Error(MsgToDisplay);
             MsgToDisplay := MsgToDisplay + '\' + ContinueMsg;
@@ -1343,7 +1382,7 @@ codeunit 6060150 "Event Management"
         //+NPR5.35 [275959]
     end;
 
-    local procedure AllowOverCapacitateResource(Rec: Record "Job Planning Line"; var OverCapacitateResourceSetupValue: Integer): Boolean
+    procedure AllowOverCapacitateResource(Rec: Record "Job Planning Line";var OverCapacitateResourceSetupValue: Integer): Boolean
     begin
         JobsSetup.Get();
         OverCapacitateResourceSetupValue := GetOverCapacitateResourceSetup(Rec);
@@ -2551,6 +2590,13 @@ codeunit 6060150 "Event Management"
         if not Job.IsEmpty then
             Error(BlockDeleteErr, Job."No.", Format(Job."Event Status"), JobsSetup.TableCaption);
         //+NPR5.53 [346821]
+    end;
+
+    procedure SetBufferMode()
+    begin
+        //-NPR5.55 [397741]
+        BufferMode := true;
+        //+NPR5.55 [397741]
     end;
 }
 

@@ -3,6 +3,7 @@ report 6014449 "Vendor trn. by Item group"
     // NPR70.00.00.00/LS  CASE 159377 : Convert Report to NAV 2013
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.55/BHR /20200219 CASE 361515 Change Key as it's not supported in extension
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Vendor trn. by Item group.rdlc';
 
@@ -131,7 +132,7 @@ report 6014449 "Vendor trn. by Item group"
 
             trigger OnAfterGetRecord()
             begin
-                //Varesalg sidste �r
+                //Varesalg sidste år
                 CalcFields("Purchases (LCY)");
 
                 if vg.GetFilter("Date Filter")<>'' then begin
@@ -175,16 +176,18 @@ report 6014449 "Vendor trn. by Item group"
                 CopyFilter("Date Filter", valueentry."Posting Date");
 
                 CopyFilter("Vendor Filter", valueentry."Vendor No.");
-
-                valueentry.SetCurrentKey("Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Item Charge No.",
-                "Location Code","Variant Code","Global Dimension 1 Code",
-                "Global Dimension 2 Code","Vendor No.");
+                //-NPR5.55 [361515]
+                //valueentry.SETCURRENTKEY("Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Item Charge No.",
+                //"Location Code","Variant Code","Global Dimension 1 Code",
+                //"Global Dimension 2 Code","Vendor No.");
+                valueentry.SetCurrentKey("Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Variance Type","Item Charge No.","Location Code","Variant Code");
+                //+NPR5.55 [361515]
                 CopyFilter("Date Filter", valueentry."Posting Date");
                 valueentry.SetRange("Item Ledger Entry Type", valueentry."Item Ledger Entry Type"::Sale);
                 valueentry.CalcSums("Sales Amount (Actual)");
                 totalsalg:=valueentry."Sales Amount (Actual)";
 
-                //Salg sidste �r - filtre
+                //Salg sidste år - filtre
                 if vg.GetFilter("Date Filter")<>'' then begin
                   varegruppefjor.CopyFilters(vg);
                   startdato:=CalcDate('<-1Y>',vg.GetRangeMin("Date Filter"));

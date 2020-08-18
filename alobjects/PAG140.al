@@ -1,4 +1,4 @@
-pageextension 6014413 pageextension6014413 extends "Posted Purchase Credit Memo" 
+pageextension 6014414 pageextension6014414 extends "Posted Purchase Credit Memo" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -10,6 +10,7 @@ pageextension 6014413 pageextension6014413 extends "Posted Purchase Credit Memo"
     // NPR5.29/TJ/20170113 CASE 262797 Restored Permission property to standard value (from: TableData Purch. Cr. Memo Hdr.=m)
     //                                 Also restored TooltipML property of some actions to standard values
     // NPR5.42/THRO/20180518 CASE 308179 Removed code from Action SendAsPdf and EmailLog
+    // NPR5.55/CLVA/20200610 CASE Added Action "Show Imported File"
     actions
     {
         addafter("&Navigate")
@@ -27,6 +28,25 @@ pageextension 6014413 pageextension6014413 extends "Posted Purchase Credit Memo"
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                 }
+            }
+        }
+        addafter(IncomingDocAttachFile)
+        {
+            action("Show Imported File")
+            {
+                Caption = 'Show Imported File';
+                Image = DocInBrowser;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    NcImportListPg: Page "Nc Import List";
+                begin
+                    //-366790 [366790]
+                    NcImportListPg.ShowFormattedDocByDocNo("Vendor Cr. Memo No.");
+                    //+366790 [366790]
+                end;
             }
         }
     }

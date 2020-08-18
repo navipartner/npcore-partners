@@ -1,6 +1,7 @@
 page 6150744 "Archive POS Sale"
 {
     // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.55/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization: removed field "POS Sales Data" and related functions
 
     Caption = 'Archive POS Sale';
     Editable = false;
@@ -76,58 +77,6 @@ page 6150744 "Archive POS Sale"
 
     actions
     {
-        area(processing)
-        {
-            action("View POS Sales Data")
-            {
-                Caption = 'View POS Sales Data';
-                Image = XMLFile;
-
-                trigger OnAction()
-                var
-                    POSQuoteMgt: Codeunit "POS Quote Mgt.";
-                begin
-                    ViewPOSSalesData(Rec);
-                end;
-            }
-        }
     }
-
-    procedure ViewPOSSalesData(ArchiveSalePOS: Record "Archive Sale POS")
-    var
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        StreamReader: DotNet npNetStreamReader;
-        InStr: InStream;
-        Path: Text;
-        POSSalesData: Text;
-    begin
-        if not ArchiveSalePOS."POS Sales Data".HasValue then
-            exit;
-
-        ArchiveSalePOS.CalcFields("POS Sales Data");
-        if IsWebClient() then begin
-            ArchiveSalePOS."POS Sales Data".CreateInStream(InStr);
-            StreamReader := StreamReader.StreamReader(InStr);
-            POSSalesData := StreamReader.ReadToEnd();
-            POSSalesData := NpXmlDomMgt.PrettyPrintXml(POSSalesData);
-            Message(POSSalesData);
-            exit;
-        end;
-
-        TempBlob.FromRecord(ArchiveSalePOS, ArchiveSalePOS.FieldNo("POS Sales Data"));
-        Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + ArchiveSalePOS."Sales Ticket No." + '.xml', false);
-        HyperLink(Path);
-    end;
-
-    local procedure IsWebClient(): Boolean
-    var
-        ActiveSession: Record "Active Session";
-    begin
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then
-            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
-        exit(false);
-    end;
 }
 

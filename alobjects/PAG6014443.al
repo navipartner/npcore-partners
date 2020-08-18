@@ -2,12 +2,13 @@ page 6014443 "Customer Repair List"
 {
     // 
     // //-NPR3.0a ved Nikolai Pedersen
-    //   afgr�nset s� kun reperationer fra egen afdeling kan ses
+    //   afgrænset så kun reperationer fra egen afdeling kan ses
     // NPR5.23/TS/20160603  CASE 243207 Added Filter <> Claimed
     // NPR5.25/TS/20160711 CASE 244140 Added Customer Repair Card
     // NPR5.26/TS/20160901  CASE 248351 Removed Filter <> Claimed
     // NPR5.30/BHR /20170217 CASE 262923 Add fields "Item No" and  "handed in date"
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
+    // NPR5.55/YAHA/20200615 CASE 409873 Removed Customer Repair Card,Claimed list and all status list from new
 
     Caption = 'Customer Repair List';
     CardPageID = "Customer Repair Card";
@@ -77,43 +78,6 @@ page 6014443 "Customer Repair List"
 
     actions
     {
-        area(processing)
-        {
-            action("Customer Repair Card")
-            {
-                Caption = 'Customer Repair Card';
-                Image = New;
-                Promoted = true;
-                RunObject = Page "Customer Repair Card";
-                RunPageMode = Create;
-            }
-            action("Claimed List")
-            {
-                Caption = 'Claimed List';
-                Image = List;
-                Promoted = true;
-                ShortCutKey = 'F5';
-
-                trigger OnAction()
-                var
-                    CustomerRepair: Record "Customer Repair";
-                    CustomerRepairList: Page "Customer Repair List";
-                begin
-                    SetFilterStatus(false);
-                end;
-            }
-            action("All Status List")
-            {
-                Caption = 'All Status List';
-                Image = Status;
-                Promoted = true;
-
-                trigger OnAction()
-                begin
-                    SetFilterStatus(true);
-                end;
-            }
-        }
     }
 
     trigger OnInit()

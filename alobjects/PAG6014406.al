@@ -1,7 +1,7 @@
 page 6014406 "Register Card"
 {
-    // //-NPR3.0n d.56.05.05 v. Simon Sch�bel
-    //   Overs�ttelser
+    // //-NPR3.0n d.56.05.05 v. Simon Sch¢bel
+    //   Oversættelser
     // 
     // NPR4.10/VB/20150601  CASE 213003 Added field Control Add-in Type
     // NPR4.10/JDH/20150519 CASE 214307 Possible to set opening balance to 0

@@ -138,7 +138,7 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
         //-NPR5.22.01
         /*
         //-NPR-3.0
-        StdTableCode.K�bsLinjeValidateGavekort(Rec);
+        StdTableCode.K¢bsLinjeValidateGavekort(Rec);
         //+NPR-3.0
         */
         with Rec do begin
@@ -170,7 +170,7 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
         //-NPR5.22.01
         /*
         //-NPR-3.0
-        StdTableCode.K�bsLinjeValidateTilgbevis(Rec)
+        StdTableCode.K¢bsLinjeValidateTilgbevis(Rec)
         //+NPR-3.0
         */
         with Rec do begin

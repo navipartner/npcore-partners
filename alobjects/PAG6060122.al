@@ -16,6 +16,7 @@ page 6060122 "TM Admission Schedule Entry"
     // TM1.45/TSA /20191204 CASE 378212 Added sales limitation fields
     // TM1.45/TSA /20191204 CASE 380754 Added Waiting list properties and actions
     // TM1.45/TSA /20200116 CASE 385922 Added Concurrency Capacity calculation field
+    // TM1.48/TSA /20200702 CASE 409741 Added Initial Entry flowfield to page
 
     Caption = 'Admission Schedule Entry';
     InsertAllowed = false;
@@ -81,6 +82,10 @@ page 6060122 "TM Admission Schedule Entry"
                 field("Reason Code";"Reason Code")
                 {
                     Visible = false;
+                }
+                field("Initial Entry";"Initial Entry")
+                {
+                    Editable = false;
                 }
                 field("Open Reservations";"Open Reservations")
                 {

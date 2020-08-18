@@ -23,6 +23,7 @@ report 6060042 "Import Excel Item Worksheet"
     // NPR5.38/BR  /20171124 CASE 278205 Remove Check If Item Categories are missing, removed function CheckItemCategories
     // NPR5.38/BR  /20171124 CASE 297587 Added fields Sales Price Start Date and Purchase Price Start Date
     // NPR5.49/BHR /20190213 CASE 343119 Correct report as per OMA standards
+    // NPR5.55/ALST/20200521 CASE 402502 added event publisher after item worksheer line is created from excel
 
     Caption = 'Import Excel Item Worksheet';
     ProcessingOnly = true;
@@ -265,6 +266,9 @@ report 6060042 "Import Excel Item Worksheet"
               ItemWorksheetLine.Validate("Line No.",LineNo);
               ItemWorksheetLine.SetUpNewLine(LastItemWorksheetLine);
               ItemWorksheetLine.Insert(true);
+              //-NPR5.55 [402502]
+              OnAfterCreateWorksheetLineFromExcel(ItemWorksheetLine, ExcelBuf);
+              //+NPR5.55 [402502]
               //-NPR5.35 [268786]
               if SetItemsToSkip then
                 ItemWorksheetLine.Action := ItemWorksheetLine.Action :: Skip
@@ -833,6 +837,11 @@ report 6060042 "Import Excel Item Worksheet"
           exit(ItemNoIn);
         exit(PrefixCode + '-' + ItemNoIn);
         //+NPR5.36 [268786]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateWorksheetLineFromExcel(var ItemWorksheetLine: Record "Item Worksheet Line";var ExcelBuffer: Record "Excel Buffer")
+    begin
     end;
 }
 

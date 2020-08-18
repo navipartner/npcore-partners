@@ -1,6 +1,7 @@
 page 6060157 "Event Word Layouts"
 {
     // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
+    // NPR5.55/ALPO/20200630 CASE 411779 Hide not supported "Edit Layout" button in Web Client
 
     Caption = 'Event Word Layouts';
     PageType = List;
@@ -81,6 +82,7 @@ page 6060157 "Event Word Layouts"
                 Image = EditReminder;
                 Promoted = true;
                 PromotedCategory = Process;
+                Visible = CanEdit;
 
                 trigger OnAction()
                 begin
@@ -118,6 +120,11 @@ page 6060157 "Event Word Layouts"
         }
     }
 
+    trigger OnAfterGetRecord()
+    begin
+        CanEdit := IsWindowsClient;  //NPR5.55 [411779]
+    end;
+
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         "Source Record ID" := Job.RecordId;
@@ -128,6 +135,7 @@ page 6060157 "Event Word Layouts"
         FilterGroup := 2;
         SetRange("Source Record ID",Job.RecordId);
         FilterGroup := 0;
+        IsWindowsClient := false;
     end;
 
     var
@@ -136,6 +144,8 @@ page 6060157 "Event Word Layouts"
         UpdateNotRequiredMsg: Label 'Layout is up-to-date. No further updates are required.';
         CaptionTxt: Label '%1 - %2 %3', Locked=true;
         PageCaption: Text;
+        CanEdit: Boolean;
+        IsWindowsClient: Boolean;
 
     procedure SetEvent(JobHere: Record Job)
     begin

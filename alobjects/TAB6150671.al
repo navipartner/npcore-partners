@@ -2,6 +2,7 @@ table 6150671 "NPRE W.Pad Line Prnt Log Entry"
 {
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'W. Pad Line Send Log Entry';
     DrillDownPageID = "NPRE W.Pad Line Pr.Log Entries";
@@ -22,7 +23,7 @@ table 6150671 "NPRE W.Pad Line Prnt Log Entry"
         field(4;"Print Category Code";Code[20])
         {
             Caption = 'Print Category Code';
-            TableRelation = "NPRE Print Category";
+            TableRelation = "NPRE Print/Prod. Category";
         }
         field(5;"Flow Status Object";Option)
         {
@@ -57,6 +58,19 @@ table 6150671 "NPRE W.Pad Line Prnt Log Entry"
         {
             Caption = 'Sent Date-Time';
         }
+        field(40;"Sent Quanity (Base)";Decimal)
+        {
+            Caption = 'Sent Quanity (Base)';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
+        }
+        field(50;Context;Option)
+        {
+            Caption = 'Context';
+            Description = 'NPR5.55';
+            OptionCaption = 'Ordering,Line Splitting';
+            OptionMembers = Ordering,"Line Splitting";
+        }
     }
 
     keys
@@ -64,8 +78,9 @@ table 6150671 "NPRE W.Pad Line Prnt Log Entry"
         key(Key1;"Entry No.")
         {
         }
-        key(Key2;"Waiter Pad No.","Waiter Pad Line No.","Print Type","Print Category Code","Flow Status Object","Flow Status Code")
+        key(Key2;"Waiter Pad No.","Waiter Pad Line No.","Print Type","Print Category Code","Flow Status Object","Flow Status Code","Output Type")
         {
+            SumIndexFields = "Sent Quanity (Base)";
         }
     }
 

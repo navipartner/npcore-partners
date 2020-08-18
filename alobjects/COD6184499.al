@@ -12,6 +12,7 @@ codeunit 6184499 "EFT Framework Mgt."
     // NPR5.54/MMV /20200226 CASE 364340 Added "Result Processed" field.
     //                                   Unified lookup mgt. between giftcard load & payment/refund.
     //                                   Added pause/resume methods for code reuse.
+    // NPR5.55/MMV /20200420 CASE 386254 Added support for EFT workflows
 
 
     trigger OnRun()
@@ -258,6 +259,20 @@ codeunit 6184499 "EFT Framework Mgt."
         EFTInterface.OnSendEftDeviceRequest(EFTTransactionRequest, Handled);
         if not Handled then
             Error('EFT Integration %1 is not subscribing to SendRequest correctly.', EFTTransactionRequest."Integration Type");
+    end;
+
+    procedure GetIntegrationWorkflow(EFTTransactionRequest: Record "EFT Transaction Request"): Text
+    var
+        EFTInterface: Codeunit "EFT Interface";
+        IntegrationWorkflow: Text;
+    begin
+        //-NPR5.55 [386254]
+        EFTInterface.OnGetIntegrationRequestWorkflow(EFTTransactionRequest, IntegrationWorkflow);
+        if IntegrationWorkflow = '' then
+          Error('EFT Integration %1 is not subscribing to IntegrationWorkflow correctly.', EFTTransactionRequest."Integration Type");
+
+        exit(IntegrationWorkflow);
+        //+NPR5.55 [386254]
     end;
 
     procedure ConfirmAfterPayment(var EFTTransactionRequest: Record "EFT Transaction Request"; var Annul: Boolean)
@@ -603,12 +618,15 @@ codeunit 6184499 "EFT Framework Mgt."
         Skip: Boolean;
         EFTInterface: Codeunit "EFT Interface";
     begin
-        //-NPR5.54 [364340]
+        //-NPR5.55 [386254]
+        if not POSFrontEnd.IsPaused() then
+          exit;
+        //+NPR5.55 [386254]
+
         EFTInterface.OnBeforeResumeFrontEnd(EFTTransactionRequest, Skip);
         if not Skip then begin
           POSFrontEnd.ResumeWorkflow();
         end;
-        //+NPR5.54 [364340]
     end;
 
     local procedure "// Event Publishers"()

@@ -2,6 +2,8 @@ table 6151603 "NpDc Sale Line POS New Coupon"
 {
     // NPR5.36/MHA /20170831  CASE 286812 Object created - Discount Coupon Issue Module
     // NPR5.41/MHA /20180412  CASE 307048 Added fields for predefining Discount
+    // NPR5.54/ALPO/20200423  CASE 401611 5.54 upgrade performace optimization
+    // NPR5.55/ALPO/20200424  CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
 
     Caption = 'NpDc Sale Line POS New Coupon';
 

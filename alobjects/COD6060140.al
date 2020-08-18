@@ -13,6 +13,7 @@ codeunit 6060140 "MM POS Action - Member Arrival"
     // MM1.36/TSA /20181119 CASE 335889 Refactored MemberArrival with Guests
     // MM1.37/MHA /20190328  CASE 350288 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
     // MM1.41/TSA /20190909 CASE 367779 SignatureChange PromptForMemberGuestArrival() and MemberFastCheckIn();
+    // MM1.44/TSA /20200519 CASE 405185 Changed spelling of param "Admission Code" to "AdmissionCode"
 
 
     trigger OnRun()
@@ -70,6 +71,7 @@ codeunit 6060140 "MM POS Action - Member Arrival"
           Sender.RegisterWorkflowStep ('9', 'respond ();');
           Sender.RegisterWorkflow (false);
 
+          // NOTE: Dont forget to update the EAN box parameter setup in OnInitEanBoxParameters()
           Sender.RegisterOptionParameter ('DialogPrompt', 'Member Number,Member Card Number,Membership Number,Facial Recognition,No Prompt', 'Member Card Number');
           Sender.RegisterOptionParameter ('POSWorkflow', 'POSSales,Automatic,With Guests', 'POSSales');
           Sender.RegisterTextParameter ('AdmissionCode', '');
@@ -135,7 +137,10 @@ codeunit 6060140 "MM POS Action - Member Arrival"
           POSWorkflowType := POSWorkflowMethod::POS;
 
         JSON.InitializeJObjectParser (Context, FrontEnd);
-        AdmissionCode := JSON.GetStringParameter ('Admission Code', false);
+        //-MM1.44 [405185]
+        //AdmissionCode := JSON.GetStringParameter ('Admission Code', FALSE);
+        AdmissionCode := JSON.GetStringParameter ('AdmissionCode', false);
+        //+MM1.44 [405185]
 
         JSON.InitializeJObjectParser (Context, FrontEnd);
         ConfirmMember := JSON.GetBooleanParameter ('ConfirmMember', true);
@@ -276,9 +281,9 @@ codeunit 6060140 "MM POS Action - Member Arrival"
         case EanBoxEvent.Code of
           EventCodeExtMemberCardNo():
             begin
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'DefaultInputValue',true,'');
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'DialogPrompt',false,'No Prompt');
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'Function',false,'Member Arrival');
+              Sender.SetNonEditableParameterValues(EanBoxEvent, 'DefaultInputValue', true, '');
+              Sender.SetNonEditableParameterValues(EanBoxEvent, 'DialogPrompt', false, 'No Prompt');
+              Sender.SetNonEditableParameterValues(EanBoxEvent, 'Function', false, 'Member Arrival');
             end;
         end;
         //+MM1.33 [326754]

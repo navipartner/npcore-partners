@@ -475,7 +475,7 @@ table 6014425 "Retail Document Header"
         field(69;Factor;Integer)
         {
             Caption = 'Factor';
-            Description = 'Forhold mellem m�neder og perioder';
+            Description = 'Forhold mellem måneder og perioder';
 
             trigger OnValidate()
             begin
@@ -773,12 +773,12 @@ table 6014425 "Retail Document Header"
         field(128;"Expiry Date";Date)
         {
             Caption = 'Expiry Date';
-            Description = 'Hvorn�r en udlejningskontrakt oph�rer';
+            Description = 'Hvornår en udlejningskontrakt oph¢rer';
         }
         field(129;"Document Date";Date)
         {
             Caption = 'Date Created';
-            Description = 'kontrakt dato. Benyttes til at udregne expire date ved hj�lp af antal betalinger og antal terminer';
+            Description = 'kontrakt dato. Benyttes til at udregne expire date ved hjælp af antal betalinger og antal terminer';
 
             trigger OnValidate()
             begin
@@ -1478,18 +1478,18 @@ table 6014425 "Retail Document Header"
         if RetailDocLine.Find('-') then repeat
           PurchOrderQty := RetailDocLine.Quantity - RetailDocLine."Quantity in order";
         
-          /*Er �nskede antal mindre end det bestilte ??*/
+          /*Er ¢nskede antal mindre end det bestilte ??*/
           if (PurchOrderQty > 0) then begin
             CreateManko := true;
         
-            /*Sikrer at leverand�r-nummeret for varen er udfyldt ellers stop og meddel*/
+            /*Sikrer at leverand¢r-nummeret for varen er udfyldt ellers stop og meddel*/
             if RetailDocLine."No." <> '' then
               ItemHere.Get(RetailDocLine."No.");
         
             if ItemHere."Group sale"=false then begin
               ItemHere.TestField("Vendor No.");
         
-              /*Checker f�rst om der findes en ordre, der passer til det bestilte antal*/
+              /*Checker f¢rst om der findes en ordre, der passer til det bestilte antal*/
               PurchLine2.SetCurrentKey("Document Type",Type,"No.");
               PurchLine2.SetRange("Document Type", PurchLine2."Document Type"::Order);
               PurchLine2.SetRange(Type, PurchLine2.Type::Item);
@@ -1510,8 +1510,8 @@ table 6014425 "Retail Document Header"
                 end;
               until((PurchLine2.Next = 0) or (not CreateManko));
         
-        /*Der dannes Mankoliste dvs. der sliftes bilagstype til k�bsrekvisition*/
-        /*Der findes en mankoliste til leverand�ren med den samme vare*/
+        /*Der dannes Mankoliste dvs. der sliftes bilagstype til k¢bsrekvisition*/
+        /*Der findes en mankoliste til leverand¢ren med den samme vare*/
             if CreateManko then begin
               PurchLine2.Reset;
               PurchLine2.SetCurrentKey("Document Type",Type,"No.");
@@ -1530,11 +1530,11 @@ table 6014425 "Retail Document Header"
                         PurchOrderQty, PurchLine2."No.", PurchLine2.Description, PurchLine2."Document No.");
               end else begin
         
-        /*Pr�ver at finde en mankoliste til leverand�ren, som man kan tilf�je bestillingen til*/
+        /*Pr¢ver at finde en mankoliste til leverand¢ren, som man kan tilf¢je bestillingen til*/
                 PurchHeader.SetRange("Document Type",PurchHeader."Document Type"::Quote);
                 PurchHeader.SetRange("Buy-from Vendor No.",ItemHere."Vendor No.");
         
-        /*Hvis ikke Mankoliste til leverand�ren findes, dannes der �n inder linien tilf�jes*/
+        /*Hvis ikke Mankoliste til leverand¢ren findes, dannes der én inder linien tilf¢jes*/
                 if not PurchHeader.Find('-') then begin
                   PurchHeader.Init;
                   PurchHeader."No." := '';
@@ -1547,7 +1547,7 @@ table 6014425 "Retail Document Header"
                 Validate( "Purchase Order No.", PurchHeader."No." );
                 Modify;
         
-        /*Der tilf�jes en linie til manko-listen*/
+        /*Der tilf¢jes en linie til manko-listen*/
                 PurchLine.SetRange("Document Type", PurchHeader."Document Type");
                 PurchLine.SetRange("Document No.", PurchHeader."No.");
                 if not PurchLine.Find('+') then;
@@ -1655,7 +1655,7 @@ table 6014425 "Retail Document Header"
         T002: Label 'The periodic fee will be greater than the payment!';
         T003: Label 'The payment will be negative!';
     begin
-        //BeregnBel�b();
+        //BeregnBel¢b();
 
         CalcFields("Total Price");
         Validate(Factor);

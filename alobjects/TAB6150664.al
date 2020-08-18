@@ -5,10 +5,11 @@ table 6150664 "NPRE Flow Status"
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
     // NPR5.54/ALPO/20200226 CASE 392956 Send to kitchen print waiter pad lines with no print category assigned
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Status';
-    DrillDownPageID = "NPRE Flow Status";
-    LookupPageID = "NPRE Flow Status";
+    DrillDownPageID = "NPRE Select Flow Status";
+    LookupPageID = "NPRE Select Flow Status";
 
     fields
     {
@@ -50,30 +51,57 @@ table 6150664 "NPRE Flow Status"
         }
     }
 
+    trigger OnDelete()
+    begin
+        WaiterPadMgt.ClearAssignedPrintCategories(RecordId);  //NPR5.55 [382428]
+    end;
+
+    trigger OnRename()
+    begin
+        WaiterPadMgt.MoveAssignedPrintCategories(xRec.RecordId, RecordId);  //NPR5.55 [382428]
+    end;
+
     var
         InQuotes: Label '''%1''';
         EmptyCodeINQuotes: Label '''''', Comment='{Fixed}';
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
 
     procedure AssignedPrintCategoriesAsFilterString(): Text
     var
-        FlowStatusPrCategory: Record "NPRE Flow Status Pr.Category";
-        PrintCategory: Record "NPRE Print Category";
+        AssignedPrintCategory: Record "NPRE Assigned Print Category";
+        PrintCategory: Record "NPRE Print/Prod. Category";
         PrintCategoryString: Text;
     begin
         //-NPR5.53 [360258]
         //Return not assigned group filter for empty Code
         PrintCategory.Reset;
-        FlowStatusPrCategory.SetRange("Flow Status Object","Status Object");
+        //-NPR5.55 [382428]-revoked
+        /*
+        FlowStatusPrCategory.SETRANGE("Flow Status Object","Status Object");
+        IF Code <> '' THEN
+          FlowStatusPrCategory.SETRANGE("Flow Status Code",Code)
+        ELSE
+          FlowStatusPrCategory.SETFILTER("Flow Status Code",'<>%1','');
+        IF FlowStatusPrCategory.FINDSET THEN
+          REPEAT
+            IF PrintCategory.GET(FlowStatusPrCategory."Print Category Code") THEN
+              PrintCategory.MARK := TRUE;
+          UNTIL FlowStatusPrCategory.NEXT = 0;
+        */
+        //+NPR5.55 [382428]-revoked
+        //-NPR5.55 [382428]
+        AssignedPrintCategory.SetRange("Table No.", DATABASE::"NPRE Flow Status");
         if Code <> '' then
-          FlowStatusPrCategory.SetRange("Flow Status Code",Code)
+          AssignedPrintCategory.SetRange("Record ID", RecordId)
         else
-          FlowStatusPrCategory.SetFilter("Flow Status Code",'<>%1','');
-        if FlowStatusPrCategory.FindSet then
+          AssignedPrintCategory.SetFilter("Record ID", '<>%1', RecordId);
+        if AssignedPrintCategory.FindSet then
           repeat
-            PrintCategory.Code := FlowStatusPrCategory."Print Category Code";
-            PrintCategory.Mark := true;
-          until FlowStatusPrCategory.Next = 0;
-
+            if PrintCategory.Get(AssignedPrintCategory."Print/Prod. Category Code") then
+              PrintCategory.Mark := true;
+          until AssignedPrintCategory.Next = 0;
+        //+NPR5.55 [382428]
+        
         PrintCategoryString := '';
         if Code <> '' then
           PrintCategory.MarkedOnly(true);
@@ -85,13 +113,14 @@ table 6150664 "NPRE Flow Status"
               PrintCategoryString := PrintCategoryString + StrSubstNo(InQuotes,PrintCategory.Code);
             end;
           until PrintCategory.Next = 0;
-
+        
         //-NPR5.54 [392956]
         if (Code = '') and (PrintCategoryString <> '') and not PrintCategory.Get('') then
           PrintCategoryString := StrSubstNo('%1|%2',EmptyCodeINQuotes,PrintCategoryString);
         //+NPR5.54 [392956]
         exit(PrintCategoryString);
         //+NPR5.53 [360258]
+
     end;
 }
 

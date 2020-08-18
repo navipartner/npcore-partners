@@ -1,4 +1,4 @@
-table 6151015 "NpRv Sale Line POS Voucher"
+table 6151015 "NpRv Sales Line"
 {
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
     // NPR5.48/MHA /20190123  CASE 341711 Added field 103 "Send via Print", 105 "Send via E-mail", 107 "Send via SMS"
@@ -7,10 +7,14 @@ table 6151015 "NpRv Sale Line POS Voucher"
     // NPR5.50/MMV /20190527  CASE 356003 Added field 310,
     //                                    Added Option "Partner Issue Voucher" to field 30, for "delayed" partner voucher posting through same flow as normal.
     // NPR5.53/MHA /20200103  CASE 384055 Updated Name 2 reference in UpdateContactInfo()
+    // NPR5.54/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
+    // NPR5.55/ALPO/20200424 CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
+    // NPR5.55/MHA /20200427  CASE 402015 Changed Primary Key to field 100 "Id" and added Sales Document Fields
+    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
 
-    Caption = 'Sale Line POS Retail Voucher';
-    DrillDownPageID = "NpRv Sale Line POS Vouchers";
-    LookupPageID = "NpRv Sale Line POS Vouchers";
+    Caption = 'Retail Voucher Sales Line';
+    DrillDownPageID = "NpRv Sales Lines";
+    LookupPageID = "NpRv Sales Lines";
 
     fields
     {
@@ -39,10 +43,6 @@ table 6151015 "NpRv Sale Line POS Voucher"
         field(20;"Sale Line No.";Integer)
         {
             Caption = 'Sale Line No.';
-        }
-        field(25;"Line No.";Integer)
-        {
-            Caption = 'Line No.';
         }
         field(30;Type;Option)
         {
@@ -159,8 +159,6 @@ table 6151015 "NpRv Sale Line POS Voucher"
         field(210;Name;Text[50])
         {
             Caption = 'Name';
-            TableRelation = Customer;
-            ValidateTableRelation = false;
         }
         field(215;"Name 2";Text[50])
         {
@@ -225,6 +223,12 @@ table 6151015 "NpRv Sale Line POS Voucher"
         {
             Caption = 'Phone No.';
         }
+        field(270;"Language Code";Code[10])
+        {
+            Caption = 'Language Code';
+            Description = 'NPR5.55';
+            TableRelation = Language;
+        }
         field(300;"Voucher Message";Text[250])
         {
             Caption = 'Voucher Message';
@@ -233,11 +237,71 @@ table 6151015 "NpRv Sale Line POS Voucher"
         {
             Caption = 'Posted';
         }
+        field(400;"External Document No.";Code[50])
+        {
+            Caption = 'External Document No.';
+            Description = 'NPR5.55';
+            NotBlank = true;
+        }
+        field(405;"Document Source";Option)
+        {
+            Caption = 'Document Source';
+            Description = 'NPR5.55';
+            OptionCaption = 'POS,Sales Document,Payment Line';
+            OptionMembers = POS,"Sales Document","Payment Line";
+        }
+        field(410;"Document Type";Option)
+        {
+            Caption = 'Document Type';
+            Description = 'NPR5.55';
+            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
+            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+        }
+        field(420;"Document No.";Code[20])
+        {
+            Caption = 'Document No.';
+            Description = 'NPR5.55';
+            TableRelation = "Sales Header"."No." WHERE ("Document Type"=FIELD("Document Type"));
+        }
+        field(430;"Document Line No.";Integer)
+        {
+            Caption = 'Document Line No.';
+            Description = 'NPR5.55';
+        }
+        field(440;"Posting No.";Code[20])
+        {
+            Caption = 'Posting No.';
+            Description = 'NPR5.55';
+        }
+        field(1000;Id;Guid)
+        {
+            Caption = 'Id';
+            Description = 'NPR5.55';
+        }
+        field(1010;"Retail ID";Guid)
+        {
+            Caption = 'Retail ID';
+            Description = 'NPR5.55';
+        }
+        field(1020;"Parent Id";Guid)
+        {
+            Caption = 'Parent Id';
+            Description = 'NPR5.55';
+        }
     }
 
     keys
     {
-        key(Key1;"Register No.","Sales Ticket No.","Sale Type","Sale Date","Sale Line No.","Line No.")
+        key(Key1;Id)
+        {
+        }
+        key(Key2;Type,"Voucher Type","Voucher No.","Reference No.")
+        {
+        }
+        key(Key3;"Document Source","Document Type","Document No.","Document Line No.")
+        {
+        }
+        key(Key4;"Retail ID")
         {
         }
     }
@@ -245,6 +309,25 @@ table 6151015 "NpRv Sale Line POS Voucher"
     fieldgroups
     {
     }
+
+    trigger OnDelete()
+    var
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
+    begin
+        //-NPR5.55 [402015]
+        NpRvSalesLineReference.SetRange("Sales Line Id",Id);
+        if NpRvSalesLineReference.FindFirst then
+          NpRvSalesLineReference.DeleteAll;
+        //+NPR5.55 [402015]
+    end;
+
+    trigger OnInsert()
+    begin
+        //-NPR5.55 [402015]
+        if IsNullGuid(Id) then
+          Id := CreateGuid;
+        //+NPR5.55 [402015]
+    end;
 
     local procedure UpdateContactInfo()
     var
@@ -266,6 +349,9 @@ table 6151015 "NpRv Sale Line POS Voucher"
           "Country/Region Code" := Cont."Country/Region Code";
           "E-mail" := Cont."E-Mail";
           "Phone No." := Cont."Phone No.";
+          //-NPR5.55 [397527]
+          "Language Code" := Cont."Language Code";
+          //-NPR5.55 [397527]
           exit;
         end;
 
@@ -283,6 +369,9 @@ table 6151015 "NpRv Sale Line POS Voucher"
           "Country/Region Code" := Cust."Country/Region Code";
           "E-mail" := Cust."E-Mail";
           "Phone No." := Cust."Phone No.";
+          //-NPR5.55 [397527]
+          "Language Code" := Cust."Language Code";
+          //-NPR5.55 [397527]
           exit;
         end;
     end;

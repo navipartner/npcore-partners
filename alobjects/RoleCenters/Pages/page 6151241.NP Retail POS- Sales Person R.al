@@ -582,12 +582,6 @@ page 6151241 "NP Retail POS- Sales Person R"
                         group(Webshop)
                         {
                             Caption = 'Webshop';
-                            action("NPR List of Sales Orders")
-                            {
-                                Caption = 'NPR List of Sales Orders';
-                                Image = Report2;
-                                RunObject = Report "List of Sales Orders";
-                            }
                             action("NPR List of Sales Invoices")
                             {
                                 Caption = 'NPR List of Sales Invoices';

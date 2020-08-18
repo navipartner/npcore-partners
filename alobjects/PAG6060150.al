@@ -35,10 +35,15 @@ page 6060150 "Event Card"
     //                                   New action AdmissionScheduleEntry in ActionGroup Tickets
     //                                   Actions TicketAdmissions and AdmissionScheduleLines set to be run with "Admission Code" filter if not empty
     // NPR5.54/TJ  /20200324 CASE 397749 New ActionGroup Tickets with actions TicketSchedules, TicketAdmissions and AdmissionScheduleLines added under RelatedInformation
+    // NPR5.55/TJ  /20200326 CASE 397741 Added "Group Source Line No.=CONST(0)" to SubPageLink property of part "<Event Planning Lines Subpage>"
+    //                                   Part "<Event Planning Lines Subpage>" renamed to EventPlanningLinesSubpage
+    //                                   Added new part "<Event Grouped Plan. Lines Sub>" - new part is only visible when grouped lines exist
+    // NPR5.55/TJ  /20200205 CASE 374887 New parameter was added for email sending function
+    //                                   Added Tickets to property PromotedActionCategoriesML - this was missed in 397749
 
     Caption = 'Event Card';
     PageType = Card;
-    PromotedActionCategories = 'New,Process,Report,Prices';
+    PromotedActionCategories = 'New,Process,Report,Prices,Tickets';
     RefreshOnActivate = true;
     SourceTable = Job;
     SourceTableView = WHERE(Event=CONST(true));
@@ -1001,10 +1006,18 @@ page 6060150 "Event Card"
                 {
                 }
             }
-            part(Control6014400;"Event Planning Lines Subpage")
+            part(EventPlanningLinesSubpage;"Event Planning Lines Subpage")
             {
                 Editable = GlobalEditable;
-                SubPageLink = "Job No."=FIELD("No.");
+                SubPageLink = "Job No."=FIELD("No."),
+                              "Group Source Line No."=CONST(0);
+            }
+            part(Control6014530;"Event Grouped Plan. Lines Sub")
+            {
+                Editable = GlobalEditable;
+                SubPageLink = "Job No."=FIELD("No."),
+                              "Group Line"=CONST(true);
+                Visible = GroupedLineGroupVisible;
             }
             group("Foreign Trade")
             {
@@ -1494,7 +1507,10 @@ page 6060150 "Event Card"
 
                         trigger OnAction()
                         begin
-                            EventEmailMgt.SendEMail(Rec,0);
+                            //-NPR5.55 [374887]
+                            //EventEmailMgt.SendEMail(Rec,0);
+                            EventEmailMgt.SendEMail(Rec,0,0);
+                            //+NPR5.55 [374887]
                             CurrPage.Update(false);
                         end;
                     }
@@ -1506,7 +1522,10 @@ page 6060150 "Event Card"
 
                         trigger OnAction()
                         begin
-                            EventEmailMgt.SendEMail(Rec,1);
+                            //-NPR5.55 [374887]
+                            //EventEmailMgt.SendEMail(Rec,1);
+                            EventEmailMgt.SendEMail(Rec,1,0);
+                            //+NPR5.55 [374887]
                             CurrPage.Update(false);
                         end;
                     }
@@ -1576,6 +1595,9 @@ page 6060150 "Event Card"
         //-NPR5.53 [374886]
         SetGlobalEditable();
         //+NPR5.53 [374886]
+        //-NPR5.55 [397741]
+        SetGroupedLineGroupVisibility();
+        //+NPR5.55 [397741]
     end;
 
     trigger OnInit()
@@ -1678,6 +1700,7 @@ page 6060150 "Event Card"
         EventTicketMgt: Codeunit "Event Ticket Management";
         EventEWSMgt: Codeunit "Event EWS Management";
         GlobalEditable: Boolean;
+        GroupedLineGroupVisible: Boolean;
 
     local procedure CurrencyCheck()
     begin
@@ -1904,6 +1927,17 @@ page 6060150 "Event Card"
         //-NPR5.53 [374886]
         GlobalEditable := not Locked;
         //+NPR5.53 [374886]
+    end;
+
+    local procedure SetGroupedLineGroupVisibility()
+    var
+        JobPlanningLine: Record "Job Planning Line";
+    begin
+        //-NPR5.55 [397741]
+        JobPlanningLine.SetRange("Job No.",Rec."No.");
+        JobPlanningLine.SetFilter("Group Source Line No.",'<>0');
+        GroupedLineGroupVisible := not JobPlanningLine.IsEmpty;
+        //+NPR5.55 [397741]
     end;
 }
 

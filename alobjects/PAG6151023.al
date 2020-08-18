@@ -3,6 +3,7 @@ page 6151023 "NpRv Arch. Voucher Entries"
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
     // NPR5.48/MHA /20180921  CASE 302179 Renamed field 55 "Sales Ticket No." to "Document No." and added fields 53 "Document Type", 60 "External Document No."
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
+    // NPR5.55/MHA /20200512  CASE 404116 Added Navigation Page action
 
     Caption = 'Archived Retail Voucher Entries';
     Editable = false;
@@ -69,6 +70,26 @@ page 6151023 "NpRv Arch. Voucher Entries"
 
     actions
     {
+        area(navigation)
+        {
+            action("Navi&gate")
+            {
+                Caption = 'Navi&gate';
+                Image = Navigate;
+                Promoted = true;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    Navigate: Page Navigate;
+                begin
+                    //-NPR5.55 [404116]
+                    Navigate.SetDoc("Posting Date","Document No.");
+                    Navigate.Run;
+                    //+NPR5.55 [404116]
+                end;
+            }
+        }
     }
 }
 

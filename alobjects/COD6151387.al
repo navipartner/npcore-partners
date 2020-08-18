@@ -33,6 +33,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
     // NPR5.53/CLVA/20191115 CASE 377135 Changed posting rutine
     // NPR5.54/CLVA/20200220 CASE 391080 Added DeleteTransferredDataLines
     // NPR5.54/CLVA/20200225 CASE 392901 Changed modify handling of record.
+    // NPR5.55/ALPO/20200729 CASE 404663 Possibility to use vendor item number & description for CS warehouse activity lines
 
     TableNo = "CS UI Header";
 
@@ -573,6 +574,8 @@ codeunit 6151387 "CS UI Warehouse Activity"
         TableNo: Integer;
         BinIsMandatory: Boolean;
         Location: Record Location;
+        CSWarehouseActivitySetup: Record "CS Warehouse Activity Setup";
+        ItemIdentifier: Text;
     begin
         Clear(CSWarehouseActivityHandling);
         CSWarehouseActivityHandling.SetRange(Id,CSSessionId);
@@ -645,12 +648,18 @@ codeunit 6151387 "CS UI Warehouse Activity"
                 Line := DOMxmlin.CreateElement('Line');
                 AddAttribute(Line,'Descrip',WhseActivityLine.FieldCaption("Item No."));
                 AddAttribute(Line,'Type',Format(LineType::TEXT));
-                //-NPR5.50 [247747]
-                if WhseActivityLine."Variant Code" <> '' then
-                  Line.InnerText := StrSubstNo(Text027,WhseActivityLine."Item No.",WhseActivityLine."Variant Code")
-                else
-                //-NPR5.50 [247747]
-                  Line.InnerText := WhseActivityLine."Item No.";
+                //-NPR5.55 [404663]-revoked
+        //        //-NPR5.50 [247747]
+        //        IF WhseActivityLine."Variant Code" <> '' THEN
+        //          Line.InnerText := STRSUBSTNO(Text027,WhseActivityLine."Item No.",WhseActivityLine."Variant Code")
+        //        ELSE
+        //        //-NPR5.50 [247747]
+        //          Line.InnerText := WhseActivityLine."Item No.";
+                //+NPR5.55 [404663]-revoked
+                //-NPR5.55 [404663]
+                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, ' | ');
+                Line.InnerText := ItemIdentifier;
+                //+NPR5.55 [404663]
                 Record.AppendChild(Line);
 
                 //4
@@ -700,12 +709,19 @@ codeunit 6151387 "CS UI Warehouse Activity"
                 //-NPR5.49 [349554]
                 AddAttribute(Line,'CollapsItems','TRUE');
                 //+NPR5.49 [349554]
-                //-NPR5.49 [346224]
-                if WhseActivityLine."Variant Code" <> '' then
-                  Line.InnerText := StrSubstNo(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No."+'-'+WhseActivityLine."Variant Code",WhseActivityLine.Description)
-                else
-                //+NPR5.49 [346224]
-                Line.InnerText := StrSubstNo(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No.",WhseActivityLine.Description);
+                //-NPR5.55 [404663]-revoked
+        //        //-NPR5.49 [346224]
+        //        IF WhseActivityLine."Variant Code" <> '' THEN
+        //          Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No."+'-'+WhseActivityLine."Variant Code",WhseActivityLine.Description)
+        //        ELSE
+        //        //+NPR5.49 [346224]
+        //        Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No.",WhseActivityLine.Description);
+                //+NPR5.55 [404663]-revoked
+                //-NPR5.55 [404663]
+                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, '-');
+                Line.InnerText :=
+                  StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", ItemIdentifier, WhseActivityLine.Description);
+                //+NPR5.55 [404663]
                 Record.AppendChild(Line);
 
                 //-NPR5.48 [335606]
@@ -805,12 +821,18 @@ codeunit 6151387 "CS UI Warehouse Activity"
                     Line := DOMxmlin.CreateElement('Line');
                     AddAttribute(Line,'Descrip',WhseActivityLine.FieldCaption("Item No."));
                     AddAttribute(Line,'Type',Format(LineType::TEXT));
-                    //-NPR5.50 [247747]
-                    if WhseActivityLine."Variant Code" <> '' then
-                      Line.InnerText := StrSubstNo(Text027,WhseActivityLine."Item No.",WhseActivityLine."Variant Code")
-                    else
-                    //-NPR5.50 [247747]
-                      Line.InnerText := WhseActivityLine."Item No.";
+                    //-NPR5.55 [404663]-revoked
+        //            //-NPR5.50 [247747]
+        //            IF WhseActivityLine."Variant Code" <> '' THEN
+        //              Line.InnerText := STRSUBSTNO(Text027,WhseActivityLine."Item No.",WhseActivityLine."Variant Code")
+        //            ELSE
+        //            //-NPR5.50 [247747]
+        //              Line.InnerText := WhseActivityLine."Item No.";
+                    //+NPR5.55 [404663]-revoked
+                    //-NPR5.55 [404663]
+                    ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, ' | ');
+                    Line.InnerText := ItemIdentifier;
+                    //+NPR5.55 [404663]
                     Record.AppendChild(Line);
 
                     //4
@@ -854,12 +876,19 @@ codeunit 6151387 "CS UI Warehouse Activity"
                     AddAttribute(Line,'Descrip',WhseActivityLine.FieldCaption(Description));
                     AddAttribute(Line,'Indicator',Indicator);
                     AddAttribute(Line,'Type',Format(LineType::TEXT));
-                    //-NPR5.49 [346224]
-                    if WhseActivityLine."Variant Code" <> '' then
-                      Line.InnerText := StrSubstNo(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No."+'-'+WhseActivityLine."Variant Code",WhseActivityLine.Description)
-                    else
-                    //+NPR5.49 [346224]
-                    Line.InnerText := StrSubstNo(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No.",WhseActivityLine.Description);
+                    //-NPR5.55 [404663]-revoked
+        //            //-NPR5.49 [346224]
+        //            IF WhseActivityLine."Variant Code" <> '' THEN
+        //              Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No."+'-'+WhseActivityLine."Variant Code",WhseActivityLine.Description)
+        //            ELSE
+        //            //+NPR5.49 [346224]
+        //            Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No.",WhseActivityLine.Description);
+                    //+NPR5.55 [404663]-revoked
+                    //-NPR5.55 [404663]
+                    ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, '-');
+                    Line.InnerText :=
+                      StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", ItemIdentifier, WhseActivityLine.Description);
+                    //+NPR5.55 [404663]
                     Record.AppendChild(Line);
 
                     //-NPR5.48 [335606]

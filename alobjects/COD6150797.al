@@ -10,6 +10,7 @@ codeunit 6150797 "POS Action - Cancel Sale"
     //                                     - added return value (boolean)
     //                                     - set to global
     // NPR5.54/MMV /20200217 CASE 364658 Added configurable start of new sale to allow business logic first.
+    // NPR5.55/ALPO/20200720 CASE 391678 Possibility to set an alternative description for cancalled sale
 
 
     trigger OnRun()
@@ -23,6 +24,7 @@ codeunit 6150797 "POS Action - Cancel Sale"
         PartlyPaid: Label 'This sales can''t be deleted. It has been partly paid. You must first void the payment.';
         CustomerInvoice: Label 'This sales can''t be deleted. It has a customer invoice attached. ';
         CANCEL_SALE: Label 'Sale was canceled %1';
+        AltSaleCancelDescription: Text;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
@@ -147,6 +149,12 @@ codeunit 6150797 "POS Action - Cancel Sale"
 
         with Line do begin
             Type := Type::Comment;
+          //-NPR5.55 [391678]
+          if AltSaleCancelDescription <> '' then begin
+            Description := CopyStr(AltSaleCancelDescription, 1, MaxStrLen(Description));
+            "Description 2" := CopyStr(AltSaleCancelDescription, MaxStrLen(Description) + 1, MaxStrLen("Description 2"));
+          end else
+          //+NPR5.55 [391678]
             Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
             "Sale Type" := "Sale Type"::Cancelled;
         end;
@@ -155,6 +163,13 @@ codeunit 6150797 "POS Action - Cancel Sale"
         POSSession.GetSale(POSSale);
         exit(POSSale.TryEndSale2(POSSession, false));
         //+NPR5.54 [364658]
+    end;
+
+    procedure SetAlternativeDescription(NewAltSaleCancelDescription: Text)
+    begin
+        //-NPR5.55 [391678]
+        AltSaleCancelDescription := NewAltSaleCancelDescription;
+        //+NPR5.55 [391678]
     end;
 }
 

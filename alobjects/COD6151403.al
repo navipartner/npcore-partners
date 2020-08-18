@@ -31,8 +31,10 @@ codeunit 6151403 "Magento Webservice"
     // MAG2.20/TSA /20190424  CASE 345376 Added Shipment Statement as PDF
     // MAG2.22/MHA /20190711  CASE 361706 Removed explicit set of Magento."Variant System" in InitSetup()
     // MAG14.00.2.22/ALST/20190714 CASE 361943 removed call to standard object customization in GeneratePdfCustomerStatement()
-    // MAG2.25/TSA /20200218 CASE 388058 Added Quotes to magento service
-    // MAG2.25/TSA /20200320 CASE 396445 Added service GetCustomerAndContactNo()
+    // MAG2.25/TSA /20200218  CASE 388058 Added Quotes to magento service
+    // MAG2.25/TSA /20200320  CASE 396445 Added service GetCustomerAndContactNo()
+    // MAG2.26/MHA /20200527  CASE 406741 Added function GetStoreInventory()
+    // MAG2.26/MHA /20200527  CASE 404580 Added functions UpdateCategories(), UpdateBrands()
 
 
     trigger OnRun()
@@ -370,6 +372,14 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
+    procedure GetStoreInventory(var store_inventory: XMLport "Magento Store Inventory")
+    begin
+        //-MAG2.26 [406741]
+        store_inventory.Import;
+        //+MAG2.26 [406741]
+    end;
+
+    [Scope('Personalization')]
     procedure GetCustomerNo(OrderNo: Code[20]) CustomerNo: Text
     var
         SalesHeader: Record "Sales Header";
@@ -570,6 +580,26 @@ codeunit 6151403 "Magento Webservice"
         MagentoSetupMgt.TriggerSetupPaymentMethodMapping();
         MagentoSetupMgt.TriggerSetupShipmentMethodMapping();
         //+MAG2.07 [286943]
+    end;
+
+    [Scope('Personalization')]
+    procedure UpdateCategories()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
+    begin
+        //-MAG2.26 [404580]
+        MagentoSetupMgt.TriggerSetupCategories();
+        //+MAG2.26 [404580]
+    end;
+
+    [Scope('Personalization')]
+    procedure UpdateBrands()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
+    begin
+        //-MAG2.26 [404580]
+        MagentoSetupMgt.TriggerSetupBrands();
+        //+MAG2.26 [404580]
     end;
 
     local procedure "--- Aux"()

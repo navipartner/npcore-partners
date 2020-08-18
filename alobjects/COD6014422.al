@@ -22,6 +22,8 @@ codeunit 6014422 "NP Environment Mgt."
     // NPR5.40/JDH /20180319 CASE 308001 Object moved from 6151300 to clear the object range
     // NPR5.42/MHA /20180525 CASE 314365 Added function DisableNpXmlTransfer()
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
+    // NPR5.55/MHA /20200519  CASE 405530 Added missing GET to OnAfterCompanyOpen() and COMMIT to avoid long table locks during STRMENU
+    // NPR5.55/MMV /20200615 CASE 410073 Added job queue cleanup prompt
 
 
     trigger OnRun()
@@ -37,8 +39,9 @@ codeunit 6014422 "NP Environment Mgt."
         Caption_CleanLessor: Label 'Disable Lessor in this new environment?';
         Caption_CleanDC: Label 'Disable Continia Document Capture in this new environment?';
         Caption_MissingPermissions: Label 'You are missing permissions for table %1. \If data scrub is necessary for this table in the new environment, then you must switch user/permissions and handle it manually.';
-        NPRetailSetup: Record "NP Retail Setup";
+        NPRetailSetupGlobal: Record "NP Retail Setup";
         NPRetailSetupRead: Boolean;
+        Caption_CleanJobQueue: Label 'Disable Job Queue entries in this new environment?';
 
     local procedure "// Accessors"()
     begin
@@ -47,25 +50,33 @@ codeunit 6014422 "NP Environment Mgt."
     procedure IsProd(): Boolean
     begin
         if GetSetupRec() then
-          exit( (NPRetailSetup."Environment Type" = NPRetailSetup."Environment Type"::PROD) and NPRetailSetup."Environment Verified" );
+          //-NPR5.55 [405530]
+          exit( (NPRetailSetupGlobal."Environment Type" = NPRetailSetupGlobal."Environment Type"::PROD) and NPRetailSetupGlobal."Environment Verified" );
+          //+NPR5.55 [405530]
     end;
 
     procedure IsDemo(): Boolean
     begin
         if GetSetupRec() then
-          exit( (NPRetailSetup."Environment Type" = NPRetailSetup."Environment Type"::DEMO) and NPRetailSetup."Environment Verified" );
+          //-NPR5.55 [405530]
+          exit( (NPRetailSetupGlobal."Environment Type" = NPRetailSetupGlobal."Environment Type"::DEMO) and NPRetailSetupGlobal."Environment Verified" );
+          //+NPR5.55 [405530]
     end;
 
     procedure IsTest(): Boolean
     begin
         if GetSetupRec() then
-          exit( (NPRetailSetup."Environment Type" = NPRetailSetup."Environment Type"::TEST) and NPRetailSetup."Environment Verified" );
+          //-NPR5.55 [405530]
+          exit( (NPRetailSetupGlobal."Environment Type" = NPRetailSetupGlobal."Environment Type"::TEST) and NPRetailSetupGlobal."Environment Verified" );
+          //+NPR5.55 [405530]
     end;
 
     procedure IsDev(): Boolean
     begin
         if GetSetupRec() then
-          exit( (NPRetailSetup."Environment Type" = NPRetailSetup."Environment Type"::DEV) and NPRetailSetup."Environment Verified" );
+          //-NPR5.55 [405530]
+          exit( (NPRetailSetupGlobal."Environment Type" = NPRetailSetupGlobal."Environment Type"::DEV) and NPRetailSetupGlobal."Environment Verified" );
+          //+NPR5.55 [405530]
     end;
 
     local procedure "// Event Publishers"()
@@ -100,6 +111,11 @@ codeunit 6014422 "NP Environment Mgt."
 
         if not NPRetailSetup.WritePermission then
           exit;
+
+        //-NPR5.55 [405530]
+        SelectLatestVersion;
+        NPRetailSetup.Get;
+        //+NPR5.55 [405530]
 
         //-NPR5.38 [292825]
         // WHILE (NOT ActiveSession.GET(SERVICEINSTANCEID, SESSIONID)) DO //Still necessary?
@@ -142,7 +158,9 @@ codeunit 6014422 "NP Environment Mgt."
     local procedure GetSetupRec(): Boolean
     begin
         if not NPRetailSetupRead then
-          NPRetailSetupRead := NPRetailSetup.Get();
+          //-NPR5.55 [405530]
+          NPRetailSetupRead := NPRetailSetupGlobal.Get();
+          //+NPR5.55 [405530]
         exit(NPRetailSetupRead);
     end;
 
@@ -209,6 +227,9 @@ codeunit 6014422 "NP Environment Mgt."
         xRecTmp.Insert;
 
         if GuiAllowed then begin
+          //-NPR5.55 [405530]
+          Commit;
+          //+NPR5.55 [405530]
           Type := StrMenu(Caption_EnvironmentOption, 3, Caption_OptionMessage);
           if Type > 0 then begin
             NPRetailSetup."Environment Company Name" := CompanyName;
@@ -241,6 +262,9 @@ codeunit 6014422 "NP Environment Mgt."
         //-NPR5.42 [314365]
         DisableNpXmlTransfer();
         //+NPR5.42 [314365]
+        //-NPR5.55 [410073]
+        CancelJobQueueEntries();
+        //+NPR5.55 [410073]
     end;
 
     local procedure "// Data Scrub Functions"()
@@ -293,6 +317,36 @@ codeunit 6014422 "NP Environment Mgt."
         if NpXmlTemplate.FindFirst then
           NpXmlTemplate.ModifyAll("API Transfer",false,false);
         //+NPR5.42 [314365]
+    end;
+
+    local procedure CancelJobQueueEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        //-NPR5.55 [410073]
+        if not JobQueueEntry.ReadPermission then begin
+          Message(Caption_MissingPermissions, JobQueueEntry.TableCaption);
+          exit;
+        end;
+
+        JobQueueEntry.SetFilter(Status, '%1|%2|%3', JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process", JobQueueEntry.Status::Error);
+        if JobQueueEntry.IsEmpty then
+          exit;
+
+        if not Confirm(Caption_CleanJobQueue) then
+          exit;
+
+        if not JobQueueEntry.WritePermission then begin
+          Message(Caption_MissingPermissions, JobQueueEntry.TableCaption);
+          exit;
+        end;
+
+        if JobQueueEntry.FindSet(true) then
+          repeat
+            JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+
+          until JobQueueEntry.Next = 0;
+        //+NPR5.55 [410073]
     end;
 }
 

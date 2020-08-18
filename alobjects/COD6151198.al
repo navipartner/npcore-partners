@@ -1,6 +1,7 @@
 codeunit 6151198 "NpCs Update Order Status"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // NPR5.55/MHA /20200701  CASE 411513 Removed unused references to SalesHeader and Customer in InitReqBody()
 
 
     trigger OnRun()
@@ -153,16 +154,12 @@ codeunit 6151198 "NpCs Update Order Status"
 
     local procedure InitReqBody(NpCsDocument: Record "NpCs Document";var XmlDoc: DotNet npNetXmlDocument)
     var
-        Customer: Record Customer;
         NpCsStore: Record "NpCs Store";
         NpCsStoreLocal: Record "NpCs Store";
         NpCsWorkflow: Record "NpCs Workflow";
-        SalesHeader: Record "Sales Header";
         ServiceName: Text;
         Content: Text;
     begin
-        SalesHeader.Get(SalesHeader."Document Type"::Order,NpCsDocument."Document No.");
-        Customer.Get(SalesHeader."Sell-to Customer No.");
         NpCsStore.Get(NpCsDocument."To Store Code");
         ServiceName := NpCsStore.GetServiceName();
         NpCsWorkflow.Get(NpCsDocument."Workflow Code");

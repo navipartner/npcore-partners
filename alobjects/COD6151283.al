@@ -1,7 +1,8 @@
 codeunit 6151283 "SS Action - Login Screen"
 {
-    // 
     // NPR5.54/TSA /20200205 CASE 387912 Initial Version
+    // NPR5.55/TSA /20200424 CASE 387912 Adjusted the workflow
+    // NPR5.55/TSA /20200429 CASE 402078 Bug fix, changed method to switch view. POS Sale is not correctly initialized after record delete.
 
 
     trigger OnRun()
@@ -11,7 +12,7 @@ codeunit 6151283 "SS Action - Login Screen"
     var
         ActionDescription: Label 'This built in function locks the POS';
         ConfirmTitle: Label 'We need your confirmation...';
-        ConfirmMessage: Label 'You current order will be lost. Are you sure you want to restart your session?';
+        ConfirmMessage: Label 'Your current order will be lost. Are you sure you want to restart your session?';
         SAVE_SALE: Label 'Saving Sales...';
         REQUIRES_ATTENTION: Label 'Your order must be handled by an attendant. It has reference number %1.';
         CANCEL_SALE: Label 'Sale was canceled %1';
@@ -25,7 +26,7 @@ codeunit 6151283 "SS Action - Login Screen"
     local procedure ActionVersion(): Text
     begin
 
-        exit ('1.5');
+        exit ('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -39,12 +40,10 @@ codeunit 6151283 "SS Action - Login Screen"
             ActionVersion())
           then begin
             RegisterWorkflow20(
-                'var responseJson;'+
-                'var result;'+
-                'await (result = await popup.confirm ({title: $captions.ConfirmTitle, caption: $captions.ConfirmMessage}));' +
+                'let result = await popup.confirm ({title: $captions.ConfirmTitle, caption: $captions.ConfirmMessage});' +
                 'if (result) {'+
-                  'await (responseJson = await workflow.respond());'+
-                  'var response = JSON.parse (responseJson);'+
+                  'let responseJson = await workflow.respond();'+
+                  'let response = JSON.parse (responseJson);'+
                   'if (response.message) {await popup.message (response.message);}'+
                 '};'
                );
@@ -102,13 +101,16 @@ codeunit 6151283 "SS Action - Login Screen"
         if (not SalesIsCanceled) then begin
           POSSession.GetSale (POSSale);
           POSSale.GetCurrentSale (SalePOS);
-          PosEntryNo := POSResumeSaleMgt.DoSaveAsPOSQuote (SalePOS, true);
+          PosEntryNo := POSResumeSaleMgt.DoSaveAsPOSQuote (POSSession, SalePOS, true, true);
           POSQuoteEntry.Get (PosEntryNo);
           ResponseMessage := StrSubstNo (REQUIRES_ATTENTION, POSQuoteEntry."Sales Ticket No.");
           WorkflowResponseJson := StrSubstNo ('{"message" : {"title":"%1", "caption":"%2"}}', SAVE_SALE, ResponseMessage);
         end;
 
-        POSSession.ChangeViewLogin();
+        //-NPR5.55 [402078]
+        //POSSession.ChangeViewLogin();
+        POSSession.StartPOSSession ();
+        //+NPR5.55 [402078]
     end;
 
     procedure IsOkToCancel(POSSession: Codeunit "POS Session"): Boolean

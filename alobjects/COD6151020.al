@@ -4,6 +4,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     // NPR5.48/MHA /20180921  CASE 302179 Replaced direct check on Voucher."In-Use Quantity" with CalcInUseQty
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner functionality used with Cross Company Vouchers
     // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing in InvokeRedeemPartnerVouchers()
+    // NPR5.55/MHA /20200427  CASE 402015 New Primary Key on Sale Line POS Voucher
 
 
     trigger OnRun()
@@ -184,8 +185,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     local procedure ReserveVoucher(var NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NpRv Voucher";
-        NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
-        LineNo: Integer;
+        NpRvSalesLine: Record "NpRv Sales Line";
         Timestamp: DateTime;
         InUseQty: Integer;
     begin
@@ -207,16 +207,16 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         //IF NpRvVoucher."In-use Quantity" > 0 THEN BEGIN
         if InUseQty > 0 then begin
         //+NPR5.48 [302179]
-          NpRvSaleLinePOSVoucher.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
-          NpRvSaleLinePOSVoucher.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
-          NpRvSaleLinePOSVoucher.SetRange("Sale Type",NpRvSaleLinePOSVoucher."Sale Type"::Sale);
-          NpRvSaleLinePOSVoucher.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
-          NpRvSaleLinePOSVoucher.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
-          NpRvSaleLinePOSVoucher.SetRange("Voucher No.",NpRvVoucher."No.");
+          NpRvSalesLine.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
+          NpRvSalesLine.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
+          NpRvSalesLine.SetRange("Sale Type",NpRvSalesLine."Sale Type"::Sale);
+          NpRvSalesLine.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
+          NpRvSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
+          NpRvSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
           //-NPR5.48 [302179]
-          // IF NpRvVoucher."In-use Quantity" = NpRvSaleLinePOSVoucher.COUNT THEN
+          // IF NpRvVoucher."In-use Quantity" = NpRvSalesLine.COUNT THEN
           //   EXIT;
-          if InUseQty = NpRvSaleLinePOSVoucher.Count then
+          if InUseQty = NpRvSalesLine.Count then
             exit;
           //+NPR5.48 [302179]
 
@@ -230,26 +230,21 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         if (NpRvVoucher."Ending Date" < Timestamp) and (NpRvVoucher."Ending Date" <> 0DT) then
           Error(Text005,NpRvVoucherBuffer."Reference No.");
 
-        NpRvSaleLinePOSVoucher.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
-        NpRvSaleLinePOSVoucher.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
-        NpRvSaleLinePOSVoucher.SetRange("Sale Type",NpRvSaleLinePOSVoucher."Sale Type"::Sale);
-        NpRvSaleLinePOSVoucher.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
-        NpRvSaleLinePOSVoucher.SetRange("Sale Line No.",10000);
-        if NpRvSaleLinePOSVoucher.FindLast then;
-        LineNo := NpRvSaleLinePOSVoucher."Line No." + 10000;
 
-        NpRvSaleLinePOSVoucher.Init;
-        NpRvSaleLinePOSVoucher."Register No." :=  NpRvVoucherBuffer."Redeem Register No.";
-        NpRvSaleLinePOSVoucher."Sales Ticket No." := NpRvVoucherBuffer."Redeem Sales Ticket No.";
-        NpRvSaleLinePOSVoucher."Sale Type" := NpRvSaleLinePOSVoucher."Sale Type"::Sale;
-        NpRvSaleLinePOSVoucher."Sale Date" := NpRvVoucherBuffer."Redeem Date";
-        NpRvSaleLinePOSVoucher."Sale Line No." := 10000;
-        NpRvSaleLinePOSVoucher."Line No." := LineNo;
-        NpRvSaleLinePOSVoucher.Type := NpRvSaleLinePOSVoucher.Type::Payment;
-        NpRvSaleLinePOSVoucher."Voucher Type" := NpRvVoucher."Voucher Type";
-        NpRvSaleLinePOSVoucher."Voucher No." := NpRvVoucher."No.";
-        NpRvSaleLinePOSVoucher.Description := NpRvVoucher.Description;
-        NpRvSaleLinePOSVoucher.Insert;
+        //-NPR5.55 [402015]
+        NpRvSalesLine.Init;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Register No." :=  NpRvVoucherBuffer."Redeem Register No.";
+        NpRvSalesLine."Sales Ticket No." := NpRvVoucherBuffer."Redeem Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := NpRvSalesLine."Sale Type"::Sale;
+        NpRvSalesLine."Sale Date" := NpRvVoucherBuffer."Redeem Date";
+        NpRvSalesLine."Sale Line No." := 10000;
+        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+        NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+        NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+        NpRvSalesLine.Description := NpRvVoucher.Description;
+        NpRvSalesLine.Insert(true);
+        //+NPR5.55 [402015]
     end;
 
     local procedure "--- Cancel Reserve Voucher"()
@@ -280,7 +275,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     local procedure CancelReserveVoucher(var NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NpRv Voucher";
-        NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
         LineNo: Integer;
         Timestamp: DateTime;
         InUseQty: Integer;
@@ -296,14 +291,14 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         if InUseQty = 0 then
           exit;
 
-        NpRvSaleLinePOSVoucher.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
-        NpRvSaleLinePOSVoucher.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
-        NpRvSaleLinePOSVoucher.SetRange("Sale Type",NpRvSaleLinePOSVoucher."Sale Type"::Sale);
-        NpRvSaleLinePOSVoucher.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
-        NpRvSaleLinePOSVoucher.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
-        NpRvSaleLinePOSVoucher.SetRange("Voucher No.",NpRvVoucher."No.");
-        if NpRvSaleLinePOSVoucher.FindFirst then
-          NpRvSaleLinePOSVoucher.DeleteAll;
+        NpRvSalesLine.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
+        NpRvSalesLine.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
+        NpRvSalesLine.SetRange("Sale Type",NpRvSalesLine."Sale Type"::Sale);
+        NpRvSalesLine.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
+        NpRvSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
+        NpRvSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
+        if NpRvSalesLine.FindFirst then
+          NpRvSalesLine.DeleteAll;
         //+NPR5.49 [342811]
     end;
 
@@ -342,7 +337,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         NpRvVoucher: Record "NpRv Voucher";
         NpRvVoucherEntry: Record "NpRv Voucher Entry";
         NpRvVoucherType: Record "NpRv Voucher Type";
-        NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         LineNo: Integer;
         InUseQty: Integer;
@@ -399,20 +394,20 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         InUseQty := NpRvVoucher.CalcInUseQty();
         if InUseQty > 0 then begin
         //+NPR5.48 [302179]
-          NpRvSaleLinePOSVoucher.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
-          NpRvSaleLinePOSVoucher.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
-          NpRvSaleLinePOSVoucher.SetRange("Sale Type",NpRvSaleLinePOSVoucher."Sale Type"::Sale);
-          NpRvSaleLinePOSVoucher.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
-          NpRvSaleLinePOSVoucher.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
-          NpRvSaleLinePOSVoucher.SetRange("Voucher No.",NpRvVoucher."No.");
+          NpRvSalesLine.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
+          NpRvSalesLine.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
+          NpRvSalesLine.SetRange("Sale Type",NpRvSalesLine."Sale Type"::Sale);
+          NpRvSalesLine.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
+          NpRvSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
+          NpRvSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
           //-NPR5.48 [302179]
-          // IF NpRvVoucher."In-use Quantity" > NpRvSaleLinePOSVoucher.COUNT THEN
+          // IF NpRvVoucher."In-use Quantity" > NpRvSalesLine.COUNT THEN
           //  ERROR(Text001,NpRvVoucherBuffer."Reference No.");
-          if InUseQty > NpRvSaleLinePOSVoucher.Count then
+          if InUseQty > NpRvSalesLine.Count then
             Error(Text001,NpRvVoucherBuffer."Reference No.");
           //+NPR5.48 [302179]
 
-          NpRvSaleLinePOSVoucher.DeleteAll;
+          NpRvSalesLine.DeleteAll;
         end;
 
         //-NPR5.49 [342811]
@@ -515,7 +510,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     var
         NpRvVoucher: Record "NpRv Voucher";
         NpRvVoucherEntry: Record "NpRv Voucher Entry";
-        NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         LineNo: Integer;
         InUseQty: Integer;
@@ -556,13 +551,13 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
 
         InUseQty := NpRvVoucher.CalcInUseQty();
         if InUseQty > 0 then begin
-          NpRvSaleLinePOSVoucher.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
-          NpRvSaleLinePOSVoucher.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
-          NpRvSaleLinePOSVoucher.SetRange("Sale Type",NpRvSaleLinePOSVoucher."Sale Type"::Sale);
-          NpRvSaleLinePOSVoucher.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
-          NpRvSaleLinePOSVoucher.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
-          NpRvSaleLinePOSVoucher.SetRange("Voucher No.",NpRvVoucher."No.");
-          NpRvSaleLinePOSVoucher.DeleteAll;
+          NpRvSalesLine.SetRange("Register No.",NpRvVoucherBuffer."Redeem Register No.");
+          NpRvSalesLine.SetRange("Sales Ticket No.",NpRvVoucherBuffer."Redeem Sales Ticket No.");
+          NpRvSalesLine.SetRange("Sale Type",NpRvSalesLine."Sale Type"::Sale);
+          NpRvSalesLine.SetRange("Sale Date",NpRvVoucherBuffer."Redeem Date");
+          NpRvSalesLine.SetRange("Voucher Type",NpRvVoucher."Voucher Type");
+          NpRvSalesLine.SetRange("Voucher No.",NpRvVoucher."No.");
+          NpRvSalesLine.DeleteAll;
         end;
 
         Voucher2Buffer(NpRvVoucher,NpRvVoucherBuffer);

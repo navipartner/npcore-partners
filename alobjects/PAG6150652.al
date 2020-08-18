@@ -45,6 +45,10 @@ page 6150652 "POS Entry List"
     // NPR5.53/SARA/20200205 CASE 389242 Remove shortcut 'POS Info Audit Roll'
     // NPR5.54/SARA/20200218 CASE 391360 Remove Shortcut 'POS Audit Log'
     // NPR5.54/SARA/20200228 CASE 393492 Remove Delete button
+    // NPR5.55/SARA/20200511 CASE 401547 Add shortcut 'POS Period Register List'
+    // NPR5.55/YAHA/20200218 CASE 391361 Remove groupaction EFT.
+    // NPR5.55/MMV /20200623 CASE 391360 Re-actived action 'POS Audit Log'.
+    // NPR5.55/SARA/20200706 CASE 412905 Related Sales Document Button: Filter only by Entry No.
 
     Caption = 'POS Entry List';
     CardPageID = "POS Entry Card";
@@ -111,7 +115,6 @@ page 6150652 "POS Entry List"
                 }
                 field("Fiscal No.";"Fiscal No.")
                 {
-                    Visible = false;
                 }
                 field("POS Store Code";"POS Store Code")
                 {
@@ -371,7 +374,6 @@ page 6150652 "POS Entry List"
             {
                 Caption = 'POS Audit Log';
                 Image = InteractionLog;
-                Visible = false;
 
                 trigger OnAction()
                 var
@@ -393,8 +395,10 @@ page 6150652 "POS Entry List"
                 begin
                     //-NPR5.50 [300557]
                     POSEntrySalesDocLink.SetRange("POS Entry No.", "Entry No.");
-                    POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
-                    POSEntrySalesDocLink.SetRange("POS Entry Reference Line No.", 0);
+                    //-NPR5.55 [412905]
+                    //POSEntrySalesDocLink.SETRANGE("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
+                    //POSEntrySalesDocLink.SETRANGE("POS Entry Reference Line No.", 0);
+                    //+NPR5.55 [412905]
                     PAGE.RunModal(PAGE::"POS Entry Related Sales Doc.", POSEntrySalesDocLink);
                     //+NPR5.50 [300557]
                 end;
@@ -411,6 +415,19 @@ page 6150652 "POS Entry List"
                     ShowWorkshift (Rec);
                     //+NPR5.50 [345376]
                 end;
+            }
+            action("EFT Transaction Requests")
+            {
+                Caption = 'EFT Transaction Requests';
+                Image = CreditCardLog;
+                RunObject = Page "EFT Transaction Requests";
+                RunPageLink = "Sales Ticket No."=FIELD("Document No.");
+            }
+            action("POS Period Register")
+            {
+                Image = PeriodEntries;
+                RunObject = Page "POS Period Register List";
+                RunPageLink = "No."=FIELD("POS Period Register No.");
             }
             group(Vouchers)
             {
@@ -518,17 +535,6 @@ page 6150652 "POS Entry List"
                     RunObject = Page "NpRv Voucher Types";
                 }
             }
-            group(EFT)
-            {
-                Caption = '&EFT';
-                action("EFT Transaction Requests")
-                {
-                    Caption = 'EFT Transaction Requests';
-                    Image = CreditCardLog;
-                    RunObject = Page "EFT Transaction Requests";
-                    RunPageLink = "Sales Ticket No."=FIELD("Document No.");
-                }
-            }
             group("POS Entry Lists")
             {
                 Caption = 'POS Entry Lists';
@@ -567,6 +573,15 @@ page 6150652 "POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "POS Balancing Line";
+                }
+                action("POS Period Register List")
+                {
+                    Caption = 'POS Period Register List';
+                    Image = PeriodEntries;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Period Register List";
                 }
             }
             group("Failed POS Lists")

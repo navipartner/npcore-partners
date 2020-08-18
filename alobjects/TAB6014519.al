@@ -1,7 +1,7 @@
 table 6014519 "Warranty Line"
 {
     // //-NPR3.0g
-    //   Tilf�jet insurance
+    //   Tilf¢jet insurance
     // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range below 50000
 
     Caption = 'Warranty Line';

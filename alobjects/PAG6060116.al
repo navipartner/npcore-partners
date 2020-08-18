@@ -15,6 +15,8 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
     // TM1.36/TSA /20180727 CASE 323024 Adding dimension variant code
     // TM1.36/TSA /20180727 CASE 323400 Added admitted including revisits
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
+    // TM1.47/TSA /20200421 CASE 401250 Added a "update statistics" action
+    // TM1.48/TSA /20200705 CASE 409741 Added Admission Forecast Action
 
     Caption = 'Ticket Access Statistics Matrix';
     PageType = ListPlus;
@@ -320,103 +322,132 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
     {
         area(processing)
         {
+            action("Update Statistics")
+            {
+                Caption = 'Update Statistics';
+                Image = Refresh;
+                Promoted = true;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                begin
+
+                    //-TM1.47 [401250]
+                    TicketAccessStatisticsMgr.BuildCompressedStatistics (Today);
+                    UpdateMatrixSubForm;
+                    //+TM1.47 [401250]
+                end;
+            }
             group(Periods)
             {
                 Caption = 'Periods';
+                action("Next Period")
+                {
+                    Caption = 'Next Period';
+                    Image = NextRecord;
+                    Promoted = true;
+                    PromotedCategory = Process;
+
+                    trigger OnAction()
+                    begin
+
+                        FindPeriod('>');
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
+
+                        CurrPage.Update;
+                        UpdateMatrixSubForm;
+                    end;
+                }
+                action("Previous Period")
+                {
+                    Caption = 'Previous Period';
+                    Image = PreviousRecord;
+                    Promoted = true;
+                    PromotedCategory = Process;
+
+                    trigger OnAction()
+                    begin
+
+                        FindPeriod('<');
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
+
+                        CurrPage.Update;
+                        UpdateMatrixSubForm;
+                    end;
+                }
+                action("Previous Set")
+                {
+                    Caption = 'Previous Set';
+                    Image = PreviousSet;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ToolTip = 'Previous Set';
+
+                    trigger OnAction()
+                    begin
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Previous);
+                        UpdateMatrixSubForm;
+                    end;
+                }
+                action("Previous Column")
+                {
+                    Caption = 'Previous Column';
+                    Image = PreviousRecord;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ToolTip = 'Previous Set';
+
+                    trigger OnAction()
+                    begin
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::PreviousColumn);
+                        UpdateMatrixSubForm;
+                    end;
+                }
+                action("Next Column")
+                {
+                    Caption = 'Next Column';
+                    Image = NextRecord;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ToolTip = 'Next Set';
+
+                    trigger OnAction()
+                    begin
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::NextColumn);
+                        UpdateMatrixSubForm;
+                    end;
+                }
+                action("Next Set")
+                {
+                    Caption = 'Next Set';
+                    Image = NextSet;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ToolTip = 'Next Set';
+
+                    trigger OnAction()
+                    begin
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Next);
+                        UpdateMatrixSubForm;
+                    end;
+                }
             }
-            action("Next Period")
+        }
+        area(navigation)
+        {
+            action(Forecast)
             {
-                Caption = 'Next Period';
-                Image = NextRecord;
+                Caption = 'Admission Forecast';
+                Ellipsis = true;
+                Image = Forecast;
                 Promoted = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                begin
-
-                    FindPeriod('>');
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-
-                    CurrPage.Update;
-                    UpdateMatrixSubForm;
-                end;
-            }
-            action("Previous Period")
-            {
-                Caption = 'Previous Period';
-                Image = PreviousRecord;
-                Promoted = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                begin
-
-                    FindPeriod('<');
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-
-                    CurrPage.Update;
-                    UpdateMatrixSubForm;
-                end;
-            }
-            action("Previous Set")
-            {
-                Caption = 'Previous Set';
-                Image = PreviousSet;
-                Promoted = true;
-                PromotedCategory = Process;
+                PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ToolTip = 'Previous Set';
-
-                trigger OnAction()
-                begin
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Previous);
-                    UpdateMatrixSubForm;
-                end;
-            }
-            action("Previous Column")
-            {
-                Caption = 'Previous Column';
-                Image = PreviousRecord;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ToolTip = 'Previous Set';
-
-                trigger OnAction()
-                begin
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::PreviousColumn);
-                    UpdateMatrixSubForm;
-                end;
-            }
-            action("Next Column")
-            {
-                Caption = 'Next Column';
-                Image = NextRecord;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ToolTip = 'Next Set';
-
-                trigger OnAction()
-                begin
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::NextColumn);
-                    UpdateMatrixSubForm;
-                end;
-            }
-            action("Next Set")
-            {
-                Caption = 'Next Set';
-                Image = NextSet;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ToolTip = 'Next Set';
-
-                trigger OnAction()
-                begin
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Next);
-                    UpdateMatrixSubForm;
-                end;
+                RunObject = Page "TM Admission Forecast Matrix";
             }
         }
     }

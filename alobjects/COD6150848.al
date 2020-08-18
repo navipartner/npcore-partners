@@ -3,6 +3,8 @@ codeunit 6150848 "POS Action - Adjust Inventory"
     // NPR5.39/MHA /20180206  CASE 299736 Object created - Inventory Adjustment from POS
     // NPR5.45/MHA /20180806  CASE 323812 Added Return Reason functionality
     // NPR5.53/ALST/20191216  CASE 381438 possible to adjust negative or positive
+    // NPR5.55/ALST/20200420  CASE 400775 allow for third option in adjustment action (besides strictly positive or negative)
+    // NPR5.55/ALST/20200420  CASE 411559 changed captions
 
 
     trigger OnRun()
@@ -39,9 +41,15 @@ codeunit 6150848 "POS Action - Adjust Inventory"
                 RegisterTextParameter('FixedReturnReason', '');
                 RegisterBooleanParameter('LookupReturnReason', false);
                 //+NPR5.45 [323812]
-            //-NPR5.53 [381438]
-            RegisterBooleanParameter('NegativeInput', false);
-            //+NPR5.53 [381438]
+            //-NPR5.55 [400775]
+        //    //-NPR5.53 [381438]
+        //    RegisterBooleanParameter('NegativeInput', FALSE);
+        //    //+NPR5.53 [381438]
+            //-NPR5.55 [411559]
+            //RegisterOptionParameter('InputAdjustment','Negative Input Only,Positive Input Only,Both Negative and Positive Inputs','Both Negative and Positive Inputs');
+            RegisterOptionParameter('InputAdjustment','perform only Negative Adjustment,perform only Positive Adjustment,perform both Negative and Positive Adjustment','perform both Negative and Positive Adjustment');
+            //+NPR5.55 [411559]
+            //+NPR5.55 [400775]
                 RegisterWorkflow(true);
 
             end;
@@ -136,13 +144,22 @@ codeunit 6150848 "POS Action - Adjust Inventory"
         JSON.SetScope('/', true);
         ReturnReasonCode := JSON.GetString('ReturnReason', false);
 
-        //-NPR5.53 [381438]
-        Quantity := Abs(Quantity);
-
+        //-NPR5.55 [400775]
+        // //-NPR5.53 [381438]
+        // Quantity := ABS(Quantity);
+        //
+        // JSON.SetScope('parameters',TRUE);
+        // IF JSON.GetBoolean('NegativeInput', FALSE) THEN
+        //  Quantity *= -1;
+        // //+NPR5.53 [381438]
         JSON.SetScope('parameters',true);
-        if JSON.GetBoolean('NegativeInput', false) then
-          Quantity *= -1;
-        //+NPR5.53 [381438]
+        case JSON.GetInteger('InputAdjustment', true) of
+          0:
+            Quantity := -Abs(Quantity);
+          1:
+            Quantity := Abs(Quantity);
+        end;
+        //+NPR5.55 [400775]
 
         PerformAdjustInventory(POSSession, Quantity, ReturnReasonCode);
         //+NPR5.45 [323812]
@@ -265,6 +282,12 @@ codeunit 6150848 "POS Action - Adjust Inventory"
 
     local procedure ActionVersion(): Text
     begin
+        //-NPR5.55 [411559]
+        exit('1.4');
+        //+NPR5.55 [411559]
+        //-NPR5.55 [400775]
+        exit('1.3');
+        //+NPR5.55 [400775]
         //-NPR5.45 [323812]
         exit('1.2');
         //+NPR5.45 [323812]

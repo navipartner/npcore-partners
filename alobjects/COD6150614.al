@@ -66,6 +66,8 @@ codeunit 6150614 "POS Create Entry"
     // NPR5.53/MMV /20200108 CASE 373453 Support for storing links to posted documents when unposted document fields are blank.
     // NPR5.54/TJ  /20200211 CASE 347209 Cancelled sale gets a similar description as on Audit Roll
     // NPR5.54/MMV /20200220 CASE 391871 Added field "Retail ID" for payment lines.
+    // NPR5.55/TSA /20200228 CASE 393569 Added a publisher when RMA lines are created.
+    // NPR5.55/ALPO/20200720 CASE 391678 Use description for cancalled sales from sale line pos; Log resume sale and parked sale retrieval
 
     TableNo = "Sale POS";
 
@@ -210,6 +212,7 @@ codeunit 6150614 "POS Create Entry"
         Contact: Record Contact;
         POSAuditRollIntegration: Codeunit "POS-Audit Roll Integration";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SaleLinePOS: Record "Sale Line POS";
     begin
         POSEntry.Init;
         POSEntry."Entry No." := 0; //Autoincrement;
@@ -277,8 +280,16 @@ codeunit 6150614 "POS Create Entry"
                 POSEntry.Description := SalespersonPurchaser.Name;
               end;
             //-NPR5.54 [347209]
-            POSEntry."Entry Type"::"Cancelled Sale":
-              POSEntry.Description := CANCEL_SALE;
+            POSEntry."Entry Type"::"Cancelled Sale": begin  //NPR5.55 [391678] (BEGIN added)
+              //-NPR5.55 [391678]
+              SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+              SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+              if SaleLinePOS.FindFirst and (SaleLinePOS.Description <> '') then
+                POSEntry.Description := SaleLinePOS.Description
+              else
+              //+NPR5.55 [391678]
+                POSEntry.Description := CANCEL_SALE;
+            end;  //NPR5.55 [391678]
             //+NPR5.54 [347209]
           end;
         end;
@@ -1044,6 +1055,44 @@ codeunit 6150614 "POS Create Entry"
         //+NPR5.51 [356076]
     end;
 
+    procedure InsertParkedSaleRetrievalEntry(POSUnitNo: Code[10];SalespersonCode: Code[10];ParkedSalesTicketNo: Code[20];NewSalesTicketNo: Code[20]) EntryNo: Integer
+    var
+        POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
+        LoadQuoteMsg: Label 'Parked sales ticket No. %1 loaded as ticket No. %2';
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+    begin
+        //-NPR5.55 [391678]
+        if not IsActivated then
+          exit(0);
+
+        EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Retrieve Parked Sale');
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntryExtended(
+          POSEntry.RecordId, POSAuditLog."Action Type"::SALE_LOAD, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.",
+          StrSubstNo(LoadQuoteMsg, ParkedSalesTicketNo, NewSalesTicketNo), '');
+        //+NPR5.55 [391678]
+    end;
+
+    procedure InsertResumeSaleEntry(POSUnitNo: Code[10];SalespersonCode: Code[10];UnfinishedTicketNo: Code[20];NewSalesTicketNo: Code[20]) EntryNo: Integer
+    var
+        POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
+        ResumeSaleMsg: Label 'Unfinished sales ticket No. %1 resumed as ticket No. %2';
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+    begin
+        //-NPR5.55 [391678]
+        if not IsActivated then
+          exit(0);
+
+        EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Resume Sale');
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntryExtended(
+          POSEntry.RecordId, POSAuditLog."Action Type"::SALE_LOAD, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.",
+          StrSubstNo(ResumeSaleMsg, UnfinishedTicketNo, NewSalesTicketNo), '');
+        //+NPR5.55 [391678]
+    end;
+
     procedure InsertTransferLocation(POSUnitNo: Code[10];SalespersonCode: Code[10];OldDocumentNo: Code[20];NewDocumentNo: Code[20])
     var
         POSEntry: Record "POS Entry";
@@ -1464,6 +1513,10 @@ codeunit 6150614 "POS Create Entry"
         PosRmaLine.Insert ();
         //+NPR5.49 [342090]
 
+        //-NPR5.55 [393569]
+        OnAfterInsertRmaEntry (PosRmaLine, POSEntry, SalePOS, SaleLinePOS);
+        //+NPR5.55 [393569]
+
         //-NPR5.51 [356076]
         POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::ITEM_RMA, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", '',
           StrSubstNo('%1|%2|%3', PosRmaLine."Return Line No.", PosRmaLine."Sales Ticket No.", PosRmaLine."Return Reason Code"));
@@ -1718,6 +1771,12 @@ codeunit 6150614 "POS Create Entry"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertPOSBalanceLine(POSPaymentBinCheckpoint: Record "POS Payment Bin Checkpoint";POSEntry: Record "POS Entry";var POSBalancingLine: Record "POS Balancing Line")
     begin
+    end;
+
+    [IntegrationEvent(FALSE, FALSE)]
+    local procedure OnAfterInsertRmaEntry(POSRMALine: Record "POS RMA Line";POSEntry: Record "POS Entry";SalePOS: Record "Sale POS";SaleLinePOS: Record "Sale Line POS")
+    begin
+        //-+NPR5.55 [393569]
     end;
 
     [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateFindRecords', '', true, true)]

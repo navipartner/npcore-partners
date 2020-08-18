@@ -4,6 +4,7 @@ codeunit 6151491 "Raptor Management"
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
     // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
+    // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor. Default data sending frequency set to every 10 minuntes
 
 
     trigger OnRun()
@@ -18,12 +19,12 @@ codeunit 6151491 "Raptor Management"
         ActionCommentLbl_GetUserRecomm: Label 'Generates personalized recommendations based on a user''s current behavior on the website.';
         ActionNotSupported: Label 'An unknown or unsupported %1 ''%2'' has been invoked. You must register the corresponding action handler before you can call it. This indicates a programming bug, not a user error. Please contact system vendor if you need assistance.';
         ConfirmOverwrite: Label '%1 ''%2'' already exists in the database. Are you sure you want to overwrite it with default values?';
-        DailyUpdateQst: Label 'A job queue entry for daily export of Raptor tracking data has been created.\\Do you want to open the Job Queue Entries window?';
+        DailyUpdateQst: Label 'A job queue entry for exporting of Raptor tracking data has been created.\\Do you want to open the Job Queue Entry Setup window?';
         NothingToShowErr: Label 'There are no Raptor %1 available for the customer %2.';
-        NaviConnectIsNotEnabled: Label 'You must setup and enable NaviConnect before proceeding.';
-        SendDataToRaptrorLbl: Label 'Daily export of tracking data to Raptor.';
+        SendDataToRaptrorLbl: Label 'Export of tracking data to Raptor.';
         TrackServDescr_rsa: Label 'Raptor service for tracking in a no-javascript environment';
         UnknownValue: Label 'The %1 = %2 is not defined in the system.';
+        IncorrectFunctionCallErr: Label 'Function call on a non-temporary variable. This is a critical programming error. Please contact system vendor.';
 
     procedure SendRaptorGetDataRequst(RaptorAction: Record "Raptor Action";UserIdentifier: Text;var ErrorMsg: Text): Text
     var
@@ -288,9 +289,16 @@ codeunit 6151491 "Raptor Management"
           JobQueueEntry.ScheduleRecurrentJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,CODEUNIT::"Raptor Send Data",DummyRecId);  // NAV versions 2017 and later
           JobQueueEntry.Description := CopyStr(SendDataToRaptrorLbl,1,MaxStrLen(JobQueueEntry.Description));
-          JobQueueEntry."Starting Time" := 230000T;
-          JobQueueEntry."Ending Time" := 235900T;
-          JobQueueEntry."No. of Minutes between Runs" := 1200;
+          //-NPR5.55 [400925]-revoked
+          //JobQueueEntry."Starting Time" := 230000T;
+          //JobQueueEntry."Ending Time" := 235900T;
+          //JobQueueEntry."No. of Minutes between Runs" := 1200;
+          //+NPR5.55 [400925]-revoked
+          //-NPR5.55 [400925]
+          JobQueueEntry."Starting Time" := 070000T;
+          JobQueueEntry."Ending Time" := 230000T;
+          JobQueueEntry."No. of Minutes between Runs" := 10;
+          //+NPR5.55 [400925]
           JobQueueEntry.Modify;
           Commit;
 
@@ -386,7 +394,7 @@ codeunit 6151491 "Raptor Management"
     begin
         //-NPR5.54 [355871]
         if not ListOfTrackingServiceTypes.IsTemporary then
-          Error('Function call on a non-temporary variable. This is a critical programming error.');
+          Error(IncorrectFunctionCallErr);
 
         ListOfTrackingServiceTypes.Reset;
         ListOfTrackingServiceTypes.DeleteAll;
@@ -421,6 +429,44 @@ codeunit 6151491 "Raptor Management"
     procedure RaptorDataLogSubscriber(): Code[30]
     begin
         exit('RAPTOR');
+    end;
+
+    procedure SelectWebShopSalespersons(var SalespersonFilter: Text)
+    var
+        SalespersonTmp: Record "Salesperson/Purchaser" temporary;
+        RaptorSendData: Codeunit "Raptor Send Data";
+        SalespersonList: Page "Salesperson List";
+        InQuotes: Label '''%1''';
+    begin
+        //-NPR5.55 [400925]
+        RaptorSendData.CreateTmpSalespersonList(SalespersonTmp);
+
+        if SalespersonFilter <> '' then begin
+          SalespersonTmp.SetFilter(Code,SalespersonFilter);
+          if SalespersonTmp.FindSet then
+            repeat
+              SalespersonTmp.Mark := true;
+            until SalespersonTmp.Next = 0;
+          SalespersonTmp.SetRange(Code);
+        end;
+
+        Clear(SalespersonList);
+        SalespersonList.SetDataset(SalespersonTmp);
+        SalespersonList.SetMultiSelectionMode(true);
+        SalespersonList.LookupMode(true);
+        if SalespersonList.RunModal <> ACTION::LookupOK then
+          exit;
+        SalespersonList.GetDataset(SalespersonTmp);
+        SalespersonTmp.MarkedOnly(true);
+
+        SalespersonFilter := '';
+        if SalespersonTmp.FindSet then
+          repeat
+            if SalespersonFilter <> '' then
+              SalespersonFilter := SalespersonFilter + '|';
+            SalespersonFilter := SalespersonFilter + StrSubstNo(InQuotes,SalespersonTmp.Code);
+          until SalespersonTmp.Next = 0;
+        //+NPR5.55 [400925]
     end;
 
     [IntegrationEvent(TRUE, false)]

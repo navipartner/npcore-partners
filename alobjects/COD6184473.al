@@ -17,6 +17,8 @@ codeunit 6184473 "EFT Transaction Mgt."
     //                                   Consolidated all request types into this codeunit for more code-reuse.
     //                                   Renamed to "EFT Transaction Mgt." to indicate purpose better.
     //                                   Refactored the void & lookup flow to better fit the new sales recovery mechanism.
+    // NPR5.55/MMV /20200420 CASE 386254 Added WF2 methods, unattended lookup skip, adjusted captions & fixed sale completion check.
+    // NPR5.55/MMV /20200701 CASE 412426 Disable LOCKTIMEOUT in sensitive areas.
 
 
     trigger OnRun()
@@ -26,7 +28,7 @@ codeunit 6184473 "EFT Transaction Mgt."
     var
         ActionDescription: Label 'Backend action for handling EFT payments';
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved by EFT Framework';
-        CAPTION_RECOVER_PROMPT: Label 'The last %1 transaction on this register never completed successfully.\Do you want to attempt recovery of the below transaction now?\(This is strongly recommended but can be done later on the EFT transaction list)\\From Sales Ticket No.: %2\Type: %3\Amount: %4 %5\External Ref. No.: %6';
+        CAPTION_RECOVER_PROMPT: Label 'The last %1 transaction on this register never completed successfully.\Do you want to attempt recovery of the below transaction now?\(This is strongly recommended)\\From Sales Ticket No.: %2\Type: %3\Amount: %4 %5\External Ref. No.: %6';
         CAPTION_RECOVER_FAIL_HARD: Label 'LOOKUP UNKNOWN:\%1 lookup request failed. Check the connection and try again.';
         CAPTION_RECOVER_FAIL_SOFT: Label 'LOOKUP UNKNOWN:\Cannot lookup %1 result for transaction entry no. %2';
         CAPTION_RECOVER_SYNC: Label 'LOOKUP SUCCESS:\In sync with the originally recorded transaction result:\\%1\From Sales Ticket No.: %2\Type: %3\Amount: %4 %5\External Ref. No.: %6';
@@ -43,6 +45,10 @@ codeunit 6184473 "EFT Transaction Mgt."
         SALE_NOT_FOUND: Label 'Could not find sale linked with trx. It needs to be either finished or active in the current POS sale before a void operation is allowed.';
         QUOTE_OUT_OF_SYNC: Label 'LOOKUP WARNING:\Transaction result is out of sync, but cannot be recreated unless %1 %2 is loaded first. Please load that sale and lookup transaction again!';
         MISSING_ORIGINAL: Label 'LOOKUP WARNING:\A transaction result was recovered but the original sale connected to it, is missing.If the sale was cancelled the transaction should be reversed.\\%1\From Sales Ticket No.: %2\Type: %3\Amount: %4 %5\External Ref. No.: %6';
+
+    local procedure "// Workflow V1"()
+    begin
+    end;
 
     procedure StartPayment(EFTSetup: Record "EFT Setup";PaymentTypePOS: Record "Payment Type POS";Amount: Decimal;CurrencyCode: Code[10];SalePOS: Record "Sale POS"): Integer
     var
@@ -209,6 +215,40 @@ codeunit 6184473 "EFT Transaction Mgt."
         //+NPR5.54 [364340]
     end;
 
+    local procedure "// Workflow V2"()
+    begin
+    end;
+
+    procedure PreparePayment(EFTSetup: Record "EFT Setup";PaymentTypePOS: Record "Payment Type POS";Amount: Decimal;CurrencyCode: Code[10];SalePOS: Record "Sale POS";var IntegrationWorkflowOut: Text): Integer
+    var
+        EFTTransactionRequest: Record "EFT Transaction Request";
+        EFTTransactionRequestToRecover: Record "EFT Transaction Request";
+        EFTFrameworkMgt: Codeunit "EFT Framework Mgt.";
+        POSSession: Codeunit "POS Session";
+        POSFrontEndManagement: Codeunit "POS Front End Management";
+    begin
+        //-NPR5.55 [386254]
+        if PerformRecoveryInstead(SalePOS, EFTSetup."EFT Integration Type", EFTTransactionRequestToRecover) then begin
+          EFTFrameworkMgt.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EFTTransactionRequestToRecover."Entry No.")
+        end else begin
+          if (Amount >= 0) then
+            EFTFrameworkMgt.CreatePaymentOfGoodsRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Amount)
+          else
+            EFTFrameworkMgt.CreateRefundRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", CurrencyCode, Abs(Amount), 0);
+        end;
+
+        IntegrationWorkflowOut := EFTFrameworkMgt.GetIntegrationWorkflow(EFTTransactionRequest);
+
+        Commit; // Save the request record data regardless of any later errors when invoking.
+
+        exit(EFTTransactionRequest."Entry No.");
+        //+NPR5.55 [386254]
+    end;
+
+    local procedure "// Response Handlers"()
+    begin
+    end;
+
     procedure HandleIntegrationResponse(EftTransactionRequest: Record "EFT Transaction Request")
     var
         POSSession: Codeunit "POS Session";
@@ -217,6 +257,10 @@ codeunit 6184473 "EFT Transaction Mgt."
         if not POSSession.IsActiveSession(POSFrontEnd) then
             Error(ERROR_SESSION);
         POSFrontEnd.GetSession(POSSession);
+
+        //-NPR5.55 [412426]
+        LockTimeout(false);
+        //+NPR5.55 [412426]
 
         case EftTransactionRequest."Processing Type" of
           EftTransactionRequest."Processing Type"::REFUND,
@@ -351,7 +395,7 @@ codeunit 6184473 "EFT Transaction Mgt."
         POSSession.RequestRefreshData();
     end;
 
-    local procedure "--"()
+    local procedure "// Aux"()
     begin
     end;
 
@@ -588,6 +632,11 @@ codeunit 6184473 "EFT Transaction Mgt."
           if ("External Result Known" and (Finished <> 0DT)) then
                 exit(false);
 
+        //-NPR5.55 [386254]
+          if "Self Service" then
+            exit(false);
+        //+NPR5.55 [386254]
+
         //-NPR5.54 [364340]
         //  IF ("Processing Type" = "Processing Type"::VOID) THEN
         //    IF "Sales Ticket No." <> SalePOS."Sales Ticket No." THEN
@@ -622,6 +671,9 @@ codeunit 6184473 "EFT Transaction Mgt."
         if NPRetailSetup.Get then begin
           if NPRetailSetup."Advanced Posting Activated" then begin
             POSEntry.SetRange("Retail ID", RetailID);
+        //-NPR5.55 [386254]
+            POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        //+NPR5.55 [386254]
             exit(not POSEntry.IsEmpty);
           end;
         end;

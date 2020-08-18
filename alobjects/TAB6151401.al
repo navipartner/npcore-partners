@@ -31,6 +31,10 @@ table 6151401 "Magento Setup"
     // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
     // MAG2.24/MHA /20191024  CASE 371807 Added Option "Phone No. to Customer No." to field 500 "Customer Mapping"
     // MAG2.25/MHA /20200204  CASE 387936 Added fields 750 "Send Order Confirmation", 760 "Order Conf. E-mail Template"
+    // MAG2.26/MHA /20200428  CASE 402247 Added Option "Fixed" to field 490 "Customer Update Mode"
+    // MAG2.26/MHA /20200430  CASE 402486 Added field 800 "Stock Calculation Method"
+    // MAG2.26/MHA /20200505  CASE 402488 Added field 810 "Stock NpXml Template", 820 "Stock Codeunit Id", 830 "Stock Codeunit Name", 840 "Stock Function Name"
+    // MAG2.26/MHA /20200526  CASE 406591 Added fields 850 "NpCs Workflow Code", 860 "NpCs From Store Code"
 
     Caption = 'Magento Setup';
 
@@ -361,12 +365,18 @@ table 6151401 "Magento Setup"
             OptionCaption = 'On Posting,On Insert';
             OptionMembers = OnPosting,OnInsert;
         }
+        field(480;"Fixed Customer No.";Code[20])
+        {
+            Caption = 'Fixed Customer No.';
+            Description = 'MAG2.26';
+            TableRelation = Customer;
+        }
         field(490;"Customer Update Mode";Option)
         {
             Caption = 'Customer Update Mode';
-            Description = 'MAG2.22';
-            OptionCaption = 'Create and Update,Create,Update,None';
-            OptionMembers = "Create and Update",Create,Update,"None";
+            Description = 'MAG2.22,MAG2.26';
+            OptionCaption = 'Create and Update,Create,Update,None,Fixed';
+            OptionMembers = "Create and Update",Create,Update,"None","Fixed";
         }
         field(500;"Customer Mapping";Option)
         {
@@ -515,6 +525,119 @@ table 6151401 "Magento Setup"
             Description = 'MAG2.25';
             TableRelation = "E-mail Template Header" WHERE ("Table No."=CONST(36));
         }
+        field(800;"Stock Calculation Method";Option)
+        {
+            Caption = 'Stock Calculation Method';
+            Description = 'MAG2.26';
+            OptionCaption = 'Standard,Function';
+            OptionMembers = Standard,"Function";
+        }
+        field(810;"Stock NpXml Template";Code[20])
+        {
+            Caption = 'Stock NpXml Template';
+            Description = 'MAG2.26';
+            TableRelation = "NpXml Template" WHERE ("Table No."=CONST(27),
+                                                    "Xml Root Name"=CONST('stock_updates'));
+        }
+        field(820;"Stock Codeunit Id";Integer)
+        {
+            BlankZero = true;
+            Caption = 'Stock Codeunit Id';
+            Description = 'MAG2.26';
+            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Codeunit));
+        }
+        field(830;"Stock Codeunit Name";Text[30])
+        {
+            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Codeunit),
+                                                             "Object ID"=FIELD("Stock Codeunit Id")));
+            Caption = 'Stock Codeunit Name';
+            Description = 'MAG2.26';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(840;"Stock Function Name";Text[250])
+        {
+            Caption = 'Stock Function Name';
+            Description = 'MAG2.26';
+
+            trigger OnLookup()
+            var
+                EventSubscription: Record "Event Subscription";
+            begin
+                //-MAG2.26 [402488]
+                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID",GetStockPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function",GetStockPublisherFunctionName());
+                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
+                  exit;
+
+                "Stock Codeunit Id" := EventSubscription."Subscriber Codeunit ID";
+                "Stock Function Name" := EventSubscription."Subscriber Function";
+                //+MAG2.26 [402488]
+            end;
+
+            trigger OnValidate()
+            var
+                EventSubscription: Record "Event Subscription";
+            begin
+                //-MAG2.26 [402488]
+                if "Stock Function Name" = '' then begin
+                  "Stock Codeunit Id" := 0;
+                  exit;
+                end;
+
+                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID",GetStockPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function",GetStockPublisherFunctionName());
+                if "Stock Codeunit Id" > 0 then
+                  EventSubscription.SetRange("Subscriber Codeunit ID","Stock Codeunit Id");
+                if "Stock Function Name" <> '' then
+                  EventSubscription.SetFilter("Subscriber Function",'@*' + "Stock Function Name" + '*');
+                EventSubscription.FindFirst;
+
+                "Stock Codeunit Id" := EventSubscription."Subscriber Codeunit ID";
+                "Stock Function Name" := EventSubscription."Subscriber Function";
+                //+MAG2.26 [402488]
+            end;
+        }
+        field(850;"NpCs Workflow Code";Code[20])
+        {
+            Caption = 'Collect in Store Workflow Code';
+            Description = 'MAG2.26';
+            TableRelation = "NpCs Workflow";
+        }
+        field(860;"NpCs From Store Code";Code[20])
+        {
+            Caption = 'From Collect Store Code';
+            Description = 'MAG2.26';
+            TableRelation = "NpCs Store" WHERE ("Local Store"=CONST(true));
+
+            trigger OnLookup()
+            var
+                NpCsStore: Record "NpCs Store";
+            begin
+                //-MAG2.26 [406591]
+                NpCsStore.SetRange("Local Store",true);
+                NpCsStore.SetFilter("Location Code","Inventory Location Filter");
+                if PAGE.RunModal(0,NpCsStore) = ACTION::LookupOK then
+                  Validate("NpCs From Store Code",NpCsStore.Code);
+                //+MAG2.26 [406591]
+            end;
+
+            trigger OnValidate()
+            var
+                NpCsStoreWorkflowRelation: Record "NpCs Store Workflow Relation";
+            begin
+                //-MAG2.26 [406591]
+                if "NpCs From Store Code" = '' then
+                  exit;
+
+                NpCsStoreWorkflowRelation.SetRange("Store Code");
+                if NpCsStoreWorkflowRelation.FindFirst then
+                  Validate("NpCs Workflow Code",NpCsStoreWorkflowRelation."Workflow Code");
+                //+MAG2.26 [406591]
+            end;
+        }
     }
 
     keys
@@ -595,6 +718,20 @@ table 6151401 "Magento Setup"
         //-MAG2.00
         exit(LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(GetApiUsername() + "Api Password" + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2','MD5')));
         //+MAG2.00
+    end;
+
+    local procedure GetStockPublisherCodeunitId(): Integer
+    begin
+        //-MAG2.26 [402488]
+        exit(CODEUNIT::"Magento Item Mgt.");
+        //+MAG2.26 [402488]
+    end;
+
+    local procedure GetStockPublisherFunctionName(): Text
+    begin
+        //-MAG2.26 [402488]
+        exit('OnCalcStockQty');
+        //+MAG2.26 [402488]
     end;
 }
 

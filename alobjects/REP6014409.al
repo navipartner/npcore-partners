@@ -13,6 +13,9 @@ report 6014409 "Sales Ticket Statistics"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TSA /20180327 CASE 301544 Dereferenced cu 6014452 from OnInitReport and OnPreReport
     // NPR5.42/BHR /20180516 CASE 315147 Set datefilter to curent workdate
+    // NPR5.55/YAHA/20191129 CASE 376369 Addnig a new section called Adjust Cost
+    // NPR5.55/ZESO/20200505 CASE 398134 Calculate Click and Collect Sales + Remove from Debit Sale Value
+    // NPR5.55/ANPA/20200505 CASE 402923 Removed ':' from ProfitExcVat_Caption
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Ticket Statistics.rdlc';
 
@@ -43,7 +46,7 @@ report 6014409 "Sales Ticket Statistics"
             column(Turnover1_PaymentTypePeriod;PaymentTypePeriod."Normal Sale in Audit Roll")
             {
             }
-            column(DebitSales1_PaymentTypePeriod;PaymentTypePeriod."Debit Sale in Audit Roll")
+            column(DebitSales1_PaymentTypePeriod;PaymentTypePeriod."Debit Sale in Audit Roll" -varDebitSales)
             {
             }
             column(SalesQty2_PaymentTypePeriod;PaymentLastYr."No. of Sales in Audit Roll"+PaymentLastYr."No. of Deb. Sales in Aud. Roll")
@@ -52,13 +55,13 @@ report 6014409 "Sales Ticket Statistics"
             column(Turnover2_PaymentTypePeriod;PaymentLastYr."Normal Sale in Audit Roll")
             {
             }
-            column(DebitSales2_PaymentTypePeriod;PaymentLastYr."Debit Sale in Audit Roll")
+            column(DebitSales2_PaymentTypePeriod;PaymentLastYr."Debit Sale in Audit Roll" - varDebitSalesLastYr)
             {
             }
-            column(SalesTotal1_PaymentTypePeriod;PaymentTypePeriod."Normal Sale in Audit Roll"+PaymentTypePeriod."Debit Sale in Audit Roll")
+            column(SalesTotal1_PaymentTypePeriod;PaymentTypePeriod."Normal Sale in Audit Roll"+(PaymentTypePeriod."Debit Sale in Audit Roll" -varDebitSales))
             {
             }
-            column(SalesTotal2_PaymentTypePeriod;PaymentLastYr."Normal Sale in Audit Roll"+PaymentLastYr."Debit Sale in Audit Roll")
+            column(SalesTotal2_PaymentTypePeriod;PaymentLastYr."Normal Sale in Audit Roll"+ (PaymentLastYr."Debit Sale in Audit Roll" - varDebitSalesLastYr))
             {
             }
             column(ItemCost1_PaymentTypePeriod;PaymentTypePeriod."Cost Amount in Audit Roll"+PaymentTypePeriod."Debit Cost Amount Audit Roll")
@@ -68,6 +71,12 @@ report 6014409 "Sales Ticket Statistics"
             {
             }
             column(SalesTotalExcVAT_PaymentTypePeriod;("Norm. Sales in Audit Excl. VAT"+"Debit Sales in Audit Excl. VAT"))
+            {
+            }
+            column(ClickandCollect1_;varDebitSales)
+            {
+            }
+            column(ClickandCollect2_;varDebitSalesLastYr)
             {
             }
             column(SalesExVatLYr;SalesExVatLYr)
@@ -85,10 +94,10 @@ report 6014409 "Sales Ticket Statistics"
             column(Profit_LCY2Pct_PaymentTypePeriod;Profit_LCY2_Pct)
             {
             }
-            column(Turnover_avg1_PaymentTypePeriod;Divider(("Normal Sale in Audit Roll"+"Debit Sale in Audit Roll"),("No. of Sales in Audit Roll"+"No. of Deb. Sales in Aud. Roll")))
+            column(Turnover_avg1_PaymentTypePeriod;Divider(("Normal Sale in Audit Roll"+"Debit Sale in Audit Roll" -varDebitSales),("No. of Sales in Audit Roll"+"No. of Deb. Sales in Aud. Roll")))
             {
             }
-            column(Turnover_avg2_PaymentTypePeriod;Divider((PaymentLastYr."Normal Sale in Audit Roll"+PaymentLastYr."Debit Sale in Audit Roll"),(PaymentLastYr."No. of Sales in Audit Roll"+PaymentLastYr."No. of Deb. Sales in Aud. Roll")))
+            column(Turnover_avg2_PaymentTypePeriod;Divider((PaymentLastYr."Normal Sale in Audit Roll"+PaymentLastYr."Debit Sale in Audit Roll"- varDebitSalesLastYr),(PaymentLastYr."No. of Sales in Audit Roll"+PaymentLastYr."No. of Deb. Sales in Aud. Roll")))
             {
             }
             column(ItemQty1_PaymentTypePeriod;"No. of Items in Audit Roll" + "No. of Items in Audit Debit")
@@ -115,6 +124,33 @@ report 6014409 "Sales Ticket Statistics"
             column(ItemQtyLine2_PaymentTypePeriod;Divider(NoOfItemsInAuditRollLastYr,(PaymentLastYr."No. of Sales in Audit Roll"+PaymentLastYr."No. of Deb. Sales in Aud. Roll")))
             {
             }
+            column(ItemCost1_Adj;SumOfILELineCurrentYear * -1)
+            {
+            }
+            column(ItemCost2_Adj;SumOfILELinePreviousYear * -1)
+            {
+            }
+            column(SalesTotalExcVAT_PaymentTypePeriod_Adj;("Norm. Sales in Audit Excl. VAT"+"Debit Sales in Audit Excl. VAT"))
+            {
+            }
+            column(SalesExVatLYr_Adj;SalesExVatLYr)
+            {
+            }
+            column(Profit_LCY1_PaymentTypePeriod_Adj;"Pct."(("Norm. Sales in Audit Excl. VAT"+"Debit Sales in Audit Excl. VAT")-(SumOfILELineCurrentYear * -1),("Norm. Sales in Audit Excl. VAT"+"Debit Sales in Audit Excl. VAT")))
+            {
+            }
+            column(Profit_LCYAmt1_PaymentTypePeriod_Adj;("Norm. Sales in Audit Excl. VAT"+"Debit Sales in Audit Excl. VAT")-(SumOfILELineCurrentYear * -1))
+            {
+            }
+            column(Profit_LCY2_PaymentTypePeriod_Adj;Profit_LCY3_Amt)
+            {
+            }
+            column(Profit_LCY2Pct_PaymentTypePeriod_Adj;Profit_LCY3_Pct)
+            {
+            }
+            column(ShowAdj;ShowAdj)
+            {
+            }
             dataitem(PaymentLastYr;"Payment Type POS")
             {
                 CalcFields = "Normal Sale in Audit Roll","Debit Sale in Audit Roll","No. of Sales in Audit Roll","Cost Amount in Audit Roll","No. of Items in Audit Roll","No. of Sale Lines in Aud. Roll","No. of Items in Audit Debit","No. of Item Lines in Aud. Deb.","No. of Deb. Sales in Aud. Roll","Norm. Sales in Audit Excl. VAT","Debit Sales in Audit Excl. VAT","Debit Cost Amount Audit Roll";
@@ -133,9 +169,20 @@ report 6014409 "Sales Ticket Statistics"
                     //,(PaymentLastYr."Norm sales in audit ex VAT"+PaymentLastYr."Debit sales in audit ex VAT"));
 
                     Profit_LCY2_Amt := (PaymentLastYr."Norm. Sales in Audit Excl. VAT"+PaymentLastYr."Debit Sales in Audit Excl. VAT")-(PaymentLastYr."Cost Amount in Audit Roll"+PaymentLastYr."Debit Cost Amount Audit Roll");
+                    //-NPR5.55 [376369]
+                    Profit_LCY3_Amt := (PaymentLastYr."Norm. Sales in Audit Excl. VAT"+PaymentLastYr."Debit Sales in Audit Excl. VAT")-(PaymentLastYr."Cost Amount in Audit Roll"+PaymentLastYr."Debit Cost Amount Audit Roll");
+                    //+NPR5.55 [376369]
+
 
                     Profit_LCY2_Pct := "Pct."((PaymentLastYr."Norm. Sales in Audit Excl. VAT"+PaymentLastYr."Debit Sales in Audit Excl. VAT")-(PaymentLastYr."Cost Amount in Audit Roll"+PaymentLastYr."Debit Cost Amount Audit Roll")
                     ,(PaymentLastYr."Norm. Sales in Audit Excl. VAT"+PaymentLastYr."Debit Sales in Audit Excl. VAT"));
+
+                    //-NPR5.55 [376369]
+                    Profit_LCY3_Amt := "Pct."((PaymentLastYr."Norm. Sales in Audit Excl. VAT"+PaymentLastYr."Debit Sales in Audit Excl. VAT")-(PaymentLastYr."Cost Amount in Audit Roll"+PaymentLastYr."Debit Cost Amount Audit Roll")
+                    ,(PaymentLastYr."Norm. Sales in Audit Excl. VAT"+PaymentLastYr."Debit Sales in Audit Excl. VAT"));
+                    //+NPR5.55 [376369]
+
+
 
                     SalesExVatLYr := (PaymentLastYr."Norm. Sales in Audit Excl. VAT"+PaymentLastYr."Debit Sales in Audit Excl. VAT");
                     //+NPK1.01
@@ -152,6 +199,30 @@ report 6014409 "Sales Ticket Statistics"
                     AuditRollLastYr.SetRange(Type,AuditRoll.Type::Item);
                     NoOfItemsInAuditRollLastYr := AuditRollLastYr.Count;
                     //+NPR5.30
+                    //-NPR5.55 [398134]
+                    varDebitSalesLastYr := 0;
+
+                    DebitAmtQuery.SetRange(Sale_Date_Filter,StartDate, EndDate);
+                    DebitAmtQuery.SetFilter(Register_No_Filter,GetFilter("Register Filter"));
+                    DebitAmtQuery.SetRange(Sale_Type_Filter,2);
+                    DebitAmtQuery.SetRange(Type_Filter,1);
+                    DebitAmtQuery.SetFilter(Gift_voucher_ref_Filter,'');
+                    DebitAmtQuery.SetFilter(Salesperson_Code_Filter,GetFilter("Salesperson Filter"));
+                    DebitAmtQuery.SetFilter(Closing_Time_Filter,GetFilter("End Time Filter"));
+                    DebitAmtQuery.SetFilter(Shortcut_Dim_1_Code_Filter,GetFilter("Global Dimension Code 1 Filter"));
+                    DebitAmtQuery.SetFilter(Shortcut_Dim_2_Code_Filter,GetFilter("Global Dimension Code 2 Filter"));
+                    DebitAmtQuery.SetFilter(Sales_Ticket_No_Filter, GetFilter("Receipt Filter"));
+
+
+                    DebitAmtQuery.Open;
+                    while DebitAmtQuery.Read do begin
+                      ArchDocument.Reset;
+                      ArchDocument.SetRange("Delivery Document Type",ArchDocument."Delivery Document Type"::"POS Entry");
+                      ArchDocument.SetRange("Delivery Document No.",DebitAmtQuery.Sales_Ticket_No);
+                      if ArchDocument.FindFirst then
+                       varDebitSalesLastYr += DebitAmtQuery.Amount_Including_VAT;
+                    end;
+                    //-NPR5.55 [398134]
                 end;
 
                 trigger OnPreDataItem()
@@ -193,6 +264,32 @@ report 6014409 "Sales Ticket Statistics"
                 AuditRoll.SetRange(Type,AuditRoll.Type::Item);
                 NoOfItemsInAuditRoll := AuditRoll.Count;
                 //+NPR5.30
+                //-NPR5.55 [398134]
+                varDebitSales := 0;
+                if PaymentTypePeriod.GetFilter("Date Filter")='' then
+                  DebitAmtQuery.SetFilter(Sale_Date_Filter,'%1' ,WorkDate)
+                else
+                  DebitAmtQuery.SetFilter(Sale_Date_Filter,GetFilter("Date Filter"));
+                  DebitAmtQuery.SetFilter(Register_No_Filter,GetFilter("Register Filter"));
+                  DebitAmtQuery.SetRange(Sale_Type_Filter,2);
+                  DebitAmtQuery.SetRange(Type_Filter,1);
+                  DebitAmtQuery.SetFilter(Gift_voucher_ref_Filter,'');
+                  DebitAmtQuery.SetFilter(Salesperson_Code_Filter,GetFilter("Salesperson Filter"));
+                  DebitAmtQuery.SetFilter(Closing_Time_Filter,GetFilter("End Time Filter"));
+                  DebitAmtQuery.SetFilter(Shortcut_Dim_1_Code_Filter,GetFilter("Global Dimension Code 1 Filter"));
+                  DebitAmtQuery.SetFilter(Shortcut_Dim_2_Code_Filter,GetFilter("Global Dimension Code 2 Filter"));
+                  DebitAmtQuery.SetFilter(Sales_Ticket_No_Filter, GetFilter("Receipt Filter"));
+
+
+                  DebitAmtQuery.Open;
+                  while DebitAmtQuery.Read do begin
+                   ArchDocument.Reset;
+                   ArchDocument.SetRange("Delivery Document Type",ArchDocument."Delivery Document Type"::"POS Entry");
+                   ArchDocument.SetRange("Delivery Document No.",DebitAmtQuery.Sales_Ticket_No);
+                   if ArchDocument.FindFirst then
+                     varDebitSales += DebitAmtQuery.Amount_Including_VAT;
+                  end;
+                //-NPR5.55 [398134]
             end;
 
             trigger OnPreDataItem()
@@ -202,6 +299,22 @@ report 6014409 "Sales Ticket Statistics"
                     //ERROR(Trans0001);
                     PaymentTypePeriod.SetFilter("Date Filter",'%1' ,WorkDate);
                   //+NPR5.42 [315147]
+
+                //-NPR5.55 [376369]
+                StartDateAdj := (PaymentTypePeriod.GetRangeMin("Date Filter"));
+                EndDate := ( PaymentTypePeriod.GetRangeMax("Date Filter"));
+
+                ILEntry.SetFilter("Posting Date",'%1..%2',PaymentTypePeriod.GetRangeMin("Date Filter"),PaymentTypePeriod.GetRangeMax("Date Filter"));
+                ILEntry.SetRange("Entry Type",ILEntry."Entry Type"::Sale);
+                ILEntry.SetRange("Document Type",ILEntry."Document Type"::" ");
+
+                if ILEntry.FindSet then begin
+                  repeat
+                    ILEntry.CalcFields("Cost Amount (Actual)");
+                    SumOfILELineCurrentYear += ILEntry."Cost Amount (Actual)";
+                  until ILEntry.Next = 0;
+                end;
+                //+NPR5.55 [376369]
             end;
         }
         dataitem("Salesperson/Purchaser";"Salesperson/Purchaser")
@@ -488,6 +601,9 @@ report 6014409 "Sales Ticket Statistics"
                     {
                         Caption = 'Compare Nearest Date';
                     }
+                    field("Show Adjusted Cost";ShowAdj)
+                    {
+                    }
                 }
             }
         }
@@ -533,8 +649,21 @@ report 6014409 "Sales Ticket Statistics"
         Betalt_med_Dankort = 'Payment Type:';
         Betalt_med_Teleterminal = 'Payment Type:';
         Manuelle_kort_ = 'Payment Type:';
-        ProfitExcVat_Caption = 'Profit Excl. VAT:';
+        ProfitExcVat_Caption = 'Profit Excl. VAT';
+        AdjustedCost_Caption = 'Adjusted Cost Details:';
+        AdjSalesTotalExcVAT_Caption = 'Adj Sales Excl. VAT';
+        AdjItemCostTotal = 'Adj Item Cost Total';
+        AdjProfitLCY_Total = 'Adj Profit (LCY)';
+        AdjProfitLCY_Pct = 'Adj Profit Pct';
+        ClickCollectOrders = 'Click & Collect Orders';
     }
+
+    trigger OnInitReport()
+    begin
+        //-NPR5.55 [376369]
+        ShowAdj := false;
+        //+NPR5.55 [376369]
+    end;
 
     trigger OnPreReport()
     begin
@@ -571,7 +700,6 @@ report 6014409 "Sales Ticket Statistics"
         Week: Integer;
         Year: Integer;
         AverageAmt: Decimal;
-        Trans0001: Label 'Please specify date range!';
         Eksp1: Decimal;
         Debit1: Decimal;
         Sale1: Decimal;
@@ -586,6 +714,20 @@ report 6014409 "Sales Ticket Statistics"
         AuditRoll: Record "Audit Roll";
         NoOfItemsInAuditRollLastYr: Decimal;
         AuditRollLastYr: Record "Audit Roll";
+        ILEntry: Record "Item Ledger Entry";
+        SumOfILECost: Decimal;
+        SumOfILELineCurrentYear: Decimal;
+        SumOfILELinePreviousYear: Integer;
+        Profit_LCY3_Amt: Decimal;
+        Profit_LCY3_Pct: Decimal;
+        ShowAdj: Boolean;
+        StartDateAdj: Date;
+        EndDateAdj: Date;
+        DebitAmtQuery: Query ClickNCollectSales_SalesStats;
+        varDebitSales: Decimal;
+        ArchDocument: Record "NpCs Arch. Document";
+        varDebitSalesLastYr: Decimal;
+        Trans0001: Label 'Please specify date range!';
 
     local procedure "Pct."(Tal1: Decimal;Tal2: Decimal): Decimal
     begin

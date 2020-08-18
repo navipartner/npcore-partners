@@ -15,6 +15,10 @@ codeunit 6150616 "POS Post Item Entries"
     // NPR5.52/TSA /20190925 CASE 369231 Added handling of Retail Serial No.
     // NPR5.52/TSA /20191014 CASE 372920 Replenishment Method Assembly
     // NPR5.53/TSA /20191212 CASE 381559 Fixed issue with assembly order rename
+    // NPR5.55/ALST/20200512 CASE 389261 modal pages are run on quantity validation, transaction needs to end before that
+    // NPR5.55/ALPO/20200528 CASE 407063 POS Store Location Code were not assigned to item journal line during item entry posting, if there was no location code coming from POS Sales Line
+    // NPR5.55/ALPO/20200601 CASE 407305 Try to use cash register's location code before using one from POS Store
+    // NPR5.55/ALPO/20200708 CASE 412312 Use POS sales line reason code, when posting item entries
 
     TableNo = "POS Entry";
 
@@ -184,19 +188,34 @@ codeunit 6150616 "POS Post Item Entries"
           ItemJnlLine."Source Posting Group" := POSEntry."Customer Posting Group";
           ItemJnlLine."Salespers./Purch. Code" := POSEntry."Salesperson Code";
           ItemJnlLine."Country/Region Code" := POSEntry."Country/Region Code";
-          ItemJnlLine."Reason Code" := POSEntry."Reason Code";
+          //-NPR5.55 [412312]
+          if "Reason Code" <> '' then
+            ItemJnlLine."Reason Code" := "Reason Code"
+          else
+          //+NPR5.55 [412312]
+            ItemJnlLine."Reason Code" := POSEntry."Reason Code";
           ItemJnlLine."Item No." := "No.";
           ItemJnlLine.Description := CopyStr(Description,1,MaxStrLen(ItemJnlLine.Description));
           ItemJnlLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
           ItemJnlLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
           ItemJnlLine."Dimension Set ID" := "Dimension Set ID";
+          //-NPR5.55 [407305]
+          if "Location Code" = '' then
+            "Location Code" := GetPOSUnitLocation(POSEntry."POS Unit No.");
+          //+NPR5.55 [407305]
           if "Location Code" = '' then begin
             POSStore.Get(POSEntry."POS Store Code");
-            POSStore."Location Code" := POSStore."Location Code";
-          end else begin
-            ItemJnlLine."Location Code" := "Location Code";
-            ItemJnlLine."Bin Code" := "Bin Code";
+          //-NPR5.55 [407063]-revoked
+          //  POSStore."Location Code" := POSStore."Location Code";
+          //END ELSE BEGIN
+          //+NPR5.55 [407063]-revoked
+          //-NPR5.55 [407063]
+            "Location Code" := POSStore."Location Code";
           end;
+          //+NPR5.55 [407063]
+          ItemJnlLine."Location Code" := "Location Code";
+          ItemJnlLine."Bin Code" := "Bin Code";
+          //END;  //NPR5.55 [407063]-revoked
           ItemJnlLine."Variant Code" := "Variant Code";
           ItemJnlLine."Inventory Posting Group" := "Posting Group";
           ItemJnlLine."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
@@ -419,6 +438,9 @@ codeunit 6150616 "POS Post Item Entries"
           AssemblyHeader.Init;
           AssemblyHeader.Validate ("Document Type", AssemblyHeader."Document Type"::Order);
           AssemblyHeader.Insert (true);
+          //-NPR5.55 [389261]
+          Commit;
+          //-NPR5.55 [389261]
 
           AssemblyHeader.Validate ("Posting Date", POSEntry."Posting Date");
           AssemblyHeader.Validate ("Item No.", POSSalesLine."No.");
@@ -710,6 +732,16 @@ codeunit 6150616 "POS Post Item Entries"
 
         exit (true);
         //+NPR5.52 [372920]
+    end;
+
+    local procedure GetPOSUnitLocation(POSUnitCode: Code[10]): Code[10]
+    var
+        CashRegister: Record Register;
+    begin
+        //-NPR5.55 [407305]
+        if CashRegister.Get(POSUnitCode) then
+          exit(CashRegister."Location Code");
+        //+NPR5.55 [407305]
     end;
 
     local procedure "---Events"()

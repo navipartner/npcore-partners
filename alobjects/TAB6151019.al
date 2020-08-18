@@ -5,6 +5,7 @@ table 6151019 "NpRv Arch. Voucher Entry"
     // NPR5.49/MHA /20190228  CASE 342811 Added partner fields
     // NPR5.50/MHA /20190426  CASE 353079 Added Option "Top Up" to field 10 "Entry Type"
     // NPR5.50/MMV /20190528  CASE 356712 Added field 85
+    // NPR5.55/MHA /20200512  CASE 404116 Change Option [0] for field 53 "Document Type" from "Audit Roll" to "POS Entry"
 
     Caption = 'Archived Retail Voucher Entry';
     DrillDownPageID = "NpRv Arch. Voucher Entries";
@@ -64,9 +65,9 @@ table 6151019 "NpRv Arch. Voucher Entry"
         field(53;"Document Type";Option)
         {
             Caption = 'Document Type';
-            Description = 'NPR5.48';
-            OptionCaption = 'Audit Roll,Invoice';
-            OptionMembers = "Audit Roll",Invoice;
+            Description = 'NPR5.48,NPR5.55';
+            OptionCaption = 'POS Entry,Invoice';
+            OptionMembers = "POS Entry",Invoice;
         }
         field(55;"Document No.";Code[20])
         {

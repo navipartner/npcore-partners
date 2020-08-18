@@ -247,7 +247,7 @@ report 6014417 "Inventory per Date"
         RecentSale_Caption = 'Recent Sale';
         Total_Caption = 'Total';
         PerDate_Caption = 'Per Date';
-        Footer_Caption = '�NAVIPARTNER K�benhavn 2002';
+        Footer_Caption = 'ˆNAVIPARTNER K¢benhavn 2002';
         LastPurchaseDate_Caption = 'Last Purchase Date';
         LastCostPrice_Caption = 'Last Cost Price';
         SalesPrice_Caption = 'Sales Price';

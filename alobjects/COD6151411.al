@@ -65,12 +65,12 @@ codeunit 6151411 "Magento Selection Filter Mgt."
         end;
     end;
 
-    procedure GetSelectionFilterForItemGroup(var MagentoItemGroup: Record "Magento Item Group"): Text
+    procedure GetSelectionFilterForItemGroup(var MagentoItemGroup: Record "Magento Category"): Text
     var
         RecRef: RecordRef;
     begin
         RecRef.GetTable(MagentoItemGroup);
-        exit(GetSelectionFilter(RecRef,MagentoItemGroup.FieldNo("No.")));
+        exit(GetSelectionFilter(RecRef,MagentoItemGroup.FieldNo(Id)));
     end;
 
     procedure GetSelectionFilterForBrand(var MagentoBrand: Record "Magento Brand"): Text
@@ -78,7 +78,7 @@ codeunit 6151411 "Magento Selection Filter Mgt."
         RecRef: RecordRef;
     begin
         RecRef.GetTable(MagentoBrand);
-        exit(GetSelectionFilter(RecRef,MagentoBrand.FieldNo(Code)));
+        exit(GetSelectionFilter(RecRef,MagentoBrand.FieldNo(Id)));
     end;
 }
 

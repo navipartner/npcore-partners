@@ -497,7 +497,7 @@ report 6014612 "Inventory per Variant at date"
         Item1: Record Item;
         Txt001: Label 'Date is required';
         Txt003: Label 'Total';
-        Txt004: Label '�NAVIPARTNER Copenhagen 2002';
+        Txt004: Label 'ˆNAVIPARTNER Copenhagen 2002';
         Report_Caption: Label 'Item stock acc. date';
         Date_Caption: Label 'Date';
         No_Caption: Label 'Number';

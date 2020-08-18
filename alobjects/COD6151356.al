@@ -4,6 +4,7 @@ codeunit 6151356 "CS Post - Enqueue"
     // NPR5.53/CLVA  /20191128  CASE 379973 Added "Earliest Start Date/Time" on RFID Store Counting
     // NPR5.54/CLVA  /20200217  CASE 391080 Removed timeout
     // NPR5.54/CLVA  /20200225  CASE Changed posting timing.
+    // NPR5.55/CLVA  /20200609  CASE 407858 Changed posting timing.
 
     TableNo = "CS Posting Buffer";
 
@@ -49,6 +50,11 @@ codeunit 6151356 "CS Post - Enqueue"
                 //+NPR5.54 [392901]
             end;
             //+NPR5.53 [379973]
+          //-NPR5.55 [407858]
+          if "Job Type" = "Job Type"::"Transfer Order" then begin
+            JobQueueEntry."Earliest Start Date/Time" := CreateDateTime(Today,210000T);
+          end;
+          //+NPR5.55 [407858]
             JobQueueEntry.Insert(true);
             CODEUNIT.Run(CODEUNIT::"Job Queue - Enqueue", JobQueueEntry);
             if GuiAllowed then

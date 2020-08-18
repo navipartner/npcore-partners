@@ -16,6 +16,7 @@ table 6014411 "Mixed Discount"
     // NPR5.40/MMV /20180213  CASE 294655 Performance optimization.
     // NPR5.40/MHA /20180320  CASE 306304 Added field 40 "Total Amount Excl. VAT"
     // NPR5.45/MMV /20180904  CASE 327277 Update mix part parameters correctly.
+    // NPR5.55/ALPO/20200714  CASE 412946 Support for multiple discount amount levels (option added to field 17 Discount Type: Multiple Discount Levels)
 
     Caption = 'Mixed Discount';
     LookupPageID = "Mixed Discount List";
@@ -140,13 +141,29 @@ table 6014411 "Mixed Discount"
         {
             Caption = 'Lot';
             Description = 'NPR5.31';
+
+            trigger OnValidate()
+            begin
+                //-NPR5.55 [412946]
+                if Lot and ("Discount Type" = "Discount Type"::"Multiple Discount Levels") then
+                  FieldError("Discount Type");
+                //+NPR5.55 [412946]
+            end;
         }
         field(17;"Discount Type";Option)
         {
             Caption = 'Discount Type';
-            Description = 'NPR5.31,NPR5.31,NPR5.31';
-            OptionCaption = 'Total Amount per Min. Qty.,Total Discount %,Total Discount Amt. per Min. Qty.,Priority Discount per Min. Qty';
-            OptionMembers = "Total Amount per Min. Qty.","Total Discount %","Total Discount Amt. per Min. Qty.","Priority Discount per Min. Qty";
+            Description = 'NPR5.31,NPR5.55';
+            OptionCaption = 'Total Amount per Min. Qty.,Total Discount %,Total Discount Amt. per Min. Qty.,Priority Discount per Min. Qty,Multiple Discount Levels';
+            OptionMembers = "Total Amount per Min. Qty.","Total Discount %","Total Discount Amt. per Min. Qty.","Priority Discount per Min. Qty","Multiple Discount Levels";
+
+            trigger OnValidate()
+            begin
+                //-NPR5.55 [412946]
+                if "Discount Type" = "Discount Type"::"Multiple Discount Levels" then
+                  Lot := false;
+                //+NPR5.55 [412946]
+            end;
         }
         field(18;"Total Discount %";Decimal)
         {

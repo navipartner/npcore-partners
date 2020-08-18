@@ -2,6 +2,7 @@ page 6014566 "Retail Logo Setup"
 {
     // NPR4.21/MMV/20160223 CASE 223223 Created page
     // NPR5.46/BHR /20180906 CASE 327525 Export Logo
+    // NPR5.55/MITH/20200619  CASE 404276 Added visual indicator of whether or not a logo is compatible with the Boca printer (it will be compatible after reupload)
 
     Caption = 'Retail Logo Setup';
     InsertAllowed = false;
@@ -29,6 +30,11 @@ page 6014566 "Retail Logo Setup"
                 }
                 field("End Date";"End Date")
                 {
+                }
+                field("OneBitLogo.HASVALUE";OneBitLogo.HasValue)
+                {
+                    Caption = 'Boca Compatible';
+                    Editable = false;
                 }
             }
         }

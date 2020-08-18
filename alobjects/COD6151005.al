@@ -14,6 +14,9 @@ codeunit 6151005 "POS Action - Load POS Quote"
     // NPR5.53/ALPO/20200129  CASE 388112 The sub-total on the POS Sales screen was not updated after retrieving POS Quote onto sale screen
     // NPR5.54/ALPO/20200203  CASE 364658 Part of the code moved from OnActionLoadFromQuote() to a separate global function LoadFromQuote() to be able to call it from outside of the object
     // NPR5.54/ALST/20200305  CASE 385040 no reason to get location or department code (shortcut dim 1) from POS Quote for a POS Sale
+    // NPR5.55/ALPO/20200615  CASE 399170 Added publisher OnBeforeLoadFromPOSQuote(); POS Sale header was not refreshed properly
+    // NPR5.55/ALPO/20200720  CASE 391678 Log parked sale retrieval to POS Entry
+    // NPR5.55/ALPO/20200722  CASE 392042 Removed legacy functionality with load from hardcoded fields
 
 
     trigger OnRun()
@@ -23,7 +26,8 @@ codeunit 6151005 "POS Action - Load POS Quote"
     var
         Text000: Label 'Load POS Sale from POS Quote';
         Text001: Label 'POS Quote';
-        Text002: Label 'Save current Sale as POS Quote?';
+        CannotLoad: Label 'The POS Quote is missing essential data and cannot be loaded.';
+        ObsoleteFunctionCalledMsg: Label 'Obsolete function called: %1.\This is a programming bug, not a user error. Please contact system vendor.';
 
     local procedure ActionCode(): Text
     begin
@@ -175,6 +179,7 @@ codeunit 6151005 "POS Action - Load POS Quote"
         SaleLinePOS: Record "Sale Line POS";
         Register: Record Register;
         SalePOS2: Record "Sale POS";
+        POSCreateEntry: Codeunit "POS Create Entry";
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
         QuoteEntryNo: BigInteger;
@@ -219,6 +224,7 @@ codeunit 6151005 "POS Action - Load POS Quote"
           //+NPR5.54 [385040]
         
           POSSale.Refresh(SalePOS);
+          POSSale.SetModified();  //NPR5.55 [399170]
         
           //-NPR5.50
           POSSession.GetSaleLine(POSSaleLine);
@@ -235,34 +241,43 @@ codeunit 6151005 "POS Action - Load POS Quote"
             POSSaleLine.SetLast();
           //+NPR5.53 [388112]
         
+          //-NPR5.55 [391678]
+          POSCreateEntry.InsertParkedSaleRetrievalEntry(
+            SalePOS."Register No.", SalePOS."Salesperson Code", POSQuoteEntry."Sales Ticket No.", SalePOS."Sales Ticket No.");
+          //+NPR5.55 [391678]
           POSSession.RequestRefreshData();
           exit;
         end;
         //+NPR5.48 [338208]
         
+        Error(CannotLoad);  //NPR5.55 [392042]
+        //-NPR5.55 [392042]-revoked
+        /*
         //-NPR5.48 [336498]
         UpdatePOSSale(POSQuoteEntry,SalePOS);
         //+NPR5.48 [336498]
         POSSession.GetSaleLine(POSSaleLine);
         
-        POSQuoteLine.SetRange("Quote Entry No.",POSQuoteEntry."Entry No.");
-        if POSQuoteLine.FindSet then
-          repeat
+        POSQuoteLine.SETRANGE("Quote Entry No.",POSQuoteEntry."Entry No.");
+        IF POSQuoteLine.FINDSET THEN
+          REPEAT
             //-NPR5.48 [336498]
             //InsertPOSSaleLinePOS(POSQuoteLine,POSSaleLine);
             InsertPOSSaleLine(POSQuoteLine,POSSaleLine);
             //+NPR5.48 [336498]
-          until POSQuoteLine.Next = 0;
+          UNTIL POSQuoteLine.NEXT = 0;
         
         //-NPR5.48 [338537]
         OnAfterLoadFromQuote(POSQuoteEntry,SalePOS);
         //+NPR5.48 [338537]
         
-        POSQuoteEntry.Delete(true);
+        POSQuoteEntry.DELETE(TRUE);
         //-NPR5.48 [336498]
         POSSale.Refresh(SalePOS);
         //+NPR5.48 [336498]
         POSSession.RequestRefreshData();
+        */
+        //+NPR5.55 [392042]-revoked
 
     end;
 
@@ -278,57 +293,76 @@ codeunit 6151005 "POS Action - Load POS Quote"
         //+NPR5.48 [338208]
     end;
 
-    local procedure UpdatePOSSale(POSQuoteEntry: Record "POS Quote Entry";var SalePOS: Record "Sale POS")
+    local procedure "[Obsolete]UpdatePOSSale"(POSQuoteEntry: Record "POS Quote Entry";var SalePOS: Record "Sale POS")
     var
         PrevRec: Text;
     begin
+        Error(ObsoleteFunctionCalledMsg, '6151005.[Obsolete]UpdatePOSSale');  //NPR5.55 [392042]
+        //-NPR5.55 [392042]-revoked
+        /*
         //-NPR5.48 [336498]
-        PrevRec := Format(SalePOS);
-
-        if POSQuoteEntry."Customer No." <> '' then begin
+        PrevRec := FORMAT(SalePOS);
+        
+        IF POSQuoteEntry."Customer No." <> '' THEN BEGIN
           SalePOS."Customer Type" := POSQuoteEntry."Customer Type";
-          SalePOS.Validate("Customer No.",POSQuoteEntry."Customer No.");
+          SalePOS.VALIDATE("Customer No.",POSQuoteEntry."Customer No.");
           SalePOS."Contact No." := POSQuoteEntry.Attention;
           SalePOS.Reference := POSQuoteEntry.Reference;
-        end;
-
-        if POSQuoteEntry."Customer Price Group" <> '' then
-          SalePOS.Validate("Customer Price Group",POSQuoteEntry."Customer Price Group");
-        if POSQuoteEntry."Customer Disc. Group" <> '' then
-          SalePOS.Validate("Customer Disc. Group",POSQuoteEntry."Customer Disc. Group");
-
-        if PrevRec <> Format(SalePOS) then
-          SalePOS.Modify(true);
+        END;
+        
+        IF POSQuoteEntry."Customer Price Group" <> '' THEN
+          SalePOS.VALIDATE("Customer Price Group",POSQuoteEntry."Customer Price Group");
+        IF POSQuoteEntry."Customer Disc. Group" <> '' THEN
+          SalePOS.VALIDATE("Customer Disc. Group",POSQuoteEntry."Customer Disc. Group");
+        
+        IF PrevRec <> FORMAT(SalePOS) THEN
+          SalePOS.MODIFY(TRUE);
         //+NPR5.48 [336498]
+        */
+        //+NPR5.55 [392042]-revoked
+
     end;
 
-    local procedure InsertPOSSaleLine(POSQuoteLine: Record "POS Quote Line";POSSaleLine: Codeunit "POS Sale Line")
+    local procedure "[Obsolete]InsertPOSSaleLine"(POSQuoteLine: Record "POS Quote Line";POSSaleLine: Codeunit "POS Sale Line")
     var
         SaleLinePOS: Record "Sale Line POS";
     begin
+        Error(ObsoleteFunctionCalledMsg, '6151005.[Obsolete]InsertPOSSaleLine');  //NPR5.55 [392042]
+        //-NPR5.55 [392042]-revoked
+        /*
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-
-        SaleLinePOS.Validate(Type,POSQuoteLine.Type);
-        SaleLinePOS.Validate("No.",POSQuoteLine."No.");
-        SaleLinePOS.Validate("Variant Code",POSQuoteLine."Variant Code");
+        
+        SaleLinePOS.VALIDATE(Type,POSQuoteLine.Type);
+        SaleLinePOS.VALIDATE("No.",POSQuoteLine."No.");
+        SaleLinePOS.VALIDATE("Variant Code",POSQuoteLine."Variant Code");
         SaleLinePOS.Description := POSQuoteLine.Description;
-        SaleLinePOS.Validate("Unit of Measure Code",POSQuoteLine."Unit of Measure Code");
+        SaleLinePOS.VALIDATE("Unit of Measure Code",POSQuoteLine."Unit of Measure Code");
         //-NPR5.48 [336498]
-        SaleLinePOS.Validate("Customer Price Group",POSQuoteLine."Customer Price Group");
+        SaleLinePOS.VALIDATE("Customer Price Group",POSQuoteLine."Customer Price Group");
         //+NPR5.48 [336498]
-        SaleLinePOS.Validate(Quantity,POSQuoteLine.Quantity);
+        SaleLinePOS.VALIDATE(Quantity,POSQuoteLine.Quantity);
         SaleLinePOS."Price Includes VAT" := POSQuoteLine."Price Includes VAT";
-        SaleLinePOS.Validate("Currency Code",POSQuoteLine."Currency Code");
-        SaleLinePOS.Validate("Unit Price",POSQuoteLine."Unit Price");
-        SaleLinePOS.Validate(Amount,POSQuoteLine.Amount);
-        SaleLinePOS.Validate("Amount Including VAT",POSQuoteLine."Amount Including VAT");
+        SaleLinePOS.VALIDATE("Currency Code",POSQuoteLine."Currency Code");
+        SaleLinePOS.VALIDATE("Unit Price",POSQuoteLine."Unit Price");
+        SaleLinePOS.VALIDATE(Amount,POSQuoteLine.Amount);
+        SaleLinePOS.VALIDATE("Amount Including VAT",POSQuoteLine."Amount Including VAT");
         SaleLinePOS."Discount Type" := POSQuoteLine."Discount Type";
         SaleLinePOS."Discount %" := POSQuoteLine."Discount %";
         SaleLinePOS."Discount Amount" := POSQuoteLine."Discount Amount";
         SaleLinePOS."Discount Code" := POSQuoteLine."Discount Code";
         SaleLinePOS."Discount Authorised by" := POSQuoteLine."Discount Authorised by";
-        SaleLinePOS.Insert(true);
+        SaleLinePOS.INSERT(TRUE);
         POSSaleLine.InvokeOnAfterInsertSaleLineWorkflow(SaleLinePOS);
+        */
+        //+NPR5.55 [392042]-revoked
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLoadFromPOSQuote(var SalePOS: Record "Sale POS";var POSQuoteEntry: Record "POS Quote Entry";var XmlDoc: DotNet npNetXmlDocument)
+    begin
+        //-NPR5.55 [399170]
+        //+NPR5.55 [399170]
     end;
 
     [IntegrationEvent(false, false)]
@@ -364,6 +398,7 @@ codeunit 6151005 "POS Action - Load POS Quote"
         if not POSQuoteMgt.LoadPOSSaleData(POSQuoteEntry,XmlDoc) then
           exit(false);
 
+        OnBeforeLoadFromPOSQuote(SalePOS,POSQuoteEntry,XmlDoc);  //NPR5.55 [399170]
         DeletePOSSalesLines(SalePOS);
         UpdateDates(XmlDoc,SalePOS);
         POSQuoteMgt.Xml2POSSale(XmlDoc,SalePOS);

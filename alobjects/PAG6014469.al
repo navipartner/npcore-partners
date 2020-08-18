@@ -2,20 +2,20 @@ page 6014469 "Retail Document Header"
 {
     // 
     // *NPK1.0* 100203 BC NPK
-    // Menupunkt 'Dan k�bsordre' tilf�jet p� knappen 'Skr�dder'
-    // 7545: Menupunkt 'Dan k�bsordre' <OnPush>
-    //       Overf�rer varerne fra linierne til k�bsordre ved enten at danne ny eller tilf�je til eksisterende linie / ordre
+    // Menupunkt 'Dan k¢bsordre' tilf¢jet på knappen 'Skrædder'
+    // 7545: Menupunkt 'Dan k¢bsordre' <OnPush>
+    //       Overf¢rer varerne fra linierne til k¢bsordre ved enten at danne ny eller tilf¢je til eksisterende linie / ordre
     // 
     // //-NPK3.0m Ved Nikolai Pedersen
-    //   Tilf�jet fanebladet "levering"
-    //   Tilf�jet "max bel�b" under andet
+    //   Tilf¢jet fanebladet "levering"
+    //   Tilf¢jet "max bel¢b" under andet
     // 
-    // //-NPR3.0t d.25.05.05 v. Simon Sch�bel
-    //   overs�ttelser
+    // //-NPR3.0t d.25.05.05 v. Simon Sch¢bel
+    //   oversættelser
     // 
     // NPK, MIM 01-09-2007: Rettet form til at overholde GUI retningslinjer.
     // 
-    // NPK, MH 19-01-2009: Tilf�jet menuknap, der ligger under "Hj�lp"-knappen, til brug i forb. med genvejstaster.
+    // NPK, MH 19-01-2009: Tilf¢jet menuknap, der ligger under "Hjælp"-knappen, til brug i forb. med genvejstaster.
     // 
     // NPRx.xx/JDH/20150703 CASE 217876 Caption changed
     // 

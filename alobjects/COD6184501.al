@@ -7,6 +7,7 @@ codeunit 6184501 "CleanCash Communication"
     // NPR5.29/JHL/20161028 CASE 256695 Added paramet "CleanCashRegisterNo" to the function SendReceipt, and uses this variable to send to the blackbox
     // NPR5.29/JHL/20161111 CASE 256695 Make sure that all CleanCash is commited, when the transaction is done
     // NPR5.31/JHL/20170223 CASE 256695 Add communication to application through server side
+    // NPR5.55/MHA /20200611  CASE 409228 Replaced TryFunction property on SendReceipt() with AssertError to allow for database transactions
 
     TableNo = "Audit Roll";
 
@@ -16,30 +17,35 @@ codeunit 6184501 "CleanCash Communication"
         Err005: Label 'The length of Register No. must be a maximum of 16. ';
         Err006: Label 'Not allowed to print any more copies';
         ShowErrorMessage: Boolean;
+        Err007: Label 'The receipt was not send correct to the CleanCash Box:\\%1';
         Err008: Label 'Register %1 is not setup to run CleanCash service';
         Msg001: Label 'Sales Ticket No. %1, was not fount in the Audit Roll, the Sales Ticket could not be registered in CleanCash';
         Msg002: Label 'CleanCash returns EnumCommResult %1, with ExtendedError %2';
         Msg003: Label 'CleanCash returns EnumCommResult %1';
-        Msg004: Label 'CleanCash returns EnumCommStatus %1';
         RunMultipleLine: Boolean;
         RunLocal: Boolean;
 
     procedure RunSingelSalesTicket(SalesTicketNo: Code[20]; RegisterNo: Code[10])
     var
         CleanCashAuditRoll: Record "CleanCash Audit Roll";
+        LastErrorText: Text;
     begin
         CleanCashAuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
         CleanCashAuditRoll.SetRange("Register No.", RegisterNo);
 
-        if CleanCashAuditRoll.FindFirst then begin
-            //-NPR5.26
-            //SendReceipt(CleanCashAuditRoll."Register No.",CleanCashAuditRoll."Sales Ticket No.")
-            if not SendReceipt(CleanCashAuditRoll."Register No.", CleanCashAuditRoll."Sales Ticket No.") then
-                Message('Last Error %1', GetLastErrorText);
-            //MESSAGE(Err007);
-            //-NPR5.26
-        end else
-            Message(Msg004, SalesTicketNo);
+        //-NPR5.55 [409228]
+        if not CleanCashAuditRoll.FindFirst then
+          exit;
+
+        asserterror begin
+          SendReceipt(CleanCashAuditRoll."Register No.",CleanCashAuditRoll."Sales Ticket No.");
+          Commit;
+          Error('');
+        end;
+        LastErrorText := GetLastErrorText;
+        if LastErrorText <> '' then
+          Message(Err007,LastErrorText);
+        //+NPR5.55 [409228]
 
         //-NPR5.29
         Commit;
@@ -64,7 +70,13 @@ codeunit 6184501 "CleanCash Communication"
             repeat
                 if LastSalesTicketNo <> CleanCashAuditRoll."Sales Ticket No." then begin
                     LastSalesTicketNo := CleanCashAuditRoll."Sales Ticket No.";
-                    SendReceipt(CleanCashAuditRoll."Register No.", CleanCashAuditRoll."Sales Ticket No.");
+            //-NPR5.55 [409228]
+            asserterror begin
+              SendReceipt(CleanCashAuditRoll."Register No.",CleanCashAuditRoll."Sales Ticket No.");
+              Commit;
+              Error('');
+            end;
+            //+NPR5.55 [409228]
                 end;
             until CleanCashAuditRoll.Next = 0;
 
@@ -73,210 +85,173 @@ codeunit 6184501 "CleanCash Communication"
         //+NPR5.29
     end;
 
-    [TryFunction]
-    procedure SendReceipt(RegisterNo: Code[20]; SalesTicketNo: Code[20])
+    local procedure SendReceipt(RegisterNo: Code[20];SalesTicketNo: Code[20]): Boolean
     var
-        CleanCashBridge: Codeunit "CleanCash Server Bridge";
-        Register: Record Register;
         CleanCashSetup: Record "CleanCash Setup";
         CleanCashRegister: Record "CleanCash Register";
         CleanCashAuditRoll: Record "CleanCash Audit Roll";
         CleanCashAuditRoll2: Record "CleanCash Audit Roll";
-        ConnectionString: Text[100];
-        VATs: array[4] of Text[30];
+        VATs: array [4] of Text[30];
         ReceiptTime: Text[100];
         CleanCashRegisterNo: Text[16];
-        VatRates: array[4] of Decimal;
-        VatAmounts: array[4] of Decimal;
-        VatRatesNeg: array[4] of Decimal;
-        VatAmountsNeg: array[4] of Decimal;
-        ReceiptTotal: Decimal;
-        ReceiptTotalNeg: Decimal;
-        ReceiptTotalNegDummy: Decimal;
-        i: Integer;
         ReceiptCopy: Boolean;
         Start: Boolean;
         ReceiptType: DotNet npNetCommunicationReceipt;
         ReceiptNo: Code[10];
         SerialNo: Text[100];
         ControlCode: Text[100];
-        TicketType: Option Sale,Mix,Return;
-        Loops: Integer;
     begin
-        if Register.Get(RegisterNo) and CleanCashRegister.Get(RegisterNo) then
-            if not CleanCashRegister."CleanCash Integration" then
-                exit;
-
-        ReceiptCopy := false;
-
-        //-NPR5.29
-        if not CleanCashSetup.Get(RegisterNo) then begin
-            Message(Err008, RegisterNo);
-            exit;
-        end;
-
-
+        //-NPR5.55 [409228]
+        if not CleanCashRegister.Get(RegisterNo) then
+          exit;
+        if not CleanCashRegister."CleanCash Integration" then
+          exit;
+        
+        CleanCashAuditRoll.SetRange("Register No.",RegisterNo);
+        CleanCashAuditRoll.SetRange("Sales Ticket No.",SalesTicketNo);
+        if CleanCashAuditRoll.IsEmpty then
+          exit;
+        
+        if not CleanCashSetup.Get(RegisterNo) then
+          Error(Err008,RegisterNo);
         CleanCashRegisterNo := CleanCashSetup."CleanCash Register No.";
         if CleanCashRegisterNo = '' then
-            CleanCashRegisterNo := RegisterNo;
-        //+NPR5.29
-
-        //-NPR5.26
-        //IF STRLEN(RegisterNo) > 6 THEN BEGIN
-        //-NPR5.29
-        //IF STRLEN(RegisterNo) > 16 THEN BEGIN
-        if StrLen(CleanCashRegisterNo) > 16 then begin
-            //+NPR5.29
-            //+NPR5.26
-            Message(Err005);
-        end;
-
-        CleanCashAuditRoll.SetRange("Register No.", RegisterNo);
-        CleanCashAuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-
-        if CleanCashAuditRoll.Count = 0 then
+          CleanCashRegisterNo := RegisterNo;
+        
+        if StrLen(CleanCashRegisterNo) > 16  then
+          Error(Err005);
+        
+        ReceiptCopy:= false;
+        CleanCashAuditRoll.FindFirst;
+        if ((CleanCashAuditRoll."CleanCash Serial No." <> '') and (CleanCashAuditRoll."CleanCash Control Code" <> '')) and not RunMultipleLine then begin
+          ReceiptCopy := true;
+          if ((CleanCashAuditRoll."CleanCash Copy Serial No." <> '') and (CleanCashAuditRoll."CleanCash Copy Control Code" <> '')) then begin
+            Error(Err006);
             exit;
-
-        if CleanCashAuditRoll.FindFirst then begin
-            if CleanCashAuditRoll.FindFirst then
-                if ((CleanCashAuditRoll."CleanCash Serial No." <> '') and (CleanCashAuditRoll."CleanCash Control Code" <> '')) and not RunMultipleLine then begin
-                    ReceiptCopy := true;
-                    if ((CleanCashAuditRoll."CleanCash Copy Serial No." <> '') and (CleanCashAuditRoll."CleanCash Copy Control Code" <> '')) then begin
-                        //ERROR(Err006);
-                        Message(Err006);
-                        exit;
-                    end;
-                end;
-
-            if CleanCashAuditRoll."Sales Ticket Type" = CleanCashAuditRoll."Sales Ticket Type"::Mix then
-                Loops := 2
-            else
-                Loops := 1;
-
-            ReceiptTime := Format(CleanCashAuditRoll."Sale Date", 0, '<Year4><Month,2><Day,2>');
-            ReceiptTime := ReceiptTime + Format(CleanCashAuditRoll."Closing Time", 0, '<Hours24,2><Filler Character,0><Minutes,2><Filler Character,0>');
+          end;
         end;
-
+        
+        ReceiptTime := Format(CleanCashAuditRoll."Sale Date",0,'<Year4><Month,2><Day,2>');
+        ReceiptTime := ReceiptTime + Format(CleanCashAuditRoll."Closing Time",0,'<Hours24,2><Filler Character,0><Minutes,2><Filler Character,0>');
+        //+NPR5.55 [409228]
+        
         //-NPR5.29
         //CleanCashSetup.GET(RegisterNo);
         //+NPR5.29
-
+        
         if GuiAllowed then
-            ShowErrorMessage := CleanCashSetup."Show Error Message"
+          ShowErrorMessage := CleanCashSetup."Show Error Message"
         else
-            ShowErrorMessage := false;
-
-        i := 1;
-        if CleanCashAuditRoll.FindSet then
-            repeat
-                if ReceiptCopy then begin
-                    //-NPR5.26
-                    //ReceiptNo := CleanCashAuditRoll."CleanCash Reciept No.";
-                    //+NPR5.26
-                    ReceiptType := ReceiptType.RECEIPT_COPY;
-                end else begin
-                    //-NPR5.26
-                    //ReceiptNo := GetUniqueTicketNo(RegisterNo);
-                    //+NPR5.26
-                    ReceiptType := ReceiptType.RECEIPT_NORMAL;
-                end;
-
-                if CleanCashSetup.Training then
-                    ReceiptType := ReceiptType.RECEIPT_TRAINING;
-
-                SetVatArray(VATs, CleanCashAuditRoll);
+          ShowErrorMessage := false;
+        
+        if CleanCashAuditRoll.FindSet then repeat
+          if ReceiptCopy then begin
+            //-NPR5.26
+            //ReceiptNo := CleanCashAuditRoll."CleanCash Reciept No.";
+            //+NPR5.26
+            ReceiptType := ReceiptType.RECEIPT_COPY;
+          end else begin
+            //-NPR5.26
+            //ReceiptNo := GetUniqueTicketNo(RegisterNo);
+            //+NPR5.26
+            ReceiptType := ReceiptType.RECEIPT_NORMAL;
+          end;
+        
+          if CleanCashSetup.Training then
+            ReceiptType := ReceiptType.RECEIPT_TRAINING;
+        
+          SetVatArray(VATs,CleanCashAuditRoll);
+          //-NPR5.26
+          ReceiptNo := CleanCashAuditRoll."CleanCash Reciept No.";
+          //+NPR5.26
+        
+          Start := false;
+          //-NPR5.31
+          RunLocal := CleanCashSetup."Run Local";
+          //+NPR5.31
+        
+          //-NPR5.29
+          if ((CleanCashAuditRoll."CleanCash Control Code" = '') and not ReceiptCopy) or ((CleanCashAuditRoll."CleanCash Copy Control Code" = '') and ReceiptCopy) then begin
+          //+NPR5.29
+            //-NPR5.31
+            /*
+            CleanCashProxy.InitializeProtocol();
+            CleanCashProxy.Init(CleanCashSetup."Organization ID",
+                                //-NPR5.29
+                                //RegisterNo,
+                                CleanCashRegisterNo,
+                                //+NPR5.29
+                                ReceiptTime,
+                                ReceiptNo,
+                                ReceiptType,
+                                ConvertDecimal(CleanCashAuditRoll."Receipt Total"),
+                                ConvertDecimal(CleanCashAuditRoll."Receipt Total Neg"),
+                                VATs,
+                                CleanCashSetup."Connection String",
+                                CleanCashSetup."Multi Organization ID Per POS",
+                                ShowErrorMessage);
+            COMMIT;
+            CLEAR(ProxyDialog);
+        
+            ProxyDialog.RunProtocolModal(CODEUNIT::"CleanCash Proxy");
+            */
+        
+            //Start := IsCCSucces;
+            Start := SendReceiptToApplication(CleanCashSetup."Organization ID",
+                                              CleanCashRegisterNo,
+                                              ReceiptTime,
+                                              ReceiptNo,
+                                              ReceiptType,
+                                              ConvertDecimal(CleanCashAuditRoll."Receipt Total"),
+                                              ConvertDecimal(CleanCashAuditRoll."Receipt Total Neg"),
+                                              VATs,
+                                              CleanCashSetup."Connection String",
+                                              CleanCashSetup."Multi Organization ID Per POS",
+                                              ShowErrorMessage);
+            //+NPR5.31
+        
+          //-NPR5.29
+          end;
+          //+NPR5.29
+          if Start then begin
+            //-NPR5.31
+            //SerialNo := CleanCashProxy.GetSerialNo;
+            //ControlCode := CleanCashProxy.GetControlCode;
+            SerialNo := GetSerialNo;
+            ControlCode := GetControlCode;
+            //+NPR5.31
+            Clear(CleanCashAuditRoll2);
+            CleanCashAuditRoll2.SetRange("Register No.",RegisterNo);
+            CleanCashAuditRoll2.SetRange("Sales Ticket No.",SalesTicketNo);
+            CleanCashAuditRoll2.SetRange(Type,CleanCashAuditRoll.Type);
+        
+            if CleanCashAuditRoll2.FindFirst then begin
+              //-NPR5.29
+              CleanCashAuditRoll2."CleanCash Register No." := CleanCashRegisterNo;
+              //+NPR5.29
+              if ReceiptCopy then begin
+                CleanCashAuditRoll2."CleanCash Copy Serial No." := SerialNo;
+                CleanCashAuditRoll2."CleanCash Copy Control Code" := ControlCode;
+                CleanCashAuditRoll2."Receipt Type" := ReceiptType.ToString;
+                CleanCashAuditRoll2.Modify(false);
+              end else begin
                 //-NPR5.26
-                ReceiptNo := CleanCashAuditRoll."CleanCash Reciept No.";
+                //CleanCashAuditRoll2."CleanCash Reciept No." := ReceiptNo;
                 //+NPR5.26
-
-                Start := false;
-                //-NPR5.31
-                RunLocal := CleanCashSetup."Run Local";
-                //+NPR5.31
-
-                //-NPR5.29
-                if ((CleanCashAuditRoll."CleanCash Control Code" = '') and not ReceiptCopy) or ((CleanCashAuditRoll."CleanCash Copy Control Code" = '') and ReceiptCopy) then begin
-                    //+NPR5.29
-                    //-NPR5.31
-                    /*
-                    CleanCashProxy.InitializeProtocol();
-                    CleanCashProxy.Init(CleanCashSetup."Organization ID",
-                                        //-NPR5.29
-                                        //RegisterNo,
-                                        CleanCashRegisterNo,
-                                        //+NPR5.29
-                                        ReceiptTime,
-                                        ReceiptNo,
-                                        ReceiptType,
-                                        ConvertDecimal(CleanCashAuditRoll."Receipt Total"),
-                                        ConvertDecimal(CleanCashAuditRoll."Receipt Total Neg"),
-                                        VATs,
-                                        CleanCashSetup."Connection String",
-                                        CleanCashSetup."Multi Organization ID Per POS",
-                                        ShowErrorMessage);
-                    COMMIT;
-                    CLEAR(ProxyDialog);
-
-                    ProxyDialog.RunProtocolModal(CODEUNIT::"CleanCash Proxy");
-                    */
-
-                    //Start := IsCCSucces;
-                    Start := SendReceiptToApplication(CleanCashSetup."Organization ID",
-                                                      CleanCashRegisterNo,
-                                                      ReceiptTime,
-                                                      ReceiptNo,
-                                                      ReceiptType,
-                                                      ConvertDecimal(CleanCashAuditRoll."Receipt Total"),
-                                                      ConvertDecimal(CleanCashAuditRoll."Receipt Total Neg"),
-                                                      VATs,
-                                                      CleanCashSetup."Connection String",
-                                                      CleanCashSetup."Multi Organization ID Per POS",
-                                                      ShowErrorMessage);
-                    //+NPR5.31
-
-                    //-NPR5.29
-                end;
-                //+NPR5.29
-                if Start then begin
-                    //-NPR5.31
-                    //SerialNo := CleanCashProxy.GetSerialNo;
-                    //ControlCode := CleanCashProxy.GetControlCode;
-                    SerialNo := GetSerialNo;
-                    ControlCode := GetControlCode;
-                    //+NPR5.31
-                    Clear(CleanCashAuditRoll2);
-                    CleanCashAuditRoll2.SetRange("Register No.", RegisterNo);
-                    CleanCashAuditRoll2.SetRange("Sales Ticket No.", SalesTicketNo);
-                    CleanCashAuditRoll2.SetRange(Type, CleanCashAuditRoll.Type);
-
-                    if CleanCashAuditRoll2.FindFirst then begin
-                        //-NPR5.29
-                        CleanCashAuditRoll2."CleanCash Register No." := CleanCashRegisterNo;
-                        //+NPR5.29
-                        if ReceiptCopy then begin
-                            CleanCashAuditRoll2."CleanCash Copy Serial No." := SerialNo;
-                            CleanCashAuditRoll2."CleanCash Copy Control Code" := ControlCode;
-                            CleanCashAuditRoll2."Receipt Type" := ReceiptType.ToString;
-                            CleanCashAuditRoll2.Modify(false);
-                        end else begin
-                            //-NPR5.26
-                            //CleanCashAuditRoll2."CleanCash Reciept No." := ReceiptNo;
-                            //+NPR5.26
-                            CleanCashAuditRoll2."CleanCash Serial No." := SerialNo;
-                            CleanCashAuditRoll2."CleanCash Control Code" := ControlCode;
-                            CleanCashAuditRoll2."Receipt Type" := ReceiptType.ToString;
-                            CleanCashAuditRoll2.Modify(false);
-                        end;
-                    end;
-                    Commit;
-                end;
-            until CleanCashAuditRoll.Next = 0;
+                CleanCashAuditRoll2."CleanCash Serial No." := SerialNo;
+                CleanCashAuditRoll2."CleanCash Control Code" := ControlCode;
+                CleanCashAuditRoll2."Receipt Type" := ReceiptType.ToString;
+                CleanCashAuditRoll2.Modify(false);
+              end;
+            end;
+            Commit;
+          end;
+        until CleanCashAuditRoll.Next = 0;
 
     end;
 
     local procedure SendReceiptToApplication(OrganisationNumber: Text[10]; PosId: Text[16]; DateTime: Text[12]; ReceiptNo: Text[30]; ReceiptType: DotNet npNetCommunicationReceipt; ReceiptTotal: Text[30]; NegativeTotal: Text[30]; Vat: array[4] of Text[30]; ConnectionString: Text[100]; MultiOrganizationIDPerPOS: Boolean; ShowErrorMessage: Boolean) IsSucces: Boolean
     var
-        CleanCashBridge: Codeunit "CleanCash Server Bridge";
         // TODO: CTRLUPGRADE - invokes obsolete Stargate v1 proxy-bysed protocol
         //CleanCashProxy: Codeunit "CleanCash Proxy";
         //ProxyDialog: Page "Proxy Dialog";
@@ -350,8 +325,6 @@ codeunit 6184501 "CleanCash Communication"
     end;
 
     local procedure SetVatArray(var Vats: array[4] of Text[30]; CleanCashAuditRoll: Record "CleanCash Audit Roll")
-    var
-        i: Integer;
     begin
         Vats[1] := ConvertDecimal(CleanCashAuditRoll.VatRate1) + ';' + ConvertDecimal(CleanCashAuditRoll.VatAmount1);
         Vats[2] := ConvertDecimal(CleanCashAuditRoll.VatRate2) + ';' + ConvertDecimal(CleanCashAuditRoll.VatAmount2);
@@ -360,9 +333,6 @@ codeunit 6184501 "CleanCash Communication"
     end;
 
     local procedure IsCCSucces(CCCommResult: DotNet npNetCommunicationResult; EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt," FailSendReceiptEX"," FailSendReceipt",ReceiptSend): Boolean
-    var
-        CleanCashProxy: Codeunit "CleanCash Proxy";
-        CCCommResultInt: Integer;
     begin
         //-NPR5.31
         //CleanCashProxy.GetCCCommunicationResult(CCCommResult);
@@ -379,7 +349,6 @@ codeunit 6184501 "CleanCash Communication"
 
     local procedure CheckEnumCommResult(EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend; EnumCommResult: DotNet npNetCommunicationResult): Boolean
     var
-        CleanCashProxy: Codeunit "CleanCash Proxy";
         EnumType: Text[30];
         ExtendedError: Integer;
         EnumCommResultInt: Integer;
@@ -430,7 +399,6 @@ codeunit 6184501 "CleanCash Communication"
     local procedure CheckEnumCommStatus(EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend): Boolean
     var
         EnumStatus: DotNet npNetCommunicationStatus;
-        CleanCashProxy: Codeunit "CleanCash Proxy";
         EnumType: Text[30];
         StatusList: Text[100];
         EnumStatusInt: Integer;
@@ -499,7 +467,6 @@ codeunit 6184501 "CleanCash Communication"
 
     local procedure GetLastUnitStatusList(): Text[100]
     var
-        StatusList: Text[100];
         CleanCashProxy: Codeunit "CleanCash Proxy";
     begin
         //-NPR5.31

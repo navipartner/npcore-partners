@@ -5,6 +5,9 @@ report 6014402 "Discount Statistics"
     //                                    Obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
+    // NPR5.55/ANPA/20200505  CASE 402932 Changed layout so the table is alligned with the header
+    // NPR5.55/BHR /20200220  CASE 361515 Replace the field Sales LCY flowfield
+    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Discount Statistics.rdlc';
 
@@ -89,6 +92,9 @@ report 6014402 "Discount Statistics"
             {
             }
             column(ShowItemLedger;ShowItemLedger)
+            {
+            }
+            column(CurrReportPageNoCaption;CurrReportPageNoCaptionLbl)
             {
             }
             dataitem("Salesperson/Purchaser";"Salesperson/Purchaser")
@@ -189,7 +195,7 @@ report 6014402 "Discount Statistics"
             column(Name_Salesperson_Purchaser_2;"Salesperson/Purchaser 2".Name)
             {
             }
-            column(Sales_LCY_Salesperson_Purchaser_2;"Salesperson/Purchaser 2"."Sales (LCY)")
+            column(Sales_LCY_Salesperson_Purchaser_2;SalesLCY)
             {
             }
             column(Discount_Amount_Salesperson_Purchaser_2;"Salesperson/Purchaser 2"."Discount Amount")
@@ -203,8 +209,19 @@ report 6014402 "Discount Statistics"
             }
 
             trigger OnPreDataItem()
+            var
+                ValueEntry2: Record "Value Entry";
             begin
-                Item.CopyFilter("Date Filter", "Salesperson/Purchaser 2"."Date Filter");
+
+                //-NPR5.55 [361515]
+                //Item.COPYFILTER("Date Filter", "Salesperson/Purchaser 2"."Date Filter");
+                ValueEntry2.SetCurrentKey("Item Ledger Entry Type","Posting Date");
+                Item.CopyFilter("Date Filter", ValueEntry2."Posting Date");
+                ValueEntry2.SetRange("Salespers./Purch. Code","Salesperson/Purchaser 2".Code);
+                ValueEntry2.SetRange("Item Ledger Entry Type",ValueEntry2."Item Ledger Entry Type"::Sale);
+                ValueEntry2.CalcSums("Sales Amount (Actual)");
+                SalesLCY := ValueEntry2."Sales Amount (Actual)";
+                //-NPR5.55 [361515]
             end;
         }
     }
@@ -287,5 +304,7 @@ report 6014402 "Discount Statistics"
         Total_VE_Qty: Decimal;
         Total_VE_Sales_Amt: Decimal;
         Total_VE_Discount_Amt: Decimal;
+        SalesLCY: Decimal;
+        CurrReportPageNoCaptionLbl: Label 'Page';
 }
 

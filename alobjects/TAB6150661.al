@@ -9,6 +9,9 @@ table 6150661 "NPRE Waiter Pad Line"
     //                                      5 "Sent To. Kitchen Print"
     //                                      6 "Print Category"
     // NPR5.54/ALPO/20200331 CASE 398454 Preserve price VAT parameters and use it when copying waiter pad lines to a POS sale
+    // NPR5.55/ALPO/20200422 CASE 360258 More user friendly print category selection using multi-selection mode
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Waiter Pad Line';
 
@@ -56,18 +59,21 @@ table 6150661 "NPRE Waiter Pad Line"
         field(40; "Meal Flow"; Code[10])
         {
             Caption = 'Meal Flow';
+            Description = 'Obsolete. Will be removed in later versions';
             TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
         field(41; "Meal Flow Description"; Text[50])
         {
             CalcFormula = Lookup ("NPRE Flow Status".Description WHERE(Code = FIELD("Meal Flow")));
             Caption = 'Meal Flow Description';
+            Description = 'Obsolete. Will be removed in later versions';
             FieldClass = FlowField;
         }
         field(42; "Meal Flow Order"; Integer)
         {
             CalcFormula = Lookup ("NPRE Flow Status"."Flow Order" WHERE(Code = FIELD("Meal Flow")));
             Caption = 'Meal Flow Order';
+            Description = 'Obsolete. Will be removed in later versions';
             FieldClass = FlowField;
         }
         field(45; "Line Status"; Code[10])
@@ -114,6 +120,14 @@ table 6150661 "NPRE Waiter Pad Line"
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             MaxValue = 99.999;
+
+            trigger OnValidate()
+            begin
+                //-NPR5.55 [399170]
+                TestIsOpen();
+                "Quantity (Base)" := CalcBaseQty(Quantity);
+                //+NPR5.55 [399170]
+            end;
         }
         field(54; Marked; Boolean)
         {
@@ -202,6 +216,23 @@ table 6150661 "NPRE Waiter Pad Line"
         {
             Caption = 'Unit of Measure Code';
             TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+
+            trigger OnValidate()
+            var
+                UOMMgt: Codeunit "Unit of Measure Management";
+            begin
+                //-NPR5.55 [399170]
+                case Type of
+                  Type::Item: begin
+                    GetItem;
+                    "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item,"Unit of Measure Code");
+                  end;
+                  else
+                    "Qty. per Unit of Measure" := 1;
+                end;
+                Validate(Quantity);
+                //+NPR5.55 [399170]
+            end;
         }
         field(70;"Price Includes VAT";Boolean)
         {
@@ -220,16 +251,82 @@ table 6150661 "NPRE Waiter Pad Line"
             Description = 'NPR5.54';
             TableRelation = "VAT Product Posting Group";
         }
+        field(80;"Sale Line Retail ID";Guid)
+        {
+            Caption = 'Sale Line Retail ID';
+            Description = 'NPR5.55';
+        }
+        field(81;"Sale Retail ID";Guid)
+        {
+            Caption = 'Sale Retail ID';
+            Description = 'NPR5.55';
+        }
+        field(90;"Qty. per Unit of Measure";Decimal)
+        {
+            Caption = 'Qty. per Unit of Measure';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
+            Editable = false;
+            InitValue = 1;
+        }
+        field(91;"Quantity (Base)";Decimal)
+        {
+            Caption = 'Quantity (Base)';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
+
+            trigger OnValidate()
+            begin
+                //-NPR5.55 [399170]
+                TestField("Qty. per Unit of Measure",1);
+                Validate(Quantity,"Quantity (Base)");
+                //+NPR5.55 [399170]
+            end;
+        }
+        field(92;"Billed Qty. (Base)";Decimal)
+        {
+            Caption = 'Billed Qty. (Base)';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
+
+            trigger OnValidate()
+            begin
+                //-NPR5.55 [399170]
+                TestField("Qty. per Unit of Measure");
+                "Billed Quantity" := Round("Billed Qty. (Base)" / "Qty. per Unit of Measure",0.00001);
+                //+NPR5.55 [399170]
+            end;
+        }
+        field(93;"Qty. On POS Sale Line (Base)";Decimal)
+        {
+            CalcFormula = Sum("Sale Line POS"."Quantity (Base)" WHERE ("Retail ID"=FIELD("Sale Line Retail ID")));
+            Caption = 'Qty. On POS Sale Line (Base)';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(94;"Billed Quantity";Decimal)
+        {
+            Caption = 'Billed Quantity';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
+
+            trigger OnValidate()
+            begin
+                "Billed Qty. (Base)" := CalcBaseQty("Billed Quantity");  //NPR5.55 [399170]
+            end;
+        }
         field(100; "Print Category Filter"; Code[20])
         {
             Caption = 'Print Category Filter';
             Description = 'NPR5.53';
             FieldClass = FlowFilter;
-            TableRelation = "NPRE Print Category";
+            TableRelation = "NPRE Print/Prod. Category";
         }
-        field(101; "Meal Flow Status Filter"; Code[10])
+        field(101;"Serving Step Filter";Code[10])
         {
-            Caption = 'Meal Flow Status Filter';
+            Caption = 'Serving Step Filter';
             Description = 'NPR5.53';
             FieldClass = FlowFilter;
             TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
@@ -242,15 +339,13 @@ table 6150661 "NPRE Waiter Pad Line"
             OptionCaption = 'Kitchen Order,Serving Request';
             OptionMembers = "Kitchen Order","Serving Request";
         }
-        field(120; "No. of Print Categories"; Integer)
+        field(103;"Output Type Filter";Option)
         {
-            CalcFormula = Count ("NPRE W.Pad Line Print Category" WHERE("Waiter Pad No." = FIELD("Waiter Pad No."),
-                                                                        "Waiter Pad Line No." = FIELD("Line No."),
-                                                                        "Print Category Code" = FIELD("Print Category Filter")));
-            Caption = 'No. of Print Categories';
-            Description = 'NPR5.53';
-            Editable = false;
-            FieldClass = FlowField;
+            Caption = 'Output Type Filter';
+            Description = 'NPR5.55';
+            FieldClass = FlowFilter;
+            OptionCaption = 'Print,KDS';
+            OptionMembers = Print,KDS;
         }
         field(121; "Sent to Kitchen"; Boolean)
         {
@@ -259,7 +354,8 @@ table 6150661 "NPRE Waiter Pad Line"
                                                                         "Print Type" = FIELD("Print Type Filter"),
                                                                         "Print Category Code" = FIELD("Print Category Filter"),
                                                                         "Flow Status Object" = CONST(WaiterPadLineMealFlow),
-                                                                        "Flow Status Code" = FIELD("Meal Flow Status Filter")));
+                                                                        "Flow Status Code"=FIELD("Serving Step Filter"),
+                                                                        "Output Type"=FIELD("Output Type Filter")));
             Caption = 'Sent to Kitchen';
             Description = 'NPR5.53';
             Editable = false;
@@ -272,7 +368,8 @@ table 6150661 "NPRE Waiter Pad Line"
                                                                         "Print Type" = CONST("Kitchen Order"),
                                                                         "Print Category Code" = FIELD("Print Category Filter"),
                                                                         "Flow Status Object" = CONST(WaiterPadLineMealFlow),
-                                                                        "Flow Status Code" = FIELD("Meal Flow Status Filter")));
+                                                                        "Flow Status Code"=FIELD("Serving Step Filter"),
+                                                                        "Output Type"=FIELD("Output Type Filter")));
             Caption = 'Kitchen Order Sent';
             Description = 'NPR5.53';
             Editable = false;
@@ -285,9 +382,25 @@ table 6150661 "NPRE Waiter Pad Line"
                                                                         "Print Type" = CONST("Serving Request"),
                                                                         "Print Category Code" = FIELD("Print Category Filter"),
                                                                         "Flow Status Object" = CONST(WaiterPadLineMealFlow),
-                                                                        "Flow Status Code" = FIELD("Meal Flow Status Filter")));
+                                                                        "Flow Status Code"=FIELD("Serving Step Filter"),
+                                                                        "Output Type"=FIELD("Output Type Filter")));
             Caption = 'Serving Requested';
             Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(124;"Sent to Kitchen Qty. (Base)";Decimal)
+        {
+            CalcFormula = Sum("NPRE W.Pad Line Prnt Log Entry"."Sent Quanity (Base)" WHERE ("Waiter Pad No."=FIELD("Waiter Pad No."),
+                                                                                            "Waiter Pad Line No."=FIELD("Line No."),
+                                                                                            "Print Type"=FIELD("Print Type Filter"),
+                                                                                            "Print Category Code"=FIELD("Print Category Filter"),
+                                                                                            "Flow Status Object"=CONST(WaiterPadLineMealFlow),
+                                                                                            "Flow Status Code"=FIELD("Serving Step Filter"),
+                                                                                            "Output Type"=FIELD("Output Type Filter")));
+            Caption = 'Sent to Kitchen Qty. (Base)';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.55';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -306,9 +419,20 @@ table 6150661 "NPRE Waiter Pad Line"
 
     trigger OnDelete()
     var
-        WPadPOSMgt: Codeunit "NPRE Waiter Pad POS Management";
+        POSInfoWaiterPadLink: Record "POS Info NPRE Waiter Pad";
     begin
-        WPadPOSMgt.ClearWPadLinePrintCategories(Rec);  //NPR5.53 [360258]
+        //WaiterPadMgt.ClearAssignedPrintCategories(Rec);  //NPR5.55 [382428]-revoked
+        //-NPR5.55 [382428]
+        WaiterPadMgt.ClearAssignedPrintCategories(RecordId);
+        WaiterPadMgt.ClearAssignedFlowStatuses(RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
+        //+NPR5.55 [382428]
+
+        //-NPR5.55 [399170]
+        POSInfoWaiterPadLink.SetRange("Waiter Pad No.","Waiter Pad No.");
+        POSInfoWaiterPadLink.SetRange("Waiter Pad Line No.","Line No.");
+        if not POSInfoWaiterPadLink.IsEmpty then
+          POSInfoWaiterPadLink.DeleteAll;
+        //+NPR5.55 [399170]
     end;
 
     trigger OnInsert()
@@ -325,38 +449,183 @@ table 6150661 "NPRE Waiter Pad Line"
         end;
     end;
 
-    procedure AssignedPrintCategoriesAsString(): Text
-    var
-        WPadLinePrintCategory: Record "NPRE W.Pad Line Print Category";
-        AssignedPrintCategories: Text;
+    trigger OnRename()
     begin
+        //-NPR5.55 [382428]
+        WaiterPadMgt.MoveAssignedPrintCategories(xRec.RecordId, RecordId);
+        WaiterPadMgt.MoveAssignedFlowStatuses(xRec.RecordId, RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
+        //+NPR5.55 [382428]
+    end;
+
+    var
+        FlowStatus: Record "NPRE Flow Status";
+        Item: Record Item;
+        WaiterPad: Record "NPRE Waiter Pad";
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
+        OpenCheckSuspended: Boolean;
+
+    procedure AssignedPrintCategoriesAsString(): Text
+    begin
+        //-NPR5.55 [382428]-revoked
+        /*
         //-NPR5.53 [360258]
-        WPadLinePrintCategory.SetRange("Waiter Pad No.", "Waiter Pad No.");
-        WPadLinePrintCategory.SetRange("Waiter Pad Line No.", "Line No.");
-        WPadLinePrintCategory.SetFilter("Print Category Code", '<>%1', '');
-        if not WPadLinePrintCategory.FindSet then
-            exit('');
+        WPadLinePrintCategory.SETRANGE("Waiter Pad No.","Waiter Pad No.");
+        WPadLinePrintCategory.SETRANGE("Waiter Pad Line No.","Line No.");
+        WPadLinePrintCategory.SETFILTER("Print Category Code",'<>%1','');
+        IF NOT WPadLinePrintCategory.FINDSET THEN
+          EXIT('');
         AssignedPrintCategories := '';
-        repeat
-            if AssignedPrintCategories <> '' then
-                AssignedPrintCategories := AssignedPrintCategories + ', ';
-            AssignedPrintCategories := AssignedPrintCategories + WPadLinePrintCategory."Print Category Code";
-        until WPadLinePrintCategory.Next = 0;
-        exit(AssignedPrintCategories);
+        REPEAT
+          IF AssignedPrintCategories <> '' THEN
+            AssignedPrintCategories := AssignedPrintCategories + ', ';
+          AssignedPrintCategories := AssignedPrintCategories + WPadLinePrintCategory."Print Category Code";
+        UNTIL WPadLinePrintCategory.NEXT = 0;
+        EXIT(AssignedPrintCategories);
         //+NPR5.53 [360258]
+        */
+        //+NPR5.55 [382428]-revoked
+        exit(WaiterPadMgt.AssignedPrintCategoriesAsFilterString(RecordId, GetFilter("Serving Step Filter")));  //NPR5.55 [382428]
+
     end;
 
     procedure ShowPrintCategories()
-    var
-        WPadLinePrintCategory: Record "NPRE W.Pad Line Print Category";
     begin
+        //-NPR5.55 [360258]-revoked
         //-NPR5.53 [360258]
-        WPadLinePrintCategory.FilterGroup(2);
-        WPadLinePrintCategory.SetRange("Waiter Pad No.", "Waiter Pad No.");
-        WPadLinePrintCategory.SetRange("Waiter Pad Line No.", "Line No.");
-        WPadLinePrintCategory.FilterGroup(0);
-        PAGE.RunModal(0, WPadLinePrintCategory);
+        //WPadLinePrintCategory.FILTERGROUP(2);
+        //WPadLinePrintCategory.SETRANGE("Waiter Pad No.","Waiter Pad No.");
+        //WPadLinePrintCategory.SETRANGE("Waiter Pad Line No.","Line No.");
+        //WPadLinePrintCategory.FILTERGROUP(0);
+        //PAGE.RUNMODAL(0,WPadLinePrintCategory);
         //+NPR5.53 [360258]
+        //+NPR5.55 [360258]-revoked
+        //-NPR5.55 [360258]
+        TestField("Waiter Pad No.");
+        TestField("Line No.");
+        WaiterPadMgt.SelectPrintCategories(RecordId);
+        //+NPR5.55 [360258]
+    end;
+
+    procedure NoOfPrintCategories(): Integer
+    var
+        AssignedPrintCategory: Record "NPRE Assigned Print Category";
+    begin
+        //-NPR5.55 [382428]
+        WaiterPadMgt.FilterAssignedPrintCategories(RecordId, AssignedPrintCategory);
+        CopyFilter("Print Category Filter", AssignedPrintCategory."Print/Prod. Category Code");
+        exit(AssignedPrintCategory.Count);
+        //+NPR5.55 [382428]
+    end;
+
+    procedure TotalNoOfPrintCategories(): Integer
+    var
+        AssignedPrintCategory: Record "NPRE Assigned Print Category";
+    begin
+        //-NPR5.55 [382428]
+        WaiterPadMgt.FilterAssignedPrintCategories(RecordId, AssignedPrintCategory);
+        exit(AssignedPrintCategory.Count);
+        //+NPR5.55 [382428]
+    end;
+
+    procedure AssignedFlowStatusesAsString(StatusObject: Option): Text
+    var
+        AssignedFlowStatus: Record "NPRE Assigned Flow Status";
+    begin
+        //-NPR5.55 [382428]
+        exit(WaiterPadMgt.AssignedFlowStatusesAsFilterString(RecordId, StatusObject, AssignedFlowStatus));
+        //+NPR5.55 [382428]
+    end;
+
+    procedure ShowFlowStatuses(StatusObject: Option)
+    var
+        AssignedFlowStatus: Record "NPRE Assigned Flow Status";
+    begin
+        //-NPR5.55 [382428]
+        TestField("Waiter Pad No.");
+        TestField("Line No.");
+        WaiterPadMgt.SelectFlowStatuses(RecordId, StatusObject, AssignedFlowStatus);
+        //+NPR5.55 [382428]
+    end;
+
+    procedure NoOfServingSteps(): Integer
+    var
+        AssignedFlowStatus: Record "NPRE Assigned Flow Status";
+    begin
+        //-NPR5.55 [382428]
+        WaiterPadMgt.FilterAssignedFlowStatuses(RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
+        CopyFilter("Serving Step Filter", AssignedFlowStatus."Flow Status Code");
+        exit(AssignedFlowStatus.Count);
+        //+NPR5.55 [382428]
+    end;
+
+    procedure TotalNoOfServingSteps(): Integer
+    var
+        AssignedFlowStatus: Record "NPRE Assigned Flow Status";
+    begin
+        //-NPR5.55 [382428]
+        WaiterPadMgt.FilterAssignedFlowStatuses(RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
+        exit(AssignedFlowStatus.Count);
+        //+NPR5.55 [382428]
+    end;
+
+    local procedure CalcBaseQty(Qty: Decimal): Decimal
+    begin
+        //-NPR5.55 [399170]
+        TestField("Qty. per Unit of Measure");
+        exit(Round(Qty * "Qty. per Unit of Measure",0.00001));
+        //+NPR5.55 [399170]
+    end;
+
+    local procedure GetItem()
+    begin
+        //-NPR5.55 [399170]
+        TestField(Type,Type::Item);
+        TestField("No.");
+        if "No." <> Item."No." then
+          Item.Get("No.");
+        //+NPR5.55 [399170]
+    end;
+
+    local procedure GetWaiterPad()
+    begin
+        //-NPR5.55 [399170]
+        if "Waiter Pad No." = '' then
+          Clear(WaiterPad)
+        else if "Waiter Pad No." <> WaiterPad."No." then
+          WaiterPad.Get("Waiter Pad No.");
+        //+NPR5.55 [399170]
+    end;
+
+    procedure RemainingQtyToBill(): Decimal
+    begin
+        //-NPR5.55 [399170]
+        exit(Quantity - "Billed Quantity");
+        //+NPR5.55 [399170]
+    end;
+
+    procedure TestIsOpen()
+    begin
+        //-NPR5.55 [399170]
+        if OpenCheckSuspended then
+          exit;
+        GetWaiterPad;
+        WaiterPad.TestField(Closed, false);
+        //+NPR5.55 [399170]
+    end;
+
+    procedure SuspendOpenCheck(Suspend: Boolean)
+    begin
+        //-NPR5.55 [399170]
+        OpenCheckSuspended := Suspend;
+        //+NPR5.55 [399170]
+    end;
+
+    procedure IsClosed(): Boolean
+    begin
+        //-NPR5.55 [399170]
+        GetWaiterPad;
+        exit(WaiterPad.Closed);
+        //+NPR5.55 [399170]
     end;
 }
 

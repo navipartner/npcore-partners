@@ -77,7 +77,7 @@ table 6151411 "Magento Picture"
     trigger OnDelete()
     var
         MagentoBrand: Record "Magento Brand";
-        MagentoItemGroup: Record "Magento Item Group";
+        MagentoItemGroup: Record "Magento Category";
         MagentoPictureLink: Record "Magento Picture Link";
     begin
         //-MAG2.22 [361234]

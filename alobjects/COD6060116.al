@@ -563,6 +563,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
 
     local procedure InsertTicketReservation(XmlElement: DotNet npNetXmlElement;Token: Text[100];var TicketReservationRequest: Record "TM Ticket Reservation Request")
     var
+        Member: Record "MM Member";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         ExternalItemType: Integer;
         WaitingListOptInAddress: Text[200];
@@ -595,6 +596,29 @@ codeunit 6060116 "TM Ticket WebService Mgr"
           TicketReservationRequest."Notification Address" := WaitingListOptInAddress;
         end;
         //+TM1.45 [380754]
+
+
+        // //xx
+        // if (TicketReservationRequest."External Member No." <> '') THEN BEGIN
+        //  Member.SETFILTER ("External Member No.", '=%1', TicketReservationRequest."External Member No.");
+        //  Member.SETFILTER (Blocked, '=%1', FALSE);
+        //  IF (Member.FINDFIRST ()) THEN begin
+        //    CASE Member."Notification Method" OF
+        //      Member."Notification Method"::EMAIL :
+        //        BEGIN
+        //          TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL;
+        //          TicketReservationRequest."Notification Address" := Member."E-Mail Address";
+        //        END;
+        //      Member."Notification Method"::SMS :
+        //        BEGIN
+        //          TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
+        //          TicketReservationRequest."Notification Address" := Member."Phone No.";
+        //        END;
+        //    END;
+        //  END;
+        // END;
+        // //xx
+
 
         TicketReservationRequest.Insert ();
     end;

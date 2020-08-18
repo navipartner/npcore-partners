@@ -1,11 +1,16 @@
-page 6150633 "NPRE Flow Status"
+page 6150633 "NPRE Select Flow Status"
 {
     // NPR5.34/NPKNAV/20170801 CASE 283328 Transport NPR5.34 - 1 August 2017
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.55/ALPO/20200422 CASE 360258 More user friendly print category selection using multi-selection mode
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
-    Caption = 'Flow Status';
-    PageType = List;
+    Caption = 'Select Flow Status';
+    DataCaptionExpression = GetDataCaptionExpr();
+    DeleteAllowed = false;
+    InsertAllowed = false;
+    PageType = ListPlus;
     SourceTable = "NPRE Flow Status";
     SourceTableView = SORTING("Status Object","Flow Order");
     UsageCategory = Administration;
@@ -16,38 +21,53 @@ page 6150633 "NPRE Flow Status"
         {
             repeater(Group)
             {
+                field(Selected;Selected)
+                {
+                    Caption = 'Selected';
+                    Editable = true;
+                    Visible = IsMultiSelectionMode;
+
+                    trigger OnValidate()
+                    begin
+                        Mark(Selected);  //NPR5.55 [382428]
+                    end;
+                }
                 field("Code";Code)
                 {
+                    Editable = false;
                 }
                 field("Status Object";"Status Object")
                 {
-                    Editable = StatusObjectVisible;
+                    Editable = false;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                 }
                 field(Description;Description)
                 {
+                    Editable = false;
                 }
                 field("Flow Order";"Flow Order")
                 {
+                    Editable = false;
                 }
                 field(PrintCategories;AssignedPrintCategoriesAsFilterString())
                 {
-                    Caption = 'Print Categories';
+                    Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = ShowPrintCategories;
 
                     trigger OnDrillDown()
-                    var
-                        FlowStatusPrCategory: Record "NPRE Flow Status Pr.Category";
                     begin
+                        //-NPR5.55 [360258]-revoked
                         //-NPR5.53 [360258]
-                        TestField("Status Object","Status Object"::WaiterPadLineMealFlow);
-                        TestField(Code);
-                        FlowStatusPrCategory.SetRange("Flow Status Object","Status Object");
-                        FlowStatusPrCategory.SetRange("Flow Status Code",Code);
-                        PAGE.Run(0,FlowStatusPrCategory);
+                        //TESTFIELD("Status Object","Status Object"::WaiterPadLineMealFlow);
+                        //TESTFIELD(Code);
+                        //FlowStatusPrCategory.SETRANGE("Flow Status Object","Status Object");
+                        //FlowStatusPrCategory.SETRANGE("Flow Status Code",Code);
+                        //PAGE.RUN(0,FlowStatusPrCategory);
                         //+NPR5.53 [360258]
+                        //+NPR5.55 [360258]-revoked
+                        AssignPrintCategories;  //NPR5.55 [360258]
                     end;
                 }
             }
@@ -62,15 +82,18 @@ page 6150633 "NPRE Flow Status"
             {
                 action(PrintCategories)
                 {
-                    Caption = 'Print Categories';
+                    Caption = 'Print/Prod. Categories';
+                    Enabled = PrintCategoriesEnabled;
                     Image = CoupledOrder;
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    RunObject = Page "NPRE Flow Status Pr.Categories";
-                    RunPageLink = "Flow Status Object"=FIELD("Status Object"),
-                                  "Flow Status Code"=FIELD(Code);
                     Visible = ShowPrintCategories;
+
+                    trigger OnAction()
+                    begin
+                        AssignPrintCategories;  //NPR5.55 [360258]
+                    end;
                 }
             }
         }
@@ -78,10 +101,23 @@ page 6150633 "NPRE Flow Status"
 
     trigger OnAfterGetCurrRecord()
     begin
-        ShowPrintCategories := "Status Object" = "Status Object"::WaiterPadLineMealFlow;  //NPR5.53 [360258]
+        //ShowPrintCategories := "Status Object" = "Status Object"::WaiterPadLineMealFlow;  //#391678 [391678]-revoked
+        //-NPR5.55 [382428]
+        ShowPrintCategories :=
+          ("Status Object" = "Status Object"::WaiterPadLineMealFlow) and (ServingStepDiscoveryMethod = 0);
+        //+NPR5.55 [382428]
+        PrintCategoriesEnabled := ShowPrintCategories and (Code <> '');  //NPR5.55 [360258]
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        Selected := Mark;  //NPR5.55 [382428]
     end;
 
     trigger OnOpenPage()
+    var
+        SetupProxy: Codeunit "NPRE Restaurant Setup Proxy";
+        CurrFilterGr: Integer;
     begin
         if CurrPage.LookupMode then begin
           StatusObjectVisible := false;
@@ -89,10 +125,84 @@ page 6150633 "NPRE Flow Status"
           StatusObjectVisible := true;
         end;
         ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);  //NPR5.53 [360258]
+        //-NPR5.55 [382428]
+        if not ShowPrintCategories then begin
+          CurrFilterGr := FilterGroup;
+          if CurrFilterGr <> 2 then begin
+            FilterGroup(2);
+            ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
+            FilterGroup(CurrFilterGr);
+          end;
+        end;
+        ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
+        if ShowPrintCategories then
+          ShowPrintCategories := ServingStepDiscoveryMethod = 0;
+        //+NPR5.55 [382428]
     end;
 
     var
+        ServingStepDiscoveryMethod: Integer;
+        IsMultiSelectionMode: Boolean;
+        PrintCategoriesEnabled: Boolean;
+        Selected: Boolean;
         ShowPrintCategories: Boolean;
         StatusObjectVisible: Boolean;
+        ServStepsLb: Label 'Serving Steps';
+
+    local procedure AssignPrintCategories()
+    var
+        WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
+    begin
+        //-NPR5.55 [382428]
+        TestField("Status Object","Status Object"::WaiterPadLineMealFlow);
+        TestField(Code);
+        WaiterPadMgt.SelectPrintCategories(RecordId);
+        //+NPR5.55 [382428]
+    end;
+
+    procedure SetMultiSelectionMode(Set: Boolean)
+    begin
+        //-NPR5.55 [382428]
+        IsMultiSelectionMode := Set;
+        //+NPR5.55 [382428]
+    end;
+
+    procedure SetDataset(var FlowStatus: Record "NPRE Flow Status")
+    begin
+        //-NPR5.55 [382428]
+        Copy(FlowStatus);
+        //+NPR5.55 [382428]
+    end;
+
+    procedure GetDataset(var FlowStatus: Record "NPRE Flow Status")
+    var
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+        i: Integer;
+    begin
+        //-NPR5.55 [382428]
+        FlowStatus.Copy(Rec);
+        if FlowStatus.GetFilters <> '' then begin
+          RecRef.GetTable(FlowStatus);
+          for i := 1 to RecRef.FieldCount do begin
+            FldRef := RecRef.FieldIndex(i);
+            if FldRef.GetFilter <> '' then
+              FldRef.SetRange();
+          end;
+        end;
+        //+NPR5.55 [382428]
+    end;
+
+    local procedure GetDataCaptionExpr(): Text
+    begin
+        //-NPR5.55 [382428]
+        case "Status Object" of
+          "Status Object"::WaiterPadLineMealFlow:
+            exit(ServStepsLb);
+          else
+            exit(Format("Status Object"));
+        end;
+        //+NPR5.55 [382428]
+    end;
 }
 

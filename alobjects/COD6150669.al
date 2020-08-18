@@ -1,7 +1,8 @@
 codeunit 6150669 "NPRE POS Action - Show Wa."
 {
-    // NPR5.45/MHA /20180827  CASE 318369 Object created
-    // NPR5.50/TJ  /20190530  CASE 346384 New parameter added
+    // NPR5.45/MHA /20180827 CASE 318369 Object created
+    // NPR5.50/TJ  /20190530 CASE 346384 New parameter added
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (filter seatings by restaurant)
 
 
     trigger OnRun()
@@ -35,6 +36,9 @@ codeunit 6150669 "NPRE POS Action - Show Wa."
             Type::Generic,
             "Subscriber Instances Allowed"::Multiple)
           then begin
+            //-NPR5.55 [414938]
+            RegisterWorkflowStep('addPresetValuesToContext','respond();');
+            //+NPR5.55 [414938]
             RegisterWorkflowStep('seatingInput',
               'if (param.FixedSeatingCode) {' +
               '  context.seatingCode = param.FixedSeatingCode;' +
@@ -94,6 +98,10 @@ codeunit 6150669 "NPRE POS Action - Show Wa."
 
         JSON.InitializeJObjectParser(Context,FrontEnd);
         case WorkflowStep of
+          //-NPR5.55 [414938]
+          'addPresetValuesToContext':
+            OnActionAddPresetValuesToContext(JSON, FrontEnd, POSSession);
+          //+NPR5.55 [414938]
           'seatingInput':
             OnActionSeatingInput(JSON,FrontEnd);
           'selectWaiterPad':
@@ -145,6 +153,17 @@ codeunit 6150669 "NPRE POS Action - Show Wa."
         NPREWaiterPad.Get(WaiterPadNo);
 
         NPREWaiterPadPOSMgt.UIShowWaiterPad(NPREWaiterPad);
+    end;
+
+    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session")
+    var
+        POSSetup: Codeunit "POS Setup";
+    begin
+        //-NPR5.55 [414938]
+        POSSession.GetSetup(POSSetup);
+        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
+        FrontEnd.SetActionContext(ActionCode(), JSON);
+        //+NPR5.55 [414938]
     end;
 }
 

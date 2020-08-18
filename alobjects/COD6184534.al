@@ -1,6 +1,7 @@
 codeunit 6184534 "EFT NETSCloud Protocol"
 {
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
+    // NPR5.55/MMV /20200525 CASE 405984 Fixed undocumented breaking change in NETS backend update.
 
 
     trigger OnRun()
@@ -546,7 +547,9 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 60 * 1000, EftTransactionRequest, false);
+        //-NPR5.55 [405984]
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 60 * 1000, EftTransactionRequest, true);
+        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -596,7 +599,9 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'DELETE', Endpoint, 60 * 1000, EftTransactionRequest, false);
+        //-NPR5.55 [405984]
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'DELETE', Endpoint, 60 * 1000, EftTransactionRequest, true);
+        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -610,7 +615,9 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         '';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, TimeoutMs, EftTransactionRequest, false);
+        //-NPR5.55 [405984]
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, TimeoutMs, EftTransactionRequest, true);
+        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -626,7 +633,9 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 10 * 1000, EftTransactionRequest, false);
+        //-NPR5.55 [405984]
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 10 * 1000, EftTransactionRequest, true);
+        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -642,7 +651,9 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, false);
+        //-NPR5.55 [405984]
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -658,7 +669,9 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, false);
+        //-NPR5.55 [405984]
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -674,7 +687,9 @@ codeunit 6184534 "EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, false);
+        //-NPR5.55 [405984]
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        //+NPR5.55 [405984]
     end;
 
     [TryFunction]

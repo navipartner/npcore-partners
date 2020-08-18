@@ -81,7 +81,7 @@ table 6059774 "Member Card Issued Cards"
 
             trigger OnValidate()
             var
-                "TestBel�b": Decimal;
+                "TestBel¢b": Decimal;
             begin
             end;
         }

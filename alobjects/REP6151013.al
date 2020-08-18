@@ -3,6 +3,8 @@ report 6151013 "NpRv Voucher"
     // NPR5.48/MHA /20190123  CASE 341711 Object created
     // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
     // NPR5.54/BHR /20190612  CASE 357298 Add Formatted Date to be use on word format
+    // NPR5.55/MHA /20200427  CASE 402015 Removed "In-use Quantity (External)"
+    // NPR5.55/MHA /20200701  CASE 397527 Added "Language Code"
     RDLCLayout = './layouts/NpRv Voucher.rdlc';
     WordLayout = './layouts/NpRv Voucher.docx';
 
@@ -59,9 +61,6 @@ report 6151013 "NpRv Voucher"
             {
             }
             column(InuseQuantity_NpRvVoucher; "NpRv Voucher"."In-use Quantity")
-            {
-            }
-            column(InuseQuantityExternal_NpRvVoucher; "NpRv Voucher"."In-use Quantity (External)")
             {
             }
             column(EmailTemplateCode_NpRvVoucher; "NpRv Voucher"."E-mail Template Code")
@@ -159,7 +158,13 @@ report 6151013 "NpRv Voucher"
             }
 
             trigger OnAfterGetRecord()
+            var
+                Language: Record Language;
             begin
+                //-NPR5.55 [397527]
+                CurrReport.Language := Language.GetLanguageID("Language Code");
+                //+NPR5.55 [397527]
+
                 Evaluate(StartingDate,Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate,Format(DT2Date("NpRv Voucher"."Ending Date")));
                 Evaluate(IssuedDate,Format("NpRv Voucher"."Issue Date"));

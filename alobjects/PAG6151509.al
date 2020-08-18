@@ -7,6 +7,8 @@ page 6151509 "Nc Import Type Card"
     // NC2.08/BR  /20171221  CASE 295322 Added Field 240 "Ftp Binary"
     // NC2.12/MHA /20180502  CASE 313362 Added fields 400 "Server File Enabled", 405 "Server File Path" and Action "Download Server File"
     // NC2.16/MHA /20180917  CASE 328432 Added field 203 "Sftp"
+    // NPR5.55/CLVA/20200506 CASE 366790 Added Group XML Stylesheet
+    // NPR5.55/MHA /20200604  CASE 408100 Added fields 520 "Max. Retry Count", 530 "Delay between Retries"
 
     Caption = 'Import Type Card';
     PageType = Card;
@@ -38,6 +40,12 @@ page 6151509 "Nc Import Type Card"
                 {
                 }
                 field("E-mail address on Error";"E-mail address on Error")
+                {
+                }
+                field("Max. Retry Count";"Max. Retry Count")
+                {
+                }
+                field("Delay between Retries";"Delay between Retries")
                 {
                 }
             }
@@ -105,6 +113,33 @@ page 6151509 "Nc Import Type Card"
                     }
                 }
             }
+            group("XML Stylesheet")
+            {
+                Caption = 'XML Stylesheet';
+                field(XMLStylesheetData;XMLStylesheetData)
+                {
+                    MultiLine = true;
+                    ShowCaption = false;
+
+                    trigger OnValidate()
+                    begin
+                        //-NPR5.55 [366790]
+                        if "XML Stylesheet".HasValue then begin
+                          CalcFields("XML Stylesheet");
+                          Clear("XML Stylesheet");
+                          Modify(false);
+                        end;
+
+                        if XMLStylesheetData <> '' then begin
+                          Request.AddText(XMLStylesheetData);
+                          "XML Stylesheet".CreateOutStream(OStream);
+                          Request.Write(OStream);
+                          Modify(false);
+                        end;
+                        //+NPR5.55 [366790]
+                    end;
+                }
+            }
         }
     }
 
@@ -169,5 +204,25 @@ page 6151509 "Nc Import Type Card"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        //-NPR5.55 [366790]
+        CalcFields("XML Stylesheet");
+
+        if not "XML Stylesheet".HasValue then
+          XMLStylesheetData := ''
+        else begin
+          "XML Stylesheet".CreateInStream(IStream);
+          IStream.Read(XMLStylesheetData,MaxStrLen(XMLStylesheetData));
+        end;
+        //+NPR5.55 [366790]
+    end;
+
+    var
+        XMLStylesheetData: Text;
+        IStream: InStream;
+        OStream: OutStream;
+        Request: BigText;
 }
 

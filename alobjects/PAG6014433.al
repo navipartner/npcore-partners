@@ -20,6 +20,8 @@ page 6014433 "Payment Type - Card"
     // NPR5.52/JAKUBV/20191022  CASE 373294 Transport NPR5.52 - 22 October 2019
     // NPR5.54/MMV /20200225 CASE 364340 Added tip & surcharge fields.
     //                                   Removed legacy fields.
+    // NPR5.55/ALPO/20200623 CASE 410991 Zero as default payment amount on popup window for specific payment types
+    // NPR5.55/TJ  /20200430 CASE 399242 Removed Dimensions action (with entire RelatedInformation group) as it is no longer supported for this table
 
     Caption = 'Payment Type Card';
     PromotedActionCategories = 'New,Process,Prints,Master Data,Test5,Test6,Test7,Test8';
@@ -85,6 +87,9 @@ page 6014433 "Payment Type - Card"
                     {
                     }
                     field("Sales Line Text";"Sales Line Text")
+                    {
+                    }
+                    field("Zero as Default on Popup";"Zero as Default on Popup")
                     {
                     }
                 }
@@ -252,7 +257,7 @@ page 6014433 "Payment Type - Card"
                         PaymentTypePrefix.SetRange("Global Dimension 1 Code","Global Dimension 1 Code");
                         CreditCardPrefix.SetTableView(PaymentTypePrefix);
                         CreditCardPrefix.LookupMode := true;
-                        //Pr�fixForm.Prefix;
+                        //PræfixForm.Prefix;
                         CreditCardPrefix.ShowPrefix;
                         CreditCardPrefix.RunModal;
                     end;
@@ -290,25 +295,6 @@ page 6014433 "Payment Type - Card"
                         //FORM.RUNMODAL(FORM::"G/L Account Card",Finanskontorec);
                         PAGE.RunModal(PAGE::"G/L Account Card",GLAccount);
                     end;
-                }
-            }
-        }
-        area(navigation)
-        {
-            group(Dimensions)
-            {
-                Caption = 'Dimensions';
-                Image = Dimensions;
-                action(Action6150633)
-                {
-                    Caption = 'Dimensions';
-                    Image = Dimensions;
-                    Promoted = true;
-                    PromotedCategory = Category4;
-                    RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014402),
-                                  "No."=FIELD("No.");
-                    ShortCutKey = 'Shift+Ctrl+D';
                 }
             }
         }

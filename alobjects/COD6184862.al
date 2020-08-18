@@ -2,6 +2,9 @@ codeunit 6184862 "FTP Management"
 {
     // NPR5.54/ALST/20200212 CASE 383718 Object created
     // NPR5.54/JAKUBV/20200408  CASE 394895 Transport NPR5.54 - 8 April 2020
+    // NPR5.55/ALST/20200603    CASE 402502 integrated SFTP download
+    // NPR5.55/ALST/20200609    CASE 387570 added incoming document boolean parameter
+    // NPR5.55/ALST/20200626    CASE 408285 added SSH protocol handling
 
 
     trigger OnRun()
@@ -36,6 +39,12 @@ codeunit 6184862 "FTP Management"
         UploadAllDescCaption: Label '(Optional)  logical (1/0 or true/false or t/f) case true, all files on the NAV server directory will be uploaded, else Overview table will be consulted for new files only. Default is false.';
         DataExchTypeCaption: Label 'Data exchange type';
         DataExchTypeDescCaption: Label '(Optional) Providing the Data Exchange Type (see Data Exchange Types page, Code field) will create an incoming document instead of downloading it to the server';
+        SecuredConnectionCaption: Label 'Secured connection';
+        SecuredConnDescCaption: Label '(Optional) Used when accessing information VIA a secured connection. Valid values are: SSH, SSL, and left blank (for SFTP, FTPS, and FTP connections respectively).';
+        StartingDirectoryCaption: Label 'Look in directory';
+        StartingDirDescCaption: Label '(Optional) focus command to directory, example: /folder1/folder11/';
+        IncomingDocumentCaption: Label 'Create Incoming Document';
+        IncDocumentDescCaption: Label '(Optional) logical (1/0 or true/false or t/f) parameter to send file to the incoming document table instead of the physical location on server, default set to false';
 
     procedure StorageType(): Code[20]
     begin
@@ -106,6 +115,24 @@ codeunit 6184862 "FTP Management"
             Description := StrSubstNo(ListParamDescriptionCaption, FTPOverview.TableCaption);
             if Insert then;
 
+            //-NPR5.55 [402502]
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := ListCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := SecuredConnectionCaption;
+            Description := SecuredConnDescCaption;
+            if Insert then;
+
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := ListCaption;
+            "Parameter Key" := 300;
+            "Parameter Name" := StartingDirectoryCaption;
+            Description := StartingDirDescCaption;
+            if Insert then;
+            //+NPR5.55 [402502]
+
             Init;
             "Storage Type" := StorageType();
             "Operation Code" := UploadCaption;
@@ -132,6 +159,16 @@ codeunit 6184862 "FTP Management"
             Description := UploadAllDescCaption;
             if Insert then;
 
+            //-NPR5.55 [402502]
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := UploadCaption;
+            "Parameter Key" := 400;
+            "Parameter Name" := SecuredConnectionCaption;
+            Description := SecuredConnDescCaption;
+            if Insert then;
+            //+NPR5.55 [402502]
+
             Init;
             "Storage Type" := StorageType();
             "Operation Code" := DownloadCaption;
@@ -149,6 +186,26 @@ codeunit 6184862 "FTP Management"
             Description := DataExchTypeDescCaption;
             if Insert then;
 
+            //-NPR5.55 [402502]
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 300;
+            "Parameter Name" := SecuredConnectionCaption;
+            Description := SecuredConnDescCaption;
+            if Insert then;
+            //+NPR5.55 [402502]
+
+            //-NPR5.55 [387570]
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DownloadCaption;
+            "Parameter Key" := 400;
+            "Parameter Name" := IncomingDocumentCaption;
+            Description := IncDocumentDescCaption;
+            if Insert then;
+            //+NPR5.55 [387570]
+
             Init;
             "Storage Type" := StorageType();
             "Operation Code" := DeleteCaption;
@@ -157,6 +214,16 @@ codeunit 6184862 "FTP Management"
             Description := FileDescCaption;
             "Mandatory For Job Queue" := true;
             if Insert then;
+
+            //-NPR5.55 [402502]
+            Init;
+            "Storage Type" := StorageType();
+            "Operation Code" := DeleteCaption;
+            "Parameter Key" := 200;
+            "Parameter Name" := SecuredConnectionCaption;
+            Description := SecuredConnDescCaption;
+            if Insert then;
+            //+NPR5.55 [402502]
         end;
     end;
 
@@ -175,7 +242,7 @@ codeunit 6184862 "FTP Management"
         StorageSetup.Description := FTPSetup.Description;
     end;
 
-    procedure FindOnFTP(var XMLDocument: DotNet npNetXmlDocument; FTPCode: Code[10]; StartParsingPosition: Integer; var CurrentPathDepth: Text; StartingDirectory: Text; FileName: Text; RecursiveSearch: Boolean; Secure: Boolean; Silent: Boolean): Boolean
+    procedure FindOnFTP(var XMLDocument: DotNet npNetXmlDocument; FTPCode: Code[10]; StartParsingPosition: Integer; var CurrentPathDepth: Text; StartingDirectory: Text; FileName: Text; RecursiveSearch: Boolean; Secure: Code[3]; Silent: Boolean): Boolean
     var
         TempBlob: Codeunit "Temp Blob";
         FTPSetup: Record "FTP Setup";
@@ -196,6 +263,8 @@ codeunit 6184862 "FTP Management"
         FTPWebRequest: DotNet npNetFtpWebRequest;
     begin
         //caution, recursive searching taxes FTP server resources, please try to pinpoint the directory as much as possible
+        //-NPR5.55 [408285]
+        //XML document contains search results
 
         FTPSetup.Get(FTPCode);
 
@@ -205,12 +274,31 @@ codeunit 6184862 "FTP Management"
         end else
             StartingDirectory += '/';
 
+        if IsNull(XMLDocument) then begin
+            XMLDocument := XMLDocument.XmlDocument();
+            XMLRoot := XMLDocument.CreateElement('root');
+            XMLDocument.AppendChild(XMLRoot);
+        end;
+
+        if Secure = 'SSH' then
+            exit(FindOnSFTP(XMLDocument, FTPSetup, CurrentPathDepth, StartingDirectory, FileName, RecursiveSearch));
+
+        // IF StartingDirectory > '' THEN BEGIN
+        //  IF COPYSTR(StartingDirectory, STRLEN(StartingDirectory)) <> '/' THEN
+        //    StartingDirectory += '/';
+        // END ELSE
+        //  StartingDirectory += '/';
+        //+NPR5.55 [402502]
+
         if RecursiveSearch then
             Method := 'LIST'
         else
             Method := 'NLST';
 
-        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, Method, Secure);
+        //-NPR5.55 [402502]
+        //RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, Method, Secure);
+        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, Method, Secure = 'SSL');
+        //+NPR5.55 [402502]
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
             if not Silent then
@@ -218,11 +306,13 @@ codeunit 6184862 "FTP Management"
             else
                 exit;
 
-        if IsNull(XMLDocument) then begin
-            XMLDocument := XMLDocument.XmlDocument();
-            XMLRoot := XMLDocument.CreateElement('root');
-            XMLDocument.AppendChild(XMLRoot);
-        end;
+        //-NPR5.55 [408285]
+        // IF ISNULL(XMLDocument) THEN BEGIN
+        //  XMLDocument := XMLDocument.XmlDocument();
+        //  XMLRoot := XMLDocument.CreateElement('root');
+        //  XMLDocument.AppendChild(XMLRoot);
+        // END;
+        //+NPR5.55 [408285]
 
         if not RecursiveSearch then begin
             CR := 11;
@@ -278,7 +368,7 @@ codeunit 6184862 "FTP Management"
         exit(XMLRoot.ChildNodes.Count() > 0);
     end;
 
-    procedure UploadToFTP(var TempBlob: Codeunit "Temp Blob"; FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Boolean; Silent: Boolean): Boolean
+    procedure UploadToFTP(var TempBlob: Codeunit "Temp Blob"; FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Code[3]; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -288,7 +378,19 @@ codeunit 6184862 "FTP Management"
     begin
         FTPSetup.Get(FTPCode);
 
-        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, 'STOR', Secure);
+        //-NPR5.55 [402502]
+        if Secure = 'SSH' then begin
+            //-NPR5.55 [408285]
+            //UploadToSFTP();
+            UploadToSFTP(TempBlob, FTPSetup, PathInDirectory, FileName);
+            //+NPR5.55 [408285]
+
+            exit(true);
+        end;
+
+        //RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, 'STOR', Secure);
+        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, 'STOR', Secure = 'SSL');
+        //+NPR5.55 [402502]
 
         RequestManagement.StreamToFTPRequest(FTPWebRequest, TempBlob, RequestManagement.BlobLenght(TempBlob));
 
@@ -303,7 +405,7 @@ codeunit 6184862 "FTP Management"
         exit(true);
     end;
 
-    procedure DownloadFromFTP(var TempBlob: Codeunit "Temp Blob"; FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Boolean; Silent: Boolean): Boolean
+    procedure DownloadFromFTP(var TempBlob: Codeunit "Temp Blob"; FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Code[3]; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -316,7 +418,16 @@ codeunit 6184862 "FTP Management"
     begin
         FTPSetup.Get(FTPCode);
 
-        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, 'RETR', Secure);
+        //-NPR5.55 [402502]
+        if Secure = 'SSH' then begin
+            DownloadFromSFTP(TempBlob, FTPSetup, PathInDirectory, FileName);
+
+            exit(true);
+        end;
+
+        //RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, 'RETR', Secure);
+        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, 'RETR', Secure = 'SSL');
+        //+NPR5.55 [402502]
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
             if not Silent then
@@ -332,7 +443,7 @@ codeunit 6184862 "FTP Management"
         exit(true);
     end;
 
-    procedure DeleteFromFTP(FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Boolean; Silent: Boolean): Boolean
+    procedure DeleteFromFTP(FTPCode: Code[10]; PathInDirectory: Text; FileName: Text; Secure: Code[3]; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -343,12 +454,26 @@ codeunit 6184862 "FTP Management"
     begin
         FTPSetup.Get(FTPCode);
 
+        //-NPR5.55 [402502]
+        if Secure = 'SSH' then begin
+            //-NPR5.55 [408285]
+            //DeleteFromSFTP();
+            DeleteFromSFTP(FTPSetup, PathInDirectory, FileName);
+            //+NPR5.55 [408285]
+
+            exit(true);
+        end;
+        //+NPR5.55 [402502]
+
         if FileName = '' then
             Method := 'RMD'
         else
             Method := 'DELE';
 
-        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, Method, Secure);
+        //-NPR5.55 [402502]
+        //RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, Method, Secure);
+        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + PathInDirectory + FileName, FTPCode, Method, Secure = 'SSL');
+        //+NPR5.55 [402502]
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
             if not Silent then
@@ -361,7 +486,7 @@ codeunit 6184862 "FTP Management"
         exit(true);
     end;
 
-    procedure CreateDirectoryInFTP(FTPCode: Code[10]; DirectoryPath: Text; Secure: Boolean; Silent: Boolean): Boolean
+    procedure CreateDirectoryInFTP(FTPCode: Code[10]; DirectoryPath: Text; Secure: Code[3]; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         RequestManagement: Codeunit "Request Management";
@@ -371,7 +496,16 @@ codeunit 6184862 "FTP Management"
     begin
         FTPSetup.Get(FTPCode);
 
-        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + DirectoryPath, FTPCode, 'MKD', Secure);
+        //-NPR5.55 [408285]
+        if Secure = 'SSH' then begin
+            CreateDirectoryInSFTP(FTPSetup, DirectoryPath);
+
+            exit(true);
+        end;
+
+        //RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + DirectoryPath, FTPCode, 'MKD', Secure);
+        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + DirectoryPath, FTPCode, 'MKD', Secure = 'SSL');
+        //+NPR5.55 [408285]
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
             if not Silent then
@@ -382,7 +516,7 @@ codeunit 6184862 "FTP Management"
         exit(true);
     end;
 
-    procedure ListFTP(FTPCode: Code[10]; StartParsingPosition: Integer; var CurrentPathDepth: Text; StartingDirectory: Text; SingleDirectory: Boolean; Refresh: Boolean; DBInsert: Boolean; Secure: Boolean; var Directories: DotNet npNetXmlDocument; Silent: Boolean): Boolean
+    procedure ListFTP(FTPCode: Code[10]; StartParsingPosition: Integer; var CurrentPathDepth: Text; StartingDirectory: Text; SingleDirectory: Boolean; Refresh: Boolean; DBInsert: Boolean; Secure: Code[3]; var Directories: DotNet npNetXmlDocument; Silent: Boolean): Boolean
     var
         FTPSetup: Record "FTP Setup";
         TempBlob: Codeunit "Temp Blob";
@@ -402,6 +536,7 @@ codeunit 6184862 "FTP Management"
 
         FTPSetup.Get(FTPCode);
 
+        //-NPR5.55 [402502]
         if IsNull(Directories) then begin
             Directories := Directories.XmlDocument();
             Root := Directories.CreateElement('root');
@@ -420,7 +555,36 @@ codeunit 6184862 "FTP Management"
         if Refresh then
             DeleteFromFTPOverview(FTPCode, StartingDirectory, '', SingleDirectory);
 
-        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, 'LIST', Secure);
+        if Secure = 'SSH' then begin
+            //-NPR5.55 [408285]
+            //ListSFTP(FTPSetup, StartingDirectory);
+            ListSFTP(FTPSetup, StartingDirectory, CurrentPathDepth, Directories);
+            //+NPR5.55 [408285]
+
+            exit(true);
+        end;
+
+        // IF ISNULL(Directories) THEN BEGIN
+        //  Directories := Directories.XmlDocument();
+        //  Root := Directories.CreateElement('root');
+        //  Directories.AppendChild(Root);
+        // END;
+        //
+        // IF StartingDirectory > '' THEN BEGIN
+        //  IF COPYSTR(StartingDirectory, 1, 1) <> '/' THEN
+        //    StartingDirectory := '/' + StartingDirectory;
+        //
+        //  IF COPYSTR(StartingDirectory, STRLEN(StartingDirectory)) <> '/' THEN
+        //    StartingDirectory += '/';
+        // END ELSE
+        //  StartingDirectory += '/';
+        //
+        // IF Refresh THEN
+        //  DeleteFromFTPOverview(FTPCode, StartingDirectory, '', SingleDirectory);
+
+        //RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, 'LIST', Secure);
+        RequestManagement.CreateFTPRequest(FTPWebRequest, FTPSetup."FTP Host" + StartingDirectory + CurrentPathDepth, FTPCode, 'LIST', Secure = 'SSL');
+        //+NPR5.55 [402502]
 
         if not RequestManagement.HandleFTPRequest(FTPWebRequest, Response, true) then
             if not Silent then
@@ -470,6 +634,144 @@ codeunit 6184862 "FTP Management"
         exit(true);
     end;
 
+    local procedure FindOnSFTP(var XMLDocument: DotNet npNetXmlDocument; FTPSetup: Record "FTP Setup"; var CurrentPathDepth: Text; StartingDirectory: Text; FileName: Text; RecursiveSearch: Boolean): Boolean
+    var
+        SSHNETSFTPClient: Codeunit "SSH.NET SFTP Client";
+        RequestManagement: Codeunit "Request Management";
+        XMLRoot: DotNet npNetXmlElement;
+        XMLElement: DotNet npNetXmlElement;
+        IEnumerableSFTPFileList: DotNet npNetIEnumerable;
+        SftpFile: DotNet npNetSftpFile;
+        Path: DotNet npNetPath;
+        Found: Boolean;
+    begin
+        //-NPR5.55 [408285]
+        SSHNETSFTPClient.Construct(FTPSetup."FTP Host", FTPSetup.User, FTPSetup.GetPassword(), FTPSetup."Port Number", FTPSetup.Timeout);
+        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+        SSHNETSFTPClient.ListDirectory(StartingDirectory + CurrentPathDepth, IEnumerableSFTPFileList);
+
+        foreach SftpFile in IEnumerableSFTPFileList do
+            if not (DelChr(SftpFile.Name, '=', ' ') in ['.', '..', '']) then
+                if Path.HasExtension(SftpFile.Name) then begin
+                    if StrPos(SftpFile.Name, FileName) > 0 then begin
+                        XMLRoot := XMLDocument.FirstChild();
+
+                        XMLElement := XMLDocument.CreateElement(Format(DelChr(CreateGuid, '=', '{-}')));
+                        XMLElement.InnerText := CurrentPathDepth + SftpFile.Name;
+                        XMLRoot.AppendChild(XMLElement);
+                    end;
+                end else begin
+                    CurrentPathDepth += SftpFile.Name + '/';
+
+                    Found := FindOnSFTP(XMLDocument, FTPSetup, CurrentPathDepth, StartingDirectory, FileName, true) or Found;
+                end;
+
+        if CurrentPathDepth > '' then
+            CurrentPathDepth := CopyStr(CurrentPathDepth, 1, RequestManagement.FindLastOccuranceInString(CopyStr(CurrentPathDepth, 1, StrLen(CurrentPathDepth) - 1), '/'));
+
+        if IsNull(XMLRoot) then
+            exit(Found);
+
+        exit((XMLRoot.ChildNodes.Count() > 0) or Found);
+        //+NPR5.55 [408285]
+    end;
+
+    local procedure UploadToSFTP(var TempBlob: Codeunit "Temp Blob"; FTPSetup: Record "FTP Setup"; PathInDirectory: Text; FileName: Text)
+    var
+        SSHNETSFTPClient: Codeunit "SSH.NET SFTP Client";
+    begin
+        //-NPR5.55 [408285]
+        SSHNETSFTPClient.Construct(FTPSetup."FTP Host", FTPSetup.User, FTPSetup.GetPassword(), FTPSetup."Port Number", FTPSetup.Timeout);
+        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+
+        SSHNETSFTPClient.UploadFileFromBlob(TempBlob, PathInDirectory + FileName);
+
+        InsertFTPOverview(FTPSetup.Code, PathInDirectory, FileName);
+        //+NPR5.55 [408285]
+    end;
+
+    local procedure DownloadFromSFTP(var TempBlob: Codeunit "Temp Blob"; FTPSetup: Record "FTP Setup"; FilePath: Text; FileName: Text)
+    var
+        SSHNETSFTPClient: Codeunit "SSH.NET SFTP Client";
+        FileMgt: Codeunit "File Management";
+    begin
+        //-NPR5.55 [402502]
+        SSHNETSFTPClient.Construct(FTPSetup."FTP Host", FTPSetup.User, FTPSetup.GetPassword(), FTPSetup."Port Number", FTPSetup.Timeout);
+        //-NPR5.55 [408285]
+        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+        //+NPR5.55 [408285]
+        SSHNETSFTPClient.DownloadFile(FTPSetup."Storage On Server" + FileName, FilePath + FileName);
+
+        FileMgt.BLOBImportFromServerFile(TempBlob, FTPSetup."Storage On Server" + FileName);
+        //+NPR5.55 [402502]
+    end;
+
+    local procedure DeleteFromSFTP(FTPSetup: Record "FTP Setup"; PathInDirectory: Text; FileName: Text)
+    var
+        SSHNETSFTPClient: Codeunit "SSH.NET SFTP Client";
+    begin
+        //-NPR5.55 [408285]
+        SSHNETSFTPClient.Construct(FTPSetup."FTP Host", FTPSetup.User, FTPSetup.GetPassword(), FTPSetup."Port Number", FTPSetup.Timeout);
+        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+
+        if FileName = '' then
+            SSHNETSFTPClient.DeleteDirectory(PathInDirectory)
+        else
+            SSHNETSFTPClient.DeleteFile(PathInDirectory + FileName);
+
+        DeleteFromFTPOverview(FTPSetup.Code, PathInDirectory, FileName, false);
+        //+NPR5.55 [408285]
+    end;
+
+    local procedure ListSFTP(FTPSetup: Record "FTP Setup"; StartingDirectory: Text; var CurrentPathDepth: Text; var Directories: DotNet npNetXmlDocument)
+    var
+        SSHNETSFTPClient: Codeunit "SSH.NET SFTP Client";
+        FileManagement: Codeunit "File Management";
+        RequestManagement: Codeunit "Request Management";
+        IEnumerableSFTPFileList: DotNet npNetIEnumerable;
+        SftpFile: DotNet npNetSftpFile;
+        Path: DotNet npNetPath;
+        Directory: DotNet npNetXmlNode;
+    begin
+        //-NPR5.55 [402502]
+        SSHNETSFTPClient.Construct(FTPSetup."FTP Host", FTPSetup.User, FTPSetup.GetPassword(), FTPSetup."Port Number", FTPSetup.Timeout);
+        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+        SSHNETSFTPClient.ListDirectory(StartingDirectory + CurrentPathDepth, IEnumerableSFTPFileList);
+
+        foreach SftpFile in IEnumerableSFTPFileList do
+            //-NPR5.55 [408285]
+            //InsertFTPOverview(FTPSetup.Code, StartingDirectory, SftpFile.Name);
+            if not (DelChr(SftpFile.Name, '=', ' ') in ['.', '..', '']) then
+                if Path.HasExtension(SftpFile.Name) then begin
+                    InsertFTPOverview(FTPSetup.Code, StartingDirectory + CurrentPathDepth, SftpFile.Name);
+                end else begin
+                    CurrentPathDepth += SftpFile.Name + '/';
+
+                    Directory := Directories.CreateElement(Format(DelChr(CreateGuid, '=', '{-}')));
+                    Directory.InnerText := CurrentPathDepth;
+                    Directories.FirstChild.AppendChild(Directory);
+
+                    ListSFTP(FTPSetup, StartingDirectory, CurrentPathDepth, Directories);
+                end;
+
+        if CurrentPathDepth > '' then
+            CurrentPathDepth := CopyStr(CurrentPathDepth, 1, RequestManagement.FindLastOccuranceInString(CopyStr(CurrentPathDepth, 1, StrLen(CurrentPathDepth) - 1), '/'));
+        //+NPR5.55 [408285]
+        //+NPR5.55 [402502]
+    end;
+
+    procedure CreateDirectoryInSFTP(FTPSetup: Record "FTP Setup"; DirectoryPath: Text): Boolean
+    var
+        SSHNETSFTPClient: Codeunit "SSH.NET SFTP Client";
+    begin
+        //-NPR5.55 [408285]
+        SSHNETSFTPClient.Construct(FTPSetup."FTP Host", FTPSetup.User, FTPSetup.GetPassword(), FTPSetup."Port Number", FTPSetup.Timeout);
+        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+
+        SSHNETSFTPClient.CreateDirectory(DirectoryPath);
+        //+NPR5.55 [408285]
+    end;
+
     local procedure InsertFTPOverview(FTPCode: Code[10]; FilePath: Text; FileName: Text)
     var
         FTPOverview: Record "FTP Overview";
@@ -506,11 +808,14 @@ codeunit 6184862 "FTP Management"
                 exit;
             end;
 
-            FTPOverview.FindSet;
-            repeat
-                if StrPos(FTPOverview."File Name", DirectoryName) > 0 then
-                    FTPOverview.Delete;
-            until FTPOverview.Next = 0;
+            //-NPR5.55 [408285]
+            //FTPOverview.FINDSET;
+            if FTPOverview.FindSet then
+                //+NPR5.55 [408285]
+                repeat
+                    if StrPos(FTPOverview."File Name", DirectoryName) > 0 then
+                        FTPOverview.Delete;
+                until FTPOverview.Next = 0;
         end;
     end;
 }

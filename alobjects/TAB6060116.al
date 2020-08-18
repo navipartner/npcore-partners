@@ -20,6 +20,7 @@ table 6060116 "TM Ticket Reservation Request"
     // TM1.43/TSA /20190910 CASE 368043 Added Item No. and Variant Code to make a separation from "External Item Code".
     // TM1.45/TSA /20191204 CASE 380754 Added Waiting List Reference Code, and request status option "Waiting List"
     // TM1.45/TSA /20191216 CASE 382535 Added "Admission Inclusion", "Notification Format"
+    // TM1.47/TSA /20200526 CASE 382535 Added "Admission Inclusion Status"
 
     Caption = 'Ticket Reservation Request';
 
@@ -88,6 +89,12 @@ table 6060116 "TM Ticket Reservation Request"
             Caption = 'Admission Inclusion';
             OptionCaption = 'Required,Optional and Selected,Optional and not Selected';
             OptionMembers = REQUIRED,SELECTED,NOT_SELECTED;
+        }
+        field(27;"Admission Inclusion Status";Option)
+        {
+            Caption = 'Admission Inclusion Status';
+            OptionCaption = ' ,Add,Remove';
+            OptionMembers = NO_CHANGE,ADD,REMOVE;
         }
         field(30;"Expires Date Time";DateTime)
         {

@@ -1,6 +1,7 @@
 table 6151210 "NpCs Open. Hour Entry"
 {
     // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
+    // NPR5.55/MHA /20200731  CASE 417003 Added Weekly to UpdatePeriodDescription()
 
     Caption = 'Collect Store Opening Hour Entry';
 
@@ -142,7 +143,13 @@ table 6151210 "NpCs Open. Hour Entry"
     begin
         "Period Description" := '';
         case "Period Type" of
+          //-NPR5.55 [417003]
           "Period Type"::"Every Day":
+            begin
+               "Period Description" := Format("Period Type");
+            end;
+          "Period Type"::Weekly:
+          //+NPR5.55 [417003]
             begin
               if Monday then
                 AppendPeriodDescription(FieldCaption(Monday));

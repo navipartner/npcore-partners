@@ -233,7 +233,7 @@ page 6151249 "NP Retail Entertainment RC"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Flow Status';
-                    RunObject = Page "NPRE Flow Status";
+                    RunObject = Page "NPRE Select Flow Status";
                 }
             }
         }

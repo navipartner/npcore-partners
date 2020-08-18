@@ -5,6 +5,7 @@ page 6151590 "NpDc Coupon Type Card"
     // NPR5.39/MHA /20180214  CASE 305146 Added field 70 "Enabled"
     // NPR5.40/MHA /20180308  CASE 305859 Added Action "Comments" and InitCouponType() in OnNewRecord()
     // NPR5.42/MHA /20180521  CASE 305859 Added field 67 Print on Issue
+    // NPR5.55/ALPO/20200518  CASE 387376 Possibility to define sequence in which discount coupons are applied
 
     Caption = 'Coupon Type Card';
     PageType = Card;
@@ -141,6 +142,9 @@ page 6151590 "NpDc Coupon Type Card"
                         begin
                             CurrPage.Update(true);
                         end;
+                    }
+                    field("Application Sequence No.";"Application Sequence No.")
+                    {
                     }
                 }
                 group(Control6014433)

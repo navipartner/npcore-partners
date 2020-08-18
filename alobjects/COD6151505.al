@@ -52,6 +52,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     // NC2.22/MHA /20190715  CASE 361919 Parsed OutStream to IOStream in InsertImportEntrySftp() for AL Compatability
     // NC2.23/MHA /20190927  CASE 369170 SendErrorMail() is no longer a Try function as it contains MODIFY transaction and removed Gambit integration
     // NC2.25/MHA /20200120  CASE 386177 Ftp 'LIST' replaced with 'NLST' in CheckFtpUrlExists()
+    // NC2.26/TJ  /20200506  CASE 401322 Function TaskResetCount made global
+    // NC2.26/MHA /20200506  CASE 403279 Backup path check no longer throws error in InsertImportEntry()
+    // NPR5.55/MHA /20200604  CASE 408100 Redirected Import to Nc Import Processor
 
     TableNo = "Task Line";
 
@@ -240,10 +243,13 @@ codeunit 6151505 "Nc Sync. Mgt."
                 Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end else begin
             TargetUri := TargetUri.Uri(SourceUri.AbsoluteUri + ImportType."Ftp Backup Path" + '/');
-            if not CheckFtpUrlExists(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password") then begin
-                if not MakeFtpUrl(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password") then
-                    Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
-            end;
+          //-NC2.26 [403279]
+          if (not CheckFtpUrlExists(TargetUri.AbsoluteUri,ImportType."Ftp User",ImportType."Ftp Password")) and
+            (not CheckFtpUrlExists2(TargetUri.AbsoluteUri,ImportType."Ftp User",ImportType."Ftp Password"))
+          then begin
+            if MakeFtpUrl(TargetUri.AbsoluteUri,ImportType."Ftp User",ImportType."Ftp Password") then;
+          end;
+          //+NC2.26 [403279]
 
             if not RenameFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password", ImportType."Ftp Backup Path" + '/' + Filename) then
                 Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
@@ -407,24 +413,13 @@ codeunit 6151505 "Nc Sync. Mgt."
         DataLogMgt: Codeunit "Data Log Management";
         NaviConnectImportMgt: Codeunit "Nc Import Mgt.";
     begin
-        Clear(NaviConnectImportMgt);
-        ImportEntryReset(ImportEntry);
-        //-NC2.22 [358499]
-        ClearLastError;
-        //+NC2.22 [358499]
-        if NaviConnectImportMgt.Run(ImportEntry) then begin
-            //-NC2.12 [308107]
-            DataLogMgt.DisableDataLog(false);
-            //+NC2.12 [308107]
-            ImportEntryComplete(ImportEntry);
-            exit(true);
-        end;
+        //-NPR5.55 [408100]
+        CODEUNIT.Run(CODEUNIT::"Nc Import Processor",ImportEntry);
+        if ImportEntry.Get(ImportEntry."Entry No.") then
+          exit(ImportEntry.Imported);
 
-        //-NC2.12 [308107]
-        DataLogMgt.DisableDataLog(false);
-        //+NC2.12 [308107]
-        ImportEntryError(ImportEntry);
         exit(false);
+        //+NPR5.55 [408100]
     end;
 
     [Scope('Personalization')]
@@ -434,6 +429,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
         ImportEntry.SetRange(Imported, false);
         ImportEntry.SetRange("Runtime Error", false);
+        //-NPR5.55 [408100]
+        ImportEntry.SetFilter("Earliest Import Datetime",'<=%1',CurrentDateTime);
+        //+NPR5.55 [408100]
         if ImportEntry.FindSet then
             repeat
                 ProcessImportEntry(ImportEntry);
@@ -490,79 +488,6 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     local procedure "--- Status Mgt."()
     begin
-    end;
-
-    local procedure ImportEntryComplete(var ImportEntry: Record "Nc Import Entry")
-    var
-        ErrorText: Text[1024];
-    begin
-        if not ImportEntry.Get(ImportEntry."Entry No.") then
-            exit;
-        ErrorText := GetLastErrorText;
-        Clear(ImportEntry."Last Error Message");
-        ImportEntry."Error Message" := '';
-        ImportEntry.Imported := true;
-        ImportEntry."Runtime Error" := false;
-        //-NC2.16 [313184]
-        ImportEntry."Import Completed at" := CurrentDateTime;
-        ImportEntry."Import Duration" := (ImportEntry."Import Completed at" - ImportEntry."Import Started at") / 1000;
-        //+NC2.16 [313184]
-        ImportEntry.Modify(true);
-        ClearLastError;
-        Commit;
-    end;
-
-    local procedure ImportEntryError(var ImportEntry: Record "Nc Import Entry")
-    var
-        NcImportMgt: Codeunit "Nc Import Mgt.";
-        OutStream: OutStream;
-        ErrorText: Text[1024];
-    begin
-        if not ImportEntry.Get(ImportEntry."Entry No.") then
-            exit;
-        ErrorText := GetLastErrorText;
-        //-NC2.22 [334216]
-        if ErrorText <> '' then begin
-            Clear(ImportEntry."Last Error Message");
-            ImportEntry."Error Message" := CopyStr(ErrorText, 1, MaxStrLen(ImportEntry."Error Message"));
-            ImportEntry."Last Error Message".CreateOutStream(OutStream);
-            OutStream.Write(ErrorText);
-        end;
-        //+NC2.22 [334216]
-        ImportEntry.Imported := false;
-        ImportEntry."Runtime Error" := true;
-        //-NC2.16 [313184]
-        ImportEntry."Import Completed at" := CurrentDateTime;
-        ImportEntry."Import Duration" := (ImportEntry."Import Completed at" - ImportEntry."Import Started at") / 1000;
-        //+NC2.16 [313184]
-        ImportEntry.Modify(true);
-        ClearLastError;
-        Commit;
-        //-NC2.23 [369170]
-        asserterror
-        begin
-            NcImportMgt.SendErrorMail(ImportEntry);
-            Commit;
-            Error('');
-        end;
-        //+NC2.23 [369170]
-    end;
-
-    local procedure ImportEntryReset(var ImportEntry: Record "Nc Import Entry")
-    var
-        OutStream: OutStream;
-        ErrorText: Text[1024];
-    begin
-        Clear(ImportEntry."Last Error Message");
-        ImportEntry.Imported := false;
-        ImportEntry."Runtime Error" := true;
-        //-NC2.16 [313184]
-        ImportEntry."Import Started at" := CurrentDateTime;
-        ImportEntry."Import Duration" := 0;
-        ImportEntry."Import Completed at" := 0DT;
-        //+NC2.16 [313184]
-        ImportEntry.Modify(true);
-        Commit;
     end;
 
     local procedure TaskComplete(var NaviConnectTask: Record "Nc Task")
@@ -623,7 +548,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         Commit;
     end;
 
-    local procedure TaskResetCount()
+    procedure TaskResetCount()
     var
         NaviConnectTask: Record "Nc Task";
         NcTaskMgt: Codeunit "Nc Task Mgt.";
@@ -1016,6 +941,28 @@ codeunit 6151505 "Nc Sync. Mgt."
         MemoryStream.Flush;
         MemoryStream.Close;
         Clear(MemoryStream);
+    end;
+
+    [TryFunction]
+    local procedure CheckFtpUrlExists2(FtpUrl: Text;Username: Text;Password: Text)
+    var
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+    begin
+        //-NC2.26 [403279]
+        FtpWebRequest := FtpWebRequest.Create(FtpUrl);
+        FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectory
+        FtpWebRequest.KeepAlive := false;
+        if Username <> '' then
+          FtpWebRequest.Credentials := Credential.NetworkCredential(Username,Password);
+        FtpWebResponse := FtpWebRequest.GetResponse;
+        MemoryStream := FtpWebResponse.GetResponseStream();
+        MemoryStream.Flush;
+        MemoryStream.Close;
+        Clear(MemoryStream);
+        //+NC2.26 [403279]
     end;
 
     [TryFunction]

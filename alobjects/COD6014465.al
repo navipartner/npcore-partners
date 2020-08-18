@@ -22,7 +22,7 @@ codeunit 6014465 "String Library"
     //  "DeleteSuffix(Text : Text[30])"
     //    If the text is a suffix of _String it's removed from the end of _String
     // 
-    //  "EndsWith(Text : Text[30]) IsSuffix : Boolean" Added by Ren� Ravn
+    //  "EndsWith(Text : Text[30]) IsSuffix : Boolean" Added by René Ravn
     //   Returns whether Text is a Suffix of _String or not
     // 
     //  "GetPrefixBySeq(Sequence : Text[10];n : Integer) Prefix : Text[512]"
@@ -37,13 +37,13 @@ codeunit 6014465 "String Library"
     //  "Replace(_What : Text[30];_With : Text[30])"
     //   Replaces all occurences of _What with the value of _With
     // 
-    //  "ReplaceSpecialChar()" Added by Ren� Ravn
+    //  "ReplaceSpecialChar()" Added by René Ravn
     //   Replace all chars not in a-z & 0-9 & ,.-;: with '-'.
-    //   Special convertion being �,�,�,� with a or A and �,�,�,� with o or O.
+    //   Special convertion being æ,å,Æ,Å with a or A and ¢,ö,¥,Ö with o or O.
     // 
-    //  "ReplaceWebChar()" Added by Ren� Ravn
+    //  "ReplaceWebChar()" Added by René Ravn
     //   Replace all chars not in a-z & 0-9 with '-'.
-    //   Special convertion being �,�,�,� with a or A and �,�,�,� with o or O.
+    //   Special convertion being æ,å,Æ,Å with a or A and ¢,ö,¥,Ö with o or O.
     // 
     // 
     //  "SelectStringSep(Index : Integer;Sep : Text[1]) : Text[30]"
@@ -52,7 +52,7 @@ codeunit 6014465 "String Library"
     //  "SelectString(Index : Integer) : Text[250]"
     //   Splits the string using ',' as seperator and returns the n'th string indicated by index.
     // 
-    //  "StartsWith(Text : Text[30]) IsPrefix : Boolean" Added by Ren� Ravn
+    //  "StartsWith(Text : Text[30]) IsPrefix : Boolean" Added by René Ravn
     //   Returns whether Text is a Prefix of _String of not
     // 
     //  "Text() : Text[1024]"

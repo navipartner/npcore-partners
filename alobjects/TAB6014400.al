@@ -1,17 +1,17 @@
 table 6014400 "Retail Setup"
 {
-    // NPR3.0m, NPK, DL, 05-03-07, Tilf�jet felt 50014 pakkelabel
+    // NPR3.0m, NPK, DL, 05-03-07, Tilf¢jet felt 50014 pakkelabel
     // 
     // NPR3.4n, NIES, 29-03-07, Rounding flyttet til kasserne.
-    // NPR3.4o, NPK, DL, 02-04-07, Tilf�jet felt 50016
-    // NPR3.4p, NPK, DL, 15-04-07, Tilf�jet felt 50017
-    // NPR3.4q, NPK, DL, 19-04-07, Tilf�jet felt 50018
-    // NPR3.4r, NPK, DL, 26-04-07, Tilf�jet felt 50019
+    // NPR3.4o, NPK, DL, 02-04-07, Tilf¢jet felt 50016
+    // NPR3.4p, NPK, DL, 15-04-07, Tilf¢jet felt 50017
+    // NPR3.4q, NPK, DL, 19-04-07, Tilf¢jet felt 50018
+    // NPR3.4r, NPK, DL, 26-04-07, Tilf¢jet felt 50019
     // PCM1.0 (NPR-Package1.0), NPK, DL, 18-03-08, Added fields 6500-6504
     //                                   19-03-08, Added fields 6505-6508
     //                                   04-04-08, Moved fields to table 6014550
     // 
-    // NPR4.004.006, 07-07-09, MH - Tilf�jet felt, 50044 Receipt type, der definerer, hvordan bon skal udskrives fra kassen.
+    // NPR4.004.006, 07-07-09, MH - Tilf¢jet felt, 50044 Receipt type, der definerer, hvordan bon skal udskrives fra kassen.
     // NPR6.001.005 20130313 LJJ - CASE 152082: Field 50050 - "Cust. Barcode Management" - added.
     //                                          Field 50051 - "Cust. Barcode Prefix" - added.
     // NPR6.001.006 20130702 LJJ - CASE 158804: Field 50052 - "Post Statement Per Journal" - added.
@@ -78,7 +78,7 @@ table 6014400 "Retail Setup"
         field(1;"Key";Code[20])
         {
             Caption = 'Key';
-            Description = 'Prim�rn�gle';
+            Description = 'Primærn¢gle';
         }
         field(3;"Prices Include VAT";Boolean)
         {
@@ -119,13 +119,13 @@ table 6014400 "Retail Setup"
         field(20;"Posting Source Code";Code[10])
         {
             Caption = 'Posting Source Code';
-            Description = 'Kildespor til bogf�ring';
+            Description = 'Kildespor til bogf¢ring';
             TableRelation = "Source Code";
         }
         field(51;"Posting No. Management";Code[10])
         {
             Caption = 'Posting No. Management';
-            Description = 'Nummerserie til kassebogf�ring';
+            Description = 'Nummerserie til kassebogf¢ring';
             TableRelation = "No. Series";
         }
         field(52;"Used Goods No. Management";Code[10])
@@ -317,7 +317,7 @@ table 6014400 "Retail Setup"
         field(655;"Posting Audit Roll";Option)
         {
             Caption = 'Posting Audit Roll';
-            Description = 'Ops�tning for revisionsrulle bogf�ring';
+            Description = 'Opsætning for revisionsrulle bogf¢ring';
             OptionCaption = 'Manual,Automatic';
             OptionMembers = Manual,Automatic;
         }
@@ -336,31 +336,31 @@ table 6014400 "Retail Setup"
         field(703;"Rental Contract  No. Series";Code[10])
         {
             Caption = 'Rental Contract Nos.';
-            Description = 'Nummerserie til udk�rsel';
+            Description = 'Nummerserie til udk¢rsel';
             TableRelation = "No. Series";
         }
         field(704;"Purchase Contract  No. Series";Code[10])
         {
             Caption = 'Purchase Contract Nos.';
-            Description = 'Nummerserie til udk�rsel';
+            Description = 'Nummerserie til udk¢rsel';
             TableRelation = "No. Series";
         }
         field(705;"Customization  No. Series";Code[10])
         {
             Caption = 'Customization Nos.';
-            Description = 'Nummerserie til udk�rsel';
+            Description = 'Nummerserie til udk¢rsel';
             TableRelation = "No. Series";
         }
         field(706;"Quote  No. Series";Code[10])
         {
             Caption = 'Quote Nos.';
-            Description = 'Nummerserie til udk�rsel';
+            Description = 'Nummerserie til udk¢rsel';
             TableRelation = "No. Series";
         }
         field(720;"Exchange Label  No. Series";Code[10])
         {
             Caption = 'Exchange Label Nos.';
-            Description = 'Nummerserie Til Bytte M�rker';
+            Description = 'Nummerserie Til Bytte Mærker';
             TableRelation = "No. Series";
         }
         field(750;"Variant No. Series";Code[10])
@@ -372,7 +372,7 @@ table 6014400 "Retail Setup"
         field(800;"Balancing Posting Type";Option)
         {
             Caption = 'Balancing';
-            Description = 'Ops�tning til kasseafslutning';
+            Description = 'Opsætning til kasseafslutning';
             OptionCaption = 'PER REGISTER,TOTAL';
             OptionMembers = "PER REGISTER",TOTAL;
         }
@@ -427,7 +427,7 @@ table 6014400 "Retail Setup"
         field(3009;"Item Group on Creation";Boolean)
         {
             Caption = 'Item Group On Creation';
-            Description = 'Angiver om der skal sp�rges efter vgr. ved oprettelse';
+            Description = 'Angiver om der skal sp¢rges efter vgr. ved oprettelse';
         }
         field(4001;"Print Register Report";Boolean)
         {
@@ -437,42 +437,42 @@ table 6014400 "Retail Setup"
         field(4002;"Sales Ticket Item";Boolean)
         {
             Caption = 'Sales Ticket Item No.';
-            Description = 'Angiver om varenummer skal med p� bon';
+            Description = 'Angiver om varenummer skal med på bon';
         }
         field(4003;"Recommended Price";Boolean)
         {
             Caption = 'Recommended Price On Sales Ticket';
-            Description = 'Angiver om vejledende pris skal med p� bon';
+            Description = 'Angiver om vejledende pris skal med på bon';
         }
         field(4004;"Logo on Sales Ticket";Boolean)
         {
             Caption = 'Logo On Sales Ticket';
-            Description = 'Angiver om der skal logo p� bon''erne';
+            Description = 'Angiver om der skal logo på bon''erne';
         }
         field(4005;"Name on Sales Ticket";Boolean)
         {
             Caption = 'Name On Sales Ticket';
-            Description = 'Angiver om der skal firma navn p� bon''erne';
+            Description = 'Angiver om der skal firma navn på bon''erne';
         }
         field(4009;"Vendor When Creation";Boolean)
         {
             Caption = 'Vendor When Creation';
-            Description = 'Angiver om der skal sp�rges om leverand�r ved opret';
+            Description = 'Angiver om der skal sp¢rges om leverand¢r ved opret';
         }
         field(4019;"Item Description at 1 star";Boolean)
         {
             Caption = 'Item Description At *';
-            Description = 'Overf�rer varebeskrivelse fra varegruppe ved autoopret';
+            Description = 'Overf¢rer varebeskrivelse fra varegruppe ved autoopret';
         }
         field(4020;"Item Description at 2 star";Boolean)
         {
             Caption = 'Item Description At **';
-            Description = 'Overf�rer varebeskrivelse fra varegruppe ved autoopret';
+            Description = 'Overf¢rer varebeskrivelse fra varegruppe ved autoopret';
         }
         field(5005;"Salesperson on Sales Ticket";Boolean)
         {
             Caption = 'Salesperson On Sales Ticket';
-            Description = 'Udskrift af ekspedientnavn p� bon';
+            Description = 'Udskrift af ekspedientnavn på bon';
         }
         field(5006;"Print Total Item Quantity";Boolean)
         {
@@ -490,14 +490,14 @@ table 6014400 "Retail Setup"
         field(5011;"Create retail order";Option)
         {
             Caption = 'Selection System';
-            Description = 'Skal der sp�rges om man k�rer med skr�ddersystem';
+            Description = 'Skal der sp¢rges om man k¢rer med skræddersystem';
             OptionCaption = ' ,Before Payment,After Payment';
             OptionMembers = " ","Before payment","After payment";
         }
         field(5016;"Customer No.";Option)
         {
             Caption = 'Customer No.';
-            Description = 'Om der skal sp�rges efter kundenummer ved login';
+            Description = 'Om der skal sp¢rges efter kundenummer ved login';
             OptionCaption = 'Standard,At login,Before payment';
             OptionMembers = Standard,"At login","Before payment";
         }
@@ -509,22 +509,22 @@ table 6014400 "Retail Setup"
         field(5019;"Euro on Sales Ticket";Boolean)
         {
             Caption = 'Euro On Sales Ticket';
-            Description = 'Angiver om europris skal med p� bon';
+            Description = 'Angiver om europris skal med på bon';
         }
         field(5020;"Receipt for Debit Sale";Boolean)
         {
             Caption = 'Receipt For Debit Sale';
-            Description = 'Afg�re om rapport valget under salg og faktura skal k�res ifm. at man laver en faktura';
+            Description = 'Afg¢re om rapport valget under salg og faktura skal k¢res ifm. at man laver en faktura';
         }
         field(5022;"Purchace Price Code";Text[10])
         {
             Caption = 'Purchase Price Code';
-            Description = 'Angiver det ord k�bsprisen skal kodes efter p� prislabel';
+            Description = 'Angiver det ord k¢bsprisen skal kodes efter på prislabel';
         }
         field(5024;"Bar Code on Sales Ticket Print";Boolean)
         {
             Caption = 'Bar Code On Sales Ticket Print';
-            Description = 'Stregkode p� bonudskrift';
+            Description = 'Stregkode på bonudskrift';
         }
         field(5025;"Post Sale";Boolean)
         {
@@ -549,7 +549,7 @@ table 6014400 "Retail Setup"
         field(5031;"Ask for Reference";Boolean)
         {
             Caption = 'Ask For Reference';
-            Description = 'Sp�rg efter reference ved debetsalg under ekspedition';
+            Description = 'Sp¢rg efter reference ved debetsalg under ekspedition';
         }
         field(5033;"EAN No. at 1 star";Boolean)
         {
@@ -564,7 +564,7 @@ table 6014400 "Retail Setup"
         field(5040;"Poste Sales Ticket Immediately";Boolean)
         {
             Caption = 'Poste Sales Ticket Immediately';
-            Description = 'Straksbogf�ring af bon';
+            Description = 'Straksbogf¢ring af bon';
         }
         field(5041;"Copies of Selection";Boolean)
         {
@@ -591,7 +591,7 @@ table 6014400 "Retail Setup"
         field(5051;"Exchange Label Exchange Period";DateFormula)
         {
             Caption = 'Exchange Label Exchange Period';
-            Description = 'Bytteperiode for Byttem�rker';
+            Description = 'Bytteperiode for Byttemærker';
         }
         field(5056;"Use WIN User Profile";Boolean)
         {
@@ -606,40 +606,40 @@ table 6014400 "Retail Setup"
         field(5058;"Open Register Password";Code[20])
         {
             Caption = 'Open Cash Register Password';
-            Description = 'kode til at �bne kasseskuffen';
+            Description = 'kode til at åbne kasseskuffen';
         }
         field(5061;"Unit Cost Control";Option)
         {
             Caption = 'Unit Cost Control';
-            Description = 'Sp�rremuligheder til �ndring af � pris';
+            Description = 'Spærremuligheder til ændring af á pris';
             OptionCaption = 'Enabled,Disabled,Disabled if Quantity > 0,Disabled if xUnit Cost > Unit Cost,Disabled if Quantity > 0 and xUnit Cost > Unit Cost';
             OptionMembers = Enabled,Disabled,"Disabled if Quantity > 0","Disabled if xUnit Cost > Unit Cost","Disabled if Quantity > 0 and xUnit Cost > Unit Cost";
         }
         field(5062;"Copy No. on Sales Ticket";Boolean)
         {
             Caption = 'Copy No. On Sales Ticket';
-            Description = 'Udskriv kopinummeret p� bonen';
+            Description = 'Udskriv kopinummeret på bonen';
         }
         field(5068;"Transfer SeO Item Entry";Boolean)
         {
             Caption = 'Transfer Seo To Item Entry';
-            Description = 'Overf�rsel af Serienummer ej oprettet til varepost';
+            Description = 'Overf¢rsel af Serienummer ej oprettet til varepost';
         }
         field(5071;"Register Cnt. Units";Text[100])
         {
             Caption = 'Cash Register Cnt. Units';
-            Description = 'Ops�tning af valutaopdeling til kassen';
+            Description = 'Opsætning af valutaopdeling til kassen';
             InitValue = '0,25:0,50:1:2:5:10:20:50:100:200:500:1000';
         }
         field(5073;"Post Customer Payment imme.";Boolean)
         {
             Caption = 'Post Customer Payment Imme.';
-            Description = 'Straksbogf�r debitor indbetalinger';
+            Description = 'Straksbogf¢r debitor indbetalinger';
         }
         field(5076;"Post Payouts imme.";Boolean)
         {
             Caption = 'Post Payouts Imme.';
-            Description = 'Straksbogf�r udbetalinger';
+            Description = 'Straksbogf¢r udbetalinger';
         }
         field(5077;"Auto Replication";Boolean)
         {
@@ -680,7 +680,7 @@ table 6014400 "Retail Setup"
         field(5105;"Receive Register Turnover";Option)
         {
             Caption = 'Receive Cash Register Turnover';
-            Description = 'Send  SMS med kasseoms�tning ved kasseopt�lling';
+            Description = 'Send  SMS med kasseomsætning ved kasseoptælling';
             OptionCaption = 'None,Per Register,Total Turnover';
             OptionMembers = "None","Per Register","Total Turnover";
         }
@@ -692,7 +692,7 @@ table 6014400 "Retail Setup"
         field(5110;"Itemgroup Pre No. Serie";Code[5])
         {
             Caption = 'Itemgroup Pre No. Serie';
-            Description = 'Code f�r automatisk oprettede varegruppe nr. serier';
+            Description = 'Code f¢r automatisk oprettede varegruppe nr. serier';
         }
         field(5116;"Itemgroup No. Serie StartNo.";Code[20])
         {
@@ -722,7 +722,7 @@ table 6014400 "Retail Setup"
         field(5122;"Unit Price on Sales Ticket";Boolean)
         {
             Caption = 'Unit Price On Sales Ticket';
-            Description = 'Skriv �pris p� bon';
+            Description = 'Skriv ápris på bon';
         }
         field(5124;"Show Stored Tickets";Boolean)
         {
@@ -737,12 +737,12 @@ table 6014400 "Retail Setup"
         field(5126;"Navision Shipment Note";Boolean)
         {
             Caption = 'Navision Shipment Note';
-            Description = 'Afg�re om rapport valget vedr. flgs. skal k�res n�r man laver en flgs. i retai l�sningen';
+            Description = 'Afg¢re om rapport valget vedr. flgs. skal k¢res når man laver en flgs. i retai l¢sningen';
         }
         field(5129;"Show Create Giftcertificat";Boolean)
         {
             Caption = 'Show Create Gift Certificate';
-            Description = 'Vis form til oprettelse af gavekort, n�r disse "k�bes"';
+            Description = 'Vis form til oprettelse af gavekort, når disse "k¢bes"';
         }
         field(5130;"Cash Customer Deposit rel.";Code[20])
         {
@@ -753,14 +753,14 @@ table 6014400 "Retail Setup"
         field(5134;"Immediate postings";Option)
         {
             Caption = 'Immediate Posting';
-            Description = 'Straksbogf�ringskriterier ved inds�ttelse af vareposter';
+            Description = 'Straksbogf¢ringskriterier ved indsættelse af vareposter';
             OptionCaption = ' ,Serial No.,Always';
             OptionMembers = " ","Serial No.",Always;
         }
         field(5138;"Post to Journal";Boolean)
         {
             Caption = 'Post To Journal';
-            Description = 'Inds�t i finanskladde frem for fuldst�ndig bogf�ring';
+            Description = 'Indsæt i finanskladde frem for fuldstændig bogf¢ring';
         }
         field(5139;"Journal Name";Code[10])
         {
@@ -772,30 +772,30 @@ table 6014400 "Retail Setup"
         field(5140;"Show saved expeditions";Option)
         {
             Caption = 'Show Saved Expeditions';
-            Description = 'ops�tning for vis gemte bon';
+            Description = 'opsætning for vis gemte bon';
             OptionCaption = 'All,Register,Salesperson,Register+Salesperson';
             OptionMembers = All,Register,Salesperson,"Register+Salesperson";
         }
         field(5141;"Journal Type";Code[10])
         {
             Caption = 'Journal Type';
-            Description = 'Kladdetype for bogf�ring';
+            Description = 'Kladdetype for bogf¢ring';
             TableRelation = "Gen. Journal Template".Name;
         }
         field(5144;"Show Create Credit Voucher";Boolean)
         {
             Caption = 'Show Create Credit Voucher Form';
-            Description = 'Vis form til oprettelse af tilgodebevis, n�r disse laves';
+            Description = 'Vis form til oprettelse af tilgodebevis, når disse laves';
         }
         field(5145;"Editable eksp. reverse sale";Boolean)
         {
             Caption = 'Editable Eksp. Reverse Sale';
-            Description = 'Ved tilbagef�r bon, skal det v�re muligt at lave �ndringer';
+            Description = 'Ved tilbagef¢r bon, skal det være muligt at lave ændringer';
         }
         field(5146;"Item Unit on Expeditions";Boolean)
         {
             Caption = 'Item Unit On Expeditions';
-            Description = 'Udskriv vareenheder p� bon';
+            Description = 'Udskriv vareenheder på bon';
         }
         field(5149;"Rep. Cust. Default";Option)
         {
@@ -807,29 +807,29 @@ table 6014400 "Retail Setup"
         field(5150;"Retail Debitnote";Boolean)
         {
             Caption = 'Retail Debitnote';
-            Description = 'Afg�re om rapport valget debetkvittering skal k�res';
+            Description = 'Afg¢re om rapport valget debetkvittering skal k¢res';
         }
         field(5151;"Navision Creditnote";Boolean)
         {
             Caption = 'Navision Creditnote';
-            Description = 'Afg�re om rapport valget vedr. kreditnota skal k�res n�r man laver en flgs. i retai l�sningen';
+            Description = 'Afg¢re om rapport valget vedr. kreditnota skal k¢res når man laver en flgs. i retai l¢sningen';
         }
         field(5152;"Check Purchase Lines if vendor";Boolean)
         {
             Caption = 'Check Purchase Lines If Vendor';
-            Description = 'Afg�re om man p� k�bslinie skal checke om vare man taster tilh�rer leverand�re som man laver ordre for.';
+            Description = 'Afg¢re om man på k¢bslinie skal checke om vare man taster tilh¢rer leverand¢re som man laver ordre for.';
         }
         field(5154;"Salespersoncode on Salesdoc.";Option)
         {
             Caption = 'Salesperson Code On Sales Documents';
-            Description = 'Ops�tning for s�lgerkode p� salgsbilag';
+            Description = 'Opsætning for sælgerkode på salgsbilag';
             OptionCaption = 'Forced,Free';
             OptionMembers = Forced,Free;
         }
         field(5156;"Serialno. (Itemno nonexist)";Option)
         {
             Caption = 'Serial No. (Itemno. Does Not Exists)';
-            Description = 'Hvis indtastet varenummer ikke findes, skal der s� ledes efter nummer som serienr?';
+            Description = 'Hvis indtastet varenummer ikke findes, skal der så ledes efter nummer som serienr?';
             OptionCaption = 'Search,Do not search';
             OptionMembers = Search,"Do Not Search";
 
@@ -844,7 +844,7 @@ table 6014400 "Retail Setup"
         field(5160;"Show vendoe Itemno.";Boolean)
         {
             Caption = 'Show Vendor Item No.';
-            Description = 'Vis Lev. Varenummer p� bon';
+            Description = 'Vis Lev. Varenummer på bon';
         }
         field(5163;"Profit on Gifvouchers";Decimal)
         {
@@ -863,7 +863,7 @@ table 6014400 "Retail Setup"
         field(5167;"Show Counting on Counter Rep.";Boolean)
         {
             Caption = 'Show Counting On Counter Report';
-            Description = 'Viser detaljer omkring kasseopt�lling p� kasse afslutningsrapporten';
+            Description = 'Viser detaljer omkring kasseoptælling på kasse afslutningsrapporten';
         }
         field(5171;"F9 Statistics When Login";Option)
         {
@@ -875,7 +875,7 @@ table 6014400 "Retail Setup"
         field(5185;"Item group in Item no.";Boolean)
         {
             Caption = 'Item Group In Item No.';
-            Description = 'Skal varegruppe inds�ttes foran i et automatisk oprettet varenummer';
+            Description = 'Skal varegruppe indsættes foran i et automatisk oprettet varenummer';
         }
         field(5186;"Foreign Gift Voucher no.Series";Code[10])
         {
@@ -899,7 +899,7 @@ table 6014400 "Retail Setup"
         field(6164;"Ask for Attention Name";Boolean)
         {
             Caption = 'Ask For Attention Name';
-            Description = 'F� attention popup ved debetsalg';
+            Description = 'Få attention popup ved debetsalg';
         }
         field(6183;"Reason for Return Mandatory";Boolean)
         {
@@ -1165,12 +1165,12 @@ table 6014400 "Retail Setup"
         field(6335;"Automatic inventory posting";Boolean)
         {
             Caption = 'Automatic Inventory Posting';
-            Description = 'Til automatisk lagerbogf�ring';
+            Description = 'Til automatisk lagerbogf¢ring';
         }
         field(6340;"Automatic Cost Adjustment";Boolean)
         {
             Caption = 'Automatic Cost Adjustment';
-            Description = 'Til automatisk k�rsel af kostprisefterberegning';
+            Description = 'Til automatisk k¢rsel af kostprisefterberegning';
         }
         field(6345;"Signature for Return";Boolean)
         {
@@ -1180,7 +1180,7 @@ table 6014400 "Retail Setup"
         field(6350;"Description 2 on receipt";Boolean)
         {
             Caption = 'Description 2 On Receipt';
-            Description = 'Beskrivelse 2 p� Bon';
+            Description = 'Beskrivelse 2 på Bon';
         }
         field(6355;"Return Receipt Positive Amount";Boolean)
         {
@@ -1190,7 +1190,7 @@ table 6014400 "Retail Setup"
         field(6360;"Show Discount Percent";Boolean)
         {
             Caption = 'Show Discount Percent';
-            Description = 'Vis Rabat %, sag 62801, bruges p� rapport 6014419 og 6060104';
+            Description = 'Vis Rabat %, sag 62801, bruges på rapport 6014419 og 6060104';
         }
         field(6370;"Create POS Entries Only";Boolean)
         {
@@ -1216,7 +1216,7 @@ table 6014400 "Retail Setup"
         field(10000;"Debug Posting";Boolean)
         {
             Caption = 'Debug Posting';
-            Description = 'Ingen bogf�ring, men inds�tning i kladder';
+            Description = 'Ingen bogf¢ring, men indsætning i kladder';
         }
     }
 

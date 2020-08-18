@@ -8,6 +8,9 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
     // NPR5.48/TSA /20181211 CASE 339549 Fixing the price calc function to work with currency code.
     // NPR5.50/TSA /20190509 CASE 354578 Added OnAfterFindSalesLinePrice() publisher
     // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() in InitTempPOSItemSale() and ConvertPriceToVAT()
+    // NPR5.55/BHR /20200408 CASE 399443 Remove general setup for ItemPrice function.
+    // NPR5.55/ALPO/20200605 CASE 407968 Do not ignore zero prices when calculating best unit price (same behaviour as in standard NAV starting from NAV2018)
+    // NPR5.55/ALPO/20200702 CASE 412236 Removed redundant price recalculation
 
 
     trigger OnRun()
@@ -67,13 +70,14 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
     begin
         //-NPR5.45 [323705]
         if POSUnit.Get(SalePOS."Register No.") then;
-        if NPRetailSetup.Get then;
-
-        if POSUnit."Item Price Function" = '' then begin
-          POSUnit."Item Price Codeunit ID" := NPRetailSetup."Item Price Codeunit ID";
-          POSUnit."Item Price Function" := NPRetailSetup."Item Price Function";
-        end;
-
+        //-NPR5.55 [399443]
+        // IF NPRetailSetup.GET THEN;
+        //
+        // IF POSUnit."Item Price Function" = '' THEN BEGIN
+        //  POSUnit."Item Price Codeunit ID" := NPRetailSetup."Item Price Codeunit ID";
+        //  POSUnit."Item Price Function" := NPRetailSetup."Item Price Function";
+        // END;
+        //+NPR5.55 [399443]
         if POSUnit."Item Price Function" <> '' then begin
           OnFindItemPrice(POSUnit,SalePOS,SaleLinePOS,Handled);
           if Handled then
@@ -127,20 +131,20 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
           //-NPR5.45 [323705]
           //SetCurrency(
           //  '',0,SalePOS.Date);
-
-
+        
+        
           //-NPR5.48 [339549]
           // SetCurrency("Currency Code",0,SalePOS.Date);
           SetCurrency ("Currency Code", GetCurrencyFactor ("Currency Code", SalePOS.Date), SalePOS.Date);
           //+NPR5.48 [339549]
-
+        
           //+NPR5.45 [323705]
           SetVAT(SalePOS."Prices Including VAT","VAT %","VAT Calculation Type","VAT Bus. Posting Group");
           //-NPR5.48 [335967]
           //SetUoM(ABS(Quantity),1);
           SetUoM(Abs(Quantity), "Qty. per Unit of Measure");
           //+NPR5.48 [335967]
-
+        
           SetLineDisc("Discount %",SaleLinePOS."Allow Line Discount",SaleLinePOS."Allow Invoice Discount");
           //-NPR5.45 [323705]
           // CASE Type OF
@@ -150,38 +154,53 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
             exit;
           //+NPR5.45 [323705]
           Item.Get("No.");
-          SalesLinePriceExists(SalePOS,SaleLinePOS,false);
-
+          //SalesLinePriceExists(SalePOS,SaleLinePOS,FALSE);  //NPR5.55 [412236]-revoked
+        
           if Item."Group sale" or "Custom Price" then begin
             TempSalesPrice.DeleteAll;
             TempSalesPrice."Sales Type"                   := TempSalesPrice."Sales Type"::"All Customers";
             TempSalesPrice."Item No."                     := SaleLinePOS."No.";
             TempSalesPrice."VAT Bus. Posting Gr. (Price)" := SaleLinePOS."VAT Bus. Posting Group";
-            if Quantity > 0 then
+            //-NPR5.55 [412236]-revoked
+            /*
+            IF Quantity > 0 THEN
               //-NPR5.41 [309047]
-              if "Discount %" = 100 then
+              IF "Discount %" = 100 THEN
                 TempSalesPrice."Unit Price" := 0
-              else
+              ELSE
               //+NPR5.41
                 TempSalesPrice."Unit Price"                 := (("VAT Base Amount") /
                                                               ((100 - "Discount %") / 100))/Quantity;
-
-            TempSalesPrice."Price Includes VAT"           := false;
+        
+            TempSalesPrice."Price Includes VAT"           := FALSE;
+            */
+            //+NPR5.55 [412236]-revoked
+            //-NPR5.55 [412236]
+            TempSalesPrice."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
+            TempSalesPrice."Currency Code" := SaleLinePOS."Currency Code";
+            TempSalesPrice."Unit Price" := SaleLinePOS."Unit Price";
+            TempSalesPrice."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
+            //+NPR5.55 [412236]
             TempSalesPrice.Insert;
-          end;
-
+          end else  //NPR5.55 [412236]-ELSE added
+            SalesLinePriceExists(SalePOS,SaleLinePOS,false);  //NPR5.55 [412236]
+        
           CalcBestUnitPrice(TempSalesPrice);
-
+        
           if Item.Get("No.") and Item."Explode BOM auto" then
             "Unit Price"                     := 0
           else
+            //-NPR5.55 [407968]-revoked
+            /*
             //-NPR5.41 [309047]
-            if TempSalesPrice."Unit Price" = 0 then
+            IF TempSalesPrice."Unit Price" = 0 THEN
               "Unit Price"                     := "Unit Price"
-            else
+            ELSE
             //+NPR5.41
+            */
+            //+NPR5.55 [407968]-revoked
               "Unit Price"                     := TempSalesPrice."Unit Price";
-
+        
           "Price Includes VAT"             := SalePOS."Prices Including VAT";
           "Allow Line Discount"            := TempSalesPrice."Allow Line Disc.";
           "Allow Invoice Discount"         := TempSalesPrice."Allow Invoice Disc.";
@@ -189,6 +208,7 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
             "Discount %" := 0;
         end;
         //+NPR5.45 [323705]
+
     end;
 
     procedure FindSalesLineLineDisc(SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS")
@@ -248,6 +268,7 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
     local procedure CalcBestUnitPrice(var SalesPrice: Record "Sales Price")
     var
         BestSalesPrice: Record "Sales Price";
+        BestSalesPriceFound: Boolean;
     begin
         with SalesPrice do begin
           FoundSalesPrice := FindSet;
@@ -263,20 +284,30 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
                 case true of
                   ((BestSalesPrice."Currency Code" = '') and ("Currency Code" <> '')) or
                   ((BestSalesPrice."Variant Code" = '') and ("Variant Code" <> '')):
-                    BestSalesPrice := SalesPrice;
+                    begin  //NPR5.55 [407968]
+                      BestSalesPrice := SalesPrice;
+                    //-NPR5.55 [407968]
+                      BestSalesPriceFound := true;
+                    end;
+                    //+NPR5.55 [407968]
                   ((BestSalesPrice."Currency Code" = '') or ("Currency Code" <> '')) and
                   ((BestSalesPrice."Variant Code" = '') or ("Variant Code" <> '')):
                     if (BestSalesPrice."Unit Price" = 0) or
                        (CalcLineAmount(BestSalesPrice) > CalcLineAmount(SalesPrice))
-                    then
+                    then begin  //NPR5.55 [407968] (BEGIN added)
                       BestSalesPrice := SalesPrice;
+                    //-NPR5.55 [407968]
+                      BestSalesPriceFound := true;
+                    end;
+                    //+NPR5.55 [407968]
                 end;
               end;
             until Next = 0;
         end;
 
         // No price found in agreement
-        if BestSalesPrice."Unit Price" = 0 then begin
+        //IF BestSalesPrice."Unit Price" = 0 THEN BEGIN  //NPR5.55 [407968]-revoked
+        if not BestSalesPriceFound then begin  //NPR5.55 [407968]
           ConvertPriceToVAT(
             Item."Price Includes VAT",Item."VAT Prod. Posting Group",
             Item."VAT Bus. Posting Gr. (Price)",Item."Unit Price");

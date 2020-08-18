@@ -14,6 +14,7 @@ page 6150628 "POS Payment Bin Checkpoint"
     // NPR5.49/TSA /20190405 CASE 351350 Removed hide of the "Bank" transfer fields when doing BIN_TRANSFER
     // NPR5.50/TSA /20190429 CASE 353293 Handled the special scenario, when no bin checkpoint is included in manuel balancing
     // NPR5.54/TSA /20200224 CASE 389250 Dont assume zero count when counting is virtual, allow negative transfer amount
+    // NPR5.55/SARA/20200602 CASE 405110 Run page Touch Screen - Balancing Line as Editable by default
 
     Caption = 'POS Payment Bin Checkpoint';
     //DataCaptionFields = Type,Field2,Field3;
@@ -502,17 +503,20 @@ page 6150628 "POS Payment Bin Checkpoint"
         TouchScreenBalancingLine.SetTableView (PaymentTypeDetailed);
         TouchScreenBalancingLine.LookupMode (true);
         TouchScreenBalancingLine.Editable (true);
-        if (TouchScreenBalancingLine.RunModal() = ACTION::LookupOK) then begin
+        //-NPR5.55 [405110]
+        //IF (TouchScreenBalancingLine.RUNMODAL() = ACTION::LookupOK) THEN BEGIN
+        TouchScreenBalancingLine.Run();
+        //+NPR5.55 [405110]
+        "Counted Amount Incl. Float" := 0;
+        if (PaymentTypeDetailed.FindSet()) then begin
+          repeat
+            "Counted Amount Incl. Float" += PaymentTypeDetailed.Amount;
 
-          "Counted Amount Incl. Float" := 0;
-          if (PaymentTypeDetailed.FindSet()) then begin
-            repeat
-              "Counted Amount Incl. Float" += PaymentTypeDetailed.Amount;
-
-            until (PaymentTypeDetailed.Next() = 0);
-          end;
+          until (PaymentTypeDetailed.Next() = 0);
         end;
-
+        //-NPR5.55 [405110]
+        //END;
+        //+NPR5.55 [405110]
         CountingDifference := CalculatedDifference ();
         CalculateNewFloatAmount ();
         CurrPage.Update (true);

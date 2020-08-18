@@ -1,6 +1,9 @@
 codeunit 6184866 "External Storage Interface"
 {
     // NPR5.54/ALST/20200311 CASE 394895 Object created
+    // NPR5.55/ALST/20200603 CASE 402502 integrated SFTP download
+    // NPR5.55/AlST/20200609 CASE 387570 added parameter to send file to incoming document
+    // NPR5.55/ALST/20200710 CASE 408285 add new directory if none exists when uploading
 
 
     trigger OnRun()
@@ -278,10 +281,14 @@ codeunit 6184866 "External Storage Interface"
         StorageServerFileName: Text;
         Dialog: Dialog;
         i: Integer;
+        CreateIncDoc: Boolean;
         TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]: file path [and name] on the DropBox storage server
         //TempStorageOperationParameter[second]: data exchange type used to import incoming document
+        //-NPR5.55 [387570]
+        //TempStorageOperationParameter[third]:  send file to incoming document instead
+        //+NPR5.55 [387570]
 
         if TempStorageOperationParameter."Parameter Value" = '' then begin
             if not DropBoxOverviewRun(AccountCode, DropBoxOverview) then
@@ -302,12 +309,21 @@ codeunit 6184866 "External Storage Interface"
         if not (TempStorageOperationParameter.Next = 0) then
             DataExchangeType := TempStorageOperationParameter."Parameter Value";
 
+        //-NPR5.55 [387570]
+        if not (TempStorageOperationParameter.Next = 0) then
+          if TempStorageOperationParameter."Parameter Value" > '' then
+            Evaluate(CreateIncDoc, TempStorageOperationParameter."Parameter Value");
+        //+NPR5.55 [387570]
+
         if not DropBoxOverview.FindSet then
             exit;
 
         DropBoxAPISetup.Get(AccountCode);
 
-        if DataExchangeType = '' then
+        //-NPR5.55 [387570]
+        //IF DataExchangeType = '' THEN
+        if not CreateIncDoc then
+        //+NPR5.55 [387570]
             if not FileManagement.ServerDirectoryExists(DropBoxAPISetup."Storage On Server") then
                 Error(BadDirErr, DropBoxAPISetup."Storage On Server", DropBoxAPISetup.TableCaption);
 
@@ -317,7 +333,10 @@ codeunit 6184866 "External Storage Interface"
         repeat
             DropboxAPIMgt.DownloadFromDropbox(TempBlob, AccountCode, DropBoxOverview."File Name" + '/' + DropBoxOverview.Name, false);
 
-            if DataExchangeType > '' then
+          //-NPR5.55 [387570]
+          //IF DataExchangeType > '' THEN
+          if CreateIncDoc then
+          //+NPR5.55 [387570]
                 CreateIncomingDocument(TempBlob, DropBoxOverview.Name, DataExchangeType)
             else
                 TempBlobMgt.ExportToFile(TempBlob, DropBoxAPISetup."Storage On Server" + DropBoxOverview.Name);
@@ -559,11 +578,15 @@ codeunit 6184866 "External Storage Interface"
         ContainerName: Text;
         DirectoryFileName: Text;
         i: Integer;
+        CreateIncDoc: Boolean;
         TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   directory [and file name] on the Azure storage server
         //TempStorageOperationParameter[second]:  container name on the Azure storage server
         //TempStorageOperationParameter[third]:   data exchange type used to import incoming document
+        //-NPR5.55 [387570]
+        //TempStorageOperationParameter[fourth]:  send file to incoming document instead
+        //+NPR5.55 [387570]
 
         DirectoryFileName := TempStorageOperationParameter."Parameter Value";
 
@@ -572,6 +595,12 @@ codeunit 6184866 "External Storage Interface"
 
         if not (TempStorageOperationParameter.Next = 0) then
             DataExchangeType := TempStorageOperationParameter."Parameter Value";
+
+        //-NPR5.55 [387570]
+        if not (TempStorageOperationParameter.Next = 0) then
+          if TempStorageOperationParameter."Parameter Value" > '' then
+            Evaluate(CreateIncDoc, TempStorageOperationParameter."Parameter Value");
+        //+NPR5.55 [387570]
 
         if (DirectoryFileName = '') or
           (ContainerName = '')
@@ -596,7 +625,10 @@ codeunit 6184866 "External Storage Interface"
 
         AzureStorageAPISetup.Get(AccountCode);
 
-        if DataExchangeType = '' then
+        //-NPR5.55 [387570]
+        //IF DataExchangeType = '' THEN
+        if not CreateIncDoc then
+        //+NPR5.55 [387570]
             if not FileManagement.ServerDirectoryExists(AzureStorageAPISetup."Storage On Server") then
                 Error(BadDirErr, AzureStorageAPISetup."Storage On Server", AzureStorageAPISetup.TableCaption);
 
@@ -606,7 +638,10 @@ codeunit 6184866 "External Storage Interface"
         repeat
             AzureStoageAPIMgt.DownloadFromAzureStorage(TempBlob, AccountCode, '', AzureStorageOverview."Container Name", AzureStorageOverview."File Name" + '/' + AzureStorageOverview.Name, false);
 
-            if DataExchangeType > '' then
+          //-NPR5.55 [387570]
+          //IF DataExchangeType > '' THEN
+          if CreateIncDoc then
+          //+NPR5.55 [387570]
                 CreateIncomingDocument(TempBlob, AzureStorageOverview.Name, DataExchangeType)
             else
                 TempBlobMgt.ExportToFile(TempBlob, AzureStorageAPISetup."Storage On Server" + AzureStorageOverview.Name);
@@ -693,18 +728,31 @@ codeunit 6184866 "External Storage Interface"
         FTPManagement: Codeunit "FTP Management";
         Dialog: Dialog;
         Refresh: Boolean;
+        SecuredConnection: Boolean;
         CurrentPathDepth: Text;
+        SecuredProtocolType: Code[3];
         Directories: DotNet npNetXmlDocument;
     begin
-        //TempStorageOperationParameter: boolean used to call refresh or simply to update
+        //TempStorageOperationParameter[first]:   boolean used to call refresh or simply to update
+        //-NPR5.55 [402502]
+        //TempStorageOperationParameter[second]:  type of protocol used for the connection SSH/SSL
+        //+NPR5.55 [402502]
 
         if TempStorageOperationParameter."Parameter Value" > '' then
             Evaluate(Refresh, TempStorageOperationParameter."Parameter Value");
 
+        //-NPR5.55 [402502]
+        if not (TempStorageOperationParameter.Next = 0) then
+          SecuredProtocolType := TempStorageOperationParameter."Parameter Value";
+        //+NPR5.55 [402502]
+
         if GuiAllowed then
             Dialog.Open(ProcessingCaption);
 
-        FTPManagement.ListFTP(AccountCode, 0, CurrentPathDepth, '', false, Refresh, true, false, Directories, false);
+        //-NPR5.55 [402502]
+        //FTPManagement.ListFTP(AccountCode, 0, CurrentPathDepth, '', FALSE, Refresh, TRUE, FALSE, Directories, FALSE);
+        FTPManagement.ListFTP(AccountCode, 0, CurrentPathDepth, '', false, Refresh, true, SecuredProtocolType, Directories, false);
+        //+NPR5.55 [402502]
 
         if GuiAllowed then
             Dialog.Close;
@@ -721,6 +769,7 @@ codeunit 6184866 "External Storage Interface"
         FTPManagement: Codeunit "FTP Management";
         FileManagement: Codeunit "File Management";
         Reupload: Boolean;
+        SecuredConnection: Boolean;
         DirectoryName: Text;
         ServerFileName: Text;
         CurrentPathDepth: Text;
@@ -728,11 +777,15 @@ codeunit 6184866 "External Storage Interface"
         Directories: DotNet npNetXmlDocument;
         Directory: DotNet npNetXmlNode;
         i: Integer;
+        SecuredProtocolType: Code[3];
         TempBlobMgt: Codeunit "Temp Blob Management";
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on FTP server
         //TempStorageOperationParameter[third]:   files found in the Overview table will not be reuploaded unless parameter is true
+        //-NPR5.55 [402502]
+        //TempStorageOperationParameter[fourth]:  type of protocol used for the connection SSH/SSL
+        //+NPR5.55 [402502]
 
         FTPSetup.Get(HostCode);
 
@@ -747,6 +800,11 @@ codeunit 6184866 "External Storage Interface"
         if not (TempStorageOperationParameter.Next = 0) then
             if TempStorageOperationParameter."Parameter Value" > '' then
                 Evaluate(Reupload, TempStorageOperationParameter."Parameter Value");
+
+        //-NPR5.55 [402502]
+        if not (TempStorageOperationParameter.Next = 0) then
+          SecuredProtocolType := TempStorageOperationParameter."Parameter Value";
+        //+NPR5.55 [402502]
 
         if ServerFileName = '' then begin
             File.SetRange(Path, FTPSetup."Storage On Server");
@@ -780,7 +838,10 @@ codeunit 6184866 "External Storage Interface"
             if GuiAllowed then
                 Dialog.Open(DirectoryListCaption);
 
-            FTPManagement.ListFTP(FTPSetup.Code, 0, CurrentPathDepth, '', false, false, false, false, Directories, false);
+          //-NPR5.55 [402502]
+          //FTPManagement.ListFTP(FTPSetup.Code, 0, CurrentPathDepth, '', FALSE, FALSE, FALSE, FALSE, Directories, FALSE);
+          FTPManagement.ListFTP(FTPSetup.Code, 0, CurrentPathDepth, '', false, false, false, SecuredProtocolType, Directories, false);
+          //+NPR5.55 [402502]
 
             foreach Directory in Directories.SelectNodes('/root/*') do begin
                 TempFTPOverview.SetRange("File Name", Directory.InnerText);
@@ -805,17 +866,32 @@ codeunit 6184866 "External Storage Interface"
             DirectoryName := '/' + TempFTPOverview."File Name";
         end;
 
+        //-NPR5.55 [408285]
+        FTPOverview.SetRange("Host Code", HostCode);
+        FTPOverview.SetRange("File Name", DirectoryName);
+        if FTPOverview.IsEmpty then
+          FTPManagement.CreateDirectoryInFTP(FTPSetup.Code, DirectoryName, SecuredProtocolType, false);
+        //+NPR5.55 [408285]
+
         if GuiAllowed then
-            Dialog.Open(UploadCaption);
+          //-NPR5.55 [387570]
+          //Dialog.OPEN(UploadCaption);
+          Dialog.Open(UploadMsgCaption);
+          //+NPR5.55 [387570]
 
         repeat
-            FTPOverview.SetRange("Host Code", HostCode);
-            FTPOverview.SetRange("File Name", DirectoryName);
+          //-NPR5.55 [408285]
+          //FTPOverview.SETRANGE("Host Code", HostCode);
+          //FTPOverview.SETRANGE("File Name", DirectoryName);
+          //+NPR5.55 [408285]
             FTPOverview.SetRange(Name, File.Name);
             if FTPOverview.IsEmpty or Reupload then begin
                 TempBlobMgt.ImportFromFile(TempBlob, File.Path + '\' + File.Name);
 
-                FTPManagement.UploadToFTP(TempBlob, FTPSetup.Code, DirectoryName, File.Name, false, false);
+            //-NPR5.55 [402502]
+            //FTPManagement.UploadToFTP(TempBlob, FTPSetup.Code, DirectoryName, File.Name, FALSE, FALSE);
+            FTPManagement.UploadToFTP(TempBlob, FTPSetup.Code, DirectoryName, File.Name, SecuredProtocolType, false);
+            //+NPR5.55 [402502]
 
                 Commit;
             end;
@@ -837,8 +913,11 @@ codeunit 6184866 "External Storage Interface"
         FTPOverview: Record "FTP Overview";
         FTPManagement: Codeunit "FTP Management";
         FileManagement: Codeunit "File Management";
+        SecuredConnection: Boolean;
+        CreateIncDoc: Boolean;
         Dialog: Dialog;
         DataExchangeType: Code[20];
+        SecuredProtocolType: Code[3];
         StorageServerFilePath: Text;
         StorageServerFileName: Text;
         i: Integer;
@@ -846,6 +925,12 @@ codeunit 6184866 "External Storage Interface"
     begin
         //TempStorageOperationParameter[first]: file path [and name] on the FTP storage server
         //TempStorageOperationParameter[second]: data exchange type used to import incoming document
+        //-NPR5.55 [402502]
+        //TempStorageOperationParameter[third]:  type of protocol used for the connection SSH/SSL
+        //+NPR5.55 [402502]
+        //-NPR5.55 [387570]
+        //TempStorageOperationParameter[fourth]:  send file to incoming document instead
+        //+NPR5.55 [387570]
 
         if TempStorageOperationParameter."Parameter Value" = '' then begin
             if not FTPOverviewRun(HostCode, FTPOverview) then
@@ -866,12 +951,26 @@ codeunit 6184866 "External Storage Interface"
         if not (TempStorageOperationParameter.Next = 0) then
             DataExchangeType := TempStorageOperationParameter."Parameter Value";
 
+        //-NPR5.55 [402502]
+        if not (TempStorageOperationParameter.Next = 0) then
+          SecuredProtocolType := TempStorageOperationParameter."Parameter Value";
+        //+NPR5.55 [402502]
+
+        //-NPR5.55 [387570]
+        if not (TempStorageOperationParameter.Next = 0) then
+          if TempStorageOperationParameter."Parameter Value" > '' then
+            Evaluate(CreateIncDoc, TempStorageOperationParameter."Parameter Value");
+        //+NPR5.55 [387570]
+
         if not FTPOverview.FindSet then
             exit;
 
         FTPSetup.Get(HostCode);
 
-        if DataExchangeType = '' then
+        //-NPR5.55 [387570]
+        //IF DataExchangeType = '' THEN
+        if not CreateIncDoc then
+        //+NPR5.55 [387570]
             if not FileManagement.ServerDirectoryExists(FTPSetup."Storage On Server") then
                 Error(BadDirErr, FTPSetup."Storage On Server", FTPSetup.TableCaption);
 
@@ -879,12 +978,22 @@ codeunit 6184866 "External Storage Interface"
             Dialog.Open(DownloadingCaption);
 
         repeat
-            FTPManagement.DownloadFromFTP(TempBlob, HostCode, FTPOverview."File Name", FTPOverview.Name, false, false);
+          //-NPR5.55 [402502]
+          //FTPManagement.DownloadFromFTP(TempBlob, HostCode, FTPOverview."File Name", FTPOverview.Name, FALSE, FALSE);
+          FTPManagement.DownloadFromFTP(TempBlob, HostCode, FTPOverview."File Name", FTPOverview.Name, SecuredProtocolType, false);
+          //+NPR5.55 [402502]
 
-            if DataExchangeType > '' then
+          //-NPR5.55 [387570]
+          //IF DataExchangeType > '' THEN
+          if CreateIncDoc then
+          //+NPR5.55 [387570]
                 CreateIncomingDocument(TempBlob, FTPOverview.Name, DataExchangeType)
             else
-                TempBlobMgt.ExportToFile(TempBlob, FTPSetup."Storage On Server" + FTPOverview.Name);
+            //-NPR5.55 [402502]
+            if StrPos(UpperCase(FTPSetup."FTP Host"), 'SFTP') = 0 then
+            //+NPR5.55 [402502]
+              TempBlobMgt.ExportToFile(TempBlob, FTPSetup."Storage On Server" + FTPOverview.Name);
+
 
             if GuiAllowed then begin
                 Dialog.Update(1, (i / FTPOverview.Count * 10000) div 1);
@@ -901,14 +1010,19 @@ codeunit 6184866 "External Storage Interface"
         FTPOverview: Record "FTP Overview";
         FTPManagement: Codeunit "FTP Management";
         FileManagement: Codeunit "File Management";
+        SecuredConnection: Boolean;
         Dialog: Dialog;
         FileName: Text;
         StorageServerFilePath: Text;
         StorageServerFileName: Text;
+        SecuredProtocolType: Code[3];
         i: Integer;
         OverviewCount: Integer;
     begin
-        //TempStorageOperationParameter: file path + name on the FTP storage server
+        //TempStorageOperationParameter[first]:   file path + name on the FTP storage server
+        //-NPR5.55 [402502]
+        //TempStorageOperationParameter[second]:  type of protocol used for the connection SSH/SSL
+        //+NPR5.55 [402502]
 
         if TempStorageOperationParameter."Parameter Value" = '' then begin
             if not FTPOverviewRun(HostCode, FTPOverview) then
@@ -926,6 +1040,11 @@ codeunit 6184866 "External Storage Interface"
                 FTPOverview.SetRange(Name, StorageServerFileName);
         end;
 
+        //-NPR5.55 [402502]
+        if not (TempStorageOperationParameter.Next = 0) then
+          SecuredProtocolType := TempStorageOperationParameter."Parameter Value";
+        //+NPR5.55 [402502]
+
         if not FTPOverview.FindSet then
             exit;
 
@@ -935,7 +1054,10 @@ codeunit 6184866 "External Storage Interface"
         repeat
             OverviewCount := FTPOverview.Count;
 
-            FTPManagement.DeleteFromFTP(HostCode, FTPOverview."File Name", FTPOverview.Name, false, false);
+          //-NPR5.55 [402502]
+          //FTPManagement.DeleteFromFTP(HostCode, FTPOverview."File Name", FTPOverview.Name, FALSE, FALSE);
+          FTPManagement.DeleteFromFTP(HostCode, FTPOverview."File Name", FTPOverview.Name, SecuredProtocolType, false);
+          //+NPR5.55 [402502]
 
             if GuiAllowed then begin
                 Dialog.Update(1, (i / OverviewCount * 10000) div 1);

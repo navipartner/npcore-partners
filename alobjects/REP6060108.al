@@ -2,7 +2,7 @@ report 6060108 "Balancing Ticket IV"
 {
     // 001 Af MG 7/12-01
     // summering, og beregning noegletal for alle kasser
-    // afgraenser kun p� ekspeditionsdato og type::salg
+    // afgraenser kun på ekspeditionsdato og type::salg
     // 
     // 002 af MG 24/9-02
     // Revisionsrulle body(2) PreSection:
@@ -10,7 +10,7 @@ report 6060108 "Balancing Ticket IV"
     // i bunden af "Revisionsrulle body(2) PreSection"
     // 
     // 003 af MG 20/12-04
-    // Sum for tilgodebevis beregnes her (ind- og udg�ende). Rvisionsrulle >=v. 3.1b skal benyttes, ellers er der muligvis et
+    // Sum for tilgodebevis beregnes her (ind- og udgående). Rvisionsrulle >=v. 3.1b skal benyttes, ellers er der muligvis et
     // performance problem.
     // 
     // 004 af MG 20/10-05

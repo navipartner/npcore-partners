@@ -1,10 +1,12 @@
 page 6150684 "NPRE Restaurant Card"
 {
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
+    // NPR5.55/ALPO/20200803 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Restaurant Card';
     PageType = Card;
-    PromotedActionCategories = 'New,Process,Report,Kitchen';
+    PromotedActionCategories = 'New,Process,Report,Kitchen,Layout';
     SourceTable = "NPRE Restaurant";
 
     layout
@@ -21,6 +23,9 @@ page 6150684 "NPRE Restaurant Card"
                 {
                 }
                 field("Name 2";"Name 2")
+                {
+                }
+                field("Service Flow Profile";"Service Flow Profile")
                 {
                 }
             }
@@ -91,6 +96,58 @@ page 6150684 "NPRE Restaurant Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPRE Kitchen Station Selection";
                     RunPageLink = "Restaurant Code"=FIELD(Code);
+                }
+                action(ShowKitchenRequests)
+                {
+                    Caption = 'Kitchen Requests (Expedite View)';
+                    Image = BlanketOrder;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    Scope = Repeater;
+
+                    trigger OnAction()
+                    var
+                        KitchenRequest: Record "NPRE Kitchen Request";
+                        KitchenRequests: Page "NPRE Kitchen Requests";
+                    begin
+                        Rec.ShowKitchenRequests();  //NPR5.55 [382428]
+                    end;
+                }
+            }
+            group("Layout")
+            {
+                Caption = 'Layout';
+                action(Locations)
+                {
+                    Caption = 'Locations';
+                    Image = Zones;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPRE Seating Location";
+                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                }
+                action(Seatings)
+                {
+                    Caption = 'Seatings';
+                    Enabled = (Code <> '');
+                    Image = Lot;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+
+                    trigger OnAction()
+                    var
+                        Seating: Record "NPRE Seating";
+                        SeatingMgt: Codeunit "NPRE Seating Management";
+                    begin
+                        //-NPR5.55 [382428]
+                        TestField(Code);
+                        Seating.SetFilter("Seating Location", SeatingMgt.RestaurantSeatingLocationFilter(Code));
+                        PAGE.Run(0, Seating);
+                        //+NPR5.55 [382428]
+                    end;
                 }
             }
         }

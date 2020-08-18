@@ -1,4 +1,4 @@
-tableextension 6014453 tableextension6014453 extends "User Setup" 
+tableextension 6014454 tableextension6014454 extends "User Setup" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                       Added fields 6014400

@@ -127,7 +127,7 @@ codeunit 6060142 "MM Loyalty WebService Mgr"
           Membership.SetFilter (Blocked, '=%1', false);
           if (Membership.FindFirst ()) then
             //-MM1.42 [382170]
-            //-MM1.40 [365879]�
+            //-MM1.40 [365879]õ
             //MemberInfoCapture."External Member No" := Membership."External Membership No.";
             //MemberInfoCapture."External Membership No." := Membership."External Membership No.";
             //+MM1.40 [365879]

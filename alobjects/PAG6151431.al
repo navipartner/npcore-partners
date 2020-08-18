@@ -7,7 +7,7 @@ page 6151431 "Magento Attributes"
     // MAG1.04/MH/20150206  CASE 199932 field 200 Configurable which is used for WebVariant.
     // MAG1.17/MH/20150619  CASE 216851 Magento Setup separated from NaviConnect Setup.
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.19/LS �/2019020 �CASE 344251 Added field 15 Visible
+    // MAG2.19/LS  /2019020  CASE 344251 Added field 15 Visible
 
     AutoSplitKey = true;
     Caption = 'Attributes';

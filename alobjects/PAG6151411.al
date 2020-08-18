@@ -156,7 +156,7 @@ page 6151411 "Magento Pictures"
     procedure CountRelations()
     var
         MagentoPictureLink: Record "Magento Picture Link";
-        MagentoItemGroup: Record "Magento Item Group";
+        MagentoItemGroup: Record "Magento Category";
         MagentoBrand: Record "Magento Brand";
         MagentoAttributeLabel: Record "Magento Attribute Label";
     begin
@@ -189,7 +189,7 @@ page 6151411 "Magento Pictures"
     var
         Item: Record Item;
         MagentoPictureLink: Record "Magento Picture Link";
-        MagentoItemGroup: Record "Magento Item Group";
+        MagentoItemGroup: Record "Magento Category";
         MagentoBrand: Record "Magento Brand";
         TempItem: Record Item temporary;
         TempItem2: Record Item temporary;
@@ -222,7 +222,7 @@ page 6151411 "Magento Pictures"
               begin
                 Clear(MagentoItemGroup);
                 MagentoItemGroup.SetRange(Picture,Name);
-                PAGE.Run(PAGE::"Magento Item Group List",MagentoItemGroup);
+                PAGE.Run(PAGE::"Magento Category List",MagentoItemGroup);
               end;
             Type::Brand:
               begin

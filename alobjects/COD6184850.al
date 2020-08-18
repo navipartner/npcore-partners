@@ -3,6 +3,7 @@ codeunit 6184850 "FR Audit Mgt."
     // NPR5.48/MMV /20181025 CASE 318028 Created object
     // NPR5.49/MMV /20190306 CASE 348167 Skip footer if no POS entry
     // NPR5.51/MMV /20190611 CASE 356076 French regulation, 2nd audit.
+    // NPR5.55/MMV /20200626 CASE 408900 French regulation, 3rd audit.
 
     SingleInstance = true;
 
@@ -175,28 +176,38 @@ codeunit 6184850 "FR Audit Mgt."
         Message(CAPTION_CERT_SUCCESS, FRCertificationSetup."Signing Certificate Thumbprint");
     end;
 
-    local procedure TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint"; PeriodType: Code[20]; PeriodDateCalcFormula: DateFormula; PeriodDate: Date; var FromWorkshiftEntryOut: Integer): Boolean
+    local procedure TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";PeriodType: Code[20];PeriodDateCalcFormula: DateFormula;var FromWorkshiftEntryOut: Integer): Boolean
     var
         POSWorkshifts: Record "POS Workshift Checkpoint";
         POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
     begin
         //-NPR5.51 [356076]
         POSWorkshifts.SetRange("POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
         POSWorkshifts.SetRange(Type, POSWorkshifts.Type::PREPORT);
         POSWorkshifts.SetRange("Period Type", PeriodType);
+        //-NPR5.55 [408900]
+        POSWorkshifts.SetRange(Open, false);
+        POSWorkshifts.SetFilter("POS Entry No.", '<>%1', 0);
+        //+NPR5.55 [408900]
         if not POSWorkshifts.FindLast then begin
             //Find the first workshift created after JET was initialized in-case we have old workshifts that should not be handled.
             GetJETInitRecord(POSAuditLog, POSWorkshiftCheckpoint."POS Unit No.", true);
 
             POSWorkshifts.SetRange("Period Type");
             POSWorkshifts.SetRange(Type, POSWorkshifts.Type::ZREPORT);
-            POSWorkshifts.SetFilter("POS Entry No.", '>=%1', POSAuditLog."Acted on POS Entry No.");
+        //-NPR5.55 [408900]
+          POSWorkshifts.SetFilter("POS Entry No.", '>=%1&<>%2', POSAuditLog."Acted on POS Entry No.", 0);
+        //+NPR5.55 [408900]
             if not POSWorkshifts.FindFirst then
                 exit(false);
         end;
         FromWorkshiftEntryOut := POSWorkshifts."Entry No.";
 
-        exit(CalcDate(PeriodDateCalcFormula, PeriodDate) <= Today);
+        //-NPR5.55 [408900]
+        POSEntry.Get(POSWorkshifts."POS Entry No.");
+        exit(CalcDate(PeriodDateCalcFormula, POSEntry."Document Date") <= Today);
+        //+NPR5.55 [408900]
         //+NPR5.51 [356076]
     end;
 
@@ -1328,6 +1339,11 @@ codeunit 6184850 "FR Audit Mgt."
             exit;
         LoadCertificate();
 
+        //-NPR5.55 [408900]
+        //Shave off milliseconds from timestamp to prevent sql rounding on commit causing signature invalidation later.
+        Evaluate(POSAuditLog."Log Timestamp", CopyStr(Format(POSAuditLog."Log Timestamp",0,9),1,19) + '.000Z' , 9);
+        //+NPR5.55 [408900]
+
         //-NPR5.51 [356076]
         if POSAuditLog."Action Type" <> POSAuditLog."Action Type"::LOG_INIT then
             GetJETInitRecord(POSAuditLogInit, POSUnit."No.", true); //Failsafe - first record MUST be JET INIT.
@@ -1526,10 +1542,14 @@ codeunit 6184850 "FR Audit Mgt."
 
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
 
-        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, MonthlyPeriodType(), FRCertificationSetup."Monthly Workshift Duration", POSEntry."Document Date", FromWorkshiftEntry) then
+        //-NPR5.55 [408900]
+        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, MonthlyPeriodType(), FRCertificationSetup."Monthly Workshift Duration", FromWorkshiftEntry) then
+        //+NPR5.55 [408900]
             POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", MonthlyPeriodType());
 
-        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, YearlyPeriodType(), FRCertificationSetup."Yearly Workshift Duration", POSEntry."Document Date", FromWorkshiftEntry) then
+        //-NPR5.55 [408900]
+        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, YearlyPeriodType(), FRCertificationSetup."Yearly Workshift Duration", FromWorkshiftEntry) then
+        //+NPR5.55 [408900]
             POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", YearlyPeriodType());
         //+NPR5.51 [356076]
     end;

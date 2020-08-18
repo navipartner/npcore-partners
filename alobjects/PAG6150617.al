@@ -23,6 +23,8 @@ page 6150617 "POS Unit Card"
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
     // NPR5.54/BHR /20200210 CASE 389444 Field 'POS Unit Receipt Text Profile'
     // NPR5.54/TSA /20200219 CASE 391850 Added "POS Named Actions Profile"
+    // NPR5.55/ZESO/20200603 CASE 407613 Added "POS Unit Serial No"
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
 
     Caption = 'POS Unit Card';
     RefreshOnActivate = true;
@@ -78,6 +80,9 @@ page 6150617 "POS Unit Card"
                 field(Status;Status)
                 {
                 }
+                field("POS Unit Serial No";"POS Unit Serial No")
+                {
+                }
             }
             group(Profiles)
             {
@@ -110,6 +115,9 @@ page 6150617 "POS Unit Card"
                 {
                 }
                 field("POS Named Actions Profile";"POS Named Actions Profile")
+                {
+                }
+                field("POS Restaurant Profile";"POS Restaurant Profile")
                 {
                 }
             }

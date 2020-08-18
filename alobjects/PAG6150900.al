@@ -136,12 +136,12 @@ page 6150900 "HC Audit Roll"
                 trigger OnValidate()
                 begin
                      /*
-                    CASE Bogf�rtfilter OF
-                      Bogf�rtfilter::" " :
+                    CASE Bogf¢rtfilter OF
+                      Bogf¢rtfilter::" " :
                         SETRANGE(Posted);
-                      Bogf�rtfilter::No :
+                      Bogf¢rtfilter::No :
                         SETRANGE(Posted,FALSE);
-                      Bogf�rtfilter::Yes :
+                      Bogf¢rtfilter::Yes :
                         SETRANGE(Posted,TRUE);
                     END;
                     */
@@ -580,7 +580,7 @@ page 6150900 "HC Audit Roll"
         TX001: Label 'Posted ?';
         PostDocNo: Code[20];
     begin
-        //Bogf�rBon
+        //Bogf¢rBon
         
         HCAuditRoll4 := Rec;
         HCAuditRoll4.SetCurrentKey( "Register No.", "Sales Ticket No." );

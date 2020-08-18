@@ -11,6 +11,7 @@ table 6151555 "NpXml Template Trigger"
     // NC2.00/MHA/20160525  CASE 240005 NaviConnect
     // NC2.01/MHA /20161018 CASE 2425550 Added Generic Table fields for enabling Temporary Table Exports
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
+    // NC2.26/MHA /20200501  CASE 402488 Updated UpdateNaviConnectSetup() from Local to Global and changed Keep Log for from 1 minute to 30 days
 
     Caption = 'NpXml Template Trigger';
 
@@ -300,7 +301,7 @@ table 6151555 "NpXml Template Trigger"
         //+NC1.22
     end;
 
-    local procedure UpdateNaviConnectSetup()
+    procedure UpdateNaviConnectSetup()
     var
         DataLogSetup: Record "Data Log Setup (Table)";
         DataLogSubscriber: Record "Data Log Subscriber";
@@ -337,7 +338,9 @@ table 6151555 "NpXml Template Trigger"
               DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
             if "Delete Trigger" then
               DataLogSetup."Log Deletion" := DataLogSetup."Log Deletion"::Detailed;
-            DataLogSetup."Keep Log for" := 1000 * 60;
+            //-NC2.26 [402488]
+            DataLogSetup."Keep Log for" := CreateDateTime(Today,010000T) - CreateDateTime(CalcDate('<-30D>',Today),010000T);
+            //+NC2.26 [402488]
             DataLogSetup.Insert(true);
           end else begin
             SetupChanged := false;

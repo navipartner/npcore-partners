@@ -7,6 +7,7 @@ page 6151403 "Magento Websites"
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.01/TS/20161014 CASE 254886 Added Location Code
     // MAG2.07/MHA /20170830  CASE 286943 Updated Magento Setup Actions to support Setup Event Subscription
+    // MAG2.26/MHA /20200505  CASE 402828 Added field 40 "Sales Order No. Series"
 
     Caption = 'Websites';
     InsertAllowed = false;
@@ -41,6 +42,9 @@ page 6151403 "Magento Websites"
                         Visible = false;
                     }
                     field("Location Code";"Location Code")
+                    {
+                    }
+                    field("Sales Order No. Series";"Sales Order No. Series")
                     {
                     }
                 }

@@ -1,11 +1,11 @@
 table 6014404 "Report Selection Retail"
 {
-    // NPR3.0j,mij: tilf�jet rapport kode til Label2. Skal have lookup til Label Lines hoved
+    // NPR3.0j,mij: tilf¢jet rapport kode til Label2. Skal have lookup til Label Lines hoved
     // NPR4.14/TS/20150818 CASE 220964 Caption for Report Type changed DK Sales Ticket-> Terminal Ticket
     // NPR4.14/JDH/20150902 CASE 221537 Option Caption changed for field Report Type.
     // NPR4.15/JDH/20150909 CASE 222525 translated to English - no documentation in code
     // NPR4.18/MMV/20151217 CASE 225584 Added fields 12, 13, 14.
-    // NPR4.18/MMV/20151230 CASE 229221 Blanked "Report Type" options: Label (Single) & Byttem�rke (Single) - They are deprecated.
+    // NPR4.18/MMV/20151230 CASE 229221 Blanked "Report Type" options: Label (Single) & Byttemærke (Single) - They are deprecated.
     // NPR5.22/MMV/20160408 CASE 232067 Added "Report Type" options: "CustomerLocationOnSave" & "CustomerLocationOnTrigger"
     //                                  Added missing "Report Type" option captions.
     // NPR5.23/MMV/20160510 CASE 240211 Removed field 14.
@@ -25,6 +25,8 @@ table 6014404 "Report Selection Retail"
     // NPR5.48/JDH /20181106 CASE 334560 Changed name for Data port ID / Name to XML port ID / Name. Fixed length for all objects reference
     // NPR5.50/TSA /20190423 CASE 352483 Added Report Type "Begin Workshift (POS Entry)"
     // NPR5.51/ZESO/20190711 CASE 361680 Changed Object Type to XMLPort in Object Type Filter for Field 5.
+    // NPR5.55/YAHA/20191127 CASE 362312 Added Report Type "Transfer Order"
+    // NPR5.55/BHR /202020713 CASE 414268 Add retail print and Price label for warehouse activity line
 
     Caption = 'Usage - Retail';
 
@@ -33,8 +35,8 @@ table 6014404 "Report Selection Retail"
         field(1;"Report Type";Option)
         {
             Caption = 'Report Type';
-            OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry)';
-            OptionMembers = "Sales Receipt","Register Balancing","Price Label","Signature Receipt","Gift Voucher",,"Credit Voucher",,"Terminal Receipt","Large Sales Receipt",,,"Exchange Label",,"Customer Sales Receipt",Rental,Tailor,"Order","Photo Label",,,,"Warranty Certificate","Shelf Label",,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,"Bin Label","Sales Receipt (POS Entry)","Large Sales Receipt (POS Entry)","Balancing (POS Entry)","Sales Doc. Confirmation (POS Entry)","Large Balancing (POS Entry)","Begin Workshift (POS Entry)";
+            OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry),Transfer Order,Inv.PutAway Label';
+            OptionMembers = "Sales Receipt","Register Balancing","Price Label","Signature Receipt","Gift Voucher",,"Credit Voucher",,"Terminal Receipt","Large Sales Receipt",,,"Exchange Label",,"Customer Sales Receipt",Rental,Tailor,"Order","Photo Label",,,,"Warranty Certificate","Shelf Label",,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,"Bin Label","Sales Receipt (POS Entry)","Large Sales Receipt (POS Entry)","Balancing (POS Entry)","Sales Doc. Confirmation (POS Entry)","Large Balancing (POS Entry)","Begin Workshift (POS Entry)","Transfer Order","Inv.PutAway Label";
         }
         field(2;Sequence;Code[10])
         {

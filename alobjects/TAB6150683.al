@@ -1,6 +1,7 @@
 table 6150683 "NPRE Kitchen Station Selection"
 {
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
+    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Kitchen Station Selection';
 
@@ -14,7 +15,7 @@ table 6150683 "NPRE Kitchen Station Selection"
         field(20;"Seating Location";Code[20])
         {
             Caption = 'Seating Location';
-            TableRelation = "NPRE Seating Location";
+            TableRelation = "NPRE Seating Location".Code WHERE ("Restaurant Code"=FIELD("Restaurant Code"));
         }
         field(40;"Serving Step";Code[10])
         {
@@ -24,7 +25,7 @@ table 6150683 "NPRE Kitchen Station Selection"
         field(50;"Print Category Code";Code[20])
         {
             Caption = 'Print Category Code';
-            TableRelation = "NPRE Print Category";
+            TableRelation = "NPRE Print/Prod. Category";
         }
         field(60;"Production Restaurant Code";Code[20])
         {

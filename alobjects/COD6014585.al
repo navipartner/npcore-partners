@@ -3,6 +3,7 @@ codeunit 6014585 "RP Package Handler"
     // NPR5.32/MMV /20170412 CASE 241995 Retail Print 2.0
     // NPR5.38/MMV /20171201 CASE 294095 Added custom import routine
     // NPR5.39/MMV /20180222 CASE 300666 Fixed picure import bug
+    // NPR5.55/MMV /20200615 CASE 409573 Moved deployment of retail print templates from npdeploy to azure blob storage.
 
 
     trigger OnRun()
@@ -142,6 +143,23 @@ codeunit 6014585 "RP Package Handler"
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Device Settings");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Template Media Info");
         ManagedPackageMgt.DeployPackageFromGroundControl(DATABASE::"RP Template Header");
+    end;
+
+    procedure DeployPackageFromBlobStorage()
+    var
+        ManagedPackageMgt: Codeunit "Managed Package Mgt.";
+    begin
+        //-NPR5.55 [409573]
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Template Header");
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Template Line");
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Data Items");
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Data Item Links");
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Data Item Constraint");
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Data Item Constraint Links");
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Device Settings");
+        ManagedPackageMgt.AddExpectedTableID(DATABASE::"RP Template Media Info");
+        ManagedPackageMgt.DeployPackageFromURL('https://npretailbasedata.blob.core.windows.net/retailprinttemplates/templates.json');
+        //+NPR5.55 [409573]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014628, 'OnLoadPackage', '', false, false)]

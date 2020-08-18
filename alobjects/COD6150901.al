@@ -118,11 +118,11 @@ codeunit 6150901 "HC Post audit roll"
         //+NPR5.29 [262116]
         
         //-NPR5.38 [297946]
-        //Ops�tning.GET();
+        //Opsætning.GET();
         //+NPR5.38 [297946]
         Clear(tRevisionsrulle);
         
-        //IF Ops�tning."Company - Function" = Ops�tning."Company - Function"::Offline THEN
+        //IF Opsætning."Company - Function" = Opsætning."Company - Function"::Offline THEN
         //  ERROR(t001);
         
         HCRetailSetup.Validate("Posting Source Code",HCRetailSetup."Posting Source Code");
@@ -366,12 +366,12 @@ codeunit 6150901 "HC Post audit roll"
           case HCPaymentTypePOS."Account Type" of
             HCPaymentTypePOS."Account Type"::Bank :
               begin
-                AccountType := 3; // Finans,Debitor,Kreditor,Bank,Anl�g
+                AccountType := 3; // Finans,Debitor,Kreditor,Bank,Anlæg
                 AccountNo := HCPaymentTypePOS."G/L Account No.";
               end;
             HCPaymentTypePOS."Account Type"::"G/L Account" :
               begin
-                AccountType := 0; // Finans,Debitor,Kreditor,Bank,Anl�g
+                AccountType := 0; // Finans,Debitor,Kreditor,Bank,Anlæg
                 AccountNo := HCPaymentTypePOS."Bank Acc. No.";
               end;
           end;

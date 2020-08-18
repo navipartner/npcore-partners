@@ -14,6 +14,7 @@ page 6060120 "TM Ticket Admissions"
     // TM1.45/TSA /20191108 CASE 374620 Added "Stakeholder (E-Mail/Phone No.)"
     // TM1.45/TSA /20191113 CASE 322432 Added Seating Setup button
     // TM1.45/TSA /20191207 CASE 380754 Added waitinglist fields and action to notify
+    // TM1.48/TSA /20200703 CASE 409741 Added Admission Forecast
 
     Caption = 'Ticket Admissions';
     PageType = List;
@@ -205,6 +206,27 @@ page 6060120 "TM Ticket Admissions"
                     if ("Waiting List Setup Code" <> '') then
                         TicketWaitingListMgr.ProcessAdmission(Rec, Today, true);
                     //+TM1.45 [380754]
+                end;
+            }
+        }
+        area(reporting)
+        {
+            action("Admission Forecast")
+            {
+                Image = Forecast;
+                Promoted = true;
+                PromotedCategory = "Report";
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    AdmissionForecastMatrix: Page "TM Admission Forecast Matrix";
+                begin
+
+                    //-TM1.48 [409741]
+                    AdmissionForecastMatrix.SetInitialAdmissionCode (Rec."Admission Code");
+                    AdmissionForecastMatrix.Run ();
+                    //+TM1.48 [409741]
                 end;
             }
         }

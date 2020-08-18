@@ -5,6 +5,9 @@ codeunit 6151060 "NP GDPR Management"
     // NPR5.54/ZESO/20200303 CASE 358656 Anonymize Customers where To Anomymize On is less than or equal to TODAY.
     // NPR5.54/ZESO/20200303 CASE 358656 Count of Customers which are actually being anonymized.
     // NPR5.54/ZESO/20200310 CASE 358656 Refactored Code which gives list of Customers to be anonymised.
+    // NPR5.55/ZESO/20200427 CASE 401981 Added Anonymisation of Issued Reminders + Add Check on Journals/Statements
+    // NPR5.55/ZESO/20200513 CASE 388813 Refactored Code since fields on Customer Card were not being overwritten after contact update.
+    // NPR5.55/TSA /20200715 CASE 388813-2 Refactored DoAnonymization() and made a separate function for checking if anonymization is possible
 
     Permissions = TableData "Sales Shipment Header"=rm,
                   TableData "Sales Invoice Header"=rm,
@@ -98,92 +101,129 @@ codeunit 6151060 "NP GDPR Management"
         Membership: Record "MM Membership";
         UserSetup: Record "User Setup";
         ILE: Record "Item Ledger Entry";
+        JournalFound: Boolean;
+        GenJnlLine: Record "Gen. Journal Line";
+        AnonymizationResponseValue: Integer;
     begin
         if UserSetup.Get(UserId) then
           if not UserSetup."Anonymize Customers" then
             Error(Text004);
-
-
 
         if GDPRLogEntry.FindLast then
           EntryNo := GDPRLogEntry."Entry No"
         else
           EntryNo := 0;
 
-
         if GDPRSetup.Get then;
+
         OpenDocFound := false;
         TransactionFound := false;
         OpenTransactionFound := false;
         MemberFound := false;
-
-        SalesHdr.SetCurrentKey("Sell-to Customer No.","External Document No.");
-        SalesHdr.SetRange("Sell-to Customer No.",CustNo);
-        if SalesHdr.FindFirst then
-          OpenDocFound := true;
+        //-NPR5.55 [401981]
+        JournalFound := false;
+        //+NPR5.55 [401981]
 
 
-        if VarCheckPeriod then begin
-          DateFormulaTxt := '-' + Format(GDPRSetup."Anonymize After");
-          Evaluate(VarPeriod,DateFormulaTxt);
-          CLE.SetCurrentKey("Customer No.","Posting Date","Currency Code");
-          CLE.SetRange("Customer No.",CustNo);
-          CLE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
-          if CLE.FindFirst then
-            TransactionFound := true;
+        //-NPR5.55 [388813-2] Refactored and moved to function
+        // SalesHdr.SETCURRENTKEY("Sell-to Customer No.","External Document No.");
+        // SalesHdr.SETRANGE("Sell-to Customer No.",CustNo);
+        // IF SalesHdr.FINDFIRST THEN
+        //  OpenDocFound := TRUE;
+        //
+        //
+        // IF VarCheckPeriod THEN BEGIN
+        //  DateFormulaTxt := '-' + FORMAT(GDPRSetup."Anonymize After");
+        //  EVALUATE(VarPeriod,DateFormulaTxt);
+        //  CLE.SETCURRENTKEY("Customer No.","Posting Date","Currency Code");
+        //  CLE.SETRANGE("Customer No.",CustNo);
+        //  CLE.SETFILTER("Posting Date",'>%1',CALCDATE(VarPeriod,TODAY));
+        //  IF CLE.FINDFIRST THEN
+        //    TransactionFound := TRUE;
+        //
+        //  //-NPR5.53 [358656]
+        //  IF TransactionFound = FALSE THEN BEGIN
+        //    ILE.RESET;
+        //    ILE.SETCURRENTKEY("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+        //    ILE.SETRANGE(ILE."Source Type",ILE."Source Type"::Customer);
+        //    ILE.SETRANGE(ILE."Source No.",CustNo);
+        //    ILE.SETFILTER("Posting Date",'>%1',CALCDATE(VarPeriod,TODAY));
+        //    IF ILE.FINDFIRST THEN
+        //      TransactionFound := TRUE;
+        //  END;
+        //  //+NPR5.53 [358656]
+        //
+        //
+        // END;
+        //
+        // CLE.SETCURRENTKEY("Customer No.",Open,Positive,"Due Date","Currency Code");
+        // CLE.SETRANGE("Customer No.",CustNo);
+        // CLE.SETRANGE(Open,TRUE);
+        // IF CLE.FINDFIRST THEN
+        //  OpenTransactionFound := TRUE;
+        //
+        // //-NPR5.53 [358656]
+        // IF NOT OpenTransactionFound  THEN BEGIN
+        //    ILE.RESET;
+        //    ILE.SETCURRENTKEY("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+        //    ILE.SETRANGE(ILE."Source Type",ILE."Source Type"::Customer);
+        //    ILE.SETRANGE(ILE."Source No.",CustNo);
+        //    ILE.SETRANGE(Open,TRUE);
+        //    IF ILE.FINDFIRST THEN
+        //      OpenTransactionFound := TRUE;
+        // END;
+        // //+NPR5.53 [358656]
+        //
+        //
+        //
+        // Membership.SETRANGE("Customer No.",CustNo);
+        // IF Membership.FINDFIRST THEN
+        //  MemberFound := TRUE;
+        //
+        //
+        // //-NPR5.55 [401981]
+        // GenJnlLine.RESET;
+        // GenJnlLine.SETRANGE(GenJnlLine."Account Type",GenJnlLine."Account Type"::Customer);
+        // GenJnlLine.SETRANGE(GenJnlLine."Account No.",CustNo);
+        // IF GenJnlLine.FINDFIRST THEN
+        //  JournalFound := TRUE;
+        // //+NPR5.55 [401981]
 
-          //-NPR5.53 [358656]
-          if TransactionFound = false then begin
-            ILE.Reset;
-            ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
-            ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
-            ILE.SetRange(ILE."Source No.",CustNo);
-            ILE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
-            if ILE.FindFirst then
-              TransactionFound := true;
-          end;
-          //+NPR5.53 [358656]
+        if (VarCheckPeriod) then
+          Evaluate (VarPeriod, '-' + Format(GDPRSetup."Anonymize After"));
+        IsCustomerValidForAnonymization (CustNo, VarCheckPeriod, VarPeriod, AnonymizationResponseValue);
+
+        OpenDocFound := EvaluateResponseValue (AnonymizationResponseValue, 0);
+        TransactionFound := EvaluateResponseValue (AnonymizationResponseValue, 1);
+        OpenTransactionFound := EvaluateResponseValue (AnonymizationResponseValue, 2);
+        MemberFound := EvaluateResponseValue (AnonymizationResponseValue, 3);
+        JournalFound := EvaluateResponseValue (AnonymizationResponseValue, 4);
+        //+NPR5.55 [388813-2]
 
 
-        end;
-
-        CLE.SetCurrentKey("Customer No.",Open,Positive,"Due Date","Currency Code");
-        CLE.SetRange("Customer No.",CustNo);
-        CLE.SetRange(Open,true);
-        if CLE.FindFirst then
-          OpenTransactionFound := true;
-
-        //-NPR5.53 [358656]
-        if not OpenTransactionFound  then begin
-            ILE.Reset;
-            ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
-            ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
-            ILE.SetRange(ILE."Source No.",CustNo);
-            ILE.SetRange(Open,true);
-            if ILE.FindFirst then
-              OpenTransactionFound := true;
-        end;
-        //+NPR5.53 [358656]
-
-
-
-        Membership.SetRange("Customer No.",CustNo);
-        if Membership.FindFirst then
-          MemberFound := true;
-
-
-
-        if (OpenDocFound = false) and (TransactionFound =false) and (OpenTransactionFound = false) and (MemberFound = false) then begin
+        //-NPR5.55 [401981]
+        //IF (OpenDocFound = FALSE) AND (TransactionFound =FALSE) AND (OpenTransactionFound = FALSE) AND (MemberFound = FALSE) THEN BEGIN
+        if (OpenDocFound = false) and (TransactionFound =false) and (OpenTransactionFound = false) and (MemberFound = false) and (JournalFound= false) then begin
+        //+NPR5.55 [401981]
           AnonymizeCustomer(CustNo);
           //-NPR5.54 [358656]
           VarCount += 1;
           //+NPR5.54 [358656]
-          InsertLogEntry(CustNo,true,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound);
+
+          //-NPR5.55 [401981]
+          //InsertLogEntry(CustNo,TRUE,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound);
+          InsertLogEntry(CustNo,true,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound,JournalFound);
+          //+NPR5.55 [401981]
+
+
           VarReason := StrSubstNo (Text001, CustNo);
           exit(true) ;
         end;
 
-        InsertLogEntry(CustNo,false,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound);
+        //-NPR5.55 [401981]
+        //InsertLogEntry(CustNo,FALSE,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound);
+        InsertLogEntry(CustNo,false,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound,JournalFound);
+        //+NPR5.55 [401981]
         if (VarReason = '') and (MemberFound) then
           VarReason := StrSubstNo(Text003,CustNo);
 
@@ -192,11 +232,114 @@ codeunit 6151060 "NP GDPR Management"
         exit(false);
     end;
 
+    procedure IsCustomerValidForAnonymization(CustomerNo: Code[20];LimitedTimePeriod: Boolean;LimitingDateFormula: DateFormula;var ReasonCode: Integer): Boolean
+    var
+        CLE: Record "Cust. Ledger Entry";
+        SalesHdr: Record "Sales Header";
+        Membership: Record "MM Membership";
+        ILE: Record "Item Ledger Entry";
+        GenJnlLine: Record "Gen. Journal Line";
+        Customer: Record Customer;
+    begin
+
+        //-NPR5.55 [388813-2]
+        ReasonCode := 0;
+
+        if (not Customer.Get (CustomerNo)) then begin
+          ReasonCode := -1;
+          exit (false);
+        end;
+
+        if (Customer.Anonymized) then begin
+          ReasonCode := -2;
+          exit (false);
+        end;
+
+        SalesHdr.SetCurrentKey("Sell-to Customer No.","External Document No.");
+        SalesHdr.SetRange("Sell-to Customer No.",CustomerNo);
+        if SalesHdr.FindFirst then
+          ReasonCode += Power (2, 0); //OpenDocFound := TRUE;
+
+        if (LimitedTimePeriod) then begin
+          // DateFormulaTxt := '-' + FORMAT(GDPRSetup."Anonymize After");
+          // EVALUATE(VarPeriod,DateFormulaTxt);
+          CLE.SetCurrentKey("Customer No.","Posting Date","Currency Code");
+          CLE.SetRange("Customer No.",CustomerNo);
+          CLE.SetFilter("Posting Date",'>%1', CalcDate(LimitingDateFormula, Today));
+          if CLE.FindFirst then
+            ReasonCode += Power (2, 1); // TransactionFound := TRUE;
+
+          if (CLE.IsEmpty ()) then begin
+            ILE.Reset;
+            ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+            ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
+            ILE.SetRange(ILE."Source No.",CustomerNo);
+            ILE.SetFilter("Posting Date",'>%1',CalcDate(LimitingDateFormula,Today));
+            if ILE.FindFirst then
+              ReasonCode += Power (2, 1); // TransactionFound := TRUE;
+          end;
+        end;
+
+        CLE.SetCurrentKey("Customer No.",Open,Positive,"Due Date","Currency Code");
+        CLE.SetRange("Customer No.",CustomerNo);
+        CLE.SetRange(Open,true);
+        if CLE.FindFirst then
+          ReasonCode += Power (2, 2); // OpenTransactionFound := TRUE;
+
+        if (CLE.IsEmpty ()) then begin
+            ILE.Reset;
+            ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+            ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
+            ILE.SetRange(ILE."Source No.",CustomerNo);
+            ILE.SetRange(Open,true);
+            if ILE.FindFirst then
+              ReasonCode += Power (2, 2); //OpenTransactionFound := TRUE;
+        end;
+
+
+        Membership.SetRange("Customer No.",CustomerNo);
+        if Membership.FindFirst then
+          ReasonCode += Power (2, 3); // MemberFound := TRUE;
+
+
+        GenJnlLine.Reset;
+        GenJnlLine.SetRange(GenJnlLine."Account Type",GenJnlLine."Account Type"::Customer);
+        GenJnlLine.SetRange(GenJnlLine."Account No.",CustomerNo);
+        if GenJnlLine.FindFirst then
+          ReasonCode += Power (2, 4); // JournalFound := TRUE;
+
+        exit (ReasonCode = 0);
+    end;
+
+    local procedure EvaluateResponseValue(ResponseValue: Integer;BitPosition: Integer): Boolean
+    begin
+
+        exit ((Round (ResponseValue / Power (2,BitPosition), 1, '<') mod 2 = 1))
+    end;
+
     procedure AnonymizeCustomer(CustNo: Code[20])
     var
         Customer: Record Customer;
     begin
+
+        //-NPR5.55 [388813]
+        //Customer.GET(CustNo);
+        AnonymizePrimaryContact(CustNo);
+        AnonymizeSalesInvoices(CustNo);
+        AnonymizeSalesCrMemos(CustNo);
+        AnonymizeSalesShipments(CustNo);
+        AnonymizeReturnReceipts(CustNo);
+        AnonymizeJobs(CustNo);
+        //+NPR5.55 [388813]
+
+        //-NPR5.55 [401981]
+        AnonymizeIssuedReminders(CustNo);
+        //+NPR5.55 [401981]
+
+        //-NPR5.55 [388813]
         Customer.Get(CustNo);
+        //+NPR5.55 [388813]
+
         Customer.Name := '------';
         Customer."Search Name" := '------';
         Customer."Name 2" := '------';
@@ -224,12 +367,14 @@ codeunit 6151060 "NP GDPR Management"
         Customer.Blocked := Customer.Blocked::All;
         Customer.Modify(true);
 
-        AnonymizePrimaryContact(CustNo);
-        AnonymizeSalesInvoices(CustNo);
-        AnonymizeSalesCrMemos(CustNo);
-        AnonymizeSalesShipments(CustNo);
-        AnonymizeReturnReceipts(CustNo);
-        AnonymizeJobs(CustNo);
+        //-NPR5.55 [388813]
+        //AnonymizePrimaryContact(CustNo);
+        //AnonymizeSalesInvoices(CustNo);
+        //AnonymizeSalesCrMemos(CustNo);
+        //AnonymizeSalesShipments(CustNo);
+        //AnonymizeReturnReceipts(CustNo);
+        //AnonymizeJobs(CustNo);
+        //+NPR5.55 [388813]
     end;
 
     local procedure AnonymizePrimaryContact(VarCustNo: Code[20])
@@ -429,7 +574,7 @@ codeunit 6151060 "NP GDPR Management"
           until SalesCrMemoHdr.Next =0;
     end;
 
-    local procedure InsertLogEntry(CustNo: Code[20];Success: Boolean;OpenSales: Boolean;OpenCLE: Boolean;TransactionInPeriod: Boolean;Member: Boolean)
+    local procedure InsertLogEntry(CustNo: Code[20];Success: Boolean;OpenSales: Boolean;OpenCLE: Boolean;TransactionInPeriod: Boolean;Member: Boolean;Journals: Boolean)
     var
         GDPRLogEntry: Record "Customer GDPR Log Entries";
     begin
@@ -447,6 +592,9 @@ codeunit 6151060 "NP GDPR Management"
         GDPRLogEntry."Open Cust. Ledger Entry" := OpenCLE;
         GDPRLogEntry."Has transactions" := TransactionInPeriod;
         GDPRLogEntry."Customer is a Member" := Member;
+        //-NPR5.55 [401981]
+        GDPRLogEntry."Open Journal Entries/Statement" :=  Journals;
+        //+NPR5.55 [401981]
         GDPRLogEntry."Log Entry Date Time" := CurrentDateTime;
         GDPRLogEntry."Anonymized By" := UserId;
         GDPRLogEntry.Insert;
@@ -726,6 +874,31 @@ codeunit 6151060 "NP GDPR Management"
             end;
           until Customer.Next =0;
         //+NPR5.53 [358656]
+    end;
+
+    local procedure AnonymizeIssuedReminders(VarCustNo: Code[20])
+    var
+        IssuedReminderHdr: Record "Issued Reminder Header";
+    begin
+        //-NPR5.55 [401981]
+        IssuedReminderHdr.Reset;
+        IssuedReminderHdr.SetRange("Customer No.",VarCustNo);
+        if not IssuedReminderHdr.FindFirst then
+          exit
+        else
+          repeat
+            IssuedReminderHdr.Name := '------';
+            IssuedReminderHdr."Name 2":= '------';
+            IssuedReminderHdr.Address := '------ --';
+            IssuedReminderHdr."Address 2" := '------ --';
+            IssuedReminderHdr."Post Code" := '';
+            IssuedReminderHdr.City := '';
+            IssuedReminderHdr.County := '';
+            IssuedReminderHdr."Country/Region Code" := '';
+            IssuedReminderHdr."VAT Registration No." := '';
+            IssuedReminderHdr.Modify(true);
+         until IssuedReminderHdr.Next =0;
+        //+NPR5.55 [401981]
     end;
 }
 

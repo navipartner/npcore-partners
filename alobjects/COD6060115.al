@@ -21,6 +21,7 @@ codeunit 6060115 "TM Ticket WebService"
     // TM1.38/TSA /20181025 CASE 332109 SendETicket()
     // TM1.45/TSA /20200114 CASE 384490 Ticket blocked checked for complementary item
     // TM90.1.46/TSA /20200128 CASE 387877 Added ListTicketItems() service
+    // TM1.48/TSA /20200727 CASE 414413 Changed import status to imported true, even when there there is failure (keeping runtime error flag)
 
 
     trigger OnRun()
@@ -157,14 +158,23 @@ codeunit 6060115 "TM Ticket WebService"
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Cancelation.SetDestination(OutStr);
         Cancelation.Export;
-
         ImportEntry.Modify(true);
-
         Commit ();
-        NaviConnectSyncMgt.ProcessImportEntry (ImportEntry);
 
+
+        NaviConnectSyncMgt.ProcessImportEntry (ImportEntry);
         ImportEntry.Get (ImportEntry."Entry No.");
+
         Cancelation.SetReservationResult (ImportEntry."Document ID", ImportEntry.Imported);
+
+        //-TM1.48 [414413]
+        ImportEntry.Imported := true;
+        ImportEntry."Document Source".CreateOutStream (OutStr);
+        Cancelation.SetDestination(OutStr);
+        Cancelation.Export;
+
+        ImportEntry.Modify (true);
+        //-TM1.48 [414413]
     end;
 
     [Scope('Personalization')]

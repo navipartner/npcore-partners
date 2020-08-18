@@ -2,6 +2,7 @@ codeunit 6060044 "Item Wsht.-Register Batch"
 {
     // NPR4.18\BR\20160209  CASE 182391 Object Created
     // NPR5.25\BR \20160718 CASE 246088 Added Parameter to CheckLines
+    // NPR5.55/TJ  /20200304 CASE 388960 Added function DeleteWorksheetLine and publisher OnAfterRegisterLines
 
     TableNo = "Item Worksheet Line";
 
@@ -47,6 +48,10 @@ codeunit 6060044 "Item Wsht.-Register Batch"
           RegisterLines;
 
           //DeleteLines;
+          //-NPR5.55 [388960]
+          OnAfterRegisterLines(ItemWkshLine);
+          DeleteWorksheetLine();
+          //+NPR5.55 [388960]
 
           Commit;
         end;
@@ -153,6 +158,28 @@ codeunit 6060044 "Item Wsht.-Register Batch"
             CODEUNIT.Run(CODEUNIT::"Item Wsht.-Register Line",ItemWkshLine);
           until Next = 0;
         end;
+    end;
+
+    local procedure DeleteWorksheetLine()
+    var
+        ItemWkshLine2: Record "Item Worksheet Line";
+    begin
+        //-NPR5.55 [388960]
+        ItemWkshLine2.Copy(ItemWkshLine);
+        if ItemWorksheetTemplate."Delete Processed Lines" then begin
+          ItemWkshLine2.SetRange(Status,ItemWkshLine2.Status::Processed);
+          if ItemWkshLine2.FindSet then
+            repeat
+              if not (ItemWorksheetTemplate."Leave Skipped Line on Register" and (ItemWkshLine2.Action = ItemWkshLine2.Action::Skip)) then
+                ItemWkshLine2.Delete(true);
+            until ItemWkshLine2.Next = 0;
+        end;
+        //+NPR5.55 [388960]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRegisterLines(var ItemWorksheetLine: Record "Item Worksheet Line")
+    begin
     end;
 }
 

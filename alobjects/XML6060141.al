@@ -7,6 +7,8 @@ xmlport 6060141 "MM Get Loyalty Points"
     // MM1.18/TSA/20170207  CASE 265562 - Changed to XML format
     // MM1.18/TSA/20170216  CASE 265729 - Added membercardinality and membercount
     // MM1.37/TSA /20190226 CASE 338215 - Touch-up on the response status section (breaking change)
+    // MM1.44/TSA /20200421 CASE 400845 - Additional loyalty info + tier info
+    // MM1.44/TSA /20200528 CASE 405974 - Added info regarding previous period
 
     Caption = 'Get Loyalty Points';
     FormatEvaluate = Xml;
@@ -61,9 +63,42 @@ xmlport 6060141 "MM Get Loyalty Points"
                         MinOccurs = Zero;
                         fieldelement(communitycode;tmpMembershipResponse."Community Code")
                         {
+                            textattribute(communityname)
+                            {
+                                XmlName = 'name';
+                            }
                         }
                         fieldelement(membershipcode;tmpMembershipResponse."Membership Code")
                         {
+                            textattribute(membershipname)
+                            {
+                                XmlName = 'name';
+                            }
+                        }
+                        textelement(loyaltycode)
+                        {
+                            MaxOccurs = Once;
+                            XmlName = 'loyaltyprogram';
+                            textattribute(loyaltyname)
+                            {
+                                XmlName = 'name';
+                            }
+                        }
+                        textelement(loyaltycollectionperiodcode)
+                        {
+                            XmlName = 'loyaltycollectionperiod';
+                            textattribute(loyaltycollectionperiodname)
+                            {
+                                XmlName = 'name';
+                            }
+                        }
+                        textelement(loyaltypointsourcecode)
+                        {
+                            XmlName = 'loyaltypointsource';
+                            textattribute(loyaltypointsourcename)
+                            {
+                                XmlName = 'name';
+                            }
                         }
                         fieldelement(membershipnumber;tmpMembershipResponse."External Membership No.")
                         {
@@ -108,6 +143,80 @@ xmlport 6060141 "MM Get Loyalty Points"
                             {
                             }
                         }
+                        textelement(previousperiod)
+                        {
+                            textattribute(spendperiodstart)
+                            {
+                                XmlName = 'spendperiodstart';
+                            }
+                            textattribute(spendperiodend)
+                            {
+                                XmlName = 'spendperiodend';
+                            }
+                            textelement(pointsearned)
+                            {
+                                XmlName = 'pointsearned';
+                                textattribute(pointsearnedvalue)
+                                {
+                                    XmlName = 'value';
+                                }
+                                textattribute(pointsearnedcurrencycode)
+                                {
+                                    XmlName = 'currencycode';
+                                }
+                            }
+                            textelement(pointsremaining)
+                            {
+                                XmlName = 'pointsremaining';
+                                textattribute(pointsremainingvalue)
+                                {
+                                    XmlName = 'value';
+                                }
+                                textattribute(pointsremainingcurrencycode)
+                                {
+                                    XmlName = 'currencycode';
+                                }
+                            }
+                        }
+                        textelement(loyaltytiers)
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                            textelement(upgrade)
+                            {
+                                MaxOccurs = Once;
+                                MinOccurs = Zero;
+                                textattribute(upgradetolevel)
+                                {
+                                    XmlName = 'tolevel';
+                                }
+                                textattribute(upgradethreshold)
+                                {
+                                    XmlName = 'threshold';
+                                }
+                                textattribute(upgradetoname)
+                                {
+                                    XmlName = 'toname';
+                                }
+                            }
+                            textelement(downgrade)
+                            {
+                                MaxOccurs = Once;
+                                MinOccurs = Zero;
+                                textattribute(downgradetolevel)
+                                {
+                                    XmlName = 'tolevel';
+                                }
+                                textattribute(downgradethreshold)
+                                {
+                                    XmlName = 'threshold';
+                                }
+                                textattribute(downgradetoname)
+                                {
+                                    XmlName = 'toname';
+                                }
+                            }
+                        }
                     }
 
                     trigger OnAfterGetRecord()
@@ -148,8 +257,20 @@ xmlport 6060141 "MM Get Loyalty Points"
     var
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
+        MembershipSetupTiers: Record "MM Membership Setup";
         Member: Record "MM Member";
         MembershipRole: Record "MM Membership Role";
+        LoyaltyAlterMembership: Record "MM Loyalty Alter Membership";
+        LoyaltySetup: Record "MM Loyalty Setup";
+        MemberCommunity: Record "MM Member Community";
+        TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
+        ReasonText: Text;
+        Earned: Decimal;
+        Redeemable: Decimal;
+        PeriodStart: Date;
+        PeriodEnd: Date;
     begin
 
         responsemessage := '';
@@ -163,6 +284,72 @@ xmlport 6060141 "MM Get Loyalty Points"
 
         tmpMembershipResponse.TransferFields (Membership, true);
         if (tmpMembershipResponse.Insert ()) then ;
+
+        //-MM1.44 [400845]
+        MemberCommunity.Get (Membership."Community Code");
+        MembershipSetup.Get (Membership."Membership Code");
+        CommunityName := MemberCommunity.Description;
+        MembershipName := MembershipSetup.Description;
+        UpgradeToName := '';
+        DowngradeToName := '';
+
+        if (MemberCommunity."Activate Loyalty Program") then begin
+          if (LoyaltySetup.Get (MembershipSetup."Loyalty Code")) then begin
+            LoyaltyCode := LoyaltySetup.Code;
+            LoyaltyName := LoyaltySetup.Description;
+
+            //-MM1.44 [405974]
+            LoyaltyCollectionPeriodCode := Format (LoyaltySetup."Collection Period", 0, 9);
+            LoyaltyCollectionPeriodName := Format (LoyaltySetup."Collection Period");
+            LoyaltyPointSourceCode := Format (LoyaltySetup."Voucher Point Source", 0, 9);
+            LoyaltyPointSourceName := Format (LoyaltySetup."Voucher Point Source");
+            //+MM1.44 [405974]
+
+          end;
+        end;
+
+        if (LoyaltyPointManagement.GetNextLoyaltyTier (MembershipEntryNo, true, LoyaltyAlterMembership)) then begin
+          UpgradeToLevel := LoyaltyAlterMembership."To Membership Code";
+          UpgradeThreshold := Format (LoyaltyAlterMembership."Points Threshold", 0, 9);
+          if (UpgradeToLevel <> '') then
+            if (MembershipSetupTiers.Get (UpgradeToLevel)) then
+              UpgradeToName := MembershipSetupTiers.Description;
+        end;
+
+        if (LoyaltyPointManagement.GetNextLoyaltyTier (MembershipEntryNo, false, LoyaltyAlterMembership)) then begin
+          DowngradeToLevel := LoyaltyAlterMembership."To Membership Code";
+          DowngradeThreshold := Format (LoyaltyAlterMembership."Points Threshold", 0, 9);
+          if (DowngradeToLevel <> '') then
+            if (MembershipSetupTiers.Get (DowngradeToLevel)) then
+              DowngradeToName := MembershipSetupTiers.Description
+        end;
+        //+MM1.44 [400845]
+
+        //-MM1.44 [405974]
+        Earned := LoyaltyPointManagement.CalculateEarnedPointsCurrentPeriod (MembershipEntryNo);
+        Redeemable := LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod (MembershipEntryNo);
+
+        pointsearned := Format (Earned, 0, 9);
+        pointsremaining := Format (Redeemable, 0, 9);
+        pointsearnedvalue := '0';
+        pointsremainingvalue := '0';
+
+        if (LoyaltyPointManagement.GetCouponToRedeemWS (MembershipEntryNo, TmpLoyaltyPointsSetup, 1000000000, ReasonText)) then begin
+          TmpLoyaltyPointsSetup.Reset ();
+          TmpLoyaltyPointsSetup.SetCurrentKey (Code,"Amount LCY");
+          TmpLoyaltyPointsSetup.FindLast ();
+          pointsearnedvalue := Format (Round (Earned * TmpLoyaltyPointsSetup."Point Rate", 1), 0, 9);
+          pointsremainingvalue := Format (Round (Redeemable * TmpLoyaltyPointsSetup."Point Rate", 1), 0, 9);
+
+          GeneralLedgerSetup.Get ();
+          pointsearnedcurrencycode := GeneralLedgerSetup."LCY Code";
+          pointsremainingcurrencycode := GeneralLedgerSetup."LCY Code";
+        end;
+
+        LoyaltyPointManagement.CalculateSpendPeriod (MembershipEntryNo, Today, PeriodStart, PeriodEnd);
+        spendperiodstart := Format (PeriodStart, 0, 9);
+        spendperiodend := Format (PeriodEnd, 0, 9);
+        //+MM1.44 [405974]
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)

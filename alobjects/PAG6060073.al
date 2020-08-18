@@ -5,6 +5,8 @@ page 6060073 "MM Membership Alteration Jnl"
     // MM1.34/JDH /20181109 CASE 334163 Added Caption to Actions
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.43/TSA /20200402 CASE 398329 Added action for batch renew
+    // MM1.44/TSA /20200423 CASE 401040 Added importing of alteration data, refactored validation functions
+    // MM1.44/TSA /20200423 CASE 401040 Added support for incorrect external reference
 
     Caption = 'Membership Alteration Journal';
     PageType = List;
@@ -39,7 +41,7 @@ page 6060073 "MM Membership Alteration Jnl"
                     trigger OnValidate()
                     begin
 
-                        SetExternalMembershipNo ("External Membership No.");
+                        SetExternalMembershipNo ("External Membership No.", Rec);
                     end;
                 }
                 field("Membership Code";"Membership Code")
@@ -58,7 +60,7 @@ page 6060073 "MM Membership Alteration Jnl"
                     trigger OnValidate()
                     begin
 
-                        SetItemNo ("Item No.");
+                        SetItemNo ("Item No.", Rec);
                     end;
                 }
                 field("Document Date";"Document Date")
@@ -137,6 +139,28 @@ page 6060073 "MM Membership Alteration Jnl"
                     CurrPage.Update (false);
                 end;
             }
+            action("Import From File")
+            {
+                Caption = 'Import From File';
+                Ellipsis = true;
+                Image = Import;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    SkipFirstLine: Boolean;
+                begin
+
+                    //-MM1.44 [401040]
+                    SkipFirstLine := Confirm (FILE_HAS_HEADINGS, true);
+                    ImportAlterationFromFile (SkipFirstLine);
+                    CurrPage.Update (false);
+                    //+MM1.44 [401040]
+                end;
+            }
         }
         area(navigation)
         {
@@ -176,13 +200,13 @@ page 6060073 "MM Membership Alteration Jnl"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
 
-        SetInformationContext (AlterationOption);
+        SetInformationContext (AlterationOption, Rec);
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
 
-        SetInformationContext (AlterationOption);
+        SetInformationContext (AlterationOption, Rec);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -194,16 +218,35 @@ page 6060073 "MM Membership Alteration Jnl"
     var
         AlterationOption: Option " ",REGRET,RENEW,UPGRADE,EXTEND,CANCEL;
         CONFIRM_EXECUTE: Label '%1 lines are selected. Are you sure you want to make the selected changes? ';
+        GServerFileName: Text;
+        GDateMask: Text;
+        IMPORT_MESSAGE_DIALOG: Label 'Importing :\#1#######################################################';
+        GLineCount: Integer;
+        FldAlterationType: Text;
+        FldExternalNumber: Text;
+        FldAlterationItemNo: Text;
+        FldAlterationDate: Text;
+        REQUIRED: Integer;
+        OPTIONAL: Integer;
+        SELECT_FILE_CAPTION: Label 'Membership Alteration Import';
+        FILE_FILTER: Label 'CSV Files (*.csv)|*.csv|All Files (*.*)|*.*';
+        PROCESS_INFO: Label 'Processing: (%1) %2';
+        INVALID_VALUE: Label 'The value %1 specified for %2 on line %3 is not valid.';
+        INVALID_LENGTH: Label 'The length of %1 exceeds the max length of %2 for %3 on line %4.';
+        VALUE_REQUIRED: Label 'A value is required for field %1 on line %2.';
+        DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
+        INVALID_DATE: Label 'The date %1 specified for field %2 on line %3 does not conform to the expected date format %4.';
+        FILE_HAS_HEADINGS: Label 'Does the file have headings on the first line?';
 
-    local procedure SetInformationContext(pType: Option)
+    local procedure SetInformationContext(pType: Option;var MemberInfoCapture: Record "MM Member Info Capture")
     begin
 
         case pType of
-          AlterationOption::REGRET : "Information Context" := "Information Context"::REGRET;
-          AlterationOption::RENEW : "Information Context" := "Information Context"::RENEW;
-          AlterationOption::UPGRADE : "Information Context" := "Information Context"::UPGRADE;
-          AlterationOption::EXTEND : "Information Context" := "Information Context"::EXTEND;
-          AlterationOption::CANCEL : "Information Context" := "Information Context"::CANCEL;
+          AlterationOption::REGRET : MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::REGRET;
+          AlterationOption::RENEW : MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;
+          AlterationOption::UPGRADE : MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::UPGRADE;
+          AlterationOption::EXTEND : MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::EXTEND;
+          AlterationOption::CANCEL : MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::CANCEL;
         end;
     end;
 
@@ -223,7 +266,7 @@ page 6060073 "MM Membership Alteration Jnl"
           exit;
 
         MembershipListPage.GetRecord (Membership);
-        SetExternalMembershipNo (Membership."External Membership No.");
+        SetExternalMembershipNo (Membership."External Membership No.", Rec);
     end;
 
     local procedure ItemLookup()
@@ -244,19 +287,19 @@ page 6060073 "MM Membership Alteration Jnl"
           exit;
 
         MembershipAlterationPage.GetRecord (MembershipAlterationSetup);
-        SetItemNo (MembershipAlterationSetup."Sales Item No.");
+        SetItemNo (MembershipAlterationSetup."Sales Item No.", Rec);
     end;
 
-    local procedure SetExternalMembershipNo(pExternalMembershipNo: Code[20])
+    local procedure SetExternalMembershipNo(pExternalMembershipNo: Code[20];var MemberInfoCapture: Record "MM Member Info Capture")
     var
         Membership: Record "MM Membership";
         MembershipAlterationSetup: Record "MM Membership Alteration Setup";
     begin
 
         if (pExternalMembershipNo = '') then begin
-          "Membership Entry No." := 0;
-          "External Membership No." := pExternalMembershipNo;
-          "Membership Code" := '';
+          MemberInfoCapture."Membership Entry No." := 0;
+          MemberInfoCapture."External Membership No." := pExternalMembershipNo;
+          MemberInfoCapture."Membership Code" := '';
           exit;
         end;
 
@@ -270,38 +313,46 @@ page 6060073 "MM Membership Alteration Jnl"
           if not (Membership.FindFirst ()) then begin
             Membership.Reset;
             Membership.SetFilter ("External Membership No.", '=%1', pExternalMembershipNo);
-            Membership.FindFirst ();
+            //-MM1.44 [401040]
+            //Membership.FINDFIRST ();
+            if (not Membership.FindFirst ()) then begin
+              MemberInfoCapture."External Member No" := pExternalMembershipNo;
+              MemberInfoCapture."Response Message" := 'Invalid reference.';
+              MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::FAILED;
+              exit;
+            end;
+            //+MM1.44 [401040]
           end;
         end;
         //+MM1.26 [303546]
 
-        "Membership Entry No." := Membership."Entry No.";
-        "External Membership No." := Membership."External Membership No.";
-        "Membership Code" := Membership."Membership Code";
+        MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
+        MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+        MemberInfoCapture."Membership Code" := Membership."Membership Code";
 
-        if ("Membership Code" <> '') then begin
+        if (MemberInfoCapture."Membership Code" <> '') then begin
           MembershipAlterationSetup.SetFilter ("Alteration Type", '=%1', GetAlterationType (AlterationOption));
-          MembershipAlterationSetup.SetFilter ("From Membership Code", '=%1', "Membership Code");
+          MembershipAlterationSetup.SetFilter ("From Membership Code", '=%1', MemberInfoCapture."Membership Code");
           if (MembershipAlterationSetup.Count() = 1) then begin
             MembershipAlterationSetup.FindFirst ();
-            SetItemNo (MembershipAlterationSetup."Sales Item No.");
+            SetItemNo (MembershipAlterationSetup."Sales Item No.", MemberInfoCapture);
           end;
         end;
     end;
 
-    local procedure SetItemNo(ItemNo: Code[20])
+    local procedure SetItemNo(ItemNo: Code[20];var MemberInfoCapture: Record "MM Member Info Capture")
     var
         MembershipAlterationSetup: Record "MM Membership Alteration Setup";
     begin
 
-        "Item No." := ItemNo;
-        Description := MembershipAlterationSetup.Description;
+        MemberInfoCapture."Item No." := ItemNo;
+        MemberInfoCapture.Description := MembershipAlterationSetup.Description;
         if (ItemNo = '') then
           exit;
 
-        MembershipAlterationSetup.Get (GetAlterationType (AlterationOption), "Membership Code", ItemNo);
-        "Item No." := ItemNo;
-        Description := MembershipAlterationSetup.Description;
+        MembershipAlterationSetup.Get (GetAlterationType (AlterationOption), MemberInfoCapture."Membership Code", ItemNo);
+        MemberInfoCapture."Item No." := ItemNo;
+        MemberInfoCapture.Description := MembershipAlterationSetup.Description;
     end;
 
     local procedure GetAlterationType(pAlterationOption: Option): Integer
@@ -363,6 +414,300 @@ page 6060073 "MM Membership Alteration Jnl"
         end;
 
         CurrPage.Update(false);
+    end;
+
+    local procedure SelectMembershipUsingMemberCard(ExternalCardNumber: Text[100];var MemberInfoCapture: Record "MM Member Info Capture"): Boolean
+    var
+        MemberCard: Record "MM Member Card";
+        Membership: Record "MM Membership";
+    begin
+
+        MemberCard.SetFilter ("External Card No.", '=%1', ExternalCardNumber);
+        if (not MemberCard.FindFirst ()) then
+          exit (false);
+
+        if (MemberCard.Blocked) then
+          MemberCard.TestField (Blocked);
+
+        Membership.Get (MemberCard."Membership Entry No.");
+        SetExternalMembershipNo (Membership."External Membership No.", MemberInfoCapture);
+        exit (true);
+    end;
+
+    local procedure "--"()
+    begin
+    end;
+
+    local procedure ImportAlterationFromFile(SkipFirstLine: Boolean)
+    var
+        FileManagement: Codeunit "File Management";
+        SuggestFileName: Text[1024];
+        FileName: Text[1024];
+        Serverfilename: Text;
+    begin
+
+        //-MM1.44 [401040]
+        SuggestFileName := '';
+        FileName := FileManagement.OpenFileDialog (SELECT_FILE_CAPTION, SuggestFileName, FILE_FILTER);
+
+        if (SuggestFileName = FileName) then
+          Error ('');
+
+        Serverfilename := FileManagement.UploadFileSilent(FileName);
+        SetFileName (Serverfilename);
+
+        ImportFromFile (SkipFirstLine);
+        //+MM1.44 [401040]
+    end;
+
+    procedure SetFileName(PFileName: Text[250])
+    begin
+
+        //-MM1.44 [401040]
+        GServerFileName := PFileName;
+        //+MM1.44 [401040]
+    end;
+
+    procedure ImportFromFile(SkipFirstLine: Boolean)
+    var
+        TxtFile: File;
+        IStream: InStream;
+        MemberInfoCapture: Record "MM Member Info Capture";
+        Fileline: Text;
+        Window: Dialog;
+        LowEntryNo: Integer;
+    begin
+
+        //-MM1.44 [401040]
+        REQUIRED := 1;
+        OPTIONAL := 2;
+
+        GDateMask := 'YYYYMMDD'; // Should be setup or parameter
+
+        TxtFile.TextMode (true);
+        TxtFile.Open (GServerFileName);
+        TxtFile.CreateInStream (IStream);
+
+        if (not MemberInfoCapture.FindLast()) then ;
+        LowEntryNo := MemberInfoCapture."Entry No." +1;
+
+        if GuiAllowed then
+          Window.Open (IMPORT_MESSAGE_DIALOG);
+
+        while (not IStream.EOS) do begin
+
+          if (IStream.ReadText (Fileline) > 0)  then begin
+            //Fileline := Ansi2Ascii (Fileline);
+
+            // UTF-8 files start with some bytes identifying the format, get rid of those bytes
+            //IF (lineCount = 1) THEN WHILE (fileline[1] <> '"') DO fileline := COPYSTR (fileline, 2);
+
+            DecodeLine (Fileline);
+
+            if GuiAllowed then
+              if ((GLineCount mod 5) = 0) then Window.Update (1, StrSubstNo (PROCESS_INFO, GLineCount, FldExternalNumber));
+
+            GLineCount += 1;
+
+            if ((SkipFirstLine) and (GLineCount <> 1)) or (not SkipFirstLine) then begin
+              InsertLine ();
+            end;
+
+          end;
+
+        end;
+
+        TxtFile.Close ();
+        if GuiAllowed then
+          Window.Close ();
+        //+MM1.44 [401040]
+    end;
+
+    local procedure DecodeLine(CsvLine: Text)
+    begin
+
+        //-MM1.44 [401040]
+        FldAlterationType := nextField (CsvLine);
+        FldExternalNumber := nextField (CsvLine);
+        FldAlterationItemNo := nextField (CsvLine);
+        FldAlterationDate := nextField (CsvLine);
+
+        validateTextField (FldAlterationType, 20, REQUIRED, FieldCaption ("Information Context"));
+        validateTextField (FldExternalNumber, MaxStrLen ("External Membership No."), REQUIRED, FieldCaption ("External Membership No."));
+        validateTextField (FldAlterationItemNo, MaxStrLen ("Item No."), OPTIONAL, FieldCaption ("Item No."));
+        validateDateField (FldAlterationDate, GDateMask, OPTIONAL, FieldCaption ("Document Date"));
+        //+MM1.44 [401040]
+    end;
+
+    local procedure InsertLine()
+    var
+        MemberInfoCapture: Record "MM Member Info Capture";
+    begin
+
+        //-MM1.44 [401040]
+        MemberInfoCapture.Init ();
+        MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::ALTERATION_JNL;
+        MemberInfoCapture."Document No." := CopyStr (UserId, 1, MaxStrLen (MemberInfoCapture."Document No."));
+
+        case LowerCase (FldAlterationType) of
+          'renew'  : AlterationOption := AlterationOption::RENEW;
+          'upgrade': AlterationOption := AlterationOption::UPGRADE;
+          'extend' : AlterationOption := AlterationOption::EXTEND;
+          'regret' : AlterationOption := AlterationOption::REGRET;
+          'cancel' : AlterationOption := AlterationOption::CANCEL;
+          else
+            exit;
+        end;
+        SetInformationContext (AlterationOption, MemberInfoCapture);
+
+        if (not SelectMembershipUsingMemberCard (FldExternalNumber, MemberInfoCapture)) then
+          SetExternalMembershipNo (FldExternalNumber, MemberInfoCapture);
+
+        if (MemberInfoCapture."Item No." = '') then
+          validateTextField (FldAlterationItemNo, MaxStrLen ("Item No."), REQUIRED, FieldCaption ("Item No."));
+
+        if (FldAlterationItemNo <> '') then
+          SetItemNo (FldAlterationItemNo, MemberInfoCapture);
+
+        MemberInfoCapture."Document Date" := Today;
+        if (FldAlterationDate <> '') then
+          MemberInfoCapture."Document Date" := validateDateField (FldAlterationDate, GDateMask, REQUIRED, FieldCaption ("Document Date"));
+
+        MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::REGISTERED;
+        MemberInfoCapture."Originates From File Import" := true;
+
+        MemberInfoCapture.Insert ();
+        //+MM1.44 [401040]
+    end;
+
+    local procedure validateTextField(fieldValue: Text;fieldMaxLength: Integer;fieldValueIs: Integer;fieldCaptionName: Text): Text
+    begin
+
+        //-MM1.44 [401040]
+        if (StrLen (fieldValue) > fieldMaxLength) then
+          Error (INVALID_LENGTH, fieldValue, fieldMaxLength, fieldCaptionName, GLineCount);
+
+        if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
+          Error (VALUE_REQUIRED, fieldCaptionName, GLineCount);
+
+        exit (fieldValue);
+        //+MM1.44 [401040]
+    end;
+
+    local procedure validateDateField(fieldValue: Text;dateMask: Code[20];fieldValueIs: Integer;fieldCaptionName: Text) rDate: Date
+    begin
+
+        //-MM1.44 [401040]
+        rDate := 0D;
+
+        if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
+          Error (VALUE_REQUIRED, fieldCaptionName, GLineCount);
+
+        if ((fieldValue = '') and (fieldValueIs = OPTIONAL)) then
+          exit (0D);
+
+        if (StrLen (fieldValue) <> StrLen (dateMask)) then
+          Error (INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
+
+        case UpperCase (dateMask) of
+          'YYYYMMDD'   :
+            if (not Evaluate (rDate, StrSubstNo ('%1-%2-%3', CopyStr (fieldValue, 1, 4), CopyStr (fieldValue, 5, 2), CopyStr (fieldValue, 7, 2)), 9)) then
+              Error (INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
+
+          'YYYY-MM-DD' :
+            if (not Evaluate (rDate, StrSubstNo ('%1-%2-%3', CopyStr (fieldValue, 1, 4), CopyStr (fieldValue, 6, 2), CopyStr (fieldValue, 9, 2)), 9)) then
+              Error (INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
+
+          else
+            Error (DATE_MASK_ERROR, dateMask);
+        end;
+
+        exit (rDate);
+        //+MM1.44 [401040]
+    end;
+
+    local procedure validateIntegerField(fieldValue: Text;fieldValueIs: Integer;fieldCaptionName: Text) rInteger: Integer
+    begin
+
+        //-MM1.44 [401040]
+        rInteger := 0;
+
+        if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
+          Error (VALUE_REQUIRED, fieldCaptionName, GLineCount);
+
+        if ((fieldValue = '') and (fieldValueIs = OPTIONAL)) then
+          exit (0);
+
+        if not (Evaluate (rInteger, fieldValue)) then
+          Error (INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
+
+        exit (rInteger);
+        //+MM1.44 [401040]
+    end;
+
+    local procedure nextField(var VarLineOfText: Text[1024]) rField: Text[1024]
+    begin
+
+        //-MM1.44 [401040]
+        exit (forwardTokenizer (VarLineOfText, ';', '"'));
+        //+MM1.44 [401040]
+    end;
+
+    local procedure forwardTokenizer(var VarText: Text[1024];PSeparator: Char;PQuote: Char) RField: Text[1024]
+    var
+        Separator: Char;
+        Quote: Char;
+        IsQuoted: Boolean;
+        InputText: Text[1024];
+        NextFieldPos: Integer;
+        IsNextField: Boolean;
+        NextByte: Text[1];
+    begin
+
+        //-MM1.44 [401040]
+        //  This function splits the textline into 2 parts at first occurence of separator
+        //  Quotecharacter enables separator to occur inside datablock
+
+        //  example:
+        //  23;some text;"some text with a ;";xxxx
+
+        //  result:
+        //  1) 23
+        //  2) some text
+        //  3) some text with a ;
+        //  4) xxxx
+
+        //  Quoted text, variable length text tokenizer:
+        //  forward searching tokenizer splitting string at separator.
+        //  separator is protected by quoting string
+        //  the separator is omitted from the resulting strings
+
+        if ((VarText[1] = PQuote) and (StrLen (VarText) = 1)) then begin
+          VarText := '';
+          RField := '';
+          exit (RField);
+        end;
+
+        IsQuoted := false;
+        NextFieldPos := 1;
+        IsNextField := false;
+
+        InputText := VarText;
+
+        if (PQuote = InputText[NextFieldPos]) then IsQuoted := true;
+        while ((NextFieldPos <= StrLen (InputText)) and (not IsNextField)) do begin
+          if (PSeparator = InputText[NextFieldPos]) then IsNextField := true;
+          if (IsQuoted and IsNextField) then IsNextField := (InputText[NextFieldPos-1] = PQuote);
+
+          NextByte[1] := InputText[NextFieldPos];
+          if (not IsNextField) then RField += NextByte;
+          NextFieldPos += 1;
+        end;
+        if (IsQuoted) then RField := CopyStr (RField, 2, StrLen (RField)-2);
+
+        VarText := CopyStr (InputText, NextFieldPos);
+        exit (RField);
+        //+MM1.44 [401040]
     end;
 }
 

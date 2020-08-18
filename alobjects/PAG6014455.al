@@ -4,6 +4,8 @@ page 6014455 "Campaign Discount List"
     // NPR5.29/TJ  /20170123 CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
     // NPR5.42/MHA /20180521  CASE 315554 Added Period Fields to enable Weekly Condition
     // NPR5.51/SARA/20190826  CASE 365799 Able to delete more than one lines at a time
+    // NPR5.55/TJ  /20200421  CASE 400524 Removed Name from Dimensions-Single action so it defaults to page name
+    //                                    Removed group Dimensions and unused Dimensions-Multiple
 
     Caption = 'Period Discount List';
     CardPageID = "Campaign Discount";
@@ -69,40 +71,14 @@ page 6014455 "Campaign Discount List"
     {
         area(navigation)
         {
-            group(Dimension)
+            action(Dimensions)
             {
                 Caption = 'Dimensions';
                 Image = Dimensions;
-                action("Dimensions-Single")
-                {
-                    Caption = 'Dimensions-Single';
-                    Image = Dimensions;
-                    RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014413),
-                                  "No."=FIELD(Code);
-                    ShortCutKey = 'Shift+Ctrl+D';
-                }
-                action("Dimensions-Mulitple")
-                {
-                    Caption = 'Dimensions-Mulitple';
-                    Image = DimensionSets;
-                    Visible = false;
-
-                    trigger OnAction()
-                    var
-                        PeriodDiscount: Record "Period Discount";
-                        DefaultDimMultiple: Page "Default Dimensions-Multiple";
-                    begin
-                        //-NPR5.29 [263787]
-                        /*
-                        CurrPage.SETSELECTIONFILTER(PeriodDiscount);
-                        DefaultDimMultiple.SetMultiPeriodDiscount(PeriodDiscount);
-                        DefaultDimMultiple.RUNMODAL;
-                        */
-                        //+NPR5.29 [263787]
-
-                    end;
-                }
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID"=CONST(6014413),
+                              "No."=FIELD(Code);
+                ShortCutKey = 'Shift+Ctrl+D';
             }
         }
     }

@@ -5,6 +5,7 @@ codeunit 6151367 "CS UI Warehouse Shipment"
     // NPR5.51/CLVA/20190819 CASE 345567 Added field "Vendor Item No."
     // NPR5.52/ALST/20190920 CASE 363091 quantity to ship must be 0 on warehouse shipment line if "Zero Def. Qty. to Handle" is true
     // NPR5.52/CLVA/20191010 CASE 370452 Changed posting functionality
+    // NPR5.55/ALPO/20200729 CASE 404663 Possibility to use vendor item number & description for CS warehouse activity lines
 
     TableNo = "CS UI Header";
 
@@ -447,6 +448,8 @@ codeunit 6151367 "CS UI Warehouse Shipment"
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
         TableNo: Integer;
+        CSWarehouseActivitySetup: Record "CS Warehouse Activity Setup";
+        ItemIdentifier: Text;
     begin
         Clear(CSWarehouseShipmentHandling);
         CSWarehouseShipmentHandling.SetRange(Id, CSSessionId);
@@ -479,10 +482,17 @@ codeunit 6151367 "CS UI Warehouse Shipment"
                     AddAttribute(Line, 'Descrip', WhseShipmentLine.FieldCaption(Description));
                     AddAttribute(Line, 'Indicator', Indicator);
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    if WhseShipmentLine."Variant Code" <> '' then
-                        Line.InnerText := StrSubstNo(Text015, WhseShipmentLine."Qty. to Ship", WhseShipmentLine."Qty. Outstanding", WhseShipmentLine."Item No." + '-' + WhseShipmentLine."Variant Code", WhseShipmentLine.Description)
-                    else
-                        Line.InnerText := StrSubstNo(Text015, WhseShipmentLine."Qty. to Ship", WhseShipmentLine."Qty. Outstanding", WhseShipmentLine."Item No.", WhseShipmentLine.Description);
+              //-NPR5.55 [404663]-revoked
+        //      IF WhseShipmentLine."Variant Code" <> '' THEN
+        //        Line.InnerText := STRSUBSTNO(Text015,WhseShipmentLine."Qty. to Ship",WhseShipmentLine."Qty. Outstanding",WhseShipmentLine."Item No." + '-' + WhseShipmentLine."Variant Code",WhseShipmentLine.Description)
+        //      ELSE
+        //      Line.InnerText := STRSUBSTNO(Text015,WhseShipmentLine."Qty. to Ship",WhseShipmentLine."Qty. Outstanding",WhseShipmentLine."Item No.",WhseShipmentLine.Description);
+              //+NPR5.55 [404663]-revoked
+              //-NPR5.55 [404663]
+              ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseShipmentLine.RecordId, true, '-');
+              Line.InnerText :=
+                StrSubstNo(Text015, WhseShipmentLine."Qty. to Ship", WhseShipmentLine."Qty. Outstanding", ItemIdentifier, WhseShipmentLine.Description);
+              //+NPR5.55 [404663]
                     Record.AppendChild(Line);
 
                     Line := DOMxmlin.CreateElement('Line');
@@ -540,10 +550,17 @@ codeunit 6151367 "CS UI Warehouse Shipment"
                             AddAttribute(Line, 'Descrip', WhseShipmentLine.FieldCaption(Description));
                             AddAttribute(Line, 'Indicator', Indicator);
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            if WhseShipmentLine."Variant Code" <> '' then
-                                Line.InnerText := StrSubstNo(Text015, WhseShipmentLine."Qty. to Ship", WhseShipmentLine."Qty. Outstanding", WhseShipmentLine."Item No." + '-' + WhseShipmentLine."Variant Code", WhseShipmentLine.Description)
-                            else
-                                Line.InnerText := StrSubstNo(Text015, WhseShipmentLine."Qty. to Ship", WhseShipmentLine."Qty. Outstanding", WhseShipmentLine."Item No.", WhseShipmentLine.Description);
+                  //-NPR5.55 [404663]-revoked
+        //          IF WhseShipmentLine."Variant Code" <> '' THEN
+        //            Line.InnerText := STRSUBSTNO(Text015,WhseShipmentLine."Qty. to Ship",WhseShipmentLine."Qty. Outstanding",WhseShipmentLine."Item No." + '-' + WhseShipmentLine."Variant Code",WhseShipmentLine.Description)
+        //          ELSE
+        //          Line.InnerText := STRSUBSTNO(Text015,WhseShipmentLine."Qty. to Ship",WhseShipmentLine."Qty. Outstanding",WhseShipmentLine."Item No.",WhseShipmentLine.Description);
+                  //+NPR5.55 [404663]-revoked
+                  //-NPR5.55 [404663]
+                  ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseShipmentLine.RecordId, true, '-');
+                  Line.InnerText :=
+                    StrSubstNo(Text015, WhseShipmentLine."Qty. to Ship", WhseShipmentLine."Qty. Outstanding", ItemIdentifier, WhseShipmentLine.Description);
+                  //+NPR5.55 [404663]
                             Record.AppendChild(Line);
 
                             Line := DOMxmlin.CreateElement('Line');

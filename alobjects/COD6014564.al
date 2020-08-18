@@ -391,8 +391,8 @@ codeunit 6014564 "Report - Balancing Ticket"
         FromSalesTicketNo := AuditRoll1."Sales Ticket No.";
         ToSalesTicketNo := AuditRoll."Sales Ticket No.";
 
-        //Bev�gPos := 0;
-        //Bev�gNeg := 0;
+        //BevægPos := 0;
+        //BevægNeg := 0;
 
         ChequeAmount := GlobalPeriod.Cheque;
         BalanceUpdate(ChequeAmount,ChequeAmount > 0);
@@ -1303,10 +1303,10 @@ codeunit 6014564 "Report - Balancing Ticket"
         //  Printer.SetPadChar(' ');
 
         //  Printer.AddTextField(1,0,CheckSumTxt);
-        //  Printer.AddDecimalField(2,2,Kontantbev�g+BetalingerTotal+debetsalg+gkdebet);
+        //  Printer.AddDecimalField(2,2,Kontantbevæg+BetalingerTotal+debetsalg+gkdebet);
         //  Printer.AddTextField(1,0,RoundingTxt);
-        //  Printer.AddDecimalField(2,2, (Tilgodebevisudstedelse+Gavekortsalg+Debitorindbetalinger-Udbetalinger+Bruttooms�tning+debetsalg)
-        //      -(Kontantbev�g+BetalingerTotal+debetsalg+gkdebet) );
+        //  Printer.AddDecimalField(2,2, (Tilgodebevisudstedelse+Gavekortsalg+Debitorindbetalinger-Udbetalinger+Bruttoomsætning+debetsalg)
+        //      -(Kontantbevæg+BetalingerTotal+debetsalg+gkdebet) );
           //+NPR4.18
 
           RPLinePrintMgt.SetPadChar('_');

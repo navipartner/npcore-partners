@@ -5,6 +5,7 @@ page 6151127 "NpIa Item AddOn Subform"
     // NPR5.52/ALPO/20190912  CASE 354309 Possibility to fix the quantity so user would not be able to change it on sale line
     //                                    Set whether or not specified quantity is per unit of main item
     //                                    (new controls: Quantity, "Fixed Quantity", "Per Unit")
+    // NPR5.55/ALPO/20200506  CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
 
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -45,6 +46,9 @@ page 6151127 "NpIa Item AddOn Subform"
                 {
                 }
                 field("Unit Price";"Unit Price")
+                {
+                }
+                field("Use Unit Price";"Use Unit Price")
                 {
                 }
                 field("Discount %";"Discount %")

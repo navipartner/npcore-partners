@@ -6,6 +6,8 @@ codeunit 6060093 "MM Admission Service WS"
     // NPR5.43/CLVA  /20180627  CASE 318579 Added extra info to MM Admission Service Entry. Added upgraded function GuestArrivalV2 to support additional info on the login screen/display name
     // NPR5.44/NPKNAV/20180727  CASE 318579-01 Transport NPR5.44 - 27 July 2018
     // NPR5.54/CLVA  /20200316  CASE 364422 Added function GuestValidationV2
+    // NPR5.55/CLVA  /20200608  CASE 402284 Added "Admission Code" validation and SELECTLATESTVERSION
+    // NPR5.55/JAKUBV/20200807  CASE 402284 Transport NPR5.55 - 31 July 2020
 
 
     trigger OnRun()
@@ -53,7 +55,13 @@ codeunit 6060093 "MM Admission Service WS"
         MMMembership: Record "MM Membership";
         Item: Record Item;
         MMMembershipSetup: Record "MM Membership Setup";
+        AdmissionCode: Code[20];
+        MMAdmissionScannerStations: Record "MM Admission Scanner Stations";
     begin
+        //-NPR5.55 [402284]
+        SelectLatestVersion;
+        //+NPR5.55 [402284]
+
         MMAdmissionServiceLog.Init;
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
         MMAdmissionServiceLog."Request Barcode" := Barcode;
@@ -89,6 +97,12 @@ codeunit 6060093 "MM Admission Service WS"
           ErrorDescription := ErrorScannerStationIdIsBlank;
           DataError := true;
         end;
+
+        //-NPR5.55 [402284]
+        AdmissionCode := '';
+        if MMAdmissionScannerStations.Get(ScannerStationId) then
+          AdmissionCode := MMAdmissionScannerStations."Admission Code";
+        //+NPR5.55 [402284]
 
         if not DataError then begin
           if MMAdmissionServiceSetup."Validate Members" and not AdmissionIsValid then begin
@@ -126,7 +140,10 @@ codeunit 6060093 "MM Admission Service WS"
             end;
           end;
           if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
-            if TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) then begin
+            //-NPR5.55 [402284]
+            //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
+            if TMTicketWebService.ValidateTicketArrival(AdmissionCode,Barcode,ScannerStationId,MessageText) then begin
+            //+NPR5.55 [402284]
 
               MMAdmissionServiceLog."Response No" := Barcode;
               MMAdmissionServiceLog."Response Token" := CreateToken();
@@ -643,7 +660,13 @@ codeunit 6060093 "MM Admission Service WS"
         MMMembership: Record "MM Membership";
         Item: Record Item;
         MMMembershipSetup: Record "MM Membership Setup";
+        AdmissionCode: Code[20];
+        MMAdmissionScannerStations: Record "MM Admission Scanner Stations";
     begin
+        //-NPR5.55 [402284]
+        SelectLatestVersion;
+        //+NPR5.55 [402284]
+
         MMAdmissionServiceLog.Init;
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
         MMAdmissionServiceLog."Request Barcode" := Barcode;
@@ -682,6 +705,12 @@ codeunit 6060093 "MM Admission Service WS"
           DataError := true;
         end;
 
+        //-NPR5.55 [402284]
+        AdmissionCode := '';
+        if MMAdmissionScannerStations.Get(ScannerStationId) then
+          AdmissionCode := MMAdmissionScannerStations."Admission Code";
+        //+NPR5.55 [402284]
+
         if not DataError then begin
           if MMAdmissionServiceSetup."Validate Members" and not AdmissionIsValid then begin
             if MMMemberWebService.MemberCardNumberValidation(Barcode,ScannerStationId) then begin
@@ -719,7 +748,10 @@ codeunit 6060093 "MM Admission Service WS"
             end;
           end;
           if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
-            if TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) then begin
+            //-NPR5.55 [402284]
+            //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
+            if TMTicketWebService.ValidateTicketArrival(AdmissionCode,Barcode,ScannerStationId,MessageText) then begin
+            //+NPR5.55 [402284]
 
               MMAdmissionServiceLog."Response No" := Barcode;
               MMAdmissionServiceLog."Response Token" := CreateToken();

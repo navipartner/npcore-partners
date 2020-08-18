@@ -4,6 +4,7 @@ table 6150665 "NPRE Seating"
     // NPR5.34/ANEN/20170717 CASE 262628 Added support for status (fld "Status", "Status Description")
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
+    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Seating';
     DrillDownPageID = "NPRE Seating List";
@@ -65,15 +66,27 @@ table 6150665 "NPRE Seating"
                 ValidateShortcutDimCode(2,"Global Dimension 2 Code");  //NPR5.53 [380609]
             end;
         }
+        field(50;Blocked;Boolean)
+        {
+            Caption = 'Blocked';
+            Description = 'NPR5.55';
+        }
+        field(51;"Blocking Reason";Text[100])
+        {
+            Caption = 'Blocking Reason';
+            Description = 'NPR5.55';
+        }
         field(100;"Current Waiter Pad FF";Code[20])
         {
-            CalcFormula = Lookup("NPRE Seating - Waiter Pad Link"."Waiter Pad No." WHERE ("Seating Code"=FIELD(Code)));
+            CalcFormula = Lookup("NPRE Seating - Waiter Pad Link"."Waiter Pad No." WHERE ("Seating Code"=FIELD(Code),
+                                                                                          Closed=CONST(false)));
             Caption = 'Current Waiter Pad';
             FieldClass = FlowField;
         }
         field(101;"Multiple Waiter Pad FF";Integer)
         {
-            CalcFormula = Count("NPRE Seating - Waiter Pad Link" WHERE ("Seating Code"=FIELD(Code)));
+            CalcFormula = Count("NPRE Seating - Waiter Pad Link" WHERE ("Seating Code"=FIELD(Code),
+                                                                        Closed=CONST(false)));
             Caption = 'Multiple Waiter Pad';
             FieldClass = FlowField;
         }

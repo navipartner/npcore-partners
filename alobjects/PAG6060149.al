@@ -6,7 +6,8 @@ page 6060149 "RC Member Mgr Role Center"
     // MM1.26/TSA /20180222 CASE 304705 Added button for setup actions in ticket and member module
     // MM1.29/TSA /20180509 CASE 313795 Added GDPR actions
     // TM1.39/TS  /20181206 CASE 343939 Added Missing Picture to Action
-    // TM90.1.46/TSA /20200323 CASE 397084 Added ticket wizard
+    // TM1.46/TSA /20200323 CASE 397084 Added ticket wizard
+    // TM1.48/TSA /20200703 CASE 409741 Added Admission Forecast
 
     Caption = 'Role Center';
     PageType = RoleCenter;
@@ -319,6 +320,15 @@ page 6060149 "RC Member Mgr Role Center"
                     Caption = 'Ticket Bill-of-Material';
                     Image = BOM;
                     RunObject = Page "TM Ticket BOM";
+                }
+                separator(Separator6014426)
+                {
+                }
+                action(Forecast)
+                {
+                    Caption = 'Admission Forecast';
+                    Image = Forecast;
+                    RunObject = Page "TM Admission Forecast Matrix";
                 }
                 action(Statistics)
                 {

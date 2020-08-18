@@ -4,6 +4,7 @@ page 6014452 "Mixed Discount List"
     // NPR5.29/TJ  /20170123  CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
     // NPR5.31/MHA /20170110  CASE 262904 Added field 100 "Mix Type"
     // NPR5.51/SARA/20190826  CASE 365799 Able to delete more than one lines at a time
+    // NPR5.55/TJ  /20200421  CASE 400524 Added action Dimensions
 
     Caption = 'Mix Discount List';
     CardPageID = "Mixed Discount";
@@ -106,6 +107,24 @@ page 6014452 "Mixed Discount List"
 
     actions
     {
+        area(navigation)
+        {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID"=CONST(6014411),
+                              "No."=FIELD(Code);
+                ShortCutKey = 'Shift+Ctrl+D';
+
+                trigger OnAction()
+                var
+                    DimMgt: Codeunit DimensionManagement;
+                begin
+                end;
+            }
+        }
     }
 }
 

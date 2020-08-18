@@ -4,6 +4,7 @@ report 6014419 "Vendor Sales Stat"
     // NPR5.33/JLK /20170619  CASE 280879 Changed SalesQty and PurchaseQty to Decimal
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.53/ANPA/20191227  CASE 370940 Changed caption on request page
+    // NPR5.55/ANPA/20200608  CASE 402935 Changed layout to match layout of report 6014417
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Vendor Sales Stat.rdlc';
 
@@ -218,6 +219,9 @@ report 6014419 "Vendor Sales Stat"
 
     labels
     {
+        Report_Caption = 'Vendor Sales Stat.';
+        Footer_Caption = 'ˆNAVIPARTNER K¢benhavn 2002';
+        Total_Caption = 'Total';
     }
 
     trigger OnInitReport()

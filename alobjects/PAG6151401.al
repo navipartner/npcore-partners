@@ -37,9 +37,14 @@ page 6151401 "Magento Setup"
     // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
     // MAG2.23/MHA /20191017  CASE 373262 Addded Post On Import Setup PagePart
     // MAG2.25/MHA /20200204  CASE 387936 Added fields 750 "Send Order Confirmation", 760 "Order Conf. E-mail Template"
+    // MAG2.26/MHA /20200428  CASE 402247 Added Option "Fixed" to field 490 "Customer Update Mode"
+    // MAG2.26/MHA /20200430  CASE 402486 Added field 800 "Stock Calculation Method"
+    // MAG2.26/MHA /20200505  CASE 402488 Added field 810 "Stock NpXml Template", 820 "Stock Codeunit Id", 830 "Stock Codeunit Name", 840 "Stock Function Name"
+    // MAG2.26/MHA /20200526  CASE 406591 Added Collect in Store
 
     Caption = 'Magento Setup';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
+    RefreshOnActivate = true;
     SourceTable = "Magento Setup";
     UsageCategory = Administration;
 
@@ -54,6 +59,13 @@ page 6151401 "Magento Setup"
                 }
                 field("Magento Version";"Magento Version")
                 {
+
+                    trigger OnValidate()
+                    begin
+                        //-MAG2.26 [404580]
+                        CurrPage.Update(true);
+                        //+MAG2.26 [404580]
+                    end;
                 }
                 field("Magento Url";"Magento Url")
                 {
@@ -256,6 +268,26 @@ page 6151401 "Magento Setup"
                     }
                 }
             }
+            group("Collect in Store")
+            {
+                Caption = 'Collect in Store';
+                Visible = "Collect in Store Enabled";
+                field("NpCs From Store Code";"NpCs From Store Code")
+                {
+                    ShowMandatory = true;
+                }
+                field("NpCs Workflow Code";"NpCs Workflow Code")
+                {
+                    ShowMandatory = true;
+                }
+            }
+            part(NpCsStoreCardWorkflows;"NpCs Store Card Workflows")
+            {
+                Caption = 'Collect Stores';
+                Editable = ("NpCs Workflow Code" <> '');
+                SubPageLink = "Workflow Code"=FIELD("NpCs Workflow Code");
+                Visible = "Collect in Store Enabled";
+            }
             group(GiftVoucher)
             {
                 Caption = 'Gift Voucher';
@@ -327,9 +359,52 @@ page 6151401 "Magento Setup"
                     }
                 }
             }
-            group(Inventory)
+            group(Stock)
             {
-                Caption = 'Inventory';
+                Caption = 'Stock';
+                field("Stock Calculation Method";"Stock Calculation Method")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-MAG2.26 [402488]
+                        CurrPage.Update(true);
+                        //+MAG2.26 [402488]
+                    end;
+                }
+                group(Control6151463)
+                {
+                    ShowCaption = false;
+                    Visible = ("Stock Calculation Method" = "Stock Calculation Method"::Function);
+                    field("Stock Function Name";"Stock Function Name")
+                    {
+                        ShowMandatory = true;
+
+                        trigger OnValidate()
+                        begin
+                            //-MAG2.26 [402488]
+                            CurrPage.Update(true);
+                            //+MAG2.26 [402488]
+                        end;
+                    }
+                    field("Stock Codeunit Id";"Stock Codeunit Id")
+                    {
+                        Editable = false;
+                    }
+                    field("Stock Codeunit Name";"Stock Codeunit Name")
+                    {
+                    }
+                }
+                field("Stock NpXml Template";"Stock NpXml Template")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-MAG2.26 [402488]
+                        CurrPage.Update(true);
+                        //+MAG2.26 [402488]
+                    end;
+                }
                 group(Control6150659)
                 {
                     Caption = '';
@@ -352,6 +427,15 @@ page 6151401 "Magento Setup"
             {
                 field("Customer Update Mode";"Customer Update Mode")
                 {
+                }
+                group(Control6151460)
+                {
+                    ShowCaption = false;
+                    Visible = ("Customer Update Mode" = "Customer Update Mode"::Fixed);
+                    field("Fixed Customer No.";"Fixed Customer No.")
+                    {
+                        ShowMandatory = true;
+                    }
                 }
                 field("Customer Mapping";"Customer Mapping")
                 {
@@ -508,6 +592,44 @@ page 6151401 "Magento Setup"
                             //MagentoSetupMgt.SetupMagentoCustomerGroups();
                             MagentoSetupMgt.TriggerSetupMagentoCustomerGroups();
                             //+MAG2.07 [286943]
+                        end;
+                    }
+                    action("Setup Categories")
+                    {
+                        Caption = 'Setup Categories';
+                        Image = Setup;
+                        Promoted = true;
+                        PromotedCategory = Process;
+                        PromotedIsBig = true;
+                        Visible = HasSetupCategories;
+
+                        trigger OnAction()
+                        var
+                            MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
+                        begin
+                            //-MAG2.26 [404580]
+                            MagentoSetupMgt.TriggerSetupCategories();
+                            Message(Text003);
+                            //+MAG2.26 [404580]
+                        end;
+                    }
+                    action("Setup Brands")
+                    {
+                        Caption = 'Setup Brands';
+                        Image = Setup;
+                        Promoted = true;
+                        PromotedCategory = Process;
+                        PromotedIsBig = true;
+                        Visible = HasSetupBrands;
+
+                        trigger OnAction()
+                        var
+                            MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
+                        begin
+                            //-MAG2.26 [404580]
+                            MagentoSetupMgt.TriggerSetupBrands();
+                            Message(Text004);
+                            //+MAG2.26 [404580]
                         end;
                     }
                 }
@@ -733,10 +855,24 @@ page 6151401 "Magento Setup"
         }
     }
 
+    trigger OnAfterGetCurrRecord()
+    var
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
+    begin
+        //-MAG2.26 [404580]
+        HasSetupCategories := MagentoSetupMgt.HasSetupCategories();
+        HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
+        //+MAG2.26 [404580]
+    end;
+
     trigger OnOpenPage()
     begin
         if not Get then
           Insert;
+
+        //-MAG2.26 [406591]
+        CurrPage.NpCsStoreCardWorkflows.PAGE.SetStoreCodeVisible(true);
+        //+MAG2.26 [406591]
     end;
 
     var
@@ -750,5 +886,9 @@ page 6151401 "Magento Setup"
         Text00205: Label 'Gift Vouchers';
         Text00206: Label 'Customers';
         Text00207: Label 'Sales Prices';
+        HasSetupCategories: Boolean;
+        HasSetupBrands: Boolean;
+        Text003: Label 'Category update initiated';
+        Text004: Label 'Brand update initiated';
 }
 

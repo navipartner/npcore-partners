@@ -4,6 +4,7 @@ page 6014594 "Sales Statistics Subform"
     // NPR5.53/ZESO/20191205  CASE 371446 New Function GetGlobals
     // NPR5.53/ZESO/20191210  CASE 371446 Populate Description
     // NPR5.53/ZESO/20191211  CASE 371446 New Function SetTempRec
+    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
 
     Caption = 'Sales Statistics Subform';
     DeleteAllowed = false;
@@ -275,7 +276,9 @@ page 6014594 "Sales Statistics Subform"
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry";varNo: Code[20])
     begin
         //SetValueEntryFilter
-        ValueEntry.SetCurrentKey( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //-NPR5.55 [361515]
+        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
+        //+NPR5.55 [361515]
         ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
         ValueEntry.SetFilter("Document Date and Time", '%1..%2',StartDateTime,EndDateTime);
         case Statistics of

@@ -13,6 +13,8 @@ table 6150703 "POS Action"
     // NPR5.50/VB  /20181205  CASE 338666 Supporting Workflows 2.0
     //                                    Modifying the behavior of "Subscriber Instances Allowed" - it's now obsolete.
     // NPR5.54/TSA /20200221 CASE 392247 Added field "Requires POS Type"
+    // NPR5.55/ALPO/20200330 CASE 335834 Update POS action description according to ML value set through translations
+    // NPR5.55/MMV /20200420 CASE 386254 Default "Blocking UI" to TRUE, since we only have 2 workflows that should not block UI while executing.
 
     Caption = 'POS Action';
     DrillDownPageID = "POS Actions";
@@ -211,6 +213,11 @@ table 6150703 "POS Action"
 
         ActionUpdateRequired := ActionUpdateCheck(Code, Version);
 
+        //-NPR5.55 [335834]
+        if not ActionUpdateRequired then
+          UpdateMLDescription(Code, Description);
+        //+NPR5.55 [335834]
+
         if not (IsTemporary or ActionUpdateRequired) then
             exit(false);
 
@@ -223,6 +230,9 @@ table 6150703 "POS Action"
         Rec.Description := Description;
         Rec.Version := Version;
         Rec.Type := Type;
+        //-NPR5.55 [386254]
+        Rec."Blocking UI" := true;
+        //+NPR5.55 [386254]
 
         //-NPR5.40 [307453]
         //OnActionDiscovered(Rec);
@@ -278,6 +288,9 @@ table 6150703 "POS Action"
         Rec.Description := Description;
         Rec.Version := Version;
         Rec."Workflow Engine Version" := '2.0';
+        //-NPR5.55 [386254]
+        Rec."Blocking UI" := true;
+        //+NPR5.55 [386254]
 
         if ActionUpdateRequired then
             OnActionDiscovered(Rec);
@@ -836,6 +849,19 @@ table 6150703 "POS Action"
         //-NPR5.54 [392247]
         exit ("Requires POS Type");
         //+NPR5.54 [392247]
+    end;
+
+    local procedure UpdateMLDescription("Code": Code[20];Description: Text[250])
+    var
+        POSAction: Record "POS Action";
+    begin
+        //-NPR5.55 [335834]
+        if POSAction.Get(Code) then
+          if POSAction.Description <> Description then begin
+            POSAction.Description := Description;
+            POSAction.Modify;
+          end;
+        //+NPR5.55 [335834]
     end;
 }
 

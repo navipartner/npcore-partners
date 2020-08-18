@@ -481,7 +481,7 @@ codeunit 6014567 "Report - Debet Receipt"
            // Audit Roll Details, Body (3) - OnPreSection()
            //-NPR4.13
            if ((AuditRollDetails.Type = AuditRollDetails.Type::Comment)
-           //       OR (AuditRollDetails."Sale Type" = AuditRollDetails."Sale Type"::Bem�rkning) AND
+           //       OR (AuditRollDetails."Sale Type" = AuditRollDetails."Sale Type"::Bemærkning) AND
              or (AuditRollDetails."Sale Type" = AuditRollDetails."Sale Type"::Comment))
              and (StrLen(AuditRollDetails.Description)>40) then begin
              Printer.AddTextField(1,0,CopyStr(AuditRollDetails.Description,1,41));

@@ -4,6 +4,7 @@ codeunit 6151408 "Magento Inventory NpXml Value"
     // MAG1.22.01/MHA/20161005 CASE 236917 Added Invoke of SetTrustedCertificateValidation() in order to ignore SSL certificate validation and Credential Domain added
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.01/TS/20161108  CASE 257801 Added Location Filter if Intercompany is not enabled.
+    // MAG2.26/MHA /20200430  CASE 402486 Updated Stock Calculation function
 
     TableNo = "NpXml Custom Value Buffer";
 
@@ -49,10 +50,9 @@ codeunit 6151408 "Magento Inventory NpXml Value"
           exit(0);
 
         if not MagentoSetup."Intercompany Inventory Enabled" then begin
-          //-MAG2.01
-          //Inventory := MagentoItemMgt.GetAvailInventory(ItemNo,VariantCode,'');
-          Inventory := MagentoItemMgt.GetAvailInventory(ItemNo,VariantCode,MagentoSetup."Inventory Location Filter");
-          //+MAG2.01
+          //-MAG2.26 [402486]
+          Inventory := MagentoItemMgt.GetStockQty(ItemNo,VariantCode);
+          //+MAG2.26 [402486]
 
           exit(Inventory);
         end;
@@ -86,7 +86,9 @@ codeunit 6151408 "Magento Inventory NpXml Value"
         i: Integer;
     begin
         if MagentoInventoryCompany."Company Name" = CompanyName then begin
-          Inventory := MagentoItemMgt.GetAvailInventory(ItemNo,VariantCode,MagentoInventoryCompany."Location Filter");
+          //-MAG2.26 [402486]
+          Inventory := MagentoItemMgt.GetStockQty3(ItemNo,VariantCode,MagentoInventoryCompany);
+          //+MAG2.26 [402486]
           exit(Inventory);
         end;
 

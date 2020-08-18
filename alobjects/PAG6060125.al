@@ -14,6 +14,8 @@ page 6060125 "MM Membership Sales Setup"
     // MM1.40/TSA /20190612 CASE 357360 Disallowing foreign membership management from this page;
     // MM1.40/TSA /20190726 CASE 356090 Adding field "Magento M2 Membership Sign-up"
     // MM1.40/TSA /20190808 CASE 363147 Made CreateMembership function public and changed signature, refactored to use parameter record instance instead of Rec; previous comments /  versions removed
+    // MM1.44/TSA /20200529 CASE 407401 Added Age Verification
+    // MM1.45/TSA /20200728 CASE 407401 Added "Requires Guardian"
 
     Caption = 'Membership Sales Setup';
     PageType = List;
@@ -78,6 +80,15 @@ page 6060125 "MM Membership Sales Setup"
                 {
                 }
                 field("Magento M2 Membership Sign-up";"Magento M2 Membership Sign-up")
+                {
+                }
+                field("Age Constraint Type";"Age Constraint Type")
+                {
+                }
+                field("Age Constraint (Years)";"Age Constraint (Years)")
+                {
+                }
+                field("Requires Guardian";"Requires Guardian")
                 {
                 }
             }

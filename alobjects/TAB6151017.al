@@ -1,56 +1,33 @@
-table 6151017 "NpRv Sale Line POS Reference"
+table 6151017 "NpRv Sales Line Reference"
 {
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
     // NPR5.54/MHA /20200310  CASE 372135 Added field 50 "Voucher No."
+    // NPR5.55/MHA /20200512  CASE 402015 Changed Primary key, Restructured fields and updated Object Name
 
-    Caption = 'Sale Line POS Retail Voucher Reference';
-    DrillDownPageID = "NpRv POS Issue Voucher Refs.";
-    LookupPageID = "NpRv POS Issue Voucher Refs.";
+    Caption = 'Retail Voucher Sales Line Reference';
+    DrillDownPageID = "NpRv Sales Line References";
+    LookupPageID = "NpRv Sales Line References";
 
     fields
     {
-        field(1;"Register No.";Code[10])
+        field(1;Id;Guid)
         {
-            Caption = 'Cash Register No.';
-            NotBlank = true;
-            TableRelation = Register;
+            Description = 'NPR5.55';
         }
-        field(5;"Sales Ticket No.";Code[20])
+        field(10;"Sales Line Id";Guid)
         {
-            Caption = 'Sales Ticket No.';
-            Editable = false;
-            NotBlank = true;
+            Caption = 'Sales Line Id';
+            Description = 'NPR5.55';
         }
-        field(10;"Sale Type";Option)
-        {
-            Caption = 'Sale Type';
-            OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
-            OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
-        }
-        field(15;"Sale Date";Date)
-        {
-            Caption = 'Sale Date';
-        }
-        field(20;"Sale Line No.";Integer)
-        {
-            Caption = 'Sale Line No.';
-        }
-        field(25;"Voucher Line No.";Integer)
-        {
-            Caption = 'Voucher Line No.';
-        }
-        field(30;"Line No.";Integer)
-        {
-            Caption = 'Line No.';
-        }
-        field(50;"Voucher No.";Code[20])
+        field(20;"Voucher No.";Code[20])
         {
             Caption = 'Voucher No.';
-            Description = 'NPR5.54';
+            Description = 'NPR5.55';
         }
-        field(60;"Reference No.";Text[30])
+        field(30;"Reference No.";Text[30])
         {
             Caption = 'Reference No.';
+            Description = 'NPR5.55';
 
             trigger OnValidate()
             begin
@@ -61,7 +38,10 @@ table 6151017 "NpRv Sale Line POS Reference"
 
     keys
     {
-        key(Key1;"Register No.","Sales Ticket No.","Sale Type","Sale Date","Sale Line No.","Voucher Line No.","Line No.")
+        key(Key1;Id)
+        {
+        }
+        key(Key2;"Sales Line Id","Voucher No.","Reference No.")
         {
         }
     }
@@ -69,6 +49,12 @@ table 6151017 "NpRv Sale Line POS Reference"
     fieldgroups
     {
     }
+
+    trigger OnInsert()
+    begin
+        if IsNullGuid(Id) then
+          Id := CreateGuid;
+    end;
 
     var
         Text000: Label 'Reference No. %1 is already used';

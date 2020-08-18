@@ -1,4 +1,4 @@
-pageextension 6014447 pageextension6014447 extends "Purchase Order" 
+pageextension 6014451 pageextension6014451 extends "Purchase Order" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -22,6 +22,7 @@ pageextension 6014447 pageextension6014447 extends "Purchase Order"
     // NPR5.48/TS  /20181220  CASE 338609 Added Shortcut to Price Label
     // NPR5.48/TS  /20190104  CASE 340491 Added Item Availability Factbox
     // NPR5.53/SARA/20191022  CASE 373617 Correct pagelink for Item Availability FactBox
+    // NPR5.55/CLVA/20200506 CASE Added ShowCaptureService and action "RFID Document"
     layout
     {
         addafter("Job Queue Status")
@@ -109,6 +110,22 @@ pageextension 6014447 pageextension6014447 extends "Purchase Order"
                 end;
             }
         }
+        addafter("Create Inventor&y Put-away/Pick")
+        {
+            action("RFID Document")
+            {
+                Caption = 'RFID Document';
+                Image = Delivery;
+                Visible = ShowCaptureService;
+
+                trigger OnAction()
+                var
+                    CSRfidHeader: Record "CS Rfid Header";
+                begin
+                    CSRfidHeader.OpenRfidSalesDoc(1,"Vendor Order No.","Sell-to Customer No.","No.");
+                end;
+            }
+        }
         addafter("&Print")
         {
             action(RetailPrint)
@@ -144,5 +161,36 @@ pageextension 6014447 pageextension6014447 extends "Purchase Order"
             }
         }
     }
+
+    var
+        ShowCaptureService: Boolean;
+        CSHelperFunctions: Codeunit "CS Helper Functions";
+
+
+    //Unsupported feature: Code Modification on "OnOpenPage".
+
+    //trigger OnOpenPage()
+    //>>>> ORIGINAL CODE:
+    //begin
+        /*
+        SetDocNoVisible;
+        IsSaaS := PermissionManager.SoftwareAsAService;
+
+        #4..9
+          DocumentIsPosted := (not Get("Document Type","No."));
+
+        ActivateFields;
+        */
+    //end;
+    //>>>> MODIFIED CODE:
+    //begin
+        /*
+        #1..12
+
+        //-NPR5.55 [379709]
+        ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
+        //+NPR5.55 [379709]
+        */
+    //end;
 }
 

@@ -147,7 +147,7 @@ page 6014663 "Stock-Take Worksheet"
                         StockTakeWorkSheetLine.SetRange ("Stock-Take Config Code", StockTakeWorkSheetName."Stock-Take Config Code");
                         StockTakeWorkSheetLine.SetRange ("Worksheet Name", StockTakeWorkSheetName.Name);
                         if (StockTakeWorkSheetLine.IsEmpty ()) then ;
-                        //DATAPORT.RUNMODAL(DATAPORT::"Indl�sning af Status tal fra", TRUE, StockTakeWorkSheetLine);
+                        //DATAPORT.RUNMODAL(DATAPORT::"Indlæsning af Status tal fra", TRUE, StockTakeWorkSheetLine);
                         XMLPORT.Run(XMLPORT::"Import StockTake Wrksht. Line",false,true, StockTakeWorkSheetLine);
                         StockTakeMgr.ImportPostHandler (Rec);
 

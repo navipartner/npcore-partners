@@ -1312,7 +1312,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="bev�gelseprimodkk">
+                        <Textbox Name="bevægelseprimodkk">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1557,7 +1557,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="bev�gelseultimo">
+                        <Textbox Name="bevægelseultimo">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1592,7 +1592,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="bev�gelseultimodkk">
+                        <Textbox Name="bevægelseultimodkk">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2165,7 +2165,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.CreateTotalAmount(SUM(ReportItems!bev�gelseprimodkk.Value))</Value>
+                      <Value>=Code.CreateTotalAmount(SUM(ReportItems!bevægelseprimodkk.Value))</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -2480,7 +2480,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.CreateTotalQtyUltimo(SUM(ReportItems!bev�gelseultimo.Value))</Value>
+                      <Value>=Code.CreateTotalQtyUltimo(SUM(ReportItems!bevægelseultimo.Value))</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -2525,7 +2525,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.CreateTotalAmountUltimo(SUM(ReportItems!bev�gelseultimodkk.Value))</Value>
+                      <Value>=Code.CreateTotalAmountUltimo(SUM(ReportItems!bevægelseultimodkk.Value))</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>

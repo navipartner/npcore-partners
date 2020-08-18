@@ -221,7 +221,7 @@ table 6150905 "HC Payment Type POS"
                                                        "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
                                                        "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. Sales in audit roll';
-            Description = 'T�ller kun linier m. linienr=10000,vare, salg';
+            Description = 'Tæller kun linier m. linienr=10000,vare, salg';
             FieldClass = FlowField;
         }
         field(38; "Normal Sale in Audit Roll"; Decimal)
@@ -236,7 +236,7 @@ table 6150905 "HC Payment Type POS"
                                                                             "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
                                                                             "Sales Ticket No." = FIELD("Receipt Filter")));
             Caption = 'Normal sale in audit roll';
-            Description = 'T�ller "bel�b inkl. moms" hvis salg, vare';
+            Description = 'Tæller "bel¢b inkl. moms" hvis salg, vare';
             FieldClass = FlowField;
         }
         field(39; "Debit Sale in Audit Roll"; Decimal)
@@ -295,7 +295,7 @@ table 6150905 "HC Payment Type POS"
                                                        "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
                                                        "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. sales lines in audit roll';
-            Description = 'T�ller alle linier m. type <>Afbrudt &<>�ben/Luk';
+            Description = 'Tæller alle linier m. type <>Afbrudt &<>Åben/Luk';
             FieldClass = FlowField;
         }
         field(43; "Salesperson Filter"; Code[10])
@@ -348,7 +348,7 @@ table 6150905 "HC Payment Type POS"
                                                        "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
                                                        "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. debit sales in audit roll';
-            Description = 'T�ller linie debetsalg,linienr=10000';
+            Description = 'Tæller linie debetsalg,linienr=10000';
             FieldClass = FlowField;
         }
         field(47; Euro; Boolean)
@@ -406,12 +406,12 @@ table 6150905 "HC Payment Type POS"
         field(54; "Maximum Amount"; Decimal)
         {
             Caption = 'Max amount';
-            Description = 'Maksimalt bel�b, hvor prisen skal g�lde';
+            Description = 'Maksimalt bel¢b, hvor prisen skal gælde';
         }
         field(55; "Minimum Amount"; Decimal)
         {
             Caption = 'Min amount';
-            Description = 'Minimumsbel�b, hvor gebyret skal g�lde';
+            Description = 'Minimumsbel¢b, hvor gebyret skal gælde';
         }
         field(56; "Debit Cost Amount Audit Roll"; Decimal)
         {
@@ -426,7 +426,7 @@ table 6150905 "HC Payment Type POS"
                                                           "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
                                                           "Sales Ticket No." = FIELD("Receipt Filter")));
             Caption = 'Cost amount in audit';
-            Description = 'Calcformula tilf�jet';
+            Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
         }
         field(57; "Debit Sales in Audit Excl. VAT"; Decimal)
@@ -442,7 +442,7 @@ table 6150905 "HC Payment Type POS"
                                                             "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
                                                             "Sales Ticket No." = FIELD("Receipt Filter")));
             Caption = 'Debit sales in audit ex VAT';
-            Description = 'Calcformula tilf�jet';
+            Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
         }
         field(58; "Cardholder Verification Method"; Option)

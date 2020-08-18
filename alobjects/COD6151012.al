@@ -6,6 +6,8 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
     // NPR5.52/ALPO/20190925  CASE 369420 Disallow negative quantity of gift vouchers to be sold
     // NPR5.53/MHA /20200103  CASE 384055 Customer No. is carried to Retail Voucher in IssueVoucher()
     // NPR5.54/MHA /20200310  CASE 372135 Added Generation of Voucher- and Reference No. in IssueVoucher() in order to display Reference No on POS Sales Line
+    // NPR5.55/MHA /20200427  CASE 402015 New Primary Key on Sale Line POS Voucher
+    // NPR5.55/MHA /20200520  CASE 405889 Reference No. should only be generated if not already exists
 
 
     trigger OnRun()
@@ -220,26 +222,26 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
 
     local procedure ContactInfo(JSON: Codeunit "POS JSON Management";SaleLinePOS: Record "Sale Line POS")
     var
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        NpRvSalesLine: Record "NpRv Sales Line";
     begin
-        SaleLinePOSVoucher.SetRange("Register No.",SaleLinePOS."Register No.");
-        SaleLinePOSVoucher.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSVoucher.SetRange("Sale Type",SaleLinePOS."Sale Type");
-        SaleLinePOSVoucher.SetRange("Sale Date",SaleLinePOS.Date);
-        SaleLinePOSVoucher.SetRange("Sale Line No.",SaleLinePOS."Line No.");
-        if not SaleLinePOSVoucher.FindSet then
+        NpRvSalesLine.SetRange("Register No.",SaleLinePOS."Register No.");
+        NpRvSalesLine.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
+        NpRvSalesLine.SetRange("Sale Type",SaleLinePOS."Sale Type");
+        NpRvSalesLine.SetRange("Sale Date",SaleLinePOS.Date);
+        NpRvSalesLine.SetRange("Sale Line No.",SaleLinePOS."Line No.");
+        if not NpRvSalesLine.FindSet then
           exit;
 
         repeat
-          PAGE.RunModal(PAGE::"NpRv POS Issue Voucher Card",SaleLinePOSVoucher);
+          PAGE.RunModal(PAGE::"NpRv Sales Line Card",NpRvSalesLine);
           Commit;
-        until SaleLinePOSVoucher.Next = 0;
+        until NpRvSalesLine.Next = 0;
     end;
 
     local procedure IssueVoucher(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session")
     var
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
-        SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
+        NpRvSalesLine: Record "NpRv Sales Line";
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
         VoucherType: Record "NpRv Voucher Type";
         SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
@@ -252,6 +254,10 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
     begin
         VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode',true));
         VoucherType.Get(VoucherTypeCode);
+
+        //-NPR5.55 [402015]
+        NpRvVoucherMgt.GenerateTempVoucher(VoucherType,TempVoucher);
+        //+NPR5.55 [402015]
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
@@ -294,90 +300,95 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if SaleLinePOS."Discount Amount" > 0 then
           SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
+        //-NPR5.55 [402015]
+        SaleLinePOS.Description := TempVoucher.Description;
+        //+NPR5.55 [402015]
         SaleLinePOS.Modify(true);
         POSSession.RequestRefreshData();
 
-        SaleLinePOSVoucher.Init;
-        SaleLinePOSVoucher."Register No." := SaleLinePOS."Register No.";
-        SaleLinePOSVoucher."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSVoucher."Sale Type" := SaleLinePOS."Sale Type";
-        SaleLinePOSVoucher."Sale Date" := SaleLinePOS.Date;
-        SaleLinePOSVoucher."Sale Line No." := SaleLinePOS."Line No.";
-        SaleLinePOSVoucher."Line No." := 10000;
-        SaleLinePOSVoucher.Type := SaleLinePOSVoucher.Type::"New Voucher";
-        SaleLinePOSVoucher."Voucher Type" := VoucherType.Code;
-        SaleLinePOSVoucher.Description := VoucherType.Description;
-        SaleLinePOSVoucher."Starting Date" := CurrentDateTime;
+        //-NPR5.55 [402015]
+        NpRvSalesLine.Init;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
+        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
+        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
+        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
+        NpRvSalesLine."Voucher No." := TempVoucher."No.";
+        NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
+        NpRvSalesLine.Description := TempVoucher.Description;
+        //+NPR5.55 [402015]
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine.Description := VoucherType.Description;
+        NpRvSalesLine."Starting Date" := CurrentDateTime;
         //-NPR5.53 [384055]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         case SalePOS."Customer Type" of
           SalePOS."Customer Type"::Ord:
             begin
-              SaleLinePOSVoucher.Validate("Customer No.",SalePOS."Customer No.");
+              NpRvSalesLine.Validate("Customer No.",SalePOS."Customer No.");
             end;
           SalePOS."Customer Type"::Cash:
             begin
-              SaleLinePOSVoucher.Validate("Contact No.",SalePOS."Customer No.");
+              NpRvSalesLine.Validate("Contact No.",SalePOS."Customer No.");
             end;
         end;
         //+NPR5.53 [384055]
         //-NPR5.48 [341711]
         JSON.SetScope('/',true);
-        SaleLinePOSVoucher."Send via Print" := JSON.GetBoolean('SendMethodPrint',false);
-        SaleLinePOSVoucher."Send via E-mail" := JSON.GetBoolean('SendMethodEmail',false);
-        SaleLinePOSVoucher."Send via SMS" := JSON.GetBoolean('SendMethodSMS',false);
+        NpRvSalesLine."Send via Print" := JSON.GetBoolean('SendMethodPrint',false);
+        NpRvSalesLine."Send via E-mail" := JSON.GetBoolean('SendMethodEmail',false);
+        NpRvSalesLine."Send via SMS" := JSON.GetBoolean('SendMethodSMS',false);
         if JSON.SetScope('$send_method_email',false) then
-          SaleLinePOSVoucher."E-mail" := CopyStr(JSON.GetString('input',false),1,MaxStrLen(SaleLinePOSVoucher."E-mail"));
+          NpRvSalesLine."E-mail" := CopyStr(JSON.GetString('input',false),1,MaxStrLen(NpRvSalesLine."E-mail"));
         JSON.SetScope('/',true);
         if JSON.SetScope('$send_method_sms',false) then
-          SaleLinePOSVoucher."Phone No." := CopyStr(JSON.GetString('input',false),1,MaxStrLen(SaleLinePOSVoucher."Phone No."));
+          NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input',false),1,MaxStrLen(NpRvSalesLine."Phone No."));
         //+NPR5.48 [341711]
-        SaleLinePOSVoucher.Insert;
+        NpRvSalesLine.Insert;
 
         //-NPR5.54 [372135]
-        NpRvVoucherMgt.GenerateTempVoucher(VoucherType,TempVoucher);
-
-        SaleLinePOSVoucher.Description := TempVoucher.Description;
-        SaleLinePOSVoucher.Modify;
-
-        SaleLinePOSReference.Init;
-        SaleLinePOSReference."Register No." := SaleLinePOSVoucher."Register No.";
-        SaleLinePOSReference."Sales Ticket No." := SaleLinePOSVoucher."Sales Ticket No.";
-        SaleLinePOSReference."Sale Type" := SaleLinePOSVoucher."Sale Type";
-        SaleLinePOSReference."Sale Date" := SaleLinePOSVoucher."Sale Date";
-        SaleLinePOSReference."Sale Line No." := SaleLinePOSVoucher."Sale Line No.";
-        SaleLinePOSReference."Voucher Line No." := SaleLinePOSVoucher."Line No.";
-        SaleLinePOSReference."Voucher No." := TempVoucher."No.";
-        SaleLinePOSReference."Reference No." := TempVoucher."Reference No.";
-        SaleLinePOSReference.Insert;
-
-        SaleLinePOS.Description := TempVoucher.Description;
-        SaleLinePOS.Modify;
+        //-NPR5.55 [405889]
+        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine,NpRvSalesLineReference);
+        if NpRvSalesLineReference.IsEmpty then begin
+        //+NPR5.55 [405889]
+          //-NPR5.55 [402015]
+          NpRvSalesLineReference.Init;
+          NpRvSalesLineReference.Id := CreateGuid;
+          NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
+          NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
+          NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+          NpRvSalesLineReference.Insert(true);
+          //+NPR5.55 [402015]
+        //-NPR5.55 [405889]
+        end;
+        //+NPR5.55 [405889]
         POSSession.RequestRefreshData();
         //+NPR5.54 [372135]
     end;
 
     local procedure ScanReferenceNos(SaleLinePOS: Record "Sale Line POS";Quantity: Decimal)
     var
-        SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
-        SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
-        NpRvPOSIssueVoucherRefs: Page "NpRv POS Issue Voucher Refs.";
+        NpRvSalesLine: Record "NpRv Sales Line";
+        NpRvSalesLineReference: Record "NpRv Sales Line Reference";
+        NpRvSalesLineReferences: Page "NpRv Sales Line References";
     begin
         if not GuiAllowed then
           exit;
 
-        SaleLinePOSVoucher.SetRange("Register No.",SaleLinePOS."Register No.");
-        SaleLinePOSVoucher.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSVoucher.SetRange("Sale Type",SaleLinePOS."Sale Type");
-        SaleLinePOSVoucher.SetRange("Sale Date",SaleLinePOS.Date);
-        SaleLinePOSVoucher.SetRange("Sale Line No.",SaleLinePOS."Line No.");
-        SaleLinePOSVoucher.SetRange(Type,SaleLinePOSVoucher.Type::"New Voucher");
-        if not SaleLinePOSVoucher.FindFirst then
+        //-NPR5.55 [402015]
+        NpRvSalesLine.SetRange("Retail ID",SaleLinePOS."Retail ID");
+        //+NPR5.55 [402015]
+        NpRvSalesLine.SetRange(Type,NpRvSalesLine.Type::"New Voucher");
+        if not NpRvSalesLine.FindFirst then
           exit;
 
-        NpRvPOSIssueVoucherRefs.SetSaleLinePOSVoucher(SaleLinePOSVoucher,Quantity);
-        NpRvPOSIssueVoucherRefs.RunModal;
+        NpRvSalesLineReferences.SetNpRvSalesLine(NpRvSalesLine,Quantity);
+        NpRvSalesLineReferences.RunModal;
     end;
 
     local procedure SelectSendMethod(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")

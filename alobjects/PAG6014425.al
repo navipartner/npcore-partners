@@ -1,7 +1,7 @@
 page 6014425 "Retail Item Card"
 {
     // NPR3.1p, NPK, DL, 04-01-07, Added "Automatic Ext. Texts"
-    // NPR4.000.003, NPK, 29-03-09, MH, Tilf�jet "Additional info" p� web-fanebladet.
+    // NPR4.000.003, NPK, 29-03-09, MH, Tilf¢jet "Additional info" på web-fanebladet.
     // NPR7.000.000    27.2.2013  TS   :was on Activate Trigger of Form :
     // MAG1.00/MH/20150113    CASE 199932 Upgraded Magento Integration from WEB1.00
     // NPR1.06/BHR/20150120   CASE 203485 Add field Blocked on POS
@@ -96,6 +96,8 @@ page 6014425 "Retail Item Card"
     // NPR5.52/ANPA/20191001  CASE 367476 Removed field "Units", "Barcodes" and "Reperation" in pageaction Related
     // NPR5.52/SARA/20191014  CASE 372089 Redesign Magento fasttab for webclient
     // NPR5.53/MHA /20191113  CASE 374721 Updated Page Caption
+    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
+    // NPR5.55/ALPO/20200708  CASE 382428 Added field "Rest. Item Routing Profile"
 
     Caption = 'Retail Item Card';
     PageType = Card;
@@ -1801,6 +1803,9 @@ page 6014425 "Retail Item Card"
                             //+NPR4.18
                         end;
                     }
+                    field("NPRE Item Routing Profile";"NPRE Item Routing Profile")
+                    {
+                    }
                 }
                 group("NPR Attributes")
                 {
@@ -1991,9 +1996,9 @@ page 6014425 "Retail Item Card"
                     {
                     }
                 }
-                part("Item Group Links"; "Magento Item Group Link")
+                part("Category Links";"Magento Category Links")
                 {
-                    Caption = 'Item Group Links';
+                    Caption = 'Category Links';
                     SubPageLink = "Item No." = FIELD("No.");
                     Visible = NOT MagentoEnabledMultiStore;
                 }
@@ -2910,7 +2915,7 @@ page 6014425 "Retail Item Card"
                         RetailJournalLine.Validate("Quantity to Print", TempQty);
                         RetailJournalLine.Insert;
                         //+TS
-                        //CurrForm.S�gkode.ACTIVATE;
+                        //CurrForm.S¢gkode.ACTIVATE;
                         //-TS
                     end;
                 }
@@ -2938,7 +2943,7 @@ page 6014425 "Retail Item Card"
                         //+NPR5.22
 
                         //+TS
-                        //CurrForm.S�gkode.ACTIVATE;
+                        //CurrForm.S¢gkode.ACTIVATE;
                         //-TS
                     end;
                 }

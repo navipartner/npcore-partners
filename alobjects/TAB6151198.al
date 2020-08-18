@@ -6,6 +6,7 @@ table 6151198 "NpCs Document"
     // NPR5.51/MHA /20190819  CASE 364557 Added options "Posted Invoice", "Posted Credit Memo" to field 5 "Document Type"
     // NPR5.53/MHA /20191128  CASE 378895 Added Keys "Reference","Processing expires at", and "Delivery expires at"
     // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
+    // NPR5.55/MHA /20200526  CASE 406591 Added field 260 "Allow Partial Delivery"
 
     Caption = 'Collect Document';
     DataCaptionFields = "Document Type","Reference No.","Sell-to Customer Name";
@@ -346,6 +347,11 @@ table 6151198 "NpCs Document"
             Description = 'NPR5.51';
             OptionCaption = 'Delivery,Processing';
             OptionMembers = Delivery,Processing;
+        }
+        field(260;"Allow Partial Delivery";Boolean)
+        {
+            Caption = 'Allow Partial Delivery';
+            Description = 'NPR5.55';
         }
         field(290;"Processing Print Template";Code[20])
         {

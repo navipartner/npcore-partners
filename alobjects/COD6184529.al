@@ -3,10 +3,14 @@ codeunit 6184529 "EFT Adyen Response Parser"
     // NPR5.53/MMV /20191120 CASE 377533 Created object
     // NPR5.53/MMV /20200131 CASE 377533 Added support for aborting InProgress/Busy terminal automatically
     // NPR5.54/MMV /20200213 CASE 387990 Re-wrote receipt parsing to prevent locking FIND.
+    // NPR5.55/MMV /20200701 CASE 412426 Disabled LOCKTIMEOUT in sensitive timing.
 
 
     trigger OnRun()
     begin
+        //-NPR5.55 [412426]
+        LockTimeout(false);
+        //+NPR5.55 [412426]
         RunParser();
     end;
 
@@ -698,10 +702,10 @@ codeunit 6184529 "EFT Adyen Response Parser"
         String: DotNet npNetString;
     begin
         //Make print data more encoding agnostic.
-        if StrPos(Value, '�') > 0 then begin
+        if StrPos(Value, '') > 0 then begin
 
           String := Value;
-          exit(String.Replace('�', 'EUR'));
+          exit(String.Replace('', 'EUR'));
         end;
 
         exit(Value);
