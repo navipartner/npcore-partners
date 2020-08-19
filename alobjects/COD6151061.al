@@ -8,8 +8,7 @@ codeunit 6151061 "GDPR Anonymization Request WS"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure AnonymizationRequest(CustomerNo: Code[20];ContactNo: Code[20]): Boolean
+        procedure AnonymizationRequest(CustomerNo: Code[20];ContactNo: Code[20]): Boolean
     var
         Customer: Record Customer;
         Contact: Record Contact;
@@ -22,8 +21,7 @@ codeunit 6151061 "GDPR Anonymization Request WS"
         //+NPR5.55 [388813]
     end;
 
-    [Scope('Personalization')]
-    procedure CanCustomerBeAnonymized(CustomerNo: Code[20];ContactNo: Code[20];var ResponseCode: Integer) OkToAnonymize: Boolean
+        procedure CanCustomerBeAnonymized(CustomerNo: Code[20];ContactNo: Code[20];var ResponseCode: Integer) OkToAnonymize: Boolean
     var
         GDPRSetup: Record "Customer GDPR SetUp";
         GDPRAnonymizationRequest: Record "GDPR Anonymization Request";

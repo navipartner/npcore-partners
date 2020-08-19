@@ -369,8 +369,7 @@ page 6151261 "NP Retail Purchase Ord Chart"
         UpdateStatus;
     end;
 
-    [Scope('Personalization')]
-    procedure SetActionsEnabled()
+        procedure SetActionsEnabled()
     begin
         AllOrdersEnabled := (TrailingSalesOrdersSetup."Show Orders" <> TrailingSalesOrdersSetup."Show Orders"::"All Orders") and
           IsChartAddInReady;

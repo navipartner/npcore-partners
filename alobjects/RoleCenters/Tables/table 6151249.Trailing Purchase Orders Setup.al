@@ -60,8 +60,7 @@ table 6151249 "Trailing Purchase Orders Setup"
     var
         Text001: Label 'Updated at %1.';
 
-    [Scope('Personalization')]
-    procedure GetCurrentSelectionText(): Text[100]
+        procedure GetCurrentSelectionText(): Text[100]
     begin
         exit(Format("Show Orders") + '|' +
           Format("Period Length") + '|' +
@@ -69,8 +68,7 @@ table 6151249 "Trailing Purchase Orders Setup"
           StrSubstNo(Text001, Time) + ')');
     end;
 
-    [Scope('Personalization')]
-    procedure GetStartDate(): Date
+        procedure GetStartDate(): Date
     var
         StartDate: Date;
     begin
@@ -86,8 +84,7 @@ table 6151249 "Trailing Purchase Orders Setup"
         exit(StartDate);
     end;
 
-    [Scope('Personalization')]
-    procedure GetChartType(): Integer
+        procedure GetChartType(): Integer
     var
         BusinessChartBuf: Record "Business Chart Buffer";
     begin
@@ -103,29 +100,25 @@ table 6151249 "Trailing Purchase Orders Setup"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure SetPeriodLength(PeriodLength: Option)
+        procedure SetPeriodLength(PeriodLength: Option)
     begin
         "Period Length" := PeriodLength;
         Modify;
     end;
 
-    [Scope('Personalization')]
-    procedure SetShowOrders(ShowOrders: Integer)
+        procedure SetShowOrders(ShowOrders: Integer)
     begin
         "Show Orders" := ShowOrders;
         Modify;
     end;
 
-    [Scope('Personalization')]
-    procedure SetValueToCalcuate(ValueToCalc: Integer)
+        procedure SetValueToCalcuate(ValueToCalc: Integer)
     begin
         "Value to Calculate" := ValueToCalc;
         Modify;
     end;
 
-    [Scope('Personalization')]
-    procedure SetChartType(ChartType: Integer)
+        procedure SetChartType(ChartType: Integer)
     begin
         "Chart Type" := ChartType;
         Modify;

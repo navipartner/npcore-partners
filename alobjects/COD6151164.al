@@ -10,8 +10,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure WebServiceApi(LoyaltyEndpointClient: Record "MM NPR Remote Endpoint Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: DotNet npNetXmlDocument; var XmlDocOut: DotNet npNetXmlDocument): Boolean
+        procedure WebServiceApi(LoyaltyEndpointClient: Record "MM NPR Remote Endpoint Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: DotNet npNetXmlDocument; var XmlDocOut: DotNet npNetXmlDocument): Boolean
     var
         NPRMembership: Codeunit "MM NPR Membership";
     begin
@@ -61,8 +60,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
         //+MM1.40 [357360]
     end;
 
-    [Scope('Personalization')]
-    procedure ToBase64(StringToEncode: Text) B64String: Text
+        procedure ToBase64(StringToEncode: Text) B64String: Text
     var
         TempBlob: Codeunit "Temp Blob";
         BinaryReader: DotNet npNetBinaryReader;
@@ -87,8 +85,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
         Clear(MemoryStream);
     end;
 
-    [Scope('Personalization')]
-    procedure XmlSafe(InText: Text): Text
+        procedure XmlSafe(InText: Text): Text
     begin
 
         exit(DelChr(InText, '<=>', DelChr(InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));

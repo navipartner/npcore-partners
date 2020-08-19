@@ -14,8 +14,7 @@ codeunit 6014469 "Dynamic Module Helper"
         ErrorType: Option WrongDataType,LengthExceeded,WrongOption;
         SetupSettingErr: Label 'Module %1 or setting %2 doesn''t exist or module isn''t enabled.';
 
-    [Scope('Personalization')]
-    procedure CreateOrFindModule(ModuleName: Text[50];var DynamicModule: Record "Dynamic Module")
+        procedure CreateOrFindModule(ModuleName: Text[50];var DynamicModule: Record "Dynamic Module")
     begin
         if not GetDynamicModuleFromName(ModuleName,DynamicModule) then begin
           DynamicModule."Module Name" := ModuleName;
@@ -23,8 +22,7 @@ codeunit 6014469 "Dynamic Module Helper"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure CreateModuleSetting(DynamicModule: Record "Dynamic Module";SettingID: Integer;Name: Text;DataType: Integer;AdditionalPropertyType: Option;AdditionalPropertyValue: Text;SetupValue: Variant)
+        procedure CreateModuleSetting(DynamicModule: Record "Dynamic Module";SettingID: Integer;Name: Text;DataType: Integer;AdditionalPropertyType: Option;AdditionalPropertyValue: Text;SetupValue: Variant)
     var
         DynamicModuleSetting: Record "Dynamic Module Setting";
         SettingAlreadyExistsErr: Label 'Setting with name %1 already exists in module %2.';
@@ -312,8 +310,7 @@ codeunit 6014469 "Dynamic Module Helper"
         exit(false);
     end;
 
-    [Scope('Personalization')]
-    procedure ModuleIsEnabledAndReturnSetupValue(ModuleName: Text;SettingID: Integer;var SetupValue: Variant): Boolean
+        procedure ModuleIsEnabledAndReturnSetupValue(ModuleName: Text;SettingID: Integer;var SetupValue: Variant): Boolean
     var
         DynamicModule: Record "Dynamic Module";
         DynamicModuleSetting: Record "Dynamic Module Setting";
@@ -331,8 +328,7 @@ codeunit 6014469 "Dynamic Module Helper"
         exit(true);
     end;
 
-    [Scope('Personalization')]
-    procedure ReturnSetupValueWithError(ModuleName: Text;SettingID: Integer;var SetupValue: Variant)
+        procedure ReturnSetupValueWithError(ModuleName: Text;SettingID: Integer;var SetupValue: Variant)
     begin
         //-NPR5.48 [304372]
         if not ModuleIsEnabledAndReturnSetupValue(ModuleName,SettingID,SetupValue) then

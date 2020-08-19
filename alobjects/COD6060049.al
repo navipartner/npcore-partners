@@ -1130,8 +1130,7 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure Initialize()
+        procedure Initialize()
     begin
 
         if not Initialized then begin

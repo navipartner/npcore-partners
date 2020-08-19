@@ -7,8 +7,7 @@ codeunit 6060158 "Event Web Service"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure CopyEventFromTemplate(BundledItemNo: Code[20];TemplateEventNo: Code[20];BillToCustomerNo: Code[20];BundledItemQuantity: Decimal;BundledItemPrice: Decimal;StartDateTime: DateTime;EndDateTime: DateTime;AdditionalItems: XMLport "Event Import Optional Items";var ReturnMessage: Text): Boolean
+        procedure CopyEventFromTemplate(BundledItemNo: Code[20];TemplateEventNo: Code[20];BillToCustomerNo: Code[20];BundledItemQuantity: Decimal;BundledItemPrice: Decimal;StartDateTime: DateTime;EndDateTime: DateTime;AdditionalItems: XMLport "Event Import Optional Items";var ReturnMessage: Text): Boolean
     var
         EventSalesSetup: Record "Event Web Sales Setup";
         CopyJob: Codeunit "Copy Job";

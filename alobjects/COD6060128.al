@@ -55,8 +55,7 @@ codeunit 6060128 "MM Member WebService"
         NEW_MEMBER_TICKET: Label 'Ticket %1 for admission %2 was created for member %3.';
         MEMBER_TICKET: Label 'Ticket %1 for admission %2 was reused for member %3.';
 
-    [Scope('Personalization')]
-    procedure MemberValidation(ExternalMemberNo: Code[20];ScannerStationId: Code[10]) IsValid: Boolean
+        procedure MemberValidation(ExternalMemberNo: Code[20];ScannerStationId: Code[10]) IsValid: Boolean
     var
         MembershipMgr: Codeunit "MM Membership Management";
         MembershipEntryNo: Integer;
@@ -66,8 +65,7 @@ codeunit 6060128 "MM Member WebService"
         exit (IsMembershipValid (MembershipEntryNo));
     end;
 
-    [Scope('Personalization')]
-    procedure MembershipValidation(ExternalMembershipNo: Code[20];ScannerStationId: Code[10]) IsValid: Boolean
+        procedure MembershipValidation(ExternalMembershipNo: Code[20];ScannerStationId: Code[10]) IsValid: Boolean
     var
         MembershipMgr: Codeunit "MM Membership Management";
         MembershipEntryNo: Integer;
@@ -77,8 +75,7 @@ codeunit 6060128 "MM Member WebService"
         exit (IsMembershipValid (MembershipEntryNo));
     end;
 
-    [Scope('Personalization')]
-    procedure MemberEmailExists(EmailToCheck: Text[100]) EmailExists: Boolean
+        procedure MemberEmailExists(EmailToCheck: Text[100]) EmailExists: Boolean
     var
         Member: Record "MM Member";
     begin
@@ -88,8 +85,7 @@ codeunit 6060128 "MM Member WebService"
         exit (Member.FindFirst ());
     end;
 
-    [Scope('Personalization')]
-    procedure MemberCardNumberValidation(ExternalMemberCardNo: Text[50];ScannerStationId: Code[10]) IsValid: Boolean
+        procedure MemberCardNumberValidation(ExternalMemberCardNo: Text[50];ScannerStationId: Code[10]) IsValid: Boolean
     var
         MembershipMgr: Codeunit "MM Membership Management";
         MembershipEntryNo: Integer;
@@ -100,8 +96,7 @@ codeunit 6060128 "MM Member WebService"
         exit (IsMembershipValid (MembershipEntryNo));
     end;
 
-    [Scope('Personalization')]
-    procedure MemberRegisterArrival(ExternalMemberNo: Code[20];AdmissionCode: Code[20];ScannerStationId: Code[10];var MessageText: Text) IsRegistered: Boolean
+        procedure MemberRegisterArrival(ExternalMemberNo: Code[20];AdmissionCode: Code[20];ScannerStationId: Code[10];var MessageText: Text) IsRegistered: Boolean
     var
         Success: Integer;
     begin
@@ -111,8 +106,7 @@ codeunit 6060128 "MM Member WebService"
         exit (Success = 0);
     end;
 
-    [Scope('Personalization')]
-    procedure MemberCardRegisterArrival(ExternalMemberCardNo: Code[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var MessageText: Text) IsRegistered: Boolean
+        procedure MemberCardRegisterArrival(ExternalMemberCardNo: Code[50];AdmissionCode: Code[20];ScannerStationId: Code[10];var MessageText: Text) IsRegistered: Boolean
     var
         Member: Record "MM Member";
         MembershipMgr: Codeunit "MM Membership Management";
@@ -132,8 +126,7 @@ codeunit 6060128 "MM Member WebService"
         exit (Success = 0);
     end;
 
-    [Scope('Personalization')]
-    procedure GetMembershipTicketList(var Membership: XMLport "MM Get Membership Ticket List";AdmissionCode: Code[20];ScannerStationId: Code[10])
+        procedure GetMembershipTicketList(var Membership: XMLport "MM Get Membership Ticket List";AdmissionCode: Code[20];ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -182,8 +175,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure GetMembershipChangeItemsList(var Membership: XMLport "MM Get Membership Change Items")
+        procedure GetMembershipChangeItemsList(var Membership: XMLport "MM Get Membership Change Items")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -228,8 +220,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure ActivateMembership(ExternalMembershipNo: Code[20];ScannerStationId: Code[10]) IsValid: Boolean
+        procedure ActivateMembership(ExternalMembershipNo: Code[20];ScannerStationId: Code[10]) IsValid: Boolean
     var
         MembershipMgr: Codeunit "MM Membership Management";
         MembershipEntryNo: Integer;
@@ -243,8 +234,7 @@ codeunit 6060128 "MM Member WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure CreateMembership(var membership: XMLport "MM Create Membership";ScannerStationId: Code[10])
+        procedure CreateMembership(var membership: XMLport "MM Create Membership";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -283,8 +273,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure AddMembershipMember(var member: XMLport "MM Add Member";ScannerStationId: Code[10])
+        procedure AddMembershipMember(var member: XMLport "MM Add Member";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -322,8 +311,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure AddAnonymousMember(var AnonymousMember: XMLport "MM Anonymous Member";ScannerStationId: Code[10])
+        procedure AddAnonymousMember(var AnonymousMember: XMLport "MM Anonymous Member";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -362,8 +350,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure ChangeMembership(var membership: XMLport "MM Change Membership")
+        procedure ChangeMembership(var membership: XMLport "MM Change Membership")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -402,8 +389,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure GetMembership(var membership: XMLport "MM Get Membership";ScannerStationId: Code[10])
+        procedure GetMembership(var membership: XMLport "MM Get Membership";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -448,8 +434,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure GetMembershipMembers(var member: XMLport "MM Get Membership Members";ScannerStationId: Code[10])
+        procedure GetMembershipMembers(var member: XMLport "MM Get Membership Members";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -492,8 +477,7 @@ codeunit 6060128 "MM Member WebService"
         Commit;
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateMember(var member: XMLport "MM Update Member";ScannerStationId: Code[10])
+        procedure UpdateMember(var member: XMLport "MM Update Member";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -531,8 +515,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateMemberImage(MemberExternalNo: Code[20];Base64StringImage: Text;ScannerStationId: Code[10]) Success: Boolean
+        procedure UpdateMemberImage(MemberExternalNo: Code[20];Base64StringImage: Text;ScannerStationId: Code[10]) Success: Boolean
     var
         MembershipManagement: Codeunit "MM Membership Management";
         MemberEntryNo: Integer;
@@ -544,8 +527,7 @@ codeunit 6060128 "MM Member WebService"
         exit (Success);
     end;
 
-    [Scope('Personalization')]
-    procedure GetMemberImage(MemberExternalNo: Code[20];var Base64StringImage: Text;ScannerStationId: Code[10]) Success: Boolean
+        procedure GetMemberImage(MemberExternalNo: Code[20];var Base64StringImage: Text;ScannerStationId: Code[10]) Success: Boolean
     var
         MembershipManagement: Codeunit "MM Membership Management";
         MemberEntryNo: Integer;
@@ -557,8 +539,7 @@ codeunit 6060128 "MM Member WebService"
         exit (Success);
     end;
 
-    [Scope('Personalization')]
-    procedure BlockMembership(var member: XMLport "MM Block Membership";ScannerStationId: Code[10])
+        procedure BlockMembership(var member: XMLport "MM Block Membership";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -601,8 +582,7 @@ codeunit 6060128 "MM Member WebService"
         Commit;
     end;
 
-    [Scope('Personalization')]
-    procedure BlockMember(var member: XMLport "MM Block Membership Member";ScannerStationId: Code[10])
+        procedure BlockMember(var member: XMLport "MM Block Membership Member";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -647,8 +627,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.44 [400429]
     end;
 
-    [Scope('Personalization')]
-    procedure GetMembershipRoles(var roles: XMLport "MM Get Member GDPR Roles")
+        procedure GetMembershipRoles(var roles: XMLport "MM Get Member GDPR Roles")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -689,8 +668,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.35 [333592]
     end;
 
-    [Scope('Personalization')]
-    procedure GetSetGDPRApprovalState(var gdpr: XMLport "MM GDPR Get Set Approval State")
+        procedure GetSetGDPRApprovalState(var gdpr: XMLport "MM GDPR Get Set Approval State")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -729,8 +707,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure ConfirmMembershipPayment(var ConfirmMembershipPayment: XMLport "MM Confirm Membership Payment")
+        procedure ConfirmMembershipPayment(var ConfirmMembershipPayment: XMLport "MM Confirm Membership Payment")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -778,8 +755,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.24 [290599]
     end;
 
-    [Scope('Personalization')]
-    procedure RegretMembershipTimeframe(var Membership: XMLport "MM Regret Membership Timeframe")
+        procedure RegretMembershipTimeframe(var Membership: XMLport "MM Regret Membership Timeframe")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -818,8 +794,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure PrintMemberCard(ExternalMemberCardNo: Code[50];PrintDirective: Integer): Boolean
+        procedure PrintMemberCard(ExternalMemberCardNo: Code[50];PrintDirective: Integer): Boolean
     var
         MemberRetailIntegration: Codeunit "MM Member Retail Integration";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -856,8 +831,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.26 [305685]
     end;
 
-    [Scope('Personalization')]
-    procedure CreateWalletMemberPass(var CreateMemberPass: XMLport "MM Create Wallet Member Pass")
+        procedure CreateWalletMemberPass(var CreateMemberPass: XMLport "MM Create Wallet Member Pass")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -896,8 +870,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure ValidateNotificationToken(Token: Text[64];var ExternalMembershipNumber: Code[20];var ExternalMemberNumber: Code[20]): Boolean
+        procedure ValidateNotificationToken(Token: Text[64];var ExternalMembershipNumber: Code[20];var ExternalMemberNumber: Code[20]): Boolean
     var
         MembershipRole: Record "MM Membership Role";
     begin
@@ -918,8 +891,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.38 [355234]
     end;
 
-    [Scope('Personalization')]
-    procedure ExpireNotificationToken(Token: Text[64])
+        procedure ExpireNotificationToken(Token: Text[64])
     var
         MembershipRole: Record "MM Membership Role";
     begin
@@ -937,8 +909,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.38 [355234]
     end;
 
-    [Scope('Personalization')]
-    procedure GenerateNotificationToken(ExternalMembershipNumber: Code[20];ExternalMemberNumber: Code[20];var Token: Text[64]): Boolean
+        procedure GenerateNotificationToken(ExternalMembershipNumber: Code[20];ExternalMemberNumber: Code[20];var Token: Text[64]): Boolean
     var
         MembershipRole: Record "MM Membership Role";
         Membership: Record "MM Membership";
@@ -965,8 +936,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.38 [355234]
     end;
 
-    [Scope('Personalization')]
-    procedure GetSetComOptions(var GetSetMemberComOptions: XMLport "MM Member Communication")
+        procedure GetSetComOptions(var GetSetMemberComOptions: XMLport "MM Member Communication")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -1054,8 +1024,7 @@ codeunit 6060128 "MM Member WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GetAutoRenewProduct(var Membership: XMLport "MM Get AutoRenew Product")
+        procedure GetAutoRenewProduct(var Membership: XMLport "MM Get AutoRenew Product")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -1100,8 +1069,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure ConfirmAutoRenewPayment(var Membership: XMLport "MM Confirm AutoRenew Payment")
+        procedure ConfirmAutoRenewPayment(var Membership: XMLport "MM Confirm AutoRenew Payment")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -1146,8 +1114,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
-    [Scope('Personalization')]
-    procedure GetSetAutoRenew(var GetSetAutoRenew: XMLport "MM GetSet AutoRenew Option")
+        procedure GetSetAutoRenew(var GetSetAutoRenew: XMLport "MM GetSet AutoRenew Option")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -1193,8 +1160,7 @@ codeunit 6060128 "MM Member WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure ResolveMemberIdentifier(var MemberIdentifier: XMLport "MM Member Identifier")
+        procedure ResolveMemberIdentifier(var MemberIdentifier: XMLport "MM Member Identifier")
     begin
 
         //-MM1.34 [325803]

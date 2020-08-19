@@ -9,8 +9,7 @@ codeunit 6151241 "NP Retail Purchase Ord Mgt"
         TrailingSalesOrdersSetup: Record "Trailing Purchase Orders Setup";
         SalesHeader: Record "Purchase Header";
 
-    [Scope('Personalization')]
-    procedure OnOpenPage(var TrailingSalesOrdersSetup: Record "Trailing Purchase Orders Setup")
+        procedure OnOpenPage(var TrailingSalesOrdersSetup: Record "Trailing Purchase Orders Setup")
     begin
         with TrailingSalesOrdersSetup do
             if not Get(UserId) then begin
@@ -24,8 +23,7 @@ codeunit 6151241 "NP Retail Purchase Ord Mgt"
             end;
     end;
 
-    [Scope('Personalization')]
-    procedure DrillDown(var BusChartBuf: Record "Business Chart Buffer")
+        procedure DrillDown(var BusChartBuf: Record "Business Chart Buffer")
     var
         SalesHeader: Record "Purchase Header";
         ToDate: Date;
@@ -47,8 +45,7 @@ codeunit 6151241 "NP Retail Purchase Ord Mgt"
         PAGE.Run(PAGE::"Sales Order List", SalesHeader);
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateData(var BusChartBuf: Record "Business Chart Buffer")
+        procedure UpdateData(var BusChartBuf: Record "Business Chart Buffer")
     var
         ChartToStatusMap: array[4] of Integer;
         ToDate: array[5] of Date;
@@ -151,8 +148,7 @@ codeunit 6151241 "NP Retail Purchase Ord Mgt"
         exit(SalesHeader.Count);
     end;
 
-    [Scope('Personalization')]
-    procedure CreateMap(var Map: array[4] of Integer)
+        procedure CreateMap(var Map: array[4] of Integer)
     var
         SalesHeader: Record "Purchase Header";
     begin

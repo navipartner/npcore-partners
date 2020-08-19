@@ -127,8 +127,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure DownloadFtp()
+        procedure DownloadFtp()
     var
         ImportType: Record "Nc Import Type";
         LastErrorMessage: Text;
@@ -146,8 +145,7 @@ codeunit 6151505 "Nc Sync. Mgt."
             Error(CopyStr(LastErrorMessage, 1, 1000));
     end;
 
-    [Scope('Personalization')]
-    procedure DownloadFtpType(ImportType: Record "Nc Import Type"): Boolean
+        procedure DownloadFtpType(ImportType: Record "Nc Import Type"): Boolean
     var
         FileList: DotNet npNetIList;
         LsEntry: DotNet npNetChannelSftp_LsEntry;
@@ -190,8 +188,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    [Scope('Personalization')]
-    procedure InsertImportEntry(ImportType: Record "Nc Import Type"; Filename: Text)
+        procedure InsertImportEntry(ImportType: Record "Nc Import Type"; Filename: Text)
     var
         ImportEntry: Record "Nc Import Entry";
         FileMgt: Codeunit "File Management";
@@ -259,8 +256,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    [Scope('Personalization')]
-    procedure InsertImportEntrySftp(ImportType: Record "Nc Import Type"; Filename: Text)
+        procedure InsertImportEntrySftp(ImportType: Record "Nc Import Type"; Filename: Text)
     var
         ImportEntry: Record "Nc Import Entry";
         SharpSFtp: DotNet npNetSftp0;
@@ -317,8 +313,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure DownloadServerFiles()
+        procedure DownloadServerFiles()
     var
         NcImportType: Record "Nc Import Type";
         LastErrorText: Text;
@@ -346,8 +341,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         //+NC2.12 [313362]
     end;
 
-    [Scope('Personalization')]
-    procedure DownloadServerFile(NcImportType: Record "Nc Import Type")
+        procedure DownloadServerFile(NcImportType: Record "Nc Import Type")
     var
         FileMgt: Codeunit "File Management";
         ArrayHelper: DotNet npNetArray;
@@ -370,8 +364,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    [Scope('Personalization')]
-    procedure InsertImportEntry2(NcImportType: Record "Nc Import Type"; Filename: Text)
+        procedure InsertImportEntry2(NcImportType: Record "Nc Import Type"; Filename: Text)
     var
         NcImportEntry: Record "Nc Import Entry";
         TempBlob: Codeunit "Temp Blob";
@@ -407,8 +400,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure ProcessImportEntry(var ImportEntry: Record "Nc Import Entry"): Boolean
+        procedure ProcessImportEntry(var ImportEntry: Record "Nc Import Entry"): Boolean
     var
         DataLogMgt: Codeunit "Data Log Management";
         NaviConnectImportMgt: Codeunit "Nc Import Mgt.";
@@ -422,8 +414,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         //+NPR5.55 [408100]
     end;
 
-    [Scope('Personalization')]
-    procedure ProcessImportEntries()
+        procedure ProcessImportEntries()
     var
         ImportEntry: Record "Nc Import Entry";
     begin
@@ -442,8 +433,7 @@ codeunit 6151505 "Nc Sync. Mgt."
             until ImportEntry.Next = 0;
     end;
 
-    [Scope('Personalization')]
-    procedure ProcessTask(var Task: Record "Nc Task"): Boolean
+        procedure ProcessTask(var Task: Record "Nc Task"): Boolean
     var
         TaskSetup: Record "Nc Task Setup";
     begin
@@ -465,8 +455,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         exit(true);
     end;
 
-    [Scope('Personalization')]
-    procedure ProcessTasks(TaskProcessor: Record "Nc Task Processor"; MaxRetry: Integer)
+        procedure ProcessTasks(TaskProcessor: Record "Nc Task Processor"; MaxRetry: Integer)
     var
         Task: Record "Nc Task";
     begin
@@ -563,8 +552,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         Commit;
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateTaskProcessor(TaskProcessor: Record "Nc Task Processor")
+        procedure UpdateTaskProcessor(TaskProcessor: Record "Nc Task Processor")
     begin
         if TaskProcessor.Find then
             exit;
@@ -683,8 +671,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    [Scope('Personalization')]
-    procedure DownloadFtpListDirectory(ImportType: Record "Nc Import Type"; var ListDirectory: Text)
+        procedure DownloadFtpListDirectory(ImportType: Record "Nc Import Type"; var ListDirectory: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -712,8 +699,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    [Scope('Personalization')]
-    procedure DownloadFtpListDirectoryDetails(ImportType: Record "Nc Import Type"; var ListDirectoryDetails: Text)
+        procedure DownloadFtpListDirectoryDetails(ImportType: Record "Nc Import Type"; var ListDirectoryDetails: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -1026,8 +1012,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         Clear(MemoryStream);
     end;
 
-    [Scope('Personalization')]
-    procedure NewLine(): Text[2]
+        procedure NewLine(): Text[2]
     var
         Cr: Char;
         Lf: Char;
@@ -1056,80 +1041,67 @@ codeunit 6151505 "Nc Sync. Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
     end;
 
-    [Scope('Personalization')]
-    procedure "--- Constants"()
+        procedure "--- Constants"()
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.CleanupImport"(): Code[20]
+        procedure "Parameter.CleanupImport"(): Code[20]
     begin
         exit('CLEANUP_IMPORT');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.DownloadFtp"(): Code[20]
+        procedure "Parameter.DownloadFtp"(): Code[20]
     begin
         exit('DOWNLOAD_FTP');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.DownloadServerFile"(): Code[20]
+        procedure "Parameter.DownloadServerFile"(): Code[20]
     begin
         //-NC2.12 [313362]
         exit('DOWNLOAD_SERVER_FILE');
         //+NC2.12 [313362]
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.DownloadType"(): Code[20]
+        procedure "Parameter.DownloadType"(): Code[20]
     begin
         exit('DOWNLOAD_IMPORT_TYPE');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.ImportNewTasks"(): Code[20]
+        procedure "Parameter.ImportNewTasks"(): Code[20]
     begin
         exit('IMPORT_NEW_TASKS');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.ProcessImport"(): Code[20]
+        procedure "Parameter.ProcessImport"(): Code[20]
     begin
         exit('PROCESS_IMPORT');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.ProcessTasks"(): Code[20]
+        procedure "Parameter.ProcessTasks"(): Code[20]
     begin
         exit('PROCESS_TASKS');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.ResetTaskCount"(): Code[20]
+        procedure "Parameter.ResetTaskCount"(): Code[20]
     begin
         exit('RESET_RETRY_COUNT');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.TaskRetryCount"(): Code[20]
+        procedure "Parameter.TaskRetryCount"(): Code[20]
     begin
         exit('TASK_RETRY_COUNT');
     end;
 
-    [Scope('Personalization')]
-    procedure "Parameter.TaskProcessorCode"(): Code[20]
+        procedure "Parameter.TaskProcessorCode"(): Code[20]
     begin
         exit('TASK_PROCESSOR_CODE');
     end;
 
-    [Scope('Personalization')]
-    procedure "--- UI"()
+        procedure "--- UI"()
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
+        procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
     var
         [RunOnClient]
         Process: DotNet npNetProcess;

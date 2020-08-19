@@ -18,8 +18,7 @@ codeunit 6151145 "M2 POS Price WebService"
         // TEST_SOAP_ItemPrice ();
     end;
 
-    [Scope('Personalization')]
-    procedure POSQuote(var POSPriceRequest: XMLport "M2 POS Quote Price Request")
+        procedure POSQuote(var POSPriceRequest: XMLport "M2 POS Quote Price Request")
     var
         TmpSalePOS: Record "Sale POS" temporary;
         TmpSaleLinePOS: Record "Sale Line POS" temporary;
@@ -209,8 +208,7 @@ codeunit 6151145 "M2 POS Price WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure ItemPrice(var ItemPriceRequest: XMLport "M2 Item Price Request")
+        procedure ItemPrice(var ItemPriceRequest: XMLport "M2 Item Price Request")
     var
         TmpSalesPriceRequest: Record "M2 Price Calculation Buffer" temporary;
         TmpPriceBracketResponse: Record "M2 Price Calculation Buffer" temporary;
@@ -674,8 +672,7 @@ codeunit 6151145 "M2 POS Price WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "M2 Item Availability By Period")
+        procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "M2 Item Availability By Period")
     begin
 
         //-NPR5.49 [345373]
@@ -686,8 +683,7 @@ codeunit 6151145 "M2 POS Price WebService"
         //+NPR5.49 [345373]
     end;
 
-    [Scope('Personalization')]
-    procedure CustomerItemByPeriod(var CustomerItemByPeriod: XMLport "M2 Customer Item By Period")
+        procedure CustomerItemByPeriod(var CustomerItemByPeriod: XMLport "M2 Customer Item By Period")
     begin
 
         //-NPR5.49 [345375]
@@ -698,8 +694,7 @@ codeunit 6151145 "M2 POS Price WebService"
         //+NPR5.49 [345375]
     end;
 
-    [Scope('Personalization')]
-    procedure EstimateDeliveryDate(var EstimateDeliveryDate: XMLport "M2 Estimate Delivery Date")
+        procedure EstimateDeliveryDate(var EstimateDeliveryDate: XMLport "M2 Estimate Delivery Date")
     begin
 
         //-MAG2.25 [349999]
@@ -708,8 +703,7 @@ codeunit 6151145 "M2 POS Price WebService"
         //+MAG2.25 [349999]
     end;
 
-    [Scope('Personalization')]
-    procedure GetWorkingDayCalendar(var GetWorkingDayCalendar: XMLport "M2 Get WorkingDay Calendar")
+        procedure GetWorkingDayCalendar(var GetWorkingDayCalendar: XMLport "M2 Get WorkingDay Calendar")
     begin
 
         //-MAG2.25 [349999]

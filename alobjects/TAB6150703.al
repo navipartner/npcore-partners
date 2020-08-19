@@ -149,8 +149,7 @@ table 6150703 "POS Action"
         Text007: Label 'You have called a Workflow 1.0 function in the context of a Workflow 2.0 discovery process.';
         Text008: Label 'You have called a Workflow 2.0 function in the context of a Workflow 1.0 discovery process.';
 
-    [Scope('Personalization')]
-    procedure SetSession(SessionIn: Codeunit "POS Session")
+        procedure SetSession(SessionIn: Codeunit "POS Session")
     begin
         POSSession := SessionIn;
     end;
@@ -187,8 +186,7 @@ table 6150703 "POS Action"
         DiscoveredAction.Insert;
     end;
 
-    [Scope('Personalization')]
-    procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
+        procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
     begin
         if (ActionInRefresh <> '') and (ActionInRefresh <> Code) then
             exit(false);
@@ -349,8 +347,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterWorkflowStep(Label: Text; "Code": Text)
+        procedure RegisterWorkflowStep(Label: Text; "Code": Text)
     var
         FrontEnd: Codeunit "POS Front End Management";
         WorkflowStep: DotNet npNetWorkflowStep;
@@ -368,8 +365,7 @@ table 6150703 "POS Action"
         WorkflowObj.Steps.Add(WorkflowStep);
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterWorkflow(WithOnBeforeWorkflowEvent: Boolean)
+        procedure RegisterWorkflow(WithOnBeforeWorkflowEvent: Boolean)
     var
         FrontEnd: Codeunit "POS Front End Management";
     begin
@@ -390,8 +386,7 @@ table 6150703 "POS Action"
         InitializeWorkflowDiscovery();
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterWorkflow20("Code": Text)
+        procedure RegisterWorkflow20("Code": Text)
     var
         FrontEnd: Codeunit "POS Front End Management";
         WorkflowStep: DotNet npNetWorkflowStep;
@@ -414,48 +409,42 @@ table 6150703 "POS Action"
         //+NPR5.50 [338666]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterTextParameter(Name: Text; DefaultValue: Text)
+        procedure RegisterTextParameter(Name: Text; DefaultValue: Text)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Text, DefaultValue, '');
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterIntegerParameter(Name: Text; DefaultValue: Integer)
+        procedure RegisterIntegerParameter(Name: Text; DefaultValue: Integer)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Integer, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterDateParameter(Name: Text; DefaultValue: Date)
+        procedure RegisterDateParameter(Name: Text; DefaultValue: Date)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Date, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterBooleanParameter(Name: Text; DefaultValue: Boolean)
+        procedure RegisterBooleanParameter(Name: Text; DefaultValue: Boolean)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Boolean, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterDecimalParameter(Name: Text; DefaultValue: Decimal)
+        procedure RegisterDecimalParameter(Name: Text; DefaultValue: Decimal)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Decimal, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterOptionParameter(Name: Text; Options: Text; DefaultValue: Text)
+        procedure RegisterOptionParameter(Name: Text; Options: Text; DefaultValue: Text)
     var
         Param: Record "POS Action Parameter";
     begin
@@ -486,8 +475,7 @@ table 6150703 "POS Action"
         Param.Insert;
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterDataBinding()
+        procedure RegisterDataBinding()
     begin
         "Bound to DataSource" := true;
         Modify;
@@ -496,8 +484,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterDataSourceBinding(DataSource: Code[50])
+        procedure RegisterDataSourceBinding(DataSource: Code[50])
     begin
         "Bound to DataSource" := true;
         "Data Source Name" := DataSource;
@@ -507,8 +494,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
+        procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
         Dictionary: DotNet npNetDictionary_Of_T_U;
         MemStr: DotNet npNetMemoryStream;
@@ -534,8 +520,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterDataSource(Name: Code[50])
+        procedure RegisterDataSource(Name: Code[50])
     begin
         "Data Source Name" := Name;
         //-NPR5.40 [306347]
@@ -546,8 +531,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterBlockingUI(Blocking: Boolean)
+        procedure RegisterBlockingUI(Blocking: Boolean)
     begin
         //-NPR5.32.11 [281618]
         "Blocking UI" := Blocking;
@@ -558,8 +542,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterTooltip(TooltipIn: Text)
+        procedure RegisterTooltip(TooltipIn: Text)
     begin
         //-NPR5.32.11 [281618]
         Tooltip := CopyStr(TooltipIn, 1, MaxStrLen(Tooltip));
@@ -570,16 +553,14 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterSecureMethod(SecureMethodCode: Code[10])
+        procedure RegisterSecureMethod(SecureMethodCode: Code[10])
     begin
         //-NPR5.43 [314603]
         "Secure Method Code" := SecureMethodCode;
         //+NPR5.43
     end;
 
-    [Scope('Personalization')]
-    procedure IsThisAction("Code": Code[20]): Boolean
+        procedure IsThisAction("Code": Code[20]): Boolean
     begin
         exit(Rec.Code = Code);
     end;
@@ -597,8 +578,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-    [Scope('Personalization')]
-    procedure RefreshWorkflow()
+        procedure RefreshWorkflow()
     var
         "Action": Record "POS Action";
     begin
@@ -648,8 +628,7 @@ table 6150703 "POS Action"
         //+NPR5.44 [286547]
     end;
 
-    [Scope('Personalization')]
-    procedure GetCustomJavaScriptLogic(var "Object": DotNet npNetObject)
+        procedure GetCustomJavaScriptLogic(var "Object": DotNet npNetObject)
     var
         Dictionary: DotNet npNetDictionary_Of_T_U;
         KeyValuePair: DotNet npNetKeyValuePair_Of_T_U;
@@ -725,28 +704,24 @@ table 6150703 "POS Action"
         Dictionary.Add(Name, Value);
     end;
 
-    [Scope('Personalization')]
-    procedure SetWorkflowInvocationParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "POS Front End Management")
+        procedure SetWorkflowInvocationParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "POS Front End Management")
     begin
         CheckParameter(Name, Value, FrontEnd);
         SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
     end;
 
-    [Scope('Personalization')]
-    procedure SetWorkflowInvocationContext(Name: Text; Value: Variant)
+        procedure SetWorkflowInvocationContext(Name: Text; Value: Variant)
     begin
         SetWorkflowInvocationDictionary(WorkflowInvocationContext, Name, Value);
     end;
 
-    [Scope('Personalization')]
-    procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: DotNet npNetDictionary_Of_T_U; var WorkflowInvocationContextOut: DotNet npNetDictionary_Of_T_U)
+        procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: DotNet npNetDictionary_Of_T_U; var WorkflowInvocationContextOut: DotNet npNetDictionary_Of_T_U)
     begin
         WorkflowInvocationParametersOut := WorkflowInvocationParameters;
         WorkflowInvocationContextOut := WorkflowInvocationContext;
     end;
 
-    [Scope('Personalization')]
-    procedure DiscoverActions()
+        procedure DiscoverActions()
     var
         CodeunitInstanceDetector: Codeunit "POS Action Management";
     begin

@@ -10,8 +10,7 @@ codeunit 6151081 "ExRv Webservice"
     var
         Text000: Label 'Invalid voucher_type: %1';
 
-    [Scope('Personalization')]
-    procedure IssueVouchers(var vouchers: XMLport "ExRv Vouchers")
+        procedure IssueVouchers(var vouchers: XMLport "ExRv Vouchers")
     var
         TempExRvVoucher: Record "ExRv Voucher" temporary;
         ExRvMgt: Codeunit "ExRv Management";
@@ -26,8 +25,7 @@ codeunit 6151081 "ExRv Webservice"
         vouchers.SetSourceTable(TempExRvVoucher);
     end;
 
-    [Scope('Personalization')]
-    procedure GetVouchers(var vouchers: XMLport "ExRv Vouchers")
+        procedure GetVouchers(var vouchers: XMLport "ExRv Vouchers")
     var
         ExRvVoucher: Record "ExRv Voucher";
         TempExRvVoucher: Record "ExRv Voucher" temporary;
