@@ -207,7 +207,7 @@ page 6151241 "NP Retail POS- Sales Person R"
                 }
                 action("VAT-VIES Declaration Tax A&uth")
                 {
-                    Caption = 'VAT-VIES Declaration Tax A&uth';
+                    Caption = 'VAT - VIES Declaration Tax A&uth';
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Tax Auth";
                 }
