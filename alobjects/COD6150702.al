@@ -250,7 +250,7 @@ codeunit 6150702 "POS UI Management"
                         //-NPR5.42 [314128]
                         //InitializeSubmenu(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
                         InitializeSubmenu(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
-                    //+NPR5.42 [314128]
+                //+NPR5.42 [314128]
                 until Next = 0;
         end;
     end;
@@ -408,83 +408,83 @@ codeunit 6150702 "POS UI Management"
         Template: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.51 [352582]
-        AdminTemplateScope.SetRange("Applies To",AdminTemplateScope."Applies To"::All);
+        AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::All);
         if AdminTemplateScope.FindSet then
-          repeat
-            AdminTemplateScopeTmp := AdminTemplateScope;
-            AdminTemplateScopeTmp.Insert();
-          until AdminTemplateScope.Next = 0;
+            repeat
+                AdminTemplateScopeTmp := AdminTemplateScope;
+                AdminTemplateScopeTmp.Insert();
+            until AdminTemplateScope.Next = 0;
 
         if POSUnit.Get(Register."Register No.") then begin
-          AdminTemplateScope.SetRange("Applies To",AdminTemplateScope."Applies To"::"POS Unit");
-          AdminTemplateScope.SetRange("Applies To Code",POSUnit."No.");
-          if AdminTemplateScope.FindSet then
-            repeat
-              AdminTemplateScopeTmp := AdminTemplateScope;
-              AdminTemplateScopeTmp.Insert();
-            until AdminTemplateScope.Next = 0;
+            AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::"POS Unit");
+            AdminTemplateScope.SetRange("Applies To Code", POSUnit."No.");
+            if AdminTemplateScope.FindSet then
+                repeat
+                    AdminTemplateScopeTmp := AdminTemplateScope;
+                    AdminTemplateScopeTmp.Insert();
+                until AdminTemplateScope.Next = 0;
         end;
 
-        AdminTemplateScope.SetRange("Applies To",AdminTemplateScope."Applies To"::User);
-        AdminTemplateScope.SetRange("Applies To Code",UserId);
+        AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::User);
+        AdminTemplateScope.SetRange("Applies To Code", UserId);
         if AdminTemplateScope.FindSet then
-          repeat
-            AdminTemplateScopeTmp := AdminTemplateScope;
-            AdminTemplateScopeTmp.Insert();
-          until AdminTemplateScope.Next = 0;
+            repeat
+                AdminTemplateScopeTmp := AdminTemplateScope;
+                AdminTemplateScopeTmp.Insert();
+            until AdminTemplateScope.Next = 0;
 
         if AdminTemplateScopeTmp.IsEmpty then
-          exit;
+            exit;
 
         Templates := Templates.List();
         AdminTemplateScopeTmp.FindSet();
         repeat
-          if AdminTemplate.Get(AdminTemplateScopeTmp."POS Admin. Template Id") and (AdminTemplate.Status <> AdminTemplate.Status::Draft) then begin
-            InitializeAdministrativeTemplatePolicy(Template,AdminTemplate.Id,AdminTemplate."Persist on Client",AdminTemplateScopeTmp."Applies To");
-            case AdminTemplate.Status of
-              AdminTemplate.Status::Active:
-                begin
-                  InitialiteAdministrativeTemplatePasswordPolicy(Template,'roleCenter',AdminTemplate."Role Center",AdminTemplate."Role Center Password");
-                  InitialiteAdministrativeTemplatePasswordPolicy(Template,'configuration',AdminTemplate.Configuration,AdminTemplate."Configuration Password");
+            if AdminTemplate.Get(AdminTemplateScopeTmp."POS Admin. Template Id") and (AdminTemplate.Status <> AdminTemplate.Status::Draft) then begin
+                InitializeAdministrativeTemplatePolicy(Template, AdminTemplate.Id, AdminTemplate."Persist on Client", AdminTemplateScopeTmp."Applies To");
+                case AdminTemplate.Status of
+                    AdminTemplate.Status::Active:
+                        begin
+                            InitialiteAdministrativeTemplatePasswordPolicy(Template, 'roleCenter', AdminTemplate."Role Center", AdminTemplate."Role Center Password");
+                            InitialiteAdministrativeTemplatePasswordPolicy(Template, 'configuration', AdminTemplate.Configuration, AdminTemplate."Configuration Password");
+                        end;
+                    AdminTemplate.Status::Retired:
+                        Template.Add('retired', true);
                 end;
-              AdminTemplate.Status::Retired:
-                Template.Add('retired',true);
             end;
-          end;
-          Templates.Add(Template);
+            Templates.Add(Template);
         until AdminTemplateScopeTmp.Next = 0;
         FrontEnd.ApplyAdministrativeTemplates(Templates);
         //+NPR5.51 [352582]
     end;
 
-    local procedure InitializeAdministrativeTemplatePolicy(var Template: DotNet npNetDictionary_Of_T_U;Id: Guid;Persist: Boolean;AppliesTo: Integer)
+    local procedure InitializeAdministrativeTemplatePolicy(var Template: DotNet npNetDictionary_Of_T_U; Id: Guid; Persist: Boolean; AppliesTo: Integer)
     begin
         //-NPR5.51 [352582]
         Template := Template.Dictionary();
-        Template.Add('id',Id);
-        Template.Add('persist',Persist);
-        Template.Add('strength',AppliesTo);
+        Template.Add('id', Id);
+        Template.Add('persist', Persist);
+        Template.Add('strength', AppliesTo);
         //+NPR5.51 [352582]
     end;
 
-    local procedure InitialiteAdministrativeTemplatePasswordPolicy(Template: DotNet npNetDictionary_Of_T_U;PolicyName: Text;Policy: Option "Not Defined",Visible,Disabled,Hidden,Password;Password: Text)
+    local procedure InitialiteAdministrativeTemplatePasswordPolicy(Template: DotNet npNetDictionary_Of_T_U; PolicyName: Text; Policy: Option "Not Defined",Visible,Disabled,Hidden,Password; Password: Text)
     var
         PolicyObject: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.51 [352582]
         case Policy of
-          Policy::Disabled:
-            Template.Add(PolicyName,'deny');
-          Policy::Hidden:
-            Template.Add(PolicyName,'hide');
-          Policy::Visible:
-            Template.Add(PolicyName,'allow');
-          Policy::Password:
-            begin
-              PolicyObject := PolicyObject.Dictionary();
-              PolicyObject.Add('password',Password);
-              Template.Add(PolicyName,PolicyObject);
-            end;
+            Policy::Disabled:
+                Template.Add(PolicyName, 'deny');
+            Policy::Hidden:
+                Template.Add(PolicyName, 'hide');
+            Policy::Visible:
+                Template.Add(PolicyName, 'allow');
+            Policy::Password:
+                begin
+                    PolicyObject := PolicyObject.Dictionary();
+                    PolicyObject.Add('password', Password);
+                    Template.Add(PolicyName, PolicyObject);
+                end;
         end;
         //+NPR5.51 [352582]
     end;
@@ -619,12 +619,12 @@ codeunit 6150702 "POS UI Management"
         Captions.Add('Sale_PaymentAmount', CaptionLabelPaymentAmount);
 
         //-NPR5.55 [405186]
-        Captions.Add ('Sale_TimeoutTitle', Sale_TimeoutTitle);
-        Captions.Add ('Sale_TimeoutCaption', Sale_TimeoutCaption);
-        Captions.Add ('Sale_TimeoutButtonCaption', Sale_TimeoutButtonCaption);
-        Captions.Add ('Payment_TimeoutTitle', Payment_TimeoutTitle);
-        Captions.Add ('Payment_TimeoutCaption', Payment_TimeoutCaption);
-        Captions.Add ('Payment_TimeoutButtonCaption', Payment_TimeoutButtonCaption);
+        Captions.Add('Sale_TimeoutTitle', Sale_TimeoutTitle);
+        Captions.Add('Sale_TimeoutCaption', Sale_TimeoutCaption);
+        Captions.Add('Sale_TimeoutButtonCaption', Sale_TimeoutButtonCaption);
+        Captions.Add('Payment_TimeoutTitle', Payment_TimeoutTitle);
+        Captions.Add('Payment_TimeoutCaption', Payment_TimeoutCaption);
+        Captions.Add('Payment_TimeoutButtonCaption', Payment_TimeoutButtonCaption);
         //+NPR5.55 [405186]
 
         //-NPR5.39 [299908]
@@ -643,7 +643,7 @@ codeunit 6150702 "POS UI Management"
         //+NPR5.37 [292323]
 
         //-NPR5.53 [382035]
-        Captions.Add ('Item_Count', CaptionItemCount);
+        Captions.Add('Item_Count', CaptionItemCount);
         //+NPR5.53 [382035]
 
         Captions.Add('Payment_PaymentInfo', CaptionPaymentInfo);
@@ -656,7 +656,7 @@ codeunit 6150702 "POS UI Management"
         Captions.Add('Global_Today', CaptionGlobalToday);
         Captions.Add('Global_Tomorrow', CaptionGlobalTomorrow);
         Captions.Add('Global_Yesterday', CaptionGlobalYesterday);
-        Captions.Add('Global_Abort',CaptionGlobalAbort);
+        Captions.Add('Global_Abort', CaptionGlobalAbort);
         Captions.Add('CaptionBalancingRegisterTransactions', CaptionBalancingRegisterTransactions);
         Captions.Add('CaptionBalancingRegisters', CaptionBalancingRegisters);
         Captions.Add('CaptionBalancingReceipts', CaptionBalancingReceipts);
@@ -757,20 +757,20 @@ codeunit 6150702 "POS UI Management"
         Setup.Action_UnlockPOS(Action, POSSession);
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Unlock POS Action Code")), POSSetup.FieldNo("Unlock POS Action Code"));
 
-        Setup.Action_Login(Action,POSSession);
-        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Login Action Code")),POSSetup.FieldNo("Login Action Code"));
+        Setup.Action_Login(Action, POSSession);
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Login Action Code")), POSSetup.FieldNo("Login Action Code"));
 
-        Setup.Action_TextEnter(Action,POSSession);
-        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Text Enter Action Code")),POSSetup.FieldNo("Text Enter Action Code"));
+        Setup.Action_TextEnter(Action, POSSession);
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Text Enter Action Code")), POSSetup.FieldNo("Text Enter Action Code"));
 
         //-NPR5.54 [392121]
-        Setup.Action_IdleTimeout (Action, POSSession);
-        ConfigureReusableWorkflow (Action, POSSession, StrSubstNo ('%1, %2',POSSetup.TableCaption, POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
+        Setup.Action_IdleTimeout(Action, POSSession);
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
         //+NPR5.54 [392121]
 
         //-NPR5.55 [400734]
-        Setup.Action_AdminMenu (Action, POSSession);
-        ConfigureReusableWorkflow (Action, POSSession, StrSubstNo ('%1, %2',POSSetup.TableCaption, POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
+        Setup.Action_AdminMenu(Action, POSSession);
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
         //+NPR5.55 [400734]
     end;
 
@@ -784,8 +784,8 @@ codeunit 6150702 "POS UI Management"
     begin
 
         //-NPR5.54 [391850]
-        POSSession.GetSetup (POSSetup);
-        POSSetup.GetPOSUnit (POSUnit);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
         //+NPR5.54 [391850]
 
         //-+NPR5.54 [392121] removed green code
@@ -793,10 +793,10 @@ codeunit 6150702 "POS UI Management"
             "Action Type" := "Action Type"::Action;
             "Action Code" := Action.Code;
 
-          //-NPR5.54 [391850]
-          // RetrieveReusableWorkflowParameters(FieldNumber,POSParameterValue);
-          RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", POSParameterValue);
-          //+NPR5.54 [391850]
+            //-NPR5.54 [391850]
+            // RetrieveReusableWorkflowParameters(FieldNumber,POSParameterValue);
+            RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", POSParameterValue);
+            //+NPR5.54 [391850]
 
             GetAction(WorkflowAction, POSSession, Source, POSParameterValue);
 
@@ -820,8 +820,8 @@ codeunit 6150702 "POS UI Management"
         Options.Add('lockWorkflow', Setup.ActionCode_LockPOS);
         Options.Add('unlockWorkflow', Setup.ActionCode_UnlockPOS);
         Options.Add('autoLockTimeout', Setup.GetLockTimeout());
-        Options.Add('loginWorkflow',Setup.ActionCode_Login);
-        Options.Add('textEnterWorkflow',Setup.ActionCode_TextEnter);
+        Options.Add('loginWorkflow', Setup.ActionCode_Login);
+        Options.Add('textEnterWorkflow', Setup.ActionCode_TextEnter);
         Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
 
         //-NPR5.54 [392121]
@@ -829,16 +829,16 @@ codeunit 6150702 "POS UI Management"
         //+NPR5.54 [392121]
 
         //-NPR5.54 [392247]
-        Options.Add ('posUnitType', Format (GetPOSUnitType(Setup), 0, 9));
+        Options.Add('posUnitType', Format(GetPOSUnitType(Setup), 0, 9));
         //+NPR5.54 [392247]
 
         //-NPR5.55 [400734]
         Options.Add('adminMenuWorkflow', Setup.ActionCode_AdminMenu());
-        Setup.GetNamedActionSetup (POSSetup);
-        Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson (POSSetup.RecordId, POSSetup.FieldNo ("Admin Menu Action Code")));
+        Setup.GetNamedActionSetup(POSSetup);
+        Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));
         //-NPR5.55 [400734]
 
-        Options.Add('nprVersion',GetNPRVersion());
+        Options.Add('nprVersion', GetNPRVersion());
         FrontEnd.SetOptions(Options);
     end;
 
@@ -890,7 +890,7 @@ codeunit 6150702 "POS UI Management"
         //+NPR5.40 [307453]
     end;
 
-    local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer;POSSetupProfileCode: Code[20];var TmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer; POSSetupProfileCode: Code[20]; var TmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         POSParameterValue: Record "POS Parameter Value";
         POSSetup: Record "POS Setup";
@@ -900,7 +900,7 @@ codeunit 6150702 "POS UI Management"
         // POSSetup.GET;
         // //+NPR5.51 [359825]
 
-        POSSetup.Get (POSSetupProfileCode);
+        POSSetup.Get(POSSetupProfileCode);
         //+NPR5.54 [391850]
 
 
@@ -922,14 +922,31 @@ codeunit 6150702 "POS UI Management"
     procedure GetNPRVersion(): Text
     var
         NPRUpgradeHistory: Record "NPR Upgrade History";
+        PublishedApp: Record "Published Application";
+        InstalledApp: Record "Installed Application";
     begin
+        // First, let's try to retrieve the app by its currently known GUID
+        PublishedApp.SetRange(ID, '992c2309-cca4-43cb-9e41-911f482ec088');
+        if PublishedApp.FindFirst() then begin
+            if InstalledApp.Get(PublishedApp."Runtime Package ID", TenantId()) then
+                exit(StrSubstNo(
+                    'NPR %1.%2.%3.%4',
+                    PublishedApp."Version Major",
+                    PublishedApp."Version Minor",
+                    PublishedApp."Version Build",
+                    PublishedApp."Version Revision"
+                ));
+        end;
+
+        // ... and if that fails, fallback to previous logic
+
         //-NPR5.51 [361184]
         with NPRUpgradeHistory do begin
-          SetCurrentKey("Upgrade Time");
-          SetAscending("Upgrade Time",false);
-          if not FindFirst then
-            exit('');
-          exit(Version);
+            SetCurrentKey("Upgrade Time");
+            SetAscending("Upgrade Time", false);
+            if not FindFirst then
+                exit('');
+            exit(Version);
         end;
         //+NPR5.51 [361184]
     end;
@@ -940,8 +957,8 @@ codeunit 6150702 "POS UI Management"
     begin
 
         //-NPR5.54 [392247]
-        POSSetup.GetPOSUnit (POSUnit);
-        exit (POSUnit."POS Type");
+        POSSetup.GetPOSUnit(POSUnit);
+        exit(POSUnit."POS Type");
         //+NPR5.54 [392247]
     end;
 }
