@@ -14,8 +14,7 @@ codeunit 6060048 "Item Wksht. WebService"
         SETUP_MISSING: Label 'Setup is missing for %1';
         FileMan: Codeunit "File Management";
 
-    [Scope('Personalization')]
-    procedure CreateItemWorksheetLine(var ItemWorksheetLineImport: XMLport "Item Worksheet Line Web Import")
+        procedure CreateItemWorksheetLine(var ItemWorksheetLineImport: XMLport "Item Worksheet Line Web Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";

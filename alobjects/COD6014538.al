@@ -12,8 +12,7 @@ codeunit 6014538 "RP Epson Web Print Service"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GetPrintJobs(PrinterID: Text[250]): Text
+        procedure GetPrintJobs(PrinterID: Text[250]): Text
     var
         WebPrintBuffer: Record "Web Print Buffer";
         PrintJobs: Text;

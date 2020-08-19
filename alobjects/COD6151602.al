@@ -7,8 +7,7 @@ codeunit 6151602 "NpDc Non-POS Coupon Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure ApplyCouponDiscount(var coupon_application: XMLport "NpDc Ext. Coupon Application")
+        procedure ApplyCouponDiscount(var coupon_application: XMLport "NpDc Ext. Coupon Application")
     var
         TempSalePOS: Record "Sale POS" temporary;
         TempSaleLinePOS: Record "Sale Line POS" temporary;
@@ -23,8 +22,7 @@ codeunit 6151602 "NpDc Non-POS Coupon Webservice"
         coupon_application.SetResponse(TempSalePOS,TempSaleLinePOS);
     end;
 
-    [Scope('Personalization')]
-    procedure CheckCoupons(var coupons: XMLport "NpDc Ext. Coupon")
+        procedure CheckCoupons(var coupons: XMLport "NpDc Ext. Coupon")
     var
         NpDcCoupon: Record "NpDc Coupon";
         TempNpDcExtCouponBuffer: Record "NpDc Ext. Coupon Buffer" temporary;
@@ -38,8 +36,7 @@ codeunit 6151602 "NpDc Non-POS Coupon Webservice"
         coupons.SetCoupons(TempNpDcExtCouponBuffer);
     end;
 
-    [Scope('Personalization')]
-    procedure ReserveCoupons(var coupons: XMLport "NpDc Ext. Coupon")
+        procedure ReserveCoupons(var coupons: XMLport "NpDc Ext. Coupon")
     var
         NpDcCoupon: Record "NpDc Coupon";
         TempNpDcExtCouponBuffer: Record "NpDc Ext. Coupon Buffer" temporary;
@@ -53,8 +50,7 @@ codeunit 6151602 "NpDc Non-POS Coupon Webservice"
         coupons.SetCoupons(TempNpDcExtCouponBuffer);
     end;
 
-    [Scope('Personalization')]
-    procedure CancelCouponReservations(var coupons: XMLport "NpDc Ext. Coupon")
+        procedure CancelCouponReservations(var coupons: XMLport "NpDc Ext. Coupon")
     var
         NpDcCoupon: Record "NpDc Coupon";
         TempNpDcExtCouponBuffer: Record "NpDc Ext. Coupon Buffer" temporary;

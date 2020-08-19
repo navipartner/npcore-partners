@@ -79,8 +79,7 @@ codeunit 6150706 "POS Sale Line"
         InsertWithAutoSplitKeyForced: Boolean;
         IsAutoSplitKeyRecord: Boolean;
 
-    [Scope('Personalization')]
-    procedure Init(RegisterNo: Code[20];SalesTicketNo: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
+        procedure Init(RegisterNo: Code[20];SalesTicketNo: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
     var
         POSViewProfile: Record "POS View Profile";
         POSUnit: Record "POS Unit";
@@ -151,8 +150,7 @@ codeunit 6150706 "POS Sale Line"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure GetNextLineNo() NextLineNo: Integer
+        procedure GetNextLineNo() NextLineNo: Integer
     var
         SaleLinePOS: Record "Sale Line POS";
     begin
@@ -197,47 +195,40 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.37 [293084]
     end;
 
-    [Scope('Personalization')]
-    procedure GetNewSaleLine(var SaleLinePOS: Record "Sale Line POS")
+        procedure GetNewSaleLine(var SaleLinePOS: Record "Sale Line POS")
     begin
         InitLine();
         SaleLinePOS := Rec;
     end;
 
-    [Scope('Personalization')]
-    procedure RefreshCurrent(): Boolean
+        procedure RefreshCurrent(): Boolean
     begin
         exit (Rec.Find());
     end;
 
-    [Scope('Personalization')]
-    procedure SetFirst()
+        procedure SetFirst()
     begin
         Rec.FindFirst ();
     end;
 
-    [Scope('Personalization')]
-    procedure SetLast()
+        procedure SetLast()
     begin
         Rec.FindLast ();
     end;
 
-    [Scope('Personalization')]
-    procedure SetPosition(Position: Text): Boolean
+        procedure SetPosition(Position: Text): Boolean
     begin
         Rec.SetPosition(Position);
         exit(Rec.Find);
     end;
 
-    [Scope('Personalization')]
-    procedure GetCurrentSaleLine(var SaleLinePOS: Record "Sale Line POS")
+        procedure GetCurrentSaleLine(var SaleLinePOS: Record "Sale Line POS")
     begin
         RefreshCurrent();
         SaleLinePOS.Copy (Rec);
     end;
 
-    [Scope('Personalization')]
-    procedure InsertLine(var Line: Record "Sale Line POS") Return: Boolean
+        procedure InsertLine(var Line: Record "Sale Line POS") Return: Boolean
     var
         Contact: Record Contact;
         Linie: Record "Sale Line POS";
@@ -356,8 +347,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.48 [300557]
     end;
 
-    [Scope('Personalization')]
-    procedure DeleteLine()
+        procedure DeleteLine()
     var
         xRec: Record "Sale Line POS";
         POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
@@ -391,8 +381,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.46 [329523]
     end;
 
-    [Scope('Personalization')]
-    procedure DeleteAll()
+        procedure DeleteAll()
     var
         xRec: Record "Sale Line POS";
     begin
@@ -420,8 +409,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.51 [350674]
     end;
 
-    [Scope('Personalization')]
-    procedure IsEmpty(): Boolean
+        procedure IsEmpty(): Boolean
     begin
         //-NPR5.50 [300557]
         CheckInit(true);
@@ -429,8 +417,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.50 [300557]
     end;
 
-    [Scope('Personalization')]
-    procedure SetQuantity(Quantity: Decimal)
+        procedure SetQuantity(Quantity: Decimal)
     var
         POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
     begin
@@ -460,8 +447,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.46 [329523]
     end;
 
-    [Scope('Personalization')]
-    procedure SetUnitPrice(UnitPriceLCY: Decimal)
+        procedure SetUnitPrice(UnitPriceLCY: Decimal)
     begin
         RefreshCurrent ();
 
@@ -476,8 +462,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.46 [329523]
     end;
 
-    [Scope('Personalization')]
-    procedure SetDescription(NewDescription: Text)
+        procedure SetDescription(NewDescription: Text)
     begin
         //-NPR5.38 [275242]
         RefreshCurrent ();
@@ -494,8 +479,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.46 [329523]
     end;
 
-    [Scope('Personalization')]
-    procedure CalculateBalance(var AmountExclVAT: Decimal;var VATAmount: Decimal;var TotalAmount: Decimal)
+        procedure CalculateBalance(var AmountExclVAT: Decimal;var VATAmount: Decimal;var TotalAmount: Decimal)
     var
         SaleLine: Record "Sale Line POS";
         RetailFormCode: Codeunit "Retail Form Code";
@@ -533,8 +517,7 @@ codeunit 6150706 "POS Sale Line"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+        procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         DataMgt: Codeunit "POS Data Management";
         AmountExclVAT: Decimal;
@@ -562,8 +545,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.53 [382035]
     end;
 
-    [Scope('Personalization')]
-    procedure GetDepositLine(var LinePOS: Record "Sale Line POS")
+        procedure GetDepositLine(var LinePOS: Record "Sale Line POS")
     begin
         SetDepositLineType (LinePOS);
     end;
@@ -579,8 +561,7 @@ codeunit 6150706 "POS Sale Line"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure InsertDepositLine(var Line: Record "Sale Line POS";ForeignCurrencyAmount: Decimal) Return: Boolean
+        procedure InsertDepositLine(var Line: Record "Sale Line POS";ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
         with Rec do begin
           InitLine ();
@@ -617,8 +598,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.48 [300557]
     end;
 
-    [Scope('Personalization')]
-    procedure ResendAllOnAfterInsertPOSSaleLine()
+        procedure ResendAllOnAfterInsertPOSSaleLine()
     var
         SaleLinePOS: Record "Sale Line POS";
         POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
@@ -799,8 +779,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.43 [319425]
     end;
 
-    [Scope('Personalization')]
-    procedure InvokeOnBeforeInsertSaleLineWorkflow(var SaleLinePOS: Record "Sale Line POS")
+        procedure InvokeOnBeforeInsertSaleLineWorkflow(var SaleLinePOS: Record "Sale Line POS")
     var
         POSSalesWorkflowSetEntry: Record "POS Sales Workflow Set Entry";
         POSSalesWorkflowStep: Record "POS Sales Workflow Step";
@@ -824,8 +803,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.43 [319425]
     end;
 
-    [Scope('Personalization')]
-    procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "Sale Line POS")
+        procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "Sale Line POS")
     var
         POSSalesWorkflowSetEntry: Record "POS Sales Workflow Set Entry";
         POSSalesWorkflowStep: Record "POS Sales Workflow Step";

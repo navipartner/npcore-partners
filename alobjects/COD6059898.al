@@ -84,8 +84,7 @@ codeunit 6059898 "Data Log Subscriber Mgt."
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure CleanDataLog()
+        procedure CleanDataLog()
     var
         DataLogField: Record "Data Log Field";
         DataLogSetup: Record "Data Log Setup (Table)";
@@ -119,8 +118,7 @@ codeunit 6059898 "Data Log Subscriber Mgt."
         DataLogRecord.DeleteAll;
     end;
 
-    [Scope('Personalization')]
-    procedure GetNewRecords(SubscriberCode: Code[30];ModifySubscriber: Boolean;MaxRecords: Integer;var TempDataLogRecord: Record "Data Log Record" temporary) NewRecords: Boolean
+        procedure GetNewRecords(SubscriberCode: Code[30];ModifySubscriber: Boolean;MaxRecords: Integer;var TempDataLogRecord: Record "Data Log Record" temporary) NewRecords: Boolean
     var
         DataLogRecord: Record "Data Log Record";
         DataLogSubscriber: Record "Data Log Subscriber";
@@ -206,8 +204,7 @@ codeunit 6059898 "Data Log Subscriber Mgt."
         exit(TempDataLogRecord.FindSet);
     end;
 
-    [Scope('Personalization')]
-    procedure GetNewRecordsCompany(SubscriberCode: Code[30];SubscriberCompanyName: Text[30];ModifySubscriber: Boolean;MaxRecords: Integer;var TempDataLogRecord: Record "Data Log Record" temporary) NewRecords: Boolean
+        procedure GetNewRecordsCompany(SubscriberCode: Code[30];SubscriberCompanyName: Text[30];ModifySubscriber: Boolean;MaxRecords: Integer;var TempDataLogRecord: Record "Data Log Record" temporary) NewRecords: Boolean
     var
         DataLogRecord: Record "Data Log Record";
         DataLogSubscriber: Record "Data Log Subscriber";
@@ -317,8 +314,7 @@ codeunit 6059898 "Data Log Subscriber Mgt."
         //+DL9.14 [286526]
     end;
 
-    [Scope('Personalization')]
-    procedure ProcessNewRecords(SubscriberCode: Code[10])
+        procedure ProcessNewRecords(SubscriberCode: Code[10])
     var
         TempDataLogRecord: Record "Data Log Record" temporary;
     begin
@@ -331,8 +327,7 @@ codeunit 6059898 "Data Log Subscriber Mgt."
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure ProcessRecord(SubscriberCode: Code[10];DirectDataProcessing: Boolean;var RecordEntryNo: BigInteger)
+        procedure ProcessRecord(SubscriberCode: Code[10];DirectDataProcessing: Boolean;var RecordEntryNo: BigInteger)
     var
         DataLogSubscriber: Record "Data Log Subscriber";
         DataLogRecord: Record "Data Log Record";
@@ -352,8 +347,7 @@ codeunit 6059898 "Data Log Subscriber Mgt."
         until DataLogSubscriber.Next = 0;
     end;
 
-    [Scope('Personalization')]
-    procedure RestoreRecordToRecRef(RecordEntryNo: BigInteger;Previous: Boolean;var RecRef: RecordRef): Boolean
+        procedure RestoreRecordToRecRef(RecordEntryNo: BigInteger;Previous: Boolean;var RecRef: RecordRef): Boolean
     var
         DataLogRecord: Record "Data Log Record";
         DataLogField: Record "Data Log Field";

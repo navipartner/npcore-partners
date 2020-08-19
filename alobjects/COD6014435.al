@@ -1424,8 +1424,7 @@ codeunit 6014435 "Retail Form Code"
 
     end;
 
-    [Scope('Personalization')]
-    procedure FetchRegisterNumber(): Code[10]
+        procedure FetchRegisterNumber(): Code[10]
     var
         Register: Record Register;
         UserSetup: Record "User Setup";

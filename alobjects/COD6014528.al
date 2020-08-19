@@ -63,8 +63,7 @@ codeunit 6014528 "Barcode Library"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GenerateBarcode(BarCode: Code[20]; var TempBlob: Codeunit "Temp Blob")
+        procedure GenerateBarcode(BarCode: Code[20]; var TempBlob: Codeunit "Temp Blob")
     var
         MemoryStream: DotNet npNetMemoryStream;
         OutStream: OutStream;

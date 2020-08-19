@@ -15,8 +15,7 @@ codeunit 6150734 "POS Workflows 2.0 - State"
         ActionStateRecRef: array [1024] of RecordRef;
         ActionStateRecRefCounter: Integer;
 
-    [Scope('Personalization')]
-    procedure Constructor(FrontEndIn: Codeunit "POS Front End Management";ActionCodeIn: Text)
+        procedure Constructor(FrontEndIn: Codeunit "POS Front End Management";ActionCodeIn: Text)
     var
         JavaScriptInterface: Codeunit "POS JavaScript Interface";
         OldPOSSession: Codeunit "POS Session";
@@ -27,8 +26,7 @@ codeunit 6150734 "POS Workflows 2.0 - State"
         ActionState := ActionState.Dictionary();
     end;
 
-    [Scope('Personalization')]
-    procedure StoreActionState("Key": Text;"Object": Variant)
+        procedure StoreActionState("Key": Text;"Object": Variant)
     begin
         if Object.IsRecord then
           Object := StoreActionStateRecRef(Object);
@@ -37,14 +35,12 @@ codeunit 6150734 "POS Workflows 2.0 - State"
           FrontEnd.ReportBug(StrSubstNo(Text003,ActionCode,GetLastErrorText));
     end;
 
-    [Scope('Personalization')]
-    procedure RetrieveActionState("Key": Text;var "Object": Variant)
+        procedure RetrieveActionState("Key": Text;var "Object": Variant)
     begin
         Object := ActionState.Item(ActionCode + '.' + Key);
     end;
 
-    [Scope('Personalization')]
-    procedure RetrieveActionStateSafe("Key": Text;var "Object": Variant): Boolean
+        procedure RetrieveActionStateSafe("Key": Text;var "Object": Variant): Boolean
     begin
         if ActionState.ContainsKey(ActionCode + '.' + Key) then begin
           RetrieveActionState(Key,Object);
@@ -52,8 +48,7 @@ codeunit 6150734 "POS Workflows 2.0 - State"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure RetrieveActionStateRecordRef("Key": Text;var RecRef: RecordRef)
+        procedure RetrieveActionStateRecordRef("Key": Text;var RecRef: RecordRef)
     var
         Index: Integer;
     begin

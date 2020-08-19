@@ -32,8 +32,7 @@ codeunit 6151572 "AF API WebService"
         TaskCompleted: Label 'Task is completed by %1';
         TaskIsCompleted: Label 'Task was completed by %1';
 
-    [Scope('Personalization')]
-    procedure SendDefaultPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
+        procedure SendDefaultPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
     var
         AFNotificationHub: Record "AF Notification Hub";
     begin
@@ -50,8 +49,7 @@ codeunit 6151572 "AF API WebService"
         exit(AFNotificationHub.Id);
     end;
 
-    [Scope('Personalization')]
-    procedure SendAlertPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
+        procedure SendAlertPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
     var
         AFNotificationHub: Record "AF Notification Hub";
     begin
@@ -71,8 +69,7 @@ codeunit 6151572 "AF API WebService"
         exit(AFNotificationHub.Id);
     end;
 
-    [Scope('Personalization')]
-    procedure GetCustomerTag(): Text
+        procedure GetCustomerTag(): Text
     var
         AFSetup: Record "AF Setup";
     begin
@@ -103,8 +100,7 @@ codeunit 6151572 "AF API WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure SetNotificationFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+        procedure SetNotificationFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
@@ -142,8 +138,7 @@ codeunit 6151572 "AF API WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure SetNotificationHandledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+        procedure SetNotificationHandledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
@@ -178,8 +173,7 @@ codeunit 6151572 "AF API WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure SetNotificationCancelledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+        procedure SetNotificationCancelledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
@@ -211,8 +205,7 @@ codeunit 6151572 "AF API WebService"
         exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsCancelled, AFNotificationHub."Cancelled By")));
     end;
 
-    [Scope('Personalization')]
-    procedure SetNotificationCompletedFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+        procedure SetNotificationCompletedFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
@@ -248,8 +241,7 @@ codeunit 6151572 "AF API WebService"
             exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskIsCompleted, AFNotificationHub."Completed By")));
     end;
 
-    [Scope('Personalization')]
-    procedure GetNotificationStatus("Key": Code[10]): Text
+        procedure GetNotificationStatus("Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
@@ -268,8 +260,7 @@ codeunit 6151572 "AF API WebService"
         exit(BuildNotificationStatusResponse(AFNotificationHub, true, ''));
     end;
 
-    [Scope('Personalization')]
-    procedure GetVariantByItem(ItemNo: Code[20]): Text
+        procedure GetVariantByItem(ItemNo: Code[20]): Text
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -360,8 +351,7 @@ codeunit 6151572 "AF API WebService"
         exit(JObject.ToString);
     end;
 
-    [Scope('Personalization')]
-    procedure GetVariantByBarcode(Barcode: Code[20]): Text
+        procedure GetVariantByBarcode(Barcode: Code[20]): Text
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -458,8 +448,7 @@ codeunit 6151572 "AF API WebService"
         exit(JObject.ToString);
     end;
 
-    [Scope('Personalization')]
-    procedure GetReceiptAsPDF(SalesTicketNo: Code[20];ReportId: Integer): Text
+        procedure GetReceiptAsPDF(SalesTicketNo: Code[20];ReportId: Integer): Text
     var
         AuditRoll: Record "Audit Roll";
         TempFile: File;
@@ -574,8 +563,7 @@ codeunit 6151572 "AF API WebService"
 
     end;
 
-    [Scope('Personalization')]
-    procedure GetReportByJObjectAsBase64(JObjectTxt: Text): Text
+        procedure GetReportByJObjectAsBase64(JObjectTxt: Text): Text
     var
         TempFile: File;
         Filename: Text[1024];

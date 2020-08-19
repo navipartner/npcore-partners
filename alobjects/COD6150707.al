@@ -46,8 +46,7 @@ codeunit 6150707 "POS Payment Line"
         MinAmountLimit: Label 'Minimum payment amount for %1 is %2.';
         InvalidAmount: Label 'Amount %1 is not valid for payment type %2';
 
-    [Scope('Personalization')]
-    procedure Init(RegisterNoIn: Code[20];SalesTicketNoIn: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
+        procedure Init(RegisterNoIn: Code[20];SalesTicketNoIn: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
     begin
         Clear(Rec);
         with Rec do begin
@@ -79,8 +78,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.50 [300557]
     end;
 
-    [Scope('Personalization')]
-    procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+        procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         DataMgt: Codeunit "POS Data Management";
         SaleAmount: Decimal;
@@ -106,33 +104,28 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.38 [301053]
     end;
 
-    [Scope('Personalization')]
-    procedure SetPosition(Position: Text): Boolean
+        procedure SetPosition(Position: Text): Boolean
     begin
         Rec.SetPosition(Position);
         exit(Rec.Find);
     end;
 
-    [Scope('Personalization')]
-    procedure RefreshCurrent(): Boolean
+        procedure RefreshCurrent(): Boolean
     begin
         exit (Rec.Find());
     end;
 
-    [Scope('Personalization')]
-    procedure SetFirst()
+        procedure SetFirst()
     begin
         Rec.FindFirst ();
     end;
 
-    [Scope('Personalization')]
-    procedure SetLast()
+        procedure SetLast()
     begin
         Rec.FindLast ();
     end;
 
-    [Scope('Personalization')]
-    procedure GetCurrentPaymentLine(var PaymentLinePOS: Record "Sale Line POS")
+        procedure GetCurrentPaymentLine(var PaymentLinePOS: Record "Sale Line POS")
     begin
         //-NPR5.37 [288119]
         RefreshCurrent();
@@ -141,8 +134,7 @@ codeunit 6150707 "POS Payment Line"
         PaymentLinePOS.Copy (Rec);
     end;
 
-    [Scope('Personalization')]
-    procedure CalculateBalance(var SaleAmount: Decimal;var PaidAmount: Decimal;var ReturnAmount: Decimal;var Subtotal: Decimal)
+        procedure CalculateBalance(var SaleAmount: Decimal;var PaidAmount: Decimal;var ReturnAmount: Decimal;var Subtotal: Decimal)
     var
         PaymentLine: Record "Sale Line POS";
         PaymentType: Record "Payment Type POS";
@@ -283,8 +275,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.37 [293084]
     end;
 
-    [Scope('Personalization')]
-    procedure GetNextLineNo() NextLineNo: Integer
+        procedure GetNextLineNo() NextLineNo: Integer
     var
         SaleLinePOS: Record "Sale Line POS";
     begin
@@ -302,8 +293,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.37 [293084]
     end;
 
-    [Scope('Personalization')]
-    procedure GetPaymentLine(var PaymentLinePOS: Record "Sale Line POS")
+        procedure GetPaymentLine(var PaymentLinePOS: Record "Sale Line POS")
     begin
         SetPaymentLineType (PaymentLinePOS);
     end;
@@ -319,8 +309,7 @@ codeunit 6150707 "POS Payment Line"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure InsertPaymentLine(Line: Record "Sale Line POS";ForeignCurrencyAmount: Decimal) Return: Boolean
+        procedure InsertPaymentLine(Line: Record "Sale Line POS";ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
 
         ValidatePaymentLine (Line);
@@ -356,8 +345,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.46 [329523]
     end;
 
-    [Scope('Personalization')]
-    procedure DeleteLine()
+        procedure DeleteLine()
     begin
 
         //-NPR5.37 [293979]
@@ -428,8 +416,7 @@ codeunit 6150707 "POS Payment Line"
         end
     end;
 
-    [Scope('Personalization')]
-    local procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "Sale Line POS")
+        local procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "Sale Line POS")
     var
         PaymentType: Record "Payment Type POS";
         Currency: Record Currency;
@@ -477,8 +464,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.50 [354832]
     end;
 
-    [Scope('Personalization')]
-    procedure GetPaymentType(var PaymentTypePosOut: Record "Payment Type POS";PaymentTypeCode: Code[10];RegisterNo: Code[10]): Boolean
+        procedure GetPaymentType(var PaymentTypePosOut: Record "Payment Type POS";PaymentTypeCode: Code[10];RegisterNo: Code[10]): Boolean
     begin
 
         if (PaymentTypePosOut.Get (PaymentTypeCode, RegisterNo)) then
@@ -487,8 +473,7 @@ codeunit 6150707 "POS Payment Line"
         exit (PaymentTypePosOut.Get (PaymentTypeCode, ''));
     end;
 
-    [Scope('Personalization')]
-    procedure CalculateMinimumReturnAmount(PaymentTypePOS: Record "Payment Type POS") ret: Decimal
+        procedure CalculateMinimumReturnAmount(PaymentTypePOS: Record "Payment Type POS") ret: Decimal
     var
         Kasse: Record Register;
         Betalingsvalg: Record "Payment Type POS";
@@ -497,8 +482,7 @@ codeunit 6150707 "POS Payment Line"
         ret := Round (PaymentTypePOS."Rounding Precision" / 2, 0.001, '=');
     end;
 
-    [Scope('Personalization')]
-    procedure CalculateForeignAmount(PaymentTypePOS: Record "Payment Type POS";AmountLCY: Decimal) Amount: Decimal
+        procedure CalculateForeignAmount(PaymentTypePOS: Record "Payment Type POS";AmountLCY: Decimal) Amount: Decimal
     begin
 
         if (PaymentTypePOS."Fixed Rate" <> 0) then
@@ -507,8 +491,7 @@ codeunit 6150707 "POS Payment Line"
           Amount := AmountLCY;
     end;
 
-    [Scope('Personalization')]
-    procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal;PaidAmount: Decimal;PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";AllowNegativePaymentBalance: Boolean): Decimal
+        procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal;PaidAmount: Decimal;PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";AllowNegativePaymentBalance: Boolean): Decimal
     var
         Balance: Decimal;
         ReturnRoundedBalance: Decimal;
@@ -543,8 +526,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.38 [300957]
     end;
 
-    [Scope('Personalization')]
-    procedure CalculateRemainingPaymentSuggestionInCurrentSale(PaymentTypePOS: Record "Payment Type POS"): Decimal
+        procedure CalculateRemainingPaymentSuggestionInCurrentSale(PaymentTypePOS: Record "Payment Type POS"): Decimal
     var
         SaleAmount: Decimal;
         PaidAmount: Decimal;
@@ -566,8 +548,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.46 [290734]
     end;
 
-    [Scope('Personalization')]
-    procedure RoundAmount(PaymentTypePOS: Record "Payment Type POS";Amount: Decimal): Decimal
+        procedure RoundAmount(PaymentTypePOS: Record "Payment Type POS";Amount: Decimal): Decimal
     begin
 
         if (PaymentTypePOS."Rounding Precision" = 0) then

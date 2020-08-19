@@ -8,8 +8,7 @@ codeunit 6151166 "NpGp POS Sales Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure InsertPosSalesEntries(var sales_entries: XMLport "NpGp POS Entries")
+        procedure InsertPosSalesEntries(var sales_entries: XMLport "NpGp POS Entries")
     var
         TempNpGpPOSSalesEntry: Record "NpGp POS Sales Entry" temporary;
         TempNpGpPOSSalesLine: Record "NpGp POS Sales Line" temporary;
@@ -22,8 +21,7 @@ codeunit 6151166 "NpGp POS Sales Webservice"
         NpGpPOSSalesInitMgt.InsertPosSalesEntries(TempNpGpPOSSalesEntry,TempNpGpPOSSalesLine,TempNpGpPOSInfoPOSEntry);
     end;
 
-    [Scope('Personalization')]
-    procedure GetGlobalSale(referenceNumber: Text;fullSale: Boolean;var npGpPOSEntries: XMLport "NpGp POS Entries")
+        procedure GetGlobalSale(referenceNumber: Text;fullSale: Boolean;var npGpPOSEntries: XMLport "NpGp POS Entries")
     var
         TempNpGpPOSSalesEntry: Record "NpGp POS Sales Entry" temporary;
         TempNpGpPOSSalesLine: Record "NpGp POS Sales Line" temporary;

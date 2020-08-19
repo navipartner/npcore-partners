@@ -130,8 +130,7 @@ page 6151335 "NP Retail Resturant Cue"
     end;
 
 
-    [Scope('Personalization')]
-    procedure DrilldownGrossTurnover()
+        procedure DrilldownGrossTurnover()
     var
         POSEntry: Record "POS Entry";
     begin
@@ -142,8 +141,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(Page::"POS Entries", POSEntry);
     end;
 
-    [Scope('Personalization')]
-    procedure DrilldownAmountPerGuest()
+        procedure DrilldownAmountPerGuest()
     var
         POSEntry: Record "POS Entry";
     begin
@@ -156,8 +154,7 @@ page 6151335 "NP Retail Resturant Cue"
 
 
 
-    [Scope('Personalization')]
-    procedure DrilldownDownOccuipedtable()
+        procedure DrilldownDownOccuipedtable()
     var
         seating: Record "NPRE Seating";
 
@@ -167,8 +164,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-    [Scope('Personalization')]
-    procedure DrilldownDownFreetable()
+        procedure DrilldownDownFreetable()
     var
         seating: Record "NPRE Seating";
 
@@ -178,8 +174,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-    [Scope('Personalization')]
-    procedure DrilldownDownInhouseguests()
+        procedure DrilldownDownInhouseguests()
     var
         seating: Record "NPRE Seating";
     begin
@@ -188,8 +183,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-    [Scope('Personalization')]
-    procedure DrilldownDownAvailableseats()
+        procedure DrilldownDownAvailableseats()
     var
         seating: Record "NPRE Seating";
 
@@ -199,8 +193,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-    [Scope('Personalization')]
-    procedure DrilldownTransaction()
+        procedure DrilldownTransaction()
     var
         POSEntry: Record "POS Entry";
     begin

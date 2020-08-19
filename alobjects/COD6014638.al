@@ -129,8 +129,7 @@ codeunit 6014638 "Dynamic Module Item Wsht Setup"
         RetailJournalLine.Insert(false);
     end;
 
-    [Scope('Personalization')]
-    procedure GetModuleName(): Text
+        procedure GetModuleName(): Text
     begin
         exit('Item Worksheet Setup');
     end;

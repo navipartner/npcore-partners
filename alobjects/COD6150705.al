@@ -73,8 +73,7 @@ codeunit 6150705 "POS Sale"
         ERROR_AFTER_END_SALE: Label 'An error occurred after the sale ended: %1';
         IsMock: Boolean;
 
-    [Scope('Personalization')]
-    procedure InitializeAtLogin(RegisterIn: Record Register;SetupIn: Codeunit "POS Setup")
+        procedure InitializeAtLogin(RegisterIn: Record Register;SetupIn: Codeunit "POS Setup")
     begin
         Register := RegisterIn;
         Setup := SetupIn;
@@ -82,8 +81,7 @@ codeunit 6150705 "POS Sale"
         OnAfterInitializeAtLogin(Register);
     end;
 
-    [Scope('Personalization')]
-    procedure InitializeNewSale(RegisterIn: Record Register;FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";ThisIn: Codeunit "POS Sale")
+        procedure InitializeNewSale(RegisterIn: Record Register;FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";ThisIn: Codeunit "POS Sale")
     var
         ViewType: DotNet npNetViewType0;
     begin
@@ -183,15 +181,13 @@ codeunit 6150705 "POS Sale"
 
     end;
 
-    [Scope('Personalization')]
-    procedure GetContext(var SaleLineOut: Codeunit "POS Sale Line";var PaymentLineOut: Codeunit "POS Payment Line")
+        procedure GetContext(var SaleLineOut: Codeunit "POS Sale Line";var PaymentLineOut: Codeunit "POS Payment Line")
     begin
         SaleLineOut := SaleLine;
         PaymentLineOut := PaymentLine;
     end;
 
-    [Scope('Personalization')]
-    procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+        procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         TempRec: Record "Sale POS" temporary;
         DataMgt: Codeunit "POS Data Management";
@@ -212,21 +208,18 @@ codeunit 6150705 "POS Sale"
         //+NPR5.38 [301053]
     end;
 
-    [Scope('Personalization')]
-    procedure SetPosition(Position: Text): Boolean
+        procedure SetPosition(Position: Text): Boolean
     begin
         Rec.SetPosition(Position);
         exit(Rec.Find);
     end;
 
-    [Scope('Personalization')]
-    procedure GetCurrentSale(var SalePOS: Record "Sale POS")
+        procedure GetCurrentSale(var SalePOS: Record "Sale POS")
     begin
         SalePOS.Copy (Rec);
     end;
 
-    [Scope('Personalization')]
-    procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal;var LastSalePaymentOut: Decimal;var LastSaleDateTextOut: Text;var LastSaleReturnAmountOut: Decimal;var LastReceiptNoOut: Text)
+        procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal;var LastSalePaymentOut: Decimal;var LastSaleDateTextOut: Text;var LastSaleReturnAmountOut: Decimal;var LastReceiptNoOut: Text)
     var
         TouchScreenFunctions: Codeunit "Touch Screen - Functions";
     begin
@@ -247,8 +240,7 @@ codeunit 6150705 "POS Sale"
         LastReceiptNoOut := LastReceiptNo;
     end;
 
-    [Scope('Personalization')]
-    procedure GetModified() Result: Boolean
+        procedure GetModified() Result: Boolean
     begin
         Result := IsModified or (not Initialized);
         IsModified := false;
@@ -261,8 +253,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.45 [323780]
     end;
 
-    [Scope('Personalization')]
-    procedure GetTotals(var SalesAmountOut: Decimal;var PaidAmountOut: Decimal;var ChangeAmountOut: Decimal;var RoundingAmountOut: Decimal)
+        procedure GetTotals(var SalesAmountOut: Decimal;var PaidAmountOut: Decimal;var ChangeAmountOut: Decimal;var RoundingAmountOut: Decimal)
     var
         ReturnAmount: Decimal;
         SubTotal: Decimal;
@@ -278,8 +269,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.38 [298025]
     end;
 
-    [Scope('Personalization')]
-    procedure Modify(RunTriggers: Boolean;ReturnValue: Boolean) Result: Boolean
+        procedure Modify(RunTriggers: Boolean;ReturnValue: Boolean) Result: Boolean
     begin
 
         if ReturnValue then begin
@@ -292,8 +282,7 @@ codeunit 6150705 "POS Sale"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure Refresh(var SalePOS: Record "Sale POS")
+        procedure Refresh(var SalePOS: Record "Sale POS")
     begin
         Rec.Copy(SalePOS);
 
@@ -302,8 +291,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.46 [329523]
     end;
 
-    [Scope('Personalization')]
-    procedure RefreshCurrent()
+        procedure RefreshCurrent()
     var
         LocalSaleLinePOS: Record "Sale Line POS";
     begin
@@ -317,8 +305,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.46 [329523]
     end;
 
-    [Scope('Personalization')]
-    procedure SetDimension(DimCode: Code[20];DimValue: Code[20])
+        procedure SetDimension(DimCode: Code[20];DimValue: Code[20])
     var
         Dim: Record Dimension;
         DimVal: Record "Dimension Value";
@@ -358,8 +345,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.34 [283019]
     end;
 
-    [Scope('Personalization')]
-    procedure SetShortcutDimCode1(DimensionValue: Code[20])
+        procedure SetShortcutDimCode1(DimensionValue: Code[20])
     begin
 
         //-NPR5.34 [283019]
@@ -367,14 +353,12 @@ codeunit 6150705 "POS Sale"
         //+NPR5.34 [283019]
     end;
 
-    [Scope('Personalization')]
-    procedure SetShortcutDimCode2(DimensionValue: Code[20])
+        procedure SetShortcutDimCode2(DimensionValue: Code[20])
     begin
         Rec.Validate (Rec."Shortcut Dimension 2 Code", DimensionValue);
     end;
 
-    [Scope('Personalization')]
-    procedure TryEndSale(POSSession: Codeunit "POS Session"): Boolean
+        procedure TryEndSale(POSSession: Codeunit "POS Session"): Boolean
     begin
         //-NPR5.54 [364658]
         exit(TryEndSale2(POSSession, true));
@@ -418,8 +402,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.54 [364658]
     end;
 
-    [Scope('Personalization')]
-    procedure TryEndSaleWithBalancing(POSSession: Codeunit "POS Session";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS"): Boolean
+        procedure TryEndSaleWithBalancing(POSSession: Codeunit "POS Session";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS"): Boolean
     var
         SalesAmount: Decimal;
         PaidAmount: Decimal;
@@ -507,8 +490,7 @@ codeunit 6150705 "POS Sale"
         exit (POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false) = 0);
     end;
 
-    [Scope('Personalization')]
-    procedure SelectViewForEndOfSale(POSSession: Codeunit "POS Session")
+        procedure SelectViewForEndOfSale(POSSession: Codeunit "POS Session")
     var
         POSViewProfile: Record "POS View Profile";
     begin
@@ -539,8 +521,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.55 [406862]
     end;
 
-    [Scope('Personalization')]
-    procedure LoadSavedSale(var SalePOS: Record "Sale POS")
+        procedure LoadSavedSale(var SalePOS: Record "Sale POS")
     var
         SaleLinePOS: Record "Sale Line POS";
         SaleLinePOS1: Record "Sale Line POS";
@@ -643,8 +624,7 @@ codeunit 6150705 "POS Sale"
         OnAfterLoadSavedSale (SalePOS."Sales Ticket No.", Rec."Sales Ticket No.");
     end;
 
-    [Scope('Personalization')]
-    procedure SaveSale()
+        procedure SaveSale()
     var
         FormCode: Codeunit "Retail Form Code";
         TouchScreenFunctions: Codeunit "Touch Screen - Functions";
@@ -915,8 +895,7 @@ codeunit 6150705 "POS Sale"
         //+NPR5.39 [302779]
     end;
 
-    [Scope('Personalization')]
-    procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "Sale POS")
+        procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "Sale POS")
     var
         POSUnit: Record "POS Unit";
         POSSalesWorkflowSetEntry: Record "POS Sales Workflow Set Entry";
