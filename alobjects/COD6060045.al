@@ -55,8 +55,7 @@ codeunit 6060045 "Item Wsht.-Check Line"
         Text132: Label '%1 %2 not found.';
         Text133: Label ' - %1: %2';
 
-    [Scope('Personalization')]
-    procedure RunCheck(ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean; CalledFromRegister: Boolean)
+        procedure RunCheck(ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean; CalledFromRegister: Boolean)
     var
         RecItem: Record Item;
         NoSeries: Record "No. Series";

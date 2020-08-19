@@ -68,8 +68,7 @@ codeunit 6059823 "NPR TransferOrder-Post + Print"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure PrintReport(TransHeaderSource: Record "Transfer Header";Selection: Option " ",Shipment,Receipt)
+        procedure PrintReport(TransHeaderSource: Record "Transfer Header";Selection: Option " ",Shipment,Receipt)
     begin
         with TransHeaderSource do
           case Selection of

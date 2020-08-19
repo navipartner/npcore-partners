@@ -22,8 +22,7 @@ codeunit 6060110 "TM Statistics WebService"
         Build2DimensionalStatistics (FromDate, UntilDate, TmpLineFacts."Fact Name", TmpColumnFacts."Fact Name", TmpTicketAccessStatistics, TmpLineFacts, TmpColumnFacts);
     end;
 
-    [Scope('Personalization')]
-    procedure GetNDimTicketStatistics(var TicketStatistics: XMLport "TM Ticket Statistics N-Dim")
+        procedure GetNDimTicketStatistics(var TicketStatistics: XMLport "TM Ticket Statistics N-Dim")
     var
         FromDate: Date;
         UntilDate: Date;
@@ -38,8 +37,7 @@ codeunit 6060110 "TM Statistics WebService"
         TicketStatistics.SetResponse (TmpTicketAccessStatistics);
     end;
 
-    [Scope('Personalization')]
-    procedure Get2DimTicketStatistics(var TicketStatistics: XMLport "TM Ticket Statistics 2-Dim")
+        procedure Get2DimTicketStatistics(var TicketStatistics: XMLport "TM Ticket Statistics 2-Dim")
     var
         FromDate: Date;
         UntilDate: Date;
@@ -97,8 +95,7 @@ codeunit 6060110 "TM Statistics WebService"
         exit (true);
     end;
 
-    [Scope('Personalization')]
-    procedure Build2DimensionalStatistics(FromDate: Date;UntilDate: Date;Dim1: Option;Dim2: Option;var Tmp2DimStatistics: Record "TM Ticket Access Statistics" temporary;var TmpLineFacts: Record "TM Ticket Access Fact" temporary;var TmpColumnFacts: Record "TM Ticket Access Fact" temporary)
+        procedure Build2DimensionalStatistics(FromDate: Date;UntilDate: Date;Dim1: Option;Dim2: Option;var Tmp2DimStatistics: Record "TM Ticket Access Statistics" temporary;var TmpLineFacts: Record "TM Ticket Access Fact" temporary;var TmpColumnFacts: Record "TM Ticket Access Fact" temporary)
     var
         TmpTicketAccessStatistics: Record "TM Ticket Access Statistics" temporary;
         TicketAccessStatistics: Codeunit "TM Ticket Access Statistics";

@@ -12,8 +12,7 @@ codeunit 6151503 "Nc Webservice"
         FileMgt: Codeunit "File Management";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
 
-    [Scope('Personalization')]
-    procedure ImportIncommingDocuments(var documents: XMLport "Nc Import Entry")
+        procedure ImportIncommingDocuments(var documents: XMLport "Nc Import Entry")
     var
         ImportEntry: Record "Nc Import Entry";
         TempImportEntry: Record "Nc Import Entry" temporary;

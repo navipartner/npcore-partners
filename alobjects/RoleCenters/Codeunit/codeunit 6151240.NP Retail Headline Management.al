@@ -19,8 +19,7 @@ codeunit 6151240 "NP Retail Headline Management"
         SimpleAfternoonGreetingTxt: Label 'Good afternoon!', Comment = ' This is displayed between 14:00 and 18:59.';
         SimpleEveningGreetingTxt: Label 'Good evening!', Comment = ' This is displayed between 19:00 and 23:59.';
 
-    [Scope('Personalization')]
-    procedure Truncate(TextToTruncate: Text; MaxLength: Integer): Text
+        procedure Truncate(TextToTruncate: Text; MaxLength: Integer): Text
     begin
         if StrLen(TextToTruncate) <= MaxLength then
             exit(TextToTruncate);
@@ -34,15 +33,13 @@ codeunit 6151240 "NP Retail Headline Management"
         exit(CopyStr(TextToTruncate, 1, MaxLength - 3) + '...');
     end;
 
-    [Scope('Personalization')]
-    procedure Emphasize(TextToEmphasize: Text): Text
+        procedure Emphasize(TextToEmphasize: Text): Text
     begin
         if TextToEmphasize <> '' then
             exit(StrSubstNo('<emphasize>%1</emphasize>', TextToEmphasize));
     end;
 
-    [Scope('Personalization')]
-    procedure GetHeadlineText(Qualifier: Text; Payload: Text; var ResultText: Text[250]): Boolean
+        procedure GetHeadlineText(Qualifier: Text; Payload: Text; var ResultText: Text[250]): Boolean
     var
         RegExMgt: Codeunit DotNet_Regex;
         PayloadWithoutEmphasize: Text[158];
@@ -81,8 +78,7 @@ codeunit 6151240 "NP Retail Headline Management"
             exit(StrSubstNo('<qualifier>%1</qualifier>', QualifierText));
     end;
 
-    [Scope('Personalization')]
-    procedure GetUserGreetingText(var GreetingText: Text[250])
+        procedure GetUserGreetingText(var GreetingText: Text[250])
     var
         User: Record User;
     begin
@@ -90,8 +86,7 @@ codeunit 6151240 "NP Retail Headline Management"
         GetUserGreetingTextInternal(User."Full Name", GetTimeOfDay, GreetingText);
     end;
 
-    [Scope('Personalization')]
-    procedure GetUserGreetingTextInternal(UserName: Text[80]; CurrentTimeOfDay: Option; var GreetingText: Text[250])
+        procedure GetUserGreetingTextInternal(UserName: Text[80]; CurrentTimeOfDay: Option; var GreetingText: Text[250])
     var
         RegExMgt: Codeunit DotNet_Regex;
         UserNameFound: Boolean;
@@ -157,8 +152,7 @@ codeunit 6151240 "NP Retail Headline Management"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure ShouldUserGreetingBeVisible(): Boolean
+        procedure ShouldUserGreetingBeVisible(): Boolean
     var
         UserLoginTimeTracker: Codeunit "User Login Time Tracker";
         LimitDateTime: DateTime;
@@ -167,20 +161,17 @@ codeunit 6151240 "NP Retail Headline Management"
         exit(UserLoginTimeTracker.UserLoggedInSinceDateTime(LimitDateTime));
     end;
 
-    [Scope('Personalization')]
-    procedure GetMaxQualifierLength(): Integer
+        procedure GetMaxQualifierLength(): Integer
     begin
         exit(50);
     end;
 
-    [Scope('Personalization')]
-    procedure GetMaxPayloadLength(): Integer
+        procedure GetMaxPayloadLength(): Integer
     begin
         exit(75);
     end;
 
-    [Scope('Personalization')]
-    procedure ScheduleTask(CodeunitId: Integer)
+        procedure ScheduleTask(CodeunitId: Integer)
     var
         JobQueueEntry: Record "Job Queue Entry";
         DummyRecordId: RecordID;
@@ -222,8 +213,7 @@ codeunit 6151240 "NP Retail Headline Management"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GetTopSalesToday(var HigestTodaySales: Text[250])
+        procedure GetTopSalesToday(var HigestTodaySales: Text[250])
     var
         User: Record User;
         POSEntry: Record "POS Entry";
@@ -246,8 +236,7 @@ codeunit 6151240 "NP Retail Headline Management"
 
     end;
 
-    [Scope('Personalization')]
-    procedure GetTopSalesPersonToday(var TopSalesPerson: Text[50])
+        procedure GetTopSalesPersonToday(var TopSalesPerson: Text[50])
     var
         User: Record User;
         SalesPerson: Record "Salesperson/Purchaser";
@@ -272,8 +261,7 @@ codeunit 6151240 "NP Retail Headline Management"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure GetMyPickToday(var MyPickText: Text[250])
+        procedure GetMyPickToday(var MyPickText: Text[250])
     var
         WarehouseActivityHdr: Record "Warehouse Activity Header";
     begin
@@ -282,8 +270,7 @@ codeunit 6151240 "NP Retail Headline Management"
         MyPickText := Format(WarehouseActivityHdr.Count);
     end;
 
-    [Scope('Personalization')]
-    procedure GetMyPutAwayToday(var AwayPickText: Text[50])
+        procedure GetMyPutAwayToday(var AwayPickText: Text[50])
     var
         WarehouseActivityHdr: Record "Warehouse Activity Header";
     begin
@@ -293,8 +280,7 @@ codeunit 6151240 "NP Retail Headline Management"
     end;
 
 
-    [Scope('Personalization')]
-    procedure GetHighestPOSSalesText(var highestPOSSales: Text)
+        procedure GetHighestPOSSalesText(var highestPOSSales: Text)
     var
         User: Record User;
         POSEntry: Record "POS Entry";
@@ -316,8 +302,7 @@ codeunit 6151240 "NP Retail Headline Management"
     end;
 
 
-    [Scope('Personalization')]
-    procedure GetHighestSalesInvText(var highestSalesInv: Text)
+        procedure GetHighestSalesInvText(var highestSalesInv: Text)
     var
         User: Record User;
         SalesInvHdr: Record "Sales Invoice Header";
@@ -339,8 +324,7 @@ codeunit 6151240 "NP Retail Headline Management"
 
     end;
 
-    [Scope('Personalization')]
-    procedure GetTopSalesPersonText(var TopSalesPersonText: Text)
+        procedure GetTopSalesPersonText(var TopSalesPersonText: Text)
     var
         User: Record User;
         SalesPerson: Record "Salesperson/Purchaser";
@@ -372,8 +356,7 @@ codeunit 6151240 "NP Retail Headline Management"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure GetAverageBasket(var AvgBasket: decimal)
+        procedure GetAverageBasket(var AvgBasket: decimal)
     var
         PosEntry: Record "POS Entry";
         Turnover: Decimal;
@@ -403,8 +386,7 @@ codeunit 6151240 "NP Retail Headline Management"
     end;
 
 
-    [Scope('Personalization')]
-    procedure GetissuedTicketToday(var AvgIssued: Text[250])
+        procedure GetissuedTicketToday(var AvgIssued: Text[250])
     var
         TMTicketType: Record "TM Ticket";
 
@@ -416,8 +398,7 @@ codeunit 6151240 "NP Retail Headline Management"
 
     end;
 
-    [Scope('Personalization')]
-    procedure GetTicketAdmissionToday(var AvgAdmission: Text[250])
+        procedure GetTicketAdmissionToday(var AvgAdmission: Text[250])
     var
         TMAdmissionScheduleLines: Record "TM Admission Schedule Lines";
 
@@ -428,8 +409,7 @@ codeunit 6151240 "NP Retail Headline Management"
     end;
 
 
-    [Scope('Personalization')]
-    procedure GetMembersCreatedToday(var AvgMember: Text[250])
+        procedure GetMembersCreatedToday(var AvgMember: Text[250])
     var
         MMMember: Record "MM Membership";
     begin
@@ -450,8 +430,7 @@ codeunit 6151240 "NP Retail Headline Management"
         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
     end;
 
-    [Scope('Personalization')]
-    procedure CalcSalesThisMonthAmountLastYear(CalledFromWebService: Boolean) Amount: Decimal
+        procedure CalcSalesThisMonthAmountLastYear(CalledFromWebService: Boolean) Amount: Decimal
     var
         ILE: Record "Item Ledger Entry";
     begin

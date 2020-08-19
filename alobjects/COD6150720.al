@@ -16,16 +16,14 @@ codeunit 6150720 "POS Caption Management"
         Text002: Label 'Caption with ID %1 has already been added to the front end, and an attempt was made to add it again. The original caption value is retained.';
         Text003: Label 'There have been %1 duplicate captions detected during action initialization. This indicates a programming issue, most likely an action codeunit that uses the same action ID as another action codeunit. Please check the front-end log for warnings to learn which captions are duplicated.';
 
-    [Scope('Personalization')]
-    procedure Initialize(var FrontEndIn: Codeunit "POS Front End Management")
+        procedure Initialize(var FrontEndIn: Codeunit "POS Front End Management")
     begin
         FrontEnd := FrontEndIn;
         Captions := Captions.Dictionary;
         Initialized := true;
     end;
 
-    [Scope('Personalization')]
-    procedure Finalize(CaptionsOut: DotNet npNetDictionary_Of_T_U)
+        procedure Finalize(CaptionsOut: DotNet npNetDictionary_Of_T_U)
     var
         KeyValuePair: DotNet npNetKeyValuePair_Of_T_U;
         DuplicateWarning: Text;
@@ -65,15 +63,13 @@ codeunit 6150720 "POS Caption Management"
         Target.Add(CaptionId,CaptionText);
     end;
 
-    [Scope('Personalization')]
-    procedure AddCaption(CaptionId: Text;CaptionText: Text)
+        procedure AddCaption(CaptionId: Text;CaptionText: Text)
     begin
         FailIfNotInitialized();
         AddCaptionToCollection(Captions,CaptionId,CaptionText,true);
     end;
 
-    [Scope('Personalization')]
-    procedure AddActionCaption(ActionCode: Text;CaptionId: Text;CaptionText: Text)
+        procedure AddActionCaption(ActionCode: Text;CaptionId: Text;CaptionText: Text)
     begin
         AddCaption(ActionCode + '.' + CaptionId,CaptionText);
     end;

@@ -12,8 +12,7 @@ codeunit 6151300 "NpEc Webservice"
         Text001: Label 'Post Sales Order';
         Text002: Label 'Delete Sales Order';
 
-    [Scope('Personalization')]
-    procedure CreateSalesOrder(var sales_orders: XMLport "NpEc Sales Order Import")
+        procedure CreateSalesOrder(var sales_orders: XMLport "NpEc Sales Order Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NcSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -38,8 +37,7 @@ codeunit 6151300 "NpEc Webservice"
           Error(NcImportMgt.GetErrorMessage(ImportEntry,false));
     end;
 
-    [Scope('Personalization')]
-    procedure PostSalesOrder(var sales_orders: XMLport "NpEc Sales Order Import")
+        procedure PostSalesOrder(var sales_orders: XMLport "NpEc Sales Order Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NcSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -65,8 +63,7 @@ codeunit 6151300 "NpEc Webservice"
           Error(NcImportMgt.GetErrorMessage(ImportEntry,false));
     end;
 
-    [Scope('Personalization')]
-    procedure DeleteSalesOrder(var sales_orders: XMLport "NpEc Sales Order Import")
+        procedure DeleteSalesOrder(var sales_orders: XMLport "NpEc Sales Order Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NcSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -92,8 +89,7 @@ codeunit 6151300 "NpEc Webservice"
           Error(NcImportMgt.GetErrorMessage(ImportEntry,false));
     end;
 
-    [Scope('Personalization')]
-    procedure CreatePurchaseInvoice(var purchase_invoices: XMLport "NpEc Purch. Invoice Import")
+        procedure CreatePurchaseInvoice(var purchase_invoices: XMLport "NpEc Purch. Invoice Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NcImportType: Record "Nc Import Type";

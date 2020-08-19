@@ -11,8 +11,7 @@ codeunit 6014680 "Endpoint Query WebService"
         SETUP_MISSING: Label 'Setup is missing for %1';
         FileMan: Codeunit "File Management";
 
-    [Scope('Personalization')]
-    procedure Createendpointquery(var EndpointQueryWebImport: XMLport "Endpoint Query Web Import")
+        procedure Createendpointquery(var EndpointQueryWebImport: XMLport "Endpoint Query Web Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";

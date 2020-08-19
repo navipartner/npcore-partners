@@ -8,8 +8,7 @@ codeunit 6014698 "Mnm Webservices"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GetNavObjects(var objects: XMLport "Mnm Export Nav Objects")
+        procedure GetNavObjects(var objects: XMLport "Mnm Export Nav Objects")
     begin
         //-NPR5.37 [294593]
         //CLEAR(objects);

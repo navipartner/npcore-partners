@@ -71,8 +71,7 @@ codeunit 6151372 "CS WS"
         Txt024: Label 'Document can''t be closed when there is no tags collected';
         NoRfidModelsInDBErr: Label 'There are no Rfid models set up in "%1" please make sure that either values are available or the "%2" check in %3 is switched off';
 
-    [Scope('Personalization')]
-    procedure ProcessDocument(var Document: Text)
+        procedure ProcessDocument(var Document: Text)
     var
         XMLDOMManagement: Codeunit "XML DOM Management";
         InputXmlDocument: DotNet npNetXmlDocument;
@@ -93,8 +92,7 @@ codeunit 6151372 "CS WS"
         CSHelperFunctions.UpdateLogEntry(CSCommunicationLog, 'ProcessDocument', IsInternal, InternalCallId, Document, LogCommunication, '');
     end;
 
-    [Scope('Personalization')]
-    procedure ProcessData(DeviceId: Code[10]; BatchId: Text; BatchNo: Text; PostData: Text; StockTakeConfig: Text; WorksheetName: Text; var Data: Text)
+        procedure ProcessData(DeviceId: Code[10]; BatchId: Text; BatchNo: Text; PostData: Text; StockTakeConfig: Text; WorksheetName: Text; var Data: Text)
     var
         CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
         OK: Boolean;
@@ -163,15 +161,13 @@ codeunit 6151372 "CS WS"
         CSStockTakeHandlingRfid.Modify(false);
     end;
 
-    [Scope('Personalization')]
-    procedure IsInternalCall(LocalIsInternal: Boolean; LocalId: Guid)
+        procedure IsInternalCall(LocalIsInternal: Boolean; LocalId: Guid)
     begin
         IsInternal := LocalIsInternal;
         InternalCallId := LocalId;
     end;
 
-    [Scope('Personalization')]
-    procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
+        procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
     var
         Item: Record Item;
         BarcodeLibrary: Codeunit "Barcode Library";
@@ -235,8 +231,7 @@ codeunit 6151372 "CS WS"
         exit(StrSubstNo('%1#%2', DetailTxt, MasterTxt));
     end;
 
-    [Scope('Personalization')]
-    procedure GetItemPicture(Barcode: Code[20]) PictureBase64: Text
+        procedure GetItemPicture(Barcode: Code[20]) PictureBase64: Text
     var
         Item: Record Item;
         BarcodeLibrary: Codeunit "Barcode Library";
@@ -260,8 +255,7 @@ codeunit 6151372 "CS WS"
         //+NPR5.53 [374331]
     end;
 
-    [Scope('Personalization')]
-    procedure SearchItem(Word: Text): Text
+        procedure SearchItem(Word: Text): Text
     var
         CSItemSeachHandling: Record "CS Item Seach Handling" temporary;
         Item: Record Item;
@@ -376,16 +370,14 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure GetRfidOfflineDataDelta(DeviceId: Code[20]): Text
+        procedure GetRfidOfflineDataDelta(DeviceId: Code[20]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
     begin
         exit(CSHelperFunctions.CreateOfflineRfidDataDelta(DeviceId));
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateRfidDeviceInfo(DeviceId: Code[20]; Lasttimestamp: Text; Location: Code[20]): Text
+        procedure UpdateRfidDeviceInfo(DeviceId: Code[20]; Lasttimestamp: Text; Location: Code[20]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
         Timestamp: BigInteger;
@@ -399,16 +391,14 @@ codeunit 6151372 "CS WS"
         exit(CSHelperFunctions.UpdateDeviceInfo(DeviceId, Timestamp, Location));
     end;
 
-    [Scope('Personalization')]
-    procedure GetRefillData(StockTakeId: Text): Text
+        procedure GetRefillData(StockTakeId: Text): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
     begin
         exit(CSHelperFunctions.CreateRefillData(StockTakeId));
     end;
 
-    [Scope('Personalization')]
-    procedure GetRfidTagData(TagId: Text): Text
+        procedure GetRfidTagData(TagId: Text): Text
     var
         CSRfidData: Record "CS Rfid Data";
         CSRfidTagModels: Record "CS Rfid Tag Models";
@@ -436,8 +426,7 @@ codeunit 6151372 "CS WS"
             exit('UNKNOWNITEM');
     end;
 
-    [Scope('Personalization')]
-    procedure SetRfidTagData(StockTakeId: Text; StockTakeConfigCode: Text; WorksheetName: Text; TagId: Text): Text
+        procedure SetRfidTagData(StockTakeId: Text; StockTakeConfigCode: Text; WorksheetName: Text; TagId: Text): Text
     var
         CSStockTakesData: Record "CS Stock-Takes Data";
         CSRfidData: Record "CS Rfid Data";
@@ -463,8 +452,7 @@ codeunit 6151372 "CS WS"
             exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure SetRfidTagDataByType(StockTakeId: Text; StockTakeConfigCode: Text; WorksheetName: Text; TagId: Text; "Area": Text): Text
+        procedure SetRfidTagDataByType(StockTakeId: Text; StockTakeConfigCode: Text; WorksheetName: Text; TagId: Text; "Area": Text): Text
     var
         CSStockTakesData: Record "CS Stock-Takes Data";
         CSRfidData: Record "CS Rfid Data";
@@ -498,8 +486,7 @@ codeunit 6151372 "CS WS"
             exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure GetRfidWhseReceiptData(DocNo: Text): Text
+        procedure GetRfidWhseReceiptData(DocNo: Text): Text
     var
         WhseReceiptLine: Record "Warehouse Receipt Line";
         JObject: DotNet JObject;
@@ -563,8 +550,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure ValidateRfidWhseReceiptData(DocNo: Text; TagId: Text): Text
+        procedure ValidateRfidWhseReceiptData(DocNo: Text; TagId: Text): Text
     var
         CSRfidData: Record "CS Rfid Data";
         WhseReceiptLine: Record "Warehouse Receipt Line";
@@ -580,8 +566,7 @@ codeunit 6151372 "CS WS"
             exit('UNKNOWNITEM#2');
     end;
 
-    [Scope('Personalization')]
-    procedure SaveRfidWhseReceiptData(DocNo: Text): Text
+        procedure SaveRfidWhseReceiptData(DocNo: Text): Text
     var
         CSWhseReceiptData: Record "CS Whse. Receipt Data";
         Result: Text;
@@ -625,8 +610,7 @@ codeunit 6151372 "CS WS"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure CloseCounting(StockTakeId: Text; WorksheetName: Text): Text
+        procedure CloseCounting(StockTakeId: Text; WorksheetName: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         OK: Boolean;
@@ -664,8 +648,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
-    [Scope('Personalization')]
-    procedure CloseRefill(StockTakeId: Text): Text
+        procedure CloseRefill(StockTakeId: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         OK: Boolean;
@@ -683,8 +666,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateRefill(StockTakeId: Text; ItemNo: Text; Refilled: Text): Text
+        procedure UpdateRefill(StockTakeId: Text; ItemNo: Text; Refilled: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         Item: Record Item;
@@ -728,8 +710,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
-    [Scope('Personalization')]
-    procedure ApproveCounting(StockTakeId: Text): Text
+        procedure ApproveCounting(StockTakeId: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         OK: Boolean;
@@ -758,8 +739,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
-    [Scope('Personalization')]
-    procedure CloseWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
+        procedure CloseWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
     var
         StockTakeWorksheet: Record "Stock-Take Worksheet";
         OK: Boolean;
@@ -890,8 +870,7 @@ codeunit 6151372 "CS WS"
         //+NPR5.52
     end;
 
-    [Scope('Personalization')]
-    procedure ResetWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
+        procedure ResetWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
     var
         CSSetup: Record "CS Setup";
         ItemJournalBatch: Record "Item Journal Batch";
@@ -930,8 +909,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeConfigCode);
     end;
 
-    [Scope('Personalization')]
-    procedure GetItemObject(Barcode: Code[20]): Text
+        procedure GetItemObject(Barcode: Code[20]): Text
     var
         Item: Record Item;
         Item2: Record Item;
@@ -966,8 +944,7 @@ codeunit 6151372 "CS WS"
         //+NPR5.53 [374331]
     end;
 
-    [Scope('Personalization')]
-    procedure GetWarehouseCountingDetails(BatchName: Text): Text
+        procedure GetWarehouseCountingDetails(BatchName: Text): Text
     var
         ItemJournalTemplate: Record "Item Journal Template";
         ItemJournalBatch: Record "Item Journal Batch";
@@ -994,8 +971,7 @@ codeunit 6151372 "CS WS"
         exit(Format(PredictedQty));
     end;
 
-    [Scope('Personalization')]
-    procedure GetStoreData(CurrUser: Text): Text
+        procedure GetStoreData(CurrUser: Text): Text
     var
         CSStoreUsers: Record "CS Store Users";
         CSStockTakes: Record "CS Stock-Takes";
@@ -1191,8 +1167,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure StartStoreCounting(StockTakeId: Text; "Area": Text): Text
+        procedure StartStoreCounting(StockTakeId: Text; "Area": Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
     begin
@@ -1236,8 +1211,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
-    [Scope('Personalization')]
-    procedure CloseStoreCounting(StockTakeId: Text; "Area": Text): Text
+        procedure CloseStoreCounting(StockTakeId: Text; "Area": Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         OK: Boolean;
@@ -1272,8 +1246,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
-    [Scope('Personalization')]
-    procedure ApproveStoreCounting(StockTakeId: Text): Text
+        procedure ApproveStoreCounting(StockTakeId: Text): Text
     var
         StockTakeWorksheet: Record "Stock-Take Worksheet";
         OK: Boolean;
@@ -1480,8 +1453,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId)
     end;
 
-    [Scope('Personalization')]
-    procedure ResetCounting(StockTakeConfigCode: Text; WorksheetName: Text; "Area": Text): Text
+        procedure ResetCounting(StockTakeConfigCode: Text; WorksheetName: Text; "Area": Text): Text
     var
         CSSetup: Record "CS Setup";
         ItemJournalBatch: Record "Item Journal Batch";
@@ -1517,8 +1489,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeConfigCode);
     end;
 
-    [Scope('Personalization')]
-    procedure CreateStoreRefillData(StockTakeId: Text) Result: Text
+        procedure CreateStoreRefillData(StockTakeId: Text) Result: Text
     var
         CSRefillData: Record "CS Refill Data";
         Item: Record Item;
@@ -1693,8 +1664,7 @@ codeunit 6151372 "CS WS"
         Result := JObject.ToString();
     end;
 
-    [Scope('Personalization')]
-    procedure CreateStoreCounting(Location: Code[10]): Text
+        procedure CreateStoreCounting(Location: Code[10]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
         LocationRec: Record Location;
@@ -1704,8 +1674,7 @@ codeunit 6151372 "CS WS"
         exit('');
     end;
 
-    [Scope('Personalization')]
-    procedure CreateStoreCountingV2(Location: Code[10]): Text
+        procedure CreateStoreCountingV2(Location: Code[10]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
         LocationRec: Record Location;
@@ -1715,8 +1684,7 @@ codeunit 6151372 "CS WS"
         exit('');
     end;
 
-    [Scope('Personalization')]
-    procedure SearchPOSStore(Word: Text): Text
+        procedure SearchPOSStore(Word: Text): Text
     var
         CSItemSeachHandling: Record "CS Item Seach Handling" temporary;
         POSStore: Record "POS Store";
@@ -1834,8 +1802,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure GetStoreDataV2(CurrUser: Text;POSStoreCode: Text): Text
+        procedure GetStoreDataV2(CurrUser: Text;POSStoreCode: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         POSStore: Record "POS Store";
@@ -2051,8 +2018,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure GetStoreDataByStoreUser(CurrUser: Text): Text
+        procedure GetStoreDataByStoreUser(CurrUser: Text): Text
     var
         CSStoreUsers: Record "CS Store Users";
         CSStockTakes: Record "CS Stock-Takes";
@@ -2265,8 +2231,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure SetRfidTagDataByTypeBatch(StockTakeId: Text;StockTakeConfigCode: Text;WorksheetName: Text;TagIds: Text;"Area": Text;DeviceId: Code[10];BatchId: Text) ResultData: Text
+        procedure SetRfidTagDataByTypeBatch(StockTakeId: Text;StockTakeConfigCode: Text;WorksheetName: Text;TagIds: Text;"Area": Text;DeviceId: Code[10];BatchId: Text) ResultData: Text
     var
         CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
         CSSetup: Record "CS Setup";
@@ -2350,8 +2315,7 @@ codeunit 6151372 "CS WS"
         exit(ResultData);
     end;
 
-    [Scope('Personalization')]
-    procedure CreateStoreRefillDataV2(StockTakeId: Text) Result: Text
+        procedure CreateStoreRefillDataV2(StockTakeId: Text) Result: Text
     var
         CSRefillDataTmp: Record "CS Refill Data" temporary;
         Item: Record Item;
@@ -2634,8 +2598,7 @@ codeunit 6151372 "CS WS"
         Result := JObject.ToString();
     end;
 
-    [Scope('Personalization')]
-    procedure SetRfidTagDataTransferBatch(DocId: Text;TagIds: Text;ToDocNo: Text;DeviceId: Code[10];BatchId: Text) ResultData: Text
+        procedure SetRfidTagDataTransferBatch(DocId: Text;TagIds: Text;ToDocNo: Text;DeviceId: Code[10];BatchId: Text) ResultData: Text
     var
         CSTransferHandlingRfid: Record "CS Transfer Handling Rfid";
         OK: Boolean;
@@ -2704,8 +2667,7 @@ codeunit 6151372 "CS WS"
         exit(ResultData);
     end;
 
-    [Scope('Personalization')]
-    procedure SetRfidTagDataTransfer(DocId: Text;TagId: Text;ToDocNo: Text): Text
+        procedure SetRfidTagDataTransfer(DocId: Text;TagId: Text;ToDocNo: Text): Text
     var
         CSRfidLines: Record "CS Rfid Lines";
         CSRfidData: Record "CS Rfid Data";
@@ -2758,8 +2720,7 @@ codeunit 6151372 "CS WS"
         exit(Result)
     end;
 
-    [Scope('Personalization')]
-    procedure ResetTransfer(DocId: Text;ToDocNo: Text): Text
+        procedure ResetTransfer(DocId: Text;ToDocNo: Text): Text
     var
         CSTransferHandlingRfid: Record "CS Transfer Handling Rfid";
         CSRfidHeader: Record "CS Rfid Header";
@@ -2803,8 +2764,7 @@ codeunit 6151372 "CS WS"
         exit(DocId);
     end;
 
-    [Scope('Personalization')]
-    procedure CloseTransfer(DocId: Text;ToDocNo: Text): Text
+        procedure CloseTransfer(DocId: Text;ToDocNo: Text): Text
     var
         CSSetup: Record "CS Setup";
         CSRfidHeader: Record "CS Rfid Header";
@@ -2828,8 +2788,7 @@ codeunit 6151372 "CS WS"
         exit(DocId)
     end;
 
-    [Scope('Personalization')]
-    procedure GetJournalItemCount(StockTakeConfigCode: Text;WorksheetName: Text): Text
+        procedure GetJournalItemCount(StockTakeConfigCode: Text;WorksheetName: Text): Text
     var
         CSSetup: Record "CS Setup";
         ItemJournalBatch: Record "Item Journal Batch";
@@ -2881,8 +2840,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
-    [Scope('Personalization')]
-    procedure GetDocumentItemCount(DocId: Text): Text
+        procedure GetDocumentItemCount(DocId: Text): Text
     var
         JObject: DotNet npNetJObject;
         JTokenWriter: DotNet npNetJTokenWriter;

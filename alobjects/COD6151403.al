@@ -45,8 +45,7 @@ codeunit 6151403 "Magento Webservice"
         Error001: Label 'Wrong key';
         Error002: Label 'Magento Integration has already been setup to %1';
 
-    [Scope('Personalization')]
-    procedure GeneratePdfCreditMemo(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfCrMemo: Text
+        procedure GeneratePdfCreditMemo(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfCrMemo: Text
     var
         ReportSelections: Record "Report Selections";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -69,8 +68,7 @@ codeunit 6151403 "Magento Webservice"
         exit(PdfCrMemo);
     end;
 
-    [Scope('Personalization')]
-    procedure GeneratePdfOrder(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfSalesOrder: Text
+        procedure GeneratePdfOrder(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfSalesOrder: Text
     var
         SalesHeader: Record "Sales Header";
         ReportSelections: Record "Report Selections";
@@ -95,8 +93,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.07 [290144]
     end;
 
-    [Scope('Personalization')]
-    procedure GeneratePdfInvoice(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfSalesInvoice: Text
+        procedure GeneratePdfInvoice(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfSalesInvoice: Text
     var
         SalesInvHeader: Record "Sales Invoice Header";
         ReportSelections: Record "Report Selections";
@@ -119,8 +116,7 @@ codeunit 6151403 "Magento Webservice"
         exit(PdfSalesInvoice);
     end;
 
-    [Scope('Personalization')]
-    procedure GeneratePdfCustomerStatement(CustomerNo: Code[20]; FromDate: Date; UntilDate: Date) PdfCustomerStatement: Text
+        procedure GeneratePdfCustomerStatement(CustomerNo: Code[20]; FromDate: Date; UntilDate: Date) PdfCustomerStatement: Text
     var
         ReportSelections: Record "Report Selections";
         Filename: Text;
@@ -146,8 +142,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [351590]
     end;
 
-    [Scope('Personalization')]
-    procedure GeneratePdfShipment(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfShipment: Text
+        procedure GeneratePdfShipment(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfShipment: Text
     var
         SalesShipmentHeader: Record "Sales Shipment Header";
         ReportSelections: Record "Report Selections";
@@ -173,8 +168,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GeneratePdfQuote(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfQuote: Text
+        procedure GeneratePdfQuote(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfQuote: Text
     var
         SalesHeader: Record "Sales Header";
         ReportSelections: Record "Report Selections";
@@ -200,16 +194,14 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.25 [388058]
     end;
 
-    [Scope('Personalization')]
-    procedure GetInvoices(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure GetInvoices(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
         //-MAG2.20 [345376]
         documents.SetFilters(CustomerNo, '', StartDate, EndDate, false, true, false, false, false);
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetCrMemos(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure GetCrMemos(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlDocElement: DotNet npNetXmlElement;
@@ -224,16 +216,14 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetOrders(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure GetOrders(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
         //-MAG2.20 [345376]
         documents.SetFilters(CustomerNo, '', StartDate, EndDate, false, false, false, true, false);
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetShipments(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure GetShipments(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
@@ -241,8 +231,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetQuotes(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure GetQuotes(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.25 [388058]
@@ -250,8 +239,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.25 [388058]
     end;
 
-    [Scope('Personalization')]
-    procedure ListInvoices(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure ListInvoices(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
@@ -259,8 +247,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure ListCrMemos(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure ListCrMemos(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlDocElement: DotNet npNetXmlElement;
@@ -276,8 +263,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure ListOrders(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure ListOrders(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
@@ -285,8 +271,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure ListShipments(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure ListShipments(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
@@ -294,8 +279,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure ListQuotes(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
+        procedure ListQuotes(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.25 [388058]
@@ -303,8 +287,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.25 [388058]
     end;
 
-    [Scope('Personalization')]
-    procedure GetInvoice(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+        procedure GetInvoice(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
@@ -312,8 +295,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetCrMemo(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+        procedure GetCrMemo(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlDocElement: DotNet npNetXmlElement;
@@ -329,8 +311,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetOrder(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+        procedure GetOrder(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
@@ -338,8 +319,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetShipment(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+        procedure GetShipment(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
@@ -347,8 +327,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [345376]
     end;
 
-    [Scope('Personalization')]
-    procedure GetQuote(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+        procedure GetQuote(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.25 [388058]
@@ -356,31 +335,27 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.25 [388058]
     end;
 
-    [Scope('Personalization')]
-    procedure GetItemInventory(itemFilter: Text; variantFilter: Text; locationFilter: Text; var items: XMLport "Magento Avail. InventoryExport")
+        procedure GetItemInventory(itemFilter: Text; variantFilter: Text; locationFilter: Text; var items: XMLport "Magento Avail. InventoryExport")
     begin
         Clear(items);
         items.SetFilters(itemFilter, variantFilter, locationFilter);
     end;
 
-    [Scope('Personalization')]
-    procedure GetItemInventorySet(var retail_inventory_api: XMLport "Magento Inventory Set Api")
+        procedure GetItemInventorySet(var retail_inventory_api: XMLport "Magento Inventory Set Api")
     begin
         //-MAG2.17 [322939]
         retail_inventory_api.Import;
         //+MAG2.17 [322939]
     end;
 
-    [Scope('Personalization')]
-    procedure GetStoreInventory(var store_inventory: XMLport "Magento Store Inventory")
+        procedure GetStoreInventory(var store_inventory: XMLport "Magento Store Inventory")
     begin
         //-MAG2.26 [406741]
         store_inventory.Import;
         //+MAG2.26 [406741]
     end;
 
-    [Scope('Personalization')]
-    procedure GetCustomerNo(OrderNo: Code[20]) CustomerNo: Text
+        procedure GetCustomerNo(OrderNo: Code[20]) CustomerNo: Text
     var
         SalesHeader: Record "Sales Header";
     begin
@@ -393,8 +368,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.03
     end;
 
-    [Scope('Personalization')]
-    procedure GetCustomerAndContactNo(OrderNo: Code[20]; var CustomerNo: Code[20]; var ContactNo: Code[20]): Boolean
+        procedure GetCustomerAndContactNo(OrderNo: Code[20]; var CustomerNo: Code[20]; var ContactNo: Code[20]): Boolean
     var
         SalesHeader: Record "Sales Header";
     begin
@@ -413,8 +387,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.25 [396445]
     end;
 
-    [Scope('Personalization')]
-    procedure GetItemImage(ItemNo: Code[20]; VariantCode: Code[10]; ImageType: Option ANY,BASE,SMALL,THUMBNAIL; var ImageName: Text[250]; var ImageDescription: Text[250]; var ImageBase64: Text): Boolean
+        procedure GetItemImage(ItemNo: Code[20]; VariantCode: Code[10]; ImageType: Option ANY,BASE,SMALL,THUMBNAIL; var ImageName: Text[250]; var ImageDescription: Text[250]; var ImageBase64: Text): Boolean
     var
         Item: Record Item;
         MagentoPictureLink: Record "Magento Picture Link";
@@ -464,8 +437,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.20 [351060]
     end;
 
-    [Scope('Personalization')]
-    procedure ImportSalesOrders(var sales_orders: XMLport "Magento Sales Order Import")
+        procedure ImportSalesOrders(var sales_orders: XMLport "Magento Sales Order Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSalesOrderMgt: Codeunit "Magento Sales Order Mgt.";
@@ -484,8 +456,7 @@ codeunit 6151403 "Magento Webservice"
         NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
     end;
 
-    [Scope('Personalization')]
-    procedure ImportSalesReturnOrders(var sales_return_orders: XMLport "Magento Return Order Import")
+        procedure ImportSalesReturnOrders(var sales_return_orders: XMLport "Magento Return Order Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NcSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -519,8 +490,7 @@ codeunit 6151403 "Magento Webservice"
         ImportEntry.Insert(true);
     end;
 
-    [Scope('Personalization')]
-    procedure InitSetup(MagentoUrl: Text; Hash: Text): Text
+        procedure InitSetup(MagentoUrl: Text; Hash: Text): Text
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlSetup: Record "NpXml Setup";
@@ -582,8 +552,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.07 [286943]
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateCategories()
+        procedure UpdateCategories()
     var
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
@@ -592,8 +561,7 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.26 [404580]
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateBrands()
+        procedure UpdateBrands()
     var
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin

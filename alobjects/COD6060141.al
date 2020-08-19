@@ -19,8 +19,7 @@ codeunit 6060141 "MM Loyalty WebService"
     var
         SETUP_MISSING: Label 'Setup is missing for %1.';
 
-    [Scope('Personalization')]
-    procedure GetLoyaltyPoints(var GetLoyaltyPoints: XMLport "MM Get Loyalty Points")
+        procedure GetLoyaltyPoints(var GetLoyaltyPoints: XMLport "MM Get Loyalty Points")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -60,8 +59,7 @@ codeunit 6060141 "MM Loyalty WebService"
         MemberInfoCapture.DeleteAll();
     end;
 
-    [Scope('Personalization')]
-    procedure GetLoyaltyPointEntries(var GetLoyaltyStatement: XMLport "MM Get Loyalty Statement")
+        procedure GetLoyaltyPointEntries(var GetLoyaltyStatement: XMLport "MM Get Loyalty Statement")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -101,8 +99,7 @@ codeunit 6060141 "MM Loyalty WebService"
         MemberInfoCapture.DeleteAll();
     end;
 
-    [Scope('Personalization')]
-    procedure GetMembershipReceiptList(var GetLoyaltyReceiptList: XMLport "MM Get Loyalty Receipt List")
+        procedure GetMembershipReceiptList(var GetLoyaltyReceiptList: XMLport "MM Get Loyalty Receipt List")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -146,8 +143,7 @@ codeunit 6060141 "MM Loyalty WebService"
         //+MM1.40 [365879]
     end;
 
-    [Scope('Personalization')]
-    procedure GetMembershipReceiptPdf(ExternalMembershipNumber: Code[20]; ReceiptEntryNo: Integer) PdfDoc: Text
+        procedure GetMembershipReceiptPdf(ExternalMembershipNumber: Code[20]; ReceiptEntryNo: Integer) PdfDoc: Text
     var
         ReportSelections: Record "Report Selection Retail";
         POSEntry: Record "POS Entry";
@@ -199,8 +195,7 @@ codeunit 6060141 "MM Loyalty WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure RegisterSale(var RegisterSale: XMLport "MM Register Sale")
+        procedure RegisterSale(var RegisterSale: XMLport "MM Register Sale")
     var
         TmpAuthorization: Record "MM Loyalty Ledger Entry (Srvr)" temporary;
         TmpSalesLines: Record "MM Register Sales Buffer" temporary;
@@ -253,8 +248,7 @@ codeunit 6060141 "MM Loyalty WebService"
         ImportEntry.Modify(true);
     end;
 
-    [Scope('Personalization')]
-    procedure ReservePoints(var ReservePoints: XMLport "MM Reserve Points")
+        procedure ReservePoints(var ReservePoints: XMLport "MM Reserve Points")
     var
         TmpAuthorization: Record "MM Loyalty Ledger Entry (Srvr)" temporary;
         TmpPaymentLines: Record "MM Register Sales Buffer" temporary;
@@ -310,8 +304,7 @@ codeunit 6060141 "MM Loyalty WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GetLoyaltyConfiguration(var GetLoyaltyConfiguration: XMLport "MM Get Loyalty Configuration")
+        procedure GetLoyaltyConfiguration(var GetLoyaltyConfiguration: XMLport "MM Get Loyalty Configuration")
     var
         TmpAuthorization: Record "MM Loyalty Ledger Entry (Srvr)" temporary;
         TmpLoyaltySetup: Record "MM Loyalty Setup" temporary;
@@ -367,8 +360,7 @@ codeunit 6060141 "MM Loyalty WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GetCouponEligibility(var LoyaltyCouponEligibility: XMLport "MM Loyalty Coupon Eligibility")
+        procedure GetCouponEligibility(var LoyaltyCouponEligibility: XMLport "MM Loyalty Coupon Eligibility")
     var
         TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;
         TmpMemberInfoCapture: Record "MM Member Info Capture" temporary;
@@ -428,8 +420,7 @@ codeunit 6060141 "MM Loyalty WebService"
         //+MM1.40 [343352]
     end;
 
-    [Scope('Personalization')]
-    procedure CreateCoupon(var LoyaltyCreateCoupon: XMLport "MM Loyalty Create Coupon")
+        procedure CreateCoupon(var LoyaltyCreateCoupon: XMLport "MM Loyalty Create Coupon")
     var
         TmpMemberInfoCapture: Record "MM Member Info Capture" temporary;
         TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;
@@ -514,8 +505,7 @@ codeunit 6060141 "MM Loyalty WebService"
         ImportEntry.Modify(true);
     end;
 
-    [Scope('Personalization')]
-    procedure ListCoupons(var LoyaltyListCoupon: XMLport "MM Loyalty List Coupon")
+        procedure ListCoupons(var LoyaltyListCoupon: XMLport "MM Loyalty List Coupon")
     var
         TmpMemberInfoCapture: Record "MM Member Info Capture" temporary;
         ImportEntry: Record "Nc Import Entry";

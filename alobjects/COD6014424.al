@@ -345,8 +345,7 @@ codeunit 6014424 Utility
         Evaluate(Ret,Format(Round(Dec1,1 / Power(10,nDec)),0,'<sign><Integer><Decimal,' + decp + '>'));
     end;
 
-    [Scope('Personalization')]
-    procedure GetTicketText(var RetailComment: Record "Retail Comment" temporary;Register: Record Register)
+        procedure GetTicketText(var RetailComment: Record "Retail Comment" temporary;Register: Record Register)
     var
         RetailComment2: Record "Retail Comment";
         RetailSetup2: Record "Retail Setup";

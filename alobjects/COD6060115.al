@@ -32,8 +32,7 @@ codeunit 6060115 "TM Ticket WebService"
         TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO;
         SETUP_MISSING: Label 'Setup is missing for %1';
 
-    [Scope('Personalization')]
-    procedure ValidateTicketArrival(AdmissionCode: Code[20];ExternalTicketNo: Text[50];ScannerStationId: Code[10];var MessageText: Text): Boolean
+        procedure ValidateTicketArrival(AdmissionCode: Code[20];ExternalTicketNo: Text[50];ScannerStationId: Code[10];var MessageText: Text): Boolean
     var
         TicketManagement: Codeunit "TM Ticket Management";
         MessageId: Integer;
@@ -43,8 +42,7 @@ codeunit 6060115 "TM Ticket WebService"
         exit (MessageId = 0);
     end;
 
-    [Scope('Personalization')]
-    procedure ValidateTicketDeparture(AdmissionCode: Code[20];ExternalTicketNo: Text[50];ScannerStationId: Code[10];var MessageText: Text): Boolean
+        procedure ValidateTicketDeparture(AdmissionCode: Code[20];ExternalTicketNo: Text[50];ScannerStationId: Code[10];var MessageText: Text): Boolean
     var
         TicketManagement: Codeunit "TM Ticket Management";
         MessageId: Integer;
@@ -54,8 +52,7 @@ codeunit 6060115 "TM Ticket WebService"
         exit (MessageId = 0);
     end;
 
-    [Scope('Personalization')]
-    procedure MakeTicketReservation(var Reservation: XMLport "TM Ticket Reservation";ScannerStationId: Code[10])
+        procedure MakeTicketReservation(var Reservation: XMLport "TM Ticket Reservation";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -106,8 +103,7 @@ codeunit 6060115 "TM Ticket WebService"
         //+TM1.26 [295981]
     end;
 
-    [Scope('Personalization')]
-    procedure PreConfirmTicketReservation(var PreConfirm: XMLport "TM Ticket PreConfirm";ScannerStationId: Code[10])
+        procedure PreConfirmTicketReservation(var PreConfirm: XMLport "TM Ticket PreConfirm";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -137,8 +133,7 @@ codeunit 6060115 "TM Ticket WebService"
         PreConfirm.SetReservationResult (ImportEntry."Document ID", ImportEntry.Imported);
     end;
 
-    [Scope('Personalization')]
-    procedure CancelTicketReservation(var Cancelation: XMLport "TM Ticket Cancel";ScannerStationId: Code[10])
+        procedure CancelTicketReservation(var Cancelation: XMLport "TM Ticket Cancel";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -177,8 +172,7 @@ codeunit 6060115 "TM Ticket WebService"
         //-TM1.48 [414413]
     end;
 
-    [Scope('Personalization')]
-    procedure ConfirmTicketReservation(var Confirmation: XMLport "TM Ticket Confirmation";ScannerStationId: Code[10]) Success: Boolean
+        procedure ConfirmTicketReservation(var Confirmation: XMLport "TM Ticket Confirmation";ScannerStationId: Code[10]) Success: Boolean
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -216,8 +210,7 @@ codeunit 6060115 "TM Ticket WebService"
         exit (true);
     end;
 
-    [Scope('Personalization')]
-    procedure MakeTicketReservationConfirmAndValidateArrival(var Reservation: XMLport "TM Ticket ReservationAndArrive";ScannerStationId: Code[10])
+        procedure MakeTicketReservationConfirmAndValidateArrival(var Reservation: XMLport "TM Ticket ReservationAndArrive";ScannerStationId: Code[10])
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -250,13 +243,11 @@ codeunit 6060115 "TM Ticket WebService"
         Reservation.SetReservationResult (ImportEntry."Document ID");
     end;
 
-    [Scope('Personalization')]
-    procedure RevokeTicketReservation()
+        procedure RevokeTicketReservation()
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure GetComplementaryMembershipItemNo(ExternalTicketNo: Code[20];var ComplementaryItemNo: Code[20]) Success: Integer
+        procedure GetComplementaryMembershipItemNo(ExternalTicketNo: Code[20];var ComplementaryItemNo: Code[20]) Success: Integer
     var
         TicketManagement: Codeunit "TM Ticket Management";
         Ticket: Record "TM Ticket";
@@ -298,8 +289,7 @@ codeunit 6060115 "TM Ticket WebService"
         //+TM1.18 [261405]
     end;
 
-    [Scope('Personalization')]
-    procedure ConsumeComplementaryItem(ExternalTicketNo: Code[20];var ComplementaryItemNo: Code[20]) Success: Integer
+        procedure ConsumeComplementaryItem(ExternalTicketNo: Code[20];var ComplementaryItemNo: Code[20]) Success: Integer
     var
         TicketManagement: Codeunit "TM Ticket Management";
         Ticket: Record "TM Ticket";
@@ -334,8 +324,7 @@ codeunit 6060115 "TM Ticket WebService"
         //+#308975 [308975]
     end;
 
-    [Scope('Personalization')]
-    procedure OfflineTicketValidation(var OfflineTicketValidation: XMLport "TM Offline Ticket Validation") Success: Boolean
+        procedure OfflineTicketValidation(var OfflineTicketValidation: XMLport "TM Offline Ticket Validation") Success: Boolean
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -362,8 +351,7 @@ codeunit 6060115 "TM Ticket WebService"
         exit (true);
     end;
 
-    [Scope('Personalization')]
-    procedure SetReservationAttributes(var Attributes: XMLport "TM Ticket Set Attributes") Success: Boolean
+        procedure SetReservationAttributes(var Attributes: XMLport "TM Ticket Set Attributes") Success: Boolean
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
@@ -404,8 +392,7 @@ codeunit 6060115 "TM Ticket WebService"
         //+TM1.23 [284752]
     end;
 
-    [Scope('Personalization')]
-    procedure GetAdmissionCapacity(var AdmissionCapacityCheck: XMLport "TM Admission Capacity Check")
+        procedure GetAdmissionCapacity(var AdmissionCapacityCheck: XMLport "TM Admission Capacity Check")
     begin
 
         //-TM1.24 [287582]
@@ -414,16 +401,14 @@ codeunit 6060115 "TM Ticket WebService"
         //+TM1.24 [287582]
     end;
 
-    [Scope('Personalization')]
-    procedure GetTicketPrintUrl(var TicketGetTicketPrintURL: XMLport "TM Ticket Get Ticket Print URL")
+        procedure GetTicketPrintUrl(var TicketGetTicketPrintURL: XMLport "TM Ticket Get Ticket Print URL")
     begin
 
         TicketGetTicketPrintURL.Import ();
         TicketGetTicketPrintURL.CreateResponse ();
     end;
 
-    [Scope('Personalization')]
-    procedure ListTickets(var TicketDetails: XMLport "TM Ticket Details")
+        procedure ListTickets(var TicketDetails: XMLport "TM Ticket Details")
     begin
 
         //-#276842 [276842]
@@ -432,8 +417,7 @@ codeunit 6060115 "TM Ticket WebService"
         //+#276842 [276842]
     end;
 
-    [Scope('Personalization')]
-    procedure SendETicket(var SendETicket: XMLport "TM Send eTicket")
+        procedure SendETicket(var SendETicket: XMLport "TM Send eTicket")
     begin
 
         //-TM1.38 [332109]
@@ -442,8 +426,7 @@ codeunit 6060115 "TM Ticket WebService"
         //+TM1.38 [332109]
     end;
 
-    [Scope('Personalization')]
-    procedure ListTicketItems(var ListTicketItems: XMLport "TM List Ticket Items")
+        procedure ListTicketItems(var ListTicketItems: XMLport "TM List Ticket Items")
     begin
 
         //-TM90.1.46 [387877]

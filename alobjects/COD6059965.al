@@ -26,8 +26,7 @@ codeunit 6059965 "MPOS Webservice"
     var
         EmptyJasonResult: Label '{}';
 
-    [Scope('Personalization')]
-    procedure GetCompanyLogo() PictureBase64: Text
+        procedure GetCompanyLogo() PictureBase64: Text
     var
         CompanyInformation: Record "Company Information";
         BinaryReader: DotNet npNetBinaryReader;
@@ -50,8 +49,7 @@ codeunit 6059965 "MPOS Webservice"
         exit(PictureBase64);
     end;
 
-    [Scope('Personalization')]
-    procedure GetRegisterList() RegisterList: Text
+        procedure GetRegisterList() RegisterList: Text
     var
         Register: Record Register;
         Counter: Integer;
@@ -69,8 +67,7 @@ codeunit 6059965 "MPOS Webservice"
         exit(RegisterList);
     end;
 
-    [Scope('Personalization')]
-    procedure SetRegister(CurrentUser: Code[50]; RegisterId: Code[10]): Boolean
+        procedure SetRegister(CurrentUser: Code[50]; RegisterId: Code[10]): Boolean
     var
         Register: Record Register;
         UserSetup: Record "User Setup";
@@ -100,8 +97,7 @@ codeunit 6059965 "MPOS Webservice"
         exit(true);
     end;
 
-    [Scope('Personalization')]
-    procedure GetCompanyInfo(): Text
+        procedure GetCompanyInfo(): Text
     var
         CompanyInformation: Record "Company Information";
         BinaryReader: DotNet npNetBinaryReader;
@@ -149,8 +145,7 @@ codeunit 6059965 "MPOS Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure SetTransactionResponse(json: Text): Boolean
+        procedure SetTransactionResponse(json: Text): Boolean
     begin
         if json = '' then
             exit(false);
@@ -158,8 +153,7 @@ codeunit 6059965 "MPOS Webservice"
         exit(ParseNetsTransactionJson(json));
     end;
 
-    [Scope('Personalization')]
-    procedure SetEODResponse(json: Text): Boolean
+        procedure SetEODResponse(json: Text): Boolean
     begin
         if json = '' then
             exit(false);

@@ -54,8 +54,7 @@ codeunit 6060151 "Event EWS Management"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure OrganizerAccountSet(Job: Record Job; Test: Boolean; IsEmailBeingSent: Boolean): Boolean
+        procedure OrganizerAccountSet(Job: Record Job; Test: Boolean; IsEmailBeingSent: Boolean): Boolean
     var
         SetEMailError: Label 'You must choose %1 on %2 or set %3 on Event Card or set %4 with %5 if sending an e-mail before you can proceed.';
         EventExchIntEmail: Record "Event Exch. Int. E-Mail";
@@ -128,8 +127,7 @@ codeunit 6060151 "Event EWS Management"
         //+NPR5.38 [285194]
     end;
 
-    [Scope('Personalization')]
-    procedure CheckStatus(Job: Record Job; ShowError: Boolean) StatusOK: Boolean
+        procedure CheckStatus(Job: Record Job; ShowError: Boolean) StatusOK: Boolean
     var
         ProperStatusText: Label 'Events in status %1 are not allowed for calendar integration.';
     begin
@@ -162,8 +160,7 @@ codeunit 6060151 "Event EWS Management"
         //+NPR5.38 [285194]
     end;
 
-    [Scope('Personalization')]
-    procedure AutoDiscoverExchangeServiceWithLog(RecordId: RecordID; var ExchService: DotNet npNetExchangeService; Job: Record Job; ForceAutoDiscover: Boolean): Boolean
+        procedure AutoDiscoverExchangeServiceWithLog(RecordId: RecordID; var ExchService: DotNet npNetExchangeService; Job: Record Job; ForceAutoDiscover: Boolean): Boolean
     var
         ActivityLog: Record "Activity Log";
         ActivityDescription: Label 'Auto Discovering...';
@@ -183,8 +180,7 @@ codeunit 6060151 "Event EWS Management"
         exit(true);
     end;
 
-    [Scope('Personalization')]
-    procedure InitializeExchService(RecordId: RecordID; Job: Record Job; var ExchService: DotNet npNetExchangeService; ExchItemType2: Option "E-Mail",Appointment,"Meeting Request"): Boolean
+        procedure InitializeExchService(RecordId: RecordID; Job: Record Job; var ExchService: DotNet npNetExchangeService; ExchItemType2: Option "E-Mail",Appointment,"Meeting Request"): Boolean
     var
         ExchangeCredentials: DotNet npNetExchangeCredentials;
         NetworkCredential: DotNet npNetNetworkCredential;
@@ -244,16 +240,14 @@ codeunit 6060151 "Event EWS Management"
 
     end;
 
-    [Scope('Personalization')]
-    procedure SetJobPlanLineFilter(Job: Record Job; var JobPlanningLine: Record "Job Planning Line")
+        procedure SetJobPlanLineFilter(Job: Record Job; var JobPlanningLine: Record "Job Planning Line")
     begin
         JobPlanningLine.SetRange("Job No.", Job."No.");
         JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
         JobPlanningLine.SetFilter("Resource E-Mail", '<>%1', '');
     end;
 
-    [Scope('Personalization')]
-    procedure ParseEmailTemplateText(var RecRef: RecordRef; Line: Text) NewLine: Text
+        procedure ParseEmailTemplateText(var RecRef: RecordRef; Line: Text) NewLine: Text
     var
         FieldRef: FieldRef;
         "Count": Integer;
@@ -312,8 +306,7 @@ codeunit 6060151 "Event EWS Management"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure IncludeAttachmentCheck(Job: Record Job; Usage: Option): Boolean
+        procedure IncludeAttachmentCheck(Job: Record Job; Usage: Option): Boolean
     begin
         if not CustomizedLayoutFound(Job, Usage) then
             //-NPR5.32 [274405]
@@ -327,8 +320,7 @@ codeunit 6060151 "Event EWS Management"
 
     end;
 
-    [Scope('Personalization')]
-    procedure CreateFilePath(Job: Record Job; FileName: Text; EMailTemplateHeader: Record "E-mail Template Header"): Text
+        procedure CreateFilePath(Job: Record Job; FileName: Text; EMailTemplateHeader: Record "E-mail Template Header"): Text
     var
         FileMgt: Codeunit "File Management";
     begin
@@ -338,8 +330,7 @@ codeunit 6060151 "Event EWS Management"
         //+NPR5.34 [277938]
     end;
 
-    [Scope('Personalization')]
-    procedure CreateFileName(Job: Record Job; EMailTemplateHeader: Record "E-mail Template Header") Name: Text
+        procedure CreateFileName(Job: Record Job; EMailTemplateHeader: Record "E-mail Template Header") Name: Text
     var
         RecRef: RecordRef;
         EventEmailMgt: Codeunit "Event Email Management";
@@ -365,8 +356,7 @@ codeunit 6060151 "Event EWS Management"
 
     end;
 
-    [Scope('Personalization')]
-    procedure CreateAttachment(Job: Record Job; Usage: Option; EMailTemplateHeader: Record "E-mail Template Header"; var FileName: Text): Boolean
+        procedure CreateAttachment(Job: Record Job; Usage: Option; EMailTemplateHeader: Record "E-mail Template Header"; var FileName: Text): Boolean
     var
         FileMgt: Codeunit "File Management";
         EventWordLayout: Record "Event Word Layout";
@@ -387,8 +377,7 @@ codeunit 6060151 "Event EWS Management"
         exit(true);
     end;
 
-    [Scope('Personalization')]
-    procedure UseTemplate(Job: Record Job; TemplateFor: Integer; ExchItemType: Integer; var EventExchIntTemplate: Record "Event Exch. Int. Template"): Boolean
+        procedure UseTemplate(Job: Record Job; TemplateFor: Integer; ExchItemType: Integer; var EventExchIntTemplate: Record "Event Exch. Int. Template"): Boolean
     begin
         Clear(EventExchIntTemplate);
         exit(FindExchIntTemplate(Job, TemplateFor, ExchItemType, EventExchIntTemplate));
@@ -421,8 +410,7 @@ codeunit 6060151 "Event EWS Management"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure GetEmailTemplateHeader(RecRef: RecordRef; var EmailTemplateHeader: Record "E-mail Template Header") RecordExists: Boolean
+        procedure GetEmailTemplateHeader(RecRef: RecordRef; var EmailTemplateHeader: Record "E-mail Template Header") RecordExists: Boolean
     var
         EmailTemplateFilter: Record "E-mail Template Filter";
         FieldRef: FieldRef;
@@ -527,8 +515,7 @@ codeunit 6060151 "Event EWS Management"
         exit(false);
     end;
 
-    [Scope('Personalization')]
-    procedure SetEmailPassword(var EventExchIntEmail: Record "Event Exch. Int. E-Mail")
+        procedure SetEmailPassword(var EventExchIntEmail: Record "Event Exch. Int. E-Mail")
     var
         EventStdDialog: Page "Event Standard Dialog";
         PasswordText: Text;
@@ -539,8 +526,7 @@ codeunit 6060151 "Event EWS Management"
             SaveEmailPassword(EventExchIntEmail, EventStdDialog.GetPassword());
     end;
 
-    [Scope('Personalization')]
-    procedure SaveEmailPassword(var EventExchIntEmail: Record "Event Exch. Int. E-Mail"; PasswordText: Text)
+        procedure SaveEmailPassword(var EventExchIntEmail: Record "Event Exch. Int. E-Mail"; PasswordText: Text)
     var
         CryptographyManagement: Codeunit "Cryptography Management";
         OutStream: OutStream;
@@ -551,8 +537,7 @@ codeunit 6060151 "Event EWS Management"
         OutStream.Write(PasswordText);
     end;
 
-    [Scope('Personalization')]
-    procedure GetEmailPassword(EventExchIntEmail: Record "Event Exch. Int. E-Mail") PasswordText: Text
+        procedure GetEmailPassword(EventExchIntEmail: Record "Event Exch. Int. E-Mail") PasswordText: Text
     var
         InStream: InStream;
         CryptographyManagement: Codeunit "Cryptography Management";
@@ -568,8 +553,7 @@ codeunit 6060151 "Event EWS Management"
         exit(PasswordText);
     end;
 
-    [Scope('Personalization')]
-    procedure TestEmailServerConnection(var EventExchIntEmail: Record "Event Exch. Int. E-Mail")
+        procedure TestEmailServerConnection(var EventExchIntEmail: Record "Event Exch. Int. E-Mail")
     var
         ExchService: DotNet npNetExchangeService;
         ConnectionSuccessMsg: Label 'Connection succeeded.';
@@ -684,8 +668,7 @@ codeunit 6060151 "Event EWS Management"
         exit('');
     end;
 
-    [Scope('Personalization')]
-    procedure ShowExchIntSummary(Job: Record Job)
+        procedure ShowExchIntSummary(Job: Record Job)
     var
         EventExchIntSumBuffer: Record "Event Exc. Int. Summary Buffer" temporary;
     begin
@@ -693,8 +676,7 @@ codeunit 6060151 "Event EWS Management"
         PAGE.Run(PAGE::"Event Exch. Int. Email Summary", EventExchIntSumBuffer);
     end;
 
-    [Scope('Personalization')]
-    procedure ExchIntSummaryApplyStyleExpr(var EventExchIntSummaryBuffer: Record "Event Exc. Int. Summary Buffer" temporary; var ColorStyle: Text): Boolean
+        procedure ExchIntSummaryApplyStyleExpr(var EventExchIntSummaryBuffer: Record "Event Exc. Int. Summary Buffer" temporary; var ColorStyle: Text): Boolean
     var
         EventExchIntSummaryBuffer2: Record "Event Exc. Int. Summary Buffer" temporary;
         Apply: Boolean;
@@ -729,16 +711,14 @@ codeunit 6060151 "Event EWS Management"
         exit(false);
     end;
 
-    [Scope('Personalization')]
-    procedure GetEventExchIntEmail(var EventExchIntEmail: Record "Event Exch. Int. E-Mail")
+        procedure GetEventExchIntEmail(var EventExchIntEmail: Record "Event Exch. Int. E-Mail")
     begin
         //-NPR5.46 [323953]
         EventExchIntEmail := EventExchIntEmailGlobal;
         //+NPR5.46 [323953]
     end;
 
-    [Scope('Personalization')]
-    procedure SetSkipLookup(SkipLookupHere: Boolean)
+        procedure SetSkipLookup(SkipLookupHere: Boolean)
     begin
         //-NPR5.55 [374887]
         SkipLookup := SkipLookupHere;

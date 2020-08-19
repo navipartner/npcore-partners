@@ -45,8 +45,7 @@ codeunit 6059996 "Scanner Service WS"
         BarcodeNotFoundError: Label 'Barcode %1 doesn''t exist';
         ItemImageNotFoundError: Label 'No Image for itemno';
 
-    [Scope('Personalization')]
-    procedure Process(var Request: BigText)
+        procedure Process(var Request: BigText)
     var
         xmlrootnode: DotNet npNetXmlNode;
         XMLdocIn: DotNet npNetXmlDocument;
@@ -411,8 +410,7 @@ codeunit 6059996 "Scanner Service WS"
         exit(tempbool);
     end;
 
-    [Scope('Personalization')]
-    procedure IsInternalCall(LocalIsInternal: Boolean;LocalId: Guid)
+        procedure IsInternalCall(LocalIsInternal: Boolean;LocalId: Guid)
     begin
         IsInternal := LocalIsInternal;
         InternalCallId := LocalId;

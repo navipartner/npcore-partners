@@ -25,8 +25,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure CheckVouchers(var vouchers: XMLport "NpRv Ext. Vouchers")
+        procedure CheckVouchers(var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
     begin
@@ -53,8 +52,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
     end;
 
-    [Scope('Personalization')]
-    procedure GetVouchersByCustomerNo(CustomerNo: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
+        procedure GetVouchersByCustomerNo(CustomerNo: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvVoucher: Record "NpRv Voucher";
         NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
@@ -83,8 +81,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         //+NPR5.52 [372315]
     end;
 
-    [Scope('Personalization')]
-    procedure GetVouchersByEmail(Email: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
+        procedure GetVouchersByEmail(Email: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvVoucher: Record "NpRv Voucher";
         NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
@@ -117,8 +114,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure CreateVouchers(var vouchers: XMLport "NpRv Ext. Vouchers")
+        procedure CreateVouchers(var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
     begin
@@ -211,8 +207,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure ReserveVouchers(var vouchers: XMLport "NpRv Ext. Vouchers")
+        procedure ReserveVouchers(var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
     begin
@@ -286,8 +281,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure CancelVoucherReservations(var vouchers: XMLport "NpRv Ext. Vouchers")
+        procedure CancelVoucherReservations(var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
     begin
@@ -332,8 +326,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure FindVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var Voucher: Record "NpRv Voucher"): Boolean
+        procedure FindVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var Voucher: Record "NpRv Voucher"): Boolean
     begin
         //-NPR5.55 [402015]
         if ReferenceNo = '' then
@@ -349,8 +342,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         //+NPR5.55 [402015]
     end;
 
-    [Scope('Personalization')]
-    procedure FindSalesVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var NpRvSalesLine: Record "NpRv Sales Line"): Boolean
+        procedure FindSalesVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var NpRvSalesLine: Record "NpRv Sales Line"): Boolean
     begin
         //-NPR5.55 [402015]
         NpRvSalesLine.SetFilter("Voucher Type",UpperCase(VoucherTypeFilter));

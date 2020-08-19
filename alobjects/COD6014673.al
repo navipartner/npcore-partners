@@ -228,8 +228,7 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure Initialize()
+        procedure Initialize()
     begin
 
         if not Initialized then begin

@@ -221,8 +221,7 @@ codeunit 6059899 "Data Log Management"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure InitializeIntegrationRecords(TableID: Integer)
+        procedure InitializeIntegrationRecords(TableID: Integer)
     var
         RecRef: RecordRef;
     begin
@@ -256,8 +255,7 @@ codeunit 6059899 "Data Log Management"
           until DataLogSetup.Next = 0;
     end;
 
-    [Scope('Personalization')]
-    procedure DisableDataLog(Disable: Boolean)
+        procedure DisableDataLog(Disable: Boolean)
     begin
         //-DL1.15 [297502]
         DataLogDisabled := Disable;

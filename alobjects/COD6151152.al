@@ -8,15 +8,13 @@ codeunit 6151152 "M2 Budget WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure ListBudgets(var ListBudgets: XMLport "M2 List Budgets")
+        procedure ListBudgets(var ListBudgets: XMLport "M2 List Budgets")
     begin
 
         // NAV will run the EXPORT implicitly
     end;
 
-    [Scope('Personalization')]
-    procedure GetBudgetDimensionValues(var GetBudgetDimensionValues: XMLport "M2 Get Budget Dimension Values")
+        procedure GetBudgetDimensionValues(var GetBudgetDimensionValues: XMLport "M2 Get Budget Dimension Values")
     begin
 
         SelectLatestVersion ();
@@ -25,8 +23,7 @@ codeunit 6151152 "M2 Budget WebService"
         GetBudgetDimensionValues.GenerateResponse ();
     end;
 
-    [Scope('Personalization')]
-    procedure GetBudgetData(var GetBudgetEntries: XMLport "M2 Get Budget Entries")
+        procedure GetBudgetData(var GetBudgetEntries: XMLport "M2 Get Budget Entries")
     begin
 
         SelectLatestVersion ();
@@ -35,8 +32,7 @@ codeunit 6151152 "M2 Budget WebService"
         GetBudgetEntries.GenerateResponse ();
     end;
 
-    [Scope('Personalization')]
-    procedure GetSimpleBudgetData(var GetSimpleBudget: XMLport "M2 Get Simple Budget")
+        procedure GetSimpleBudgetData(var GetSimpleBudget: XMLport "M2 Get Simple Budget")
     begin
 
         //-MAG2.24 354183

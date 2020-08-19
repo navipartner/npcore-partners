@@ -697,8 +697,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure Initialize()
+        procedure Initialize()
     begin
 
         if not Initialized then begin

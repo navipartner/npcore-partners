@@ -11,8 +11,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         DefaultWorkDate: Date;
         RefreshFrequencyErr: Label 'Refresh intervals of less than 10 minutes are not supported.';
 
-    [Scope('Personalization')]
-    procedure CalcOverdueSalesInvoiceAmount(CalledFromWebService: Boolean) Amount: Decimal
+        procedure CalcOverdueSalesInvoiceAmount(CalledFromWebService: Boolean) Amount: Decimal
     var
         DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
     begin
@@ -30,8 +29,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
             DetailedCustLedgEntry.SetFilter("Initial Entry Due Date", '<%1', GetDefaultWorkDate);
     end;
 
-    [Scope('Personalization')]
-    procedure DrillDownCalcOverdueSalesInvoiceAmount()
+        procedure DrillDownCalcOverdueSalesInvoiceAmount()
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
@@ -45,8 +43,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         PAGE.Run(PAGE::"Customer Ledger Entries", CustLedgerEntry);
     end;
 
-    [Scope('Personalization')]
-    procedure CalcOverduePurchaseInvoiceAmount(CalledFromWebService: Boolean) Amount: Decimal
+        procedure CalcOverduePurchaseInvoiceAmount(CalledFromWebService: Boolean) Amount: Decimal
     var
         DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry";
     begin
@@ -64,8 +61,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
             DetailedVendorLedgEntry.SetFilter("Initial Entry Due Date", '<%1', GetDefaultWorkDate);
     end;
 
-    [Scope('Personalization')]
-    procedure DrillDownOverduePurchaseInvoiceAmount()
+        procedure DrillDownOverduePurchaseInvoiceAmount()
     var
         VendorLedgerEntry: Record "Vendor Ledger Entry";
     begin
@@ -78,8 +74,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         PAGE.Run(PAGE::"Vendor Ledger Entries", VendorLedgerEntry);
     end;
 
-    [Scope('Personalization')]
-    procedure CalcSalesThisMonthAmount(CalledFromWebService: Boolean) Amount: Decimal
+        procedure CalcSalesThisMonthAmount(CalledFromWebService: Boolean) Amount: Decimal
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
@@ -99,8 +94,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
     end;
 
 
-    [Scope('Personalization')]
-    procedure NPCalcSalesThisMonthAmount(CalledFromWebService: Boolean) Amount: Decimal
+        procedure NPCalcSalesThisMonthAmount(CalledFromWebService: Boolean) Amount: Decimal
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -115,8 +109,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure NPCalcSalesThisMonthAmountLastYear(CalledFromWebService: Boolean) Amount: Decimal
+        procedure NPCalcSalesThisMonthAmountLastYear(CalledFromWebService: Boolean) Amount: Decimal
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -131,8 +124,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure DrillDownSalesThisMonth()
+        procedure DrillDownSalesThisMonth()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -142,8 +134,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
     end;
 
-    [Scope('Personalization')]
-    procedure DrillDownSalesThisMonthLastYear()
+        procedure DrillDownSalesThisMonthLastYear()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -166,8 +157,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         CustLedgerEntry.SetRange("Closed at Date", CalcDate('<CM-3M>', GetDefaultWorkDate), GetDefaultWorkDate);
     end;
 
-    [Scope('Personalization')]
-    procedure CalcCashAccountsBalances() CashAccountBalance: Decimal
+        procedure CalcCashAccountsBalances() CashAccountBalance: Decimal
     var
         GLAccount: Record "G/L Account";
     begin
@@ -182,8 +172,7 @@ codeunit 6151242 "NP Retail Activities Mgt."
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure DrillDownCalcCashAccountsBalances()
+        procedure DrillDownCalcCashAccountsBalances()
     var
         GLAccount: Record "G/L Account";
     begin

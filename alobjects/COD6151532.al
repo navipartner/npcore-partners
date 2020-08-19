@@ -11,8 +11,7 @@ codeunit 6151532 "Nc Coll.  Request WebService"
         SETUP_MISSING: Label 'Setup is missing for %1';
         FileMan: Codeunit "File Management";
 
-    [Scope('Personalization')]
-    procedure Createcollectorrequest(var CollectorRequestWebImport: XMLport "Collector Request Web Import")
+        procedure Createcollectorrequest(var CollectorRequestWebImport: XMLport "Collector Request Web Import")
     var
         ImportEntry: Record "Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";

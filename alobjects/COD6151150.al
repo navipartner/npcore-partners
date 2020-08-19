@@ -14,8 +14,7 @@ codeunit 6151150 "M2 Account WebService"
     begin
     end;
 
-    [Scope('Personalization')]
-    procedure AuthenticateAccountPassword(var M2Authenticate: XMLport "M2 Authenticate")
+        procedure AuthenticateAccountPassword(var M2Authenticate: XMLport "M2 Authenticate")
     var
         TmpOneTimePassword: Record "M2 One Time Password" temporary;
         TmpContact: Record Contact temporary;
@@ -35,8 +34,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure RequestPasswordReset(var M2ResetAccountPassword: XMLport "M2 Reset Account Password")
+        procedure RequestPasswordReset(var M2ResetAccountPassword: XMLport "M2 Reset Account Password")
     var
         TmpOneTimePassword: Record "M2 One Time Password" temporary;
     begin
@@ -52,8 +50,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure ChangeAccountPassword(var M2ChangeAccountPassword: XMLport "M2 Change Account Password")
+        procedure ChangeAccountPassword(var M2ChangeAccountPassword: XMLport "M2 Change Account Password")
     var
         TmpOneTimePassword: Record "M2 One Time Password" temporary;
         TmpContact: Record Contact temporary;
@@ -73,8 +70,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure GetAccountDetails(var M2GetAccount: XMLport "M2 Get Account")
+        procedure GetAccountDetails(var M2GetAccount: XMLport "M2 Get Account")
     var
         ContactNo: Code[20];
         TmpContact: Record Contact temporary;
@@ -97,8 +93,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateAccount(var M2UpdateAccount: XMLport "M2 Update Account")
+        procedure UpdateAccount(var M2UpdateAccount: XMLport "M2 Update Account")
     var
         TmpContact: Record Contact temporary;
         TmpCustomer: Record Customer temporary;
@@ -119,8 +114,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure CreateCorporateAccount(var M2CreateCorporateAccount: XMLport "M2 Create Corporate Account")
+        procedure CreateCorporateAccount(var M2CreateCorporateAccount: XMLport "M2 Create Corporate Account")
     var
         TmpContact: Record Contact temporary;
         TmpCustomer: Record Customer temporary;
@@ -141,8 +135,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure AddPersonAccount(var M2AddAccount: XMLport "M2 Add Account")
+        procedure AddPersonAccount(var M2AddAccount: XMLport "M2 Add Account")
     var
         TmpContact: Record Contact temporary;
         TmpCustomer: Record Customer temporary;
@@ -163,8 +156,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure DeleteAccount(var M2DeleteAccount: XMLport "M2 Delete Account")
+        procedure DeleteAccount(var M2DeleteAccount: XMLport "M2 Delete Account")
     var
         ContactNo: Code[20];
         TmpContact: Record Contact temporary;
@@ -187,8 +179,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure AddShiptoAddress(var M2AddShiptoAddress: XMLport "M2 Add Shipto Address")
+        procedure AddShiptoAddress(var M2AddShiptoAddress: XMLport "M2 Add Shipto Address")
     var
         TmpAccount: Record Contact temporary;
         TmpShiptoAddressRequest: Record "Ship-to Address" temporary;
@@ -209,8 +200,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateShiptoAddress(var M2UpdateShiptoAddress: XMLport "M2 Update Shipto Address")
+        procedure UpdateShiptoAddress(var M2UpdateShiptoAddress: XMLport "M2 Update Shipto Address")
     var
         TmpAccount: Record Contact temporary;
         TmpShiptoAddressRequest: Record "Ship-to Address" temporary;
@@ -231,8 +221,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure DeleteShiptoAddress(var M2DeleteShiptoAddress: XMLport "M2 Delete Shipto Address")
+        procedure DeleteShiptoAddress(var M2DeleteShiptoAddress: XMLport "M2 Delete Shipto Address")
     var
         TmpAccount: Record Contact temporary;
         TmpShiptoAddressRequest: Record "Ship-to Address" temporary;
@@ -253,8 +242,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure GetExtendedAccountDetails(var GetExtendedAccount: XMLport "M2 Get Extended Account")
+        procedure GetExtendedAccountDetails(var GetExtendedAccount: XMLport "M2 Get Extended Account")
     var
         ContactNo: Code[20];
         TmpContact: Record Contact temporary;
@@ -279,8 +267,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [350001]
     end;
 
-    [Scope('Personalization')]
-    procedure ListAllMailGroups(var ListMailingGroups: XMLport "M2 List Mailing Groups")
+        procedure ListAllMailGroups(var ListMailingGroups: XMLport "M2 List Mailing Groups")
     begin
 
         //-NPR5.51 [362020]
@@ -288,8 +275,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
-    [Scope('Personalization')]
-    procedure ListMailGroupsForAccount(ContactNo: Code[20];var ListMailingGroups: XMLport "M2 List Mailing Groups")
+        procedure ListMailGroupsForAccount(ContactNo: Code[20];var ListMailingGroups: XMLport "M2 List Mailing Groups")
     begin
 
         //-NPR5.51 [362020]
@@ -300,8 +286,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
-    [Scope('Personalization')]
-    procedure AddAccountToMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
+        procedure AddAccountToMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
     var
         ContactMailingGroup: Record "Contact Mailing Group";
     begin
@@ -321,8 +306,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
-    [Scope('Personalization')]
-    procedure RemoveAccountFromMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
+        procedure RemoveAccountFromMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
     var
         ContactMailingGroup: Record "Contact Mailing Group";
     begin
@@ -340,8 +324,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
-    [Scope('Personalization')]
-    procedure GetShopperRecognition(var ShopperRecognition: XMLport "M2 Shopper Recognition")
+        procedure GetShopperRecognition(var ShopperRecognition: XMLport "M2 Shopper Recognition")
     var
         TmpEFTShopperRecognition: Record "EFT Shopper Recognition" temporary;
         EFTShopperRecognition: Codeunit "EFT Shopper Recognition";
@@ -375,8 +358,7 @@ codeunit 6151150 "M2 Account WebService"
         exit (AccountManager.AuthenticatePassword (TmpOneTimePassword, TmpContact, ReasonText));
     end;
 
-    [Scope('Personalization')]
-    procedure DoChangePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary): Boolean
+        procedure DoChangePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary): Boolean
     var
         AccountManager: Codeunit "M2 Account Manager";
         ReasonText: Text;

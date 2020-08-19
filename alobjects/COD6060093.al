@@ -37,8 +37,7 @@ codeunit 6060093 "MM Admission Service WS"
         ErrorTooManyLogins: Label 'TooManyLogins';
         TicketDisplayName: Label 'Ticket';
 
-    [Scope('Personalization')]
-    procedure GuestValidation(Barcode: Text[50];ScannerStationId: Code[10];var No: Code[20];var Token: Code[50];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
+        procedure GuestValidation(Barcode: Text[50];ScannerStationId: Code[10];var No: Code[20];var Token: Code[50];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
     var
         MMMemberWebService: Codeunit "MM Member WebService";
         MemberCard: Record "MM Member Card";
@@ -234,8 +233,7 @@ codeunit 6060093 "MM Admission Service WS"
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
-    [Scope('Personalization')]
-    procedure GuestArrival(No: Text;Token: Text;ScannerStationId: Code[10];var Name: Text;var PictureBase64: Text;var Transaktion: Code[10];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
+        procedure GuestArrival(No: Text;Token: Text;ScannerStationId: Code[10];var Name: Text;var PictureBase64: Text;var Transaktion: Code[10];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
     var
         MMAdmissionServiceLog: Record "MM Admission Service Log";
         MMAdmissionServiceEntry: Record "MM Admission Service Entry";
@@ -349,8 +347,7 @@ codeunit 6060093 "MM Admission Service WS"
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
-    [Scope('Personalization')]
-    procedure GuestArrivalV2(No: Text;Token: Text;ScannerStationId: Code[10];var Name: Text;var PictureBase64: Text;var Transaktion: Code[10];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
+        procedure GuestArrivalV2(No: Text;Token: Text;ScannerStationId: Code[10];var Name: Text;var PictureBase64: Text;var Transaktion: Code[10];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
     var
         MMAdmissionServiceLog: Record "MM Admission Service Log";
         MMAdmissionServiceEntry: Record "MM Admission Service Entry";
@@ -475,14 +472,12 @@ codeunit 6060093 "MM Admission Service WS"
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
-    [Scope('Personalization')]
-    procedure ValidateConnection(ScannerStationId: Code[10]): Text
+        procedure ValidateConnection(ScannerStationId: Code[10]): Text
     begin
         exit('Hallo ' + ScannerStationId);
     end;
 
-    [Scope('Personalization')]
-    procedure GetTurnstileImages(ScannerStationId: Code[10];var PictureBase64Default: Text;var PictureExtensionDefault: Text;var PictureBase64Error: Text;var PictureExtensionError: Text): Text
+        procedure GetTurnstileImages(ScannerStationId: Code[10];var PictureBase64Default: Text;var PictureExtensionDefault: Text;var PictureBase64Error: Text;var PictureExtensionError: Text): Text
     var
         InStrDefault: InStream;
         InStrError: InStream;
@@ -642,8 +637,7 @@ codeunit 6060093 "MM Admission Service WS"
         Clear(InS);
     end;
 
-    [Scope('Personalization')]
-    procedure GuestValidationV2(Barcode: Text[50];ScannerStationId: Code[10];var No: Code[20];var Token: Code[50];var ErrorNumber: Code[10];var ErrorDescription: Text;var LightColor: Text[30]): Boolean
+        procedure GuestValidationV2(Barcode: Text[50];ScannerStationId: Code[10];var No: Code[20];var Token: Code[50];var ErrorNumber: Code[10];var ErrorDescription: Text;var LightColor: Text[30]): Boolean
     var
         MMMemberWebService: Codeunit "MM Member WebService";
         MemberCard: Record "MM Member Card";

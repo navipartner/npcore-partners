@@ -13,8 +13,7 @@ codeunit 6151199 "NpCs Collect Webservice"
         Text001: Label 'Collect %1 %2 not found';
         Text002: Label 'It is not allowed to change Processing Status from %1 to %2 on Collect %3 %4';
 
-    [Scope('Personalization')]
-    procedure ImportSalesDocuments(var sales_documents: XMLport "NpCs Sales Document")
+        procedure ImportSalesDocuments(var sales_documents: XMLport "NpCs Sales Document")
     var
         ImportEntry: Record "Nc Import Entry";
         TempSalesHeader: Record "Sales Header" temporary;
@@ -46,8 +45,7 @@ codeunit 6151199 "NpCs Collect Webservice"
         end;
     end;
 
-    [Scope('Personalization')]
-    procedure GetCollectDocuments(var collect_documents: XMLport "NpCs Collect Documents")
+        procedure GetCollectDocuments(var collect_documents: XMLport "NpCs Collect Documents")
     begin
         collect_documents.Import;
         //-NPR5.53 [378216]
@@ -55,14 +53,12 @@ codeunit 6151199 "NpCs Collect Webservice"
         //+NPR5.53 [378216]
     end;
 
-    [Scope('Personalization')]
-    procedure GetCollectStores(var stores: XMLport "NpCs Collect Store")
+        procedure GetCollectStores(var stores: XMLport "NpCs Collect Store")
     begin
         stores.Import;
     end;
 
-    [Scope('Personalization')]
-    procedure RunNextWorkflowStep(var collect_documents: XMLport "NpCs Collect Documents")
+        procedure RunNextWorkflowStep(var collect_documents: XMLport "NpCs Collect Documents")
     var
         NpCsDocument: Record "NpCs Document";
         TempNpCsDocument: Record "NpCs Document" temporary;
@@ -85,20 +81,17 @@ codeunit 6151199 "NpCs Collect Webservice"
           until TempNpCsDocument.Next = 0;
     end;
 
-    [Scope('Personalization')]
-    procedure GetLocalInventory(var local_inventory: XMLport "NpCs Local Inventory")
+        procedure GetLocalInventory(var local_inventory: XMLport "NpCs Local Inventory")
     begin
         local_inventory.Import;
     end;
 
-    [Scope('Personalization')]
-    procedure GetStoreInventory(var store_inventory: XMLport "NpCs Store Inventory")
+        procedure GetStoreInventory(var store_inventory: XMLport "NpCs Store Inventory")
     begin
         store_inventory.Import;
     end;
 
-    [Scope('Personalization')]
-    procedure UpdateProcessingStatus(var collect_documents: XMLport "NpCs Collect Documents")
+        procedure UpdateProcessingStatus(var collect_documents: XMLport "NpCs Collect Documents")
     var
         NpCsDocument: Record "NpCs Document";
         TempNpCsDocument: Record "NpCs Document" temporary;
