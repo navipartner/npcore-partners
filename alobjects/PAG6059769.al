@@ -24,79 +24,79 @@ page 6059769 "NaviDocs Document List"
         {
             repeater(Group)
             {
-                field("Document Description";"Document Description")
+                field("Document Description"; "Document Description")
                 {
                     Editable = false;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
                     Editable = false;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                     Editable = false;
                 }
-                field("Order No.";"Order No.")
+                field("Order No."; "Order No.")
                 {
                     Editable = false;
                 }
-                field("External Document No.";"External Document No.")
+                field("External Document No."; "External Document No.")
                 {
                     Editable = false;
                 }
-                field("No. (Recipient)";"No. (Recipient)")
+                field("No. (Recipient)"; "No. (Recipient)")
                 {
                     Editable = false;
                 }
-                field("Name (Recipient)";"Name (Recipient)")
+                field("Name (Recipient)"; "Name (Recipient)")
                 {
                     Editable = false;
                 }
-                field(StatusText;StatusText)
+                field(StatusText; StatusText)
                 {
                     Caption = 'Status';
                     Editable = false;
                     OptionCaption = 'Unhandled,Error,Handled';
                 }
-                field("Document Handling Profile";"Document Handling Profile")
+                field("Document Handling Profile"; "Document Handling Profile")
                 {
                 }
-                field("Document Handling";"Document Handling")
+                field("Document Handling"; "Document Handling")
                 {
                     Editable = false;
                 }
-                field("Report No.";"Report No.")
+                field("Report No."; "Report No.")
                 {
                 }
-                field("E-mail (Recipient)";"E-mail (Recipient)")
+                field("E-mail (Recipient)"; "E-mail (Recipient)")
                 {
                 }
-                field("Template Code";"Template Code")
+                field("Template Code"; "Template Code")
                 {
                     Visible = false;
                 }
-                field("Printed Qty.";"Printed Qty.")
+                field("Printed Qty."; "Printed Qty.")
                 {
                     Editable = false;
                 }
-                field("Processed Qty.";"Processed Qty.")
+                field("Processed Qty."; "Processed Qty.")
                 {
                     Editable = false;
                 }
-                field("Delay sending until";"Delay sending until")
+                field("Delay sending until"; "Delay sending until")
                 {
                 }
             }
-            part(NaviDocsCommentSubpage;"NaviDocs Comment Subpage")
+            part(NaviDocsCommentSubpage; "NaviDocs Comment Subpage")
             {
                 Editable = false;
                 ShowFilter = false;
             }
-            part(NaviDocsAttachments;"NaviDocs Entry Attachments")
+            part(NaviDocsAttachments; "NaviDocs Entry Attachments")
             {
                 ShowFilter = false;
-                SubPageLink = "NaviDocs Entry No."=FIELD("Entry No.");
-                SubPageView = SORTING("NaviDocs Entry No.","Line No.");
+                SubPageLink = "NaviDocs Entry No." = FIELD("Entry No.");
+                SubPageView = SORTING("NaviDocs Entry No.", "Line No.");
                 Visible = ShowAttachmentSubpage;
             }
         }
@@ -228,7 +228,7 @@ page 6059769 "NaviDocs Document List"
             group("Handling Profile")
             {
                 Caption = 'Handling Profile';
-                action(ChangeHandlingProfile)
+                action(DoChangeHandlingProfile)
                 {
                     Caption = 'Change Handling Profile';
                     Image = SendToMultiple;
@@ -291,7 +291,7 @@ page 6059769 "NaviDocs Document List"
     trigger OnAfterGetCurrRecord()
     begin
         //-NPR5.30 [243998]
-        CurrPage.NaviDocsCommentSubpage.PAGE.SetData(Rec,NaviDocsSetup."Log to Activity Log");
+        CurrPage.NaviDocsCommentSubpage.PAGE.SetData(Rec, NaviDocsSetup."Log to Activity Log");
         //+NPR5.30 [243998]
     end;
 
@@ -337,18 +337,18 @@ page 6059769 "NaviDocs Document List"
         //-NPR5.26 [248662]
         //NaviDocsEntry2.SETRANGE(Type,Type::"2");
         //+NPR5.26 [248662]
-        NaviDocsEntry2.SetRange(Status,0,1);
+        NaviDocsEntry2.SetRange(Status, 0, 1);
 
-        if not Confirm(StrSubstNo(TxtConfirm001,Format(NaviDocsEntry2.Count),TxtConfirm011),true) then
-          Error(TxtConfirm020);
+        if not Confirm(StrSubstNo(TxtConfirm001, Format(NaviDocsEntry2.Count), TxtConfirm011), true) then
+            Error(TxtConfirm020);
 
         if NaviDocsEntry2.FindSet then
-          repeat
-            NaviDocsEntry3.Copy(NaviDocsEntry2);
-            if NaviDocsManagement.Run(NaviDocsEntry3) then;
-            //NaviDocsManagement.RUN(NaviDocsEntry3);
-            Commit;
-          until NaviDocsEntry2.Next = 0;
+            repeat
+                NaviDocsEntry3.Copy(NaviDocsEntry2);
+                if NaviDocsManagement.Run(NaviDocsEntry3) then;
+                //NaviDocsManagement.RUN(NaviDocsEntry3);
+                Commit;
+            until NaviDocsEntry2.Next = 0;
 
         NaviDocsEntry2.Reset;
         //-NPR5.26 [248662]
@@ -356,11 +356,11 @@ page 6059769 "NaviDocs Document List"
         //NaviDocsEntry2.SETRANGE(Type,Type::"2");
         NaviDocsEntry2.SetCurrentKey(Status);
         //+NPR5.26 [248662]
-        NaviDocsEntry2.SetRange(Status,0,1);
+        NaviDocsEntry2.SetRange(Status, 0, 1);
         if NaviDocsEntry2.Count > 0 then
-          Message(TxtHandled001,NaviDocsEntry2.Count)
+            Message(TxtHandled001, NaviDocsEntry2.Count)
         else
-          Message(TxtHandled002);
+            Message(TxtHandled002);
 
         CurrPage.Update(false);
     end;
@@ -370,12 +370,12 @@ page 6059769 "NaviDocs Document List"
         Clear(NaviDocsEntry2);
         NaviDocsEntry2.SetCurrentKey(Status);
         CurrPage.SetSelectionFilter(NaviDocsEntry2);
-        NaviDocsEntry2.SetRange(Status,0,1);
+        NaviDocsEntry2.SetRange(Status, 0, 1);
         if NaviDocsEntry2.FindSet then
-          repeat
-            if NaviDocsManagement.CheckAndUpdateStatus(NaviDocsEntry2) then
-              Commit;
-          until NaviDocsEntry2.Next = 0;
+            repeat
+                if NaviDocsManagement.CheckAndUpdateStatus(NaviDocsEntry2) then
+                    Commit;
+            until NaviDocsEntry2.Next = 0;
 
         CurrPage.Update(false);
     end;
@@ -384,15 +384,15 @@ page 6059769 "NaviDocs Document List"
     var
         NaviDocsEntry3: Record "NaviDocs Entry";
     begin
-        if not Confirm(StrSubstNo(TxtConfirm001,Format(NaviDocsEntry2.Count),TxtConfirm012)) then
-          Error(TxtConfirm020);
+        if not Confirm(StrSubstNo(TxtConfirm001, Format(NaviDocsEntry2.Count), TxtConfirm012)) then
+            Error(TxtConfirm020);
 
         if NaviDocsEntry2.FindSet then
-          repeat
-            NaviDocsEntry3.Copy(NaviDocsEntry2);
-            NaviDocsManagement.UpdateStatus(NaviDocsEntry3,UpdateStatus);
-            Commit;
-          until NaviDocsEntry2.Next = 0;
+            repeat
+                NaviDocsEntry3.Copy(NaviDocsEntry2);
+                NaviDocsManagement.UpdateStatus(NaviDocsEntry3, UpdateStatus);
+                Commit;
+            until NaviDocsEntry2.Next = 0;
 
         CurrPage.Update(false);
     end;
@@ -405,25 +405,25 @@ page 6059769 "NaviDocs Document List"
         //-NPR5.40 [306875]
         NaviDocsEntry2.SetCurrentKey("Entry No.");
 
-        if PAGE.RunModal(0,NewHandlingProfile) <> ACTION::LookupOK then
-          exit;
+        if PAGE.RunModal(0, NewHandlingProfile) <> ACTION::LookupOK then
+            exit;
         if NaviDocsEntry2.FindSet then
-          repeat
-            if NaviDocsManagement.SetHandlingProfile(NaviDocsEntry2,NewHandlingProfile) then begin
-              TempChangedNaviDocsEntry := NaviDocsEntry2;
-              TempChangedNaviDocsEntry.Insert;
-              Commit;
-            end;
-          until NaviDocsEntry2.Next = 0;
+            repeat
+                if NaviDocsManagement.SetHandlingProfile(NaviDocsEntry2, NewHandlingProfile) then begin
+                    TempChangedNaviDocsEntry := NaviDocsEntry2;
+                    TempChangedNaviDocsEntry.Insert;
+                    Commit;
+                end;
+            until NaviDocsEntry2.Next = 0;
 
         if TempChangedNaviDocsEntry.FindSet then
-          if Confirm(TxtConfirmHandleChanged) then
-            repeat
-              NaviDocsEntry2.Get(TempChangedNaviDocsEntry."Entry No.");
-              NaviDocsEntry2.Status := 0;
-              if NaviDocsManagement.Run(NaviDocsEntry2) then;
-              Commit;
-            until TempChangedNaviDocsEntry.Next = 0;
+            if Confirm(TxtConfirmHandleChanged) then
+                repeat
+                    NaviDocsEntry2.Get(TempChangedNaviDocsEntry."Entry No.");
+                    NaviDocsEntry2.Status := 0;
+                    if NaviDocsManagement.Run(NaviDocsEntry2) then;
+                    Commit;
+                until TempChangedNaviDocsEntry.Next = 0;
 
         NaviDocsEntry2.Reset;
         CurrPage.Update(false);

@@ -15,122 +15,122 @@ page 6151570 "AF Setup"
         {
             group(General)
             {
-                field("Enable Azure Functions";"Enable Azure Functions")
+                field("Enable Azure Functions"; "Enable Azure Functions")
                 {
                 }
-                field("Customer Tag";"Customer Tag")
+                field("Customer Tag"; "Customer Tag")
                 {
                 }
-                field("Web Service Is Published";"Web Service Is Published")
+                field("Web Service Is Published"; "Web Service Is Published")
                 {
                 }
-                field("Web Service Url";"Web Service Url")
+                field("Web Service Url"; "Web Service Url")
                 {
                 }
             }
             group("Spire Barcode")
             {
                 Caption = 'Spire Barcode';
-                field("Spire Barcode - API Key";"Spire Barcode - API Key")
+                field("Spire Barcode - API Key"; "Spire Barcode - API Key")
                 {
                 }
-                field("Spire Barcode - Base Url";"Spire Barcode - Base Url")
+                field("Spire Barcode - Base Url"; "Spire Barcode - Base Url")
                 {
                 }
-                field("Spire Barcode - API Routing";"Spire Barcode - API Routing")
+                field("Spire Barcode - API Routing"; "Spire Barcode - API Routing")
                 {
                 }
             }
             group(Control6014405)
             {
                 Caption = 'Notification Hub';
-                field("Notification - API Key";"Notification - API Key")
+                field("Notification - API Key"; "Notification - API Key")
                 {
                 }
-                field("Notification - Base Url";"Notification - Base Url")
+                field("Notification - Base Url"; "Notification - Base Url")
                 {
                 }
-                field("Notification - API Routing";"Notification - API Routing")
+                field("Notification - API Routing"; "Notification - API Routing")
                 {
                 }
-                field("Notification - Conn. String";"Notification - Conn. String")
+                field("Notification - Conn. String"; "Notification - Conn. String")
                 {
                 }
-                field("Notification - Hub Path";"Notification - Hub Path")
+                field("Notification - Hub Path"; "Notification - Hub Path")
                 {
                 }
             }
             group("Msg Service")
             {
                 Caption = 'Msg Service';
-                field("Msg Service - Site Created";"Msg Service - Site Created")
+                field("Msg Service - Site Created"; "Msg Service - Site Created")
                 {
                 }
-                field("Msg Service - API Key";"Msg Service - API Key")
+                field("Msg Service - API Key"; "Msg Service - API Key")
                 {
                 }
-                field("Msg Service - Base Url";"Msg Service - Base Url")
+                field("Msg Service - Base Url"; "Msg Service - Base Url")
                 {
                 }
-                field("Msg Service - Base Web Url";"Msg Service - Base Web Url")
+                field("Msg Service - Base Web Url"; "Msg Service - Base Web Url")
                 {
                 }
-                field("Msg Service - API Routing";"Msg Service - API Routing")
+                field("Msg Service - API Routing"; "Msg Service - API Routing")
                 {
                 }
-                field("Msg Service - Name";"Msg Service - Name")
+                field("Msg Service - Name"; "Msg Service - Name")
                 {
                 }
-                field("Msg Service - Title";"Msg Service - Title")
+                field("Msg Service - Title"; "Msg Service - Title")
                 {
                 }
-                field("Msg Service - Description";"Msg Service - Description")
+                field("Msg Service - Description"; "Msg Service - Description")
                 {
                 }
-                field(WebsiteUrl;WebsiteUrl)
+                field(WebsiteUrl; WebsiteUrl)
                 {
                     Caption = 'Msg Service - Website Url';
                     Editable = false;
                     ExtendedDatatype = URL;
                 }
-                field("Msg Service - Report ID";"Msg Service - Report ID")
+                field("Msg Service - Report ID"; "Msg Service - Report ID")
                 {
                 }
-                field("Msg Service - Report Caption";"Msg Service - Report Caption")
+                field("Msg Service - Report Caption"; "Msg Service - Report Caption")
                 {
                 }
-                field("Msg Service - Source Type";"Msg Service - Source Type")
+                field("Msg Service - Source Type"; "Msg Service - Source Type")
                 {
                 }
-                field("Msg Service - Encryption Key";"Msg Service - Encryption Key")
+                field("Msg Service - Encryption Key"; "Msg Service - Encryption Key")
                 {
                 }
-                field("Msg Service - NAV WS User";"Msg Service - NAV WS User")
+                field("Msg Service - NAV WS User"; "Msg Service - NAV WS User")
                 {
                 }
-                field("Msg Service - NAV WS Password";"Msg Service - NAV WS Password")
+                field("Msg Service - NAV WS Password"; "Msg Service - NAV WS Password")
                 {
                 }
-                field("Msg Service - Image";"Msg Service - Image")
+                field("Msg Service - Image"; "Msg Service - Image")
                 {
                 }
-                field("Msg Service - Icon";"Msg Service - Icon")
+                field("Msg Service - Icon"; "Msg Service - Icon")
                 {
                 }
             }
             group("OIO Validation")
             {
                 Caption = 'OIO Validation';
-                field("OIO Validation - Enable";"OIO Validation - Enable")
+                field("OIO Validation - Enable"; "OIO Validation - Enable")
                 {
                 }
-                field("OIO Validation - API Key";"OIO Validation - API Key")
+                field("OIO Validation - API Key"; "OIO Validation - API Key")
                 {
                 }
-                field("OIO Validation - Base Url";"OIO Validation - Base Url")
+                field("OIO Validation - Base Url"; "OIO Validation - Base Url")
                 {
                 }
-                field("OIO Validation - API Routing";"OIO Validation - API Routing")
+                field("OIO Validation - API Routing"; "OIO Validation - API Routing")
                 {
                 }
             }
@@ -182,7 +182,7 @@ page 6151570 "AF Setup"
                     end;
                 }
             }
-            group("MSG Service")
+            group(MSGService)
             {
                 Caption = 'MSG Service';
                 action("Create Site")
@@ -195,7 +195,7 @@ page 6151570 "AF Setup"
                     var
                         AFAPIMsgService: Codeunit "AF API - Msg Service";
                     begin
-                        AFAPIMsgService.PostSiteInfo(Rec,0);
+                        AFAPIMsgService.PostSiteInfo(Rec, 0);
                     end;
                 }
                 action("Update Site")
@@ -207,7 +207,7 @@ page 6151570 "AF Setup"
                     var
                         AFAPIMsgService: Codeunit "AF API - Msg Service";
                     begin
-                        AFAPIMsgService.PostSiteInfo(Rec,1);
+                        AFAPIMsgService.PostSiteInfo(Rec, 1);
                     end;
                 }
                 action("Delete Site")
@@ -219,7 +219,7 @@ page 6151570 "AF Setup"
                     var
                         AFAPIMsgService: Codeunit "AF API - Msg Service";
                     begin
-                        AFAPIMsgService.PostSiteInfo(Rec,2);
+                        AFAPIMsgService.PostSiteInfo(Rec, 2);
                     end;
                 }
             }
