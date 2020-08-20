@@ -13,13 +13,13 @@ page 6151090 "Nc RapidConnect Setup Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Package Code";"Package Code")
+                field("Package Code"; "Package Code")
                 {
                     Importance = Promoted;
                     ShowMandatory = true;
@@ -31,76 +31,76 @@ page 6151090 "Nc RapidConnect Setup Card"
                 group(Control6151431)
                 {
                     ShowCaption = false;
-                    field("Export Enabled";"Export Enabled")
+                    field("Export Enabled"; "Export Enabled")
                     {
                         Importance = Promoted;
                     }
-                    field("Task Processor Code";"Task Processor Code")
+                    field("Task Processor Code"; "Task Processor Code")
                     {
                         Importance = Promoted;
                     }
-                    field("Export File Type";"Export File Type")
+                    field("Export File Type"; "Export File Type")
                     {
                     }
                 }
                 group(Control6151414)
                 {
                     ShowCaption = false;
-                    part(Control6151411;"Nc RapidConnect Subform")
+                    part(Control6151411; "Nc RapidConnect Subform")
                     {
-                        SubPageLink = "Setup Code"=FIELD(Code);
+                        SubPageLink = "Setup Code" = FIELD(Code);
                     }
-                    part(Control6151416;"Nc RapidConnect Endpoint Sub.")
+                    part(Control6151416; "Nc RapidConnect Endpoint Sub.")
                     {
-                        SubPageLink = "Setup Code"=FIELD(Code);
+                        SubPageLink = "Setup Code" = FIELD(Code);
                     }
                 }
             }
             group(Import)
             {
                 Caption = 'Import';
-                field("Import Enabled";"Import Enabled")
+                field("Import Enabled"; "Import Enabled")
                 {
                     Importance = Promoted;
                 }
-                field("Import Type";"Import Type")
+                field("Import Type"; "Import Type")
                 {
                 }
-                field("Validate Package";"Validate Package")
+                field("Validate Package"; "Validate Package")
                 {
                 }
-                field("Apply Package";"Apply Package")
+                field("Apply Package"; "Apply Package")
                 {
                 }
-                field("Disable Data Log on Import";"Disable Data Log on Import")
+                field("Disable Data Log on Import"; "Disable Data Log on Import")
                 {
                 }
                 group("Download from")
                 {
                     Caption = 'Download from';
-                    field("Ftp Host";"Ftp Host")
+                    field("Ftp Host"; "Ftp Host")
                     {
                         Importance = Promoted;
                     }
-                    field("Ftp Port";"Ftp Port")
+                    field("Ftp Port"; "Ftp Port")
                     {
                     }
-                    field("Ftp User";"Ftp User")
+                    field("Ftp User"; "Ftp User")
                     {
                     }
-                    field("Ftp Password";"Ftp Password")
+                    field("Ftp Password"; "Ftp Password")
                     {
                     }
-                    field("Ftp Passive";"Ftp Passive")
+                    field("Ftp Passive"; "Ftp Passive")
                     {
                     }
-                    field("Ftp Binary";"Ftp Binary")
+                    field("Ftp Binary"; "Ftp Binary")
                     {
                     }
-                    field("Ftp Path";"Ftp Path")
+                    field("Ftp Path"; "Ftp Path")
                     {
                     }
-                    field("Ftp Backup Path";"Ftp Backup Path")
+                    field("Ftp Backup Path"; "Ftp Backup Path")
                     {
                     }
                 }
@@ -112,7 +112,7 @@ page 6151090 "Nc RapidConnect Setup Card"
     {
         area(processing)
         {
-            group(Export)
+            group(ExportActionGroup)
             {
                 Caption = 'Export';
                 action("Init Export Triggers")
@@ -128,7 +128,7 @@ page 6151090 "Nc RapidConnect Setup Card"
                     end;
                 }
             }
-            group(Import)
+            group(ImportActionGroup)
             {
                 Caption = 'Import';
                 action("Download Ftp")

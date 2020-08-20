@@ -7,7 +7,7 @@ page 6151131 "TM Seating Template"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "TM Seating Template";
-    SourceTableView = SORTING("Admission Code",Path);
+    SourceTableView = SORTING("Admission Code", Path);
 
     layout
     {
@@ -16,28 +16,28 @@ page 6151131 "TM Seating Template"
             repeater(Group)
             {
                 IndentationColumn = "Indent Level";
-                IndentationControls = "Seating Code",Description;
+                IndentationControls = "Seating Code", Description;
                 ShowAsTree = true;
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Seating Code";"Seating Code")
+                field("Seating Code"; "Seating Code")
                 {
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
                     Visible = false;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
                 }
-                field(Capacity;Capacity)
+                field(Capacity; Capacity)
                 {
                 }
-                field("Reservation Category";"Reservation Category")
+                field("Reservation Category"; "Reservation Category")
                 {
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
                     Style = StandardAccent;
                     StyleExpr = AccentuatedPrice;
@@ -48,16 +48,16 @@ page 6151131 "TM Seating Template"
                         SeatingTemplate: Record "TM Seating Template";
                     begin
 
-                        if (Confirm (UPDATE_CHILDREN, true)) then begin
-                          SeatingTemplate.SetFilter ("Admission Code", '=%1', Rec."Admission Code");
-                          SeatingTemplate.SetFilter (Path, '%1', StrSubstNo ('%1/*', Rec.Path));
-                          SeatingTemplate.ModifyAll ("Unit Price", Rec."Unit Price");
+                        if (Confirm(UPDATE_CHILDREN, true)) then begin
+                            SeatingTemplate.SetFilter("Admission Code", '=%1', Rec."Admission Code");
+                            SeatingTemplate.SetFilter(Path, '%1', StrSubstNo('%1/*', Rec.Path));
+                            SeatingTemplate.ModifyAll("Unit Price", Rec."Unit Price");
                         end;
 
-                        CurrPage.Update (false);
+                        CurrPage.Update(false);
                     end;
                 }
-                field(UnitPrice;UnitPrice)
+                field(UnitPrice; UnitPrice)
                 {
                     Caption = 'Unit Price';
                     Style = StandardAccent;
@@ -68,21 +68,21 @@ page 6151131 "TM Seating Template"
                         SeatingTemplate: Record "TM Seating Template";
                     begin
 
-                        if (Confirm (UPDATE_CHILDREN, true)) then begin
-                          SeatingTemplate.SetFilter ("Admission Code", '=%1', Rec."Admission Code");
-                          SeatingTemplate.SetFilter (Path, '%1', StrSubstNo ('%1/*', Rec.Path));
-                          SeatingTemplate.ModifyAll ("Unit Price", Rec."Unit Price");
+                        if (Confirm(UPDATE_CHILDREN, true)) then begin
+                            SeatingTemplate.SetFilter("Admission Code", '=%1', Rec."Admission Code");
+                            SeatingTemplate.SetFilter(Path, '%1', StrSubstNo('%1/*', Rec.Path));
+                            SeatingTemplate.ModifyAll("Unit Price", Rec."Unit Price");
                         end;
-                        CurrPage.Update (false);
+                        CurrPage.Update(false);
                     end;
                 }
-                field(Ordinal;Ordinal)
+                field(Ordinal; Ordinal)
                 {
                 }
-                field(Path;Path)
+                field(Path; Path)
                 {
                 }
-                field("Indent Level";"Indent Level")
+                field("Indent Level"; "Indent Level")
                 {
                 }
             }
@@ -103,7 +103,7 @@ page 6151131 "TM Seating Template"
                 trigger OnAction()
                 begin
 
-                    DeleteNode ();
+                    DeleteNode();
                 end;
             }
             action("Add Root")
@@ -113,8 +113,8 @@ page 6151131 "TM Seating Template"
                 trigger OnAction()
                 begin
 
-                    if (GetFilter ("Admission Code") <> '') then
-                      SeatingManagement.AddRoot (GetFilter ("Admission Code"), '');
+                    if (GetFilter("Admission Code") <> '') then
+                        SeatingManagement.AddRoot(GetFilter("Admission Code"), '');
                 end;
             }
             action("Add Parent")
@@ -128,7 +128,7 @@ page 6151131 "TM Seating Template"
                 trigger OnAction()
                 begin
 
-                    SeatingManagement.AddChild (Rec."Entry No.");
+                    SeatingManagement.AddChild(Rec."Entry No.");
                 end;
             }
             action("Add Sibling")
@@ -138,7 +138,7 @@ page 6151131 "TM Seating Template"
                 trigger OnAction()
                 begin
 
-                    SeatingManagement.AddSibling (Rec."Entry No.");
+                    SeatingManagement.AddSibling(Rec."Entry No.");
                 end;
             }
             action("Structure Wizard")
@@ -150,7 +150,7 @@ page 6151131 "TM Seating Template"
                     SeatingTemplate: Record "TM Seating Template";
                 begin
 
-                    SeatingManagement.RowsAndSeatWizard (Rec."Entry No.", 1, SeatingTemplate);
+                    SeatingManagement.RowsAndSeatWizard(Rec."Entry No.", 1, SeatingTemplate);
                 end;
             }
             action("Numbering Wizard")
@@ -162,8 +162,8 @@ page 6151131 "TM Seating Template"
                     SeatingTemplate: Record "TM Seating Template";
                 begin
 
-                    CurrPage.SetSelectionFilter (SeatingTemplate);
-                    SeatingManagement.RowsAndSeatWizard (Rec."Entry No.", 2, SeatingTemplate);
+                    CurrPage.SetSelectionFilter(SeatingTemplate);
+                    SeatingManagement.RowsAndSeatWizard(Rec."Entry No.", 2, SeatingTemplate);
                 end;
             }
             action("Split Wizard")
@@ -175,8 +175,8 @@ page 6151131 "TM Seating Template"
                     SeatingTemplate: Record "TM Seating Template";
                 begin
 
-                    CurrPage.SetSelectionFilter (SeatingTemplate);
-                    SeatingManagement.RowsAndSeatWizard (Rec."Entry No.", 3, SeatingTemplate);
+                    CurrPage.SetSelectionFilter(SeatingTemplate);
+                    SeatingManagement.RowsAndSeatWizard(Rec."Entry No.", 3, SeatingTemplate);
                 end;
             }
             group("Order")
@@ -196,7 +196,7 @@ page 6151131 "TM Seating Template"
                     begin
 
                         MoveUp(Rec);
-                        CurrPage.Update (false);
+                        CurrPage.Update(false);
                     end;
                 }
                 action("Move Down")
@@ -213,14 +213,14 @@ page 6151131 "TM Seating Template"
                     begin
 
                         MoveDown(Rec);
-                        CurrPage.Update (false);
+                        CurrPage.Update(false);
                     end;
                 }
             }
-            group(Indent)
+            group(Indentation)
             {
                 Caption = 'Indent';
-                action(Unindent)
+                action(DoUnindent)
                 {
                     Caption = 'Unindent';
 
@@ -229,8 +229,8 @@ page 6151131 "TM Seating Template"
                         SeatingTemplate: Record "TM Seating Template";
                     begin
 
-                        UnIndent (Rec);
-                        CurrPage.Update (false);
+                        UnIndent(Rec);
+                        CurrPage.Update(false);
                     end;
                 }
                 action(Action6014422)
@@ -240,8 +240,8 @@ page 6151131 "TM Seating Template"
                     trigger OnAction()
                     begin
 
-                        Indent (Rec);
-                        CurrPage.Update (false);
+                        Indent(Rec);
+                        CurrPage.Update(false);
                     end;
                 }
             }
@@ -253,8 +253,8 @@ page 6151131 "TM Seating Template"
         AccentuatedPrice := false;
         UnitPrice := "Unit Price";
         if (UnitPrice = 0) then begin
-          UnitPrice := SeatingManagement.GetInheritedUnitPice (Rec."Parent Entry No.");
-          AccentuatedPrice := true;
+            UnitPrice := SeatingManagement.GetInheritedUnitPice(Rec."Parent Entry No.");
+            AccentuatedPrice := true;
         end;
     end;
 
@@ -277,36 +277,36 @@ page 6151131 "TM Seating Template"
         SeatingTemplate: Record "TM Seating Template";
     begin
 
-        CurrPage.SetSelectionFilter (SeatingTemplate);
-        if (SeatingTemplate.FindSet (true, true)) then begin
-          repeat
-            SeatingManagement.DeleteNode (SeatingTemplate."Entry No.");
-          until (SeatingTemplate.Next () = 0);
+        CurrPage.SetSelectionFilter(SeatingTemplate);
+        if (SeatingTemplate.FindSet(true, true)) then begin
+            repeat
+                SeatingManagement.DeleteNode(SeatingTemplate."Entry No.");
+            until (SeatingTemplate.Next() = 0);
         end;
     end;
 
     local procedure MoveUp(RecToMove: Record "TM Seating Template")
     begin
 
-        SeatingManagement.MoveNodeUp (RecToMove);
+        SeatingManagement.MoveNodeUp(RecToMove);
     end;
 
     local procedure MoveDown(RecToMove: Record "TM Seating Template")
     begin
 
-        SeatingManagement.MoveNodeDown (RecToMove);
+        SeatingManagement.MoveNodeDown(RecToMove);
     end;
 
     local procedure Indent(RecToIndent: Record "TM Seating Template")
     begin
 
-        SeatingManagement.IndentNode (RecToIndent);
+        SeatingManagement.IndentNode(RecToIndent);
     end;
 
     local procedure UnIndent(RecToUnIndent: Record "TM Seating Template")
     begin
 
-        SeatingManagement.UnIndentNode (RecToUnIndent);
+        SeatingManagement.UnIndentNode(RecToUnIndent);
     end;
 }
 

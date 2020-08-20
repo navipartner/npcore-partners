@@ -57,7 +57,7 @@ page 6059897 "Data Log Setup"
     {
         area(processing)
         {
-            action(CleanDataLog)
+            action(DoCleanDataLog)
             {
                 Caption = 'Clean Data Log';
                 Image = ClearLog;

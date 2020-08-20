@@ -1803,7 +1803,7 @@ page 6014425 "Retail Item Card"
                             //+NPR4.18
                         end;
                     }
-                    field("NPRE Item Routing Profile";"NPRE Item Routing Profile")
+                    field("NPRE Item Routing Profile"; "NPRE Item Routing Profile")
                     {
                     }
                 }
@@ -1996,7 +1996,7 @@ page 6014425 "Retail Item Card"
                     {
                     }
                 }
-                part("Category Links";"Magento Category Links")
+                part("Category Links"; "Magento Category Links")
                 {
                     Caption = 'Category Links';
                     SubPageLink = "Item No." = FIELD("No.");
@@ -2864,7 +2864,7 @@ page 6014425 "Retail Item Card"
             separator(Separator6150719)
             {
             }
-            action(ReplicateItem)
+            action(ReplicateThisItem)
             {
                 Caption = 'Replicate this Item';
                 Image = Copy;
