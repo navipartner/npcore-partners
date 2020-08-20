@@ -57,14 +57,14 @@ page 6014406 "Register Card"
             group(Register)
             {
                 Caption = 'Register';
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                     Importance = Promoted;
                 }
-                field("Logon-User Name";"Logon-User Name")
+                field("Logon-User Name"; "Logon-User Name")
                 {
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -72,31 +72,31 @@ page 6014406 "Register Card"
                         RetailFormCode.RegisterLogonnameAutofill(Rec);
                     end;
                 }
-                field("Register Type";"Register Type")
+                field("Register Type"; "Register Type")
                 {
                 }
-                field("Register Layout";"Register Layout")
+                field("Register Layout"; "Register Layout")
                 {
                 }
-                field("Shop id";"Shop id")
+                field("Shop id"; "Shop id")
                 {
                 }
-                field("Sales Ticket Print Output";"Sales Ticket Print Output")
+                field("Sales Ticket Print Output"; "Sales Ticket Print Output")
                 {
                 }
-                field("Sales Ticket Email Output";"Sales Ticket Email Output")
+                field("Sales Ticket Email Output"; "Sales Ticket Email Output")
                 {
                 }
-                field("Primary Payment Type";"Primary Payment Type")
+                field("Primary Payment Type"; "Primary Payment Type")
                 {
                 }
-                field("Return Payment Type";"Return Payment Type")
+                field("Return Payment Type"; "Return Payment Type")
                 {
                 }
-                field("Connected To Server";"Connected To Server")
+                field("Connected To Server"; "Connected To Server")
                 {
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
                 }
             }
@@ -106,28 +106,28 @@ page 6014406 "Register Card"
                 group(Control6150627)
                 {
                     ShowCaption = false;
-                    field("Customer Display";"Customer Display")
+                    field("Customer Display"; "Customer Display")
                     {
                         Importance = Promoted;
 
                         trigger OnValidate()
                         begin
                             if "Customer Display" then begin
-                              FieldDisplay1 := true;
-                              FieldDisplay2 := true;
-                              FieldDisplayMetode := true;
+                                FieldDisplay1 := true;
+                                FieldDisplay2 := true;
+                                FieldDisplayMetode := true;
                             end else begin
-                              FieldDisplay1 := false;
-                              FieldDisplay2 := false;
-                              FieldDisplayMetode := false;
+                                FieldDisplay1 := false;
+                                FieldDisplay2 := false;
+                                FieldDisplayMetode := false;
                             end;
                         end;
                     }
-                    field("Display 1";"Display 1")
+                    field("Display 1"; "Display 1")
                     {
                         Editable = FieldDisplay1;
                     }
-                    field("Display 2";"Display 2")
+                    field("Display 2"; "Display 2")
                     {
                         Editable = FieldDisplay2;
                     }
@@ -139,48 +139,48 @@ page 6014406 "Register Card"
                 group(Control6150661)
                 {
                     ShowCaption = false;
-                    field(Name;Name)
+                    field(Name; Name)
                     {
                         Importance = Promoted;
                     }
-                    field("Name 2";"Name 2")
+                    field("Name 2"; "Name 2")
                     {
                     }
-                    field(Address;Address)
+                    field(Address; Address)
                     {
                     }
-                    field("Post Code";"Post Code")
+                    field("Post Code"; "Post Code")
                     {
                     }
-                    field(City;City)
+                    field(City; City)
                     {
                     }
-                    field("Phone No.";"Phone No.")
+                    field("Phone No."; "Phone No.")
                     {
                     }
-                    field("E-mail";"E-mail")
+                    field("E-mail"; "E-mail")
                     {
                     }
-                    field(Website;Website)
+                    field(Website; Website)
                     {
                     }
                 }
                 group(Control6150669)
                 {
                     ShowCaption = false;
-                    field("Bank Name";"Bank Name")
+                    field("Bank Name"; "Bank Name")
                     {
                     }
-                    field("Bank Registration No.";"Bank Registration No.")
+                    field("Bank Registration No."; "Bank Registration No.")
                     {
                     }
-                    field("Bank Account No.";"Bank Account No.")
+                    field("Bank Account No."; "Bank Account No.")
                     {
                     }
-                    field("Automatic Payment No.";"Automatic Payment No.")
+                    field("Automatic Payment No."; "Automatic Payment No.")
                     {
                     }
-                    field("VAT No.";"VAT No.")
+                    field("VAT No."; "VAT No.")
                     {
                     }
                 }
@@ -188,7 +188,7 @@ page 6014406 "Register Card"
             group(Receipt)
             {
                 Caption = 'Receipt';
-                field("Sales Ticket Line Text off";"Sales Ticket Line Text off")
+                field("Sales Ticket Line Text off"; "Sales Ticket Line Text off")
                 {
                     Importance = Promoted;
 
@@ -196,37 +196,37 @@ page 6014406 "Register Card"
                     var
                         RetailComment: Record "Retail Comment";
                     begin
-                        RetailComment.SetRange("Table ID",DATABASE::Register);
-                        RetailComment.SetRange("No.","Register No.");
-                        RetailComment.SetRange(Integer,300);
-                        PAGE.RunModal(PAGE::"Retail Comments",RetailComment)
+                        RetailComment.SetRange("Table ID", DATABASE::Register);
+                        RetailComment.SetRange("No.", "Register No.");
+                        RetailComment.SetRange(Integer, 300);
+                        PAGE.RunModal(PAGE::"Retail Comments", RetailComment)
                     end;
                 }
-                field("Sales Ticket Line Text1";"Sales Ticket Line Text1")
+                field("Sales Ticket Line Text1"; "Sales Ticket Line Text1")
                 {
                     Importance = Promoted;
                 }
-                field("Sales Ticket Line Text2";"Sales Ticket Line Text2")
+                field("Sales Ticket Line Text2"; "Sales Ticket Line Text2")
                 {
                     Importance = Promoted;
                 }
-                field("Sales Ticket Line Text3";"Sales Ticket Line Text3")
+                field("Sales Ticket Line Text3"; "Sales Ticket Line Text3")
                 {
                     Importance = Promoted;
                 }
-                field("Sales Ticket Line Text4";"Sales Ticket Line Text4")
+                field("Sales Ticket Line Text4"; "Sales Ticket Line Text4")
                 {
                 }
-                field("Sales Ticket Line Text5";"Sales Ticket Line Text5")
+                field("Sales Ticket Line Text5"; "Sales Ticket Line Text5")
                 {
                 }
-                field("Sales Ticket Line Text6";"Sales Ticket Line Text6")
+                field("Sales Ticket Line Text6"; "Sales Ticket Line Text6")
                 {
                 }
-                field("Sales Ticket Line Text7";"Sales Ticket Line Text7")
+                field("Sales Ticket Line Text7"; "Sales Ticket Line Text7")
                 {
                 }
-                field(BonText;BonText)
+                field(BonText; BonText)
                 {
                     Caption = 'Show Ticket Line Text';
                     Width = 2500;
@@ -238,19 +238,19 @@ page 6014406 "Register Card"
                 group(Control6150695)
                 {
                     ShowCaption = false;
-                    field("Touch Screen Login autopopup";"Touch Screen Login autopopup")
+                    field("Touch Screen Login autopopup"; "Touch Screen Login autopopup")
                     {
                     }
-                    field("Touch Screen Extended info";"Touch Screen Extended info")
+                    field("Touch Screen Extended info"; "Touch Screen Extended info")
                     {
                     }
-                    field("Touch Screen Customerclub";"Touch Screen Customerclub")
+                    field("Touch Screen Customerclub"; "Touch Screen Customerclub")
                     {
                     }
-                    field("Touch Screen Login Type";"Touch Screen Login Type")
+                    field("Touch Screen Login Type"; "Touch Screen Login Type")
                     {
                     }
-                    field("Skip Infobox Update in Sale";"Skip Infobox Update in Sale")
+                    field("Skip Infobox Update in Sale"; "Skip Infobox Update in Sale")
                     {
                     }
                 }
@@ -261,70 +261,70 @@ page 6014406 "Register Card"
                 group(Control6150705)
                 {
                     ShowCaption = false;
-                    field(Account;'')
+                    field(Account; '')
                     {
                         Caption = 'Account';
                         ShowCaption = false;
                         Style = Strong;
                         StyleExpr = TRUE;
                     }
-                    field(Control6150706;Account)
+                    field(Control6150706; Account)
                     {
                         ShowCaption = false;
                     }
-                    field("Gift Voucher Account";"Gift Voucher Account")
+                    field("Gift Voucher Account"; "Gift Voucher Account")
                     {
                     }
-                    field("Gift Voucher Discount Account";"Gift Voucher Discount Account")
+                    field("Gift Voucher Discount Account"; "Gift Voucher Discount Account")
                     {
                     }
-                    field("City Gift Voucher Account";"City Gift Voucher Account")
+                    field("City Gift Voucher Account"; "City Gift Voucher Account")
                     {
                     }
-                    field("City Gift Voucher Discount";"City Gift Voucher Discount")
+                    field("City Gift Voucher Discount"; "City Gift Voucher Discount")
                     {
                     }
-                    field("Credit Voucher Account";"Credit Voucher Account")
+                    field("Credit Voucher Account"; "Credit Voucher Account")
                     {
                     }
-                    field("Difference Account";"Difference Account")
+                    field("Difference Account"; "Difference Account")
                     {
                     }
-                    field("Difference Account - Neg.";"Difference Account - Neg.")
+                    field("Difference Account - Neg."; "Difference Account - Neg.")
                     {
                     }
-                    field("Register Change Account";"Register Change Account")
+                    field("Register Change Account"; "Register Change Account")
                     {
                     }
-                    field("Location Code";"Location Code")
+                    field("Location Code"; "Location Code")
                     {
                     }
-                    field("VAT Customer No.";"VAT Customer No.")
+                    field("VAT Customer No."; "VAT Customer No.")
                     {
                     }
                 }
                 group(Control6150716)
                 {
                     ShowCaption = false;
-                    field("End of Day Balancing";'')
+                    field("End of Day Balancing"; '')
                     {
                         Caption = 'End of Day Balancing';
                         ShowCaption = false;
                         Style = Strong;
                         StyleExpr = TRUE;
                     }
-                    field("Balancing every";"Balancing every")
+                    field("Balancing every"; "Balancing every")
                     {
                     }
-                    field("Balanced Type";"Balanced Type")
-                    {
-                        Importance = Promoted;
-                    }
-                    field("Balance Account";"Balance Account")
+                    field("Balanced Type"; "Balanced Type")
                     {
                         Importance = Promoted;
                     }
-                    field("End of day - Exchange Amount";"End of day - Exchange Amount")
+                    field("Balance Account"; "Balance Account")
+                    {
+                        Importance = Promoted;
+                    }
+                    field("End of day - Exchange Amount"; "End of day - Exchange Amount")
                     {
                     }
                 }
@@ -332,26 +332,26 @@ page 6014406 "Register Card"
             group(Sale)
             {
                 Caption = 'Sale';
-                field("Customer Price Group";"Customer Price Group")
+                field("Customer Price Group"; "Customer Price Group")
                 {
                     Importance = Promoted;
                 }
-                field("Customer Disc. Group";"Customer Disc. Group")
+                field("Customer Disc. Group"; "Customer Disc. Group")
                 {
                 }
-                field("Customer No. auto debit sale";"Customer No. auto debit sale")
+                field("Customer No. auto debit sale"; "Customer No. auto debit sale")
                 {
                 }
-                field("Exchange Label Exchange Period";"Exchange Label Exchange Period")
+                field("Exchange Label Exchange Period"; "Exchange Label Exchange Period")
                 {
                 }
-                field("Lock Register To Salesperson";"Lock Register To Salesperson")
+                field("Lock Register To Salesperson"; "Lock Register To Salesperson")
                 {
                 }
-                field("Use Sales Statistics";"Use Sales Statistics")
+                field("Use Sales Statistics"; "Use Sales Statistics")
                 {
                 }
-                field("Active Event No.";"Active Event No.")
+                field("Active Event No."; "Active Event No.")
                 {
                 }
             }
@@ -361,7 +361,7 @@ page 6014406 "Register Card"
                 group(mPos)
                 {
                     Caption = 'mPos';
-                    field("mPos Payment Type";"mPos Payment Type")
+                    field("mPos Payment Type"; "mPos Payment Type")
                     {
                     }
                 }
@@ -373,7 +373,7 @@ page 6014406 "Register Card"
     {
         area(processing)
         {
-            group(Register)
+            group(RegisterActions)
             {
                 Caption = 'Register';
                 action(Autofill)
@@ -407,23 +407,23 @@ page 6014406 "Register Card"
                     Caption = 'User Setup';
                     Image = UserSetup;
                     RunObject = Page "User Setup";
-                    RunPageLink = "Backoffice Register No."=FIELD("Register No.");
+                    RunPageLink = "Backoffice Register No." = FIELD("Register No.");
                 }
                 action(Skuffer)
                 {
                     Caption = 'Drawers';
                     Image = "Action";
                     RunObject = Page "Alternative Number";
-                    RunPageLink = Code=FIELD("Register No."),
-                                  Type=CONST(Register);
-                    RunPageView = SORTING(Type,Code,"Alt. No.");
+                    RunPageLink = Code = FIELD("Register No."),
+                                  Type = CONST(Register);
+                    RunPageView = SORTING(Type, Code, "Alt. No.");
                 }
                 action("Show Registers Periods")
                 {
                     Caption = 'Show Register Periods';
                     Image = Register;
                     RunObject = Page "Register Period List";
-                    RunPageLink = "Register No."=FIELD("Register No.");
+                    RunPageLink = "Register No." = FIELD("Register No.");
                 }
                 action("Set Saldo Inicial ")
                 {
@@ -437,10 +437,10 @@ page 6014406 "Register Card"
                         ID: Integer;
                     begin
                         InputDialog.LookupMode := true;
-                        InputDialog.SetInput(1,Amount,Text10600007);
+                        InputDialog.SetInput(1, Amount, Text10600007);
                         repeat
-                          if InputDialog.RunModal = ACTION::LookupOK then
-                            ID := InputDialog.InputDecimal(1,Amount);
+                            if InputDialog.RunModal = ACTION::LookupOK then
+                                ID := InputDialog.InputDecimal(1, Amount);
                         //-NPR4.10
                         //UNTIL (Amount > 0) OR (ID = 0);
                         until (Amount >= 0) or (ID = 0);
@@ -473,17 +473,17 @@ page 6014406 "Register Card"
     trigger OnAfterGetCurrRecord()
     begin
         if "Customer Display" then begin
-          FieldDisplay1 := true;
-          FieldDisplay2 := true;
-        //-NPR5.29 [241549]
-        //  FieldDisplayMetode:=TRUE;
-        //+NPR5.29 [241549]
+            FieldDisplay1 := true;
+            FieldDisplay2 := true;
+            //-NPR5.29 [241549]
+            //  FieldDisplayMetode:=TRUE;
+            //+NPR5.29 [241549]
         end else begin
-          FieldDisplay1 := false;
-          FieldDisplay2 := false;
-        //-NPR5.29 [241549]
-        //  FieldDisplayMetode:=FALSE;
-        //+NPR5.29 [241549]
+            FieldDisplay1 := false;
+            FieldDisplay2 := false;
+            //-NPR5.29 [241549]
+            //  FieldDisplayMetode:=FALSE;
+            //+NPR5.29 [241549]
         end;
 
         //-NPR5.29 [241549]
@@ -578,73 +578,73 @@ page 6014406 "Register Card"
     begin
         Clear(BonText);
         case "Sales Ticket Line Text off" of
-          "Sales Ticket Line Text off"::Comment:
-            begin
-              RetailComment.SetRange("Table ID",6014401);
-              RetailComment.SetRange("No.","Register No.");
-              RetailComment.SetRange(Integer,300);
-              RetailComment.SetRange("Hide on printout",false);
-              i:=1;
-              if RetailComment.Find('-') then begin
-                repeat
-                  BonText += RetailComment.Comment + ' \';
-                  i+=1;
-                  if (i = 18) then
-                    BonText += StrSubstNo(Text10600005,17,RetailComment.Count);
-                until ((RetailComment.Next = 0) or (i >= 18));
-              end;
-            end;
-          "Sales Ticket Line Text off"::"NP Config":
-            begin
-              RetailSetup.Get;
-              BonText += RetailSetup."Sales Ticket Line Text1";
-              if (RetailSetup."Sales Ticket Line Text2" <> '') then
-                BonText += '\';
-              BonText += RetailSetup."Sales Ticket Line Text2";
-              if (RetailSetup."Sales Ticket Line Text3" <> '') then
-                BonText += '\';
-              BonText += RetailSetup."Sales Ticket Line Text3";
-              if (RetailSetup."Sales Ticket Line Text4" <> '') then
-                BonText += '\';
-              BonText += RetailSetup."Sales Ticket Line Text4";
-              if (RetailSetup."Sales Ticket Line Text5" <> '') then
-                BonText += '\';
-              BonText += RetailSetup."Sales Ticket Line Text5";
-              if (RetailSetup."Sales Ticket Line Text6" <> '') then
-                BonText += '\';
-              BonText += RetailSetup."Sales Ticket Line Text6";
-              if (RetailSetup."Sales Ticket Line Text7" <> '') then
-                BonText += '\';
-              BonText += RetailSetup."Sales Ticket Line Text7";
-            end;
-          "Sales Ticket Line Text off"::Register:
-            begin
-              BonText += "Sales Ticket Line Text1";
-              if ("Sales Ticket Line Text2" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text2";
-              if ("Sales Ticket Line Text3" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text3";
-              if ("Sales Ticket Line Text4" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text4";
-              if ("Sales Ticket Line Text5" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text5";
-              if ("Sales Ticket Line Text6" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text6";
-              if ("Sales Ticket Line Text7" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text7";
-              if ("Sales Ticket Line Text8" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text8";
-              if ("Sales Ticket Line Text9" <> '') then
-                BonText += '\';
-              BonText += "Sales Ticket Line Text9";
-            end;
+            "Sales Ticket Line Text off"::Comment:
+                begin
+                    RetailComment.SetRange("Table ID", 6014401);
+                    RetailComment.SetRange("No.", "Register No.");
+                    RetailComment.SetRange(Integer, 300);
+                    RetailComment.SetRange("Hide on printout", false);
+                    i := 1;
+                    if RetailComment.Find('-') then begin
+                        repeat
+                            BonText += RetailComment.Comment + ' \';
+                            i += 1;
+                            if (i = 18) then
+                                BonText += StrSubstNo(Text10600005, 17, RetailComment.Count);
+                        until ((RetailComment.Next = 0) or (i >= 18));
+                    end;
+                end;
+            "Sales Ticket Line Text off"::"NP Config":
+                begin
+                    RetailSetup.Get;
+                    BonText += RetailSetup."Sales Ticket Line Text1";
+                    if (RetailSetup."Sales Ticket Line Text2" <> '') then
+                        BonText += '\';
+                    BonText += RetailSetup."Sales Ticket Line Text2";
+                    if (RetailSetup."Sales Ticket Line Text3" <> '') then
+                        BonText += '\';
+                    BonText += RetailSetup."Sales Ticket Line Text3";
+                    if (RetailSetup."Sales Ticket Line Text4" <> '') then
+                        BonText += '\';
+                    BonText += RetailSetup."Sales Ticket Line Text4";
+                    if (RetailSetup."Sales Ticket Line Text5" <> '') then
+                        BonText += '\';
+                    BonText += RetailSetup."Sales Ticket Line Text5";
+                    if (RetailSetup."Sales Ticket Line Text6" <> '') then
+                        BonText += '\';
+                    BonText += RetailSetup."Sales Ticket Line Text6";
+                    if (RetailSetup."Sales Ticket Line Text7" <> '') then
+                        BonText += '\';
+                    BonText += RetailSetup."Sales Ticket Line Text7";
+                end;
+            "Sales Ticket Line Text off"::Register:
+                begin
+                    BonText += "Sales Ticket Line Text1";
+                    if ("Sales Ticket Line Text2" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text2";
+                    if ("Sales Ticket Line Text3" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text3";
+                    if ("Sales Ticket Line Text4" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text4";
+                    if ("Sales Ticket Line Text5" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text5";
+                    if ("Sales Ticket Line Text6" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text6";
+                    if ("Sales Ticket Line Text7" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text7";
+                    if ("Sales Ticket Line Text8" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text8";
+                    if ("Sales Ticket Line Text9" <> '') then
+                        BonText += '\';
+                    BonText += "Sales Ticket Line Text9";
+                end;
         end;
     end;
 }

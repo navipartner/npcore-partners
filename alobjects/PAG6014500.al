@@ -16,13 +16,13 @@ page 6014500 "Dynamic Module Settings"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
                     Caption = 'Setting Name';
                     Style = Strong;
                     StyleExpr = "Setting ID" = 0;
                 }
-                field("Formatted Value";"Formatted Value")
+                field("Formatted Value"; "Formatted Value")
                 {
                     Caption = 'Setting Value';
 
@@ -39,7 +39,7 @@ page 6014500 "Dynamic Module Settings"
     {
         area(processing)
         {
-            action(EditSetting)
+            action(DoEditSetting)
             {
                 Caption = 'Edit Setting';
                 Image = Edit;
@@ -64,11 +64,11 @@ page 6014500 "Dynamic Module Settings"
                 trigger OnAction()
                 begin
                     if not Confirm(ConfirmRestoreMsg) then
-                      exit;
+                        exit;
                     DynamicModuleHelper.RestoreSetting(Rec);
                     ModifiedDynamicModuleSetting := Rec;
                     if not ModifiedDynamicModuleSetting.Insert then
-                      ModifiedDynamicModuleSetting.Modify;
+                        ModifiedDynamicModuleSetting.Modify;
                     CurrPage.Update;
                 end;
             }
@@ -78,13 +78,13 @@ page 6014500 "Dynamic Module Settings"
     trigger OnClosePage()
     begin
         if ModifiedDynamicModuleSetting.FindSet then
-          repeat
-            DynamicModuleSetting.Get(ModifiedDynamicModuleSetting."Module Guid",ModifiedDynamicModuleSetting."Setting ID");
-            if DynamicModuleSetting."Formatted Value" <> ModifiedDynamicModuleSetting."Formatted Value" then begin
-              DynamicModuleSetting := ModifiedDynamicModuleSetting;
-              DynamicModuleSetting.Modify;
-            end;
-          until ModifiedDynamicModuleSetting.Next = 0;
+            repeat
+                DynamicModuleSetting.Get(ModifiedDynamicModuleSetting."Module Guid", ModifiedDynamicModuleSetting."Setting ID");
+                if DynamicModuleSetting."Formatted Value" <> ModifiedDynamicModuleSetting."Formatted Value" then begin
+                    DynamicModuleSetting := ModifiedDynamicModuleSetting;
+                    DynamicModuleSetting.Modify;
+                end;
+            until ModifiedDynamicModuleSetting.Next = 0;
     end;
 
     var
@@ -95,7 +95,7 @@ page 6014500 "Dynamic Module Settings"
 
     procedure SetModuleSettings(var DynamicModuleSetting: Record "Dynamic Module Setting")
     begin
-        Rec.Copy(DynamicModuleSetting,true);
+        Rec.Copy(DynamicModuleSetting, true);
     end;
 
     local procedure EditSetting()
@@ -104,23 +104,23 @@ page 6014500 "Dynamic Module Settings"
         OptionNumber: Integer;
     begin
         if Rec."Data Type" = Rec."Data Type"::Option then begin
-          OptionNumber := StrMenu(Rec."Option String","Integer Value" + 1);
-          if OptionNumber = 0 then
-            exit;
-          ModifiedDynamicModuleSetting := Rec;
-          DynamicModuleHelper.CheckSetupValue(ModifiedDynamicModuleSetting,OptionNumber - 1);
-          DynamicModuleHelper.SetSetupValue(ModifiedDynamicModuleSetting,OptionNumber - 1);
-          if not ModifiedDynamicModuleSetting.Insert then
-            ModifiedDynamicModuleSetting.Modify;
-          Rec := ModifiedDynamicModuleSetting;
-        end else begin
-          DynamicModuleSettingDialog.SetModuleScopeSetting(Rec);
-          if DynamicModuleSettingDialog.RunModal = ACTION::OK then begin
-            DynamicModuleSettingDialog.GetModuleScopeSetting(Rec);
+            OptionNumber := StrMenu(Rec."Option String", "Integer Value" + 1);
+            if OptionNumber = 0 then
+                exit;
             ModifiedDynamicModuleSetting := Rec;
+            DynamicModuleHelper.CheckSetupValue(ModifiedDynamicModuleSetting, OptionNumber - 1);
+            DynamicModuleHelper.SetSetupValue(ModifiedDynamicModuleSetting, OptionNumber - 1);
             if not ModifiedDynamicModuleSetting.Insert then
-              ModifiedDynamicModuleSetting.Modify;
-          end;
+                ModifiedDynamicModuleSetting.Modify;
+            Rec := ModifiedDynamicModuleSetting;
+        end else begin
+            DynamicModuleSettingDialog.SetModuleScopeSetting(Rec);
+            if DynamicModuleSettingDialog.RunModal = ACTION::OK then begin
+                DynamicModuleSettingDialog.GetModuleScopeSetting(Rec);
+                ModifiedDynamicModuleSetting := Rec;
+                if not ModifiedDynamicModuleSetting.Insert then
+                    ModifiedDynamicModuleSetting.Modify;
+            end;
         end;
         CurrPage.Update;
     end;

@@ -24,59 +24,59 @@ page 6151014 "NpRv Voucher Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
                         ShowMandatory = true;
                     }
-                    field("Voucher Type";"Voucher Type")
+                    field("Voucher Type"; "Voucher Type")
                     {
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
                     }
-                    field("Account No.";"Account No.")
+                    field("Account No."; "Account No.")
                     {
                         ShowMandatory = true;
                     }
-                    field("Issue Register No.";"Issue Register No.")
+                    field("Issue Register No."; "Issue Register No.")
                     {
                     }
-                    field("Issue Document Type";"Issue Document Type")
+                    field("Issue Document Type"; "Issue Document Type")
                     {
                     }
-                    field("Issue Document No.";"Issue Document No.")
+                    field("Issue Document No."; "Issue Document No.")
                     {
                     }
-                    field("Issue External Document No.";"Issue External Document No.")
+                    field("Issue External Document No."; "Issue External Document No.")
                     {
                     }
-                    field("Issue Partner Code";"Issue Partner Code")
+                    field("Issue Partner Code"; "Issue Partner Code")
                     {
                     }
-                    field("Partner Clearing";"Partner Clearing")
+                    field("Partner Clearing"; "Partner Clearing")
                     {
                     }
-                    field("Allow Top-up";"Allow Top-up")
+                    field("Allow Top-up"; "Allow Top-up")
                     {
                     }
                 }
                 group(Control6014422)
                 {
                     ShowCaption = false;
-                    field("Issue Date";"Issue Date")
+                    field("Issue Date"; "Issue Date")
                     {
                     }
-                    field(Open;Open)
+                    field(Open; Open)
                     {
                     }
-                    field("Initial Amount";"Initial Amount")
+                    field("Initial Amount"; "Initial Amount")
                     {
                         Editable = false;
                     }
-                    field(Amount;Amount)
+                    field(Amount; Amount)
                     {
                     }
-                    field("In-use Quantity";"In-use Quantity")
+                    field("In-use Quantity"; "In-use Quantity")
                     {
                     }
                 }
@@ -87,82 +87,82 @@ page 6151014 "NpRv Voucher Card"
                 group(Control6014417)
                 {
                     ShowCaption = false;
-                    field("Send Voucher Module";"Send Voucher Module")
+                    field("Send Voucher Module"; "Send Voucher Module")
                     {
                     }
                 }
                 group(Control6014415)
                 {
                     ShowCaption = false;
-                    field("Reference No.";"Reference No.")
+                    field("Reference No."; "Reference No.")
                     {
                     }
-                    field("Send via Print";"Send via Print")
+                    field("Send via Print"; "Send via Print")
                     {
                     }
-                    field("Print Template Code";"Print Template Code")
+                    field("Print Template Code"; "Print Template Code")
                     {
                     }
-                    field("Send via E-mail";"Send via E-mail")
+                    field("Send via E-mail"; "Send via E-mail")
                     {
                     }
-                    field("E-mail Template Code";"E-mail Template Code")
+                    field("E-mail Template Code"; "E-mail Template Code")
                     {
                     }
-                    field("Send via SMS";"Send via SMS")
+                    field("Send via SMS"; "Send via SMS")
                     {
                     }
-                    field("SMS Template Code";"SMS Template Code")
+                    field("SMS Template Code"; "SMS Template Code")
                     {
                     }
-                    field("No. Send";"No. Send")
+                    field("No. Send"; "No. Send")
                     {
                     }
                 }
                 group(Contact)
                 {
                     Caption = 'Contact';
-                    field("Customer No.";"Customer No.")
+                    field("Customer No."; "Customer No.")
                     {
                     }
-                    field("Contact No.";"Contact No.")
+                    field("Contact No."; "Contact No.")
                     {
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
                     }
-                    field("Name 2";"Name 2")
+                    field("Name 2"; "Name 2")
                     {
                     }
-                    field(Address;Address)
+                    field(Address; Address)
                     {
                     }
-                    field("Address 2";"Address 2")
+                    field("Address 2"; "Address 2")
                     {
                     }
-                    field("Post Code";"Post Code")
+                    field("Post Code"; "Post Code")
                     {
                     }
-                    field(City;City)
+                    field(City; City)
                     {
                     }
-                    field(County;County)
+                    field(County; County)
                     {
                     }
-                    field("Country/Region Code";"Country/Region Code")
+                    field("Country/Region Code"; "Country/Region Code")
                     {
                     }
-                    field("E-mail";"E-mail")
+                    field("E-mail"; "E-mail")
                     {
                     }
-                    field("Phone No.";"Phone No.")
+                    field("Phone No."; "Phone No.")
                     {
                     }
-                    field("Language Code";"Language Code")
+                    field("Language Code"; "Language Code")
                     {
                         Importance = Additional;
                     }
-                    field("Voucher Message";"Voucher Message")
+                    field("Voucher Message"; "Voucher Message")
                     {
                         MultiLine = true;
                     }
@@ -174,17 +174,17 @@ page 6151014 "NpRv Voucher Card"
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Validate Voucher Module";"Validate Voucher Module")
+                    field("Validate Voucher Module"; "Validate Voucher Module")
                     {
                     }
                 }
                 group(Control6014409)
                 {
                     ShowCaption = false;
-                    field("Starting Date";"Starting Date")
+                    field("Starting Date"; "Starting Date")
                     {
                     }
-                    field("Ending Date";"Ending Date")
+                    field("Ending Date"; "Ending Date")
                     {
                     }
                 }
@@ -192,7 +192,7 @@ page 6151014 "NpRv Voucher Card"
             group("Apply Payment")
             {
                 Caption = 'Apply Payment';
-                field("Apply Payment Module";"Apply Payment Module")
+                field("Apply Payment Module"; "Apply Payment Module")
                 {
                 }
             }
@@ -207,7 +207,7 @@ page 6151014 "NpRv Voucher Card"
             {
                 Caption = '&Send';
                 Image = Post;
-                action("Send Voucher")
+                action(SendVoucher)
                 {
                     Caption = 'Send Voucher';
                     Image = SendTo;
@@ -233,7 +233,7 @@ page 6151014 "NpRv Voucher Card"
                     NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
                 begin
                     if not Confirm(Text000) then
-                      exit;
+                        exit;
 
                     NpRvVoucherMgt.ResetInUseQty(Rec);
                 end;
@@ -252,8 +252,8 @@ page 6151014 "NpRv Voucher Card"
                         Voucher: Record "NpRv Voucher";
                         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
                     begin
-                        if not Confirm(Text001,false) then
-                          exit;
+                        if not Confirm(Text001, false) then
+                            exit;
 
                         Voucher.Get("No.");
                         Voucher.SetRecFilter;
@@ -269,7 +269,7 @@ page 6151014 "NpRv Voucher Card"
                 Caption = 'Voucher Entries';
                 Image = Entries;
                 RunObject = Page "NpRv Voucher Entries";
-                RunPageLink = "Voucher No."=FIELD("No.");
+                RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
             }
             action("Sending Log")
@@ -277,7 +277,7 @@ page 6151014 "NpRv Voucher Card"
                 Caption = 'Sending Log';
                 Image = Log;
                 RunObject = Page "NpRv Sending Log";
-                RunPageLink = "Voucher No."=FIELD("No.");
+                RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
             }
         }

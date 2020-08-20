@@ -21,7 +21,7 @@ page 6014649 "Generic Filter Page"
                 group(Control6014414)
                 {
                     ShowCaption = false;
-                    field(SortingKey;SortingKey)
+                    field(SortingKey; SortingKey)
                     {
                         Caption = 'Key';
                         Editable = false;
@@ -34,16 +34,16 @@ page 6014649 "Generic Filter Page"
                             IntegerRec: Record "Integer";
                         begin
                             //-NPR5.48 [318531]
-                            GenericKeyList.SetParameters(RecRef,SortingKey);
+                            GenericKeyList.SetParameters(RecRef, SortingKey);
                             GenericKeyList.LookupMode := true;
                             if GenericKeyList.RunModal = ACTION::LookupOK then begin
-                              GenericKeyList.GetRecord(IntegerRec);
-                              SortingKey := GenericKeyList.GetSortingKey(IntegerRec.Number);
+                                GenericKeyList.GetRecord(IntegerRec);
+                                SortingKey := GenericKeyList.GetSortingKey(IntegerRec.Number);
                             end;
                             //+NPR5.48 [318531]
                         end;
                     }
-                    field("Descending";Descending)
+                    field("Descending"; Descending)
                     {
                         Caption = 'Descending';
                     }
@@ -51,15 +51,15 @@ page 6014649 "Generic Filter Page"
             }
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                     Editable = false;
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
                     Editable = false;
                 }
-                field("Filter";FilterText)
+                field("Filter"; FilterText)
                 {
                     Caption = 'Filter';
                     Lookup = true;
@@ -74,29 +74,29 @@ page 6014649 "Generic Filter Page"
                     begin
                         //-NPR5.48 [318531]
                         case true of
-                          FldRef.Relation <> 0:
-                            begin
-                              RelationRecRef.Open(FldRef.Relation);
-                              RelationKeyRef := RelationRecRef.KeyIndex(1);
-                              if RelationKeyRef.FieldCount > 1 then
-                                Error(OnlySimpleKeysSupportedErr);
-                              Variant := RelationRecRef;
-                              if PAGE.RunModal(0,Variant) = ACTION::LookupOK then begin
-                                RelationRecRef := Variant;
-                                RelationFieldRef := RelationKeyRef.FieldIndex(1);
-                                FilterText := RelationFieldRef.Value;
-                              end;
-                            end;
-                          FldRef.OptionString <> '':
-                            begin
-                              GenericMultipleCheckList.LookupMode := true;
-                              GenericMultipleCheckList.SetOptions(FldRef.OptionString,FilterText);
-                              if GenericMultipleCheckList.RunModal = ACTION::LookupOK then
-                                FilterText := GenericMultipleCheckList.GetSelectedOption();
-                            end;
+                            FldRef.Relation <> 0:
+                                begin
+                                    RelationRecRef.Open(FldRef.Relation);
+                                    RelationKeyRef := RelationRecRef.KeyIndex(1);
+                                    if RelationKeyRef.FieldCount > 1 then
+                                        Error(OnlySimpleKeysSupportedErr);
+                                    Variant := RelationRecRef;
+                                    if PAGE.RunModal(0, Variant) = ACTION::LookupOK then begin
+                                        RelationRecRef := Variant;
+                                        RelationFieldRef := RelationKeyRef.FieldIndex(1);
+                                        FilterText := RelationFieldRef.Value;
+                                    end;
+                                end;
+                            FldRef.OptionString <> '':
+                                begin
+                                    GenericMultipleCheckList.LookupMode := true;
+                                    GenericMultipleCheckList.SetOptions(FldRef.OptionString, FilterText);
+                                    if GenericMultipleCheckList.RunModal = ACTION::LookupOK then
+                                        FilterText := GenericMultipleCheckList.GetSelectedOption();
+                                end;
                         end;
                         if FilterText <> '' then
-                          FilterOnValidate();
+                            FilterOnValidate();
                         //+NPR5.48 [318531]
                     end;
 
@@ -117,7 +117,7 @@ page 6014649 "Generic Filter Page"
 
                     end;
                 }
-                field(Include;Include)
+                field(Include; Include)
                 {
                     Caption = 'Include';
 
@@ -127,19 +127,19 @@ page 6014649 "Generic Filter Page"
                         GetFieldRef();
                         //+NPR5.48 [318531]
                         if not Include then begin
-                          //-NPR5.48 [318531]
-                          RemoveFieldFromRawFilter(FldRef.Name);
-                          //+NPR5.48 [318531]
-                          ResetFieldFilter();
-                          FilterText := '';
-                          //-NPR5.48 [318531]
-                          Static := false;
-                          //+NPR5.48 [318531]
-                          Mark(false);
+                            //-NPR5.48 [318531]
+                            RemoveFieldFromRawFilter(FldRef.Name);
+                            //+NPR5.48 [318531]
+                            ResetFieldFilter();
+                            FilterText := '';
+                            //-NPR5.48 [318531]
+                            Static := false;
+                            //+NPR5.48 [318531]
+                            Mark(false);
                         end;
                     end;
                 }
-                field(Static;Static)
+                field(Static; Static)
                 {
                     Caption = 'Static';
 
@@ -149,17 +149,17 @@ page 6014649 "Generic Filter Page"
                     begin
                         //-NPR5.48 [318531]
                         if FilterText = '' then
-                          exit;
+                            exit;
                         GetFieldRef();
                         if not Static then begin
-                          if not Confirm(ConfirmStaticDisable) then begin
-                            Static := not Static;
-                            exit;
-                          end;
-                          RemoveFieldFromRawFilter(FldRef.Name);
-                          FldRef.SetFilter(FilterText);
-                          FilterText := FldRef.GetFilter;
-                          WriteRawFilter(FldRef.Name,FilterText);
+                            if not Confirm(ConfirmStaticDisable) then begin
+                                Static := not Static;
+                                exit;
+                            end;
+                            RemoveFieldFromRawFilter(FldRef.Name);
+                            FldRef.SetFilter(FilterText);
+                            FilterText := FldRef.GetFilter;
+                            WriteRawFilter(FldRef.Name, FilterText);
                         end;
                         //+NPR5.48 [318531]
                     end;
@@ -185,7 +185,7 @@ page 6014649 "Generic Filter Page"
                     MarkedOnly(false);
                 end;
             }
-            action(ShowFilteredFields)
+            action(FilteredFields)
             {
                 Caption = 'Show Filtered Fields';
                 Image = FilterLines;
@@ -229,22 +229,22 @@ page 6014649 "Generic Filter Page"
         RawFilter := ReadRawFilter(FldRef.Name);
         //IF FldRef.GETFILTER <> '' THEN BEGIN
         if RawFilter <> '' then begin
-          FldRef.SetFilter(RawFilter);
-        //+NPR5.48 [318531]
-          FilterText := FldRef.GetFilter;
-          Include := true;
-          //-NPR5.48 [318531]
-          Static := FilterText <> RawFilter;
-          if Static then
-            FilterText := RawFilter;
-          //+NPR5.48 [318531]
+            FldRef.SetFilter(RawFilter);
+            //+NPR5.48 [318531]
+            FilterText := FldRef.GetFilter;
+            Include := true;
+            //-NPR5.48 [318531]
+            Static := FilterText <> RawFilter;
+            if Static then
+                FilterText := RawFilter;
+            //+NPR5.48 [318531]
         end;
     end;
 
     trigger OnOpenPage()
     begin
         FilterGroup := 2;
-        SetRange(TableNo,RecRef.Number);
+        SetRange(TableNo, RecRef.Number);
         FilterGroup := 0;
         //-NPR5.48 [318531]
         InitKeyWords();
@@ -309,7 +309,7 @@ page 6014649 "Generic Filter Page"
     begin
         Reset;
         FilterGroup := 2;
-        SetRange(TableNo,RecRef.Number);
+        SetRange(TableNo, RecRef.Number);
         FilterGroup := 0;
         RecRef.Reset;
         FilterText := '';
@@ -327,18 +327,18 @@ page 6014649 "Generic Filter Page"
         //-NPR5.48 [318531]
         //IF RecRef.HASFILTER THEN BEGIN
         if CompleteFilterText <> '' then begin
-        //+NPR5.48 [318531]
-          for i := 1 to RecRef.FieldCount do begin
-            FldRef := RecRef.FieldIndex(i);
-            //-NPR5.48 [318531]
-            //IF FldRef.GETFILTER <> '' THEN BEGIN
-            if ReadRawFilter(FldRef.Name) <> '' then begin
             //+NPR5.48 [318531]
-              Get(RecRef.Number,FldRef.Number);
-              Mark(true);
+            for i := 1 to RecRef.FieldCount do begin
+                FldRef := RecRef.FieldIndex(i);
+                //-NPR5.48 [318531]
+                //IF FldRef.GETFILTER <> '' THEN BEGIN
+                if ReadRawFilter(FldRef.Name) <> '' then begin
+                    //+NPR5.48 [318531]
+                    Get(RecRef.Number, FldRef.Number);
+                    Mark(true);
+                end;
             end;
-          end;
-          MarkedOnly(true);
+            MarkedOnly(true);
         end;
     end;
 
@@ -347,30 +347,30 @@ page 6014649 "Generic Filter Page"
         Position: Integer;
     begin
         //-NPR5.48 [318531]
-        Position := StrPos(CompleteFilterText,FieldName + FilterKeyWord);
+        Position := StrPos(CompleteFilterText, FieldName + FilterKeyWord);
         case true of
-          Position = 0:
-            exit('');
-          Position > 1:
-            if not (CompleteFilterText[Position - 1] in [',','(']) then
-              exit('');
+            Position = 0:
+                exit('');
+            Position > 1:
+                if not (CompleteFilterText[Position - 1] in [',', '(']) then
+                    exit('');
         end;
-        Position := StrPos(CompleteFilterText,FieldName + FilterKeyWord) + StrLen(FieldName) + StrLen(FilterKeyWord);
-        FilterValue := CopyStr(CompleteFilterText,Position);
-        exit(CopyStr(FilterValue,1,StrPos(FilterValue,')') - 1));
+        Position := StrPos(CompleteFilterText, FieldName + FilterKeyWord) + StrLen(FieldName) + StrLen(FilterKeyWord);
+        FilterValue := CopyStr(CompleteFilterText, Position);
+        exit(CopyStr(FilterValue, 1, StrPos(FilterValue, ')') - 1));
         //+NPR5.48 [318531]
     end;
 
-    local procedure WriteRawFilter(FieldName: Text;FilterValue: Text)
+    local procedure WriteRawFilter(FieldName: Text; FilterValue: Text)
     begin
         //-NPR5.48 [318531]
         if CompleteFilterText <> '' then begin
-          if CompleteFilterText[StrLen(CompleteFilterText)] = ')' then
-            CompleteFilterText := CopyStr(CompleteFilterText,1,StrLen(CompleteFilterText) - 1);
-          //-NPR5.51 [318531]
-          if CompleteFilterText <> '' then
-          //+NPR5.51 [318531]
-          CompleteFilterText += ',';
+            if CompleteFilterText[StrLen(CompleteFilterText)] = ')' then
+                CompleteFilterText := CopyStr(CompleteFilterText, 1, StrLen(CompleteFilterText) - 1);
+            //-NPR5.51 [318531]
+            if CompleteFilterText <> '' then
+                //+NPR5.51 [318531]
+                CompleteFilterText += ',';
         end;
         CompleteFilterText += FieldName + FilterKeyWord + FilterValue + '))';
         //+NPR5.48 [318531]
@@ -385,19 +385,19 @@ page 6014649 "Generic Filter Page"
         //-NPR5.48 [318531]
         FilterValue := ReadRawFilter(FieldName);
         if FilterValue = '' then
-          exit;
-        Position := StrPos(CompleteFilterText,FieldName + FilterKeyWord);
+            exit;
+        Position := StrPos(CompleteFilterText, FieldName + FilterKeyWord);
         Length := StrLen(FieldName) + StrLen(FilterKeyWord) + StrLen(FilterValue) + 1;
         if Position > 1 then
-          if CompleteFilterText[Position - 1] = ',' then begin
-            Position -= 1;
-            Length += 1;
-          end;
-        CompleteFilterText := DelStr(CompleteFilterText,Position,Length);
+            if CompleteFilterText[Position - 1] = ',' then begin
+                Position -= 1;
+                Length += 1;
+            end;
+        CompleteFilterText := DelStr(CompleteFilterText, Position, Length);
         if CompleteFilterText[1] = ',' then
-          CompleteFilterText := CopyStr(CompleteFilterText,2);
-        if StrPos(CompleteFilterText,WhereKeyWord + ',') > 0 then
-          CompleteFilterText := DelStr(CompleteFilterText,StrLen(WhereKeyWord + ','),1);
+            CompleteFilterText := CopyStr(CompleteFilterText, 2);
+        if StrPos(CompleteFilterText, WhereKeyWord + ',') > 0 then
+            CompleteFilterText := DelStr(CompleteFilterText, StrLen(WhereKeyWord + ','), 1);
         //+NPR5.48 [318531]
     end;
 
@@ -405,10 +405,10 @@ page 6014649 "Generic Filter Page"
     begin
         //-NPR5.48 [318531]
         Filter := CompleteFilterText;
-        if (CompleteFilterText <> '') and (StrPos(CompleteFilterText,WhereKeyWord) = 0) then
-          Filter := WhereKeyWord + CompleteFilterText ;
+        if (CompleteFilterText <> '') and (StrPos(CompleteFilterText, WhereKeyWord) = 0) then
+            Filter := WhereKeyWord + CompleteFilterText;
         if Descending then
-          Filter := CopyStr(DescendingKeyWord,2) + Filter;
+            Filter := CopyStr(DescendingKeyWord, 2) + Filter;
         Filter := SortingKeyWord + SortingKey + ')' + Filter;
         exit(Filter);
         //+NPR5.48 [318531]
@@ -421,15 +421,15 @@ page 6014649 "Generic Filter Page"
         ResetFieldFilter();
         RemoveFieldFromRawFilter(FldRef.Name);
         if FilterText <> '' then begin
-          FldRef.SetFilter(FilterText);
-          WriteRawFilter(FldRef.Name,FilterText);
-          Static := FilterText <> FldRef.GetFilter;
-          Include := true;
-          Mark(true);
+            FldRef.SetFilter(FilterText);
+            WriteRawFilter(FldRef.Name, FilterText);
+            Static := FilterText <> FldRef.GetFilter;
+            Include := true;
+            Mark(true);
         end else begin
-          Include := false;
-          Static := false;
-          Mark(false);
+            Include := false;
+            Static := false;
+            Mark(false);
         end;
         //+NPR5.48 [318531]
     end;
@@ -443,36 +443,36 @@ page 6014649 "Generic Filter Page"
         FieldRefHere: FieldRef;
     begin
         //-NPR5.48 [318531]
-        if StrPos(CompleteFilterText,SortingKeyWord) <> 0 then begin
-          case true of
-            Descending:
-              begin
-                FilterStartPosition := StrPos(CompleteFilterText,DescendingKeyWord) + StrLen(DescendingKeyWord);
-                if StrPos(CompleteFilterText,WhereKeyWord) <> 0 then
-                  FilterStartPosition := StrPos(CompleteFilterText,WhereKeyWord) + StrLen(WhereKeyWord);
-                SortingKeyEndPos := StrPos(CompleteFilterText,DescendingKeyWord) - 1;
-              end;
-            StrPos(CompleteFilterText,')' + WhereKeyWord) <> 0:
-              begin
-                FilterStartPosition := StrPos(CompleteFilterText,')' + WhereKeyWord) + StrLen(')' + WhereKeyWord);
-                SortingKeyEndPos := StrPos(CompleteFilterText,')' + WhereKeyWord) - 1;
-              end;
-            else begin
-              FilterStartPosition := StrLen(CompleteFilterText) + 1;
-              SortingKeyEndPos := StrPos(CompleteFilterText,')') - 1;
+        if StrPos(CompleteFilterText, SortingKeyWord) <> 0 then begin
+            case true of
+                Descending:
+                    begin
+                        FilterStartPosition := StrPos(CompleteFilterText, DescendingKeyWord) + StrLen(DescendingKeyWord);
+                        if StrPos(CompleteFilterText, WhereKeyWord) <> 0 then
+                            FilterStartPosition := StrPos(CompleteFilterText, WhereKeyWord) + StrLen(WhereKeyWord);
+                        SortingKeyEndPos := StrPos(CompleteFilterText, DescendingKeyWord) - 1;
+                    end;
+                StrPos(CompleteFilterText, ')' + WhereKeyWord) <> 0:
+                    begin
+                        FilterStartPosition := StrPos(CompleteFilterText, ')' + WhereKeyWord) + StrLen(')' + WhereKeyWord);
+                        SortingKeyEndPos := StrPos(CompleteFilterText, ')' + WhereKeyWord) - 1;
+                    end;
+                else begin
+                        FilterStartPosition := StrLen(CompleteFilterText) + 1;
+                        SortingKeyEndPos := StrPos(CompleteFilterText, ')') - 1;
+                    end;
             end;
-          end;
-          SortingKey := CopyStr(PadStr(CompleteFilterText,SortingKeyEndPos),StrLen(SortingKeyWord) + 1);
-          CompleteFilterText := CopyStr(CompleteFilterText,FilterStartPosition);
+            SortingKey := CopyStr(PadStr(CompleteFilterText, SortingKeyEndPos), StrLen(SortingKeyWord) + 1);
+            CompleteFilterText := CopyStr(CompleteFilterText, FilterStartPosition);
         end else
-          SortingKey := GenericFilterPageMgt.ReadKeyString(RecRef,1);
+            SortingKey := GenericFilterPageMgt.ReadKeyString(RecRef, 1);
         //+NPR5.48 [318531]
     end;
 
     local procedure SetOrder()
     begin
         //-NPR5.48 [318531]
-        Descending := StrPos(CompleteFilterText,DescendingKeyWord) <> 0;
+        Descending := StrPos(CompleteFilterText, DescendingKeyWord) <> 0;
         //+NPR5.48 [318531]
     end;
 

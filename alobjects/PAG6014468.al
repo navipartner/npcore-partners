@@ -19,13 +19,13 @@ page 6014468 "Sales Ticket Statistics"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Period Start";"Period Start")
+                field("Period Start"; "Period Start")
                 {
                 }
-                field("Period Name";"Period Name")
+                field("Period Name"; "Period Name")
                 {
                 }
-                field("Kassedata.""All Normal Sales in Audit Roll""";Kassedata."All Normal Sales in Audit Roll")
+                field("Kassedata.""All Normal Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll")
                 {
                     Caption = 'Balance Due (LCY)';
 
@@ -34,16 +34,16 @@ page 6014468 "Sales Ticket Statistics"
                         AuditRoll: Record "Audit Roll";
                     begin
 
-                        AuditRoll.SetRange( "Sale Date", "Period Start", "Period End" );
-                        AuditRoll.SetRange( "Sale Type", AuditRoll."Sale Type"::Sale );
-                        AuditRoll.SetRange( Type, AuditRoll.Type::Item );
-                        Clear( AuditRollForm );
-                        AuditRollForm.SetExtFilters( true );
-                        AuditRollForm.SetTableView( AuditRoll );
+                        AuditRoll.SetRange("Sale Date", "Period Start", "Period End");
+                        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+                        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+                        Clear(AuditRollForm);
+                        AuditRollForm.SetExtFilters(true);
+                        AuditRollForm.SetTableView(AuditRoll);
                         AuditRollForm.RunModal;
                     end;
                 }
-                field("Kassedata.""All Debit Sales in Audit Roll""";Kassedata."All Debit Sales in Audit Roll")
+                field("Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Debit Sales in Audit Roll")
                 {
                     Caption = 'Purchases (LCY)';
 
@@ -52,26 +52,26 @@ page 6014468 "Sales Ticket Statistics"
                         AuditRoll: Record "Audit Roll";
                     begin
 
-                        AuditRoll.SetRange( "Sale Date", "Period Start", "Period End" );
+                        AuditRoll.SetRange("Sale Date", "Period Start", "Period End");
                         //-NPR4.12
                         //AuditRoll.SETRANGE( Type, AuditRoll.Type::"Debit Sale" );
-                        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::"Debit Sale" );
+                        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::"Debit Sale");
                         //+NPR4.12
-                        Clear( AuditRollForm );
-                        AuditRollForm.SetExtFilters( true );
-                        AuditRollForm.SetTableView( AuditRoll );
+                        Clear(AuditRollForm);
+                        AuditRollForm.SetExtFilters(true);
+                        AuditRollForm.SetTableView(AuditRoll);
                         AuditRollForm.RunModal;
                     end;
                 }
-                field("Kassedata.""All Normal Sales in Audit Roll""+Kassedata.""All Debit Sales in Audit Roll""";Kassedata."All Normal Sales in Audit Roll"+Kassedata."All Debit Sales in Audit Roll")
+                field("Kassedata.""All Normal Sales in Audit Roll""+Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll" + Kassedata."All Debit Sales in Audit Roll")
                 {
                     Caption = 'Total';
                 }
-                field(totalCount;totalCount)
+                field(totalCount; totalCount)
                 {
                     Caption = 'Number of Exp.';
                 }
-                field(CalcAverage;CalcAverage)
+                field(CalculatedAverage; CalcAverage)
                 {
                     Caption = 'Stay Expedition';
                 }
@@ -79,19 +79,19 @@ page 6014468 "Sales Ticket Statistics"
             group(Control6150623)
             {
                 ShowCaption = false;
-                field(Dim1Filter;Dim1Filter)
+                field(Dim1Filter; Dim1Filter)
                 {
                     CaptionClass = '1,2,1';
                     Caption = 'Dept. Code';
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                 }
-                field(Dim2Filter;Dim2Filter)
+                field(Dim2Filter; Dim2Filter)
                 {
                     CaptionClass = '1,2,2';
                     Caption = 'Project Code';
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
                 }
-                field(PeriodType;PeriodType)
+                field(PeriodType; PeriodType)
                 {
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Year';
@@ -100,39 +100,39 @@ page 6014468 "Sales Ticket Statistics"
                     begin
                         //+TS
                         case PeriodType of
-                          PeriodType::Day:
-                          begin
+                            PeriodType::Day:
+                                begin
 
-                          Tidsvalg := 1;
-                          VendPeriodLength := VendPeriodLength::Day;
-                          CurrPage.Update;
+                                    Tidsvalg := 1;
+                                    VendPeriodLength := VendPeriodLength::Day;
+                                    CurrPage.Update;
 
-                          end;
-                          PeriodType::Week:
-                          begin
+                                end;
+                            PeriodType::Week:
+                                begin
 
-                          Tidsvalg := 7;
-                          VendPeriodLength := VendPeriodLength::Week;
-                          CurrPage.Update;
+                                    Tidsvalg := 7;
+                                    VendPeriodLength := VendPeriodLength::Week;
+                                    CurrPage.Update;
 
-                          end;
+                                end;
 
-                          PeriodType::Month:
-                          begin
+                            PeriodType::Month:
+                                begin
 
-                          Tidsvalg := 31;
-                          VendPeriodLength := VendPeriodLength::Month;
-                          CurrPage.Update;
+                                    Tidsvalg := 31;
+                                    VendPeriodLength := VendPeriodLength::Month;
+                                    CurrPage.Update;
 
-                          end;
-                          PeriodType::Year:
-                          begin
+                                end;
+                            PeriodType::Year:
+                                begin
 
-                          Tidsvalg := 12;
-                          VendPeriodLength := VendPeriodLength::Year;
-                          CurrPage.Update;
+                                    Tidsvalg := 12;
+                                    VendPeriodLength := VendPeriodLength::Year;
+                                    CurrPage.Update;
 
-                          end;
+                                end;
                         end;
                         //-TS
                     end;
@@ -156,7 +156,7 @@ page 6014468 "Sales Ticket Statistics"
         //-NPR4.10
         //Kassedata.CALCFIELDS("All Normal Sales in Audit Roll","All Debit Sales in Audit Roll","All Count in Audit Roll",
         //  "All Item in Audit Roll Debit");
-        Kassedata.CalcFields("All Normal Sales in Audit Roll","All Debit Sales in Audit Roll");
+        Kassedata.CalcFields("All Normal Sales in Audit Roll", "All Debit Sales in Audit Roll");
 
         CalcAverage();
         //+NPR4.10
@@ -165,7 +165,7 @@ page 6014468 "Sales Ticket Statistics"
     trigger OnFindRecord(Which: Text): Boolean
     begin
 
-        exit(PeriodFormMgt.FindDate(Which,Rec,VendPeriodLength));
+        exit(PeriodFormMgt.FindDate(Which, Rec, VendPeriodLength));
     end;
 
     trigger OnInit()
@@ -180,7 +180,7 @@ page 6014468 "Sales Ticket Statistics"
     trigger OnNextRecord(Steps: Integer): Integer
     begin
 
-        exit(PeriodFormMgt.NextDate(Steps,Rec,VendPeriodLength));
+        exit(PeriodFormMgt.NextDate(Steps, Rec, VendPeriodLength));
     end;
 
     trigger OnOpenPage()
@@ -201,7 +201,7 @@ page 6014468 "Sales Ticket Statistics"
         AuditRoll: Record "Audit Roll";
         totalCount: Decimal;
 
-    procedure Set(var NewVend: Record Register;NewVendPeriodLength: Integer;NewAmountType: Option "Net Change","Balance at Date";var NewKassedata: Record Register)
+    procedure Set(var NewVend: Record Register; NewVendPeriodLength: Integer; NewAmountType: Option "Net Change","Balance at Date"; var NewKassedata: Record Register)
     begin
         Kassedata.Copy(NewKassedata);
         VendPeriodLength := NewVendPeriodLength;
@@ -213,15 +213,15 @@ page 6014468 "Sales Ticket Statistics"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-          Kassedata.SetRange("Date Filter","Period Start","Period End")
+            Kassedata.SetRange("Date Filter", "Period Start", "Period End")
         else
-          Kassedata.SetRange("Date Filter",0D,"Period End");
+            Kassedata.SetRange("Date Filter", 0D, "Period End");
 
         //-NPR4.10
         if AmountType = AmountType::"Net Change" then
-          AuditRoll.SetRange("Sale Date","Period Start","Period End")
+            AuditRoll.SetRange("Sale Date", "Period Start", "Period End")
         else
-          AuditRoll.SetRange("Sale Date",0D,"Period End");
+            AuditRoll.SetRange("Sale Date", 0D, "Period End");
         //+NPR4.10
     end;
 
@@ -239,42 +239,42 @@ page 6014468 "Sales Ticket Statistics"
         //                                  AuditRoll."Sale Type"::Udbetaling,
         //                                  AuditRoll."Sale Type"::Indbetaling,
         //                                  AuditRoll."Sale Type"::Debetsalg);
-        AuditRoll.SetFilter("Sale Type",'%1|%2',AuditRoll."Sale Type"::Sale,AuditRoll."Sale Type"::"Debit Sale");
+        AuditRoll.SetFilter("Sale Type", '%1|%2', AuditRoll."Sale Type"::Sale, AuditRoll."Sale Type"::"Debit Sale");
         //+NPR5.31
-        totalCount  := AuditRoll.GetNoOfSales();
+        totalCount := AuditRoll.GetNoOfSales();
         AuditRoll.SetRange("Sale Type");
         //+NPR4.12
         totalAmount := Kassedata."All Normal Sales in Audit Roll";
         //+NPR4.10
 
         if totalCount <> 0 then
-          Average := totalAmount / totalCount
+            Average := totalAmount / totalCount
         else
-          Average := 0;
+            Average := 0;
     end;
 
     procedure SetDimensionFilters()
     begin
         if Dim1Filter <> '' then
-          Kassedata.SetRange("Global Dimension 1 Filter", Dim1Filter)
+            Kassedata.SetRange("Global Dimension 1 Filter", Dim1Filter)
         else
-          Kassedata.SetRange("Global Dimension 1 Filter");
+            Kassedata.SetRange("Global Dimension 1 Filter");
 
         if Dim2Filter <> '' then
-          Kassedata.SetFilter("Global Dimension 2 Filter", Dim2Filter)
+            Kassedata.SetFilter("Global Dimension 2 Filter", Dim2Filter)
         else
-          Kassedata.SetRange("Global Dimension 2 Filter");
+            Kassedata.SetRange("Global Dimension 2 Filter");
 
         //-NPR4.10
         if Dim1Filter <> '' then
-          AuditRoll.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
+            AuditRoll.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
         else
-          AuditRoll.SetRange("Shortcut Dimension 1 Code");
+            AuditRoll.SetRange("Shortcut Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          AuditRoll.SetFilter("Shortcut Dimension 2 Code", Dim2Filter)
+            AuditRoll.SetFilter("Shortcut Dimension 2 Code", Dim2Filter)
         else
-          AuditRoll.SetRange("Shortcut Dimension 2 Code");
+            AuditRoll.SetRange("Shortcut Dimension 2 Code");
         //+NPR4.10
     end;
 }

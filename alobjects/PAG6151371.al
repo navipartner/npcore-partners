@@ -89,17 +89,17 @@ page 6151371 "CS Setup"
                 field("Batch Size"; "Batch Size")
                 {
                 }
-                field("Disregard Unknown RFID Tags";"Disregard Unknown RFID Tags")
+                field("Disregard Unknown RFID Tags"; "Disregard Unknown RFID Tags")
                 {
                 }
             }
             group("Ship & Receive")
             {
                 Caption = 'Ship & Receive';
-                field("Import Tags to Shipping Doc.";"Import Tags to Shipping Doc.")
+                field("Import Tags to Shipping Doc."; "Import Tags to Shipping Doc.")
                 {
                 }
-                field("Use Whse. Receipt";"Use Whse. Receipt")
+                field("Use Whse. Receipt"; "Use Whse. Receipt")
                 {
                 }
             }
@@ -269,7 +269,7 @@ page 6151371 "CS Setup"
                     RunObject = Page "CS Counting Supervisor";
                 }
             }
-            group(Rfid)
+            group(RfidActionGroup)
             {
                 Caption = 'Rfid';
                 action("Tag Models")
