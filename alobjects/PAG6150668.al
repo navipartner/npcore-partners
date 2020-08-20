@@ -19,7 +19,7 @@ page 6150668 "NPRE Select Print Categories"
         {
             repeater(Group)
             {
-                field(Selected;Selected)
+                field(Selected; Selected)
                 {
                     Caption = 'Selected';
                     Editable = true;
@@ -30,20 +30,20 @@ page 6150668 "NPRE Select Print Categories"
                         Mark(Selected);  //NPR5.55 [360258]
                     end;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                     Editable = false;
                 }
-                field("Print Tag";"Print Tag")
+                field("Print Tag"; "Print Tag")
                 {
                     Editable = false;
                     Visible = ShowPrintTags;
                 }
-                field("AssignedServingStepsAsString()";AssignedServingStepsAsString())
+                field(AssignedServingSteps; AssignedServingStepsAsString())
                 {
                     Caption = 'Appl. Only for Serving Steps';
                     Editable = false;
@@ -113,12 +113,12 @@ page 6150668 "NPRE Select Print Categories"
         //-NPR5.55 [360258]
         PrintCategory.Copy(Rec);
         if PrintCategory.GetFilters <> '' then begin
-          RecRef.GetTable(PrintCategory);
-          for i := 1 to RecRef.FieldCount do begin
-            FldRef := RecRef.FieldIndex(i);
-            if FldRef.GetFilter <> '' then
-              FldRef.SetRange();
-          end;
+            RecRef.GetTable(PrintCategory);
+            for i := 1 to RecRef.FieldCount do begin
+                FldRef := RecRef.FieldIndex(i);
+                if FldRef.GetFilter <> '' then
+                    FldRef.SetRange();
+            end;
         end;
         //+NPR5.55 [360258]
     end;
@@ -134,7 +134,7 @@ page 6150668 "NPRE Select Print Categories"
     begin
         //-NPR5.55 [382428]
         if not ShowApplOnServingStep then
-          exit(false);
+            exit(false);
         AssignedPrintCategory."Table No." := SourceRecID.TableNo;
         AssignedPrintCategory."Record ID" := SourceRecID;
         AssignedPrintCategory."Print/Prod. Category Code" := Code;
@@ -146,7 +146,7 @@ page 6150668 "NPRE Select Print Categories"
     begin
         //-NPR5.55 [382428]
         if not InitAssignedPrintCategory() then
-          exit('');
+            exit('');
         exit(WaiterPadMgt.AssignedFlowStatusesAsFilterString(AssignedPrintCategory.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow, AssignedFlowStatusTmp));
         //+NPR5.55 [382428]
     end;
@@ -155,7 +155,7 @@ page 6150668 "NPRE Select Print Categories"
     begin
         //-NPR5.55 [382428]
         if not InitAssignedPrintCategory() then
-          exit;
+            exit;
         WaiterPadMgt.SelectFlowStatuses(AssignedPrintCategory.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow, AssignedFlowStatusTmp);
         //+NPR5.55 [382428]
     end;
