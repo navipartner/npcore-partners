@@ -922,22 +922,11 @@ codeunit 6150702 "POS UI Management"
     procedure GetNPRVersion(): Text
     var
         NPRUpgradeHistory: Record "NPR Upgrade History";
-        PublishedApp: Record "Published Application";
-        InstalledApp: Record "Installed Application";
+        Npr: ModuleInfo;
     begin
-        // First, let's try to retrieve the app by its currently known GUID
-        PublishedApp.SetRange(ID, '992c2309-cca4-43cb-9e41-911f482ec088');
-        if PublishedApp.FindFirst() then begin
-            if InstalledApp.Get(PublishedApp."Runtime Package ID", TenantId()) then
-                exit(StrSubstNo(
-                    'NPR %1.%2.%3.%4',
-                    PublishedApp."Version Major",
-                    PublishedApp."Version Minor",
-                    PublishedApp."Version Build",
-                    PublishedApp."Version Revision"
-                ));
-        end;
-
+        // First, let's try to retrieve the current module info
+        if NavApp.GetCurrentModuleInfo(Npr) then
+            exit(StrSubstNo('NPR %1', Npr.AppVersion()));
         // ... and if that fails, fallback to previous logic
 
         //-NPR5.51 [361184]
@@ -962,4 +951,3 @@ codeunit 6150702 "POS UI Management"
         //+NPR5.54 [392247]
     end;
 }
-
