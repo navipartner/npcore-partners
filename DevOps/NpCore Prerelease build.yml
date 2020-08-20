@@ -33,6 +33,7 @@ jobs:
     containerAdminPassword: P@ssword1
     licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
+    translationsTargetRepoName: NpCore-Translations
     translationsRepo: translations
     dependancyPackages:
       - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
