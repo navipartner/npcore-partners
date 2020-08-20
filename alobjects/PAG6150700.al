@@ -77,6 +77,8 @@ page 6150700 "POS (New)"
         SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
 
     local procedure Initialize()
+    var
+        Framework: Codeunit "Framework: Transcendence";
     begin
         //-NPR5.43 [318028]
         // FrontEnd.Initialize(CurrPage.Framework,POSSession);
@@ -85,8 +87,8 @@ page 6150700 "POS (New)"
         //
         // FrontEndKeeper.Initialize(CurrPage.Framework,FrontEnd,POSSession);
         // BINDSUBSCRIPTION(FrontEndKeeper);
-
-        POSSession.Constructor(CurrPage.Framework, FrontEnd, Setup, POSSession);
+        Framework.Constructor(CurrPage.Framework);
+        POSSession.Constructor(Framework, FrontEnd, Setup, POSSession);
         //+NPR5.43 [318028]
     end;
 
@@ -100,10 +102,6 @@ page 6150700 "POS (New)"
 
         POSSession.Destructor();
         //+NPR5.43 [318028]
-    end;
-
-    local procedure "--- Low-level method handling ---"()
-    begin
     end;
 
     local procedure PreHandleMethod(Method: Text; Context: JsonObject): Boolean

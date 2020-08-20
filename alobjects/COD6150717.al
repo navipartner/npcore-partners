@@ -8,11 +8,11 @@ codeunit 6150717 "POS Front End Keeper"
 
     var
         POSSession: Codeunit "POS Session";
-        Framework: ControlAddIn Transcendence;
+        Framework: Interface "Framework Interface";
         FrontEnd: Codeunit "POS Front End Management";
         Initialized: Boolean;
 
-    procedure Initialize(FrameworkIn: ControlAddIn Transcendence; FrontEndIn: Codeunit "POS Front End Management"; POSSessionIn: Codeunit "POS Session")
+    procedure Initialize(FrameworkIn: Interface "Framework Interface"; FrontEndIn: Codeunit "POS Front End Management"; POSSessionIn: Codeunit "POS Session")
     begin
         FrontEnd := FrontEndIn;
         Framework := FrameworkIn;
@@ -29,7 +29,7 @@ codeunit 6150717 "POS Front End Keeper"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnDetectFramework', '', false, false)]
-    local procedure DetectFramework(var FrameworkOut: ControlAddIn Transcendence; var POSSessionOut: Codeunit "POS Session"; var Handled: Boolean)
+    local procedure DetectFramework(var FrameworkOut: Interface "Framework Interface"; var POSSessionOut: Codeunit "POS Session"; var Handled: Boolean)
     begin
         FrameworkOut := Framework;
         POSSessionOut := POSSession;
