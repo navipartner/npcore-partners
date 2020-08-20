@@ -8,44 +8,53 @@ table 6150705 "POS Parameter Value"
     // NPR5.54/ALPO/20200330 CASE 335834 Enable lookup and value translations for parameters of type boolean
 
     Caption = 'POS Parameter Value';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
         }
         field(2; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Menu";
         }
         field(3; ID; Integer)
         {
             Caption = 'ID';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(4; "Record ID"; RecordID)
         {
             Caption = 'Record ID';
+            DataClassification = CustomerContent;
         }
         field(5; Name; Text[30])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
         field(6; "Action Code"; Code[20])
         {
             Caption = 'Action Code';
+            DataClassification = CustomerContent;
         }
         field(7; "Data Type"; Option)
         {
             Caption = 'Data Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Text,Integer,Decimal,Date,Boolean,Option';
             OptionMembers = Text,"Integer",Decimal,Date,Boolean,Option;
         }
         field(8; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -131,7 +140,7 @@ table 6150705 "POS Parameter Value"
         Param.Options := GetOptions();
         //-NPR5.54 [335834]
         if Param."Data Type" = Param."Data Type"::Boolean then
-          OptionsCaption := BoolOptionMLCaptions();
+            OptionsCaption := BoolOptionMLCaptions();
         //+NPR5.54 [335834]
         //-NPR5.40 [308050]
         OnGetParameterOptionStringCaption(Rec, OptionsCaption);
@@ -243,12 +252,12 @@ table 6150705 "POS Parameter Value"
         Param: Record "POS Action Parameter";
     begin
         if Param.Get("Action Code", Name) then
-          //-NPR5.54 [335834]
-          if Param."Data Type" = Param."Data Type"::Boolean then
-            exit(BoolOptionNames())
-          else
-          //+NPR5.54 [335834]
-            exit(Param.Options);
+            //-NPR5.54 [335834]
+            if Param."Data Type" = Param."Data Type"::Boolean then
+                exit(BoolOptionNames())
+            else
+                //+NPR5.54 [335834]
+                exit(Param.Options);
     end;
 
     procedure LookupValue()
@@ -284,17 +293,17 @@ table 6150705 "POS Parameter Value"
                     end;
                 end;
 
-          //-NPR5.54 [335834]
-          "Data Type"::Boolean :
-            begin
-              POSActionParamMgt.SplitString(BoolOptionMLCaptions(),Parts);
-              foreach Part in Parts do begin
-                TempRetailList.Number += 1;
-                TempRetailList.Choice := Part;
-                TempRetailList.Insert;
-              end;
-            end;
-          //+NPR5.54 [335834]
+            //-NPR5.54 [335834]
+            "Data Type"::Boolean:
+                begin
+                    POSActionParamMgt.SplitString(BoolOptionMLCaptions(), Parts);
+                    foreach Part in Parts do begin
+                        TempRetailList.Number += 1;
+                        TempRetailList.Choice := Part;
+                        TempRetailList.Insert;
+                    end;
+                end;
+            //+NPR5.54 [335834]
             else
                 exit;
         end;
@@ -303,12 +312,12 @@ table 6150705 "POS Parameter Value"
             exit;
         //-NPR5.54 [335834]
         if Value <> '' then
-          case "Data Type" of
-            "Data Type"::Boolean:
-              TempRetailList.SetRange(Choice,GetBooleanStringCaption());
-            "Data Type"::Option:
-              TempRetailList.SetRange(Choice,GetOptionStringCaption(OptionsCaption));
-          end;
+            case "Data Type" of
+                "Data Type"::Boolean:
+                    TempRetailList.SetRange(Choice, GetBooleanStringCaption());
+                "Data Type"::Option:
+                    TempRetailList.SetRange(Choice, GetOptionStringCaption(OptionsCaption));
+            end;
         if TempRetailList.FindFirst then;
         TempRetailList.SetRange(Choice);
         //+NPR5.54 [335834]
@@ -439,9 +448,9 @@ table 6150705 "POS Parameter Value"
         POSActionParameter.Get("Action Code", Name);
 
         if TrySelectStr(TypeHelper.GetOptionNo(Value, POSActionParameter.Options), ParameterOptionStringCaption, OptionCaption) then
-          exit(OptionCaption)
+            exit(OptionCaption)
         else
-          exit(Value);
+            exit(Value);
         //+NPR5.54 [335834]
     end;
 
@@ -451,18 +460,18 @@ table 6150705 "POS Parameter Value"
         OptionCaption: Text;
     begin
         //-NPR5.54 [335834]
-        if TrySelectStr(TypeHelper.GetOptionNo(Value,BoolOptionNames),BoolOptionMLCaptions,OptionCaption) then
-          exit(OptionCaption)
+        if TrySelectStr(TypeHelper.GetOptionNo(Value, BoolOptionNames), BoolOptionMLCaptions, OptionCaption) then
+            exit(OptionCaption)
         else
-          exit(Value);
+            exit(Value);
         //+NPR5.54 [335834]
     end;
 
     [TryFunction]
-    local procedure TrySelectStr(Ordinal: Integer;OptionString: Text;var OptionOut: Text)
+    local procedure TrySelectStr(Ordinal: Integer; OptionString: Text; var OptionOut: Text)
     begin
         //-NPR5.54 [335834]
-        OptionOut := SelectStr(Ordinal+1, OptionString);
+        OptionOut := SelectStr(Ordinal + 1, OptionString);
         //+NPR5.54 [335834]
     end;
 }

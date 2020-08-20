@@ -10,58 +10,68 @@ table 6060117 "TM Ticket Reservation Response"
     // TM1.21/TSA/20170523  CASE 276898 Added keys on session and request entry no
 
     Caption = 'Ticket Reservation Response';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(2;"Request Entry No.";Integer)
+        field(2; "Request Entry No."; Integer)
         {
             Caption = 'Request Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "TM Ticket Reservation Request";
         }
-        field(10;"Session Token ID";Text[100])
+        field(10; "Session Token ID"; Text[100])
         {
             Caption = 'Session Token ID';
+            DataClassification = CustomerContent;
         }
-        field(11;"Exires (Seconds)";Integer)
+        field(11; "Exires (Seconds)"; Integer)
         {
             Caption = 'Expires (Seconds)';
+            DataClassification = CustomerContent;
         }
-        field(12;Status;Boolean)
+        field(12; Status; Boolean)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
         }
-        field(13;Confirmed;Boolean)
+        field(13; Confirmed; Boolean)
         {
             Caption = 'Confirmed';
+            DataClassification = CustomerContent;
         }
-        field(14;Canceled;Boolean)
+        field(14; Canceled; Boolean)
         {
             Caption = 'Canceled';
+            DataClassification = CustomerContent;
         }
-        field(20;"Response Message";Text[250])
+        field(20; "Response Message"; Text[250])
         {
             Caption = 'Message';
+            DataClassification = CustomerContent;
         }
-        field(25;"Admission Code";Code[20])
+        field(25; "Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Request Entry No.")
+        key(Key2; "Request Entry No.")
         {
         }
-        key(Key3;"Session Token ID")
+        key(Key3; "Session Token ID")
         {
         }
     }

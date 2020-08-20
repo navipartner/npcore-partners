@@ -4,23 +4,27 @@ table 6060105 "Ean Box Setup"
     // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
 
     Caption = 'Ean Box Setup';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Ean Box Setups";
     LookupPageID = "Ean Box Setups";
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(5;Description;Text[50])
+        field(5; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(10;"POS View";Option)
+        field(10; "POS View"; Option)
         {
             Caption = 'POS View';
+            DataClassification = CustomerContent;
             OptionCaption = 'Sale';
             OptionMembers = Sale;
         }
@@ -28,7 +32,7 @@ table 6060105 "Ean Box Setup"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -41,9 +45,9 @@ table 6060105 "Ean Box Setup"
     var
         EanBoxSetupEvent: Record "Ean Box Setup Event";
     begin
-        EanBoxSetupEvent.SetRange("Setup Code",Code);
+        EanBoxSetupEvent.SetRange("Setup Code", Code);
         if EanBoxSetupEvent.FindFirst then
-          EanBoxSetupEvent.DeleteAll;
+            EanBoxSetupEvent.DeleteAll;
     end;
 }
 

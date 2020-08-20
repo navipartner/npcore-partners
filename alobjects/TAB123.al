@@ -1,4 +1,4 @@
-tableextension 6014413 tableextension6014413 extends "Purch. Inv. Line" 
+tableextension 6014413 tableextension6014413 extends "Purch. Inv. Line"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014602..6014604
@@ -6,34 +6,40 @@ tableextension 6014413 tableextension6014413 extends "Purch. Inv. Line"
     // NPR5.38.01/JKL/20180206/ Case 289017 added field 6151051
     fields
     {
-        field(6014602;Color;Code[20])
+        field(6014602; Color; Code[20])
         {
             Caption = 'Color';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014603;Size;Code[20])
+        field(6014603; Size; Code[20])
         {
             Caption = 'Size';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014604;Label;Boolean)
+        field(6014604; Label; Boolean)
         {
             Caption = 'Label';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6059970;"Is Master";Boolean)
+        field(6059970; "Is Master"; Boolean)
         {
             Caption = 'Is Master';
+            DataClassification = CustomerContent;
             Description = 'VRT1.00';
         }
-        field(6059971;"Master Line No.";Integer)
+        field(6059971; "Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
+            DataClassification = CustomerContent;
             Description = 'VRT1.00';
         }
-        field(6151051;"Retail Replenisment No.";Integer)
+        field(6151051; "Retail Replenisment No."; Integer)
         {
             Caption = 'Retail Replenisment No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38.01';
         }
     }

@@ -11,28 +11,33 @@ table 6151431 "Magento Item Attribute Value"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object and field 17
 
     Caption = 'Magento Item Attribute Value';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(2;"Attribute ID";Integer)
+        field(2; "Attribute ID"; Integer)
         {
             Caption = 'Attribute ID';
+            DataClassification = CustomerContent;
             TableRelation = "Magento Attribute";
         }
-        field(3;Type;Option)
+        field(3; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             InitValue = Multiple;
             OptionCaption = ',Single,Multiple,Text Area (single)';
             OptionMembers = ,Single,Multiple,"Text Area (single)";
         }
-        field(5;"Attribute Label Line No.";Integer)
+        field(5; "Attribute Label Line No."; Integer)
         {
             Caption = 'Value Line No.';
+            DataClassification = CustomerContent;
         }
-        field(6;Picture;Text[200])
+        field(6; Picture; Text[200])
         {
             Caption = 'Image';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -40,34 +45,39 @@ table 6151431 "Magento Item Attribute Value"
             begin
                 //-MAG1.14
                 //PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Attribute",MAXSTRLEN(Picture));
-                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Attribute",Picture);
+                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Attribute", Picture);
                 //+MAG1.14
                 if PictureName <> '' then
-                  Picture := PictureName;
+                    Picture := PictureName;
             end;
         }
-        field(10;"Attribute Set ID";Integer)
+        field(10; "Attribute Set ID"; Integer)
         {
             Caption = 'Attribute Set ID';
+            DataClassification = CustomerContent;
             Description = 'MAG1.04';
             TableRelation = "Magento Attribute Set";
         }
-        field(13;Selected;Boolean)
+        field(13; Selected; Boolean)
         {
             Caption = 'Selected';
+            DataClassification = CustomerContent;
         }
-        field(16;"Item No.";Code[20])
+        field(16; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
             TableRelation = Item;
         }
-        field(17;"Variant Code";Code[10])
+        field(17; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
+            DataClassification = CustomerContent;
         }
-        field(100;"Long Value";BLOB)
+        field(100; "Long Value"; BLOB)
         {
             Caption = 'Long Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -80,17 +90,17 @@ table 6151431 "Magento Item Attribute Value"
                 RecRef.Modify(true);
             end;
         }
-        field(110;Value;Text[100])
+        field(110; Value; Text[100])
         {
-            CalcFormula = Lookup("Magento Attribute Label".Value WHERE ("Attribute ID"=FIELD("Attribute ID"),
-                                                                        "Line No."=FIELD("Attribute Label Line No.")));
+            CalcFormula = Lookup ("Magento Attribute Label".Value WHERE("Attribute ID" = FIELD("Attribute ID"),
+                                                                        "Line No." = FIELD("Attribute Label Line No.")));
             Caption = 'Value';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1000;"Attribute Description";Text[50])
+        field(1000; "Attribute Description"; Text[50])
         {
-            CalcFormula = Lookup("Magento Attribute".Description WHERE ("Attribute ID"=FIELD("Attribute ID")));
+            CalcFormula = Lookup ("Magento Attribute".Description WHERE("Attribute ID" = FIELD("Attribute ID")));
             Caption = 'Attribute';
             Description = 'MAG1.04';
             Editable = false;
@@ -100,7 +110,7 @@ table 6151431 "Magento Item Attribute Value"
 
     keys
     {
-        key(Key1;"Attribute ID","Item No.","Variant Code","Attribute Label Line No.")
+        key(Key1; "Attribute ID", "Item No.", "Variant Code", "Attribute Label Line No.")
         {
         }
     }

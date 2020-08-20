@@ -3,84 +3,98 @@ table 6151138 "TM Ticket Waiting List"
     // TM1.45/TSA /20191203 CASE 380754 Initial Version
 
     Caption = 'Ticket Waiting List';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(10;"External Schedule Entry No.";Integer)
+        field(10; "External Schedule Entry No."; Integer)
         {
             Caption = 'External Schedule Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(11;"Schedule Entry Description";Text[30])
+        field(11; "Schedule Entry Description"; Text[30])
         {
             Caption = 'Schedule Entry Description';
+            DataClassification = CustomerContent;
         }
-        field(15;"Admission Code";Code[20])
+        field(15; "Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
+            DataClassification = CustomerContent;
             TableRelation = "TM Admission";
         }
-        field(20;"Notification Address";Text[100])
+        field(20; "Notification Address"; Text[100])
         {
             Caption = 'Notification Address';
+            DataClassification = CustomerContent;
         }
-        field(25;"Created At";DateTime)
+        field(25; "Created At"; DateTime)
         {
             Caption = 'Created At';
+            DataClassification = CustomerContent;
         }
-        field(30;Token;Text[50])
+        field(30; Token; Text[50])
         {
             Caption = 'Token';
+            DataClassification = CustomerContent;
         }
-        field(35;"Item No.";Code[20])
+        field(35; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
             TableRelation = Item;
         }
-        field(36;"Variant Code";Code[10])
+        field(36; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
-        field(37;Quantity;Integer)
+        field(37; Quantity; Integer)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
         }
-        field(40;Status;Option)
+        field(40; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Redeemed,Cancelled';
             OptionMembers = ACTIVE,REDEEMED,CANCELLED;
         }
-        field(50;"Temp Count";Integer)
+        field(50; "Temp Count"; Integer)
         {
             Caption = 'Tmp Count';
+            DataClassification = CustomerContent;
         }
-        field(51;"Temp Notified At";DateTime)
+        field(51; "Temp Notified At"; DateTime)
         {
             Caption = 'Temp Notified At';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Notification Count";Integer)
+        field(1000; "Notification Count"; Integer)
         {
-            CalcFormula = Count("TM Waiting List Entry" WHERE ("Ticket Waiting List Entry No."=FIELD("Entry No.")));
+            CalcFormula = Count ("TM Waiting List Entry" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
             Caption = 'Notification Count';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1010;"Notified At";DateTime)
+        field(1010; "Notified At"; DateTime)
         {
-            CalcFormula = Max("TM Waiting List Entry"."Created At" WHERE ("Ticket Waiting List Entry No."=FIELD("Entry No.")));
+            CalcFormula = Max ("TM Waiting List Entry"."Created At" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
             Caption = 'Notified At';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1020;"Notification Expires At";DateTime)
+        field(1020; "Notification Expires At"; DateTime)
         {
-            CalcFormula = Max("TM Waiting List Entry"."Expires At" WHERE ("Ticket Waiting List Entry No."=FIELD("Entry No.")));
+            CalcFormula = Max ("TM Waiting List Entry"."Expires At" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
             Caption = 'Notification Expires At';
             Editable = false;
             FieldClass = FlowField;
@@ -89,13 +103,13 @@ table 6151138 "TM Ticket Waiting List"
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"External Schedule Entry No.",Status)
+        key(Key2; "External Schedule Entry No.", Status)
         {
         }
-        key(Key3;"Temp Notified At")
+        key(Key3; "Temp Notified At")
         {
         }
     }
@@ -109,8 +123,8 @@ table 6151138 "TM Ticket Waiting List"
         WaitingListEntry: Record "TM Waiting List Entry";
     begin
 
-        WaitingListEntry.SetFilter ("Ticket Waiting List Entry No.", '=%1', "Entry No.");
-        WaitingListEntry.DeleteAll ();
+        WaitingListEntry.SetFilter("Ticket Waiting List Entry No.", '=%1', "Entry No.");
+        WaitingListEntry.DeleteAll();
     end;
 }
 

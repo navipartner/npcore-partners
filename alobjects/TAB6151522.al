@@ -4,92 +4,106 @@ table 6151522 "Nc Endpoint FTP"
     // NC2.01/BR  /20161220  CASE 261431 Added Option SharpSFTP in field type,Added field 170 File Encoding and Removed Chilkat options from field 100 Type
 
     Caption = 'Nc Endpoint FTP';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Nc Endpoint FTP List";
     LookupPageID = "Nc Endpoint FTP List";
 
     fields
     {
-        field(10;"Code";Code[20])
+        field(10; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(20;Description;Text[50])
+        field(20; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(40;Enabled;Boolean)
+        field(40; Enabled; Boolean)
         {
             Caption = 'Enabled';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(50;"Output Nc Task Entry No.";BigInteger)
+        field(50; "Output Nc Task Entry No."; BigInteger)
         {
             Caption = 'Output Nc Task Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(100;Type;Option)
+        field(100; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
             OptionCaption = 'DotNet,,,SharpSFTP';
             OptionMembers = DotNet,,,SharpSFTP;
         }
-        field(110;Server;Text[250])
+        field(110; Server; Text[250])
         {
             Caption = 'FTP Server';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(120;Username;Text[100])
+        field(120; Username; Text[100])
         {
             Caption = 'FTP Username';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(130;Password;Text[100])
+        field(130; Password; Text[100])
         {
             Caption = 'FTP Password';
+            DataClassification = CustomerContent;
         }
-        field(140;Directory;Text[100])
+        field(140; Directory; Text[100])
         {
             Caption = 'FTP Directory';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(145;Filename;Text[100])
+        field(145; Filename; Text[100])
         {
             Caption = 'Filename';
+            DataClassification = CustomerContent;
         }
-        field(150;Port;Integer)
+        field(150; Port; Integer)
         {
             Caption = 'FTP Port';
+            DataClassification = CustomerContent;
             MinValue = 0;
         }
-        field(160;Passive;Boolean)
+        field(160; Passive; Boolean)
         {
             Caption = 'FTP Passive';
+            DataClassification = CustomerContent;
         }
-        field(170;"File Encoding";Option)
+        field(170; "File Encoding"; Option)
         {
             Caption = 'File Encoding';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
             InitValue = ANSI;
             OptionCaption = 'ANSI,Unicode,UTF-8';
@@ -99,7 +113,7 @@ table 6151522 "Nc Endpoint FTP"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -112,12 +126,12 @@ table 6151522 "Nc Endpoint FTP"
     var
         NcEndpointTriggerLink: Record "Nc Endpoint Trigger Link";
     begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode,Code);
+        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
     end;
 
     trigger OnRename()
     begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode,Code);
+        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
     end;
 
     var
@@ -136,7 +150,7 @@ table 6151522 "Nc Endpoint FTP"
         Clear(NcEndpointTriggerLinks);
         NcEndpointTriggerLink.Reset;
         //NcEndpointTriggerLink.SETRANGE("Endpoint Type Code",GetEndpointTypeCode);
-        NcEndpointTriggerLink.SetRange("Endpoint Code",Code);
+        NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
         NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
         NcEndpointTriggerLinks.RunModal;
     end;
@@ -149,33 +163,33 @@ table 6151522 "Nc Endpoint FTP"
     begin
         ToBeUpdated := false;
         if not NcEndpoint.Get(Code) then begin
-          NcEndpoint.Init;
-          NcEndpoint.Validate(Code,Code);
-          NcEndpoint.Validate("Endpoint Type",GetEndpointTypeCode);
-          NcEndpoint.Insert;
+            NcEndpoint.Init;
+            NcEndpoint.Validate(Code, Code);
+            NcEndpoint.Validate("Endpoint Type", GetEndpointTypeCode);
+            NcEndpoint.Insert;
         end;
         if Description <> NcEndpoint.Description then begin
-          NcEndpoint.Description := Description;
-          ToBeUpdated := true;
+            NcEndpoint.Description := Description;
+            ToBeUpdated := true;
         end;
         SetupSummary := BuildSetupSummary;
         if SetupSummary <> NcEndpoint."Setup Summary" then begin
-          NcEndpoint."Setup Summary" := CopyStr(SetupSummary,1,MaxStrLen(NcEndpoint."Setup Summary"));
-          ToBeUpdated := true;
+            NcEndpoint."Setup Summary" := CopyStr(SetupSummary, 1, MaxStrLen(NcEndpoint."Setup Summary"));
+            ToBeUpdated := true;
         end;
         if Enabled <> NcEndpoint.Enabled then begin
-          NcEndpoint.Enabled := Enabled;
-          ToBeUpdated := true;
+            NcEndpoint.Enabled := Enabled;
+            ToBeUpdated := true;
         end;
         if ToBeUpdated then
-          NcEndpoint.Modify(true);
+            NcEndpoint.Modify(true);
     end;
 
     local procedure BuildSetupSummary(): Text
     var
         TextSetupSummary: Label 'FTP Server: %1, Username %2, Directory %3';
     begin
-        exit(StrSubstNo(TextSetupSummary,Server,Username,Directory));
+        exit(StrSubstNo(TextSetupSummary, Server, Username, Directory));
     end;
 }
 

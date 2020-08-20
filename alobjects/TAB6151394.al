@@ -3,64 +3,77 @@ table 6151394 "CS Item Reclass. Handling"
     // NPR5.50/CLVA/20190527  CASE 355694 Object created
 
     Caption = 'CS Warehouse Shipment Handling';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;Id;Code[10])
+        field(1; Id; Code[10])
         {
             Caption = 'Id';
+            DataClassification = CustomerContent;
         }
-        field(2;"Line No.";Integer)
+        field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(3;"Unit of Measure";Code[10])
+        field(3; "Unit of Measure"; Code[10])
         {
             Caption = 'Unit of Measure';
-            TableRelation = "Item Unit of Measure".Code WHERE ("Item No."=FIELD("Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
         }
-        field(10;Barcode;Text[30])
+        field(10; Barcode; Text[30])
         {
             Caption = 'Barcode';
+            DataClassification = CustomerContent;
         }
-        field(11;Qty;Decimal)
+        field(11; Qty; Decimal)
         {
             Caption = 'Qty';
+            DataClassification = CustomerContent;
             InitValue = 1;
         }
-        field(12;"Journal Template Name";Code[10])
+        field(12; "Journal Template Name"; Code[10])
         {
             Caption = 'Journal Template Name';
+            DataClassification = CustomerContent;
             TableRelation = "Item Journal Template";
         }
-        field(13;"Journal Batch Name";Code[10])
+        field(13; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Item Journal Batch".Name WHERE ("Journal Template Name"=FIELD("Journal Template Name"));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
         }
-        field(14;"Zone Code";Code[10])
+        field(14; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE ("Location Code"=FIELD("Location Code"));
+            DataClassification = CustomerContent;
+            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
         }
-        field(21;"No.";Code[20])
+        field(21; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(22;"Location Code";Code[10])
+        field(22; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = Location;
         }
-        field(23;"Shelf No.";Code[10])
+        field(23; "Shelf No."; Code[10])
         {
             Caption = 'Shelf No.';
+            DataClassification = CustomerContent;
         }
-        field(26;"Bin Code";Code[20])
+        field(26; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -80,14 +93,16 @@ table 6151394 "CS Item Reclass. Handling"
             begin
             end;
         }
-        field(27;"Assignment Date";Date)
+        field(27; "Assignment Date"; Date)
         {
             Caption = 'Assignment Date';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(28;"New Bin Code";Code[20])
+        field(28; "New Bin Code"; Code[20])
         {
             Caption = 'New Bin Code';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -107,9 +122,10 @@ table 6151394 "CS Item Reclass. Handling"
             begin
             end;
         }
-        field(50;"Item No.";Code[20])
+        field(50; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
             TableRelation = Item."No.";
 
             trigger OnValidate()
@@ -117,59 +133,67 @@ table 6151394 "CS Item Reclass. Handling"
                 Validate("Variant Code", '');
             end;
         }
-        field(51;"Variant Code";Code[10])
+        field(51; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
-        field(52;"Item Description";Text[50])
+        field(52; "Item Description"; Text[50])
         {
-            CalcFormula = Lookup(Item.Description WHERE ("No."=FIELD("Item No.")));
+            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(53;"Variant Description";Text[50])
+        field(53; "Variant Description"; Text[50])
         {
-            CalcFormula = Lookup("Item Variant".Description WHERE (Code=FIELD("Variant Code"),
-                                                                   "Item No."=FIELD("Item No.")));
+            CalcFormula = Lookup ("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
+                                                                   "Item No." = FIELD("Item No.")));
             Caption = 'Variant Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(54;"Source Doc. No.";Code[20])
+        field(54; "Source Doc. No."; Code[20])
         {
             Caption = 'Source Doc. No.';
+            DataClassification = CustomerContent;
         }
-        field(100;"Table No.";Integer)
+        field(100; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
         }
-        field(101;"Record Id";RecordID)
+        field(101; "Record Id"; RecordID)
         {
             Caption = 'Record Id';
+            DataClassification = CustomerContent;
         }
-        field(102;Handled;Boolean)
+        field(102; Handled; Boolean)
         {
             Caption = 'Handled';
+            DataClassification = CustomerContent;
         }
-        field(103;Created;DateTime)
+        field(103; Created; DateTime)
         {
             Caption = 'Created';
+            DataClassification = CustomerContent;
         }
-        field(104;"Created By";Code[20])
+        field(104; "Created By"; Code[20])
         {
             Caption = 'Created By';
+            DataClassification = CustomerContent;
         }
-        field(105;"Transferred to Worksheet";Boolean)
+        field(105; "Transferred to Worksheet"; Boolean)
         {
             Caption = 'Transferred to Worksheet';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Id,"Line No.")
+        key(Key1; Id, "Line No.")
         {
         }
     }

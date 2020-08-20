@@ -3,24 +3,26 @@ table 6150668 "NPRE Item Routing Profile"
     // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Rest. Item Routing Profile';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NPRE Item Routing Profiles";
     LookupPageID = "NPRE Item Routing Profiles";
 
     fields
     {
-        field(10;"Code";Code[20])
+        field(10; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(20;Description;Text[50])
+        field(20; Description; Text[50])
         {
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }

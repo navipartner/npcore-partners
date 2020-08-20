@@ -121,6 +121,7 @@ table 6014406 "Sale Line POS"
     // NPR5.55/ALPO/20200703 CASE 380979 Part of 'UpdateAmounts' code extracted to a subfunction 'UpdateLineVatAmounts' to isolate execution
 
     Caption = 'Sale Line';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Sale Lines Subpage";
     PasteIsValid = false;
 
@@ -129,28 +130,33 @@ table 6014406 "Sale Line POS"
         field(1; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Register;
         }
         field(2; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
+            DataClassification = CustomerContent;
             Editable = false;
             NotBlank = true;
         }
         field(3; "Sale Type"; Option)
         {
             Caption = 'Sale Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
         }
         field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(5; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.30';
             InitValue = Item;
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
@@ -159,6 +165,7 @@ table 6014406 "Sale Line POS"
         field(6; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
             ELSE
             IF (Type = CONST("Item Group")) "Item Group"."No."
@@ -230,25 +237,30 @@ table 6014406 "Sale Line POS"
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
+            DataClassification = CustomerContent;
             TableRelation = Location;
         }
         field(8; "Posting Group"; Code[10])
         {
             Caption = 'Posting Group';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group";
         }
         field(9; "Qty. Discount Code"; Code[20])
         {
             Caption = 'Qty. Discount Code';
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(11; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
+            DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
             ELSE
@@ -278,6 +290,7 @@ table 6014406 "Sale Line POS"
         field(12; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             MaxValue = 99.999;
 
@@ -316,11 +329,11 @@ table 6014406 "Sale Line POS"
                                 if Quantity = 0 then
                                     Error(Err003);
                             end;
-                      //-NPR5.55 [404458]-revoked
-                      //"Amount Including VAT" := "Unit Price" * Quantity;
-                      //Amount := "Amount Including VAT";
-                      //+NPR5.55 [404458]-revoked
-                      UpdateAmounts(Rec);  //NPR5.55 [404458]
+                            //-NPR5.55 [404458]-revoked
+                            //"Amount Including VAT" := "Unit Price" * Quantity;
+                            //Amount := "Amount Including VAT";
+                            //+NPR5.55 [404458]-revoked
+                            UpdateAmounts(Rec);  //NPR5.55 [404458]
                         end;
                     Type::Item:
                         begin
@@ -384,11 +397,13 @@ table 6014406 "Sale Line POS"
         field(13; "Invoice (Qty)"; Decimal)
         {
             Caption = 'Invoice (Qty)';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
         }
         field(14; "To Ship (Qty)"; Decimal)
         {
             Caption = 'To Ship (Qty)';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
         }
         field(15; "Unit Price"; Decimal)
@@ -396,6 +411,7 @@ table 6014406 "Sale Line POS"
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
+            DataClassification = CustomerContent;
             DecimalPlaces = 2 : 2;
             Editable = true;
             MaxValue = 9999999;
@@ -534,6 +550,7 @@ table 6014406 "Sale Line POS"
         {
             AutoFormatType = 2;
             Caption = 'Unit Cost (LCY)';
+            DataClassification = CustomerContent;
             Description = 'NPR5.45';
 
             trigger OnValidate()
@@ -549,12 +566,14 @@ table 6014406 "Sale Line POS"
         field(17; "VAT %"; Decimal)
         {
             Caption = 'VAT %';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(18; "Qty. Discount %"; Decimal)
         {
             Caption = 'Qty. Discount %';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -562,6 +581,7 @@ table 6014406 "Sale Line POS"
         field(19; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 1;
             MaxValue = 100;
             MinValue = 0;
@@ -670,6 +690,7 @@ table 6014406 "Sale Line POS"
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Discount';
+            DataClassification = CustomerContent;
             MinValue = 0;
 
             trigger OnValidate()
@@ -686,18 +707,21 @@ table 6014406 "Sale Line POS"
         field(21; "Manual Item Sales Price"; Boolean)
         {
             Caption = 'Manual Item Sales Price';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48';
             InitValue = false;
         }
         field(25; Date; Date)
         {
             Caption = 'Date';
+            DataClassification = CustomerContent;
         }
         field(30; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
+            DataClassification = CustomerContent;
             DecimalPlaces = 2 : 2;
             MaxValue = 1000000;
 
@@ -745,6 +769,7 @@ table 6014406 "Sale Line POS"
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
+            DataClassification = CustomerContent;
             MaxValue = 99999999;
 
             trigger OnValidate()
@@ -776,20 +801,24 @@ table 6014406 "Sale Line POS"
         field(32; "Allow Invoice Discount"; Boolean)
         {
             Caption = 'Allow Invoice Discount';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(33; "Allow Line Discount"; Boolean)
         {
             Caption = 'Allow Line Discount';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(34; "Price Includes VAT"; Boolean)
         {
             Caption = 'Price Includes VAT';
+            DataClassification = CustomerContent;
         }
         field(38; "Initial Group Sale Price"; Decimal)
         {
             Caption = 'Initial Group Sale Price';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -800,6 +829,7 @@ table 6014406 "Sale Line POS"
         field(41; "Customer Price Group"; Code[10])
         {
             Caption = 'Customer Price Group';
+            DataClassification = CustomerContent;
             Description = 'NPR5.30';
             TableRelation = "Customer Price Group";
 
@@ -811,11 +841,13 @@ table 6014406 "Sale Line POS"
         field(42; "Allow Quantity Discount"; Boolean)
         {
             Caption = 'Allow Quantity Discount';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(43; "Serial No."; Code[20])
         {
             Caption = 'Serial No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -850,6 +882,7 @@ table 6014406 "Sale Line POS"
         field(44; "Customer/Item Discount %"; Decimal)
         {
             Caption = 'Customer/Item Discount %';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -866,6 +899,7 @@ table 6014406 "Sale Line POS"
         field(46; "Invoice to Customer No."; Code[20])
         {
             Caption = 'Invoice to Customer No.';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = Customer;
         }
@@ -874,30 +908,36 @@ table 6014406 "Sale Line POS"
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Invoice Discount Amount';
+            DataClassification = CustomerContent;
         }
         field(48; "Gen. Bus. Posting Group"; Code[10])
         {
             Caption = 'Gen. Bus. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
         }
         field(49; "Gen. Prod. Posting Group"; Code[10])
         {
             Caption = 'Gen. Prod. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
         field(50; "VAT Bus. Posting Group"; Code[10])
         {
             Caption = 'VAT Bus. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
         field(51; "VAT Prod. Posting Group"; Code[10])
         {
             Caption = 'VAT Prod. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
         }
         field(52; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = Currency;
         }
@@ -905,6 +945,7 @@ table 6014406 "Sale Line POS"
         {
             AutoFormatType = 1;
             Caption = 'Claim (LCY)';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(54; "VAT Base Amount"; Decimal)
@@ -912,15 +953,18 @@ table 6014406 "Sale Line POS"
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(55; Cost; Decimal)
         {
             Caption = 'Cost';
+            DataClassification = CustomerContent;
         }
         field(56; Euro; Decimal)
         {
             Caption = 'Euro';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -935,10 +979,12 @@ table 6014406 "Sale Line POS"
         field(57; "Quantity (Base)"; Decimal)
         {
             Caption = 'Quantity (Base)';
+            DataClassification = CustomerContent;
         }
         field(58; "Period Discount code"; Code[20])
         {
             Caption = 'Period Discount code';
+            DataClassification = CustomerContent;
             TableRelation = "Period Discount".Code;
 
             trigger OnValidate()
@@ -955,11 +1001,13 @@ table 6014406 "Sale Line POS"
         field(59; "Lookup On No."; Boolean)
         {
             Caption = 'Lookup On No.';
+            DataClassification = CustomerContent;
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -976,6 +1024,7 @@ table 6014406 "Sale Line POS"
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -991,11 +1040,13 @@ table 6014406 "Sale Line POS"
         field(75; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
+            DataClassification = CustomerContent;
             TableRelation = Bin.Code;
         }
         field(80; "Special price"; Decimal)
         {
             Caption = 'Special price';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -1033,6 +1084,7 @@ table 6014406 "Sale Line POS"
         field(84; "Gen. Posting Type"; Option)
         {
             Caption = 'Gen. Posting Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
             OptionCaption = ' ,Purchase,Sale';
             OptionMembers = " ",Purchase,Sale;
@@ -1048,33 +1100,39 @@ table 6014406 "Sale Line POS"
         field(85; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
             TableRelation = "Tax Area";
         }
         field(86; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
         field(87; "Tax Group Code"; Code[10])
         {
             Caption = 'Tax Group Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
             TableRelation = "Tax Group";
         }
         field(88; "Use Tax"; Boolean)
         {
             Caption = 'Use Tax';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
         field(90; "Return Reason Code"; Code[10])
         {
             Caption = 'Return Reason Code';
+            DataClassification = CustomerContent;
             TableRelation = "Return Reason";
         }
         field(91; "Reason Code"; Code[10])
         {
             Caption = 'Reason Code';
+            DataClassification = CustomerContent;
             TableRelation = "Reason Code";
         }
         field(100; "Unit Cost"; Decimal)
@@ -1082,6 +1140,7 @@ table 6014406 "Sale Line POS"
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
+            DataClassification = CustomerContent;
             DecimalPlaces = 2 : 2;
             Editable = false;
 
@@ -1106,11 +1165,13 @@ table 6014406 "Sale Line POS"
         field(101; "System-Created Entry"; Boolean)
         {
             Caption = 'System-Created Entry';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(102; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
+            DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
 
             trigger OnValidate()
@@ -1123,6 +1184,7 @@ table 6014406 "Sale Line POS"
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -1136,11 +1198,13 @@ table 6014406 "Sale Line POS"
         field(106; "VAT Identifier"; Code[10])
         {
             Caption = 'VAT Identifier';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(117; "Retail Document Type"; Option)
         {
             Caption = 'Retail Document Type';
+            DataClassification = CustomerContent;
             NotBlank = true;
             OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
             OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
@@ -1148,76 +1212,94 @@ table 6014406 "Sale Line POS"
         field(118; "Retail Document No."; Code[20])
         {
             Caption = 'Retail Document No.';
+            DataClassification = CustomerContent;
         }
         field(140; "Sales Document Type"; Integer)
         {
             Caption = 'Sales Document Type';
+            DataClassification = CustomerContent;
         }
         field(141; "Sales Document No."; Code[20])
         {
             Caption = 'Sales Document No.';
+            DataClassification = CustomerContent;
         }
         field(142; "Sales Document Line No."; Integer)
         {
             Caption = 'Sales Document Line No.';
+            DataClassification = CustomerContent;
         }
         field(143; "Sales Document Prepayment"; Boolean)
         {
             Caption = 'Sales Document Prepayment';
+            DataClassification = CustomerContent;
         }
         field(144; "Sales Doc. Prepayment Value"; Decimal)
         {
             Caption = 'Sales Doc. Prepayment Value';
+            DataClassification = CustomerContent;
         }
         field(145; "Sales Document Invoice"; Boolean)
         {
             Caption = 'Sales Document Invoice';
+            DataClassification = CustomerContent;
         }
         field(146; "Sales Document Ship"; Boolean)
         {
             Caption = 'Sales Document Ship';
+            DataClassification = CustomerContent;
         }
         field(147; "Sales Document Sync. Posting"; Boolean)
         {
             Caption = 'Sales Document Sync. Posting';
+            DataClassification = CustomerContent;
         }
         field(148; "Sales Document Print"; Boolean)
         {
             Caption = 'Sales Document Print';
+            DataClassification = CustomerContent;
         }
         field(149; "Sales Document Receive"; Boolean)
         {
             Caption = 'Sales Document Receive';
+            DataClassification = CustomerContent;
         }
         field(150; "Customer Location No."; Code[20])
         {
             Caption = 'Customer Location No.';
+            DataClassification = CustomerContent;
         }
         field(151; "Sales Document Prepay. Refund"; Boolean)
         {
             Caption = 'Sales Document Prepay. Refund';
+            DataClassification = CustomerContent;
         }
         field(152; "Sales Document Delete"; Boolean)
         {
             Caption = 'Sales Document Delete';
+            DataClassification = CustomerContent;
         }
         field(153; "Sales Doc. Prepay Is Percent"; Boolean)
         {
             Caption = 'Sales Doc. Prepay Is Percent';
+            DataClassification = CustomerContent;
         }
         field(154; "Sales Document Pdf2Nav"; Boolean)
         {
             Caption = 'Sales Document Pdf2Nav';
+            DataClassification = CustomerContent;
         }
         field(155; "Posted Sales Document Type"; Option)
         {
             Caption = 'Posted Sales Document Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Invoice,Credit Memo';
             OptionMembers = INVOICE,CREDIT_MEMO;
         }
         field(156; "Posted Sales Document No."; Code[20])
         {
             Caption = 'Posted Sales Document No.';
+            DataClassification = CustomerContent;
             TableRelation = IF ("Posted Sales Document Type" = CONST(INVOICE)) "Sales Invoice Header"
             ELSE
             IF ("Posted Sales Document Type" = CONST(CREDIT_MEMO)) "Sales Cr.Memo Header";
@@ -1225,12 +1307,14 @@ table 6014406 "Sale Line POS"
         field(157; "Delivered Sales Document Type"; Option)
         {
             Caption = 'Delivered Sales Document Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Shipment,Return Receipt';
             OptionMembers = SHIPMENT,RETURN_RECEIPT;
         }
         field(158; "Delivered Sales Document No."; Code[20])
         {
             Caption = 'Delivered Sales Document No.';
+            DataClassification = CustomerContent;
             TableRelation = IF ("Delivered Sales Document Type" = CONST(SHIPMENT)) "Sales Shipment Header"
             ELSE
             IF ("Delivered Sales Document Type" = CONST(RETURN_RECEIPT)) "Return Receipt Header";
@@ -1238,25 +1322,30 @@ table 6014406 "Sale Line POS"
         field(159; "Sales Document Send"; Boolean)
         {
             Caption = 'Sales Document Send';
+            DataClassification = CustomerContent;
         }
         field(160; "Orig. POS Sale ID"; Integer)
         {
             Caption = 'Orig. POS Sale ID';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
         field(161; "Orig. POS Line No."; Integer)
         {
             Caption = 'Orig. POS Line No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
         field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
+            DataClassification = CustomerContent;
             Description = 'NPR5.50';
         }
         field(200; "Qty. per Unit of Measure"; Decimal)
         {
             Caption = 'Qty. per Unit of Measure';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             Editable = false;
             InitValue = 1;
@@ -1264,32 +1353,39 @@ table 6014406 "Sale Line POS"
         field(300; "Return Sale Register No."; Code[10])
         {
             Caption = 'Return Sale Cash Register No.';
+            DataClassification = CustomerContent;
         }
         field(301; "Return Sale Sales Ticket No."; Code[20])
         {
             Caption = 'Return Sale Sales Ticket No.';
+            DataClassification = CustomerContent;
         }
         field(302; "Return Sales Sales Type"; Option)
         {
             Caption = 'Return Sales Sales Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Payment1,Disbursement,Comment,,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Payment1,Disbursement,Comment,,"Open/Close";
         }
         field(303; "Return Sale Line No."; Integer)
         {
             Caption = 'Return Sale Line No.';
+            DataClassification = CustomerContent;
         }
         field(304; "Return Sale No."; Code[20])
         {
             Caption = 'Return Sale No.';
+            DataClassification = CustomerContent;
         }
         field(305; "Return Sales Sales Date"; Date)
         {
             Caption = 'Return Sales Sales Date';
+            DataClassification = CustomerContent;
         }
         field(400; "Discount Type"; Option)
         {
             Caption = 'Discount Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.30';
             OptionCaption = ' ,Period,Mixed,Multiple Unit,Salesperson Discount,Inventory,,Rounding,Combination,Customer';
             OptionMembers = " ",Campaign,Mix,Quantity,Manual,"BOM List",,Rounding,Combination,Customer;
@@ -1303,6 +1399,7 @@ table 6014406 "Sale Line POS"
         field(401; "Discount Code"; Code[20])
         {
             Caption = 'Discount Code';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -1320,11 +1417,13 @@ table 6014406 "Sale Line POS"
         field(402; "Discount Calculated"; Boolean)
         {
             Caption = 'Discount Calculated';
+            DataClassification = CustomerContent;
             Description = 'NPR5.40';
         }
         field(405; "Discount Authorised by"; Code[20])
         {
             Caption = 'Discount Authorised by';
+            DataClassification = CustomerContent;
             Description = 'NPR5.39';
             TableRelation = "Salesperson/Purchaser";
         }
@@ -1358,18 +1457,22 @@ table 6014406 "Sale Line POS"
         field(430; "Coupon Applied"; Boolean)
         {
             Caption = 'Coupon Applied';
+            DataClassification = CustomerContent;
         }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
+            DataClassification = CustomerContent;
         }
         field(500; "EFT Approved"; Boolean)
         {
             Caption = 'Cash Terminal Approved';
+            DataClassification = CustomerContent;
         }
         field(505; "Credit Card Tax Free"; Boolean)
         {
             Caption = 'Credit Card Tax Free';
+            DataClassification = CustomerContent;
             Description = 'Only to be set if Cash Terminal Approved';
 
             trigger OnValidate()
@@ -1380,11 +1483,13 @@ table 6014406 "Sale Line POS"
         field(550; "Drawer Opened"; Boolean)
         {
             Caption = 'Drawer Opened';
+            DataClassification = CustomerContent;
             Description = 'NPR4.002.005, for indication of opening on drawer.';
         }
         field(600; "VAT Calculation Type"; Option)
         {
             Caption = 'VAT Calculation Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.33';
             OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
             OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
@@ -1392,6 +1497,7 @@ table 6014406 "Sale Line POS"
         field(700; "NPRE Seating Code"; Code[10])
         {
             Caption = 'Seating Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
             TableRelation = "NPRE Seating";
 
@@ -1409,6 +1515,7 @@ table 6014406 "Sale Line POS"
         field(801; "Insurance Category"; Code[50])
         {
             Caption = 'Insurance Category';
+            DataClassification = CustomerContent;
             TableRelation = "Insurance Category";
 
             trigger OnValidate()
@@ -1420,77 +1527,94 @@ table 6014406 "Sale Line POS"
         field(5002; Color; Code[20])
         {
             Caption = 'Color';
+            DataClassification = CustomerContent;
         }
         field(5003; Size; Code[20])
         {
             Caption = 'Size';
+            DataClassification = CustomerContent;
         }
         field(5004; Clearing; Option)
         {
             Caption = 'Clearing';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Gift Voucher,Credit Voucher';
             OptionMembers = " ",Gavekort,Tilgodebevis;
         }
         field(5008; "External Document No."; Code[20])
         {
             Caption = 'External Document No.';
+            DataClassification = CustomerContent;
         }
         field(5999; "Buffer Ref. No."; Integer)
         {
             Caption = 'Buffer Ref. No.';
+            DataClassification = CustomerContent;
         }
         field(6000; "Buffer Document Type"; Option)
         {
             Caption = 'Buffer Document Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Payment,Invoice,Credit Note,Interest Note,Reminder';
             OptionMembers = " ",Betaling,Faktura,Kreditnota,Rentenota,Rykker;
         }
         field(6001; "Buffer ID"; Code[20])
         {
             Caption = 'Buffer ID';
+            DataClassification = CustomerContent;
         }
         field(6002; "Buffer Document No."; Code[20])
         {
             Caption = 'Buffer Document No.';
+            DataClassification = CustomerContent;
         }
         field(6003; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
+            DataClassification = CustomerContent;
         }
         field(6004; Internal; Boolean)
         {
             Caption = 'Internal';
+            DataClassification = CustomerContent;
             InitValue = false;
         }
         field(6005; "Currency Amount"; Decimal)
         {
             Caption = 'Currency Amount';
+            DataClassification = CustomerContent;
         }
         field(6006; Accessory; Boolean)
         {
             Caption = 'Accessory';
+            DataClassification = CustomerContent;
             InitValue = false;
         }
         field(6007; "Main Item No."; Code[21])
         {
             Caption = 'Main Item No.';
+            DataClassification = CustomerContent;
         }
         field(6008; "Combination Item"; Boolean)
         {
             Caption = 'Combination Item';
+            DataClassification = CustomerContent;
         }
         field(6009; "Combination No."; Code[20])
         {
             Caption = 'Combination No.';
+            DataClassification = CustomerContent;
         }
         field(6010; "From Selection"; Boolean)
         {
             Caption = 'From Selection';
+            DataClassification = CustomerContent;
             InitValue = false;
         }
         field(6011; "Item Group"; Code[10])
         {
             Caption = 'Item Group';
+            DataClassification = CustomerContent;
             TableRelation = "Item Group";
 
             trigger OnValidate()
@@ -1507,128 +1631,157 @@ table 6014406 "Sale Line POS"
         field(6012; "MR Anvendt antal"; Decimal)
         {
             Caption = 'MR Used Amount';
+            DataClassification = CustomerContent;
         }
         field(6013; "FP Anvendt"; Boolean)
         {
             Caption = 'FP Used';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(6014; "Eksp. Salgspris"; Boolean)
         {
             Caption = 'Sale POS Salesprice';
+            DataClassification = CustomerContent;
             InitValue = false;
         }
         field(6015; "Serial No. not Created"; Code[30])
         {
             Caption = 'Serial No. not Created';
+            DataClassification = CustomerContent;
         }
         field(6019; "Custom Price"; Boolean)
         {
             Caption = 'Custom Price';
+            DataClassification = CustomerContent;
         }
         field(6020; NegPriceZero; Boolean)
         {
             Caption = 'NegPriceZero';
+            DataClassification = CustomerContent;
         }
         field(6021; Reference; Text[50])
         {
             Caption = 'Reference';
+            DataClassification = CustomerContent;
         }
         field(6022; "Rep. Nummer"; Code[10])
         {
             Caption = 'Rep. No.';
+            DataClassification = CustomerContent;
         }
         field(6023; "Gift Voucher Ref."; Code[20])
         {
             Caption = 'Gift Voucher Ref.';
+            DataClassification = CustomerContent;
         }
         field(6024; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit voucher ref.';
+            DataClassification = CustomerContent;
         }
         field(6025; "Custom Cost"; Boolean)
         {
             Caption = 'Custom Cost';
+            DataClassification = CustomerContent;
         }
         field(6026; "Wish List"; Code[10])
         {
             Caption = 'Wish list';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
         field(6027; "Wish List Line No."; Integer)
         {
             Caption = 'Wish List Line No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
         field(6028; "Item group accessory"; Boolean)
         {
             Caption = 'Itemgroup Accessories';
+            DataClassification = CustomerContent;
         }
         field(6029; "Accessories Item Group No."; Code[20])
         {
             Caption = 'Accessories Itemgroup No.';
+            DataClassification = CustomerContent;
         }
         field(6032; "Label Quantity"; Integer)
         {
             Caption = 'Label Quantity';
+            DataClassification = CustomerContent;
         }
         field(6033; "Offline Sales Ticket No"; Code[20])
         {
             Caption = 'Emergency Ticket No.';
+            DataClassification = CustomerContent;
         }
         field(6034; "Custom Descr"; Boolean)
         {
             Caption = 'Customer Description';
+            DataClassification = CustomerContent;
         }
         field(6036; "Foreign No."; Code[20])
         {
             Caption = 'Foreign No.';
+            DataClassification = CustomerContent;
         }
         field(6037; GiftCrtLine; Integer)
         {
             Caption = 'Gift Certificate Line';
+            DataClassification = CustomerContent;
         }
         field(6038; "Label Date"; Date)
         {
             Caption = 'Label Date';
+            DataClassification = CustomerContent;
         }
         field(6039; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            DataClassification = CustomerContent;
             Description = 'NPR5.23';
         }
         field(6043; "Order No. from Web"; Code[20])
         {
             Caption = 'Order No. from Web';
+            DataClassification = CustomerContent;
         }
         field(6044; "Order Line No. from Web"; Integer)
         {
             BlankZero = true;
             Caption = 'Order Line No. from Web';
+            DataClassification = CustomerContent;
         }
         field(6050; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.00 [250375]';
         }
         field(6051; "Product Group Code"; Code[10])
         {
             Caption = 'Product Group Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.000 [250375]';
         }
         field(6055; "Lock Code"; Code[10])
         {
             Caption = 'Lock Code';
+            DataClassification = CustomerContent;
             Description = 'NPR4.007.016';
         }
         field(6100; "Main Line No."; Integer)
         {
             Caption = 'Main Line No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.40';
         }
         field(7014; "Item Disc. Group"; Code[20])
         {
             Caption = 'Item Disc. Group';
+            DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Discount Group" WHERE(Code = FIELD("Item Disc. Group"));
             //This property is currently not supported
@@ -1638,69 +1791,85 @@ table 6014406 "Sale Line POS"
         field(10000; Silent; Boolean)
         {
             Caption = 'Silent';
+            DataClassification = CustomerContent;
         }
         field(10001; Deleting; Boolean)
         {
             Caption = 'Deleting';
+            DataClassification = CustomerContent;
         }
         field(10002; NoWarning; Boolean)
         {
             Caption = 'No Warning';
+            DataClassification = CustomerContent;
         }
         field(10003; CondFirstRun; Boolean)
         {
             Caption = 'Conditioned First Run';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(10004; CurrencySilent; Boolean)
         {
             Caption = 'Currency (Silent)';
+            DataClassification = CustomerContent;
         }
         field(10005; StyklisteSilent; Boolean)
         {
             Caption = 'Bill of materials (Silent)';
+            DataClassification = CustomerContent;
         }
         field(10006; "Cust Forsikring"; Boolean)
         {
             Caption = 'Cust. Insurrance';
+            DataClassification = CustomerContent;
         }
         field(10007; Forsikring; Boolean)
         {
             Caption = 'Insurrance';
+            DataClassification = CustomerContent;
         }
         field(10008; TestOnServer; Boolean)
         {
             Caption = 'Test on Server';
+            DataClassification = CustomerContent;
         }
         field(10009; "Customer No. Line"; Boolean)
         {
             Caption = 'Customer No. Line';
+            DataClassification = CustomerContent;
         }
         field(10010; ForceApris; Boolean)
         {
             Caption = 'Force A-Price';
+            DataClassification = CustomerContent;
         }
         field(10011; GuaranteePrinted; Boolean)
         {
             Caption = 'Guarantee Certificat Printed';
+            DataClassification = CustomerContent;
             Description = 'Field set true, if guarantee certificate has been printed';
         }
         field(10012; "Custom Disc Blocked"; Boolean)
         {
             Caption = 'Custom Disc Blocked';
+            DataClassification = CustomerContent;
         }
         field(10013; "Invoiz Guid"; Text[150])
         {
             Caption = 'Invoiz Guid';
+            DataClassification = CustomerContent;
         }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';
+            DataClassification = CustomerContent;
             Description = 'NPR4.007.025 - Benyttes i forbindelse med Smart Safety forsikring';
         }
         field(6014512; "SQL Server Timestamp"; BigInteger)
         {
             Caption = 'Timestamp';
+            DataClassification = CustomerContent;
             Description = 'NPR5.22';
             Editable = false;
             SQLTimestamp = true;
@@ -1932,7 +2101,7 @@ table 6014406 "Sale Line POS"
 
         //-NPR5.54 [391871]
         if IsNullGuid("Retail ID") then begin
-          "Retail ID" := CreateGuid();
+            "Retail ID" := CreateGuid();
         end;
         //+NPR5.54 [391871]
     end;
@@ -2174,7 +2343,7 @@ table 6014406 "Sale Line POS"
             //-NPR5.40 [306257]
             SalesLine.Description := Description;
             //+NPR5.40 [306257]
-          SalesLine."Description 2" := "Description 2";  //NPR5.54 [385837]
+            SalesLine."Description 2" := "Description 2";  //NPR5.54 [385837]
             exit;
         end;
 
@@ -2505,7 +2674,7 @@ table 6014406 "Sale Line POS"
         //-NPR5.54 [395683]
         //Currency.InitRoundingPrecision ();  //NPR5.55 [380979]-revoked
         //+NPR5.54 [395683]
-        
+
         //-NPR5.31 [248534]
         with SaleLinePOS do begin
             //-NPR5.48 [335967]
@@ -2520,17 +2689,17 @@ table 6014406 "Sale Line POS"
                 SaleLinePOS2.SetFilter(Amount, '<%1', 0);
             SaleLinePOS2.SetRange("VAT Identifier", "VAT Identifier");
             SaleLinePOS2.SetRange("Tax Group Code", "Tax Group Code");
-        
+
             //-NPR5.48 [338181]
             //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
             //+NPR5.48 [338181]:= ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-        
+
             TotalLineAmount := 0;
             TotalInvDiscAmount := 0;
             TotalAmount := 0;
             TotalAmountInclVAT := 0;
             TotalQuantityBase := 0;
-        
+
             if ("VAT Calculation Type" = "VAT Calculation Type"::"Sales Tax") or
                (("VAT Calculation Type" in
                  ["VAT Calculation Type"::"Normal VAT", "VAT Calculation Type"::"Reverse Charge VAT"]) and ("VAT %" <> 0))
@@ -2543,257 +2712,257 @@ table 6014406 "Sale Line POS"
                     TotalAmountInclVAT := SaleLinePOS2."Amount Including VAT";
                     TotalQuantityBase := SaleLinePOS2."Quantity (Base)";
                 end;
-        
-          //-NPR5.55 [380979]
-          UpdateLineVatAmounts(
-            SaleLinePOS, TotalLineAmount, TotalInvDiscAmount, TotalAmount, TotalAmountInclVAT);
-          //+NPR5.55 [380979]
-          //-NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
-          /*
-          //+NPR5.48 [335967]
-          IF "Price Includes VAT" THEN BEGIN
-            "Amount Including VAT" := Quantity * "Unit Price";
-            IF "Discount %" <> 0 THEN
-              "Discount Amount" := ROUND("Amount Including VAT" * "Discount %"/100)
-            ELSE
-              IF "Discount Amount" <> 0 THEN
-                "Discount %" := ROUND(100-("Amount Including VAT" - "Discount Amount")/"Amount Including VAT"*100,0.0001);
-            "Amount Including VAT" := "Amount Including VAT" - "Discount Amount";
-        
-            //-NPR5.48 [338181]
-        
-            //-NPR5.54 [395683]
-            //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-            "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
-            //+NPR5.54 [395683]
-        
-            //+NPR5.48 [338181]
-        
-            CASE "VAT Calculation Type" OF
-              "VAT Calculation Type"::"Reverse Charge VAT",
-              "VAT Calculation Type"::"Normal VAT":
-                BEGIN
-                  //-NPR5.48 [335967]
-                  //Amount := ROUND("Amount Including VAT"/(1 + "VAT %"/100));
-                  Amount:= ROUND((TotalLineAmount -TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
-                                   Currency."Amount Rounding Precision") - TotalAmount;
-                  //+NPR5.48 [335967]
-                  "Amount Including VAT" := ROUND("Amount Including VAT");
-                  //-NPR5.51 [365487]
-                  IF ("Amount Including VAT" = 0) THEN
-                    Amount := 0;
-                  //+NPR5.51 [365487]
-        
-                  "VAT Base Amount" := Amount;
-                END;
-              "VAT Calculation Type"::"Sales Tax":
-                BEGIN
-                  //-NPR5.34 [284658]
-                  //Amount := SalesTaxCalculate.ReverseCalculateTax(
-                  //-NPR5.40 [303616]
-                  TESTFIELD("Tax Area Code");
-                  //+NPR5.40 [303616]
-                  //-NPR5.41 [311309]
-                  //Amount := SalesTaxCalculate.CalculateTax(
-                  Amount := SalesTaxCalculate.ReverseCalculateTax(
-                  //+NPR5.41 [311309]
-                  //+NPR5.34
-                    "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
-                  //-NPR5.41 [311309]
-                  //  "Amount Including VAT",Quantity,0);
-                    "Amount Including VAT","Quantity (Base)",0);
-                  //-NPR5.41 [311309]
-                  IF Amount <> 0 THEN
-                    "VAT %" := ROUND(100 * ("Amount Including VAT" - Amount) / Amount,0.00001)
-                  ELSE
-                    "VAT %" := 0;
-                  "Amount Including VAT" := ROUND("Amount Including VAT");
-                  Amount := ROUND(Amount);
-                  "VAT Base Amount" := Amount;
-                END;
+
+            //-NPR5.55 [380979]
+            UpdateLineVatAmounts(
+              SaleLinePOS, TotalLineAmount, TotalInvDiscAmount, TotalAmount, TotalAmountInclVAT);
+            //+NPR5.55 [380979]
+            //-NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
+            /*
+            //+NPR5.48 [335967]
+            IF "Price Includes VAT" THEN BEGIN
+              "Amount Including VAT" := Quantity * "Unit Price";
+              IF "Discount %" <> 0 THEN
+                "Discount Amount" := ROUND("Amount Including VAT" * "Discount %"/100)
               ELSE
-                ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
-            END;
-          END ELSE BEGIN
-            Amount := Quantity * "Unit Price";
-            IF "Discount %" <> 0 THEN
-              "Discount Amount" := ROUND(Amount * "Discount %"/100)
-            ELSE
-              IF "Discount Amount" <> 0 THEN
-                "Discount %" := ROUND(100-(Amount - "Discount Amount")/Amount*100,0.0001);
-            Amount := Amount - "Discount Amount";
-        
-            //-NPR5.48 [338181]
-        
-            //-NPR5.54 [395683]
-            //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-            "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
-            //+NPR5.54 [395683]
-        
-            //+NPR5.48 [338181]
-        
-            CASE "VAT Calculation Type" OF
-              "VAT Calculation Type"::"Reverse Charge VAT",
-              "VAT Calculation Type"::"Normal VAT":
-                BEGIN
-                  //-NPR5.48 [335967]
-                  //"Amount Including VAT" := ROUND(Amount * (1 + "VAT %"/100));
-                  //Amount := ROUND(Amount);
-                  //"VAT Base Amount" := Amount;
-                  Amount := ROUND("Line Amount" - "Invoice Discount Amount",Currency."Amount Rounding Precision");
-                  "VAT Base Amount" := Amount;
-                  "Amount Including VAT" :=
-                    TotalAmount + Amount +
-                    ROUND(
-                      (TotalAmount + Amount) * "VAT %" / 100,
-                      Currency."Amount Rounding Precision",Currency.VATRoundingDirection) -
-                    TotalAmountInclVAT;
-                  //+NPR5.48 [335967]
-        
-                  //-NPR5.51 [365487]
-                  IF (Amount  = 0) THEN
-                    "Amount Including VAT" := 0;
-                  //+NPR5.51 [365487]
-        
-                END;
-              "VAT Calculation Type"::"Sales Tax":
-                BEGIN
-                  Amount := ROUND(Amount);
-                  "VAT Base Amount" := Amount;
-                  //-NPR5.34 [284658]
-                  //"Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.ReverseCalculateTax(
-                  "Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.CalculateTax(
-                  //+NPR5.34
-                    "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
-                  //-NPR5.41 [311309]
-                    //Amount,Quantity,0));
-                    Amount,"Quantity (Base)",0));
-                  //+NPR5.41 [311309]
-                  IF "VAT Base Amount" <> 0 THEN
-                    "VAT %" := ROUND(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount",0.00001)
-                  ELSE
-                    "VAT %" := 0;
-                END;
+                IF "Discount Amount" <> 0 THEN
+                  "Discount %" := ROUND(100-("Amount Including VAT" - "Discount Amount")/"Amount Including VAT"*100,0.0001);
+              "Amount Including VAT" := "Amount Including VAT" - "Discount Amount";
+
+              //-NPR5.48 [338181]
+
+              //-NPR5.54 [395683]
+              //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
+              "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+              //+NPR5.54 [395683]
+
+              //+NPR5.48 [338181]
+
+              CASE "VAT Calculation Type" OF
+                "VAT Calculation Type"::"Reverse Charge VAT",
+                "VAT Calculation Type"::"Normal VAT":
+                  BEGIN
+                    //-NPR5.48 [335967]
+                    //Amount := ROUND("Amount Including VAT"/(1 + "VAT %"/100));
+                    Amount:= ROUND((TotalLineAmount -TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
+                                     Currency."Amount Rounding Precision") - TotalAmount;
+                    //+NPR5.48 [335967]
+                    "Amount Including VAT" := ROUND("Amount Including VAT");
+                    //-NPR5.51 [365487]
+                    IF ("Amount Including VAT" = 0) THEN
+                      Amount := 0;
+                    //+NPR5.51 [365487]
+
+                    "VAT Base Amount" := Amount;
+                  END;
+                "VAT Calculation Type"::"Sales Tax":
+                  BEGIN
+                    //-NPR5.34 [284658]
+                    //Amount := SalesTaxCalculate.ReverseCalculateTax(
+                    //-NPR5.40 [303616]
+                    TESTFIELD("Tax Area Code");
+                    //+NPR5.40 [303616]
+                    //-NPR5.41 [311309]
+                    //Amount := SalesTaxCalculate.CalculateTax(
+                    Amount := SalesTaxCalculate.ReverseCalculateTax(
+                    //+NPR5.41 [311309]
+                    //+NPR5.34
+                      "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
+                    //-NPR5.41 [311309]
+                    //  "Amount Including VAT",Quantity,0);
+                      "Amount Including VAT","Quantity (Base)",0);
+                    //-NPR5.41 [311309]
+                    IF Amount <> 0 THEN
+                      "VAT %" := ROUND(100 * ("Amount Including VAT" - Amount) / Amount,0.00001)
+                    ELSE
+                      "VAT %" := 0;
+                    "Amount Including VAT" := ROUND("Amount Including VAT");
+                    Amount := ROUND(Amount);
+                    "VAT Base Amount" := Amount;
+                  END;
+                ELSE
+                  ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
+              END;
+            END ELSE BEGIN
+              Amount := Quantity * "Unit Price";
+              IF "Discount %" <> 0 THEN
+                "Discount Amount" := ROUND(Amount * "Discount %"/100)
               ELSE
-                ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
+                IF "Discount Amount" <> 0 THEN
+                  "Discount %" := ROUND(100-(Amount - "Discount Amount")/Amount*100,0.0001);
+              Amount := Amount - "Discount Amount";
+
+              //-NPR5.48 [338181]
+
+              //-NPR5.54 [395683]
+              //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
+              "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+              //+NPR5.54 [395683]
+
+              //+NPR5.48 [338181]
+
+              CASE "VAT Calculation Type" OF
+                "VAT Calculation Type"::"Reverse Charge VAT",
+                "VAT Calculation Type"::"Normal VAT":
+                  BEGIN
+                    //-NPR5.48 [335967]
+                    //"Amount Including VAT" := ROUND(Amount * (1 + "VAT %"/100));
+                    //Amount := ROUND(Amount);
+                    //"VAT Base Amount" := Amount;
+                    Amount := ROUND("Line Amount" - "Invoice Discount Amount",Currency."Amount Rounding Precision");
+                    "VAT Base Amount" := Amount;
+                    "Amount Including VAT" :=
+                      TotalAmount + Amount +
+                      ROUND(
+                        (TotalAmount + Amount) * "VAT %" / 100,
+                        Currency."Amount Rounding Precision",Currency.VATRoundingDirection) -
+                      TotalAmountInclVAT;
+                    //+NPR5.48 [335967]
+
+                    //-NPR5.51 [365487]
+                    IF (Amount  = 0) THEN
+                      "Amount Including VAT" := 0;
+                    //+NPR5.51 [365487]
+
+                  END;
+                "VAT Calculation Type"::"Sales Tax":
+                  BEGIN
+                    Amount := ROUND(Amount);
+                    "VAT Base Amount" := Amount;
+                    //-NPR5.34 [284658]
+                    //"Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.ReverseCalculateTax(
+                    "Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.CalculateTax(
+                    //+NPR5.34
+                      "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
+                    //-NPR5.41 [311309]
+                      //Amount,Quantity,0));
+                      Amount,"Quantity (Base)",0));
+                    //+NPR5.41 [311309]
+                    IF "VAT Base Amount" <> 0 THEN
+                      "VAT %" := ROUND(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount",0.00001)
+                    ELSE
+                      "VAT %" := 0;
+                  END;
+                ELSE
+                  ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
+              END;
             END;
-          END;
-          //-NPR5.32.01 [248534]
-          */
-          //+NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
-        
-          "Discount %" := Abs("Discount %");
-        
-          //-NPR5.45 [323615] Discount Amount needs to be same sign as quantity field, this value propagates in posting to value entry.
-          //"Discount Amount" := ABS("Discount Amount");
-          //+NPR5.45 [323615]
-        
-          //+NPR5.32.01 [248534]
+            //-NPR5.32.01 [248534]
+            */
+            //+NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
+
+            "Discount %" := Abs("Discount %");
+
+            //-NPR5.45 [323615] Discount Amount needs to be same sign as quantity field, this value propagates in posting to value entry.
+            //"Discount Amount" := ABS("Discount Amount");
+            //+NPR5.45 [323615]
+
+            //+NPR5.32.01 [248534]
         end;
         //+NPR5.31 [248534]
 
     end;
 
-    procedure UpdateLineVatAmounts(var SaleLinePOS: Record "Sale Line POS";TotalLineAmount: Decimal;TotalInvDiscAmount: Decimal;TotalAmount: Decimal;TotalAmountInclVAT: Decimal)
+    procedure UpdateLineVatAmounts(var SaleLinePOS: Record "Sale Line POS"; TotalLineAmount: Decimal; TotalInvDiscAmount: Decimal; TotalAmount: Decimal; TotalAmountInclVAT: Decimal)
     var
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
     begin
         //-NPR5.55 [380979] (Extracted from 'UpdateAmounts')
         if SaleLinePOS."Currency Code" <> '' then
-          Currency.Get(SaleLinePOS."Currency Code")
+            Currency.Get(SaleLinePOS."Currency Code")
         else
-          Currency.InitRoundingPrecision();
+            Currency.InitRoundingPrecision();
 
         with SaleLinePOS do begin
-          if "Price Includes VAT" then begin
-            "Amount Including VAT" := Quantity * "Unit Price";
-            if "Discount %" <> 0 then
-              "Discount Amount" := Round("Amount Including VAT" * "Discount %" / 100, Currency."Amount Rounding Precision")
-            else
-              if "Discount Amount" <> 0 then begin
-                "Discount Amount" := Round("Discount Amount", Currency."Amount Rounding Precision");
-                "Discount %" := Round(100 - ("Amount Including VAT" - "Discount Amount") / "Amount Including VAT" * 100, 0.0001);
-              end;
-            "Amount Including VAT" := Round("Amount Including VAT" - "Discount Amount", Currency."Amount Rounding Precision");
-            "Line Amount" := Round (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+            if "Price Includes VAT" then begin
+                "Amount Including VAT" := Quantity * "Unit Price";
+                if "Discount %" <> 0 then
+                    "Discount Amount" := Round("Amount Including VAT" * "Discount %" / 100, Currency."Amount Rounding Precision")
+                else
+                    if "Discount Amount" <> 0 then begin
+                        "Discount Amount" := Round("Discount Amount", Currency."Amount Rounding Precision");
+                        "Discount %" := Round(100 - ("Amount Including VAT" - "Discount Amount") / "Amount Including VAT" * 100, 0.0001);
+                    end;
+                "Amount Including VAT" := Round("Amount Including VAT" - "Discount Amount", Currency."Amount Rounding Precision");
+                "Line Amount" := Round(Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
 
-            case "VAT Calculation Type" of
-              "VAT Calculation Type"::"Reverse Charge VAT",
-              "VAT Calculation Type"::"Normal VAT":
-                begin
-                  Amount :=
-                    Round(
-                      (TotalLineAmount - TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
-                      Currency."Amount Rounding Precision") -
-                    TotalAmount;
-                  "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
-                  if "Amount Including VAT" = 0 then
-                    Amount := 0;
-                  "VAT Base Amount" := Amount;
-                end;
+                case "VAT Calculation Type" of
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"Normal VAT":
+                        begin
+                            Amount :=
+                              Round(
+                                (TotalLineAmount - TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
+                                Currency."Amount Rounding Precision") -
+                              TotalAmount;
+                            "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
+                            if "Amount Including VAT" = 0 then
+                                Amount := 0;
+                            "VAT Base Amount" := Amount;
+                        end;
 
-              "VAT Calculation Type"::"Sales Tax":
-                begin
-                  TestField("Tax Area Code");
-                  Amount := SalesTaxCalculate.ReverseCalculateTax(
-                    "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
-                    "Amount Including VAT","Quantity (Base)",0);
-                  if Amount <> 0 then
-                    "VAT %" := Round(100 * ("Amount Including VAT" - Amount) / Amount, 0.00001)
-                  else
-                    "VAT %" := 0;
-                  "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
-                  Amount := Round(Amount, Currency."Amount Rounding Precision");
-                  "VAT Base Amount" := Amount;
+                    "VAT Calculation Type"::"Sales Tax":
+                        begin
+                            TestField("Tax Area Code");
+                            Amount := SalesTaxCalculate.ReverseCalculateTax(
+                              "Tax Area Code", "Tax Group Code", "Tax Liable", Rec.Date,
+                              "Amount Including VAT", "Quantity (Base)", 0);
+                            if Amount <> 0 then
+                                "VAT %" := Round(100 * ("Amount Including VAT" - Amount) / Amount, 0.00001)
+                            else
+                                "VAT %" := 0;
+                            "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
+                            Amount := Round(Amount, Currency."Amount Rounding Precision");
+                            "VAT Base Amount" := Amount;
+                        end;
+                    else
+                        Error(ErrVATCalcNotSupportInPOS, FieldCaption("VAT Calculation Type"), "VAT Calculation Type");
                 end;
-              else
-                Error(ErrVATCalcNotSupportInPOS,FieldCaption("VAT Calculation Type"),"VAT Calculation Type");
+            end else begin
+                Amount := Quantity * "Unit Price";
+                if "Discount %" <> 0 then
+                    "Discount Amount" := Round(Amount * "Discount %" / 100, Currency."Amount Rounding Precision")
+                else
+                    if "Discount Amount" <> 0 then begin
+                        "Discount Amount" := Round("Discount Amount", Currency."Amount Rounding Precision");
+                        "Discount %" := Round(100 - (Amount - "Discount Amount") / Amount * 100, 0.0001);
+                    end;
+                Amount := Round(Amount - "Discount Amount", Currency."Amount Rounding Precision");
+                "Line Amount" := Round(Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+
+                case "VAT Calculation Type" of
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"Normal VAT":
+                        begin
+                            Amount := Round("Line Amount" - "Invoice Discount Amount", Currency."Amount Rounding Precision");
+                            "VAT Base Amount" := Amount;
+                            "Amount Including VAT" :=
+                              TotalAmount + Amount +
+                              Round(
+                                (TotalAmount + Amount) * "VAT %" / 100,
+                                Currency."Amount Rounding Precision", Currency.VATRoundingDirection) -
+                              TotalAmountInclVAT;
+                            if Amount = 0 then
+                                "Amount Including VAT" := 0;
+                        end;
+
+                    "VAT Calculation Type"::"Sales Tax":
+                        begin
+                            Amount := Round(Amount, Currency."Amount Rounding Precision");
+                            "VAT Base Amount" := Amount;
+                            "Amount Including VAT" := Amount +
+                              Round(
+                                SalesTaxCalculate.CalculateTax("Tax Area Code", "Tax Group Code", "Tax Liable", Rec.Date, Amount, "Quantity (Base)", 0),
+                                Currency."Amount Rounding Precision");
+                            if "VAT Base Amount" <> 0 then
+                                "VAT %" := Round(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount", 0.00001)
+                            else
+                                "VAT %" := 0;
+                        end;
+                    else
+                        Error(ErrVATCalcNotSupportInPOS, FieldCaption("VAT Calculation Type"), "VAT Calculation Type");
+                end;
             end;
-          end else begin
-            Amount := Quantity * "Unit Price";
-            if "Discount %" <> 0 then
-              "Discount Amount" := Round(Amount * "Discount %" / 100, Currency."Amount Rounding Precision")
-            else
-              if "Discount Amount" <> 0 then begin
-                "Discount Amount" := Round("Discount Amount", Currency."Amount Rounding Precision");
-                "Discount %" := Round(100 - (Amount - "Discount Amount") / Amount * 100, 0.0001);
-              end;
-            Amount := Round(Amount - "Discount Amount", Currency."Amount Rounding Precision");
-            "Line Amount" := Round(Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
-
-            case "VAT Calculation Type" of
-              "VAT Calculation Type"::"Reverse Charge VAT",
-              "VAT Calculation Type"::"Normal VAT":
-                begin
-                  Amount := Round("Line Amount" - "Invoice Discount Amount", Currency."Amount Rounding Precision");
-                  "VAT Base Amount" := Amount;
-                  "Amount Including VAT" :=
-                    TotalAmount + Amount +
-                    Round(
-                      (TotalAmount + Amount) * "VAT %" / 100,
-                      Currency."Amount Rounding Precision", Currency.VATRoundingDirection) -
-                    TotalAmountInclVAT;
-                  if Amount  = 0 then
-                    "Amount Including VAT" := 0;
-                end;
-
-              "VAT Calculation Type"::"Sales Tax":
-                begin
-                  Amount := Round(Amount, Currency."Amount Rounding Precision");
-                  "VAT Base Amount" := Amount;
-                  "Amount Including VAT" := Amount +
-                    Round(
-                      SalesTaxCalculate.CalculateTax("Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,Amount,"Quantity (Base)",0),
-                      Currency."Amount Rounding Precision");
-                  if "VAT Base Amount" <> 0 then
-                    "VAT %" := Round(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount", 0.00001)
-                  else
-                    "VAT %" := 0;
-                end;
-              else
-                Error(ErrVATCalcNotSupportInPOS,FieldCaption("VAT Calculation Type"),"VAT Calculation Type");
-            end;
-          end;
         end;
         //+NPR5.55 [380979] (Extracted from 'UpdateAmounts')
     end;
@@ -3205,9 +3374,9 @@ table 6014406 "Sale Line POS"
         //-NPR5.55 [398263]
         xSaleLinePOS2 := Rec;
         if not SerialNoLookup2() then
-          exit;
+            exit;
         if "Variant Code" <> xSaleLinePOS2."Variant Code" then
-          Validate("Variant Code");
+            Validate("Variant Code");
         Validate("Serial No.");
         //+NPR5.55 [398263]
 
@@ -3225,7 +3394,7 @@ table 6014406 "Sale Line POS"
 
         GetItem;
         Item.TestField("Costing Method", Item."Costing Method"::Specific);
-        ItemLedgerEntry.SetCurrentKey(Open,Positive,"Item No.","Serial No.");
+        ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
         ItemLedgerEntry.SetRange(Positive, true);
         ItemLedgerEntry.SetRange("Item No.", "No.");
@@ -3233,31 +3402,31 @@ table 6014406 "Sale Line POS"
         ItemLedgerEntry.SetRange("Location Code", "Location Code");
         //-NPR5.55 [398263]
         if "Variant Code" <> '' then
-          ItemLedgerEntry.SetRange("Variant Code","Variant Code");
+            ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
         //+NPR5.55 [398263]
         if not RetailSetup."Not use Dim filter SerialNo" then
-          ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
         if ItemLedgerEntry.Find('-') then
-          repeat
-            ItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");
-            ItemLedgerEntry.FindLast;
-            TempItemLedgerEntry := ItemLedgerEntry;
-            TempItemLedgerEntry.Insert;
-            ItemLedgerEntry.SetRange("Serial No.");
-          until ItemLedgerEntry.Next = 0;
+            repeat
+                ItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");
+                ItemLedgerEntry.FindLast;
+                TempItemLedgerEntry := ItemLedgerEntry;
+                TempItemLedgerEntry.Insert;
+                ItemLedgerEntry.SetRange("Serial No.");
+            until ItemLedgerEntry.Next = 0;
 
         //-NPR5.55 [398263]
-        TempItemLedgerEntry.SetFilter("Expiration Date",'<>%1',0D);
+        TempItemLedgerEntry.SetFilter("Expiration Date", '<>%1', 0D);
         if not TempItemLedgerEntry.IsEmpty then
-          TempItemLedgerEntry.SetCurrentKey("Expiration Date");
+            TempItemLedgerEntry.SetCurrentKey("Expiration Date");
         TempItemLedgerEntry.SetRange("Expiration Date");
         if "Serial No." <> '' then
-          TempItemLedgerEntry.SetRange("Serial No.","Serial No.");
+            TempItemLedgerEntry.SetRange("Serial No.", "Serial No.");
         if TempItemLedgerEntry.FindFirst then;
         TempItemLedgerEntry.SetRange("Serial No.");
         //+NPR5.55 [398263]
         if PAGE.RunModal(PAGE::"Item - Series Number", TempItemLedgerEntry) <> ACTION::LookupOK then
-          exit(false);
+            exit(false);
 
         //VALIDATE("Serial No.", TempItemLedgerEntry."Serial No.");  //NPR5.55 [398263]-revoked
         "Serial No." := TempItemLedgerEntry."Serial No.";  //NPR5.55 [398263]

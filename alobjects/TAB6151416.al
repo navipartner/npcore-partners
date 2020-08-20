@@ -13,32 +13,36 @@ table 6151416 "Magento Brand"
     // MAG2.26/MHA /20200601  CASE 404580 Renamed Field 1 from "Code" to "Id"
 
     Caption = 'Magento Brand';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Brands";
     LookupPageID = "Magento Brands";
 
     fields
     {
-        field(1;Id;Code[20])
+        field(1; Id; Code[20])
         {
             Caption = 'Id';
+            DataClassification = CustomerContent;
             Description = 'MAG2.26';
             NotBlank = true;
         }
-        field(2;Name;Text[32])
+        field(2; Name; Text[32])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 //-MAG1.02
                 if "Seo Link" = '' then
-                  Validate("Seo Link",Name);
+                    Validate("Seo Link", Name);
                 //+MAG1.02
             end;
         }
-        field(3;Picture;Text[250])
+        field(3; Picture; Text[250])
         {
             Caption = 'Picture';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -46,19 +50,21 @@ table 6151416 "Magento Brand"
             begin
                 //-MAG1.14
                 ///PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Manufacturer",MAXSTRLEN(Picture));
-                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Brand",Picture);
+                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Brand", Picture);
                 //+MAG1.14
                 if PictureName <> '' then
-                  Picture := PictureName;
+                    Picture := PictureName;
             end;
         }
-        field(9;Description;BLOB)
+        field(9; Description; BLOB)
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(10;"Seo Link";Text[200])
+        field(10; "Seo Link"; Text[200])
         {
             Caption = 'Seo Link';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -67,12 +73,13 @@ table 6151416 "Magento Brand"
                 //+MAG1.02
             end;
         }
-        field(15;"Short Description";BLOB)
+        field(15; "Short Description"; BLOB)
         {
         }
-        field(100;"Logo Picture";Text[250])
+        field(100; "Logo Picture"; Text[250])
         {
             Caption = 'Logo';
+            DataClassification = CustomerContent;
             Description = 'MAG1.01';
 
             trigger OnLookup()
@@ -83,35 +90,38 @@ table 6151416 "Magento Brand"
                 ////-MAG1.04
                 //PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Manufacturer",MAXSTRLEN("Logo Picture"));
                 ////+MAG1.04
-                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Brand","Logo Picture");
+                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Brand", "Logo Picture");
                 //+MAG1.14
                 if PictureName <> '' then
-                  "Logo Picture" := PictureName;
+                    "Logo Picture" := PictureName;
             end;
         }
-        field(105;Sorting;Integer)
+        field(105; Sorting; Integer)
         {
             Caption = 'Sorting';
+            DataClassification = CustomerContent;
             Description = 'MAG1.20';
         }
-        field(110;"Meta Title";Text[100])
+        field(110; "Meta Title"; Text[100])
         {
             Caption = 'Meta Title';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00,MAG2.22';
         }
-        field(115;"Meta Description";Text[250])
+        field(115; "Meta Description"; Text[250])
         {
             Caption = 'Meta Description';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
     }
 
     keys
     {
-        key(Key1;Id)
+        key(Key1; Id)
         {
         }
-        key(Key2;Name)
+        key(Key2; Name)
         {
         }
     }
@@ -129,8 +139,8 @@ table 6151416 "Magento Brand"
         // Item.SETRANGE("Webshop Manufacturer",Code);
         // Item.MODIFYALL("Webshop Manufacturer",'',FALSE);
         // //+MAG1.04
-        Item.SetRange("Magento Brand",Id);
-        Item.ModifyAll("Magento Brand",'',false);
+        Item.SetRange("Magento Brand", Id);
+        Item.ModifyAll("Magento Brand", '', false);
         //+MAG2.00
     end;
 
@@ -140,14 +150,14 @@ table 6151416 "Magento Brand"
     begin
         //-MAG2.26 [404580]
         if MagentoSetupMgt.HasSetupBrands() then
-          exit;
+            exit;
         //+MAG2.26 [404580]
 
         TestField(Name);
 
         //-MAG1.02
         if "Seo Link" = '' then
-          "Seo Link" := Name;
+            "Seo Link" := Name;
         "Seo Link" := MagentoFunctions.SeoFormat("Seo Link");
         //+MAG1.02
     end;
@@ -158,14 +168,14 @@ table 6151416 "Magento Brand"
     begin
         //-MAG2.26 [404580]
         if MagentoSetupMgt.HasSetupBrands() then
-          exit;
+            exit;
         //+MAG2.26 [404580]
 
         TestField(Name);
 
         //-MAG1.02
         if "Seo Link" = '' then
-          "Seo Link" := Name;
+            "Seo Link" := Name;
         "Seo Link" := MagentoFunctions.SeoFormat("Seo Link");
         //+MAG1.02
     end;
@@ -176,7 +186,7 @@ table 6151416 "Magento Brand"
     begin
         //-MAG2.26 [404580]
         if MagentoSetupMgt.HasSetupBrands() then
-          exit;
+            exit;
         //+MAG2.26 [404580]
 
         TestField(Name);

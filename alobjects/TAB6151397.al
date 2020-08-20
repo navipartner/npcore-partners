@@ -8,28 +8,33 @@ table 6151397 "CS Posting Buffer"
     // NPR5.53/CLVA  /20191118  CASE 377721 Added "Job Type" option "Unplanned Count"
 
     Caption = 'CS Posting Buffer';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;Id;Integer)
+        field(1; Id; Integer)
         {
             AutoIncrement = true;
             Caption = 'Id';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(10;"Table No.";Integer)
+        field(10; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(11;"Record Id";RecordID)
+        field(11; "Record Id"; RecordID)
         {
             Caption = 'Record Id';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(12;"Created By";Code[50])
+        field(12; "Created By"; Code[50])
         {
             Caption = 'Created By';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = User."User Name";
             ValidateTableRelation = false;
@@ -46,27 +51,32 @@ table 6151397 "CS Posting Buffer"
             begin
             end;
         }
-        field(13;Created;DateTime)
+        field(13; Created; DateTime)
         {
             Caption = 'Created';
+            DataClassification = CustomerContent;
             Editable = true;
         }
-        field(14;Executed;Boolean)
+        field(14; Executed; Boolean)
         {
             Caption = 'Executed';
+            DataClassification = CustomerContent;
             Editable = true;
         }
-        field(15;"Posting Index";Integer)
+        field(15; "Posting Index"; Integer)
         {
             Caption = 'Posting Index';
+            DataClassification = CustomerContent;
         }
-        field(16;"Update Posting Date";Boolean)
+        field(16; "Update Posting Date"; Boolean)
         {
             Caption = 'Update Posting Date';
+            DataClassification = CustomerContent;
         }
-        field(17;"Job Queue Status";Option)
+        field(17; "Job Queue Status"; Option)
         {
             Caption = 'Job Queue Status';
+            DataClassification = CustomerContent;
             Editable = true;
             OptionCaption = ' ,Scheduled for Posting,Error,Posting';
             OptionMembers = " ","Scheduled for Posting",Error,Posting;
@@ -76,25 +86,28 @@ table 6151397 "CS Posting Buffer"
                 JobQueueEntry: Record "Job Queue Entry";
             begin
                 if ("Job Queue Status" = "Job Queue Status"::" ") and Executed then
-                  exit;
+                    exit;
                 JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
             end;
         }
-        field(18;"Job Queue Entry ID";Guid)
+        field(18; "Job Queue Entry ID"; Guid)
         {
             Caption = 'Job Queue Entry ID';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(19;"Job Type";Option)
+        field(19; "Job Type"; Option)
         {
             Caption = 'Job Type';
+            DataClassification = CustomerContent;
             Editable = false;
             OptionCaption = 'Invt. Pick,Invt. Put-away,Pick,Put-away,Phy. Inv. Journal,Item Journal,Transfer Order,Movement,Invt. Movement,Store Counting,Item Reclass.,Approve Counting,Unplanned Count';
             OptionMembers = "Invt. Pick","Invt. Put-away",Pick,"Put-away","Phy. Inv. Journal","Item Journal","Transfer Order",Movement,"Invt. Movement","Store Counting","Item Reclass.","Approve Counting","Unplanned Count";
         }
-        field(20;"Job Queue Priority for Post";Integer)
+        field(20; "Job Queue Priority for Post"; Integer)
         {
             Caption = 'Job Queue Priority for Post';
+            DataClassification = CustomerContent;
             Editable = false;
             InitValue = 1000;
             MinValue = 0;
@@ -105,15 +118,16 @@ table 6151397 "CS Posting Buffer"
                 //  ERROR(TXT002);
             end;
         }
-        field(21;"Session Id";Text[30])
+        field(21; "Session Id"; Text[30])
         {
             Caption = 'Session Id';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Id)
+        key(Key1; Id)
         {
         }
     }
@@ -126,8 +140,8 @@ table 6151397 "CS Posting Buffer"
     begin
         //-NPR5.52 [365967]
         if not IsNullGuid("Job Queue Entry ID") then
-          if JobQueueEntry.Get("Job Queue Entry ID") then
-            JobQueueEntry.Delete(true);
+            if JobQueueEntry.Get("Job Queue Entry ID") then
+                JobQueueEntry.Delete(true);
         //+NPR5.52 [365967]
     end;
 

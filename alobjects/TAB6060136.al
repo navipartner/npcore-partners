@@ -16,31 +16,35 @@ table 6060136 "MM Membership Alteration Setup"
     // MM1.44/TSA /20200529 CASE 407401 Added Age verification setup
 
     Caption = 'Membership Alteration Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Alteration Type";Option)
+        field(1; "Alteration Type"; Option)
         {
             Caption = 'Alteration Type';
+            DataClassification = CustomerContent;
             InitValue = RENEW;
             OptionCaption = 'Regret,Renew,Upgrade,Extend,Cancel,Auto-Renew';
             OptionMembers = REGRET,RENEW,UPGRADE,EXTEND,CANCEL,AUTORENEW;
         }
-        field(2;"From Membership Code";Code[20])
+        field(2; "From Membership Code"; Code[20])
         {
             Caption = 'From Membership Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Membership Setup";
 
             trigger OnValidate()
             begin
 
                 if ("Alteration Type" in ["Alteration Type"::REGRET, "Alteration Type"::CANCEL]) then
-                  "To Membership Code" := '';
+                    "To Membership Code" := '';
             end;
         }
-        field(4;"Sales Item No.";Code[20])
+        field(4; "Sales Item No."; Code[20])
         {
             Caption = 'Sales Item No.';
+            DataClassification = CustomerContent;
             TableRelation = Item;
 
             trigger OnValidate()
@@ -48,56 +52,66 @@ table 6060136 "MM Membership Alteration Setup"
                 Item: Record Item;
             begin
 
-                if (Item.Get ("Sales Item No.")) then
-                  Description := Item.Description;
+                if (Item.Get("Sales Item No.")) then
+                    Description := Item.Description;
             end;
         }
-        field(9;"Presentation Order";Integer)
+        field(9; "Presentation Order"; Integer)
         {
             Caption = 'Presentation Order';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[50])
+        field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(15;"To Membership Code";Code[20])
+        field(15; "To Membership Code"; Code[20])
         {
             Caption = 'To Membership Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Membership Setup";
         }
-        field(20;"Alteration Activate From";Option)
+        field(20; "Alteration Activate From"; Option)
         {
             Caption = 'Alteration Activate From';
+            DataClassification = CustomerContent;
             OptionCaption = 'As soon as possible,Date Formula,Back-to-Back';
             OptionMembers = ASAP,DF,B2B;
         }
-        field(25;"Alteration Date Formula";DateFormula)
+        field(25; "Alteration Date Formula"; DateFormula)
         {
             Caption = 'Alteration Date Formula';
+            DataClassification = CustomerContent;
         }
-        field(26;"Age Constraint Type";Option)
+        field(26; "Age Constraint Type"; Option)
         {
             Caption = 'Age Constraint Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Less Than,Less Than or Equal,Greater Than,Greater Than or Equal,Equal';
             OptionMembers = NA,LT,LTE,GT,GTE,E;
         }
-        field(27;"Age Constraint (Years)";Integer)
+        field(27; "Age Constraint (Years)"; Integer)
         {
             Caption = 'Age Constraint (Years)';
+            DataClassification = CustomerContent;
         }
-        field(28;"Age Constraint Applies To";Option)
+        field(28; "Age Constraint Applies To"; Option)
         {
             Caption = 'Age Constraint Applies To';
+            DataClassification = CustomerContent;
             OptionCaption = 'All Members,Youngest Member,Oldest Member,Administrators,Dependants';
             OptionMembers = ALL,YOUNGEST,OLDEST,ADMINS,DEPENDANTS;
         }
-        field(30;"Activate Grace Period";Boolean)
+        field(30; "Activate Grace Period"; Boolean)
         {
             Caption = 'Activate Grace Period';
+            DataClassification = CustomerContent;
         }
-        field(32;"Grace Period Presets";Option)
+        field(32; "Grace Period Presets"; Option)
         {
             Caption = 'Grace Period Presets';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Valid for Expired Memberships,Valid for Active Memberships';
             OptionMembers = NA,EXPIRED_MEMBERSHIP,ACTIVE_MEMBERSHIP;
 
@@ -106,79 +120,94 @@ table 6060136 "MM Membership Alteration Setup"
                 MembershipManagement: Codeunit "MM Membership Management";
             begin
 
-                MembershipManagement.ApplyGracePeriodPreset (Rec."Grace Period Presets", Rec);
+                MembershipManagement.ApplyGracePeriodPreset(Rec."Grace Period Presets", Rec);
             end;
         }
-        field(35;"Grace Period Relates To";Option)
+        field(35; "Grace Period Relates To"; Option)
         {
             Caption = 'Grace Period Relates To';
+            DataClassification = CustomerContent;
             OptionCaption = 'Start Date,End Date';
             OptionMembers = START_DATE,END_DATE;
         }
-        field(40;"Grace Period Before";DateFormula)
+        field(40; "Grace Period Before"; DateFormula)
         {
             Caption = 'Grace Period Before';
+            DataClassification = CustomerContent;
         }
-        field(45;"Grace Period After";DateFormula)
+        field(45; "Grace Period After"; DateFormula)
         {
             Caption = 'Grace Period After';
+            DataClassification = CustomerContent;
         }
-        field(46;"Grace Period Calculation";Option)
+        field(46; "Grace Period Calculation"; Option)
         {
             Caption = 'Grace Period Calculation';
+            DataClassification = CustomerContent;
             OptionCaption = 'Simple,Advanced';
             OptionMembers = SIMPLE,ADVANCED;
         }
-        field(50;"Membership Duration";DateFormula)
+        field(50; "Membership Duration"; DateFormula)
         {
             Caption = 'Membership Duration';
+            DataClassification = CustomerContent;
         }
-        field(60;"Price Calculation";Option)
+        field(60; "Price Calculation"; Option)
         {
             Caption = 'Price Calculation';
+            DataClassification = CustomerContent;
             OptionCaption = 'Unit Price,Price Difference,Time Difference';
             OptionMembers = UNIT_PRICE,PRICE_DIFFERENCE,TIME_DIFFERENCE;
         }
-        field(70;"Stacking Allowed";Boolean)
+        field(70; "Stacking Allowed"; Boolean)
         {
             Caption = 'Stacking Allowed';
+            DataClassification = CustomerContent;
         }
-        field(80;"Upgrade With New Duration";Boolean)
+        field(80; "Upgrade With New Duration"; Boolean)
         {
             Caption = 'Upgrade With New Duration';
+            DataClassification = CustomerContent;
         }
-        field(85;"Auto-Admit Member On Sale";Option)
+        field(85; "Auto-Admit Member On Sale"; Option)
         {
             Caption = 'Auto-Admit Member On Sale';
+            DataClassification = CustomerContent;
             OptionCaption = 'No,Yes,Ask';
             OptionMembers = NO,YES,ASK;
         }
-        field(90;"Member Unit Price";Decimal)
+        field(90; "Member Unit Price"; Decimal)
         {
             Caption = 'Member Unit Price';
+            DataClassification = CustomerContent;
         }
-        field(95;"Member Count Calculation";Option)
+        field(95; "Member Count Calculation"; Option)
         {
             Caption = 'Member Count Calculation';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Named Members,Anonymous Members,All Members';
             OptionMembers = NA,NAMED,ANONYMOUS,ALL;
         }
-        field(100;"Auto-Renew To";Code[20])
+        field(100; "Auto-Renew To"; Code[20])
         {
             Caption = 'Auto-Renew To';
-            TableRelation = "MM Membership Alteration Setup"."Sales Item No." WHERE ("Alteration Type"=CONST(AUTORENEW));
+            DataClassification = CustomerContent;
+            TableRelation = "MM Membership Alteration Setup"."Sales Item No." WHERE("Alteration Type" = CONST(AUTORENEW));
         }
-        field(110;"Not Available Via Web Service";Boolean)
+        field(110; "Not Available Via Web Service"; Boolean)
         {
             Caption = 'Not Available Via Web Service';
+            DataClassification = CustomerContent;
         }
-        field(120;"Assign Loyalty Points On Sale";Boolean)
+        field(120; "Assign Loyalty Points On Sale"; Boolean)
         {
             Caption = 'Assign Loyalty Points On Sale';
+            DataClassification = CustomerContent;
         }
-        field(130;"Card Expired Action";Option)
+        field(130; "Card Expired Action"; Option)
         {
             Caption = 'Card Expired Action';
+            DataClassification = CustomerContent;
             OptionCaption = 'Ignore,Prevent,Update Existing,Issue New';
             OptionMembers = IGNORE,PREVENT,UPDATE,NEW;
         }
@@ -186,10 +215,10 @@ table 6060136 "MM Membership Alteration Setup"
 
     keys
     {
-        key(Key1;"Alteration Type","From Membership Code","Sales Item No.")
+        key(Key1; "Alteration Type", "From Membership Code", "Sales Item No.")
         {
         }
-        key(Key2;"Presentation Order")
+        key(Key2; "Presentation Order")
         {
         }
     }
@@ -222,32 +251,32 @@ table 6060136 "MM Membership Alteration Setup"
         ToMembershipSetup: Record "MM Membership Setup";
         BlankDateformula: DateFormula;
     begin
-        TestField ("From Membership Code");
+        TestField("From Membership Code");
 
         if ("Alteration Type" = "Alteration Type"::UPGRADE) then
-          TestField ("To Membership Code");
+            TestField("To Membership Code");
 
         //-+MM1.19 [268166] IF ("Alteration Type" IN ["Alteration Type"::EXTEND, "Alteration Type"::RENEW]) THEN begin
         //-+MM1.22 [286922] IF (("Alteration Type" IN ["Alteration Type"::EXTEND, "Alteration Type"::RENEW]) OR
         if (("Alteration Type" in ["Alteration Type"::EXTEND, "Alteration Type"::RENEW, "Alteration Type"::AUTORENEW]) or
-          (("Alteration Type" = "Alteration Type"::UPGRADE) and ("Upgrade With New Duration")) ) then begin
-          TestField ("Membership Duration");
+          (("Alteration Type" = "Alteration Type"::UPGRADE) and ("Upgrade With New Duration"))) then begin
+            TestField("Membership Duration");
         end else begin
-          TestField ("Membership Duration", BlankDateformula);
+            TestField("Membership Duration", BlankDateformula);
         end;
 
-        TestField ("Sales Item No.");
+        TestField("Sales Item No.");
 
         if ("Activate Grace Period") then begin
-          if ("Alteration Type" <> "Alteration Type"::REGRET) then
-            TestField ("Grace Period Before");
-          TestField ("Grace Period After");
+            if ("Alteration Type" <> "Alteration Type"::REGRET) then
+                TestField("Grace Period Before");
+            TestField("Grace Period After");
         end;
 
-        if (FromMembershipSetup.Get ("From Membership Code")) then
-          if (ToMembershipSetup.Get ("To Membership Code")) then
-            if (ToMembershipSetup."Community Code" <> FromMembershipSetup."Community Code") then
-              Error (NOT_SAME_COMMUNITY);
+        if (FromMembershipSetup.Get("From Membership Code")) then
+            if (ToMembershipSetup.Get("To Membership Code")) then
+                if (ToMembershipSetup."Community Code" <> FromMembershipSetup."Community Code") then
+                    Error(NOT_SAME_COMMUNITY);
     end;
 }
 

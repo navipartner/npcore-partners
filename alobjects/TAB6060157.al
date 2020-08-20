@@ -4,24 +4,29 @@ table 6060157 "Event Attribute Column Value"
     // NPR5.33/TJ  /20170529 CASE Added delete check and Type modify check
 
     Caption = 'Event Attribute Column Value';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Template Name";Code[20])
+        field(1; "Template Name"; Code[20])
         {
             Caption = 'Template Name';
+            DataClassification = CustomerContent;
         }
-        field(2;"Line No.";Integer)
+        field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[30])
+        field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;Type;Option)
+        field(20; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Text,Decimal';
             OptionMembers = Text,Decimal;
 
@@ -29,23 +34,25 @@ table 6060157 "Event Attribute Column Value"
             begin
                 //-NPR5.33 [277946]
                 if Type <> xRec.Type then
-                  EventAttrMgt.TemplateHasEntries(1,"Template Name");
+                    EventAttrMgt.TemplateHasEntries(1, "Template Name");
                 //+NPR5.33 [277946]
             end;
         }
-        field(30;"Include in Formula";Boolean)
+        field(30; "Include in Formula"; Boolean)
         {
             Caption = 'Include in Formula';
+            DataClassification = CustomerContent;
         }
-        field(40;Promote;Boolean)
+        field(40; Promote; Boolean)
         {
             Caption = 'Promote';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Template Name","Line No.")
+        key(Key1; "Template Name", "Line No.")
         {
         }
     }
@@ -57,7 +64,7 @@ table 6060157 "Event Attribute Column Value"
     trigger OnDelete()
     begin
         //-NPR5.33 [277946]
-        EventAttrMgt.TemplateHasEntries(1,"Template Name");
+        EventAttrMgt.TemplateHasEntries(1, "Template Name");
         //+NPR5.33 [277946]
     end;
 

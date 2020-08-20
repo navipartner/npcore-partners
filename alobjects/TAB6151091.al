@@ -4,28 +4,31 @@ table 6151091 "Nc RapidConnect Trigger Table"
     // NC2.14/MHA /20180716  CASE 322308 Changed trigger field types from boolean to option to support Partial Trigger functionality
 
     Caption = 'Nc RapidConnect Trigger Table';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Setup Code";Code[20])
+        field(1; "Setup Code"; Code[20])
         {
             Caption = 'Setup Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "Nc RapidConnect Setup";
         }
-        field(5;"Table ID";Integer)
+        field(5; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE ("Object Type"=CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
 
             trigger OnLookup()
             var
                 NcRapidConnectSetupMgt: Codeunit "Nc RapidConnect Setup Mgt.";
                 ObjectId: Integer;
             begin
-                if NcRapidConnectSetupMgt.LookupTriggerTableID("Setup Code",ObjectId) then
-                  Validate("Table ID",ObjectId);
+                if NcRapidConnectSetupMgt.LookupTriggerTableID("Setup Code", ObjectId) then
+                    Validate("Table ID", ObjectId);
             end;
 
             trigger OnValidate()
@@ -33,57 +36,59 @@ table 6151091 "Nc RapidConnect Trigger Table"
                 TestTableID();
             end;
         }
-        field(10;"Table Name";Text[30])
+        field(10; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Table),
-                                                             "Object ID"=FIELD("Table ID")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+                                                             "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(15;"Insert Trigger";Option)
+        field(15; "Insert Trigger"; Option)
         {
             Caption = 'Insert Trigger';
+            DataClassification = CustomerContent;
             Description = 'NC2.14';
             InitValue = Full;
             OptionCaption = 'None,Full';
             OptionMembers = "None",Full;
         }
-        field(20;"Modify Trigger";Option)
+        field(20; "Modify Trigger"; Option)
         {
             Caption = 'Modify Trigger';
+            DataClassification = CustomerContent;
             Description = 'NC2.14';
             InitValue = Full;
             OptionCaption = 'None,Full,Partial';
             OptionMembers = "None",Full,Partial;
         }
-        field(1000;"Package Code";Code[20])
+        field(1000; "Package Code"; Code[20])
         {
-            CalcFormula = Lookup("Nc RapidConnect Setup"."Package Code" WHERE (Code=FIELD("Setup Code")));
+            CalcFormula = Lookup ("Nc RapidConnect Setup"."Package Code" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Package Code';
             Editable = false;
             FieldClass = FlowField;
             TableRelation = "Config. Package";
         }
-        field(1005;"Export Enabled";Boolean)
+        field(1005; "Export Enabled"; Boolean)
         {
-            CalcFormula = Lookup("Nc RapidConnect Setup"."Export Enabled" WHERE (Code=FIELD("Setup Code")));
+            CalcFormula = Lookup ("Nc RapidConnect Setup"."Export Enabled" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Export Enabled';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1010;"Task Processor Code";Code[20])
+        field(1010; "Task Processor Code"; Code[20])
         {
-            CalcFormula = Lookup("Nc RapidConnect Setup"."Task Processor Code" WHERE (Code=FIELD("Setup Code")));
+            CalcFormula = Lookup ("Nc RapidConnect Setup"."Task Processor Code" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Task Processor Code';
             Editable = false;
             FieldClass = FlowField;
             TableRelation = "Nc Task Processor";
         }
-        field(1015;"Trigger Fields";Integer)
+        field(1015; "Trigger Fields"; Integer)
         {
-            CalcFormula = Count("Nc RapidConnect Trigger Field" WHERE ("Setup Code"=FIELD("Setup Code"),
-                                                                       "Table ID"=FIELD("Table ID")));
+            CalcFormula = Count ("Nc RapidConnect Trigger Field" WHERE("Setup Code" = FIELD("Setup Code"),
+                                                                       "Table ID" = FIELD("Table ID")));
             Caption = 'Trigger Fields';
             Description = 'NC2.14';
             Editable = false;
@@ -93,7 +98,7 @@ table 6151091 "Nc RapidConnect Trigger Table"
 
     keys
     {
-        key(Key1;"Setup Code","Table ID")
+        key(Key1; "Setup Code", "Table ID")
         {
         }
     }
@@ -109,11 +114,11 @@ table 6151091 "Nc RapidConnect Trigger Table"
     var
         NcRapidConnectSetupMgt: Codeunit "Nc RapidConnect Setup Mgt.";
     begin
-        if NcRapidConnectSetupMgt.IsValidTableID("Setup Code","Table ID") then
-          exit;
+        if NcRapidConnectSetupMgt.IsValidTableID("Setup Code", "Table ID") then
+            exit;
 
         CalcFields("Package Code");
-        Error(Text000,"Table ID","Package Code");
+        Error(Text000, "Table ID", "Package Code");
     end;
 }
 

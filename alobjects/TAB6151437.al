@@ -8,44 +8,51 @@ table 6151437 "Magento Payment Mapping"
     // MAG2.23/ALPO/20191004  CASE 367219 Auto set capture date for payments captured externally
 
     Caption = 'Magento Payment Mapping';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(5;"External Payment Method Code";Text[50])
+        field(5; "External Payment Method Code"; Text[50])
         {
             Caption = 'External Payment Method Code';
+            DataClassification = CustomerContent;
         }
-        field(10;"External Payment Type";Text[50])
+        field(10; "External Payment Type"; Text[50])
         {
             Caption = 'External Payment Type';
+            DataClassification = CustomerContent;
             Description = 'MAG1.12';
         }
-        field(90;"Allow Adjust Payment Amount";Boolean)
+        field(90; "Allow Adjust Payment Amount"; Boolean)
         {
             Caption = 'Allow Adjust Payment Amount';
+            DataClassification = CustomerContent;
             Description = 'MAG2.05';
         }
-        field(100;"Payment Method Code";Code[10])
+        field(100; "Payment Method Code"; Code[10])
         {
             Caption = 'Payment Method Code';
+            DataClassification = CustomerContent;
             TableRelation = "Payment Method";
         }
-        field(105;"Payment Gateway Code";Code[10])
+        field(105; "Payment Gateway Code"; Code[10])
         {
             Caption = 'Payment Gateway Code';
+            DataClassification = CustomerContent;
             Description = 'MAG1.20';
             TableRelation = "Magento Payment Gateway";
         }
-        field(110;"Captured Externally";Boolean)
+        field(110; "Captured Externally"; Boolean)
         {
             Caption = 'Captured Externally';
+            DataClassification = CustomerContent;
             Description = 'MAG2.23';
         }
     }
 
     keys
     {
-        key(Key1;"External Payment Method Code","External Payment Type")
+        key(Key1; "External Payment Method Code", "External Payment Type")
         {
         }
     }

@@ -3,36 +3,44 @@ table 6059944 "NaviDocs Entry Attachment"
     // NPR5.43/THRO/20180531 CASE 315958 Table created
 
     Caption = 'NaviDocs Entry Attachment';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "NaviDocs Entry No."; BigInteger)
         {
             Caption = 'NaviDocs Entry No.';
+            DataClassification = CustomerContent;
         }
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(10; Data; BLOB)
         {
             Caption = 'Data';
+            DataClassification = CustomerContent;
         }
         field(20; "File Extension"; Text[10])
         {
             Caption = 'File Extension';
+            DataClassification = CustomerContent;
         }
         field(30; "Data Type"; Code[20])
         {
             Caption = 'Data Type';
+            DataClassification = CustomerContent;
         }
         field(40; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(50; "Internal Type"; Option)
         {
             Caption = 'Internal Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Report Parameters';
             OptionMembers = " ","Report Parameters";
         }

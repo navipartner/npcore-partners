@@ -5,113 +5,128 @@ table 6151597 "NpDc Arch. Coupon"
     // NPR5.51/MHA /20190724  CASE 343352 Removed field 80 "In-use Quantity"
 
     Caption = 'Archived Coupon';
-    DataCaptionFields = "No.","Coupon Type",Description;
+    DataClassification = CustomerContent;
+    DataCaptionFields = "No.", "Coupon Type", Description;
     DrillDownPageID = "NpDc Arch. Coupons";
     LookupPageID = "NpDc Arch. Coupons";
 
     fields
     {
-        field(1;"No.";Code[20])
+        field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
         }
-        field(5;"Coupon Type";Code[20])
+        field(5; "Coupon Type"; Code[20])
         {
             Caption = 'Coupon Type';
+            DataClassification = CustomerContent;
             TableRelation = "NpDc Coupon Type";
         }
-        field(10;Description;Text[30])
+        field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(15;"Reference No.";Text[30])
+        field(15; "Reference No."; Text[30])
         {
             Caption = 'Reference No.';
+            DataClassification = CustomerContent;
         }
-        field(17;"Discount Type";Option)
+        field(17; "Discount Type"; Option)
         {
             Caption = 'Discount Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Discount Amount,Discount %';
             OptionMembers = "Discount Amount","Discount %";
         }
-        field(20;"Discount %";Decimal)
+        field(20; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
         }
-        field(22;"Max. Discount Amount";Decimal)
+        field(22; "Max. Discount Amount"; Decimal)
         {
             BlankZero = true;
             Caption = 'Max. Discount Amount';
+            DataClassification = CustomerContent;
         }
-        field(25;"Discount Amount";Decimal)
+        field(25; "Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Discount Amount';
+            DataClassification = CustomerContent;
         }
-        field(30;"Starting Date";DateTime)
+        field(30; "Starting Date"; DateTime)
         {
             Caption = 'Starting Date';
+            DataClassification = CustomerContent;
         }
-        field(35;"Ending Date";DateTime)
+        field(35; "Ending Date"; DateTime)
         {
             Caption = 'Ending Date';
+            DataClassification = CustomerContent;
         }
-        field(40;"No. Series";Code[10])
+        field(40; "No. Series"; Code[10])
         {
             Caption = 'No. Series';
+            DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(50;"Customer No.";Code[20])
+        field(50; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
+            DataClassification = CustomerContent;
             TableRelation = Customer;
         }
-        field(53;"Max Use per Sale";Integer)
+        field(53; "Max Use per Sale"; Integer)
         {
             Caption = 'Max Use per Sale';
+            DataClassification = CustomerContent;
             InitValue = 1;
             MinValue = 1;
         }
-        field(65;"Print Template Code";Code[20])
+        field(65; "Print Template Code"; Code[20])
         {
             Caption = 'Print Template Code';
-            TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151591));
+            DataClassification = CustomerContent;
+            TableRelation = "RP Template Header" WHERE("Table ID" = CONST(6151591));
         }
-        field(70;Open;Boolean)
+        field(70; Open; Boolean)
         {
-            CalcFormula = Max("NpDc Arch. Coupon Entry".Open WHERE ("Arch. Coupon No."=FIELD("No.")));
+            CalcFormula = Max ("NpDc Arch. Coupon Entry".Open WHERE("Arch. Coupon No." = FIELD("No.")));
             Caption = 'Open';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(75;"Remaining Quantity";Decimal)
+        field(75; "Remaining Quantity"; Decimal)
         {
-            CalcFormula = Sum("NpDc Arch. Coupon Entry"."Remaining Quantity" WHERE ("Arch. Coupon No."=FIELD("No.")));
+            CalcFormula = Sum ("NpDc Arch. Coupon Entry"."Remaining Quantity" WHERE("Arch. Coupon No." = FIELD("No.")));
             Caption = 'Remaining Quantity';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
         }
-        field(100;"Issue Coupon Module";Code[20])
+        field(100; "Issue Coupon Module"; Code[20])
         {
-            CalcFormula = Lookup("NpDc Coupon Type"."Issue Coupon Module" WHERE (Code=FIELD("Coupon Type")));
+            CalcFormula = Lookup ("NpDc Coupon Type"."Issue Coupon Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Issue Coupon Module';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(110;"Validate Coupon Module";Code[20])
+        field(110; "Validate Coupon Module"; Code[20])
         {
-            CalcFormula = Lookup("NpDc Coupon Type"."Validate Coupon Module" WHERE (Code=FIELD("Coupon Type")));
+            CalcFormula = Lookup ("NpDc Coupon Type"."Validate Coupon Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Validate Coupon Module';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(120;"Apply Discount Module";Code[20])
+        field(120; "Apply Discount Module"; Code[20])
         {
-            CalcFormula = Lookup("NpDc Coupon Type"."Apply Discount Module" WHERE (Code=FIELD("Coupon Type")));
+            CalcFormula = Lookup ("NpDc Coupon Type"."Apply Discount Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Apply Discount Module';
             Editable = false;
             FieldClass = FlowField;
@@ -120,20 +135,20 @@ table 6151597 "NpDc Arch. Coupon"
 
     keys
     {
-        key(Key1;"No.")
+        key(Key1; "No.")
         {
         }
-        key(Key2;"Coupon Type")
+        key(Key2; "Coupon Type")
         {
         }
-        key(Key3;"Reference No.")
+        key(Key3; "Reference No.")
         {
         }
     }
 
     fieldgroups
     {
-        fieldgroup(DropDown;"No.","Coupon Type",Description)
+        fieldgroup(DropDown; "No.", "Coupon Type", Description)
         {
         }
     }

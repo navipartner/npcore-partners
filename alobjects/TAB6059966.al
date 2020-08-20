@@ -10,64 +10,74 @@ table 6059966 "MPOS App Setup"
     // NPR5.54/TJ  /20200303 CASE 393290 Removed fields 14 "Audit Roll Report ID", 15 "Audit Roll Report Caption", 20 "POS Entry Report ID" and 21 "POS Entry Report Caption"
 
     Caption = 'MPOS App Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Register No.";Code[10])
+        field(1; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             TableRelation = Register;
         }
-        field(11;"Payment Gateway";Code[10])
+        field(11; "Payment Gateway"; Code[10])
         {
             Caption = 'Payment Gateway';
+            DataClassification = CustomerContent;
             TableRelation = "MPOS Payment Gateway";
         }
-        field(12;"Web Service Is Published";Boolean)
+        field(12; "Web Service Is Published"; Boolean)
         {
-            CalcFormula = Exist("Web Service" WHERE ("Object Type"=CONST(Codeunit),
-                                                     "Service Name"=CONST('mpos_service')));
+            CalcFormula = Exist ("Web Service" WHERE("Object Type" = CONST(Codeunit),
+                                                     "Service Name" = CONST('mpos_service')));
             Caption = 'Web Service Is Published';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(13;"Ticket Admission Web Url";Text[250])
+        field(13; "Ticket Admission Web Url"; Text[250])
         {
             Caption = 'Ticket Admission Web Url';
+            DataClassification = CustomerContent;
         }
-        field(16;"Receipt Web API";Text[250])
+        field(16; "Receipt Web API"; Text[250])
         {
             Caption = 'Receipt Web API';
+            DataClassification = CustomerContent;
         }
-        field(17;"Custom Web Service URL";Text[250])
+        field(17; "Custom Web Service URL"; Text[250])
         {
             Caption = 'Custom Web Service URL';
+            DataClassification = CustomerContent;
         }
-        field(18;"Receipt Source Type";Option)
+        field(18; "Receipt Source Type"; Option)
         {
             Caption = 'Receipt Source Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'NAV,Magento';
             OptionMembers = NAV,Magento;
         }
-        field(19;"Encryption Key";Text[30])
+        field(19; "Encryption Key"; Text[30])
         {
             Caption = 'Encryption Key';
+            DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
         }
-        field(100;Enable;Boolean)
+        field(100; Enable; Boolean)
         {
             Caption = 'Enable';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Handle EFT Print in NAV";Boolean)
+        field(1000; "Handle EFT Print in NAV"; Boolean)
         {
             Caption = 'Handle EFT Print in NAV';
+            DataClassification = CustomerContent;
             Description = 'NPR5.36';
         }
     }
 
     keys
     {
-        key(Key1;"Register No.")
+        key(Key1; "Register No.")
         {
         }
     }
@@ -81,7 +91,7 @@ table 6059966 "MPOS App Setup"
         MPOSAppSetup: Record "MPOS App Setup";
     begin
         if MPOSAppSetup.Get(RegisterId) then
-          exit(MPOSAppSetup.Enable);
+            exit(MPOSAppSetup.Enable);
     end;
 }
 

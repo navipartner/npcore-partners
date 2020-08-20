@@ -8,63 +8,76 @@ table 6151435 "Magento Display Config"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'Magento Display Config';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Display Config";
     LookupPageID = "Magento Display Config";
 
     fields
     {
-        field(10;"No.";Code[20])
+        field(10; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type=CONST(Item)) Item
-                            ELSE IF (Type=CONST("Item Group")) "Magento Category"
-                            ELSE IF (Type=CONST(Brand)) "Magento Brand";
+            DataClassification = CustomerContent;
+            TableRelation = IF (Type = CONST(Item)) Item
+            ELSE
+            IF (Type = CONST("Item Group")) "Magento Category"
+            ELSE
+            IF (Type = CONST(Brand)) "Magento Brand";
         }
-        field(20;Type;Option)
+        field(20; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Item,Item Group,Brand';
             OptionMembers = Item,"Item Group",Brand;
         }
-        field(30;"Sales Code";Text[32])
+        field(30; "Sales Code"; Text[32])
         {
             Caption = 'Sales Code';
+            DataClassification = CustomerContent;
             Description = 'MAG1.06,MAG1.07,MAG1.08';
-            TableRelation = IF ("Sales Type"=CONST(Customer)) Customer
-                            ELSE IF ("Sales Type"=CONST("Display Group")) "Magento Display Group";
+            TableRelation = IF ("Sales Type" = CONST(Customer)) Customer
+            ELSE
+            IF ("Sales Type" = CONST("Display Group")) "Magento Display Group";
         }
-        field(40;"Sales Type";Option)
+        field(40; "Sales Type"; Option)
         {
             Caption = 'Sales Type';
+            DataClassification = CustomerContent;
             Description = 'MAG1.06,MAG1.07,MAG1.08';
             OptionCaption = 'Customer,Display Group,All Customers';
             OptionMembers = Customer,"Display Group","All Customers";
         }
-        field(50;"Is Visible";Boolean)
+        field(50; "Is Visible"; Boolean)
         {
             Caption = 'Is Visible';
+            DataClassification = CustomerContent;
         }
-        field(60;"Starting Date";Date)
+        field(60; "Starting Date"; Date)
         {
             Caption = 'Starting Date';
+            DataClassification = CustomerContent;
         }
-        field(70;"Starting Time";Time)
+        field(70; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
+            DataClassification = CustomerContent;
         }
-        field(80;"Ending Date";Date)
+        field(80; "Ending Date"; Date)
         {
             Caption = 'Ending Date';
+            DataClassification = CustomerContent;
         }
-        field(90;"Ending Time";Time)
+        field(90; "Ending Time"; Time)
         {
             Caption = 'Ending Time';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"No.",Type,"Sales Code","Sales Type","Starting Date","Starting Time","Ending Date","Ending Time")
+        key(Key1; "No.", Type, "Sales Code", "Sales Type", "Starting Date", "Starting Time", "Ending Date", "Ending Time")
         {
         }
     }
@@ -76,9 +89,9 @@ table 6151435 "Magento Display Config"
     trigger OnInsert()
     begin
         if "Sales Type" = "Sales Type"::"All Customers" then
-          "Sales Code" := ''
+            "Sales Code" := ''
         else
-          TestField("Sales Code");
+            TestField("Sales Code");
 
         TestField("No.");
     end;
@@ -86,7 +99,7 @@ table 6151435 "Magento Display Config"
     trigger OnRename()
     begin
         if "Sales Type" <> "Sales Type"::"All Customers" then
-          TestField("Sales Code");
+            TestField("Sales Code");
 
         TestField("No.");
     end;

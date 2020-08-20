@@ -8,35 +8,42 @@ table 6014505 "Customer Repair Journal"
     // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() and removed redundant VAT calculation
 
     Caption = 'Customer Repair Journal';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Customer Repair No.";Code[10])
+        field(1; "Customer Repair No."; Code[10])
         {
             Caption = 'Customer Repair No.';
+            DataClassification = CustomerContent;
             TableRelation = "Customer Repair";
         }
-        field(2;Type;Option)
+        field(2; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Error Description,Repair Description';
             OptionMembers = Fejlbeskrivelse,Reparationsbeskrivelse;
         }
-        field(3;"Line No.";Integer)
+        field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(4;Date;Date)
+        field(4; Date; Date)
         {
             Caption = 'Date';
+            DataClassification = CustomerContent;
         }
-        field(5;Text;Text[90])
+        field(5; Text; Text[90])
         {
             Caption = 'Text';
+            DataClassification = CustomerContent;
         }
-        field(6;"Item Part No.";Code[20])
+        field(6; "Item Part No."; Code[20])
         {
             Caption = 'Item Part No.';
+            DataClassification = CustomerContent;
             Description = 'NPR70.00.01.01';
             TableRelation = Item;
 
@@ -46,10 +53,10 @@ table 6014505 "Customer Repair Journal"
             begin
                 //-NPR70.00.01.01
                 Item.Get("Item Part No.");
-                Description:=Item.Description;
-                Quantity:=1;
-                if Date =0D then
-                  Date:=Today;
+                Description := Item.Description;
+                Quantity := 1;
+                if Date = 0D then
+                    Date := Today;
                 //+NPR70.00.01.01
                 //-NPR5.30 [262923]
                 "Unit Price Excl. VAT" := Item."Unit Price";
@@ -60,38 +67,43 @@ table 6014505 "Customer Repair Journal"
                 //+NPR5.30 [262923]
             end;
         }
-        field(7;Quantity;Decimal)
+        field(7; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
             Description = 'NPR70.00.01.01';
         }
-        field(8;Description;Text[50])
+        field(8; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
             Description = 'NPR70.00.01.01';
         }
-        field(15;"Qty Posted";Decimal)
+        field(15; "Qty Posted"; Decimal)
         {
-            CalcFormula = -Sum("Item Ledger Entry".Quantity WHERE ("Document No."=FIELD("Customer Repair No."),
-                                                                   "Item No."=FIELD("Item Part No.")));
+            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE("Document No." = FIELD("Customer Repair No."),
+                                                                   "Item No." = FIELD("Item Part No.")));
             Caption = 'Qty Posted';
             Description = 'NPR5.26';
             FieldClass = FlowField;
         }
-        field(16;"Expenses to be charged";Boolean)
+        field(16; "Expenses to be charged"; Boolean)
         {
             Caption = 'Expenses to be charged';
+            DataClassification = CustomerContent;
         }
-        field(20;"Variant Code";Code[10])
+        field(20; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.26';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item Part No."));
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item Part No."));
         }
-        field(21;"Unit Price Excl. VAT";Decimal)
+        field(21; "Unit Price Excl. VAT"; Decimal)
         {
             AutoFormatType = 2;
             Caption = 'Unit Price Excl. VAT';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -100,22 +112,25 @@ table 6014505 "Customer Repair Journal"
                 //+NPR5.30 [262923]
             end;
         }
-        field(25;"VAT %";Decimal)
+        field(25; "VAT %"; Decimal)
         {
             Caption = 'VAT %';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             Editable = false;
         }
-        field(29;Amount;Decimal)
+        field(29; Amount; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Amount';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(30;"Amount Including VAT";Decimal)
+        field(30; "Amount Including VAT"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
+            DataClassification = CustomerContent;
             Editable = false;
 
             trigger OnValidate()
@@ -160,16 +175,18 @@ table 6014505 "Customer Repair Journal"
 
             end;
         }
-        field(40;"VAT Calculation Type";Option)
+        field(40; "VAT Calculation Type"; Option)
         {
             Caption = 'VAT Calculation Type';
+            DataClassification = CustomerContent;
             Editable = false;
             OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
             OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
-        field(41;"VAT Bus. Posting Group";Code[10])
+        field(41; "VAT Bus. Posting Group"; Code[10])
         {
             Caption = 'VAT Bus. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
 
             trigger OnValidate()
@@ -179,9 +196,10 @@ table 6014505 "Customer Repair Journal"
                 //+NPR5.30 [262923]
             end;
         }
-        field(42;"VAT Prod. Posting Group";Code[10])
+        field(42; "VAT Prod. Posting Group"; Code[10])
         {
             Caption = 'VAT Prod. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
 
             trigger OnValidate()
@@ -190,9 +208,9 @@ table 6014505 "Customer Repair Journal"
                 Handled: Boolean;
             begin
                 //-NPR5.30 [262923]
-                VATPostingSetup.Get("VAT Bus. Posting Group","VAT Prod. Posting Group");
+                VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
                 //-NPR5.51 [358985]
-                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                 //+NPR5.51 [358985]
                 "VAT %" := VATPostingSetup."VAT %";
                 "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
@@ -202,19 +220,21 @@ table 6014505 "Customer Repair Journal"
                 //+NPR5.30 [262923]
             end;
         }
-        field(43;"VAT Identifier";Code[10])
+        field(43; "VAT Identifier"; Code[10])
         {
             Caption = 'VAT Identifier';
+            DataClassification = CustomerContent;
         }
-        field(44;"VAT Amount";Decimal)
+        field(44; "VAT Amount"; Decimal)
         {
             Caption = 'VAT Amount';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Customer Repair No.",Type,"Line No.")
+        key(Key1; "Customer Repair No.", Type, "Line No.")
         {
         }
     }
@@ -231,8 +251,8 @@ table 6014505 "Customer Repair Journal"
         //    ERROR(NPRText001);
 
         if CalcFields("Qty Posted") then begin
-          if "Qty Posted" > 0 then
-            Error(NPRText001);
+            if "Qty Posted" > 0 then
+                Error(NPRText001);
         end;
         //+NPR5.30 [262923]
         //+NPR5.26
@@ -248,8 +268,8 @@ table 6014505 "Customer Repair Journal"
     begin
 
         //-NPR5.30 [262923]
-        "VAT Amount" := "Unit Price Excl. VAT" * Quantity * ("VAT %"/100);
-        Amount := "Unit Price Excl. VAT" * Quantity ;
+        "VAT Amount" := "Unit Price Excl. VAT" * Quantity * ("VAT %" / 100);
+        Amount := "Unit Price Excl. VAT" * Quantity;
         "Amount Including VAT" := Amount + "VAT Amount";
         //+NPR5.30 [262923]
     end;

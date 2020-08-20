@@ -8,48 +8,56 @@ table 6150667 "NPRE Print Template"
     //                                   - fields "Restaurant Code", "Serving Step" added to primary key
 
     Caption = 'NPRE Print Template';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NPRE Print Templates Subpage";
     LookupPageID = "NPRE Print Templates Subpage";
 
     fields
     {
-        field(1;"Print Type";Option)
+        field(1; "Print Type"; Option)
         {
             Caption = 'Print Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Kitchen Order,Serving Request,Pre Receipt';
             OptionMembers = "Kitchen Order","Serving Request","Pre Receipt";
         }
-        field(2;"Seating Location";Code[20])
+        field(2; "Seating Location"; Code[20])
         {
             Caption = 'Seating Location';
+            DataClassification = CustomerContent;
             TableRelation = "NPRE Seating Location";
         }
-        field(3;"Template Code";Code[20])
+        field(3; "Template Code"; Code[20])
         {
             Caption = 'Template Code';
+            DataClassification = CustomerContent;
             TableRelation = "RP Template Header".Code;
         }
-        field(4;"Print Category Code";Code[20])
+        field(4; "Print Category Code"; Code[20])
         {
             Caption = 'Print Category Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
             TableRelation = "NPRE Print/Prod. Category";
         }
-        field(5;"Restaurant Code";Code[20])
+        field(5; "Restaurant Code"; Code[20])
         {
             Caption = 'Restaurant Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
             TableRelation = "NPRE Restaurant";
         }
-        field(6;"Serving Step";Code[10])
+        field(6; "Serving Step"; Code[10])
         {
             Caption = 'Serving Step';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
-            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(WaiterPadLineMealFlow));
+            TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
-        field(20;"Split Print Jobs By";Option)
+        field(20; "Split Print Jobs By"; Option)
         {
             Caption = 'Split Print Jobs By';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
             OptionCaption = 'None,Print Category,Serving Step,Both';
             OptionMembers = "None","Print Category","Serving Step",Both;
@@ -58,7 +66,7 @@ table 6150667 "NPRE Print Template"
 
     keys
     {
-        key(Key1;"Print Type","Restaurant Code","Seating Location","Serving Step","Print Category Code","Template Code")
+        key(Key1; "Print Type", "Restaurant Code", "Seating Location", "Serving Step", "Print Category Code", "Template Code")
         {
         }
     }

@@ -12,257 +12,308 @@ table 6060139 "MM Member Notification Entry"
     // MM1.44/TSA /20200416 CASE 400601 Magento Get Password URL
 
     Caption = 'Member Notification Entry';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Notification Entry No.";Integer)
+        field(1; "Notification Entry No."; Integer)
         {
             Caption = 'Notification Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(2;"Member Entry No.";Integer)
+        field(2; "Member Entry No."; Integer)
         {
             Caption = 'Member Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "MM Member";
         }
-        field(8;"Membership Entry No.";Integer)
+        field(8; "Membership Entry No."; Integer)
         {
             Caption = 'Membership Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "MM Membership";
         }
-        field(10;"Notification Code";Code[10])
+        field(10; "Notification Code"; Code[10])
         {
             Caption = 'Notification Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Member Notification Setup";
         }
-        field(20;"Date To Notify";Date)
+        field(20; "Date To Notify"; Date)
         {
             Caption = 'Date To Notify';
+            DataClassification = CustomerContent;
         }
-        field(30;"Notification Send Status";Option)
+        field(30; "Notification Send Status"; Option)
         {
             Caption = 'Notification Send Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Pending,Sent,Canceled,Failed,Not Sent';
             OptionMembers = PENDING,SENT,CANCELED,FAILED,NOT_SENT;
         }
-        field(31;"Notification Sent At";DateTime)
+        field(31; "Notification Sent At"; DateTime)
         {
             Caption = 'Notification Sent At';
+            DataClassification = CustomerContent;
         }
-        field(32;"Notification Sent By User";Text[30])
+        field(32; "Notification Sent By User"; Text[30])
         {
             Caption = 'Notification Sent By User';
+            DataClassification = CustomerContent;
         }
-        field(40;Blocked;Boolean)
+        field(40; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
         }
-        field(41;"Blocked At";DateTime)
+        field(41; "Blocked At"; DateTime)
         {
             Caption = 'Blocked At';
+            DataClassification = CustomerContent;
         }
-        field(42;"Blocked By User";Text[30])
+        field(42; "Blocked By User"; Text[30])
         {
             Caption = 'Blocked By User';
+            DataClassification = CustomerContent;
         }
-        field(50;"Notification Trigger";Option)
+        field(50; "Notification Trigger"; Option)
         {
             Caption = 'Notification Trigger';
+            DataClassification = CustomerContent;
             OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create';
             OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE;
         }
-        field(51;"Template Filter Value";Code[20])
+        field(51; "Template Filter Value"; Code[20])
         {
             Caption = 'Template Filter Value';
+            DataClassification = CustomerContent;
         }
-        field(80;"Target Member Role";Option)
+        field(80; "Target Member Role"; Option)
         {
             Caption = 'Target Member Role';
+            DataClassification = CustomerContent;
             OptionCaption = 'FIRST_ADMIN,ALL_ADMINS,ALL_MEMBERS';
             OptionMembers = FIRST_ADMIN,ALL_ADMINS,ALL_MEMBERS;
         }
-        field(90;"Notification Method";Option)
+        field(90; "Notification Method"; Option)
         {
             Caption = 'Notification Method';
+            DataClassification = CustomerContent;
             OptionCaption = 'None,E-Mail,Manual,Wallet,SMS';
             OptionMembers = "NONE",EMAIL,MANUAL,WALLET,SMS;
         }
-        field(100;"External Member No.";Code[20])
+        field(100; "External Member No."; Code[20])
         {
             Caption = 'External Member No.';
+            DataClassification = CustomerContent;
         }
-        field(101;"External Membership No.";Code[20])
+        field(101; "External Membership No."; Code[20])
         {
             Caption = 'External Membership No.';
+            DataClassification = CustomerContent;
         }
-        field(110;"E-Mail Address";Text[80])
+        field(110; "E-Mail Address"; Text[80])
         {
             Caption = 'E-Mail Address';
+            DataClassification = CustomerContent;
         }
-        field(111;"Phone No.";Text[30])
+        field(111; "Phone No."; Text[30])
         {
             Caption = 'Phone No.';
+            DataClassification = CustomerContent;
         }
-        field(120;"First Name";Text[50])
+        field(120; "First Name"; Text[50])
         {
             Caption = 'First Name';
+            DataClassification = CustomerContent;
         }
-        field(121;"Middle Name";Text[50])
+        field(121; "Middle Name"; Text[50])
         {
             Caption = 'Middle Name';
+            DataClassification = CustomerContent;
         }
-        field(122;"Last Name";Text[50])
+        field(122; "Last Name"; Text[50])
         {
             Caption = 'Last Name';
+            DataClassification = CustomerContent;
         }
-        field(123;"Display Name";Text[100])
+        field(123; "Display Name"; Text[100])
         {
             Caption = 'Display Name';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(130;Address;Text[100])
+        field(130; Address; Text[100])
         {
             Caption = 'Address';
+            DataClassification = CustomerContent;
         }
-        field(131;"Post Code Code";Code[20])
+        field(131; "Post Code Code"; Code[20])
         {
             Caption = 'ZIP Code';
+            DataClassification = CustomerContent;
             TableRelation = "Post Code";
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(132;City;Text[50])
+        field(132; City; Text[50])
         {
             Caption = 'City';
+            DataClassification = CustomerContent;
         }
-        field(133;"Country Code";Code[10])
+        field(133; "Country Code"; Code[10])
         {
             Caption = 'Country Code';
+            DataClassification = CustomerContent;
         }
-        field(134;Country;Text[50])
+        field(134; Country; Text[50])
         {
             Caption = 'Country';
+            DataClassification = CustomerContent;
         }
-        field(140;Birthday;Date)
+        field(140; Birthday; Date)
         {
             Caption = 'Birthday';
+            DataClassification = CustomerContent;
         }
-        field(150;"Community Code";Code[20])
+        field(150; "Community Code"; Code[20])
         {
             Caption = 'Community Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Member Community";
         }
-        field(151;"Membership Code";Code[20])
+        field(151; "Membership Code"; Code[20])
         {
             Caption = 'Membership Code';
-            TableRelation = "MM Membership Sales Setup"."No." WHERE (Type=CONST(ITEM));
+            DataClassification = CustomerContent;
+            TableRelation = "MM Membership Sales Setup"."No." WHERE(Type = CONST(ITEM));
         }
-        field(152;"Item No.";Code[20])
+        field(152; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
         }
-        field(153;"Membership Valid From";Date)
+        field(153; "Membership Valid From"; Date)
         {
             Caption = 'Membership Valid From';
+            DataClassification = CustomerContent;
         }
-        field(154;"Membership Valid Until";Date)
+        field(154; "Membership Valid Until"; Date)
         {
             Caption = 'Membership Valid Until';
+            DataClassification = CustomerContent;
         }
-        field(155;"Community Description";Text[50])
+        field(155; "Community Description"; Text[50])
         {
             Caption = 'Community Description';
+            DataClassification = CustomerContent;
         }
-        field(156;"Membership Description";Text[50])
+        field(156; "Membership Description"; Text[50])
         {
             Caption = 'Membership Description';
+            DataClassification = CustomerContent;
         }
-        field(160;"External Member Card No.";Text[50])
+        field(160; "External Member Card No."; Text[50])
         {
             Caption = 'External Member Card No.';
+            DataClassification = CustomerContent;
         }
-        field(161;"Card Valid Until";Date)
+        field(161; "Card Valid Until"; Date)
         {
             Caption = 'Card Valid Until';
+            DataClassification = CustomerContent;
         }
-        field(162;"Pin Code";Text[50])
+        field(162; "Pin Code"; Text[50])
         {
             Caption = 'Pin Code';
+            DataClassification = CustomerContent;
         }
-        field(165;"Auto-Renew";Option)
+        field(165; "Auto-Renew"; Option)
         {
             Caption = 'Auto-Renew';
+            DataClassification = CustomerContent;
             OptionCaption = 'No,Yes (Internal),Yes (External)';
             OptionMembers = NO,YES_INTERNAL,YES_EXTERNAL;
         }
-        field(166;"Auto-Renew Payment Method Code";Code[10])
+        field(166; "Auto-Renew Payment Method Code"; Code[10])
         {
             Caption = 'Auto-Renew Payment Method Code';
+            DataClassification = CustomerContent;
         }
-        field(167;"Auto-Renew External Data";Text[200])
+        field(167; "Auto-Renew External Data"; Text[200])
         {
             Caption = 'Auto-Renew External Data';
+            DataClassification = CustomerContent;
         }
-        field(170;"Remaining Points";Integer)
+        field(170; "Remaining Points"; Integer)
         {
-            CalcFormula = Sum("MM Membership Points Entry".Points WHERE ("Membership Entry No."=FIELD("Membership Entry No.")));
+            CalcFormula = Sum ("MM Membership Points Entry".Points WHERE("Membership Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Remaining Points';
             Description = '//-MM1.29 [314131]';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(180;"Notification Token";Text[64])
+        field(180; "Notification Token"; Text[64])
         {
             Caption = 'Notification Token';
+            DataClassification = CustomerContent;
         }
-        field(200;"Failed With Message";Text[250])
+        field(200; "Failed With Message"; Text[250])
         {
             Caption = 'Failed With Message';
+            DataClassification = CustomerContent;
         }
-        field(400;"Include NP Pass";Boolean)
+        field(400; "Include NP Pass"; Boolean)
         {
             Caption = 'Include NP Pass';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(410;"Wallet Pass Id";Text[35])
+        field(410; "Wallet Pass Id"; Text[35])
         {
             Caption = 'Wallet Pass Id';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(420;"Wallet Pass Default URL";Text[200])
+        field(420; "Wallet Pass Default URL"; Text[200])
         {
             Caption = 'Wallet Pass Default URL';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(421;"Wallet Pass Andriod URL";Text[200])
+        field(421; "Wallet Pass Andriod URL"; Text[200])
         {
             Caption = 'Wallet Pass Andriod URL';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(422;"Wallet Pass Landing URL";Text[200])
+        field(422; "Wallet Pass Landing URL"; Text[200])
         {
             Caption = 'Wallet Pass Combine URL';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29.02 [317156]';
         }
-        field(430;"Magento Get Password URL";Text[200])
+        field(430; "Magento Get Password URL"; Text[200])
         {
             Caption = 'Magento Get Password URL';
+            DataClassification = CustomerContent;
             Description = '//-MM1.44 [400601]';
         }
     }
 
     keys
     {
-        key(Key1;"Notification Entry No.","Member Entry No.")
+        key(Key1; "Notification Entry No.", "Member Entry No.")
         {
         }
-        key(Key2;"Notification Send Status","Date To Notify")
+        key(Key2; "Notification Send Status", "Date To Notify")
         {
         }
-        key(Key3;"Member Entry No.")
+        key(Key3; "Member Entry No.")
         {
         }
-        key(Key4;"Membership Entry No.")
+        key(Key4; "Membership Entry No.")
         {
         }
     }

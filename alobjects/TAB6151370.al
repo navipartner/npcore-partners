@@ -5,34 +5,38 @@ table 6151370 "CS User"
     // NPR5.48/CLVA  /20181109  CASE 335606 Added field "View All Documents"
 
     Caption = 'CS User';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;Name;Code[50])
+        field(1; Name; Code[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(11;Password;Text[250])
+        field(11; Password; Text[250])
         {
             Caption = 'Password';
+            DataClassification = CustomerContent;
             NotBlank = true;
 
             trigger OnValidate()
             begin
                 TestField(Password);
-                Password := CalculatePassword(CopyStr(Password,1,30));
+                Password := CalculatePassword(CopyStr(Password, 1, 30));
             end;
         }
-        field(12;"View All Documents";Boolean)
+        field(12; "View All Documents"; Boolean)
         {
             Caption = 'View All Documents';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Name)
+        key(Key1; Name)
         {
         }
     }

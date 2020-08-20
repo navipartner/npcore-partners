@@ -4,21 +4,25 @@ table 6151051 "Item Hierarchy Level"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
 
     Caption = 'Item Hierarchy Level';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Hierarchy Code";Code[20])
+        field(1; "Hierarchy Code"; Code[20])
         {
             Caption = 'Hierarchy Setup ID';
+            DataClassification = CustomerContent;
             TableRelation = "Item Hierarchy"."Hierarchy Code";
         }
-        field(2;"Line No.";Integer)
+        field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(5;Level;Integer)
+        field(5; Level; Integer)
         {
             Caption = 'Level';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -65,18 +69,21 @@ table 6151051 "Item Hierarchy Level"
                 // END;
             end;
         }
-        field(9;"Code";Code[20])
+        field(9; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[30])
+        field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;"Table No.";Integer)
+        field(20; "Table No."; Integer)
         {
             Caption = 'Link Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
 
             trigger OnValidate()
             var
@@ -84,24 +91,25 @@ table 6151051 "Item Hierarchy Level"
                 AllObj: Record AllObjWithCaption;
             begin
                 if "Table No." <> 0 then begin
-                //-NPR5.46 [322752]
-                //  IF Object.GET(Object.Type::Table,COMPANYNAME,"Table No.") THEN
-                //  Rec."Link Table Name" := COPYSTR(Object.Caption,1,50);
-                //  IF Description = '' THEN
-                //    Description := COPYSTR(Object.Caption,1,30);
+                    //-NPR5.46 [322752]
+                    //  IF Object.GET(Object.Type::Table,COMPANYNAME,"Table No.") THEN
+                    //  Rec."Link Table Name" := COPYSTR(Object.Caption,1,50);
+                    //  IF Description = '' THEN
+                    //    Description := COPYSTR(Object.Caption,1,30);
 
-                  if AllObj.Get(AllObj."Object Type"::Table,"Table No.") then
-                  Rec."Link Table Name" := CopyStr(AllObj."Object Caption",1,50);
-                  if Description = '' then
-                    Description := CopyStr(AllObj."Object Caption",1,30);
-                //-NPR5.46 [322752]
+                    if AllObj.Get(AllObj."Object Type"::Table, "Table No.") then
+                        Rec."Link Table Name" := CopyStr(AllObj."Object Caption", 1, 50);
+                    if Description = '' then
+                        Description := CopyStr(AllObj."Object Caption", 1, 30);
+                    //-NPR5.46 [322752]
                 end;
             end;
         }
-        field(21;"Primary Field No.";Integer)
+        field(21; "Primary Field No."; Integer)
         {
             Caption = 'Primary Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table No."));
+            DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnValidate()
             begin
@@ -116,10 +124,11 @@ table 6151051 "Item Hierarchy Level"
                 // Code := '';
             end;
         }
-        field(22;"Description Field No.";Integer)
+        field(22; "Description Field No."; Integer)
         {
             Caption = 'Description Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table No."));
+            DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnValidate()
             begin
@@ -132,15 +141,17 @@ table 6151051 "Item Hierarchy Level"
                 //  "Description Field Name" := '';
             end;
         }
-        field(23;"Level Link Table No.";Integer)
+        field(23; "Level Link Table No."; Integer)
         {
             Caption = 'Level Link Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(24;"Level Link Field No.";Integer)
+        field(24; "Level Link Field No."; Integer)
         {
             Caption = 'Level Link Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Level Link Table No."));
+            DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Level Link Table No."));
 
             trigger OnValidate()
             begin
@@ -155,9 +166,10 @@ table 6151051 "Item Hierarchy Level"
                 // "Level Link Filter" := '';
             end;
         }
-        field(25;"Level Link Filter";Text[80])
+        field(25; "Level Link Filter"; Text[80])
         {
             Caption = 'Level Link Filter';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -165,15 +177,17 @@ table 6151051 "Item Hierarchy Level"
                 // TESTFIELD("Level Link Field No.");
             end;
         }
-        field(26;"Second Level Link Table No.";Integer)
+        field(26; "Second Level Link Table No."; Integer)
         {
             Caption = 'Second Level Link Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(27;"Second Level Link Field No.";Integer)
+        field(27; "Second Level Link Field No."; Integer)
         {
             Caption = 'Second Level Link Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Second Level Link Table No."));
+            DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Second Level Link Table No."));
 
             trigger OnValidate()
             begin
@@ -188,9 +202,10 @@ table 6151051 "Item Hierarchy Level"
                 // "Level Link Filter" := '';
             end;
         }
-        field(28;"Second Level Link Filter";Text[80])
+        field(28; "Second Level Link Filter"; Text[80])
         {
             Caption = 'Second Level Link Filter';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -198,10 +213,11 @@ table 6151051 "Item Hierarchy Level"
                 // TESTFIELD("Level Link Field No.");
             end;
         }
-        field(29;"Second Level Primary Field No.";Integer)
+        field(29; "Second Level Primary Field No."; Integer)
         {
             Caption = 'Second Level Primary Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table No."));
+            DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnValidate()
             begin
@@ -216,9 +232,10 @@ table 6151051 "Item Hierarchy Level"
                 // Code := '';
             end;
         }
-        field(30;"Ext. Filter";Text[80])
+        field(30; "Ext. Filter"; Text[80])
         {
             Caption = 'Ext. Filter';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -226,10 +243,11 @@ table 6151051 "Item Hierarchy Level"
                 // TESTFIELD("Ext. Filter Field No.");
             end;
         }
-        field(31;"Ext. Filter Field No.";Integer)
+        field(31; "Ext. Filter Field No."; Integer)
         {
             Caption = 'Ext. Filter Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table No."));
+            DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnValidate()
             begin
@@ -244,15 +262,17 @@ table 6151051 "Item Hierarchy Level"
                 // "Ext. Filter" := '';
             end;
         }
-        field(32;"Link Table Name";Text[50])
+        field(32; "Link Table Name"; Text[50])
         {
             Caption = 'Link Table Name';
+            DataClassification = CustomerContent;
             Enabled = false;
         }
-        field(40;"Item Field No.";Integer)
+        field(40; "Item Field No."; Integer)
         {
             Caption = 'Item Field No.';
-            TableRelation = Field."No." WHERE (TableNo=CONST(27));
+            DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = CONST(27));
 
             trigger OnValidate()
             begin
@@ -271,7 +291,7 @@ table 6151051 "Item Hierarchy Level"
 
     keys
     {
-        key(Key1;"Hierarchy Code","Line No.")
+        key(Key1; "Hierarchy Code", "Line No.")
         {
         }
     }
@@ -284,8 +304,8 @@ table 6151051 "Item Hierarchy Level"
     var
         ItemHierarchyLine: Record "Item Hierarchy Line";
     begin
-        ItemHierarchyLine.SetRange("Item Hierarchy Code","Hierarchy Code");
-        ItemHierarchyLine.SetRange("Item Hierarchy Level",Level);
+        ItemHierarchyLine.SetRange("Item Hierarchy Code", "Hierarchy Code");
+        ItemHierarchyLine.SetRange("Item Hierarchy Level", Level);
         ItemHierarchyLine.DeleteAll(true);
     end;
 }

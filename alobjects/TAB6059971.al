@@ -4,27 +4,32 @@ table 6059971 Variety
     // VRT1.11/JDH /20160602 CASE 242940 Captions added
 
     Caption = 'Variety';
+    DataClassification = CustomerContent;
     DrillDownPageID = Variety;
     LookupPageID = Variety;
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(10;Description;Text[30])
+        field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;"Use in Variant Description";Boolean)
+        field(20; "Use in Variant Description"; Boolean)
         {
             Caption = 'Use in Variant Description';
+            DataClassification = CustomerContent;
         }
-        field(21;"Pre tag In Variant Description";Text[10])
+        field(21; "Pre tag In Variant Description"; Text[10])
         {
             Caption = 'Pre tag In Variant Description';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -32,22 +37,23 @@ table 6059971 Variety
             begin
                 //-VRT1.11
                 if "Pre tag In Variant Description" <> xRec."Pre tag In Variant Description" then
-                  if Confirm(Text001) then begin
-                    VrtTable.SetRange(Type, Code);
-                    VrtTable.ModifyAll("Pre tag In Variant Description", "Pre tag In Variant Description");
-                  end;
+                    if Confirm(Text001) then begin
+                        VrtTable.SetRange(Type, Code);
+                        VrtTable.ModifyAll("Pre tag In Variant Description", "Pre tag In Variant Description");
+                    end;
                 //+VRT1.11
             end;
         }
-        field(22;"Use Description field";Boolean)
+        field(22; "Use Description field"; Boolean)
         {
             Caption = 'Use Description field';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }

@@ -11,12 +11,14 @@ table 6151553 "NpXml Filter"
     // NC2.00/MHA/20160525  CASE 240005 NaviConnect
 
     Caption = 'NpXml Filter';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Xml Template Code"; Code[20])
         {
             Caption = 'Xml Template Code';
+            DataClassification = CustomerContent;
             Description = 'NC1.05';
             TableRelation = "NpXml Template";
             //This property is currently not supported
@@ -26,26 +28,31 @@ table 6151553 "NpXml Filter"
         field(5; "Xml Element Line No."; Integer)
         {
             Caption = 'Xml Element Line No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
         field(10; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(20; "Template Version No."; Code[20])
         {
             Caption = 'Template Version No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
         field(100; "Parent Table No."; Integer)
         {
             Caption = 'Parent Table No.';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(110; "Parent Field No."; Integer)
         {
             Caption = 'Parent Field No.';
+            DataClassification = CustomerContent;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Parent Table No."));
 
             trigger OnLookup()
@@ -89,11 +96,13 @@ table 6151553 "NpXml Filter"
         field(200; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(210; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
@@ -138,6 +147,7 @@ table 6151553 "NpXml Filter"
         field(300; "Filter Type"; Option)
         {
             Caption = 'Filter Type';
+            DataClassification = CustomerContent;
             Description = 'NC1.11';
             OptionCaption = 'Table Link,Constant,Filter';
             OptionMembers = TableLink,Constant,"Filter";
@@ -145,6 +155,7 @@ table 6151553 "NpXml Filter"
         field(310; "Filter Value"; Text[250])
         {
             Caption = 'Filter Value';
+            DataClassification = CustomerContent;
             Description = 'NC1.08';
 
             trigger OnLookup()
@@ -162,6 +173,7 @@ table 6151553 "NpXml Filter"
         field(320; "Last Modified at"; DateTime)
         {
             Caption = 'Last Modified at';
+            DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
     }

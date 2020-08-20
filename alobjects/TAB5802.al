@@ -19,22 +19,26 @@ tableextension 6014447 tableextension6014447 extends "Value Entry"
         field(6014401; "Group Sale"; Boolean)
         {
             Caption = 'Group Sale';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014407; "Item Group No."; Code[20])
         {
             Caption = 'Item Group No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014408; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = Vendor;
         }
         field(6014409; "Discount Type"; Option)
         {
             Caption = 'Discount Type';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             OptionCaption = ' ,Period,Mixed,Multiple Unit,Salesperson Discount,Inventory,Photo Work,Rounding,Combination,Customer';
             OptionMembers = " ",Period,Mixed,"Multiple Unit","Salesperson Discount",Inventory,"Photo Work",Rounding,Combination,Customer;
@@ -42,27 +46,32 @@ tableextension 6014447 tableextension6014447 extends "Value Entry"
         field(6014410; "Discount Code"; Code[30])
         {
             Caption = 'Discount Code';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014413; "Register No."; Code[20])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014414; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = "Salesperson/Purchaser";
         }
         field(6014415; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.43,NPR5.48';
         }
         field(6014416; "Document Date and Time"; DateTime)
         {
             Caption = 'Document Date and Time';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
         }
     }

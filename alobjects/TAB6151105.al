@@ -3,14 +3,16 @@ table 6151105 "NpRi Party"
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
 
     Caption = 'Reimbursement Party';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NpRi Parties";
     LookupPageID = "NpRi Parties";
 
     fields
     {
-        field(1;"Party Type";Code[20])
+        field(1; "Party Type"; Code[20])
         {
             Caption = 'Party Type';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "NpRi Party Type";
 
@@ -19,16 +21,17 @@ table 6151105 "NpRi Party"
                 NpRiPartyType: Record "NpRi Party Type";
             begin
                 if "Party Type" = '' then
-                  exit;
+                    exit;
 
                 NpRiPartyType.Get("Party Type");
                 "Reimburse every" := NpRiPartyType."Reimburse every";
                 "Next Posting Date Calculation" := NpRiPartyType."Next Posting Date Calculation";
             end;
         }
-        field(5;"No.";Code[20])
+        field(5; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
 
             trigger OnLookup()
@@ -41,27 +44,27 @@ table 6151105 "NpRi Party"
             begin
                 CalcFields("Table No.");
                 if "Table No." <= 0 then
-                  exit;
+                    exit;
                 if not TableMetadata.Get("Table No.") then
-                  exit;
+                    exit;
                 if TableMetadata.LookupPageID <= 0 then
-                  exit;
+                    exit;
 
                 RecRef.Open("Table No.");
                 KeyRef := RecRef.KeyIndex(1);
                 FieldRef := KeyRef.FieldIndex(1);
 
                 if "No." <> '' then begin
-                  FieldRef.SetFilter('%1',"No.");
-                  if RecRef.FindFirst then;
-                  FieldRef.SetRange();
+                    FieldRef.SetFilter('%1', "No.");
+                    if RecRef.FindFirst then;
+                    FieldRef.SetRange();
                 end;
 
                 RecRefVariant := RecRef;
-                if PAGE.RunModal(TableMetadata.LookupPageID,RecRefVariant) <> ACTION::LookupOK then
-                  exit;
+                if PAGE.RunModal(TableMetadata.LookupPageID, RecRefVariant) <> ACTION::LookupOK then
+                    exit;
 
-                Validate("No.",Format(FieldRef.Value));
+                Validate("No.", Format(FieldRef.Value));
             end;
 
             trigger OnValidate()
@@ -74,52 +77,55 @@ table 6151105 "NpRi Party"
             begin
                 CalcFields("Table No.");
                 if "Table No." <= 0 then
-                  exit;
+                    exit;
                 if not TableMetadata.Get("Table No.") then
-                  exit;
+                    exit;
                 if TableMetadata.LookupPageID <= 0 then
-                  exit;
+                    exit;
 
                 RecRef.Open("Table No.");
                 KeyRef := RecRef.KeyIndex(1);
                 FieldRef := KeyRef.FieldIndex(1);
 
                 if "No." <> '' then begin
-                  FieldRef.SetFilter('%1',"No.");
-                  if RecRef.FindFirst then;
-                  FieldRef.SetRange();
+                    FieldRef.SetFilter('%1', "No.");
+                    if RecRef.FindFirst then;
+                    FieldRef.SetRange();
                 end;
 
                 Name := '';
-                if DataTypeMgt.FindFieldByName(RecRef,FieldRef,FieldName(Name)) then
-                  Name := CopyStr(Format(FieldRef.Value),1,MaxStrLen(Name));
+                if DataTypeMgt.FindFieldByName(RecRef, FieldRef, FieldName(Name)) then
+                    Name := CopyStr(Format(FieldRef.Value), 1, MaxStrLen(Name));
             end;
         }
-        field(10;"Table No.";Integer)
+        field(10; "Table No."; Integer)
         {
             BlankZero = true;
-            CalcFormula = Lookup("NpRi Party Type"."Table No." WHERE (Code=FIELD("Party Type")));
+            CalcFormula = Lookup ("NpRi Party Type"."Table No." WHERE(Code = FIELD("Party Type")));
             Caption = 'Table No.';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(15;Name;Text[50])
+        field(15; Name; Text[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
-        field(100;"Reimburse every";DateFormula)
+        field(100; "Reimburse every"; DateFormula)
         {
             Caption = 'Reimburse every';
+            DataClassification = CustomerContent;
         }
-        field(105;"Next Posting Date Calculation";DateFormula)
+        field(105; "Next Posting Date Calculation"; DateFormula)
         {
             Caption = 'Next Posting Date Calculation';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Party Type","No.")
+        key(Key1; "Party Type", "No.")
         {
         }
     }
@@ -133,17 +139,17 @@ table 6151105 "NpRi Party"
         NpRiReimbursement: Record "NpRi Reimbursement";
         NpRiReimbursementEntry: Record "NpRi Reimbursement Entry";
     begin
-        NpRiReimbursement.SetRange("Party Type","Party Type");
-        NpRiReimbursement.SetRange("Party No.","No.");
-        NpRiReimbursementEntry.SetCurrentKey("Party Type","Party No.","Template Code","Entry Type",Open,"Posting Date");
-        NpRiReimbursementEntry.SetRange("Party Type","Party Type");
-        NpRiReimbursementEntry.SetRange("Party No.","No.");
+        NpRiReimbursement.SetRange("Party Type", "Party Type");
+        NpRiReimbursement.SetRange("Party No.", "No.");
+        NpRiReimbursementEntry.SetCurrentKey("Party Type", "Party No.", "Template Code", "Entry Type", Open, "Posting Date");
+        NpRiReimbursementEntry.SetRange("Party Type", "Party Type");
+        NpRiReimbursementEntry.SetRange("Party No.", "No.");
         if NpRiReimbursement.FindFirst or NpRiReimbursementEntry.FindFirst then begin
-          if not Confirm(Text000,false) then
-            Error(Text001);
+            if not Confirm(Text000, false) then
+                Error(Text001);
 
-          NpRiReimbursementEntry.DeleteAll;
-          NpRiReimbursement.DeleteAll;
+            NpRiReimbursementEntry.DeleteAll;
+            NpRiReimbursement.DeleteAll;
         end;
     end;
 

@@ -7,21 +7,24 @@ table 6151428 "Magento Attribute Set"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'Magento Attribute Set';
+    DataClassification = CustomerContent;
     LookupPageID = "Magento Attribute Set List";
 
     fields
     {
-        field(1;"Attribute Set ID";Integer)
+        field(1; "Attribute Set ID"; Integer)
         {
             Caption = 'Attribute Set ID';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[50])
+        field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Used by Items";Integer)
+        field(1000; "Used by Items"; Integer)
         {
-            CalcFormula = Count(Item WHERE ("Attribute Set ID"=FIELD("Attribute Set ID")));
+            CalcFormula = Count (Item WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'Used by Items';
             Description = 'MAG1.02,MAG2.00';
             Editable = false;
@@ -31,7 +34,7 @@ table 6151428 "Magento Attribute Set"
 
     keys
     {
-        key(Key1;"Attribute Set ID")
+        key(Key1; "Attribute Set ID")
         {
         }
     }
@@ -47,9 +50,9 @@ table 6151428 "Magento Attribute Set"
         RecRef: RecordRef;
     begin
         if MagentoAttributeSetMgt.HasProducts(RecRef) then
-          Error(Err001);
+            Error(Err001);
 
-        MagentoAttributeSetValue.SetRange("Attribute Set ID","Attribute Set ID");
+        MagentoAttributeSetValue.SetRange("Attribute Set ID", "Attribute Set ID");
         MagentoAttributeSetValue.DeleteAll;
     end;
 

@@ -1,20 +1,24 @@
 table 6150720 "POS Stargate Assembly Map"
 {
     Caption = 'POS Stargate Assembly Map';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Assembly Name";Text[250])
+        field(1; "Assembly Name"; Text[250])
         {
             Caption = 'Assembly Name';
+            DataClassification = CustomerContent;
         }
-        field(2;Path;Text[250])
+        field(2; Path; Text[250])
         {
             Caption = 'Path';
+            DataClassification = CustomerContent;
         }
-        field(3;Status;Option)
+        field(3; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Unknown,Mapped,Known,Additional';
             OptionMembers = Unknown,Mapped,Known,Additional;
         }
@@ -22,7 +26,7 @@ table 6150720 "POS Stargate Assembly Map"
 
     keys
     {
-        key(Key1;"Assembly Name")
+        key(Key1; "Assembly Name")
         {
         }
     }

@@ -7,22 +7,26 @@ table 6151126 "NpIa Item AddOn Line"
     // NPR5.55/ALPO/20200506  CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
 
     Caption = 'Item AddOn Line';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"AddOn No.";Code[20])
+        field(1; "AddOn No."; Code[20])
         {
             Caption = 'AddOn No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "NpIa Item AddOn";
         }
-        field(5;"Line No.";Integer)
+        field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(10;Type;Option)
+        field(10; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48';
             OptionCaption = 'Quantity,Select';
             OptionMembers = Quantity,Select;
@@ -31,15 +35,16 @@ table 6151126 "NpIa Item AddOn Line"
             begin
                 //-NPR5.48 [334922]
                 if Type = Type::Select then begin
-                  "Item No." := '';
-                  "Variant Code" := '';
+                    "Item No." := '';
+                    "Variant Code" := '';
                 end;
                 //+NPR5.48 [334922]
             end;
         }
-        field(15;"Item No.";Code[20])
+        field(15; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48';
             TableRelation = Item;
 
@@ -65,8 +70,8 @@ table 6151126 "NpIa Item AddOn Line"
                 //+NPR5.52 [354309]-revoked
                 //-NPR5.52 [354309]
                 if "Item No." = '' then begin
-                  Init;
-                  exit;
+                    Init;
+                    exit;
                 end;
                 //+NPR5.52 [354309]
                 Item.Get("Item No.");
@@ -77,10 +82,11 @@ table 6151126 "NpIa Item AddOn Line"
                 //+NPR5.48 [334922]
             end;
         }
-        field(20;"Variant Code";Code[10])
+        field(20; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
 
             trigger OnValidate()
             var
@@ -98,44 +104,50 @@ table 6151126 "NpIa Item AddOn Line"
                 //+NPR5.48 [334922]
                 //-NPR5.52 [354309]
                 if "Variant Code" <> '' then
-                  ItemVariant.Get("Item No.","Variant Code")
+                    ItemVariant.Get("Item No.", "Variant Code")
                 else
-                  Clear(ItemVariant);
+                    Clear(ItemVariant);
                 //+NPR5.52 [354309]
                 "Description 2" := ItemVariant.Description;
             end;
         }
-        field(25;Description;Text[50])
+        field(25; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(30;"Description 2";Text[50])
+        field(30; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            DataClassification = CustomerContent;
         }
-        field(49;"Use Unit Price";Option)
+        field(49; "Use Unit Price"; Option)
         {
             Caption = 'Use Unit Price';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
             OptionCaption = 'Non-Zero,Always';
             OptionMembers = "Non-Zero",Always;
         }
-        field(50;"Unit Price";Decimal)
+        field(50; "Unit Price"; Decimal)
         {
             AutoFormatType = 2;
             Caption = 'Unit Price';
+            DataClassification = CustomerContent;
         }
-        field(55;"Discount %";Decimal)
+        field(55; "Discount %"; Decimal)
         {
             BlankZero = true;
             Caption = 'Discount %';
-            DecimalPlaces = 0:1;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 1;
             MaxValue = 100;
             MinValue = 0;
         }
-        field(60;"Comment Enabled";Boolean)
+        field(60; "Comment Enabled"; Boolean)
         {
             Caption = 'Comment Enabled';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -145,41 +157,45 @@ table 6151126 "NpIa Item AddOn Line"
                 NpIaItemAddOn.TestField("Comment POS Info Code");
             end;
         }
-        field(100;Quantity;Decimal)
+        field(100; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
             begin
                 //-NPR5.52 [354309]
                 if Quantity = 0 then
-                  TestField("Fixed Quantity",false);
+                    TestField("Fixed Quantity", false);
                 //+NPR5.52 [354309]
             end;
         }
-        field(110;"Fixed Quantity";Boolean)
+        field(110; "Fixed Quantity"; Boolean)
         {
             Caption = 'Fixed Quantity';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
 
             trigger OnValidate()
             begin
                 //-NPR5.52 [354309]
                 if "Fixed Quantity" then
-                  TestField(Quantity);
+                    TestField(Quantity);
                 //+NPR5.52 [354309]
             end;
         }
-        field(120;"Per Unit";Boolean)
+        field(120; "Per Unit"; Boolean)
         {
             Caption = 'Per unit';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
         }
-        field(200;"Before Insert Codeunit ID";Integer)
+        field(200; "Before Insert Codeunit ID"; Integer)
         {
             BlankZero = true;
             Caption = 'Before Insert Codeunit ID';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48';
 
             trigger OnLookup()
@@ -187,11 +203,11 @@ table 6151126 "NpIa Item AddOn Line"
                 EventSubscription: Record "Event Subscription";
             begin
                 //-NPR5.48 [334922]
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",CODEUNIT::"NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function",'OnSetupGenericParentTable');
-                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
-                  exit;
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NpIa Item AddOn Mgt.");
+                EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
+                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                    exit;
 
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Before Insert Function" := EventSubscription."Subscriber Function";
@@ -204,32 +220,33 @@ table 6151126 "NpIa Item AddOn Line"
             begin
                 //-NPR5.48 [334922]
                 if "Before Insert Codeunit ID" = 0 then begin
-                  "Before Insert Function" := '';
-                  exit;
+                    "Before Insert Function" := '';
+                    exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",CODEUNIT::"NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function",'OnSetupGenericParentTable');
-                EventSubscription.SetRange("Subscriber Codeunit ID","Before Insert Codeunit ID");
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NpIa Item AddOn Mgt.");
+                EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
+                EventSubscription.SetRange("Subscriber Codeunit ID", "Before Insert Codeunit ID");
                 if "Before Insert Function" <> '' then
-                  EventSubscription.SetRange("Subscriber Function","Before Insert Function");
+                    EventSubscription.SetRange("Subscriber Function", "Before Insert Function");
                 EventSubscription.FindFirst;
                 //+NPR5.48 [334922]
             end;
         }
-        field(205;"Before Insert Codeunit Name";Text[30])
+        field(205; "Before Insert Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Codeunit),
-                                                             "Object ID"=FIELD("Before Insert Codeunit ID")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+                                                             "Object ID" = FIELD("Before Insert Codeunit ID")));
             Caption = 'Before Insert Codeunit Name';
             Description = 'NPR5.48';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(210;"Before Insert Function";Text[250])
+        field(210; "Before Insert Function"; Text[250])
         {
             Caption = 'Before Insert Function';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48';
 
             trigger OnLookup()
@@ -237,11 +254,11 @@ table 6151126 "NpIa Item AddOn Line"
                 EventSubscription: Record "Event Subscription";
             begin
                 //-NPR5.48 [334922]
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",CODEUNIT::"NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function",'BeforeInsertPOSAddOnLine');
-                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
-                  exit;
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NpIa Item AddOn Mgt.");
+                EventSubscription.SetRange("Published Function", 'BeforeInsertPOSAddOnLine');
+                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                    exit;
 
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Before Insert Function" := EventSubscription."Subscriber Function";
@@ -254,17 +271,17 @@ table 6151126 "NpIa Item AddOn Line"
             begin
                 //-NPR5.48 [334922]
                 if "Before Insert Function" = '' then begin
-                  "Before Insert Codeunit ID" := 0;
-                  exit;
+                    "Before Insert Codeunit ID" := 0;
+                    exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",CODEUNIT::"NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function",'BeforeInsertPOSAddOnLine');
-                EventSubscription.SetRange("Subscriber Function","Before Insert Function");
-                EventSubscription.SetRange("Subscriber Codeunit ID","Before Insert Codeunit ID");
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NpIa Item AddOn Mgt.");
+                EventSubscription.SetRange("Published Function", 'BeforeInsertPOSAddOnLine');
+                EventSubscription.SetRange("Subscriber Function", "Before Insert Function");
+                EventSubscription.SetRange("Subscriber Codeunit ID", "Before Insert Codeunit ID");
                 if not EventSubscription.FindFirst then
-                  EventSubscription.SetRange("Subscriber Codeunit ID");
+                    EventSubscription.SetRange("Subscriber Codeunit ID");
 
                 EventSubscription.FindFirst;
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
@@ -275,7 +292,7 @@ table 6151126 "NpIa Item AddOn Line"
 
     keys
     {
-        key(Key1;"AddOn No.","Line No.")
+        key(Key1; "AddOn No.", "Line No.")
         {
         }
     }
@@ -289,10 +306,10 @@ table 6151126 "NpIa Item AddOn Line"
         NpIaItemAddOnLineOption: Record "NpIa Item AddOn Line Option";
     begin
         //-NPR5.48 [334922]
-        NpIaItemAddOnLineOption.SetRange("AddOn No.","AddOn No.");
-        NpIaItemAddOnLineOption.SetRange("AddOn Line No.","Line No.");
+        NpIaItemAddOnLineOption.SetRange("AddOn No.", "AddOn No.");
+        NpIaItemAddOnLineOption.SetRange("AddOn Line No.", "Line No.");
         if NpIaItemAddOnLineOption.FindFirst then
-          NpIaItemAddOnLineOption.DeleteAll;
+            NpIaItemAddOnLineOption.DeleteAll;
         //+NPR5.48 [334922]
     end;
 
@@ -301,7 +318,7 @@ table 6151126 "NpIa Item AddOn Line"
         //-NPR5.48 [334922]
         //TESTFIELD("Item No.");
         if Type = Quantity then
-          TestField("Item No.");
+            TestField("Item No.");
         //+NPR5.48 [334922]
     end;
 
@@ -310,7 +327,7 @@ table 6151126 "NpIa Item AddOn Line"
         //+NPR5.48 [334922]
         //TESTFIELD("Item No.");
         if Type = Quantity then
-          TestField("Item No.");
+            TestField("Item No.");
         //+NPR5.48 [334922]
     end;
 }

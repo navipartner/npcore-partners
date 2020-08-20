@@ -5,31 +5,35 @@ table 6151408 "Magento Tax Class"
     // MAG2.03/MHA /20170324  CASE 266871 Added field 517 "Customer Config. Template Code"
 
     Caption = 'Magento Tax Class';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;Name;Text[250])
+        field(1; Name; Text[250])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(2;Type;Option)
+        field(2; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Item,Customer';
             OptionMembers = Item,Customer;
         }
-        field(517;"Customer Config. Template Code";Code[10])
+        field(517; "Customer Config. Template Code"; Code[10])
         {
             Caption = 'Customer Config. Template Code';
+            DataClassification = CustomerContent;
             Description = 'MAG2.03';
-            TableRelation = "Config. Template Header".Code WHERE ("Table ID"=CONST(18));
+            TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(18));
         }
     }
 
     keys
     {
-        key(Key1;Name,Type)
+        key(Key1; Name, Type)
         {
         }
     }

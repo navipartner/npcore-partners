@@ -3,57 +3,68 @@ table 6151606 "NpDc Ext. Coupon Buffer"
     // NPR5.51/MHA /20190724  CASE 343352 Object Created
 
     Caption = 'NpDc Ext. Coupon Buffer';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Document No.";Code[20])
+        field(1; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            DataClassification = CustomerContent;
             Editable = false;
             NotBlank = true;
         }
-        field(5;"Line No.";Integer)
+        field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(15;"Reference No.";Text[30])
+        field(15; "Reference No."; Text[30])
         {
             Caption = 'Reference No.';
+            DataClassification = CustomerContent;
         }
-        field(20;"Coupon Type";Code[20])
+        field(20; "Coupon Type"; Code[20])
         {
             Caption = 'Coupon Type';
+            DataClassification = CustomerContent;
         }
-        field(25;Description;Text[50])
+        field(25; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(35;"Starting Date";DateTime)
+        field(35; "Starting Date"; DateTime)
         {
             Caption = 'Starting Date';
+            DataClassification = CustomerContent;
         }
-        field(40;"Ending Date";DateTime)
+        field(40; "Ending Date"; DateTime)
         {
             Caption = 'Ending Date';
+            DataClassification = CustomerContent;
         }
-        field(45;Open;Boolean)
+        field(45; Open; Boolean)
         {
             Caption = 'Open';
+            DataClassification = CustomerContent;
         }
-        field(50;"Remaining Quantity";Decimal)
+        field(50; "Remaining Quantity"; Decimal)
         {
             Caption = 'Remaining Quantity';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
         }
-        field(55;"In-use Quantity";Integer)
+        field(55; "In-use Quantity"; Integer)
         {
             Caption = 'In-use Quantity';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Document No.","Line No.")
+        key(Key1; "Document No.", "Line No.")
         {
         }
     }

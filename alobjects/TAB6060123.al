@@ -10,92 +10,106 @@ table 6060123 "TM Det. Ticket Access Entry"
     // TM1.33/TSA/20180527 CASE 319454 Added Quantity on as sumindex field to enhance the schedule entry page flowfields
 
     Caption = 'Det. Ticket Access Entry';
+    DataClassification = CustomerContent;
     DrillDownPageID = "TM Det. Ticket Access Entry";
     LookupPageID = "TM Det. Ticket Access Entry";
 
     fields
     {
-        field(1;"Entry No.";BigInteger)
+        field(1; "Entry No."; BigInteger)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(2;"Posting Date";Date)
+        field(2; "Posting Date"; Date)
         {
             Caption = 'Posting Date';
+            DataClassification = CustomerContent;
         }
-        field(3;"Ticket No.";Code[20])
+        field(3; "Ticket No."; Code[20])
         {
             Caption = 'Ticket No.';
+            DataClassification = CustomerContent;
             TableRelation = "TM Ticket";
         }
-        field(4;"Ticket Access Entry No.";Integer)
+        field(4; "Ticket Access Entry No."; Integer)
         {
             Caption = 'Ticket Access Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "TM Ticket Access Entry";
         }
-        field(10;Type;Option)
+        field(10; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Initial Entry,Reservation,Admitted,Departed,Consumed,Canceled,Payment,PrePaid,PostPaid';
             OptionMembers = INITIAL_ENTRY,RESERVATION,ADMITTED,DEPARTED,CONSUMED,CANCELED,PAYMENT,PREPAID,POSTPAID;
         }
-        field(11;"External Adm. Sch. Entry No.";Integer)
+        field(11; "External Adm. Sch. Entry No."; Integer)
         {
             Caption = 'External Adm. Sch. Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "TM Admission Schedule Entry"."External Schedule Entry No.";
             ValidateTableRelation = false;
         }
-        field(12;Quantity;Decimal)
+        field(12; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
         }
-        field(13;"Closed By Entry No.";BigInteger)
+        field(13; "Closed By Entry No."; BigInteger)
         {
             Caption = 'Closed By Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "TM Det. Ticket Access Entry";
         }
-        field(14;Open;Boolean)
+        field(14; Open; Boolean)
         {
             Caption = 'Open';
+            DataClassification = CustomerContent;
         }
-        field(15;"Sales Channel No.";Code[20])
+        field(15; "Sales Channel No."; Code[20])
         {
             Caption = 'Sales Channel No.';
+            DataClassification = CustomerContent;
         }
-        field(16;"Scanner Station ID";Text[30])
+        field(16; "Scanner Station ID"; Text[30])
         {
             Caption = 'Scanner Station ID';
+            DataClassification = CustomerContent;
         }
-        field(20;"Created Datetime";DateTime)
+        field(20; "Created Datetime"; DateTime)
         {
             Caption = 'Created Datetime';
+            DataClassification = CustomerContent;
         }
-        field(21;"User ID";Code[40])
+        field(21; "User ID"; Code[40])
         {
             Caption = 'User ID';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"External Adm. Sch. Entry No.",Type,Open,"Posting Date")
+        key(Key2; "External Adm. Sch. Entry No.", Type, Open, "Posting Date")
         {
             SumIndexFields = Quantity;
         }
-        key(Key3;"Ticket No.",Type,Open,"Posting Date")
+        key(Key3; "Ticket No.", Type, Open, "Posting Date")
         {
         }
-        key(Key4;"Ticket Access Entry No.",Type,Open,"Posting Date")
+        key(Key4; "Ticket Access Entry No.", Type, Open, "Posting Date")
         {
         }
-        key(Key5;Type,Open,"Posting Date")
+        key(Key5; Type, Open, "Posting Date")
         {
         }
-        key(Key6;Type,"Created Datetime")
+        key(Key6; Type, "Created Datetime")
         {
         }
     }
@@ -118,7 +132,7 @@ table 6060123 "TM Det. Ticket Access Entry"
 
     trigger OnRename()
     begin
-        Error ('');
+        Error('');
     end;
 }
 

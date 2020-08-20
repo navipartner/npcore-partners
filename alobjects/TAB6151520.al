@@ -8,63 +8,71 @@ table 6151520 "Nc Trigger"
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to fields 60, 70, 80 and 90
 
     Caption = 'Nc Trigger';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(10;"Code";Code[20])
+        field(10; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(20;Description;Text[50])
+        field(20; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(30;"Split Trigger and Endpoint";Boolean)
+        field(30; "Split Trigger and Endpoint"; Boolean)
         {
             Caption = 'Split Trigger and Endpoint';
+            DataClassification = CustomerContent;
         }
-        field(40;Enabled;Boolean)
+        field(40; Enabled; Boolean)
         {
             Caption = 'Enabled';
+            DataClassification = CustomerContent;
         }
-        field(50;"Linked Endpoints";Integer)
+        field(50; "Linked Endpoints"; Integer)
         {
-            CalcFormula = Count("Nc Endpoint Trigger Link" WHERE ("Trigger Code"=FIELD(Code)));
+            CalcFormula = Count ("Nc Endpoint Trigger Link" WHERE("Trigger Code" = FIELD(Code)));
             Caption = 'Linked Endpoints';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(60;"Task Processor";Code[20])
+        field(60; "Task Processor"; Code[20])
         {
             Caption = 'Task Processor';
+            DataClassification = CustomerContent;
             TableRelation = "Nc Task Processor";
         }
-        field(70;"Subscriber Codeunit ID";Integer)
+        field(70; "Subscriber Codeunit ID"; Integer)
         {
             Caption = 'Subscriber Codeunit ID';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Codeunit));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
-        field(80;"Subscriber Codeunit Name";Text[50])
+        field(80; "Subscriber Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Codeunit),
-                                                             "Object ID"=FIELD("Subscriber Codeunit ID")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+                                                             "Object ID" = FIELD("Subscriber Codeunit ID")));
             Caption = 'Subscriber Codeunit Name';
             Description = 'NC2.01';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(90;"Error on Empty Output";Boolean)
+        field(90; "Error on Empty Output"; Boolean)
         {
             Caption = 'Error on Empty Output';
+            DataClassification = CustomerContent;
             Description = 'NC2.03 [271242]';
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }

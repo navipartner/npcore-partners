@@ -1,66 +1,77 @@
-tableextension 6014438 tableextension6014438 extends "Marketing Setup" 
+tableextension 6014438 tableextension6014438 extends "Marketing Setup"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields   6014400..6014410
     // NPR5.30/TJ  /20170227 CASE 262797 Removed commented code and local Text Constant from Campaign Monitor N.let. Editor - OnLookup()
     fields
     {
-        field(6014400;"Campaign Monitor API Key";Text[50])
+        field(6014400; "Campaign Monitor API Key"; Text[50])
         {
             Caption = 'Campaign Monitor API Key';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000/Campaign Monitor';
         }
-        field(6014401;"Campaign Monitor Client Key";Text[50])
+        field(6014401; "Campaign Monitor Client Key"; Text[50])
         {
             Caption = 'Campaign Monitor Client Key';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000/Campaign Monitor';
         }
-        field(6014402;"Campaign Monitor N.let. Folder";Text[250])
+        field(6014402; "Campaign Monitor N.let. Folder"; Text[250])
         {
             Caption = 'Campaign Monitor N.let. Folder';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000/Campaign Monitor';
         }
-        field(6014403;"Campaign Monitor N.let. Login";Text[20])
+        field(6014403; "Campaign Monitor N.let. Login"; Text[20])
         {
             Caption = 'Campaign Monitor N.let. Login';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000/Campaign Monitor';
         }
-        field(6014404;"Campaign Monitor N.let. Pass";Text[20])
+        field(6014404; "Campaign Monitor N.let. Pass"; Text[20])
         {
             Caption = 'Campaign Monitor N.let. Pass';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000/Campaign Monitor';
         }
-        field(6014405;"Campaign Monitor N.let. Editor";Text[250])
+        field(6014405; "Campaign Monitor N.let. Editor"; Text[250])
         {
             Caption = 'Campaign Monitor N.let. Editor';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000/Campaign Monitor';
         }
-        field(6014406;"Campaign Monitor Http Folder";Text[250])
+        field(6014406; "Campaign Monitor Http Folder"; Text[250])
         {
             Caption = 'Campaign Monitor Http Folder';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000/Campaign Monitor';
         }
-        field(6014407;"Interaction Log Opens";Code[20])
+        field(6014407; "Interaction Log Opens"; Code[20])
         {
             Caption = 'Interaction Log Opens';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = "Interaction Template";
         }
-        field(6014408;"Interaction Log Bounces";Code[20])
+        field(6014408; "Interaction Log Bounces"; Code[20])
         {
             Caption = 'Interaction Log Bounces';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = "Interaction Template";
         }
-        field(6014409;"Interaction Log Clicks";Code[20])
+        field(6014409; "Interaction Log Clicks"; Code[20])
         {
             Caption = 'Interaction Log Clicks';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = "Interaction Template";
         }
-        field(6014410;"Interaction Log Unsubscribes";Code[20])
+        field(6014410; "Interaction Log Unsubscribes"; Code[20])
         {
             Caption = 'Interaction Log Unsubscribes';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = "Interaction Template";
         }

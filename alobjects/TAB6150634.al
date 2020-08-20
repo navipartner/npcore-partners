@@ -9,232 +9,278 @@ table 6150634 "POS Posting Buffer"
     // NPR5.38/BR  /20180122  CASE 302693 Added Type = Payout
 
     Caption = 'POS Posting Buffer';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Line Type";Option)
+        field(1; "Line Type"; Option)
         {
             Caption = 'Line Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Sales,Payment,Payout';
             OptionMembers = Sales,Payment,Payout;
         }
-        field(2;"POS Entry No.";Integer)
+        field(2; "POS Entry No."; Integer)
         {
             Caption = 'POS Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Entry";
         }
-        field(3;"POS Store Code";Code[10])
+        field(3; "POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Store";
         }
-        field(4;"POS Unit No.";Code[10])
+        field(4; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Unit";
         }
-        field(5;"Document No.";Code[20])
+        field(5; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            DataClassification = CustomerContent;
         }
-        field(6;"Line No.";Integer)
+        field(6; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(7;Type;Option)
+        field(7; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,G/L Account,Item,Customer,Voucher,Payout';
             OptionMembers = " ","G/L Account",Item,Customer,Voucher,Payout;
         }
-        field(8;"No.";Code[20])
+        field(8; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
         }
-        field(9;"Posting Date";Date)
+        field(9; "Posting Date"; Date)
         {
             Caption = 'Posting Date';
+            DataClassification = CustomerContent;
         }
-        field(10;"Gen. Bus. Posting Group";Code[10])
+        field(10; "Gen. Bus. Posting Group"; Code[10])
         {
             Caption = 'Gen. Bus. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
         }
-        field(11;"Gen. Prod. Posting Group";Code[10])
+        field(11; "Gen. Prod. Posting Group"; Code[10])
         {
             Caption = 'Gen. Prod. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(12;"VAT Bus. Posting Group";Code[10])
+        field(12; "VAT Bus. Posting Group"; Code[10])
         {
             Caption = 'VAT Bus. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(13;"VAT Prod. Posting Group";Code[10])
+        field(13; "VAT Prod. Posting Group"; Code[10])
         {
             Caption = 'VAT Prod. Posting Group';
+            DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
         }
-        field(14;"Salesperson Code";Code[10])
+        field(14; "Salesperson Code"; Code[10])
         {
             Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
         }
-        field(15;"Reason Code";Code[10])
+        field(15; "Reason Code"; Code[10])
         {
             Caption = 'Reason Code';
+            DataClassification = CustomerContent;
         }
-        field(16;"Currency Code";Code[10])
+        field(16; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
+            DataClassification = CustomerContent;
         }
-        field(17;"POS Payment Bin Code";Code[10])
+        field(17; "POS Payment Bin Code"; Code[10])
         {
             Caption = 'POS Payment Bin Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Payment Bin";
         }
-        field(18;"POS Payment Method Code";Code[10])
+        field(18; "POS Payment Method Code"; Code[10])
         {
             Caption = 'POS Payment Method Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Payment Method";
         }
-        field(20;"Global Dimension 1 Code";Code[20])
+        field(20; "Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
-        field(21;"Global Dimension 2 Code";Code[20])
+        field(21; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
-        field(22;"Dimension Set ID";Integer)
+        field(22; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "Dimension Set Entry";
         }
-        field(23;"POS Period Register";Integer)
+        field(23; "POS Period Register"; Integer)
         {
             Caption = 'POS Period Register';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
             TableRelation = "POS Period Register";
         }
-        field(50;Amount;Decimal)
+        field(50; Amount; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Amount';
+            DataClassification = CustomerContent;
         }
-        field(51;"Amount (LCY)";Decimal)
+        field(51; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Amount (LCY)';
+            DataClassification = CustomerContent;
         }
-        field(52;"Discount Amount";Decimal)
+        field(52; "Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Discount Amount';
+            DataClassification = CustomerContent;
         }
-        field(53;"Discount Amount (LCY)";Decimal)
+        field(53; "Discount Amount (LCY)"; Decimal)
         {
             Caption = 'Discount Amount (LCY)';
+            DataClassification = CustomerContent;
         }
-        field(54;Description;Text[50])
+        field(54; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(60;"Rounding Amount";Decimal)
+        field(60; "Rounding Amount"; Decimal)
         {
             Caption = 'Rounding Amount';
+            DataClassification = CustomerContent;
         }
-        field(61;"Rounding Amount (LCY)";Decimal)
+        field(61; "Rounding Amount (LCY)"; Decimal)
         {
             Caption = 'Rounding Amount (LCY)';
+            DataClassification = CustomerContent;
         }
-        field(70;"VAT Amount";Decimal)
+        field(70; "VAT Amount"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'VAT Amount';
+            DataClassification = CustomerContent;
         }
-        field(71;"VAT Calculation Type";Option)
+        field(71; "VAT Calculation Type"; Option)
         {
             Caption = 'VAT Calculation Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
             OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
-        field(72;"VAT Base Amount";Decimal)
+        field(72; "VAT Base Amount"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
+            DataClassification = CustomerContent;
         }
-        field(73;"Tax Area Code";Code[20])
+        field(73; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
+            DataClassification = CustomerContent;
             TableRelation = "Tax Area";
         }
-        field(74;"Tax Liable";Boolean)
+        field(74; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
+            DataClassification = CustomerContent;
         }
-        field(75;"Tax Group Code";Code[10])
+        field(75; "Tax Group Code"; Code[10])
         {
             Caption = 'Tax Group Code';
+            DataClassification = CustomerContent;
             TableRelation = "Tax Group";
         }
-        field(76;Quantity;Decimal)
+        field(76; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 1:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 1 : 5;
         }
-        field(77;"Use Tax";Boolean)
+        field(77; "Use Tax"; Boolean)
         {
             Caption = 'Use Tax';
+            DataClassification = CustomerContent;
         }
-        field(78;"VAT Difference";Decimal)
+        field(78; "VAT Difference"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'VAT Difference';
+            DataClassification = CustomerContent;
         }
-        field(79;"VAT %";Decimal)
+        field(79; "VAT %"; Decimal)
         {
             Caption = 'VAT %';
-            DecimalPlaces = 1:1;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 1 : 1;
         }
-        field(80;"VAT Amount (LCY)";Decimal)
+        field(80; "VAT Amount (LCY)"; Decimal)
         {
             Caption = 'VAT Amount (LCY)';
+            DataClassification = CustomerContent;
         }
-        field(85;"VAT Amount Discount";Decimal)
+        field(85; "VAT Amount Discount"; Decimal)
         {
             Caption = 'VAT Amount Discount';
+            DataClassification = CustomerContent;
         }
-        field(86;"VAT Amount Discount (LCY)";Decimal)
+        field(86; "VAT Amount Discount (LCY)"; Decimal)
         {
             Caption = 'VAT Amount Discount (LCY)';
+            DataClassification = CustomerContent;
         }
-        field(90;"Applies-to Doc. Type";Option)
+        field(90; "Applies-to Doc. Type"; Option)
         {
             Caption = 'Applies-to Doc. Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
             OptionCaption = ' ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund';
             OptionMembers = " ",Payment,Invoice,"Credit Memo","Finance Charge Memo",Reminder,Refund;
         }
-        field(91;"Applies-to Doc. No.";Code[20])
+        field(91; "Applies-to Doc. No."; Code[20])
         {
             Caption = 'Applies-to Doc. No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
-        field(92;"External Document No.";Code[35])
+        field(92; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
     }
 
     keys
     {
-        key(Key1;"Posting Date","POS Entry No.","Line Type","Document No.","Line No.",Type,"No.","Gen. Bus. Posting Group","Gen. Prod. Posting Group","VAT Bus. Posting Group","VAT Prod. Posting Group","Currency Code","POS Payment Bin Code","Dimension Set ID","Tax Area Code","Applies-to Doc. No.")
+        key(Key1; "Posting Date", "POS Entry No.", "Line Type", "Document No.", "Line No.", Type, "No.", "Gen. Bus. Posting Group", "Gen. Prod. Posting Group", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Currency Code", "POS Payment Bin Code", "Dimension Set ID", "Tax Area Code", "Applies-to Doc. No.")
         {
         }
     }
