@@ -9,9 +9,7 @@ page 6150750 "POS (Dragonglass)"
     {
         area(content)
         {
-            // TODO: VB - Control add-ins issues, refactoring required!!!
-            /*
-            usercontrol(Framework; "NaviPartner.Retail.Controls.Dragonglass")
+            usercontrol(Framework; Dragonglass)
             {
 
                 trigger OnFrameworkReady()
@@ -22,16 +20,16 @@ page 6150750 "POS (Dragonglass)"
                     Initialize();
                 end;
 
-                trigger OnInvokeMethod(method: Text; eventContent: Variant)
+                trigger OnInvokeMethod(method: Text; eventContext: JsonObject)
                 begin
                     if POSSession.IsFinalized() then
                         exit;
                     POSSession.DebugWithTimestamp('Method:' + method);
-                    if not PreHandleMethod(method, eventContent) then
-                        JavaScript.InvokeMethod(method, eventContent, POSSession, FrontEnd);
+                    if not PreHandleMethod(method, eventContext) then
+                        JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd);
                 end;
 
-                trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; context: Variant)
+                trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; context: JsonObject)
                 begin
                     if POSSession.IsFinalized() then
                         Error(SESSION_FINALIZED_ERROR);
@@ -39,7 +37,6 @@ page 6150750 "POS (Dragonglass)"
                     JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, context, POSSession, FrontEnd);
                 end;
             }
-            */
         }
     }
 
@@ -70,10 +67,11 @@ page 6150750 "POS (Dragonglass)"
         SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
 
     local procedure Initialize()
+    var
+        Framework: Codeunit "Framework: Dragonglass";
     begin
-        //POSSession.Constructor(CurrPage.Framework, FrontEnd, Setup, POSSession);
-        // TODO: VB - Control add-ins issues, refactoring required!!!
-        Error('TODO: VB - Control add-ins issues, refactoring required!!!');
+        Framework.Constructor(CurrPage.Framework);
+        POSSession.Constructor(Framework, FrontEnd, Setup, POSSession);
     end;
 
     local procedure Finalize()
@@ -81,11 +79,7 @@ page 6150750 "POS (Dragonglass)"
         POSSession.Destructor();
     end;
 
-    local procedure "--- Low-level method handling ---"()
-    begin
-    end;
-
-    local procedure PreHandleMethod(Method: Text; Context: DotNet npNetJObject): Boolean
+    local procedure PreHandleMethod(Method: Text; Context: JsonObject): Boolean
     begin
         case Method of
             'KeepAlive':
