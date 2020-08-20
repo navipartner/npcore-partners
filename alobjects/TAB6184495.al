@@ -25,399 +25,490 @@ table 6184495 "EFT Transaction Request"
     //                                   parsing the EFT record information onto the POS sales lines. ("Result Processed" -> TRUE). Previously only indication was "Finished" timestamp 0DT.
 
     Caption = 'EFT Transaction Request';
+    DataClassification = CustomerContent;
     DrillDownPageID = "EFT Transaction Requests";
     LookupPageID = "EFT Transaction Requests";
 
     fields
     {
-        field(10;"Entry No.";Integer)
+        field(10; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(12;Token;Guid)
+        field(12; Token; Guid)
         {
             Caption = 'Token';
+            DataClassification = CustomerContent;
         }
-        field(15;"Integration Type";Code[20])
+        field(15; "Integration Type"; Code[20])
         {
             Caption = 'Integration Type';
+            DataClassification = CustomerContent;
         }
-        field(20;"Pepper Terminal Code";Code[10])
+        field(20; "Pepper Terminal Code"; Code[10])
         {
             Caption = 'Pepper Terminal Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper Terminal";
         }
-        field(30;"Pepper Transaction Type Code";Code[10])
+        field(30; "Pepper Transaction Type Code"; Code[10])
         {
             Caption = 'Pepper Transaction Type Code';
-            TableRelation = "Pepper EFT Transaction Type".Code WHERE ("Integration Type"=FIELD("Integration Type"));
+            DataClassification = CustomerContent;
+            TableRelation = "Pepper EFT Transaction Type".Code WHERE("Integration Type" = FIELD("Integration Type"));
         }
-        field(35;"Pepper Trans. Subtype Code";Code[10])
+        field(35; "Pepper Trans. Subtype Code"; Code[10])
         {
             Caption = 'Pepper Transaction Subtype Code';
-            TableRelation = "Pepper EFT Transaction Subtype" WHERE ("Integration Type Code"=FIELD("Integration Type"),
-                                                                    "Transaction Type Code"=FIELD("Pepper Transaction Type Code"));
+            DataClassification = CustomerContent;
+            TableRelation = "Pepper EFT Transaction Subtype" WHERE("Integration Type Code" = FIELD("Integration Type"),
+                                                                    "Transaction Type Code" = FIELD("Pepper Transaction Type Code"));
         }
-        field(40;Started;DateTime)
+        field(40; Started; DateTime)
         {
             Caption = 'Started';
+            DataClassification = CustomerContent;
         }
-        field(50;Finished;DateTime)
+        field(50; Finished; DateTime)
         {
             Caption = 'Finished';
+            DataClassification = CustomerContent;
         }
-        field(60;"User ID";Code[50])
+        field(60; "User ID"; Code[50])
         {
             Caption = 'User ID';
+            DataClassification = CustomerContent;
             TableRelation = User."User Name";
             //This property is currently not supported
             //TestTableRelation = false;
         }
-        field(70;"Integration Version Code";Code[10])
+        field(70; "Integration Version Code"; Code[10])
         {
             Caption = 'Integration Version Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper Version";
         }
-        field(80;"Sales Ticket No.";Code[20])
+        field(80; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
+            DataClassification = CustomerContent;
         }
-        field(81;"Sales ID";Guid)
+        field(81; "Sales ID"; Guid)
         {
             Caption = 'Sales ID';
+            DataClassification = CustomerContent;
         }
-        field(83;"Sales Line No.";Integer)
+        field(83; "Sales Line No."; Integer)
         {
             Caption = 'Sales Line No.';
+            DataClassification = CustomerContent;
         }
-        field(84;"Sales Line ID";Guid)
+        field(84; "Sales Line ID"; Guid)
         {
             Caption = 'Sales Line ID';
+            DataClassification = CustomerContent;
         }
-        field(85;"POS Description";Text[100])
+        field(85; "POS Description"; Text[100])
         {
             Caption = 'POS Description';
+            DataClassification = CustomerContent;
         }
-        field(90;"Register No.";Code[10])
+        field(90; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
         }
-        field(95;"POS Payment Type Code";Code[10])
+        field(95; "POS Payment Type Code"; Code[10])
         {
             Caption = 'POS Payment Type Code';
+            DataClassification = CustomerContent;
             TableRelation = "Payment Type POS";
         }
-        field(96;"Original POS Payment Type Code";Code[10])
+        field(96; "Original POS Payment Type Code"; Code[10])
         {
             Caption = 'Original POS Payment Type Code';
+            DataClassification = CustomerContent;
             TableRelation = "Payment Type POS";
         }
-        field(100;"Result Code";Integer)
+        field(100; "Result Code"; Integer)
         {
             Caption = 'Result Code';
+            DataClassification = CustomerContent;
         }
-        field(110;"Card Type";Text[4])
+        field(110; "Card Type"; Text[4])
         {
             Caption = 'Card Type';
+            DataClassification = CustomerContent;
         }
-        field(120;"Card Name";Text[24])
+        field(120; "Card Name"; Text[24])
         {
             Caption = 'Card Name';
+            DataClassification = CustomerContent;
         }
-        field(130;"Card Number";Text[30])
+        field(130; "Card Number"; Text[30])
         {
             Caption = 'Card Number';
+            DataClassification = CustomerContent;
         }
-        field(131;"Card Issuer ID";Text[30])
+        field(131; "Card Issuer ID"; Text[30])
         {
             Caption = 'Card Issuer ID';
+            DataClassification = CustomerContent;
         }
-        field(132;"Card Application ID";Text[30])
+        field(132; "Card Application ID"; Text[30])
         {
             Caption = 'Card Application ID';
+            DataClassification = CustomerContent;
         }
-        field(135;"Track Presence Input";Option)
+        field(135; "Track Presence Input"; Option)
         {
             Caption = 'Track Presence Input';
+            DataClassification = CustomerContent;
             OptionCaption = 'Read From EFT,Manually Entered,Track 2 Data,Barcode,Any Track,Manully Entered On Pinpad';
             OptionMembers = "From EFT","Manually Entered","Track 2 Data",Barcode,"Any Track","Manully Entered On Pinpad";
         }
-        field(136;"Card Information Input";Text[40])
+        field(136; "Card Information Input"; Text[40])
         {
             Caption = 'Card Information Input';
+            DataClassification = CustomerContent;
         }
-        field(140;"Card Expiry Date";Text[4])
+        field(140; "Card Expiry Date"; Text[4])
         {
             Caption = 'Card Expiry Date';
+            DataClassification = CustomerContent;
         }
-        field(150;"Reference Number Input";Text[50])
+        field(150; "Reference Number Input"; Text[50])
         {
             Caption = 'Reference Number Input';
+            DataClassification = CustomerContent;
         }
-        field(160;"Reference Number Output";Text[50])
+        field(160; "Reference Number Output"; Text[50])
         {
             Caption = 'Reference Number Output';
+            DataClassification = CustomerContent;
         }
-        field(165;"Acquirer ID";Text[50])
+        field(165; "Acquirer ID"; Text[50])
         {
             Caption = 'Acquirer ID';
+            DataClassification = CustomerContent;
         }
-        field(166;"Reconciliation ID";Text[50])
+        field(166; "Reconciliation ID"; Text[50])
         {
             Caption = 'Reconciliation ID';
+            DataClassification = CustomerContent;
         }
-        field(170;"Authorisation Number";Text[50])
+        field(170; "Authorisation Number"; Text[50])
         {
             Caption = 'Authorisation Number';
+            DataClassification = CustomerContent;
         }
-        field(180;"Hardware ID";Text[200])
+        field(180; "Hardware ID"; Text[200])
         {
             Caption = 'Hardware ID';
+            DataClassification = CustomerContent;
         }
-        field(190;"Transaction Date";Date)
+        field(190; "Transaction Date"; Date)
         {
             Caption = 'Transaction Date';
+            DataClassification = CustomerContent;
         }
-        field(200;"Transaction Time";Time)
+        field(200; "Transaction Time"; Time)
         {
             Caption = 'Transaction Time';
+            DataClassification = CustomerContent;
         }
-        field(205;"Payment Instrument Type";Text[30])
+        field(205; "Payment Instrument Type"; Text[30])
         {
             Caption = 'Payment Instrument Type';
+            DataClassification = CustomerContent;
         }
-        field(210;"Authentication Method";Option)
+        field(210; "Authentication Method"; Option)
         {
             Caption = 'Authentication Method';
+            DataClassification = CustomerContent;
             OptionCaption = 'None,Signature,PIN,Loyalty,Consumer Device';
             OptionMembers = "None",Signature,PIN,Loyalty,ConsumerDevice;
         }
-        field(215;"Signature Type";Option)
+        field(215; "Signature Type"; Option)
         {
             Caption = 'Signature Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,On Receipt,On Terminal,On POS';
             OptionMembers = " ","On Receipt","On Terminal","On POS";
         }
-        field(220;"Financial Impact";Boolean)
+        field(220; "Financial Impact"; Boolean)
         {
             Caption = 'Financial Impact';
+            DataClassification = CustomerContent;
         }
-        field(230;Mode;Option)
+        field(230; Mode; Option)
         {
             Caption = 'Mode';
+            DataClassification = CustomerContent;
             OptionCaption = 'Production,TEST Local,TEST Remote';
             OptionMembers = Production,"TEST Local","TEST Remote";
         }
-        field(240;Successful;Boolean)
+        field(240; Successful; Boolean)
         {
             Caption = 'Successful';
+            DataClassification = CustomerContent;
         }
-        field(250;"Result Description";Text[50])
+        field(250; "Result Description"; Text[50])
         {
             Caption = 'Result Description';
+            DataClassification = CustomerContent;
         }
-        field(260;"Bookkeeping Period";Text[4])
+        field(260; "Bookkeeping Period"; Text[4])
         {
             Caption = 'Bookkeeping Period';
+            DataClassification = CustomerContent;
         }
-        field(270;"Result Display Text";Text[100])
+        field(270; "Result Display Text"; Text[100])
         {
             Caption = 'Result Display Text';
+            DataClassification = CustomerContent;
         }
-        field(300;"Amount Input";Decimal)
+        field(300; "Amount Input"; Decimal)
         {
             Caption = 'Amount Input';
+            DataClassification = CustomerContent;
         }
-        field(310;"Amount Output";Decimal)
+        field(310; "Amount Output"; Decimal)
         {
             Caption = 'Amount Output';
+            DataClassification = CustomerContent;
         }
-        field(315;"Result Amount";Decimal)
+        field(315; "Result Amount"; Decimal)
         {
             Caption = 'Result Amount';
+            DataClassification = CustomerContent;
         }
-        field(320;"Currency Code";Code[10])
+        field(320; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
+            DataClassification = CustomerContent;
         }
-        field(330;"Cashback Amount";Decimal)
+        field(330; "Cashback Amount"; Decimal)
         {
             Caption = 'Cashback Amount';
+            DataClassification = CustomerContent;
         }
-        field(340;"Fee Amount";Decimal)
+        field(340; "Fee Amount"; Decimal)
         {
             Caption = 'Fee Amount';
+            DataClassification = CustomerContent;
         }
-        field(341;"Fee Line ID";Guid)
+        field(341; "Fee Line ID"; Guid)
         {
             Caption = 'Fee Line ID';
+            DataClassification = CustomerContent;
         }
-        field(345;"Tip Amount";Decimal)
+        field(345; "Tip Amount"; Decimal)
         {
             Caption = 'Tip Amount';
+            DataClassification = CustomerContent;
         }
-        field(346;"Tip Line ID";Guid)
+        field(346; "Tip Line ID"; Guid)
         {
             Caption = 'Tip Line ID';
+            DataClassification = CustomerContent;
         }
-        field(350;"Offline mode";Boolean)
+        field(350; "Offline mode"; Boolean)
         {
             Caption = 'Offline mode';
+            DataClassification = CustomerContent;
         }
-        field(360;"Client Assembly Version";Text[50])
+        field(360; "Client Assembly Version"; Text[50])
         {
             Caption = 'Client Assembly Version';
+            DataClassification = CustomerContent;
         }
-        field(370;"No. of Reprints";Integer)
+        field(370; "No. of Reprints"; Integer)
         {
             Caption = 'No. of Reprints';
+            DataClassification = CustomerContent;
         }
-        field(400;"Receipt 1";BLOB)
+        field(400; "Receipt 1"; BLOB)
         {
             Caption = 'Receipt 1';
+            DataClassification = CustomerContent;
         }
-        field(410;"Receipt 2";BLOB)
+        field(410; "Receipt 2"; BLOB)
         {
             Caption = 'Receipt 2';
+            DataClassification = CustomerContent;
         }
-        field(420;Logs;BLOB)
+        field(420; Logs; BLOB)
         {
             Caption = 'Logs';
+            DataClassification = CustomerContent;
         }
-        field(450;"Processing Type";Option)
+        field(450; "Processing Type"; Option)
         {
             Caption = 'Processing Type';
+            DataClassification = CustomerContent;
             OptionCaption = ',Payment,Refund,Open,Close,Auxiliary,Other,Void,Lookup,Setup,Gift Card Load';
             OptionMembers = ,PAYMENT,REFUND,OPEN,CLOSE,AUXILIARY,OTHER,VOID,LOOK_UP,SETUP,GIFTCARD_LOAD;
         }
-        field(460;"Processed Entry No.";Integer)
+        field(460; "Processed Entry No."; Integer)
         {
             Caption = 'Processed Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "EFT Transaction Request"."Entry No.";
         }
-        field(470;"NST Error";Text[250])
+        field(470; "NST Error"; Text[250])
         {
             Caption = 'NST Error';
+            DataClassification = CustomerContent;
         }
-        field(480;"Client Error";Text[250])
+        field(480; "Client Error"; Text[250])
         {
             Caption = 'Client Error';
+            DataClassification = CustomerContent;
         }
-        field(490;"Force Closed";Boolean)
+        field(490; "Force Closed"; Boolean)
         {
             Caption = 'Force Closed';
+            DataClassification = CustomerContent;
         }
-        field(500;Reversed;Boolean)
+        field(500; Reversed; Boolean)
         {
             Caption = 'Reversed';
+            DataClassification = CustomerContent;
         }
-        field(510;"Reversed by Entry No.";Integer)
+        field(510; "Reversed by Entry No."; Integer)
         {
             Caption = 'Reversed by Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "EFT Transaction Request"."Entry No.";
         }
-        field(520;"Number of Attempts";Integer)
+        field(520; "Number of Attempts"; Integer)
         {
             Caption = 'Number of Attempts';
+            DataClassification = CustomerContent;
         }
-        field(530;"Initiated from Entry No.";Integer)
+        field(530; "Initiated from Entry No."; Integer)
         {
             Caption = 'Initiated from Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "EFT Transaction Request";
         }
-        field(540;"External Result Known";Boolean)
+        field(540; "External Result Known"; Boolean)
         {
             Caption = 'External Result Known';
+            DataClassification = CustomerContent;
         }
-        field(550;"Auto Voidable";Boolean)
+        field(550; "Auto Voidable"; Boolean)
         {
             Caption = 'Auto Voidable';
+            DataClassification = CustomerContent;
         }
-        field(555;"Manual Voidable";Boolean)
+        field(555; "Manual Voidable"; Boolean)
         {
             Caption = 'Manual Voidable';
+            DataClassification = CustomerContent;
         }
-        field(560;Recoverable;Boolean)
+        field(560; Recoverable; Boolean)
         {
             Caption = 'Recoverable';
+            DataClassification = CustomerContent;
         }
-        field(570;Recovered;Boolean)
+        field(570; Recovered; Boolean)
         {
             Caption = 'Recovered';
+            DataClassification = CustomerContent;
         }
-        field(580;"Recovered by Entry No.";Integer)
+        field(580; "Recovered by Entry No."; Integer)
         {
             Caption = 'Recovered by Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "EFT Transaction Request"."Entry No.";
         }
-        field(590;"Auxiliary Operation ID";Integer)
+        field(590; "Auxiliary Operation ID"; Integer)
         {
             Caption = 'Auxiliary Operation ID';
+            DataClassification = CustomerContent;
         }
-        field(595;"Auxiliary Operation Desc.";Text[50])
+        field(595; "Auxiliary Operation Desc."; Text[50])
         {
             Caption = 'Auxiliary Operation Desc.';
+            DataClassification = CustomerContent;
         }
-        field(625;"External Transaction ID";Text[50])
+        field(625; "External Transaction ID"; Text[50])
         {
             Caption = 'External Transaction ID';
+            DataClassification = CustomerContent;
         }
-        field(630;"External Customer ID";Text[50])
+        field(630; "External Customer ID"; Text[50])
         {
             Caption = 'External Customer ID';
+            DataClassification = CustomerContent;
         }
-        field(635;"External Payment Token";Text[50])
+        field(635; "External Payment Token"; Text[50])
         {
             Caption = 'External Payment Token';
+            DataClassification = CustomerContent;
         }
-        field(650;"Additional Info";BLOB)
+        field(650; "Additional Info"; BLOB)
         {
             Caption = 'Additional Info';
+            DataClassification = CustomerContent;
         }
-        field(660;"DCC Used";Boolean)
+        field(660; "DCC Used"; Boolean)
         {
             Caption = 'DCC Used';
+            DataClassification = CustomerContent;
         }
-        field(670;"DCC Currency Code";Code[10])
+        field(670; "DCC Currency Code"; Code[10])
         {
             Caption = 'DCC Currency Code';
+            DataClassification = CustomerContent;
         }
-        field(675;"DCC Amount";Decimal)
+        field(675; "DCC Amount"; Decimal)
         {
             Caption = 'DCC Amount';
+            DataClassification = CustomerContent;
         }
-        field(680;"Self Service";Boolean)
+        field(680; "Self Service"; Boolean)
         {
             Caption = 'Self Service';
+            DataClassification = CustomerContent;
         }
-        field(690;"Stored Value Account Type";Text[50])
+        field(690; "Stored Value Account Type"; Text[50])
         {
             Caption = 'Stored Value Account Type';
+            DataClassification = CustomerContent;
         }
-        field(700;"Stored Value Provider";Text[50])
+        field(700; "Stored Value Provider"; Text[50])
         {
             Caption = 'Stored Value Provider';
+            DataClassification = CustomerContent;
         }
-        field(710;"Stored Value ID";Text[50])
+        field(710; "Stored Value ID"; Text[50])
         {
             Caption = 'Stored Value ID';
+            DataClassification = CustomerContent;
         }
-        field(720;"Internal Customer ID";Text[50])
+        field(720; "Internal Customer ID"; Text[50])
         {
             Caption = 'Internal Customer ID';
+            DataClassification = CustomerContent;
         }
-        field(730;"Result Processed";Boolean)
+        field(730; "Result Processed"; Boolean)
         {
             Caption = 'Result Processed';
+            DataClassification = CustomerContent;
         }
-        field(740;"Access Token";BLOB)
+        field(740; "Access Token"; BLOB)
         {
             Caption = 'Access Token';
+            DataClassification = CustomerContent;
         }
-        field(10000;"FF Moved to POS Entry";Boolean)
+        field(10000; "FF Moved to POS Entry"; Boolean)
         {
-            CalcFormula = Exist("POS Entry" WHERE ("Document No."=FIELD("Sales Ticket No.")));
+            CalcFormula = Exist ("POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));
             Caption = 'Moved to POS Entry';
             FieldClass = FlowField;
         }
@@ -425,22 +516,22 @@ table 6184495 "EFT Transaction Request"
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Sales Ticket No.")
+        key(Key2; "Sales Ticket No.")
         {
         }
-        key(Key3;"Reference Number Output")
+        key(Key3; "Reference Number Output")
         {
         }
-        key(Key4;"Initiated from Entry No.")
+        key(Key4; "Initiated from Entry No.")
         {
         }
-        key(Key5;"Register No.","Integration Type","Processing Type")
+        key(Key5; "Register No.", "Integration Type", "Processing Type")
         {
         }
-        key(Key6;"Hardware ID")
+        key(Key6; "Hardware ID")
         {
         }
     }
@@ -452,7 +543,7 @@ table 6184495 "EFT Transaction Request"
     trigger OnInsert()
     begin
         if IsNullGuid(Token) then
-          Token := CreateGuid;
+            Token := CreateGuid;
     end;
 
     var
@@ -484,32 +575,32 @@ table 6184495 "EFT Transaction Request"
         // CreditCardTransaction.PrintTerminalReceipt(FALSE);
 
         if "Entry No." = 0 then
-          exit;
+            exit;
 
         if IsReprint then begin
-          "No. of Reprints" += 1;
-          Modify;
+            "No. of Reprints" += 1;
+            Modify;
         end;
 
         EFTInterface.OnPrintReceipt(Rec, Handled);
         if Handled then
-          exit;
+            exit;
 
-        CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.","Receipt No.");
-        CreditCardTransaction.SetFilter ("EFT Trans. Request Entry No.", '=%1', "Entry No.");
+        CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
+        CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', "Entry No.");
         if not CreditCardTransaction.FindSet then
-          exit;
+            exit;
 
         First := true;
         repeat
-          if (ReceiptNo <> CreditCardTransaction."Receipt No.") or (EntryNo <> CreditCardTransaction."EFT Trans. Request Entry No.") or (First) then begin
-            CreditCardTransaction2.SetRange("EFT Trans. Request Entry No.", CreditCardTransaction."EFT Trans. Request Entry No.");
-            CreditCardTransaction2.SetRange("Receipt No.", CreditCardTransaction."Receipt No.");
-            CreditCardTransaction2.PrintTerminalReceipt();
-          end;
-          ReceiptNo := CreditCardTransaction."Receipt No.";
-          EntryNo := CreditCardTransaction."EFT Trans. Request Entry No.";
-          First := false;
+            if (ReceiptNo <> CreditCardTransaction."Receipt No.") or (EntryNo <> CreditCardTransaction."EFT Trans. Request Entry No.") or (First) then begin
+                CreditCardTransaction2.SetRange("EFT Trans. Request Entry No.", CreditCardTransaction."EFT Trans. Request Entry No.");
+                CreditCardTransaction2.SetRange("Receipt No.", CreditCardTransaction."Receipt No.");
+                CreditCardTransaction2.PrintTerminalReceipt();
+            end;
+            ReceiptNo := CreditCardTransaction."Receipt No.";
+            EntryNo := CreditCardTransaction."EFT Trans. Request Entry No.";
+            First := false;
         until CreditCardTransaction.Next = 0;
         //+NPR5.46 [290734]
     end;

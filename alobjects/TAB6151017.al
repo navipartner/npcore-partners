@@ -5,28 +5,32 @@ table 6151017 "NpRv Sales Line Reference"
     // NPR5.55/MHA /20200512  CASE 402015 Changed Primary key, Restructured fields and updated Object Name
 
     Caption = 'Retail Voucher Sales Line Reference';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NpRv Sales Line References";
     LookupPageID = "NpRv Sales Line References";
 
     fields
     {
-        field(1;Id;Guid)
+        field(1; Id; Guid)
         {
             Description = 'NPR5.55';
         }
-        field(10;"Sales Line Id";Guid)
+        field(10; "Sales Line Id"; Guid)
         {
             Caption = 'Sales Line Id';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
-        field(20;"Voucher No.";Code[20])
+        field(20; "Voucher No."; Code[20])
         {
             Caption = 'Voucher No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
-        field(30;"Reference No.";Text[30])
+        field(30; "Reference No."; Text[30])
         {
             Caption = 'Reference No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
 
             trigger OnValidate()
@@ -38,10 +42,10 @@ table 6151017 "NpRv Sales Line Reference"
 
     keys
     {
-        key(Key1;Id)
+        key(Key1; Id)
         {
         }
-        key(Key2;"Sales Line Id","Voucher No.","Reference No.")
+        key(Key2; "Sales Line Id", "Voucher No.", "Reference No.")
         {
         }
     }
@@ -53,7 +57,7 @@ table 6151017 "NpRv Sales Line Reference"
     trigger OnInsert()
     begin
         if IsNullGuid(Id) then
-          Id := CreateGuid;
+            Id := CreateGuid;
     end;
 
     var
@@ -64,11 +68,11 @@ table 6151017 "NpRv Sales Line Reference"
         Voucher: Record "NpRv Voucher";
     begin
         if "Reference No." = '' then
-          exit;
+            exit;
 
-        Voucher.SetRange("Reference No.","Reference No.");
+        Voucher.SetRange("Reference No.", "Reference No.");
         if Voucher.FindFirst then
-          Error(Text000,"Reference No.");
+            Error(Text000, "Reference No.");
     end;
 }
 

@@ -5,41 +5,48 @@ table 6151383 "CS Item Seach Handling"
     // NPR5.48/JDH /20181109 CASE 334163 Added Captions to above listed fields
 
     Caption = 'CS Item Seach Handling';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"No.";Code[20])
+        field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[50])
+        field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(11;"Description 2";Text[50])
+        field(11; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            DataClassification = CustomerContent;
         }
-        field(12;Rank;Integer)
+        field(12; Rank; Integer)
         {
             Caption = 'Rank';
+            DataClassification = CustomerContent;
         }
-        field(13;"Item Variant";Boolean)
+        field(13; "Item Variant"; Boolean)
         {
             Caption = 'Item Variant';
+            DataClassification = CustomerContent;
         }
-        field(14;Barcode;Text[30])
+        field(14; Barcode; Text[30])
         {
             Caption = 'Barcode';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"No.")
+        key(Key1; "No.")
         {
         }
-        key(Key2;Rank,"No.")
+        key(Key2; Rank, "No.")
         {
         }
     }

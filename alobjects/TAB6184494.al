@@ -6,6 +6,7 @@ table 6184494 "Pepper Version"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -fields 100..245
 
     Caption = 'Pepper Version';
+    DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
     DrillDownPageID = "Pepper Version List";
     LookupPageID = "Pepper Version List";
@@ -15,14 +16,17 @@ table 6184494 "Pepper Version"
         field(10; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(20; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(100; "XMLport Configuration"; Integer)
         {
             Caption = 'XMLport Configuration';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
         }
         field(105; "XMLport Configuration Name"; Text[30])
@@ -36,6 +40,7 @@ table 6184494 "Pepper Version"
         field(200; "Codeunit Begin Workshift"; Integer)
         {
             Caption = 'Codeunit Begin Workshift';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(205; "Codeunit Begin Workshift Name"; Text[30])
@@ -49,6 +54,7 @@ table 6184494 "Pepper Version"
         field(210; "Codeunit Transaction"; Integer)
         {
             Caption = 'Codeunit Transaction';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(215; "Codeunit Transaction Name"; Text[30])
@@ -62,6 +68,7 @@ table 6184494 "Pepper Version"
         field(220; "Codeunit End Workshift"; Integer)
         {
             Caption = 'Codeunit End Workshift';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(225; "Codeunit End Workshift Name"; Text[30])
@@ -75,6 +82,7 @@ table 6184494 "Pepper Version"
         field(230; "Codeunit Auxiliary Functions"; Integer)
         {
             Caption = 'Codeunit Auxiliary Functions';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(235; "Codeunit Auxiliary Name"; Text[30])
@@ -88,6 +96,7 @@ table 6184494 "Pepper Version"
         field(240; "Codeunit Install"; Integer)
         {
             Caption = 'Codeunit Install';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(245; "Codeunit Install Name"; Text[30])
@@ -101,15 +110,18 @@ table 6184494 "Pepper Version"
         field(300; "Install Directory"; Text[250])
         {
             Caption = 'Install Directory';
+            DataClassification = CustomerContent;
         }
         field(310; "Install Zip File"; BLOB)
         {
             Caption = 'Install Zip File';
+            DataClassification = CustomerContent;
             Compressed = false;
         }
         field(320; "Pepper DLL Version"; Text[50])
         {
             Caption = 'Pepper DLL Version';
+            DataClassification = CustomerContent;
         }
     }
 

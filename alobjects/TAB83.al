@@ -1,4 +1,4 @@
-tableextension 6014452 tableextension6014452 extends "Item Journal Line" 
+tableextension 6014452 tableextension6014452 extends "Item Journal Line"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added fields 6014401..6014604
@@ -9,51 +9,60 @@ tableextension 6014452 tableextension6014452 extends "Item Journal Line"
     // NPR5.36/JDH/20150304 CASE 201022 Added Variety Fields for grouping
     fields
     {
-        field(6014401;"Group Sale";Boolean)
+        field(6014401; "Group Sale"; Boolean)
         {
             Caption = 'Group Sale';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014404;"Discount Type";Option)
+        field(6014404; "Discount Type"; Option)
         {
             Caption = 'Discount Type';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             OptionCaption = ' ,Period,Mixed,Multiple Unit,Salesperson Discount,Inventory,Photo Work,Rounding,Combination,Customer';
             OptionMembers = " ",Period,Mixed,"Multiple Unit","Salesperson Discount",Inventory,"Photo Work",Rounding,Combination,Customer;
         }
-        field(6014405;"Discount Code";Code[20])
+        field(6014405; "Discount Code"; Code[20])
         {
             Caption = 'Discount Code';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014407;"Vendor No.";Code[20])
+        field(6014407; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014408;"Item Group No.";Code[10])
+        field(6014408; "Item Group No."; Code[10])
         {
             Caption = 'Item Group No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014413;"Register Number";Code[20])
+        field(6014413; "Register Number"; Code[20])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014414;"Document Time";Time)
+        field(6014414; "Document Time"; Time)
         {
             Caption = 'Document Time';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6059970;"Is Master";Boolean)
+        field(6059970; "Is Master"; Boolean)
         {
             Caption = 'Is Master';
+            DataClassification = CustomerContent;
             Description = 'VRT';
         }
-        field(6059971;"Master Line No.";Integer)
+        field(6059971; "Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
+            DataClassification = CustomerContent;
             Description = 'VRT';
         }
     }

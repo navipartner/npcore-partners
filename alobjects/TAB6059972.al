@@ -7,20 +7,23 @@ table 6059972 "Variety Table"
     // NPR5.47/JDH /20180913 CASE 327541  Changed field length of Code to 40 characters
 
     Caption = 'Variety Table';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Variety Table";
     LookupPageID = "Variety Table";
 
     fields
     {
-        field(1;Type;Code[10])
+        field(1; Type; Code[10])
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Variety;
         }
-        field(2;"Code";Code[40])
+        field(2; "Code"; Code[40])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
 
             trigger OnValidate()
@@ -30,39 +33,46 @@ table 6059972 "Variety Table"
                 //+NPR5.47 [327541]
             end;
         }
-        field(10;Description;Text[50])
+        field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;"Use in Variant Description";Boolean)
+        field(20; "Use in Variant Description"; Boolean)
         {
             Caption = 'Use in Variant Description';
+            DataClassification = CustomerContent;
         }
-        field(21;"Pre tag In Variant Description";Text[10])
+        field(21; "Pre tag In Variant Description"; Text[10])
         {
             Caption = 'Pre tag In Variant Description';
+            DataClassification = CustomerContent;
         }
-        field(22;"Use Description field";Boolean)
+        field(22; "Use Description field"; Boolean)
         {
             Caption = 'Use Description field';
+            DataClassification = CustomerContent;
         }
-        field(30;"Is Copy";Boolean)
+        field(30; "Is Copy"; Boolean)
         {
             Caption = 'Is Copy';
+            DataClassification = CustomerContent;
         }
-        field(31;"Copy from";Code[20])
+        field(31; "Copy from"; Code[20])
         {
             Caption = 'Copy from';
+            DataClassification = CustomerContent;
         }
-        field(40;"Lock Table";Boolean)
+        field(40; "Lock Table"; Boolean)
         {
             Caption = 'Lock Table';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Type,"Code")
+        key(Key1; Type, "Code")
         {
         }
     }
@@ -114,7 +124,7 @@ table 6059972 "Variety Table"
     begin
         //-NPR5.47 [327541]
         if (StrLen(Code) > 20) and (not "Is Copy") then
-          Error(Text001, FieldCaption(Code));
+            Error(Text001, FieldCaption(Code));
         //+NPR5.47 [327541]
     end;
 }

@@ -18,129 +18,154 @@ table 6060120 "TM Admission"
     // TM1.45/TSA /20191203 CASE 380754 Added Waiting List Setup Code
 
     Caption = 'Admission';
+    DataClassification = CustomerContent;
     LookupPageID = "TM Ticket Admissions";
 
     fields
     {
-        field(1;"Admission Code";Code[20])
+        field(1; "Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
+            DataClassification = CustomerContent;
         }
-        field(2;Type;Option)
+        field(2; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Location,Event';
             OptionMembers = LOCATION,OCCASION;
         }
-        field(10;Description;Text[50])
+        field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(15;"Location Admission Code";Code[20])
+        field(15; "Location Admission Code"; Code[20])
         {
             Caption = 'Location Admission Code';
-            TableRelation = "TM Admission" WHERE (Type=CONST(LOCATION));
+            DataClassification = CustomerContent;
+            TableRelation = "TM Admission" WHERE(Type = CONST(LOCATION));
         }
-        field(20;"Capacity Limits By";Option)
+        field(20; "Capacity Limits By"; Option)
         {
             Caption = 'Capacity Limits By';
+            DataClassification = CustomerContent;
             OptionCaption = 'Admission,Schedule,Override';
             OptionMembers = ADMISSION,SCHEDULE,OVERRIDE;
         }
-        field(21;"Default Schedule";Option)
+        field(21; "Default Schedule"; Option)
         {
             Caption = 'Default Schedule';
+            DataClassification = CustomerContent;
             OptionCaption = 'Today,Next Available,Schedule Entry Required,None';
             OptionMembers = TODAY,NEXT_AVAILABLE,SCHEDULE_ENTRY,"NONE";
         }
-        field(40;"Prebook Is Required";Boolean)
+        field(40; "Prebook Is Required"; Boolean)
         {
             Caption = 'Prebook Is Required';
+            DataClassification = CustomerContent;
         }
-        field(41;"Max Capacity Per Sch. Entry";Integer)
+        field(41; "Max Capacity Per Sch. Entry"; Integer)
         {
             Caption = 'Max Capacity Per Sch. Entry';
+            DataClassification = CustomerContent;
         }
-        field(42;"Reserved For Web";Integer)
+        field(42; "Reserved For Web"; Integer)
         {
             Caption = 'Reserved For Web';
+            DataClassification = CustomerContent;
         }
-        field(43;"Reserved For Members";Integer)
+        field(43; "Reserved For Members"; Integer)
         {
             Caption = 'Reserved For Members';
+            DataClassification = CustomerContent;
         }
-        field(44;"Capacity Control";Option)
+        field(44; "Capacity Control"; Option)
         {
             Caption = 'Capacity Control';
+            DataClassification = CustomerContent;
             OptionCaption = 'None,Sales,Admitted,Admitted & Departed,Seating';
             OptionMembers = "NONE",SALES,ADMITTED,FULL,SEATING;
         }
-        field(45;"Prebook From";DateFormula)
+        field(45; "Prebook From"; DateFormula)
         {
             Caption = 'Prebook From';
+            DataClassification = CustomerContent;
         }
-        field(47;"Unbookable Before Start (Secs)";Integer)
+        field(47; "Unbookable Before Start (Secs)"; Integer)
         {
             Caption = 'Unbookable Before Start (Secs)';
+            DataClassification = CustomerContent;
         }
-        field(48;"Bookable Passed Start (Secs)";Integer)
+        field(48; "Bookable Passed Start (Secs)"; Integer)
         {
             Caption = 'Bookable Passed Start (Secs)';
+            DataClassification = CustomerContent;
         }
-        field(50;"Dependent Admission Code";Code[20])
+        field(50; "Dependent Admission Code"; Code[20])
         {
             Caption = 'Dependent Admission Code';
+            DataClassification = CustomerContent;
             TableRelation = "TM Admission";
         }
-        field(51;"Dependency Type";Option)
+        field(51; "Dependency Type"; Option)
         {
             Caption = 'Dependency Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Within Timeframe,Exclude';
             OptionMembers = NA,TIMEFRAME,EXCLUDE;
         }
-        field(52;"Dependency Timeframe";DateFormula)
+        field(52; "Dependency Timeframe"; DateFormula)
         {
             Caption = 'Dependency Timeframe';
+            DataClassification = CustomerContent;
         }
-        field(60;"Ticketholder Notification Type";Option)
+        field(60; "Ticketholder Notification Type"; Option)
         {
             Caption = 'Ticketholder Notification Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Not Required,Optional,Required';
             OptionMembers = NOT_REQUIRED,OPTIONAL,REQUIRED;
         }
-        field(61;"POS Schedule Selection Date F.";DateFormula)
+        field(61; "POS Schedule Selection Date F."; DateFormula)
         {
             Caption = 'POS Admission Schedule Entry Selection Date Filter';
+            DataClassification = CustomerContent;
         }
-        field(70;"Stakeholder (E-Mail/Phone No.)";Text[40])
+        field(70; "Stakeholder (E-Mail/Phone No.)"; Text[40])
         {
             Caption = 'Stakeholder (E-Mail/Phone No.)';
+            DataClassification = CustomerContent;
         }
-        field(80;"Waiting List Setup Code";Code[20])
+        field(80; "Waiting List Setup Code"; Code[20])
         {
             Caption = 'Waiting List Setup Code';
+            DataClassification = CustomerContent;
             TableRelation = "TM Waiting List Setup";
         }
-        field(100;"Admission Base Calendar Code";Code[10])
+        field(100; "Admission Base Calendar Code"; Code[10])
         {
             Caption = 'Admission Base Calendar Code';
+            DataClassification = CustomerContent;
             TableRelation = "Base Calendar";
         }
-        field(110;"Ticket Base Calendar Code";Code[10])
+        field(110; "Ticket Base Calendar Code"; Code[10])
         {
             Caption = 'Ticket Base Calendar Code';
+            DataClassification = CustomerContent;
             TableRelation = "Base Calendar";
         }
-        field(210;"eTicket Type Code";Text[30])
+        field(210; "eTicket Type Code"; Text[30])
         {
             Caption = 'eTicket Type Code';
+            DataClassification = CustomerContent;
             Description = '//-TM1.38 [332109]';
         }
     }
 
     keys
     {
-        key(Key1;"Admission Code")
+        key(Key1; "Admission Code")
         {
         }
     }
@@ -156,23 +181,23 @@ table 6060120 "TM Admission"
         MMMembershipAdmissionSetup: Record "MM Membership Admission Setup";
     begin
         //-TM1.11
-        TMTicketAdmissionBOM.SetRange("Admission Code","Admission Code");
-        if (TMTicketAdmissionBOM.FindFirst ()) then
-          Error (ADMISSION_REF, "Admission Code", TMTicketAdmissionBOM.TableCaption, TMTicketAdmissionBOM."Item No.");
+        TMTicketAdmissionBOM.SetRange("Admission Code", "Admission Code");
+        if (TMTicketAdmissionBOM.FindFirst()) then
+            Error(ADMISSION_REF, "Admission Code", TMTicketAdmissionBOM.TableCaption, TMTicketAdmissionBOM."Item No.");
 
-        MMMembershipAdmissionSetup.SetRange("Admission Code","Admission Code");
-        if (MMMembershipAdmissionSetup.FindFirst ()) then
-          Error (ADMISSION_REF, "Admission Code", MMMembershipAdmissionSetup.TableCaption, MMMembershipAdmissionSetup."Membership  Code");
+        MMMembershipAdmissionSetup.SetRange("Admission Code", "Admission Code");
+        if (MMMembershipAdmissionSetup.FindFirst()) then
+            Error(ADMISSION_REF, "Admission Code", MMMembershipAdmissionSetup.TableCaption, MMMembershipAdmissionSetup."Membership  Code");
 
         TMAdmissionScheduleLines.Reset;
-        TMAdmissionScheduleLines.SetRange("Admission Code","Admission Code");
+        TMAdmissionScheduleLines.SetRange("Admission Code", "Admission Code");
         TMAdmissionScheduleLines.DeleteAll(true);
         //+TM1.11
     end;
 
     trigger OnModify()
     begin
-        UpdateScheduleLines ();
+        UpdateScheduleLines();
     end;
 
     var
@@ -182,12 +207,12 @@ table 6060120 "TM Admission"
     var
         AdmissionScheduleLines: Record "TM Admission Schedule Lines";
     begin
-        AdmissionScheduleLines.SetFilter ("Admission Code", '=%1', "Admission Code");
-        if (AdmissionScheduleLines.FindSet ()) then begin
-          repeat
-            AdmissionScheduleLines.SyncAdmissionSettings (Rec);
-            AdmissionScheduleLines.Modify ();
-          until (AdmissionScheduleLines.Next () = 0);
+        AdmissionScheduleLines.SetFilter("Admission Code", '=%1', "Admission Code");
+        if (AdmissionScheduleLines.FindSet()) then begin
+            repeat
+                AdmissionScheduleLines.SyncAdmissionSettings(Rec);
+                AdmissionScheduleLines.Modify();
+            until (AdmissionScheduleLines.Next() = 0);
         end;
     end;
 }

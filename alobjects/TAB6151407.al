@@ -6,32 +6,37 @@ table 6151407 "Magento Order Status"
     // MAG2.18/JDH /20181112 CASE 334163 Added Caption to Object (Again)
 
     Caption = 'Magento Order Status';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Order No.";Code[20])
+        field(1; "Order No."; Code[20])
         {
             Caption = 'Order No.';
+            DataClassification = CustomerContent;
         }
-        field(10;"External Order No.";Code[20])
+        field(10; "External Order No."; Code[20])
         {
             Caption = 'External Order No.';
+            DataClassification = CustomerContent;
         }
-        field(20;Status;Option)
+        field(20; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Processing,Complete,Cancelled';
             OptionMembers = Processing,Complete,Cancelled;
         }
-        field(30;"Last Modified Date";DateTime)
+        field(30; "Last Modified Date"; DateTime)
         {
             Caption = 'Last Modified Date';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Order No.")
+        key(Key1; "Order No.")
         {
         }
     }

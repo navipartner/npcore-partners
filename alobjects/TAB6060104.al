@@ -3,55 +3,65 @@ table 6060104 "Global Sale POS"
     // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
 
     Caption = 'Global Sale POS';
+    DataClassification = CustomerContent;
     DataPerCompany = false;
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(2;"Company Name";Text[50])
+        field(2; "Company Name"; Text[50])
         {
             Caption = 'Company Name';
+            DataClassification = CustomerContent;
         }
-        field(3;"Register No.";Code[20])
+        field(3; "Register No."; Code[20])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
         }
-        field(4;"Sales Ticket No.";Code[20])
+        field(4; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
+            DataClassification = CustomerContent;
         }
-        field(5;"Returning Company Name";Text[50])
+        field(5; "Returning Company Name"; Text[50])
         {
             Caption = 'Returning Company Name';
+            DataClassification = CustomerContent;
         }
-        field(6;"Audit Roll Line No.";Integer)
+        field(6; "Audit Roll Line No."; Integer)
         {
             Caption = 'Audit Roll Line No.';
+            DataClassification = CustomerContent;
         }
-        field(7;"Sales Item No.";Code[20])
+        field(7; "Sales Item No."; Code[20])
         {
             Caption = 'Sales Item No.';
+            DataClassification = CustomerContent;
         }
-        field(8;"Sales Line No.";Integer)
+        field(8; "Sales Line No."; Integer)
         {
             Caption = 'Sales Line No.';
+            DataClassification = CustomerContent;
         }
-        field(9;"Sales Quantity";Decimal)
+        field(9; "Sales Quantity"; Decimal)
         {
             Caption = 'Sales Quantity';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Register No.","Sales Ticket No.","Company Name")
+        key(Key2; "Register No.", "Sales Ticket No.", "Company Name")
         {
         }
     }

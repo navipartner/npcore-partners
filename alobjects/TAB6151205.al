@@ -4,46 +4,54 @@ table 6151205 "NpCs Store Inventory Buffer"
     // NPR5.52/MHA /20191002  CASE 369476 Added DecimalPlaces 0:5 to field 10 Quantity
 
     Caption = 'Collect Store Inventory Buffer';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Store Code";Code[20])
+        field(1; "Store Code"; Code[20])
         {
             Caption = 'Store Code';
+            DataClassification = CustomerContent;
             TableRelation = "NpCs Store";
         }
-        field(5;Sku;Text[50])
+        field(5; Sku; Text[50])
         {
             Caption = 'Sku';
+            DataClassification = CustomerContent;
         }
-        field(10;Quantity;Decimal)
+        field(10; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             Description = 'NPR5.52';
         }
-        field(15;Description;Text[50])
+        field(15; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;"Description 2";Text[50])
+        field(20; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            DataClassification = CustomerContent;
         }
-        field(100;Inventory;Decimal)
+        field(100; Inventory; Decimal)
         {
             Caption = 'Inventory';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
         }
-        field(105;"In Stock";Boolean)
+        field(105; "In Stock"; Boolean)
         {
             Caption = 'In Stock';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Store Code",Sku)
+        key(Key1; "Store Code", Sku)
         {
         }
     }

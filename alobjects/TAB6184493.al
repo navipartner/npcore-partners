@@ -4,53 +4,60 @@ table 6184493 "Pepper Terminal Type"
     // NPR5.25/BR/20160509  CASE 231481 Added field Force Fixed Currency Check.
 
     Caption = 'Pepper Terminal Type';
-    DataCaptionFields = ID,Description;
+    DataClassification = CustomerContent;
+    DataCaptionFields = ID, Description;
     DrillDownPageID = "Pepper Terminal Types";
     LookupPageID = "Pepper Terminal Types";
 
     fields
     {
-        field(10;ID;Integer)
+        field(10; ID; Integer)
         {
             Caption = 'ID';
+            DataClassification = CustomerContent;
         }
-        field(20;Description;Text[100])
+        field(20; Description; Text[100])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(30;Active;Boolean)
+        field(30; Active; Boolean)
         {
             Caption = 'Active';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 if Active then
-                  TestField(Deprecated,false);
+                    TestField(Deprecated, false);
             end;
         }
-        field(40;Deprecated;Boolean)
+        field(40; Deprecated; Boolean)
         {
             Caption = 'Deprecated';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 if Deprecated then
-                  TestField(Active,false);
+                    TestField(Active, false);
             end;
         }
-        field(200;Overtender;Boolean)
+        field(200; Overtender; Boolean)
         {
             Caption = 'Overtender';
+            DataClassification = CustomerContent;
         }
-        field(250;"Force Fixed Currency Check";Boolean)
+        field(250; "Force Fixed Currency Check"; Boolean)
         {
             Caption = 'Force Fixed Currency Check';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;ID)
+        key(Key1; ID)
         {
         }
     }

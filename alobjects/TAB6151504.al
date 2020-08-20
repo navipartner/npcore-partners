@@ -18,32 +18,38 @@ table 6151504 "Nc Import Entry"
     // NPR5.55/MHA /20200604  CASE 408100 Added fields 60 "Import Count", 70 "Import Started by", 80 "Server Instance Id", 90 "Session Id"
 
     Caption = 'Nc Import Entry';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Entry No.";BigInteger)
+        field(1; "Entry No."; BigInteger)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(3;"Import Type";Code[20])
+        field(3; "Import Type"; Code[20])
         {
             Caption = 'Import Type';
+            DataClassification = CustomerContent;
             Description = 'NC1.21,NC2.12';
             TableRelation = "Nc Import Type";
         }
-        field(5;Date;DateTime)
+        field(5; Date; DateTime)
         {
             Caption = 'Date';
+            DataClassification = CustomerContent;
         }
-        field(7;"Document Name";Text[100])
+        field(7; "Document Name"; Text[100])
         {
             Caption = 'Document Name';
+            DataClassification = CustomerContent;
             Description = 'NC1.22';
         }
-        field(8;"Document Source";BLOB)
+        field(8; "Document Source"; BLOB)
         {
             Caption = 'Document Source';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -52,22 +58,25 @@ table 6151504 "Nc Import Entry"
                 HyperLink(TemporaryPath + "Document Name");
             end;
         }
-        field(9;Imported;Boolean)
+        field(9; Imported; Boolean)
         {
             Caption = 'Imported';
+            DataClassification = CustomerContent;
         }
-        field(10;"Runtime Error";Boolean)
+        field(10; "Runtime Error"; Boolean)
         {
             Caption = 'Runtime Error';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 Clear("Last Error Message");
             end;
         }
-        field(11;"Last Error Message";BLOB)
+        field(11; "Last Error Message"; BLOB)
         {
             Caption = 'Last Error Message';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -78,86 +87,99 @@ table 6151504 "Nc Import Entry"
                 //+NC1.16
             end;
         }
-        field(12;"Error Message";Text[250])
+        field(12; "Error Message"; Text[250])
         {
             Caption = 'Error Message';
+            DataClassification = CustomerContent;
         }
-        field(15;"Last Error E-mail Sent at";DateTime)
+        field(15; "Last Error E-mail Sent at"; DateTime)
         {
             Caption = 'Last Error E-mail Sent at';
+            DataClassification = CustomerContent;
             Description = 'NC2.02';
         }
-        field(17;"Last Error E-mail Sent to";Text[250])
+        field(17; "Last Error E-mail Sent to"; Text[250])
         {
             Caption = 'Last Error E-mail Sent to';
+            DataClassification = CustomerContent;
             Description = 'NC2.02';
         }
-        field(30;"Document ID";Text[100])
+        field(30; "Document ID"; Text[100])
         {
             Caption = 'Document ID';
+            DataClassification = CustomerContent;
             Description = 'NC1.22,NC2.12';
         }
-        field(35;"Sequence No.";Integer)
+        field(35; "Sequence No."; Integer)
         {
             Caption = 'Sequence No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.22,NC2.12';
         }
-        field(40;"Import Started at";DateTime)
+        field(40; "Import Started at"; DateTime)
         {
             Caption = 'Import Started at';
+            DataClassification = CustomerContent;
             Description = 'NC2.16';
             Editable = false;
         }
-        field(45;"Import Completed at";DateTime)
+        field(45; "Import Completed at"; DateTime)
         {
             Caption = 'Import Completed at';
+            DataClassification = CustomerContent;
             Description = 'NC2.16';
             Editable = false;
         }
-        field(50;"Import Duration";Decimal)
+        field(50; "Import Duration"; Decimal)
         {
             Caption = 'Import Duration (sec.)';
+            DataClassification = CustomerContent;
             Description = 'NC2.16';
             Editable = false;
         }
-        field(60;"Import Count";Integer)
+        field(60; "Import Count"; Integer)
         {
             BlankZero = true;
             Caption = 'Import Count';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
             MinValue = 0;
         }
-        field(70;"Import Started by";Code[50])
+        field(70; "Import Started by"; Code[50])
         {
             Caption = 'Import Started by';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
-        field(80;"Server Instance Id";Integer)
+        field(80; "Server Instance Id"; Integer)
         {
             Caption = 'Server Instance Id';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
-        field(90;"Session Id";Integer)
+        field(90; "Session Id"; Integer)
         {
             Caption = 'Session Id';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
-        field(100;"Earliest Import Datetime";DateTime)
+        field(100; "Earliest Import Datetime"; DateTime)
         {
             Caption = 'Earliest Import Datetime';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Document ID","Sequence No.")
+        key(Key2; "Document ID", "Sequence No.")
         {
         }
-        key(Key3;"Import Type",Date,Imported)
+        key(Key3; "Import Type", Date, Imported)
         {
         }
     }
@@ -169,7 +191,7 @@ table 6151504 "Nc Import Entry"
     trigger OnInsert()
     begin
         if Date = 0DT then
-          Date := CurrentDateTime;
+            Date := CurrentDateTime;
     end;
 
     var
@@ -182,11 +204,11 @@ table 6151504 "Nc Import Entry"
         //-NC1.16
         CalcFields("Document Source");
         if not "Document Source".HasValue then
-          exit(false);
+            exit(false);
 
         "Document Source".CreateInStream(InStr);
         if not IsNull(XmlDoc) then
-          Clear(XmlDoc);
+            Clear(XmlDoc);
         XmlDoc := XmlDoc.XmlDocument();
         XmlDoc.Load(InStr);
         NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
@@ -201,13 +223,13 @@ table 6151504 "Nc Import Entry"
     begin
         //-NPR5.55 [408100]
         if "Import Completed at" > "Import Started at" then
-          exit(false);
+            exit(false);
 
         if not GetActiveSession(ActiveSession) then
-          exit(false);
+            exit(false);
 
         if ActiveSession."User ID" <> "Import Started by" then
-          exit(false);
+            exit(false);
 
         exit(ActiveSession."Login Datetime" <= "Import Started at");
         //+NPR5.55 [408100]
@@ -219,11 +241,11 @@ table 6151504 "Nc Import Entry"
         Clear(ActiveSession);
 
         if "Server Instance Id" <= 0 then
-          exit(false);
+            exit(false);
         if "Session Id" <= 0 then
-          exit(false);
+            exit(false);
 
-        exit(ActiveSession.Get("Server Instance Id","Session Id"));
+        exit(ActiveSession.Get("Server Instance Id", "Session Id"));
         //+NPR5.55 [408100]
     end;
 }

@@ -10,6 +10,7 @@ table 6184490 "Pepper Configuration"
     // NPR5.31/BR/20170502  CASE 274457 Fixed tablerelations for Pepper Transaction Types
 
     Caption = 'Pepper Configuration';
+    DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
     DrillDownPageID = "Pepper Configuration List";
     LookupPageID = "Pepper Configuration List";
@@ -19,14 +20,17 @@ table 6184490 "Pepper Configuration"
         field(10; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(20; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(30; Version; Code[10])
         {
             Caption = 'Version';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper Version";
 
             trigger OnValidate()
@@ -37,6 +41,7 @@ table 6184490 "Pepper Configuration"
         field(100; "Recovery Retry Attempts"; Integer)
         {
             Caption = 'Recovery Retry Attempts';
+            DataClassification = CustomerContent;
             InitValue = 3;
             MaxValue = 99;
             MinValue = 1;
@@ -44,6 +49,7 @@ table 6184490 "Pepper Configuration"
         field(110; Mode; Option)
         {
             Caption = 'Mode';
+            DataClassification = CustomerContent;
             OptionCaption = 'Production,TEST Local,TEST Remote';
             OptionMembers = Production,"TEST Local","TEST Remote";
 
@@ -75,20 +81,24 @@ table 6184490 "Pepper Configuration"
         field(120; "Default POS Timeout (Seconds)"; Integer)
         {
             Caption = 'Default POS Timeout (Seconds)';
+            DataClassification = CustomerContent;
         }
         field(130; "Show Detailed Error Messages"; Boolean)
         {
             Caption = 'Show Detailed Error Messages';
+            DataClassification = CustomerContent;
         }
         field(200; "Logging Target"; Option)
         {
             Caption = 'Logging Target';
+            DataClassification = CustomerContent;
             OptionCaption = 'File,Syslog';
             OptionMembers = file,syslog;
         }
         field(210; "Logging Level"; Option)
         {
             Caption = 'Logging Level';
+            DataClassification = CustomerContent;
             InitValue = warning;
             OptionCaption = 'Nolog,Error,Warning,Info,Debug';
             OptionMembers = nolog,error,warning,info,debug;
@@ -96,6 +106,7 @@ table 6184490 "Pepper Configuration"
         field(220; "Logging Max. File Size (MB)"; Integer)
         {
             Caption = 'Logging Max. File Size (MB)';
+            DataClassification = CustomerContent;
             InitValue = 5;
             MaxValue = 100;
             MinValue = 1;
@@ -103,14 +114,17 @@ table 6184490 "Pepper Configuration"
         field(230; "Logging Directory"; Text[250])
         {
             Caption = 'Logging Directory';
+            DataClassification = CustomerContent;
         }
         field(240; "Logging Archive Directory"; Text[250])
         {
             Caption = 'Logging Archive Directory';
+            DataClassification = CustomerContent;
         }
         field(250; "Logging Archive Max. Age Days"; Integer)
         {
             Caption = 'Logging Archive Max. Age Days';
+            DataClassification = CustomerContent;
             InitValue = 30;
             MaxValue = 100;
             MinValue = 2;
@@ -118,109 +132,130 @@ table 6184490 "Pepper Configuration"
         field(300; "Card Type File Full Path"; Text[250])
         {
             Caption = 'Card Type File Full Path';
+            DataClassification = CustomerContent;
             InitValue = '\cardtypes.pep';
         }
         field(310; "Ticket Directory"; Text[250])
         {
             Caption = 'Ticket Directory';
+            DataClassification = CustomerContent;
         }
         field(320; "Journal Directory"; Text[250])
         {
             Caption = 'Journal Directory';
+            DataClassification = CustomerContent;
         }
         field(330; "Matchbox Directory"; Text[250])
         {
             Caption = 'Matchbox Directory';
+            DataClassification = CustomerContent;
         }
         field(340; "Messages Directory"; Text[250])
         {
             Caption = 'Messages Directory';
+            DataClassification = CustomerContent;
         }
         field(350; "Persistance Directory"; Text[250])
         {
             Caption = 'Persistance Directory';
+            DataClassification = CustomerContent;
         }
         field(360; "Working Directory"; Text[250])
         {
             Caption = 'Working Directory';
+            DataClassification = CustomerContent;
         }
         field(370; "License File Full Path"; Text[250])
         {
             Caption = 'License File Full Path';
+            DataClassification = CustomerContent;
             InitValue = '\pepper_license.xml';
         }
         field(400; "Header and Footer Handling"; Option)
         {
             Caption = 'Header and Footer Handling';
+            DataClassification = CustomerContent;
             OptionCaption = 'No Headers and Footers,Manual Headers and Footers,Send Headers and Footers to Terminal,Add Headers and Footers at Printing';
             OptionMembers = "No Headers and Footers","Manual Headers and Footers","Send Headers and Footers to Terminal","Add Headers and Footers at Printing";
         }
         field(500; "Transaction Type Open Code"; Code[10])
         {
             Caption = 'Transaction Type Open Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper EFT Transaction Type".Code WHERE("Integration Type" = FILTER('PEPPER'),
                                                                       "Processing Type" = CONST(Open));
         }
         field(510; "Transaction Type Payment Code"; Code[10])
         {
             Caption = 'Transaction Type Payment Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper EFT Transaction Type".Code WHERE("Processing Type" = CONST(Payment),
                                                                       "Integration Type" = FILTER('PEPPER'));
         }
         field(520; "Transaction Type Close Code"; Code[10])
         {
             Caption = 'Transaction Type Close Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper EFT Transaction Type".Code WHERE("Integration Type" = FILTER('PEPPER'),
                                                                       "Processing Type" = CONST(Close));
         }
         field(530; "Transaction Type Refund Code"; Code[10])
         {
             Caption = 'Transaction Type Refund Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper EFT Transaction Type".Code WHERE("Processing Type" = CONST(Refund),
                                                                       "Integration Type" = FILTER('PEPPER'));
         }
         field(540; "Transaction Type Recover Code"; Code[10])
         {
             Caption = 'Transaction Type Recover Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper EFT Transaction Type".Code WHERE("Processing Type" = CONST(Other),
                                                                       "Integration Type" = FILTER('PEPPER'));
         }
         field(550; "Transaction Type Auxilary Code"; Code[10])
         {
             Caption = 'Transaction Type Auxilary Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper EFT Transaction Type".Code WHERE("Processing Type" = CONST(Auxiliary),
                                                                       "Integration Type" = FILTER('PEPPER'));
         }
         field(560; "Transaction Type Install Code"; Code[10])
         {
             Caption = 'Transaction Type Install Code';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper EFT Transaction Type".Code WHERE("Integration Type" = FILTER('PEPPER'),
                                                                       "Processing Type" = CONST(Other));
         }
         field(600; "End of Day on Close"; Boolean)
         {
             Caption = 'End of Day on Close';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(601; "Unload Library on Close"; Boolean)
         {
             Caption = 'Unload Library on Close';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(610; "End of Day Receipt Mandatory"; Boolean)
         {
             Caption = 'End of Day Receipt Mandatory';
+            DataClassification = CustomerContent;
             InitValue = false;
         }
         field(650; "Offline mode"; Option)
         {
             Caption = 'Offline mode';
+            DataClassification = CustomerContent;
             OptionCaption = 'Disabled,Mandatory Authorisation No.,Optional Authorisation No.';
             OptionMembers = Disabled,"Mandatory Authorisation No.","Optional Authorisation No.";
         }
         field(660; "Min. Length Authorisation No."; Integer)
         {
             Caption = 'Min. Length Authorisation No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.34';
             InitValue = 6;
             MaxValue = 6;
@@ -236,6 +271,7 @@ table 6184490 "Pepper Configuration"
         field(667; "Max. Length Authorisation No."; Integer)
         {
             Caption = 'Max. Length Authorisation No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.34';
             InitValue = 16;
             MaxValue = 16;
@@ -251,19 +287,23 @@ table 6184490 "Pepper Configuration"
         field(700; "Customer ID"; Text[8])
         {
             Caption = 'Customer ID';
+            DataClassification = CustomerContent;
         }
         field(710; "License ID"; Text[8])
         {
             Caption = 'License ID';
+            DataClassification = CustomerContent;
         }
         field(900; "License File"; BLOB)
         {
             Caption = 'License File';
+            DataClassification = CustomerContent;
             SubType = UserDefined;
         }
         field(910; "Additional Parameters"; BLOB)
         {
             Caption = 'Additional Parameters';
+            DataClassification = CustomerContent;
         }
     }
 

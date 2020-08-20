@@ -4,44 +4,50 @@ table 6151506 "Nc Task Proces. Line"
     // NC2.00/MHA/20160525  CASE 240005 NaviConnect
 
     Caption = 'Nc Task Proces. Line';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Task Processor Code";Code[20])
+        field(1; "Task Processor Code"; Code[20])
         {
             Caption = 'Task Processor Code';
+            DataClassification = CustomerContent;
             TableRelation = "Nc Task Processor";
         }
-        field(5;"Line No.";Integer)
+        field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(10;Type;Option)
+        field(10; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Custom,Company';
             OptionMembers = Custom,Company;
 
             trigger OnValidate()
             begin
                 if (Type = Type::Company) and (Code = '') then
-                  Code := DataLogCode();
+                    Code := DataLogCode();
             end;
         }
-        field(15;"Code";Code[20])
+        field(15; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(20;Value;Text[50])
+        field(20; Value; Text[50])
         {
             Caption = 'Value';
-            TableRelation = IF (Type=CONST(Company)) Company.Name;
+            DataClassification = CustomerContent;
+            TableRelation = IF (Type = CONST(Company)) Company.Name;
         }
     }
 
     keys
     {
-        key(Key1;"Task Processor Code","Line No.")
+        key(Key1; "Task Processor Code", "Line No.")
         {
         }
     }

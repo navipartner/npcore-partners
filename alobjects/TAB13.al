@@ -1,4 +1,4 @@
-tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser" 
+tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                           Added fields 6014400..6014420
@@ -13,43 +13,45 @@ tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
         field(6014400; "Register Password"; Code[20])
         {
             Caption = 'Register Password';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014402; "Hide Register Imbalance"; Boolean)
         {
             Caption = 'Hide Register Imbalance';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014403; "Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE ("Item Ledger Entry Type" = CONST (Sale),
-                                                                           "Salespers./Purch. Code" = FIELD (Code),
-                                                                           "Posting Date" = FIELD ("Date Filter"),
-                                                                           "Item Group No." = FIELD ("Item Group Filter"),
-                                                                           "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter"),
-                                                                           "Item No." = FIELD ("Item Filter")));
+            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
+                                                                           "Salespers./Purch. Code" = FIELD(Code),
+                                                                           "Posting Date" = FIELD("Date Filter"),
+                                                                           "Item Group No." = FIELD("Item Group Filter"),
+                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                           "Item No." = FIELD("Item Filter")));
             Caption = 'Sales (LCY)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
         field(6014404; "Discount Amount"; Decimal)
         {
-            CalcFormula = - Sum ("Value Entry"."Discount Amount" WHERE ("Item Ledger Entry Type" = CONST (Sale),
-                                                                      "Salespers./Purch. Code" = FIELD (Code),
-                                                                      "Posting Date" = FIELD ("Date Filter"),
-                                                                      "Item Group No." = FIELD ("Item Group Filter"),
-                                                                      "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter")));
+            CalcFormula = - Sum ("Value Entry"."Discount Amount" WHERE("Item Ledger Entry Type" = CONST(Sale),
+                                                                      "Salespers./Purch. Code" = FIELD(Code),
+                                                                      "Posting Date" = FIELD("Date Filter"),
+                                                                      "Item Group No." = FIELD("Item Group Filter"),
+                                                                      "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter")));
             Caption = 'Discount Amount';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
         field(6014405; "COGS (LCY)"; Decimal)
         {
-            CalcFormula = - Sum ("Value Entry"."Cost Amount (Actual)" WHERE ("Item Ledger Entry Type" = CONST (Sale),
-                                                                           "Salespers./Purch. Code" = FIELD (Code),
-                                                                           "Posting Date" = FIELD ("Date Filter"),
-                                                                           "Item Group No." = FIELD ("Item Group Filter"),
-                                                                           "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter")));
+            CalcFormula = - Sum ("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
+                                                                           "Salespers./Purch. Code" = FIELD(Code),
+                                                                           "Posting Date" = FIELD("Date Filter"),
+                                                                           "Item Group No." = FIELD("Item Group Filter"),
+                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter")));
             Caption = 'COGS (LCY)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -62,12 +64,12 @@ tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
         }
         field(6014407; "Sales (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum ("Value Entry"."Valued Quantity" WHERE ("Item Ledger Entry Type" = CONST (Sale),
-                                                                      "Salespers./Purch. Code" = FIELD (Code),
-                                                                      "Posting Date" = FIELD ("Date Filter"),
-                                                                      "Item Group No." = FIELD ("Item Group Filter"),
-                                                                      "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter"),
-                                                                      "Item No." = FIELD ("Item Filter")));
+            CalcFormula = - Sum ("Value Entry"."Valued Quantity" WHERE("Item Ledger Entry Type" = CONST(Sale),
+                                                                      "Salespers./Purch. Code" = FIELD(Code),
+                                                                      "Posting Date" = FIELD("Date Filter"),
+                                                                      "Item Group No." = FIELD("Item Group Filter"),
+                                                                      "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                      "Item No." = FIELD("Item Filter")));
             Caption = 'Sales (Qty.)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -75,6 +77,7 @@ tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
         field(6014408; "Reverse Sales Ticket"; Option)
         {
             Caption = 'Reverse Sales Ticket';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             OptionCaption = 'Yes,No';
             OptionMembers = Yes,No;
@@ -91,16 +94,16 @@ tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
             Caption = 'Global Dimension 1 Filter';
             Description = 'NPR7.100.000';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No." = CONST (1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
         field(6014412; "Item Group Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE ("Item Ledger Entry Type" = CONST (Sale),
-                                                                           "Salespers./Purch. Code" = FIELD (Code),
-                                                                           "Posting Date" = FIELD ("Date Filter"),
-                                                                           "Item Group No." = FIELD ("Item Group Filter"),
-                                                                           "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter"),
-                                                                           "Group Sale" = CONST (true)));
+            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
+                                                                           "Salespers./Purch. Code" = FIELD(Code),
+                                                                           "Posting Date" = FIELD("Date Filter"),
+                                                                           "Item Group No." = FIELD("Item Group Filter"),
+                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                           "Group Sale" = CONST(true)));
             Caption = 'Item Group Sales (LCY)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -114,22 +117,26 @@ tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
         field(6014416; "Locked-to Register No."; Code[10])
         {
             Caption = 'Locked-to Register No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014420; "Maximum Cash Returnsale"; Decimal)
         {
             Caption = 'Maximum Cash Returnsale';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
         field(6014421; Picture; BLOB)
         {
             Caption = 'Picture';
+            DataClassification = CustomerContent;
             Description = 'NPR5.26';
             SubType = Bitmap;
         }
         field(6014422; "Supervisor POS"; Boolean)
         {
             Caption = 'Supervisor POS';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
     }

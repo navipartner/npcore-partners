@@ -5,25 +5,28 @@ table 6151433 "Magento Contact Pmt. Method"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object and field 1
 
     Caption = 'Magento Contact Payment Method';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Contact Pmt. Methods";
     LookupPageID = "Magento Contact Pmt. Methods";
 
     fields
     {
-        field(1;"Contact No.";Code[20])
+        field(1; "Contact No."; Code[20])
         {
             Caption = 'Contact No.';
+            DataClassification = CustomerContent;
             TableRelation = Contact;
         }
-        field(5;"External Payment Method Code";Text[50])
+        field(5; "External Payment Method Code"; Text[50])
         {
             Caption = 'External Payment Method Code';
-            TableRelation = "Magento Payment Mapping"."External Payment Method Code" WHERE ("External Payment Type"=FILTER(=''));
+            DataClassification = CustomerContent;
+            TableRelation = "Magento Payment Mapping"."External Payment Method Code" WHERE("External Payment Type" = FILTER(= ''));
         }
-        field(100;"Payment Method Code";Code[10])
+        field(100; "Payment Method Code"; Code[10])
         {
-            CalcFormula = Lookup("Magento Payment Mapping"."Payment Method Code" WHERE ("External Payment Method Code"=FIELD("External Payment Method Code"),
-                                                                                        "External Payment Type"=FILTER(='')));
+            CalcFormula = Lookup ("Magento Payment Mapping"."Payment Method Code" WHERE("External Payment Method Code" = FIELD("External Payment Method Code"),
+                                                                                        "External Payment Type" = FILTER(= '')));
             Caption = 'Payment Method Code';
             Editable = false;
             FieldClass = FlowField;
@@ -32,7 +35,7 @@ table 6151433 "Magento Contact Pmt. Method"
 
     keys
     {
-        key(Key1;"Contact No.","External Payment Method Code")
+        key(Key1; "Contact No.", "External Payment Method Code")
         {
         }
     }

@@ -5,6 +5,7 @@ table 6151170 "NpGp POS Sales Setup"
     // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
 
     Caption = 'Global POS Sales Setup';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NpGp Global POS Sales Setups";
     LookupPageID = "NpGp Global POS Sales Setups";
 
@@ -13,11 +14,13 @@ table 6151170 "NpGp POS Sales Setup"
         field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
         field(5; "Company Name"; Text[100])
         {
             Caption = 'Company Name';
+            DataClassification = CustomerContent;
             TableRelation = Company;
 
             trigger OnValidate()
@@ -39,18 +42,22 @@ table 6151170 "NpGp POS Sales Setup"
         field(10; "Service Url"; Text[250])
         {
             Caption = 'Service Url';
+            DataClassification = CustomerContent;
         }
         field(15; "Service Username"; Text[250])
         {
             Caption = 'Service Username';
+            DataClassification = CustomerContent;
         }
         field(20; "Service Password"; Guid)
         {
             Caption = 'Service Password';
+            DataClassification = CustomerContent;
         }
         field(25; "Sync POS Sales Immediately"; Boolean)
         {
             Caption = 'Sync POS Sales Immediately';
+            DataClassification = CustomerContent;
         }
     }
 

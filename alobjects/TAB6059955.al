@@ -5,38 +5,44 @@ table 6059955 "MCS API Setup"
     // NPR5.30/NPKNAV/20170310  CASE 252646 Transport NPR5.30 - 26 January 2017
 
     Caption = 'MCS API Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;API;Option)
+        field(1; API; Option)
         {
             Caption = 'API';
+            DataClassification = CustomerContent;
             OptionCaption = 'Face,Speech,Recommendation';
             OptionMembers = Face,Speech,Recommendation;
         }
-        field(11;"Key 1";Text[50])
+        field(11; "Key 1"; Text[50])
         {
             Caption = 'Key 1';
+            DataClassification = CustomerContent;
         }
-        field(12;"Key 2";Text[50])
+        field(12; "Key 2"; Text[50])
         {
             Caption = 'Key 2';
+            DataClassification = CustomerContent;
         }
-        field(13;"Image Orientation";Option)
+        field(13; "Image Orientation"; Option)
         {
             Caption = 'Image Orientation';
+            DataClassification = CustomerContent;
             OptionCaption = 'Landscape,Portrait';
             OptionMembers = Landscape,Portrait;
         }
-        field(14;"Use Cognitive Services";Boolean)
+        field(14; "Use Cognitive Services"; Boolean)
         {
             Caption = 'Use Cognitive Services';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;API)
+        key(Key1; API)
         {
         }
     }

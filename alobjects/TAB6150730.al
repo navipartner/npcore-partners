@@ -4,39 +4,43 @@ table 6150730 "POS Sales Workflow Step"
     // NPR5.45/MHA /20180820  CASE 321266 Moved field 1 to 3 "Workflow Code" and added Field 1 "Set Code" to Primary key
 
     Caption = 'POS Sales Workflow Step';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Sales Workflow Steps";
     LookupPageID = "POS Sales Workflow Steps";
 
     fields
     {
-        field(1;"Set Code";Code[20])
+        field(1; "Set Code"; Code[20])
         {
             Caption = 'Set Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.45';
             TableRelation = "POS Sales Workflow Set";
         }
-        field(3;"Workflow Code";Code[20])
+        field(3; "Workflow Code"; Code[20])
         {
             Caption = 'Workflow Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.45';
             NotBlank = true;
             TableRelation = "POS Sales Workflow";
         }
-        field(5;"Subscriber Codeunit ID";Integer)
+        field(5; "Subscriber Codeunit ID"; Integer)
         {
             BlankZero = true;
             Caption = 'Subscriber Codeunit ID';
+            DataClassification = CustomerContent;
             NotBlank = true;
 
             trigger OnLookup()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
-                  exit;
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                    exit;
 
                 "Subscriber Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Subscriber Function" := EventSubscription."Subscriber Function";
@@ -47,41 +51,42 @@ table 6150730 "POS Sales Workflow Step"
                 EventSubscription: Record "Event Subscription";
             begin
                 if "Subscriber Codeunit ID" = 0 then begin
-                  "Subscriber Function" := '';
-                  exit;
+                    "Subscriber Function" := '';
+                    exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID","Subscriber Codeunit ID");
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                EventSubscription.SetRange("Subscriber Codeunit ID", "Subscriber Codeunit ID");
                 if "Subscriber Function" <> '' then
-                  EventSubscription.SetRange("Subscriber Function","Subscriber Function");
+                    EventSubscription.SetRange("Subscriber Function", "Subscriber Function");
                 EventSubscription.FindFirst;
             end;
         }
-        field(10;"Subscriber Codeunit Name";Text[50])
+        field(10; "Subscriber Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Codeunit),
-                                                             "Object ID"=FIELD("Subscriber Codeunit ID")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+                                                             "Object ID" = FIELD("Subscriber Codeunit ID")));
             Caption = 'Subscriber Codeunit Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(15;"Subscriber Function";Text[80])
+        field(15; "Subscriber Function"; Text[80])
         {
             Caption = 'Subscriber Function';
+            DataClassification = CustomerContent;
             NotBlank = true;
 
             trigger OnLookup()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
-                  exit;
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                    exit;
 
                 "Subscriber Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Subscriber Function" := EventSubscription."Subscriber Function";
@@ -92,40 +97,43 @@ table 6150730 "POS Sales Workflow Step"
                 EventSubscription: Record "Event Subscription";
             begin
                 if "Subscriber Function" = '' then begin
-                  "Subscriber Codeunit ID" := 0;
-                  exit;
+                    "Subscriber Codeunit ID" := 0;
+                    exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function",GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID","Subscriber Codeunit ID");
+                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
+                EventSubscription.SetRange("Published Function", GetPublisherFunction());
+                EventSubscription.SetRange("Subscriber Codeunit ID", "Subscriber Codeunit ID");
                 if "Subscriber Function" <> '' then
-                  EventSubscription.SetRange("Subscriber Function","Subscriber Function");
+                    EventSubscription.SetRange("Subscriber Function", "Subscriber Function");
                 EventSubscription.FindFirst;
             end;
         }
-        field(20;Description;Text[100])
+        field(20; Description; Text[100])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(25;"Sequence No.";Integer)
+        field(25; "Sequence No."; Integer)
         {
             Caption = 'Sequence No.';
+            DataClassification = CustomerContent;
         }
-        field(30;Enabled;Boolean)
+        field(30; Enabled; Boolean)
         {
             Caption = 'Enabled';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
     }
 
     keys
     {
-        key(Key1;"Set Code","Workflow Code","Subscriber Codeunit ID","Subscriber Function")
+        key(Key1; "Set Code", "Workflow Code", "Subscriber Codeunit ID", "Subscriber Function")
         {
         }
-        key(Key2;"Sequence No.")
+        key(Key2; "Sequence No.")
         {
         }
     }

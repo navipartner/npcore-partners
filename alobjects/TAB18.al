@@ -1,4 +1,4 @@
-tableextension 6014423 tableextension6014423 extends Customer 
+tableextension 6014423 tableextension6014423 extends Customer
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                           Added Fields : 6014400..6060150
@@ -15,93 +15,111 @@ tableextension 6014423 tableextension6014423 extends Customer
     // NPR5.53/ZESO/20200115 CASE 358656 Added Field To Anonymize On
     fields
     {
-        field(6014400;Type;Option)
+        field(6014400; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Customer,Cash';
             OptionMembers = Customer,Cash;
         }
-        field(6014402;"Internal y/n";Boolean)
+        field(6014402; "Internal y/n"; Boolean)
         {
             Caption = 'Internal';
+            DataClassification = CustomerContent;
         }
-        field(6014403;Auto;Boolean)
+        field(6014403; Auto; Boolean)
         {
             Caption = 'Auto';
+            DataClassification = CustomerContent;
         }
-        field(6014404;"Record on Debitsale";Option)
+        field(6014404; "Record on Debitsale"; Option)
         {
             Caption = 'Record on Debitsale';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Invoice,Shipping Note,Ask';
             OptionMembers = " ",Invoice,"Shipping Note",Ask;
         }
-        field(6014405;"Record on negative Debitsale";Option)
+        field(6014405; "Record on negative Debitsale"; Option)
         {
             Caption = 'Record on negative Debitsale';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Return Order,Credit Memo,Ask';
             OptionMembers = " ","Return Order","Credit Memo",Ask;
         }
-        field(6014407;"Primary Key Length";Integer)
+        field(6014407; "Primary Key Length"; Integer)
         {
             Caption = 'Primary Key Length';
+            DataClassification = CustomerContent;
         }
-        field(6014408;"Sales invoice Report No.";Integer)
+        field(6014408; "Sales invoice Report No."; Integer)
         {
             Caption = 'Sales invoice Report No.';
+            DataClassification = CustomerContent;
         }
-        field(6014409;"Change-to No.";Code[20])
+        field(6014409; "Change-to No."; Code[20])
         {
             Caption = 'Change-to No.';
+            DataClassification = CustomerContent;
         }
-        field(6014415;"Document Processing";Option)
+        field(6014415; "Document Processing"; Option)
         {
             Caption = 'Document Processing';
+            DataClassification = CustomerContent;
             Description = 'PN1.00';
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
         }
-        field(6014416;"Bill-to Company";Text[30])
+        field(6014416; "Bill-to Company"; Text[30])
         {
             Caption = 'Bill-to Company (IC)';
+            DataClassification = CustomerContent;
         }
-        field(6014417;"Bill-to Vendor No.";Code[20])
+        field(6014417; "Bill-to Vendor No."; Code[20])
         {
             Caption = 'Bill-to Vendor No. (IC)';
+            DataClassification = CustomerContent;
         }
-        field(6059771;"Loyalty Customer";Boolean)
+        field(6059771; "Loyalty Customer"; Boolean)
         {
             Caption = 'Loyalty Customer';
+            DataClassification = CustomerContent;
         }
-        field(6151060;Anonymized;Boolean)
+        field(6151060; Anonymized; Boolean)
         {
             Caption = 'Anonymized';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
             Editable = false;
         }
-        field(6151061;"Anonymized Date";DateTime)
+        field(6151061; "Anonymized Date"; DateTime)
         {
             Caption = 'Anonymized Date';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
             Editable = false;
         }
-        field(6151062;"To Anonymize";Boolean)
+        field(6151062; "To Anonymize"; Boolean)
         {
             Caption = 'To Anomymize';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
         }
-        field(6151063;"To Anonymize On";Date)
+        field(6151063; "To Anonymize On"; Date)
         {
             Caption = 'To Anonymize On';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
-        field(6151450;"External Customer No.";Code[20])
+        field(6151450; "External Customer No."; Code[20])
         {
             Caption = 'External Customer No.';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
-        field(6151455;"Magento Display Group";Code[20])
+        field(6151455; "Magento Display Group"; Code[20])
         {
             Caption = 'Magento Display Group';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00,MAG2.20';
             TableRelation = "Magento Display Group";
             //This property is currently not supported
@@ -126,9 +144,10 @@ tableextension 6014423 tableextension6014423 extends Customer
                 //+MAG2.20 [320423]
             end;
         }
-        field(6151460;"Magento Shipping Group";Text[30])
+        field(6151460; "Magento Shipping Group"; Text[30])
         {
             Caption = 'Magento Shipping Group';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48,MAG2.20';
 
             trigger OnLookup()
@@ -149,9 +168,10 @@ tableextension 6014423 tableextension6014423 extends Customer
                 //+MAG2.20 [320423]
             end;
         }
-        field(6151465;"Magento Payment Group";Text[30])
+        field(6151465; "Magento Payment Group"; Text[30])
         {
             Caption = 'Magento Payment Group';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48,MAG2.20';
 
             trigger OnLookup()
@@ -172,9 +192,10 @@ tableextension 6014423 tableextension6014423 extends Customer
                 //+MAG2.20 [320423]
             end;
         }
-        field(6151470;"Magento Store Code";Text[30])
+        field(6151470; "Magento Store Code"; Text[30])
         {
             Caption = 'Magento Store Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48,MAG2.20';
             TableRelation = "Magento Store";
 

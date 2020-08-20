@@ -1,4 +1,4 @@
-tableextension 6014444 tableextension6014444 extends "Transfer Line" 
+tableextension 6014444 tableextension6014444 extends "Transfer Line"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields  6014400..6014403
@@ -14,32 +14,36 @@ tableextension 6014444 tableextension6014444 extends "Transfer Line"
     // NPR5.41/JDH /20180418 CASE 309641 Deleted Fields Color, Size and Label. Changed Vendor Item No. to flowfield
     fields
     {
-        field(6014403;"Vendor Item No.";Text[20])
+        field(6014403; "Vendor Item No."; Text[20])
         {
-            CalcFormula = Lookup(Item."Vendor Item No." WHERE ("No."=FIELD("Item No.")));
+            CalcFormula = Lookup (Item."Vendor Item No." WHERE("No." = FIELD("Item No.")));
             Caption = 'Vendor Item No.';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
-        field(6014410;"Cross-Reference No.";Code[20])
+        field(6014410; "Cross-Reference No."; Code[20])
         {
             Caption = 'Cross-Reference No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.23';
             TableRelation = "Item Cross Reference"."Cross-Reference No.";
         }
-        field(6059970;"Is Master";Boolean)
+        field(6059970; "Is Master"; Boolean)
         {
             Caption = 'Is Master';
+            DataClassification = CustomerContent;
             Description = 'VRT';
         }
-        field(6059971;"Master Line No.";Integer)
+        field(6059971; "Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
+            DataClassification = CustomerContent;
             Description = 'VRT';
         }
-        field(6151051;"Retail Replenisment No.";Integer)
+        field(6151051; "Retail Replenisment No."; Integer)
         {
             Caption = 'Retail Replenisment No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38.01';
         }
     }

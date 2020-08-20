@@ -12,54 +12,58 @@ table 6151415 "Magento Category Link"
     // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
     Caption = 'Magento Category Link';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Item No.";Code[20])
+        field(1; "Item No."; Code[20])
         {
             Caption = 'Item no.';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Item;
         }
-        field(2;"Category Id";Code[20])
+        field(2; "Category Id"; Code[20])
         {
             Caption = 'Category Id';
+            DataClassification = CustomerContent;
             Description = 'MAG2.26';
             NotBlank = true;
             TableRelation = "Magento Category";
         }
-        field(3;"Category Name";Text[50])
+        field(3; "Category Name"; Text[50])
         {
-            CalcFormula = Lookup("Magento Category".Name WHERE (Id=FIELD("Category Id")));
+            CalcFormula = Lookup ("Magento Category".Name WHERE(Id = FIELD("Category Id")));
             Caption = 'Category Name';
             Description = 'MAG2.26';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(7;"Item Description";Text[50])
+        field(7; "Item Description"; Text[50])
         {
-            CalcFormula = Lookup(Item.Description WHERE ("No."=FIELD("Item No.")));
+            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(10;Position;Integer)
+        field(10; Position; Integer)
         {
             Caption = 'Position';
+            DataClassification = CustomerContent;
         }
-        field(100;"Root No.";Code[20])
+        field(100; "Root No."; Code[20])
         {
-            CalcFormula = Lookup("Magento Category"."Root No." WHERE (Id=FIELD("Category Id")));
+            CalcFormula = Lookup ("Magento Category"."Root No." WHERE(Id = FIELD("Category Id")));
             Caption = 'Root No.';
             Description = 'MAG1.21,MAG2.26';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(110;Disabled;Boolean)
+        field(110; Disabled; Boolean)
         {
-            CalcFormula = -Exist("Magento Store Item" WHERE ("Item No."=FIELD("Item No."),
-                                                             "Root Item Group No."=FIELD("Root No."),
-                                                             Enabled=CONST(true)));
+            CalcFormula = - Exist ("Magento Store Item" WHERE("Item No." = FIELD("Item No."),
+                                                             "Root Item Group No." = FIELD("Root No."),
+                                                             Enabled = CONST(true)));
             Caption = 'Disabled';
             Description = 'MAG1.21,MAG1.22';
             Editable = false;
@@ -69,10 +73,10 @@ table 6151415 "Magento Category Link"
 
     keys
     {
-        key(Key1;"Item No.","Category Id")
+        key(Key1; "Item No.", "Category Id")
         {
         }
-        key(Key2;"Category Id")
+        key(Key2; "Category Id")
         {
         }
     }

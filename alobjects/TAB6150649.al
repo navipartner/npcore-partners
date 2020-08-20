@@ -4,49 +4,55 @@ table 6150649 "POS Entity Group"
     //                                   Grouping may be for either functional (e.g. POS Layout grouping) or for BI/Reporting purpose.
 
     Caption = 'POS Entity Group';
+    DataClassification = CustomerContent;
     LookupPageID = "POS Entity Groups";
 
     fields
     {
-        field(1;"Table ID";Integer)
+        field(1; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(2;"Field No.";Integer)
+        field(2; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(3;"Code";Code[20])
+        field(3; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(4;Description;Text[50])
+        field(4; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(10;Sorting;Decimal)
+        field(10; Sorting; Decimal)
         {
             Caption = 'Sorting';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
         }
     }
 
     keys
     {
-        key(Key1;"Table ID","Field No.","Code")
+        key(Key1; "Table ID", "Field No.", "Code")
         {
         }
-        key(Key2;"Table ID",Sorting)
+        key(Key2; "Table ID", Sorting)
         {
         }
     }
 
     fieldgroups
     {
-        fieldgroup(DropDown;"Code",Description)
+        fieldgroup(DropDown; "Code", Description)
         {
         }
     }

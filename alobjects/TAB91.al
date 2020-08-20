@@ -1,4 +1,4 @@
-tableextension 6014454 tableextension6014454 extends "User Setup" 
+tableextension 6014454 tableextension6014454 extends "User Setup"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                       Added fields 6014400
@@ -11,39 +11,45 @@ tableextension 6014454 tableextension6014454 extends "User Setup"
     // NPR5.54/TSA /20200221 CASE 392247 Added field "Block Role Center"
     fields
     {
-        field(6014400;"Backoffice Register No.";Code[10])
+        field(6014400; "Backoffice Register No."; Code[10])
         {
             Caption = 'Backoffice Register No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = Register;
         }
-        field(6014405;"Allow Register Switch";Boolean)
+        field(6014405; "Allow Register Switch"; Boolean)
         {
             Caption = 'Allow Register Switch';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
             TableRelation = Register;
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(6014410;"Register Switch Filter";Text[100])
+        field(6014410; "Register Switch Filter"; Text[100])
         {
             Caption = 'Register Switch Filter';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
-        field(6014599;"Connection Profile Code";Code[20])
+        field(6014599; "Connection Profile Code"; Code[20])
         {
             Caption = 'Connection Profile Code';
+            DataClassification = CustomerContent;
             TableRelation = "Connection Profile";
         }
-        field(6151060;"Anonymize Customers";Boolean)
+        field(6151060; "Anonymize Customers"; Boolean)
         {
             Caption = 'Anonymize Customers';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
         }
-        field(6151070;"Block Role Center";Boolean)
+        field(6151070; "Block Role Center"; Boolean)
         {
             Caption = 'Block Role Center';
+            DataClassification = CustomerContent;
         }
     }
 }

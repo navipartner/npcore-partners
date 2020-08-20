@@ -1,22 +1,25 @@
 table 6150708 "POS Data Source (Discovery)"
 {
     Caption = 'POS Data Source';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;Name;Code[50])
+        field(1; Name; Code[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[250])
+        field(2; Description; Text[250])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Name)
+        key(Key1; Name)
         {
         }
     }
@@ -37,18 +40,18 @@ table 6150708 "POS Data Source (Discovery)"
     local procedure MakeSureRecIsTemporary()
     begin
         if not Rec.IsTemporary then
-          Error(Text001);
+            Error(Text001);
     end;
 
-    procedure RegisterDataSource(Name: Code[50];Description: Text)
+    procedure RegisterDataSource(Name: Code[50]; Description: Text)
     begin
         MakeSureRecIsTemporary();
 
-        Rec.Name := CopyStr(Name,1,MaxStrLen(Rec.Name));
+        Rec.Name := CopyStr(Name, 1, MaxStrLen(Rec.Name));
         if Rec.Find then
-          Error(Text002,Rec.Name);
+            Error(Text002, Rec.Name);
 
-        Rec.Description := CopyStr(Description,1,MaxStrLen(Rec.Description));
+        Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
         Rec.Insert;
     end;
 
@@ -60,8 +63,8 @@ table 6150708 "POS Data Source (Discovery)"
         DataSources.SetCurrent(DataSourceName);
         DataSources.LookupMode := true;
         if DataSources.RunModal = ACTION::LookupOK then begin
-          DataSourceName := DataSources.GetCurrent();
-          exit(true);
+            DataSourceName := DataSources.GetCurrent();
+            exit(true);
         end;
         exit(false);
     end;

@@ -7,56 +7,67 @@ table 6151379 "CS Warehouse Activity Handling"
     // NPR5.55/ALPO/20200723 CASE 384923 Stock adjustments for not bin-enabled locations
 
     Caption = 'CS Warehouse Activity Handling';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;Id;Code[10])
+        field(1; Id; Code[10])
         {
             Caption = 'Id';
+            DataClassification = CustomerContent;
         }
-        field(2;"Line No.";Integer)
+        field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(3;"Unit of Measure";Code[10])
+        field(3; "Unit of Measure"; Code[10])
         {
             Caption = 'Unit of Measure';
-            TableRelation = "Item Unit of Measure".Code WHERE ("Item No."=FIELD("Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
         }
-        field(10;Barcode;Text[30])
+        field(10; Barcode; Text[30])
         {
             Caption = 'Barcode';
+            DataClassification = CustomerContent;
         }
-        field(11;Qty;Decimal)
+        field(11; Qty; Decimal)
         {
             Caption = 'Qty';
+            DataClassification = CustomerContent;
             InitValue = 1;
         }
-        field(20;"Activity Type";Option)
+        field(20; "Activity Type"; Option)
         {
             Caption = 'Activity Type';
+            DataClassification = CustomerContent;
             Editable = false;
             OptionCaption = ' ,Put-away,Pick,Movement,Invt. Put-away,Invt. Pick,Invt. Movement';
             OptionMembers = " ","Put-away",Pick,Movement,"Invt. Put-away","Invt. Pick","Invt. Movement";
         }
-        field(21;"No.";Code[20])
+        field(21; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(22;"Location Code";Code[10])
+        field(22; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = Location;
         }
-        field(23;"Shelf No.";Code[10])
+        field(23; "Shelf No."; Code[10])
         {
             Caption = 'Shelf No.';
+            DataClassification = CustomerContent;
         }
-        field(24;"Serial No.";Code[20])
+        field(24; "Serial No."; Code[20])
         {
             Caption = 'Serial No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -64,9 +75,10 @@ table 6151379 "CS Warehouse Activity Handling"
             begin
             end;
         }
-        field(25;"Lot No.";Code[20])
+        field(25; "Lot No."; Code[20])
         {
             Caption = 'Lot No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -74,9 +86,10 @@ table 6151379 "CS Warehouse Activity Handling"
             begin
             end;
         }
-        field(26;"Bin Code";Code[20])
+        field(26; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -96,14 +109,16 @@ table 6151379 "CS Warehouse Activity Handling"
             begin
             end;
         }
-        field(27;"Assignment Date";Date)
+        field(27; "Assignment Date"; Date)
         {
             Caption = 'Assignment Date';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(50;"Item No.";Code[20])
+        field(50; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
             TableRelation = Item."No.";
 
             trigger OnValidate()
@@ -111,87 +126,95 @@ table 6151379 "CS Warehouse Activity Handling"
                 Validate("Variant Code", '');
             end;
         }
-        field(51;"Variant Code";Code[10])
+        field(51; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
-        field(52;"Item Description";Text[50])
+        field(52; "Item Description"; Text[50])
         {
-            CalcFormula = Lookup(Item.Description WHERE ("No."=FIELD("Item No.")));
+            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(53;"Variant Description";Text[50])
+        field(53; "Variant Description"; Text[50])
         {
-            CalcFormula = Lookup("Item Variant".Description WHERE (Code=FIELD("Variant Code"),
-                                                                   "Item No."=FIELD("Item No.")));
+            CalcFormula = Lookup ("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
+                                                                   "Item No." = FIELD("Item No.")));
             Caption = 'Variant Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(100;"Table No.";Integer)
+        field(100; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
         }
-        field(101;"Record Id";RecordID)
+        field(101; "Record Id"; RecordID)
         {
             Caption = 'Record Id';
+            DataClassification = CustomerContent;
         }
-        field(102;Handled;Boolean)
+        field(102; Handled; Boolean)
         {
             Caption = 'Handled';
+            DataClassification = CustomerContent;
         }
-        field(103;Created;DateTime)
+        field(103; Created; DateTime)
         {
             Caption = 'Created';
+            DataClassification = CustomerContent;
         }
-        field(104;"Created By";Code[20])
+        field(104; "Created By"; Code[20])
         {
             Caption = 'Created By';
+            DataClassification = CustomerContent;
         }
-        field(105;"Transferred to Document";Boolean)
+        field(105; "Transferred to Document"; Boolean)
         {
             Caption = 'Transferred to Worksheet';
+            DataClassification = CustomerContent;
         }
-        field(120;"Bin Base Qty.";Decimal)
+        field(120; "Bin Base Qty."; Decimal)
         {
-            CalcFormula = Sum("Warehouse Entry"."Qty. (Base)" WHERE ("Location Code"=FIELD("Location Code"),
-                                                                     "Bin Code"=FIELD("Bin Code"),
-                                                                     "Item No."=FIELD("Item No."),
-                                                                     "Variant Code"=FIELD("Variant Code"),
-                                                                     "Lot No."=FIELD("Lot No."),
-                                                                     "Serial No."=FIELD("Serial No.")));
+            CalcFormula = Sum ("Warehouse Entry"."Qty. (Base)" WHERE("Location Code" = FIELD("Location Code"),
+                                                                     "Bin Code" = FIELD("Bin Code"),
+                                                                     "Item No." = FIELD("Item No."),
+                                                                     "Variant Code" = FIELD("Variant Code"),
+                                                                     "Lot No." = FIELD("Lot No."),
+                                                                     "Serial No." = FIELD("Serial No.")));
             Caption = 'Bin Base Qty.';
             Description = 'NPR5.51';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(130;Inventory;Decimal)
+        field(130; Inventory; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE ("Location Code"=FIELD("Location Code"),
-                                                                  "Item No."=FIELD("Item No."),
-                                                                  "Variant Code"=FIELD("Variant Code"),
-                                                                  "Lot No."=FIELD("Lot No."),
-                                                                  "Serial No."=FIELD("Serial No.")));
+            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Location Code" = FIELD("Location Code"),
+                                                                  "Item No." = FIELD("Item No."),
+                                                                  "Variant Code" = FIELD("Variant Code"),
+                                                                  "Lot No." = FIELD("Lot No."),
+                                                                  "Serial No." = FIELD("Serial No.")));
             Caption = 'Inventory';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             Description = 'NPR5.55';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(140;"Qty. in Stock";Decimal)
+        field(140; "Qty. in Stock"; Decimal)
         {
             Caption = 'Qty. in Stock';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             Description = 'NPR5.55';
         }
     }
 
     keys
     {
-        key(Key1;Id,"Line No.")
+        key(Key1; Id, "Line No.")
         {
         }
     }

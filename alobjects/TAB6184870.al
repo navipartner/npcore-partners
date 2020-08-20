@@ -3,30 +3,36 @@ table 6184870 "DropBox API Setup"
     // NPR5.54/ALST/20200212 CASE 383718 Object created
 
     Caption = 'DropBox API Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Account Code"; Code[10])
         {
             Caption = 'DropBox Account Code';
+            DataClassification = CustomerContent;
         }
         field(5; Description; Text[250])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(10; Token; Guid)
         {
             Caption = 'Token';
+            DataClassification = CustomerContent;
             Description = 'https://www.dropbox.com/developers/apps -> select your app -> OAuth 2 section -> Generate Access token';
         }
         field(20; Timeout; Integer)
         {
             Caption = 'Timeout';
+            DataClassification = CustomerContent;
             Description = 'Miliseconds';
         }
         field(30; "Storage On Server"; Text[250])
         {
             Caption = 'Server files location';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var

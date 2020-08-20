@@ -4,22 +4,26 @@ table 6150725 "POS Secure Method"
     // NPR5.46/TSA /20180914 CASE 314603 Added overflow protection in DiscoverSecureMethod()
 
     Caption = 'POS Secure Method';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Secure Methods";
     LookupPageID = "POS Secure Methods";
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[30])
+        field(2; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(3;Type;Option)
+        field(3; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Custom,Password Client,Password Server';
             OptionMembers = Custom,"Password Client","Password Server";
         }
@@ -27,7 +31,7 @@ table 6150725 "POS Secure Method"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -56,22 +60,22 @@ table 6150725 "POS Secure Method"
         CustomCode: Text;
     begin
         if Type <> Type::Custom then
-          exit('');
+            exit('');
 
-        OnDiscoverCustomSecureMethodCode(Code,CustomCode,Handled);
+        OnDiscoverCustomSecureMethodCode(Code, CustomCode, Handled);
         if not Handled then
-          Error(Text001,Code);
+            Error(Text001, Code);
         exit(CustomCode);
     end;
 
-    procedure DiscoverSecureMethod("Code": Code[10];Description: Text;Type: Option)
+    procedure DiscoverSecureMethod("Code": Code[10]; Description: Text; Type: Option)
     begin
         Rec.Init();
-        Rec.Code := CopyStr (Code, 1, MaxStrLen (Rec.Code));
-        Rec.Description := CopyStr (Description, 1, MaxStrLen (Rec.Description));
+        Rec.Code := CopyStr(Code, 1, MaxStrLen(Rec.Code));
+        Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
         Rec.Type := Type;
         if not Rec.Insert() then
-          Rec.Modify();
+            Rec.Modify();
     end;
 
     [BusinessEvent(TRUE)]
@@ -80,7 +84,7 @@ table 6150725 "POS Secure Method"
     end;
 
     [BusinessEvent(false)]
-    local procedure OnDiscoverCustomSecureMethodCode("Code": Code[10];var CustomCode: Text;var Handled: Boolean)
+    local procedure OnDiscoverCustomSecureMethodCode("Code": Code[10]; var CustomCode: Text; var Handled: Boolean)
     begin
     end;
 }

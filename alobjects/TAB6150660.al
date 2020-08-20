@@ -11,6 +11,7 @@ table 6150660 "NPRE Waiter Pad"
     // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Waiter Pad';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NPRE Waiter Pad List";
     LookupPageID = "NPRE Waiter Pad List";
 
@@ -19,18 +20,22 @@ table 6150660 "NPRE Waiter Pad"
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
         }
         field(5; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(14; "Start Date"; Date)
         {
             Caption = 'Start Date';
+            DataClassification = CustomerContent;
         }
         field(15; "Start Time"; Time)
         {
             Caption = 'Start Time';
+            DataClassification = CustomerContent;
         }
         field(16; "Current Seating FF"; Code[10])
         {
@@ -41,8 +46,8 @@ table 6150660 "NPRE Waiter Pad"
         }
         field(17; "Multiple Seating FF"; Integer)
         {
-            CalcFormula = Count("NPRE Seating - Waiter Pad Link" WHERE ("Waiter Pad No."=FIELD("No."),
-                                                                        Closed=FIELD(Closed)));
+            CalcFormula = Count ("NPRE Seating - Waiter Pad Link" WHERE("Waiter Pad No." = FIELD("No."),
+                                                                        Closed = FIELD(Closed)));
             Caption = 'Multiple Seating';
             Editable = false;
             FieldClass = FlowField;
@@ -50,22 +55,27 @@ table 6150660 "NPRE Waiter Pad"
         field(18; "Close Date"; Date)
         {
             Caption = 'Close Date';
+            DataClassification = CustomerContent;
         }
         field(19; "Close Time"; Time)
         {
             Caption = 'Close Time';
+            DataClassification = CustomerContent;
         }
         field(20; Closed; Boolean)
         {
             Caption = 'Closed';
+            DataClassification = CustomerContent;
         }
         field(21; "Current Seating Description"; Text[50])
         {
             Caption = 'Seating Description';
+            DataClassification = CustomerContent;
         }
         field(30; Status; Code[10])
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPad));
         }
         field(31; "Status Description FF"; Text[50])
@@ -78,16 +88,18 @@ table 6150660 "NPRE Waiter Pad"
         field(40; "Number of Guests"; Integer)
         {
             Caption = 'Number of Guests';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
         field(41; "Billed Number of Guests"; Integer)
         {
             Caption = 'Billed Number of Guests';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
-        field(42;"No. of Guests on POS Sales";Integer)
+        field(42; "No. of Guests on POS Sales"; Integer)
         {
-            CalcFormula = Sum("Sale POS"."NPRE Number of Guests" WHERE ("NPRE Pre-Set Waiter Pad No."=FIELD("No.")));
+            CalcFormula = Sum ("Sale POS"."NPRE Number of Guests" WHERE("NPRE Pre-Set Waiter Pad No." = FIELD("No.")));
             Caption = 'No. of Guests on POS Sales';
             Description = 'NPR5.55';
             Editable = false;
@@ -96,6 +108,7 @@ table 6150660 "NPRE Waiter Pad"
         field(50; "Serving Step Code"; Code[10])
         {
             Caption = 'Serving Step Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
             TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
@@ -110,6 +123,7 @@ table 6150660 "NPRE Waiter Pad"
         field(52; "Last Req. Serving Step Code"; Code[10])
         {
             Caption = 'Last Req. Serving Step Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
             TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
@@ -131,9 +145,10 @@ table 6150660 "NPRE Waiter Pad"
             FieldClass = FlowField;
             MaxValue = 9999999;
         }
-        field(70;"Pre-receipt Printed";Boolean)
+        field(70; "Pre-receipt Printed"; Boolean)
         {
             Caption = 'Pre-receipt Printed';
+            DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
         field(100; "Print Category Filter"; Code[20])
@@ -209,9 +224,9 @@ table 6150660 "NPRE Waiter Pad"
         if not NPHSeatingWaiterPadLink.IsEmpty then NPHSeatingWaiterPadLink.DeleteAll;
 
         //-NPR5.55 [399170]
-        POSInfoWaiterPadLink.SetRange("Waiter Pad No.",NPHWaiterPad."No.");
+        POSInfoWaiterPadLink.SetRange("Waiter Pad No.", NPHWaiterPad."No.");
         if not POSInfoWaiterPadLink.IsEmpty then
-          POSInfoWaiterPadLink.DeleteAll;
+            POSInfoWaiterPadLink.DeleteAll;
         //+NPR5.55 [399170]
     end;
 }

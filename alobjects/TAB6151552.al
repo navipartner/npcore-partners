@@ -24,31 +24,37 @@ table 6151552 "NpXml Element"
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'NpXml Element';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Xml Template Code"; Code[20])
         {
             Caption = 'Xml Template Code';
+            DataClassification = CustomerContent;
             TableRelation = "NpXml Template";
         }
         field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(20; "Template Version No."; Code[20])
         {
             Caption = 'Template Version No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
         field(100; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnLookup()
@@ -84,6 +90,7 @@ table 6151552 "NpXml Element"
         field(200; "Parent Line No."; Integer)
         {
             Caption = 'Parent Line No.';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -100,21 +107,25 @@ table 6151552 "NpXml Element"
         field(201; "Parent Table No."; Integer)
         {
             Caption = 'Parent Table No.';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(300; Comment; Text[250])
         {
             Caption = 'Comment';
+            DataClassification = CustomerContent;
             Description = 'NC1.04';
         }
         field(500; Level; Integer)
         {
             Caption = 'Level';
+            DataClassification = CustomerContent;
         }
         field(600; "Generic Child Codeunit ID"; Integer)
         {
             BlankZero = true;
             Caption = 'Generic Child Codeunit ID';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
 
             trigger OnLookup()
@@ -165,6 +176,7 @@ table 6151552 "NpXml Element"
         field(610; "Generic Child Function"; Text[250])
         {
             Caption = 'Generic Child Function';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
 
             trigger OnLookup()
@@ -207,6 +219,7 @@ table 6151552 "NpXml Element"
         {
             BlankZero = true;
             Caption = 'Xml Value Codeunit ID';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
 
             trigger OnLookup()
@@ -257,6 +270,7 @@ table 6151552 "NpXml Element"
         field(630; "Xml Value Function"; Text[250])
         {
             Caption = 'Xml Value Function';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
 
             trigger OnLookup()
@@ -298,26 +312,31 @@ table 6151552 "NpXml Element"
         field(1000; Active; Boolean)
         {
             Caption = 'Active';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(1010; Hidden; Boolean)
         {
             Caption = 'Hidden';
+            DataClassification = CustomerContent;
             Description = 'No xml output,NC1.07';
         }
         field(5100; "Element Name"; Text[50])
         {
             Caption = 'Element Name';
+            DataClassification = CustomerContent;
         }
         field(5105; Namespace; Text[50])
         {
             Caption = 'Namespace';
+            DataClassification = CustomerContent;
             Description = 'NC1.22';
             TableRelation = "NpXml Namespace".Alias WHERE("Xml Template Code" = FIELD("Xml Template Code"));
         }
         field(5117; "Default Value"; Text[50])
         {
             Caption = 'Default Value';
+            DataClassification = CustomerContent;
             Description = 'Default value if Field Value is empty';
         }
         field(5120; "Table Name"; Text[50])
@@ -331,6 +350,7 @@ table 6151552 "NpXml Element"
         field(5200; "Field Type"; Option)
         {
             Caption = 'Field Type';
+            DataClassification = CustomerContent;
             Description = 'NC1.16';
             OptionCaption = ' ,,Primary Key,,,,Enum';
             OptionMembers = " ",,PrimaryKey,,,,Enum;
@@ -339,6 +359,7 @@ table 6151552 "NpXml Element"
         {
             BlankZero = true;
             Caption = 'Custom Codeunit ID';
+            DataClassification = CustomerContent;
             Description = 'NC1.01,NC1.07,NC1.10,NC1.16';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit),
                                                       "Object Name" = FILTER('NpXml Value*'));
@@ -373,46 +394,55 @@ table 6151552 "NpXml Element"
         field(5203; CDATA; Boolean)
         {
             Caption = 'CDATA';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
         field(5205; "Enum List (,)"; Text[250])
         {
             Caption = 'Enum List';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
         field(5210; "Only with Value"; Boolean)
         {
             Caption = 'Only with Value';
+            DataClassification = CustomerContent;
             Description = 'XML Tag is excluded if set and no Value';
         }
         field(5215; Prefix; Text[50])
         {
             Caption = 'Prefix';
+            DataClassification = CustomerContent;
             Description = 'NC1.20';
         }
         field(5220; "Iteration Type"; Option)
         {
             Caption = 'Iteration Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,First,Last';
             OptionMembers = " ",First,Last;
         }
         field(5230; "Reverse Sign"; Boolean)
         {
             Caption = 'Reverse Sign';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
         field(5240; "Lower Case"; Boolean)
         {
             Caption = 'Lower Case';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
         field(5250; "Blank Zero"; Boolean)
         {
             Caption = 'Blank Zero';
+            DataClassification = CustomerContent;
         }
         field(5255; "Last Modified at"; DateTime)
         {
             Caption = 'Last Modified at';
+            DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
         field(100000; "Has Filter"; Boolean)

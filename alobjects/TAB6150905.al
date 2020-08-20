@@ -6,6 +6,7 @@ table 6150905 "HC Payment Type POS"
     // NPR5.48/TJ  /20190128 CASE 340446 Fixed dimension table relations
 
     Caption = 'HC Payment Type POS';
+    DataClassification = CustomerContent;
     LookupPageID = "HC Payment Types";
 
     fields
@@ -13,11 +14,13 @@ table 6150905 "HC Payment Type POS"
         field(1; "No."; Code[10])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
         field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -28,6 +31,7 @@ table 6150905 "HC Payment Type POS"
         field(3; "Processing Type"; Option)
         {
             Caption = 'Processing Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Cash,Terminal Card,Manual Card,Other Credit Cards,Credit Voucher,Gift Voucher,Cash Terminal,Foreign Currency,Foreign Credit Voucher,Foreign Gift Voucher,Debit sale,Invoice,Finance Agreement,Payout,DIBS,Loyalty Card';
             OptionMembers = " ",Cash,"Terminal Card","Manual Card","Other Credit Cards","Credit Voucher","Gift Voucher","Cash Terminal","Foreign Currency","Foreign Credit Voucher","Foreign Gift Voucher","Debit sale",Invoice,"Finance Agreement",Payout,DIBS,"Point Card";
 
@@ -39,6 +43,7 @@ table 6150905 "HC Payment Type POS"
         field(4; "G/L Account No."; Code[20])
         {
             Caption = 'G/L Account';
+            DataClassification = CustomerContent;
             TableRelation = "G/L Account";
 
             trigger OnValidate()
@@ -50,6 +55,7 @@ table 6150905 "HC Payment Type POS"
         field(5; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Active,Passive';
             OptionMembers = " ",Active,Passive;
 
@@ -77,19 +83,23 @@ table 6150905 "HC Payment Type POS"
         field(6; Prefix; Code[20])
         {
             Caption = 'Prefix';
+            DataClassification = CustomerContent;
         }
         field(7; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             TableRelation = "HC Register";
         }
         field(20; "Cost Pct."; Decimal)
         {
             Caption = 'Cost %';
+            DataClassification = CustomerContent;
         }
         field(21; "Cost Account No."; Code[20])
         {
             Caption = 'Cost Account';
+            DataClassification = CustomerContent;
             TableRelation = "G/L Account";
 
             trigger OnValidate()
@@ -101,20 +111,24 @@ table 6150905 "HC Payment Type POS"
         field(22; "Sales Line Text"; Text[50])
         {
             Caption = 'Sale Line Text';
+            DataClassification = CustomerContent;
         }
         field(23; "Search Description"; Text[50])
         {
             Caption = 'Search Description';
+            DataClassification = CustomerContent;
         }
         field(24; Posting; Option)
         {
             Caption = 'Posting';
+            DataClassification = CustomerContent;
             OptionCaption = 'Condensed,Single Entry';
             OptionMembers = Condensed,"Single Entry";
         }
         field(25; "Via Terminal"; Boolean)
         {
             Caption = 'Via Cash Terminal';
+            DataClassification = CustomerContent;
         }
         field(26; "Date Filter"; Date)
         {
@@ -139,6 +153,7 @@ table 6150905 "HC Payment Type POS"
         field(28; "Customer No."; Code[20])
         {
             Caption = 'Customer';
+            DataClassification = CustomerContent;
             TableRelation = Customer;
 
             trigger OnValidate()
@@ -156,6 +171,7 @@ table 6150905 "HC Payment Type POS"
         field(29; "Account Type"; Option)
         {
             Caption = 'Account Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'G/L Account,Customer,Bank';
             OptionMembers = "G/L Account",Customer,Bank;
 
@@ -186,10 +202,12 @@ table 6150905 "HC Payment Type POS"
         field(31; "Fixed Rate"; Decimal)
         {
             Caption = 'Fixed Rate';
+            DataClassification = CustomerContent;
         }
         field(32; "Reference Incoming"; Boolean)
         {
             Caption = 'Reference Incoming';
+            DataClassification = CustomerContent;
         }
         field(33; "Receipt Filter"; Code[10])
         {
@@ -199,14 +217,17 @@ table 6150905 "HC Payment Type POS"
         field(34; "Receipt Copies"; Integer)
         {
             Caption = 'Receipt copies';
+            DataClassification = CustomerContent;
         }
         field(35; "Receipt - Post it Now"; Boolean)
         {
             Caption = 'Receipt - Post it now';
+            DataClassification = CustomerContent;
         }
         field(36; "Rounding Precision"; Decimal)
         {
             Caption = 'Rounding precision';
+            DataClassification = CustomerContent;
         }
         field(37; "No. of Sales in Audit Roll"; Integer)
         {
@@ -354,15 +375,18 @@ table 6150905 "HC Payment Type POS"
         field(47; Euro; Boolean)
         {
             Caption = 'Euro';
+            DataClassification = CustomerContent;
         }
         field(48; "Bank Acc. No."; Code[20])
         {
             Caption = 'Bank';
+            DataClassification = CustomerContent;
             TableRelation = "Bank Account"."No.";
         }
         field(49; "Fee G/L Acc. No."; Code[20])
         {
             Caption = 'Fee';
+            DataClassification = CustomerContent;
             TableRelation = "G/L Account";
 
             trigger OnValidate()
@@ -379,14 +403,17 @@ table 6150905 "HC Payment Type POS"
         field(50; "Fee Pct."; Decimal)
         {
             Caption = 'Fee Pct';
+            DataClassification = CustomerContent;
         }
         field(51; "Fixed Fee"; Decimal)
         {
             Caption = 'Fixed fee';
+            DataClassification = CustomerContent;
         }
         field(52; "Fee Item No."; Code[20])
         {
             Caption = 'Fee item';
+            DataClassification = CustomerContent;
             TableRelation = Item;
         }
         field(53; "Norm. Sales in Audit Excl. VAT"; Decimal)
@@ -406,11 +433,13 @@ table 6150905 "HC Payment Type POS"
         field(54; "Maximum Amount"; Decimal)
         {
             Caption = 'Max amount';
+            DataClassification = CustomerContent;
             Description = 'Maksimalt bel¢b, hvor prisen skal gælde';
         }
         field(55; "Minimum Amount"; Decimal)
         {
             Caption = 'Min amount';
+            DataClassification = CustomerContent;
             Description = 'Minimumsbel¢b, hvor gebyret skal gælde';
         }
         field(56; "Debit Cost Amount Audit Roll"; Decimal)
@@ -448,6 +477,7 @@ table 6150905 "HC Payment Type POS"
         field(58; "Cardholder Verification Method"; Option)
         {
             Caption = 'Cardholder Verification Method';
+            DataClassification = CustomerContent;
             Description = 'Cardholder Verification Method';
             OptionCaption = 'CVM not forced,Forced Signature,Forced Pin';
             OptionMembers = "CVM not Forced","Forced Signature","Forced Pin";
@@ -455,6 +485,7 @@ table 6150905 "HC Payment Type POS"
         field(59; "Type of Transaction"; Option)
         {
             Caption = 'Type of transaction';
+            DataClassification = CustomerContent;
             OptionCaption = 'Not forced,Forced Online,Forced Offline';
             OptionMembers = "Not Forced","Forced Online","Forced Offline";
         }
@@ -475,32 +506,39 @@ table 6150905 "HC Payment Type POS"
         field(62; "Location Code"; Code[20])
         {
             Caption = 'Location Code';
+            DataClassification = CustomerContent;
             TableRelation = Location;
         }
         field(65; "Is Check"; Boolean)
         {
             Caption = 'Check';
+            DataClassification = CustomerContent;
         }
         field(66; "Common Company Clearing"; Boolean)
         {
             Caption = 'Common Company Clearing';
+            DataClassification = CustomerContent;
         }
         field(67; "Day Clearing Account"; Code[20])
         {
             Caption = 'Day Clearing Account';
+            DataClassification = CustomerContent;
             TableRelation = "G/L Account";
         }
         field(68; "Forced Amount"; Boolean)
         {
             Caption = 'Forced amount';
+            DataClassification = CustomerContent;
         }
         field(69; Hidden; Boolean)
         {
             Caption = 'Hidden';
+            DataClassification = CustomerContent;
         }
         field(70; "To be Balanced"; Boolean)
         {
             Caption = 'Incl. in balancing';
+            DataClassification = CustomerContent;
         }
         field(71; "Balancing Total"; Decimal)
         {
@@ -513,10 +551,12 @@ table 6150905 "HC Payment Type POS"
         field(75; "Match Sales Amount"; Boolean)
         {
             Caption = 'Match Sales Amount';
+            DataClassification = CustomerContent;
         }
         field(80; "Fixed Amount"; Decimal)
         {
             Caption = 'Fixed Amount';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -526,6 +566,7 @@ table 6150905 "HC Payment Type POS"
         field(81; "Qty. Per Sale"; Integer)
         {
             Caption = 'Qty. Per Sale';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -535,6 +576,7 @@ table 6150905 "HC Payment Type POS"
         field(82; "Minimum Sales Amount"; Decimal)
         {
             Caption = 'Min Sales Amount';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -544,35 +586,42 @@ table 6150905 "HC Payment Type POS"
         field(83; "Human Validation"; Boolean)
         {
             Caption = 'Validated by user';
+            DataClassification = CustomerContent;
         }
         field(90; "Immediate Posting"; Option)
         {
             Caption = 'Immediate Posting';
+            DataClassification = CustomerContent;
             OptionCaption = 'Never,Always,Negative,Positive';
             OptionMembers = Never,Always,Negative,Positive;
         }
         field(200; "PBS Gift Voucher"; Boolean)
         {
             Caption = 'PBS Gift Voucher';
+            DataClassification = CustomerContent;
             Description = 'PBS Gift Voucher if true card balance will be checked.';
         }
         field(201; "PBS Customer ID"; Text[30])
         {
             Caption = 'PBS Customer ID';
+            DataClassification = CustomerContent;
             Description = 'PBS Inquiry ID';
         }
         field(202; "PBS Gift Voucher Barcode"; Boolean)
         {
             Caption = 'PBS Gift Voucher Barcode';
+            DataClassification = CustomerContent;
         }
         field(250; "Loyalty Card Type"; Code[20])
         {
             Caption = 'Loyalty Card Type';
+            DataClassification = CustomerContent;
         }
         field(318; "Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';
             Caption = 'Only used by Global Dimension 1';
+            DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
             trigger OnValidate()
@@ -584,6 +633,7 @@ table 6150905 "HC Payment Type POS"
         {
             CaptionClass = '1,1,2';
             Caption = 'Only used by Global Dimension 2';
+            DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
             trigger OnValidate()
@@ -594,57 +644,67 @@ table 6150905 "HC Payment Type POS"
         field(320; "Auto End Sale"; Boolean)
         {
             Caption = 'Auto end sale';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
         field(321; "Payment Method Code"; Code[10])
         {
             Caption = 'Payment Method Code';
+            DataClassification = CustomerContent;
             TableRelation = "Payment Method";
         }
         field(323; "Balancing Type"; Option)
         {
             Caption = 'Balancing type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Currency,New inventory,Transfer to Bank';
             OptionMembers = Normal,Primo,Bank;
         }
         field(329; "Payment Disc. Calc. Codeunit"; Integer)
         {
             Caption = 'Payment Disc. Calc. Codeunit';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(350; "Validation Codeunit"; Integer)
         {
             Caption = 'Validation Codeunit';
+            DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a Sale Line POS with type payment is being inserted.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(351; "On Sale End Codeunit"; Integer)
         {
             Caption = 'On Sale End Codeunit';
+            DataClassification = CustomerContent;
             Description = 'Invokes this codeunit before a sale is finished. Can interrupt the end of a sale.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(352; "Post Processing Codeunit"; Integer)
         {
             Caption = 'Post Processing Codeunit';
+            DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a sale is finished eg. transferred to the auditroll.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(500; "Payment Type"; Option)
         {
             Caption = 'Payment Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Other,Payment Card,Voucher,Cash,Credit Voucher,Deposit';
             OptionMembers = Other,PaymentCard,Voucher,Cash,CreditVoucher,Deposit;
         }
         field(501; "Payment Card Type"; Option)
         {
             Caption = 'Payment Card Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Other,Dankort,VisaDankort,Visa,VisaElectron,Mastercard,Maestro,JCB,DinersClub,AmericanExpress';
             OptionMembers = other,dankort,visadankort,visa,visaelectron,mastercard,maestro,jcb,dinersclub,americanexpress;
         }
         field(600; "HQ Processing"; Option)
         {
             Caption = 'HQ Processing';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
             OptionCaption = 'Normal,Sales Quote,Sales Order/Return Order,Sales Invoice/ Credit Memo';
             OptionMembers = Normal,SalesQuote,SalesOrder,SalesInvoice;
@@ -652,11 +712,13 @@ table 6150905 "HC Payment Type POS"
         field(601; "HQ Post Sales Document"; Boolean)
         {
             Caption = 'HQ Post Sales Document';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
         field(602; "HQ Post Payment"; Boolean)
         {
             Caption = 'HQ Post Payment';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
         field(700; "End Time Filter"; Time)
@@ -667,20 +729,24 @@ table 6150905 "HC Payment Type POS"
         field(701; "Dev Term"; Boolean)
         {
             Caption = 'Dev Term';
+            DataClassification = CustomerContent;
         }
         field(6184471; "MobilePay Merchant ID"; Code[20])
         {
             Caption = 'MobilePay Merchant ID';
+            DataClassification = CustomerContent;
             Description = 'MbP1.80';
         }
         field(6184472; "MobilePay API Key"; Code[50])
         {
             Caption = 'MobilePay API Key';
+            DataClassification = CustomerContent;
             Description = 'MbP1.80';
         }
         field(6184473; "MobilePay Environment"; Option)
         {
             Caption = 'MobilePay Environment';
+            DataClassification = CustomerContent;
             Description = 'MbP1.80';
             OptionCaption = 'PROD,DEMO';
             OptionMembers = PROD,DEMO;

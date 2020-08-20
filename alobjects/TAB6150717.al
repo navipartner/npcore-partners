@@ -7,43 +7,50 @@ table 6150717 "POS Menu Filter"
     // NPR5.51/ALPO/20190805 CASE 362878 Predefined in "POS Menu Filter" View was lost while setting POS unit filter
 
     Caption = 'POS Menu Filter';
+    DataClassification = CustomerContent;
     LookupPageID = "POS Menu Filter List";
 
     fields
     {
-        field(1;"Object Type";Option)
+        field(1; "Object Type"; Option)
         {
             Caption = 'Object Type';
+            DataClassification = CustomerContent;
             OptionCaption = ',,,Report,,Codeunit,XMLPort,,Page';
             OptionMembers = ,,,"Report",,"Codeunit","XMLPort",,"Page";
         }
-        field(2;"Object Id";Integer)
+        field(2; "Object Id"; Integer)
         {
             Caption = 'Object Id';
+            DataClassification = CustomerContent;
         }
-        field(3;"Filter Code";Code[20])
+        field(3; "Filter Code"; Code[20])
         {
             Caption = 'Filter Code';
+            DataClassification = CustomerContent;
             Description = 'Key';
         }
-        field(5;"Object Name";Text[30])
+        field(5; "Object Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=FIELD("Object Type"),
-                                                             "Object ID"=FIELD("Object Id")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = FIELD("Object Type"),
+                                                             "Object ID" = FIELD("Object Id")));
             Caption = 'Object Name';
             FieldClass = FlowField;
         }
-        field(6;Description;Text[50])
+        field(6; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(7;Active;Boolean)
+        field(7; Active; Boolean)
         {
             Caption = 'Active';
+            DataClassification = CustomerContent;
         }
-        field(8;"Send Sale POS";Boolean)
+        field(8; "Send Sale POS"; Boolean)
         {
             Caption = 'Send Sale POS';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -52,9 +59,10 @@ table 6150717 "POS Menu Filter"
                 Clear("Table Filter");
             end;
         }
-        field(9;"Send Sale Line POS";Boolean)
+        field(9; "Send Sale Line POS"; Boolean)
         {
             Caption = 'Send Sale Line POS';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -63,10 +71,11 @@ table 6150717 "POS Menu Filter"
                 Clear("Table Filter");
             end;
         }
-        field(10;"Table No.";Integer)
+        field(10; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
             ValidateTableRelation = true;
 
             trigger OnValidate()
@@ -76,38 +85,43 @@ table 6150717 "POS Menu Filter"
                 if "Table No." <> xRec."Table No." then Clear("Table Filter");
             end;
         }
-        field(11;"Table Name";Text[30])
+        field(11; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Table),
-                                                             "Object ID"=FIELD("Table No.")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+                                                             "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             FieldClass = FlowField;
         }
-        field(12;"Table Filter";BLOB)
+        field(12; "Table Filter"; BLOB)
         {
             Caption = 'Table Filter';
+            DataClassification = CustomerContent;
         }
-        field(13;"Sale POS Filter";BLOB)
+        field(13; "Sale POS Filter"; BLOB)
         {
             Caption = 'Sale POS Filter';
+            DataClassification = CustomerContent;
         }
-        field(14;"Sale Line POS Filter";BLOB)
+        field(14; "Sale Line POS Filter"; BLOB)
         {
             Caption = 'Sale Line POS Filter';
+            DataClassification = CustomerContent;
         }
-        field(15;"Run Modal";Boolean)
+        field(15; "Run Modal"; Boolean)
         {
             Caption = 'Run Modal';
+            DataClassification = CustomerContent;
         }
-        field(20;"Current POS Register / Unit";Boolean)
+        field(20; "Current POS Register / Unit"; Boolean)
         {
             Caption = 'Current POS Register / Unit';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Filter Code")
+        key(Key1; "Filter Code")
         {
         }
     }
@@ -126,8 +140,8 @@ table 6150717 "POS Menu Filter"
         FilterCount: Integer;
     begin
         FilterCount := 0;
-        if ( "Send Sale POS" ) then FilterCount += 1;
-        if ( "Send Sale Line POS" ) then FilterCount += 1;
+        if ("Send Sale POS") then FilterCount += 1;
+        if ("Send Sale Line POS") then FilterCount += 1;
         if ("Table No." <> 0) then FilterCount += 1;
         if FilterCount > 1 then Error(ERRONLYONE);
 
@@ -155,8 +169,8 @@ table 6150717 "POS Menu Filter"
     begin
         Rec.CalcFields("Table Filter");
         if Rec."Table Filter".HasValue then begin
-          Rec."Table Filter".CreateInStream(INS);
-          INS.Read(FilterStringText);
+            Rec."Table Filter".CreateInStream(INS);
+            INS.Read(FilterStringText);
         end;
 
         Rec.TestField("Table No.");
@@ -165,7 +179,7 @@ table 6150717 "POS Menu Filter"
         FilterBuilder.AddRecordRef(FilterViewName, MailRecordRef);
         if FilterStringText <> '' then FilterBuilder.SetView(FilterViewName, FilterStringText);
         if FilterBuilder.RunModal then begin
-          FilterStringText := FilterBuilder.GetView(FilterViewName);
+            FilterStringText := FilterBuilder.GetView(FilterViewName);
         end;
 
         Rec."Table Filter".CreateOutStream(OUTS);
@@ -173,7 +187,7 @@ table 6150717 "POS Menu Filter"
         Rec.Modify;
     end;
 
-    procedure RunObjectWithFilter(POSMenuFilter: Record "POS Menu Filter";POSSession: Codeunit "POS Session")
+    procedure RunObjectWithFilter(POSMenuFilter: Record "POS Menu Filter"; POSSession: Codeunit "POS Session")
     var
         FilterRecRef: RecordRef;
         FilterStringText: Text;
@@ -190,79 +204,83 @@ table 6150717 "POS Menu Filter"
         POSMenuFilter.TestField(Active, true);
 
         FilterCount := 0;
-        if ( "Send Sale POS" ) then FilterCount += 1;
-        if ( "Send Sale Line POS" ) then FilterCount += 1;
+        if ("Send Sale POS") then FilterCount += 1;
+        if ("Send Sale Line POS") then FilterCount += 1;
         if ("Table No." <> 0) then FilterCount += 1;
         if FilterCount > 1 then Error(ERRONLYONE);
 
         if FilterCount = 1 then begin
-          if ("Table No." <> 0) then begin
-            FilterRecRef.Open(POSMenuFilter."Table No.");
+            if ("Table No." <> 0) then begin
+                FilterRecRef.Open(POSMenuFilter."Table No.");
 
-            POSMenuFilter.CalcFields("Table Filter");
-            if POSMenuFilter."Table Filter".HasValue then begin
-              POSMenuFilter."Table Filter".CreateInStream(INS);
-              INS.Read(FilterStringText);
+                POSMenuFilter.CalcFields("Table Filter");
+                if POSMenuFilter."Table Filter".HasValue then begin
+                    POSMenuFilter."Table Filter".CreateInStream(INS);
+                    INS.Read(FilterStringText);
+                end;
+
+                //-NPR5.41 [310137]
+                if ("Current POS Register / Unit") then
+                    SetPOSUnitFilter("Table No.", FilterStringText);
+                //+NPR5.41 [310137]
+
+                if FilterStringText <> '' then begin
+                    FilterRecRef.SetView(FilterStringText);
+                    if FilterRecRef.FindFirst then;  //-+NPR5.51 [362878] (otherwise you are positioned at the end of the list, if DESCENDING order is used)
+                end;
+                FilterRecVariant := FilterRecRef;
+
             end;
 
-            //-NPR5.41 [310137]
-            if ("Current POS Register / Unit") then
-              SetPOSUnitFilter ("Table No.", FilterStringText);
-            //+NPR5.41 [310137]
-
-            if FilterStringText <> '' then begin
-              FilterRecRef.SetView(FilterStringText);
-              if FilterRecRef.FindFirst then;  //-+NPR5.51 [362878] (otherwise you are positioned at the end of the list, if DESCENDING order is used)
+            if POSMenuFilter."Send Sale POS" then begin
+                POSSession.GetSale(POSSale);
+                POSSale.GetCurrentSale(SalePOS);
+                FilterRecVariant := SalePOS;
             end;
-            FilterRecVariant := FilterRecRef;
 
-          end;
-
-          if POSMenuFilter."Send Sale POS" then begin
-            POSSession.GetSale(POSSale);
-            POSSale.GetCurrentSale(SalePOS);
-            FilterRecVariant := SalePOS;
-          end;
-
-          if POSMenuFilter."Send Sale Line POS" then begin
-              POSSession.GetSaleLine(POSSaleLine);
-              POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-              FilterRecVariant := SaleLinePOS;
-          end;
+            if POSMenuFilter."Send Sale Line POS" then begin
+                POSSession.GetSaleLine(POSSaleLine);
+                POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+                FilterRecVariant := SaleLinePOS;
+            end;
         end;
 
         case POSMenuFilter."Object Type" of
-          POSMenuFilter."Object Type"::Page : begin
-            if POSMenuFilter."Run Modal" then begin
-              if (FilterCount = 1) then PAGE.RunModal(POSMenuFilter."Object Id", FilterRecVariant);
-              if (FilterCount = 0) then PAGE.RunModal(POSMenuFilter."Object Id");
-            end else begin
-              if (FilterCount = 1) then PAGE.Run(POSMenuFilter."Object Id", FilterRecVariant);
-              if (FilterCount = 0) then PAGE.Run(POSMenuFilter."Object Id");
-            end;
-          end;
-          POSMenuFilter."Object Type"::Report : begin
-            if POSMenuFilter."Run Modal" then begin
-              if (FilterCount = 1) then REPORT.RunModal(POSMenuFilter."Object Id", false, false, FilterRecVariant);
-              if (FilterCount = 0) then REPORT.RunModal(POSMenuFilter."Object Id", false, false);
-            end else begin
-              ReportPrinterInterface.RunReport(POSMenuFilter."Object Id", false, false, FilterRecVariant);
-            end;
-          end;
-          POSMenuFilter."Object Type"::Codeunit : begin
-            POSMenuFilter.TestField("Run Modal", false);
-            if (FilterCount = 1) then CODEUNIT.Run(POSMenuFilter."Object Id", FilterRecVariant);
-            if (FilterCount = 0) then CODEUNIT.Run(POSMenuFilter."Object Id");
-          end;
-          POSMenuFilter."Object Type"::XMLPort : begin
-            POSMenuFilter.TestField("Run Modal", false);
-            if (FilterCount = 1) then XMLPORT.Run(POSMenuFilter."Object Id", false, false, FilterRecVariant);
-            if (FilterCount = 0) then XMLPORT.Run(POSMenuFilter."Object Id", false, false);
-          end;
+            POSMenuFilter."Object Type"::Page:
+                begin
+                    if POSMenuFilter."Run Modal" then begin
+                        if (FilterCount = 1) then PAGE.RunModal(POSMenuFilter."Object Id", FilterRecVariant);
+                        if (FilterCount = 0) then PAGE.RunModal(POSMenuFilter."Object Id");
+                    end else begin
+                        if (FilterCount = 1) then PAGE.Run(POSMenuFilter."Object Id", FilterRecVariant);
+                        if (FilterCount = 0) then PAGE.Run(POSMenuFilter."Object Id");
+                    end;
+                end;
+            POSMenuFilter."Object Type"::Report:
+                begin
+                    if POSMenuFilter."Run Modal" then begin
+                        if (FilterCount = 1) then REPORT.RunModal(POSMenuFilter."Object Id", false, false, FilterRecVariant);
+                        if (FilterCount = 0) then REPORT.RunModal(POSMenuFilter."Object Id", false, false);
+                    end else begin
+                        ReportPrinterInterface.RunReport(POSMenuFilter."Object Id", false, false, FilterRecVariant);
+                    end;
+                end;
+            POSMenuFilter."Object Type"::Codeunit:
+                begin
+                    POSMenuFilter.TestField("Run Modal", false);
+                    if (FilterCount = 1) then CODEUNIT.Run(POSMenuFilter."Object Id", FilterRecVariant);
+                    if (FilterCount = 0) then CODEUNIT.Run(POSMenuFilter."Object Id");
+                end;
+            POSMenuFilter."Object Type"::XMLPort:
+                begin
+                    POSMenuFilter.TestField("Run Modal", false);
+                    if (FilterCount = 1) then XMLPORT.Run(POSMenuFilter."Object Id", false, false, FilterRecVariant);
+                    if (FilterCount = 0) then XMLPORT.Run(POSMenuFilter."Object Id", false, false);
+                end;
         end;
     end;
 
-    local procedure SetPOSUnitFilter(TableNo: Integer;var FilterStringText: Text)
+    local procedure SetPOSUnitFilter(TableNo: Integer; var FilterStringText: Text)
     var
         FilterRecRef: RecordRef;
         FilterRecVariant: Variant;
@@ -271,25 +289,25 @@ table 6150717 "POS Menu Filter"
         FilterValue: Code[10];
     begin
 
-        FilterRecRef.Open (TableNo);
+        FilterRecRef.Open(TableNo);
         if FilterStringText <> '' then FilterRecRef.SetView(FilterStringText);
-          FilterRecVariant := FilterRecRef;
+        FilterRecVariant := FilterRecRef;
 
         case TableNo of
-          DATABASE::"Audit Roll" :
-            begin
-              AuditRoll.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
-              AuditRoll.CopyFilters (FilterRecVariant);
-              AuditRoll.SetFilter ("Register No.", '=%1', GetRegisterNo ());
-              FilterStringText := AuditRoll.GetView ();
-            end;
-          DATABASE::"POS Entry" :
-            begin
-              POSEntry.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
-              POSEntry.CopyFilters (FilterRecVariant);
-              POSEntry.SetFilter ("POS Unit No.", '=%1', GetPosUnitNo ());
-              FilterStringText := POSEntry.GetView ();
-            end;
+            DATABASE::"Audit Roll":
+                begin
+                    AuditRoll.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
+                    AuditRoll.CopyFilters(FilterRecVariant);
+                    AuditRoll.SetFilter("Register No.", '=%1', GetRegisterNo());
+                    FilterStringText := AuditRoll.GetView();
+                end;
+            DATABASE::"POS Entry":
+                begin
+                    POSEntry.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
+                    POSEntry.CopyFilters(FilterRecVariant);
+                    POSEntry.SetFilter("POS Unit No.", '=%1', GetPosUnitNo());
+                    FilterStringText := POSEntry.GetView();
+                end;
         end;
     end;
 
@@ -300,13 +318,13 @@ table 6150717 "POS Menu Filter"
         POSSetup: Codeunit "POS Setup";
     begin
 
-        if (POSSession.IsActiveSession (POSFrontEndManagement)) then begin
-          POSFrontEndManagement.GetSession (POSSession);
-          POSSession.GetSetup (POSSetup);
-          exit (POSSetup.Register());
+        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            exit(POSSetup.Register());
         end;
 
-        exit ('');
+        exit('');
     end;
 
     local procedure GetPosUnitNo(): Code[10]
@@ -317,14 +335,14 @@ table 6150717 "POS Menu Filter"
         POSUnit: Record "POS Unit";
     begin
 
-        if (POSSession.IsActiveSession (POSFrontEndManagement)) then begin
-          POSFrontEndManagement.GetSession (POSSession);
-          POSSession.GetSetup (POSSetup);
-          POSSetup.GetPOSUnit (POSUnit);
-          exit (POSUnit."No.");
+        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSUnit(POSUnit);
+            exit(POSUnit."No.");
         end;
 
-        exit ('');
+        exit('');
     end;
 
     local procedure GetStoreCode(): Code[10]
@@ -335,14 +353,14 @@ table 6150717 "POS Menu Filter"
         POSStore: Record "POS Store";
     begin
 
-        if (POSSession.IsActiveSession (POSFrontEndManagement)) then begin
-          POSFrontEndManagement.GetSession (POSSession);
-          POSSession.GetSetup (POSSetup);
-          POSSetup.GetPOSStore (POSStore);
-          exit (POSStore.Code);
+        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+            exit(POSStore.Code);
         end;
 
-        exit ('');
+        exit('');
     end;
 }
 

@@ -10,182 +10,216 @@ table 6151391 "CS Stock-Takes"
     // NPR5.54/CLVA/20200220  CASE 384506 Added filter OnInsert
 
     Caption = 'CS Stock-Takes';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Stock-Take Id";Guid)
+        field(1; "Stock-Take Id"; Guid)
         {
             Caption = 'Stock-Take Id';
+            DataClassification = CustomerContent;
         }
-        field(10;Closed;DateTime)
+        field(10; Closed; DateTime)
         {
             Caption = 'Closed';
+            DataClassification = CustomerContent;
         }
-        field(11;Location;Code[20])
+        field(11; Location; Code[20])
         {
             Caption = 'Location';
+            DataClassification = CustomerContent;
             TableRelation = Location;
         }
-        field(12;Created;DateTime)
+        field(12; Created; DateTime)
         {
             Caption = 'Created';
+            DataClassification = CustomerContent;
         }
-        field(13;"Created By";Code[20])
+        field(13; "Created By"; Code[20])
         {
             Caption = 'Created By';
+            DataClassification = CustomerContent;
         }
-        field(14;"Salesfloor Started";DateTime)
+        field(14; "Salesfloor Started"; DateTime)
         {
             Caption = 'Salesfloor Started';
+            DataClassification = CustomerContent;
         }
-        field(15;"Salesfloor Started By";Code[10])
+        field(15; "Salesfloor Started By"; Code[10])
         {
             Caption = 'Salesfloor Started By';
+            DataClassification = CustomerContent;
         }
-        field(16;"Salesfloor Closed";DateTime)
+        field(16; "Salesfloor Closed"; DateTime)
         {
             Caption = 'Salesfloor Closed';
+            DataClassification = CustomerContent;
         }
-        field(17;"Salesfloor Closed By";Code[20])
+        field(17; "Salesfloor Closed By"; Code[20])
         {
             Caption = 'Salesfloor Closed By';
+            DataClassification = CustomerContent;
         }
-        field(18;"Salesfloor Entries";Integer)
+        field(18; "Salesfloor Entries"; Integer)
         {
-            CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
-                                                             Area=CONST(Salesfloor)));
+            CalcFormula = Count ("CS Stock-Takes Data" WHERE("Stock-Take Id" = FIELD("Stock-Take Id"),
+                                                             Area = CONST(Salesfloor)));
             Caption = 'Salesfloor Entries';
             FieldClass = FlowField;
         }
-        field(19;"Stockroom Started";DateTime)
+        field(19; "Stockroom Started"; DateTime)
         {
             Caption = 'Stockroom Started';
+            DataClassification = CustomerContent;
         }
-        field(20;"Stockroom Started By";Code[10])
+        field(20; "Stockroom Started By"; Code[10])
         {
             Caption = 'Stockroom Started By';
+            DataClassification = CustomerContent;
         }
-        field(21;"Stockroom Closed";DateTime)
+        field(21; "Stockroom Closed"; DateTime)
         {
             Caption = 'Stockroom Closed';
+            DataClassification = CustomerContent;
         }
-        field(22;"Stockroom Closed By";Code[20])
+        field(22; "Stockroom Closed By"; Code[20])
         {
             Caption = 'Stockroom Closed By';
+            DataClassification = CustomerContent;
         }
-        field(23;"Stockroom Entries";Integer)
+        field(23; "Stockroom Entries"; Integer)
         {
-            CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
-                                                             Area=CONST(Stockroom)));
+            CalcFormula = Count ("CS Stock-Takes Data" WHERE("Stock-Take Id" = FIELD("Stock-Take Id"),
+                                                             Area = CONST(Stockroom)));
             Caption = 'Stockroom Entries';
             FieldClass = FlowField;
         }
-        field(24;"Refill Started";DateTime)
+        field(24; "Refill Started"; DateTime)
         {
             Caption = 'Refill Started';
+            DataClassification = CustomerContent;
         }
-        field(25;"Refill Started By";Code[10])
+        field(25; "Refill Started By"; Code[10])
         {
             Caption = 'Refill Started By';
+            DataClassification = CustomerContent;
         }
-        field(26;"Refill Closed";DateTime)
+        field(26; "Refill Closed"; DateTime)
         {
             Caption = 'Refill Closed';
+            DataClassification = CustomerContent;
         }
-        field(27;"Refill Closed By";Code[20])
+        field(27; "Refill Closed By"; Code[20])
         {
             Caption = 'Refill Closed By';
+            DataClassification = CustomerContent;
         }
-        field(28;"Salesfloor Duration";Duration)
+        field(28; "Salesfloor Duration"; Duration)
         {
             Caption = 'Salesfloor Duration';
+            DataClassification = CustomerContent;
         }
-        field(29;"Stockroom Duration";Duration)
+        field(29; "Stockroom Duration"; Duration)
         {
             Caption = 'Stockroom Duration';
+            DataClassification = CustomerContent;
         }
-        field(30;"Refill Duration";Duration)
+        field(30; "Refill Duration"; Duration)
         {
             Caption = 'Refill Duration';
+            DataClassification = CustomerContent;
         }
-        field(31;"Closed By";Code[10])
+        field(31; "Closed By"; Code[10])
         {
             Caption = 'Closed By';
+            DataClassification = CustomerContent;
         }
-        field(32;Approved;DateTime)
+        field(32; Approved; DateTime)
         {
             Caption = 'Approved';
+            DataClassification = CustomerContent;
         }
-        field(33;"Approved By";Code[20])
+        field(33; "Approved By"; Code[20])
         {
             Caption = 'Approved By';
+            DataClassification = CustomerContent;
         }
-        field(34;Note;Text[250])
+        field(34; Note; Text[250])
         {
             Caption = 'Note';
+            DataClassification = CustomerContent;
         }
-        field(35;"Refill Entries";Integer)
+        field(35; "Refill Entries"; Integer)
         {
-            CalcFormula = Count("CS Refill Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id")));
+            CalcFormula = Count ("CS Refill Data" WHERE("Stock-Take Id" = FIELD("Stock-Take Id")));
             Caption = 'Refill Entries';
             FieldClass = FlowField;
         }
-        field(36;"Create Refill Data Started";DateTime)
+        field(36; "Create Refill Data Started"; DateTime)
         {
             Caption = 'Create Refill Data Started';
+            DataClassification = CustomerContent;
         }
-        field(37;"Create Refill Data Ended";DateTime)
+        field(37; "Create Refill Data Ended"; DateTime)
         {
             Caption = 'Create Refill Data Ended';
+            DataClassification = CustomerContent;
         }
-        field(38;"Journal Template Name";Code[10])
+        field(38; "Journal Template Name"; Code[10])
         {
             Caption = 'Journal Template Name';
+            DataClassification = CustomerContent;
             TableRelation = "Item Journal Template";
         }
-        field(39;"Journal Batch Name";Code[10])
+        field(39; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Item Journal Batch".Name WHERE ("Journal Template Name"=FIELD("Journal Template Name"));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
         }
-        field(40;"Predicted Qty.";Decimal)
+        field(40; "Predicted Qty."; Decimal)
         {
             Caption = 'Predicted Qty.';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(41;"Inventory Calculated";Boolean)
+        field(41; "Inventory Calculated"; Boolean)
         {
             Caption = 'Inventory Calculated';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(42;"Journal Posted";Boolean)
+        field(42; "Journal Posted"; Boolean)
         {
             Caption = 'Journal Posted';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(43;"Adjust Inventory";Boolean)
+        field(43; "Adjust Inventory"; Boolean)
         {
             Caption = 'Adjust Inventory';
+            DataClassification = CustomerContent;
         }
-        field(44;"Unknown Entries";Integer)
+        field(44; "Unknown Entries"; Integer)
         {
-            CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
-                                                             "Item No."=FILTER('')));
+            CalcFormula = Count ("CS Stock-Takes Data" WHERE("Stock-Take Id" = FIELD("Stock-Take Id"),
+                                                             "Item No." = FILTER('')));
             Caption = 'Unknown Entries';
             FieldClass = FlowField;
         }
-        field(45;"Manuel Posting";Boolean)
+        field(45; "Manuel Posting"; Boolean)
         {
             Caption = 'Manuel Posting';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Stock-Take Id")
+        key(Key1; "Stock-Take Id")
         {
         }
-        key(Key2;Created)
+        key(Key2; Created)
         {
         }
     }
@@ -200,10 +234,10 @@ table 6151391 "CS Stock-Takes"
         CSRefillData: Record "CS Refill Data";
     begin
         //-NPR5.53 [377563]
-        CSStockTakesData.SetRange("Stock-Take Id","Stock-Take Id");
+        CSStockTakesData.SetRange("Stock-Take Id", "Stock-Take Id");
         CSStockTakesData.DeleteAll(true);
 
-        CSRefillData.SetRange("Stock-Take Id","Stock-Take Id");
+        CSRefillData.SetRange("Stock-Take Id", "Stock-Take Id");
         CSRefillData.DeleteAll(true);
         //+NPR5.53 [377563]
     end;
@@ -216,41 +250,41 @@ table 6151391 "CS Stock-Takes"
     begin
         //-NPR5.54 [384506]
         if CSCountingSupervisor.Get(UserId) then begin
-          AdjustInventory := true;
-        end else begin
-          Clear(CSStoreUsers);
-          CSStoreUsers.SetRange("User ID",UserId);
-          CSStoreUsers.SetRange("Adjust Inventory",true);
-          if CSStoreUsers.FindFirst then
             AdjustInventory := true;
+        end else begin
+            Clear(CSStoreUsers);
+            CSStoreUsers.SetRange("User ID", UserId);
+            CSStoreUsers.SetRange("Adjust Inventory", true);
+            if CSStoreUsers.FindFirst then
+                AdjustInventory := true;
         end;
         //+#NPR5.54 [384506]
 
-        CSStockTakes.SetRange(Location,Location);
+        CSStockTakes.SetRange(Location, Location);
         CSStockTakes.SetRange(Closed, 0DT);
         //-NPR5.54 [384506]
         if AdjustInventory then
-          CSStockTakes.SetRange("Adjust Inventory",true)
+            CSStockTakes.SetRange("Adjust Inventory", true)
         else
-          CSStockTakes.SetRange("Adjust Inventory",false);
+            CSStockTakes.SetRange("Adjust Inventory", false);
         //+NPR5.54 [384506]
         if CSStockTakes.FindSet then
-         Error(Err_CSStockTakes,"Stock-Take Id");
+            Error(Err_CSStockTakes, "Stock-Take Id");
     end;
 
     trigger OnModify()
     begin
         if ("Salesfloor Closed" <> 0DT) and ("Stockroom Closed" <> 0DT) and ("Refill Closed" <> 0DT) and (Approved <> 0DT) then begin
-         Closed := CurrentDateTime;
-         "Closed By" := UserId;
+            Closed := CurrentDateTime;
+            "Closed By" := UserId;
         end;
 
         if "Salesfloor Closed" <> 0DT then
-         "Salesfloor Duration" := "Salesfloor Closed" - "Salesfloor Started";
+            "Salesfloor Duration" := "Salesfloor Closed" - "Salesfloor Started";
         if "Stockroom Closed" <> 0DT then
-         "Stockroom Duration" := "Stockroom Closed" - "Stockroom Started";
+            "Stockroom Duration" := "Stockroom Closed" - "Stockroom Started";
         if "Refill Closed" <> 0DT then
-         "Refill Duration" := "Refill Closed" - "Refill Started";
+            "Refill Duration" := "Refill Closed" - "Refill Started";
     end;
 
     var
@@ -284,40 +318,40 @@ table 6151391 "CS Stock-Takes"
         QtyCalculated: Decimal;
     begin
         if not LocationRec.Get(GetFilter(Location)) then
-          Error(Err_MissingLocation);
+            Error(Err_MissingLocation);
 
         //-NPR5.52 [364063]
         Clear(CSStockTakes);
-        CSStockTakes.SetRange(Location,Location);
+        CSStockTakes.SetRange(Location, Location);
         CSStockTakes.SetRange(Closed, 0DT);
         if CSStockTakes.FindSet then
-         Error(Err_CSStockTakes,"Stock-Take Id");
+            Error(Err_CSStockTakes, "Stock-Take Id");
 
         CSSetup.Get;
         CSSetup.TestField("Phys. Inv Jour Temp Name");
         ItemJournalTemplate.Get(CSSetup."Phys. Inv Jour Temp Name");
-        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",LocationRec.Code) then begin
-          ItemJournalBatch.Init;
-          ItemJournalBatch.Validate("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
-          ItemJournalBatch.Validate(Name,LocationRec.Code);
-          ItemJournalBatch.Description := StrSubstNo(Text001,LocationRec.Code);
-          ItemJournalBatch.Validate("No. Series",CSSetup."Phys. Inv Jour No. Series");
-          ItemJournalBatch.Validate("Reason Code",ItemJournalTemplate."Reason Code");
-          ItemJournalBatch.Insert(true);
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name", LocationRec.Code) then begin
+            ItemJournalBatch.Init;
+            ItemJournalBatch.Validate("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
+            ItemJournalBatch.Validate(Name, LocationRec.Code);
+            ItemJournalBatch.Description := StrSubstNo(Text001, LocationRec.Code);
+            ItemJournalBatch.Validate("No. Series", CSSetup."Phys. Inv Jour No. Series");
+            ItemJournalBatch.Validate("Reason Code", ItemJournalTemplate."Reason Code");
+            ItemJournalBatch.Insert(true);
         end else begin
-          RecRef.GetTable(ItemJournalBatch);
-          Clear(CSPostingBuffer);
-          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
-          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
-          CSPostingBuffer.SetRange(Executed,false);
-          if CSPostingBuffer.FindSet then
-            Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+            RecRef.GetTable(ItemJournalBatch);
+            Clear(CSPostingBuffer);
+            CSPostingBuffer.SetRange("Table No.", RecRef.Number);
+            CSPostingBuffer.SetRange("Record Id", RecRef.RecordId);
+            CSPostingBuffer.SetRange(Executed, false);
+            if CSPostingBuffer.FindSet then
+                Error(Err_PostingIsScheduled, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
 
-          Clear(ItemJournalLine);
-          ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
-          ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
-          if ItemJournalLine.Count > 0 then
-            Error(Err_StockTakeWorksheetNotEmpty,ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
+            Clear(ItemJournalLine);
+            ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
+            ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
+            if ItemJournalLine.Count > 0 then
+                Error(Err_StockTakeWorksheetNotEmpty, ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
         end;
 
         // CSHelperFunctions.CreateStockTakeWorksheet(Location,'SALESFLOOR',StockTakeWorksheet);
@@ -353,47 +387,47 @@ table 6151391 "CS Stock-Takes"
 
         Commit;
 
-        if Confirm(StrSubstNo(Text002,Location,true)) then begin
-          Clear(ItemJournalLine);
-          ItemJournalLine.Init;
-          ItemJournalLine.Validate("Journal Template Name","Journal Template Name");
-          ItemJournalLine.Validate("Journal Batch Name","Journal Batch Name");
-          ItemJournalLine."Location Code" := Location;
+        if Confirm(StrSubstNo(Text002, Location, true)) then begin
+            Clear(ItemJournalLine);
+            ItemJournalLine.Init;
+            ItemJournalLine.Validate("Journal Template Name", "Journal Template Name");
+            ItemJournalLine.Validate("Journal Batch Name", "Journal Batch Name");
+            ItemJournalLine."Location Code" := Location;
 
-          Clear(NoSeriesMgt);
-          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",false);
-          ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
-          ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
-          ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
+            Clear(NoSeriesMgt);
+            ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series", ItemJournalLine."Posting Date", false);
+            ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
+            ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
+            ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
 
-          Clear(Item);
-          Item.SetFilter("Location Filter",Location);
-          if not Item.FindSet then
-            Error(Text003,Location);
+            Clear(Item);
+            Item.SetFilter("Location Filter", Location);
+            if not Item.FindSet then
+                Error(Text003, Location);
 
-          Clear(CalculateInventory);
-          CalculateInventory.UseRequestPage(false);
-          CalculateInventory.SetTableView(Item);
-          CalculateInventory.SetItemJnlLine(ItemJournalLine);
-          //-NPR5.52 [375749]
-          //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
-          CalculateInventory.InitializeRequest(WorkDate,ItemJournalLine."Document No.",false,false);
-          //+NPR5.52 [375749]
-          CalculateInventory.RunModal;
+            Clear(CalculateInventory);
+            CalculateInventory.UseRequestPage(false);
+            CalculateInventory.SetTableView(Item);
+            CalculateInventory.SetItemJnlLine(ItemJournalLine);
+            //-NPR5.52 [375749]
+            //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
+            CalculateInventory.InitializeRequest(WorkDate, ItemJournalLine."Document No.", false, false);
+            //+NPR5.52 [375749]
+            CalculateInventory.RunModal;
 
-          Clear(ItemJournalLine);
-          ItemJournalLine.SetRange("Journal Template Name","Journal Template Name");
-          ItemJournalLine.SetRange("Journal Batch Name","Journal Batch Name");
-          ItemJournalLine.SetRange("Location Code",Location);
-          if ItemJournalLine.FindSet then begin
-            repeat
-              QtyCalculated += ItemJournalLine."Qty. (Calculated)"
-            until ItemJournalLine.Next = 0;
-          end;
+            Clear(ItemJournalLine);
+            ItemJournalLine.SetRange("Journal Template Name", "Journal Template Name");
+            ItemJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+            ItemJournalLine.SetRange("Location Code", Location);
+            if ItemJournalLine.FindSet then begin
+                repeat
+                    QtyCalculated += ItemJournalLine."Qty. (Calculated)"
+                until ItemJournalLine.Next = 0;
+            end;
 
-          "Predicted Qty." := QtyCalculated;
-          "Inventory Calculated" := true;
-          Modify(true);
+            "Predicted Qty." := QtyCalculated;
+            "Inventory Calculated" := true;
+            Modify(true);
         end;
     end;
 
@@ -405,25 +439,25 @@ table 6151391 "CS Stock-Takes"
         CSPostingBuffer: Record "CS Posting Buffer";
     begin
         if Closed <> 0DT then
-          exit;
+            exit;
 
         //-NPR5.52 [364063]
         if not LocationRec.Get(GetFilter(Location)) then
-          Error(Err_MissingLocation);
+            Error(Err_MissingLocation);
 
-        if ItemJournalBatch.Get("Journal Template Name","Journal Batch Name") then begin
-          RecRef.GetTable(ItemJournalBatch);
-          Clear(CSPostingBuffer);
-          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
-          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
-          CSPostingBuffer.SetRange(Executed,false);
-          if CSPostingBuffer.FindSet then
-            Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+        if ItemJournalBatch.Get("Journal Template Name", "Journal Batch Name") then begin
+            RecRef.GetTable(ItemJournalBatch);
+            Clear(CSPostingBuffer);
+            CSPostingBuffer.SetRange("Table No.", RecRef.Number);
+            CSPostingBuffer.SetRange("Record Id", RecRef.RecordId);
+            CSPostingBuffer.SetRange(Executed, false);
+            if CSPostingBuffer.FindSet then
+                Error(Err_PostingIsScheduled, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
 
-          if not Confirm(StrSubstNo(Err_ConfirmForceClose,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name),true) then
-            exit;
+            if not Confirm(StrSubstNo(Err_ConfirmForceClose, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name), true) then
+                exit;
 
-          ItemJournalBatch.Delete(true);
+            ItemJournalBatch.Delete(true);
 
         end;
         // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
@@ -446,13 +480,13 @@ table 6151391 "CS Stock-Takes"
     procedure ApproveCounting()
     begin
         if ("Salesfloor Closed" = 0DT) then
-          Error(Err_SalesfloorClosed);
+            Error(Err_SalesfloorClosed);
 
         if ("Stockroom Closed" = 0DT) then
-          Error(Err_StockroomClosed);
+            Error(Err_StockroomClosed);
 
         if ("Refill Closed" = 0DT) then
-          Error(Err_RefillClosed);
+            Error(Err_RefillClosed);
 
         Approved := CurrentDateTime;
         "Approved By" := UserId;
@@ -462,11 +496,11 @@ table 6151391 "CS Stock-Takes"
     procedure CloseStockroom()
     begin
         if "Stockroom Closed" <> 0DT then
-          exit;
+            exit;
 
         if ("Stockroom Started" = 0DT) then begin
-          "Stockroom Started" := CurrentDateTime;
-          "Stockroom Started By" := UserId;
+            "Stockroom Started" := CurrentDateTime;
+            "Stockroom Started By" := UserId;
         end;
 
         "Stockroom Closed" := CurrentDateTime;
@@ -477,11 +511,11 @@ table 6151391 "CS Stock-Takes"
     procedure CloseSalesfloor()
     begin
         if "Salesfloor Closed" <> 0DT then
-          exit;
+            exit;
 
         if ("Salesfloor Started" = 0DT) then begin
-          "Salesfloor Started" := CurrentDateTime;
-          "Salesfloor Started By" := UserId;
+            "Salesfloor Started" := CurrentDateTime;
+            "Salesfloor Started By" := UserId;
         end;
 
         "Salesfloor Closed" := CurrentDateTime;

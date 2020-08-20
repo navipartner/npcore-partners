@@ -3,79 +3,97 @@ table 6059959 "MCS Faces"
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
 
     Caption = 'MCS Faces';
+    DataClassification = CustomerContent;
     DrillDownPageID = "MCS Faces";
     LookupPageID = "MCS Faces Card";
 
     fields
     {
-        field(1;PersonId;Text[50])
+        field(1; PersonId; Text[50])
         {
             Caption = 'Person Id';
+            DataClassification = CustomerContent;
         }
-        field(2;FaceId;Text[50])
+        field(2; FaceId; Text[50])
         {
             Caption = 'Face Id';
+            DataClassification = CustomerContent;
         }
-        field(11;Gender;Code[10])
+        field(11; Gender; Code[10])
         {
             Caption = 'Gender';
+            DataClassification = CustomerContent;
         }
-        field(12;Age;Decimal)
+        field(12; Age; Decimal)
         {
             Caption = 'Age';
+            DataClassification = CustomerContent;
         }
-        field(13;"Face Height";Integer)
+        field(13; "Face Height"; Integer)
         {
             Caption = 'Face Height';
+            DataClassification = CustomerContent;
         }
-        field(14;"Face Width";Integer)
+        field(14; "Face Width"; Integer)
         {
             Caption = 'Face Width';
+            DataClassification = CustomerContent;
         }
-        field(15;"Face Position X";Integer)
+        field(15; "Face Position X"; Integer)
         {
             Caption = 'Face Position X';
+            DataClassification = CustomerContent;
         }
-        field(16;"Face Position Y";Integer)
+        field(16; "Face Position Y"; Integer)
         {
             Caption = 'Face Position Y';
+            DataClassification = CustomerContent;
         }
-        field(17;Beard;Decimal)
+        field(17; Beard; Decimal)
         {
             Caption = 'Beard';
+            DataClassification = CustomerContent;
         }
-        field(18;Sideburns;Decimal)
+        field(18; Sideburns; Decimal)
         {
             Caption = 'Sideburns';
+            DataClassification = CustomerContent;
         }
-        field(19;Moustache;Decimal)
+        field(19; Moustache; Decimal)
         {
             Caption = 'Moustache';
+            DataClassification = CustomerContent;
         }
-        field(20;IsSmiling;Boolean)
+        field(20; IsSmiling; Boolean)
         {
             Caption = 'Is Smiling';
+            DataClassification = CustomerContent;
         }
-        field(21;Glasses;Text[50])
+        field(21; Glasses; Text[50])
         {
             Caption = 'Glasses';
+            DataClassification = CustomerContent;
         }
-        field(22;Identified;Boolean)
+        field(22; Identified; Boolean)
         {
             Caption = 'Identified';
+            DataClassification = CustomerContent;
         }
-        field(23;Created;DateTime)
+        field(23; Created; DateTime)
         {
             Caption = 'Created';
+            DataClassification = CustomerContent;
         }
-        field(24;Picture;BLOB)
+        field(24; Picture; BLOB)
         {
             Caption = 'Picture';
+            DataClassification = CustomerContent;
             SubType = Bitmap;
         }
-        field(25;"Action";Option)
+        field(25; "Action"; Option)
         {
             Caption = 'Action';
+            DataClassification = CustomerContent;
             OptionCaption = 'Capture Image,Capture And Identify Faces,Identify Faces';
             OptionMembers = CaptureImage,CaptureAndIdentifyFaces,IdentifyFaces;
         }
@@ -83,7 +101,7 @@ table 6059959 "MCS Faces"
 
     keys
     {
-        key(Key1;PersonId,FaceId)
+        key(Key1; PersonId, FaceId)
         {
         }
     }

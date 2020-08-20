@@ -5,35 +5,40 @@ table 6151180 "Retail Cross Reference"
     // NPR5.55/ALPO/20200424 CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
 
     Caption = 'Retail Cross Reference';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Retail Cross References";
     LookupPageID = "Retail Cross References";
 
     fields
     {
-        field(1;"Retail ID";Guid)
+        field(1; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
+            DataClassification = CustomerContent;
         }
-        field(5;"Reference No.";Code[50])
+        field(5; "Reference No."; Code[50])
         {
             Caption = 'Reference No.';
+            DataClassification = CustomerContent;
         }
-        field(10;"Table ID";Integer)
+        field(10; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
         }
-        field(15;"Record Value";Text[100])
+        field(15; "Record Value"; Text[100])
         {
             Caption = 'Record Value';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Retail ID")
+        key(Key1; "Retail ID")
         {
         }
-        key(Key2;"Reference No.","Table ID")
+        key(Key2; "Reference No.", "Table ID")
         {
         }
     }

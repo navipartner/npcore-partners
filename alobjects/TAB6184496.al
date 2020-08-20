@@ -4,27 +4,31 @@ table 6184496 "EFT Transact. Req. Comment"
     // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT
 
     Caption = 'EFT Transact. Req. Comment';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(10;"Entry No.";Integer)
+        field(10; "Entry No."; Integer)
         {
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "EFT Transaction Request";
         }
-        field(20;"Line No.";Integer)
+        field(20; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(30;Comment;Text[80])
+        field(30; Comment; Text[80])
         {
             Caption = 'Comment';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.","Line No.")
+        key(Key1; "Entry No.", "Line No.")
         {
         }
     }

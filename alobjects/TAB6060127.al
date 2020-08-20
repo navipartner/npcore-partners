@@ -21,86 +21,97 @@ table 6060127 "MM Membership"
     // MM1.45/TSA /20200708 CASE 413622 Added field Has Membership Entries flow field
 
     Caption = 'Membership';
+    DataClassification = CustomerContent;
     DrillDownPageID = "MM Memberships";
     LookupPageID = "MM Memberships";
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(9;"External Membership No.";Code[20])
+        field(9; "External Membership No."; Code[20])
         {
             Caption = 'External Membership No.';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[50])
+        field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(11;"Company Name";Text[50])
+        field(11; "Company Name"; Text[50])
         {
             Caption = 'Company Name';
+            DataClassification = CustomerContent;
         }
-        field(15;Blocked;Boolean)
+        field(15; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
                 MembershipRole: Record "MM Membership Role";
                 Contact: Record Contact;
             begin
-                "Blocked At" := CreateDateTime (0D, 0T);
+                "Blocked At" := CreateDateTime(0D, 0T);
                 "Blocked By" := '';
                 if (Blocked) then begin
-                  "Blocked At" := CurrentDateTime ();
-                  "Blocked By" := UserId;
+                    "Blocked At" := CurrentDateTime();
+                    "Blocked By" := UserId;
                 end;
 
                 //-MM1.41 [369123]
-                MembershipRole.SetFilter ("Membership Entry No.", '=%1', "Entry No.");
-                MembershipRole.SetFilter ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
-                if (MembershipRole.FindSet ()) then begin
-                  repeat
+                MembershipRole.SetFilter("Membership Entry No.", '=%1', "Entry No.");
+                MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
+                if (MembershipRole.FindSet()) then begin
+                    repeat
 
-                    MembershipRole.Validate (Blocked, Blocked);
-                    MembershipRole.Modify ();
+                        MembershipRole.Validate(Blocked, Blocked);
+                        MembershipRole.Modify();
 
-                    if (Contact.Get (MembershipRole."Contact No.")) then begin
-                      Contact.Validate ("Magento Contact", not Blocked);
-                      Contact.Modify();
-                    end;
-                  until (MembershipRole.Next () = 0);
+                        if (Contact.Get(MembershipRole."Contact No.")) then begin
+                            Contact.Validate("Magento Contact", not Blocked);
+                            Contact.Modify();
+                        end;
+                    until (MembershipRole.Next() = 0);
                 end;
                 //+MM1.41 [369123]
             end;
         }
-        field(16;"Blocked At";DateTime)
+        field(16; "Blocked At"; DateTime)
         {
             Caption = 'Blocked At';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(17;"Blocked By";Code[30])
+        field(17; "Blocked By"; Code[30])
         {
             Caption = 'Blocked By';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(18;"Block Reason";Option)
+        field(18; "Block Reason"; Option)
         {
             Caption = 'Block Reason';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Expired,User Request,Internal,Anonymized';
             OptionMembers = UNKNOWN,EXPIRED,USER_REQUEST,INTERNAL,ANONYMIZED;
         }
-        field(20;"Community Code";Code[20])
+        field(20; "Community Code"; Code[20])
         {
             Caption = 'Community Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Member Community";
         }
-        field(21;"Customer No.";Code[20])
+        field(21; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
+            DataClassification = CustomerContent;
             TableRelation = Customer;
 
             trigger OnValidate()
@@ -112,138 +123,147 @@ table 6060127 "MM Membership"
             begin
 
                 //-#308332 [308332]
-                Community.Get ("Community Code");
+                Community.Get("Community Code");
 
                 if ((Rec."Customer No." <> '') and (xRec."Customer No." <> Rec."Customer No.")) then begin
-                  if not Confirm (RELINK_MEMBERSHIP, false, Membership.TableCaption, Rec."External Membership No.", Customer.TableCaption, Rec."Customer No.") then
-                    Error ('');
+                    if not Confirm(RELINK_MEMBERSHIP, false, Membership.TableCaption, Rec."External Membership No.", Customer.TableCaption, Rec."Customer No.") then
+                        Error('');
 
-                  Membership.SetFilter ("Customer No.", '=%1', Rec."Customer No.");
-                  Membership.SetFilter (Blocked, '=%1', false);
-                  Membership.SetFilter ("Entry No.", '<>%1', Rec."Entry No.");
-                  if (Membership.FindFirst ()) then begin
+                    Membership.SetFilter("Customer No.", '=%1', Rec."Customer No.");
+                    Membership.SetFilter(Blocked, '=%1', false);
+                    Membership.SetFilter("Entry No.", '<>%1', Rec."Entry No.");
+                    if (Membership.FindFirst()) then begin
 
-                    if (Community."Activate Loyalty Program") then
-                      Error (DUPLICATE_CUSTOMERNO, Community.FieldCaption ("Activate Loyalty Program"), Rec."External Membership No.", Membership."External Membership No.",
-                        Membership.FieldCaption("Customer No."), Rec."Customer No.");
+                        if (Community."Activate Loyalty Program") then
+                            Error(DUPLICATE_CUSTOMERNO, Community.FieldCaption("Activate Loyalty Program"), Rec."External Membership No.", Membership."External Membership No.",
+                              Membership.FieldCaption("Customer No."), Rec."Customer No.");
 
-                    MembershipRole.SetFilter ("Membership Entry No.", '=%1', Rec."Entry No.");
-                    MembershipRole.ModifyAll ("Contact No.", '');
+                        MembershipRole.SetFilter("Membership Entry No.", '=%1', Rec."Entry No.");
+                        MembershipRole.ModifyAll("Contact No.", '');
 
-                  end;
-                  Modify(); // membership must be updated before OnModify table trigger executes
+                    end;
+                    Modify(); // membership must be updated before OnModify table trigger executes
                 end;
                 //+#308332 [308332]
             end;
         }
-        field(22;"Membership Code";Code[20])
+        field(22; "Membership Code"; Code[20])
         {
             Caption = 'Membership Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Membership Setup";
         }
-        field(23;"Issued Date";Date)
+        field(23; "Issued Date"; Date)
         {
             Caption = 'Issued Date';
+            DataClassification = CustomerContent;
         }
-        field(30;"Auto-Renew";Option)
+        field(30; "Auto-Renew"; Option)
         {
             Caption = 'Auto-Renew';
+            DataClassification = CustomerContent;
             OptionCaption = 'No,Yes (Internal),Yes (External)';
             OptionMembers = NO,YES_INTERNAL,YES_EXTERNAL;
 
             trigger OnValidate()
             begin
-                TestField ("Customer No.");
+                TestField("Customer No.");
             end;
         }
-        field(35;"Auto-Renew Payment Method Code";Code[10])
+        field(35; "Auto-Renew Payment Method Code"; Code[10])
         {
             Caption = 'Auto-Renew Payment Method Code';
+            DataClassification = CustomerContent;
             TableRelation = "Payment Method";
         }
-        field(36;"Auto-Renew External Data";Text[200])
+        field(36; "Auto-Renew External Data"; Text[200])
         {
             Caption = 'Auto-Renew External Data';
+            DataClassification = CustomerContent;
         }
-        field(100;"Awarded Points (Sale)";Integer)
+        field(100; "Awarded Points (Sale)"; Integer)
         {
-            CalcFormula = Sum("MM Membership Points Entry".Points WHERE ("Membership Entry No."=FIELD("Entry No."),
-                                                                         "Entry Type"=CONST(SALE),
-                                                                         "Posting Date"=FIELD("Date Filter")));
+            CalcFormula = Sum ("MM Membership Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+                                                                         "Entry Type" = CONST(SALE),
+                                                                         "Posting Date" = FIELD("Date Filter")));
             Caption = 'Awarded Points (Sale)';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(101;"Awarded Points (Refund)";Integer)
+        field(101; "Awarded Points (Refund)"; Integer)
         {
-            CalcFormula = Sum("MM Membership Points Entry".Points WHERE ("Membership Entry No."=FIELD("Entry No."),
-                                                                         "Entry Type"=CONST(REFUND),
-                                                                         "Posting Date"=FIELD("Date Filter")));
+            CalcFormula = Sum ("MM Membership Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+                                                                         "Entry Type" = CONST(REFUND),
+                                                                         "Posting Date" = FIELD("Date Filter")));
             Caption = 'Awarded Points (Refund)';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(102;"Redeemed Points (Withdrawl)";Integer)
+        field(102; "Redeemed Points (Withdrawl)"; Integer)
         {
-            CalcFormula = Sum("MM Membership Points Entry".Points WHERE ("Membership Entry No."=FIELD("Entry No."),
-                                                                         "Entry Type"=CONST(POINT_WITHDRAW),
-                                                                         "Posting Date"=FIELD("Date Filter")));
+            CalcFormula = Sum ("MM Membership Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+                                                                         "Entry Type" = CONST(POINT_WITHDRAW),
+                                                                         "Posting Date" = FIELD("Date Filter")));
             Caption = 'Redeemed Points (Withdrawl)';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(103;"Redeemed Points (Deposit)";Integer)
+        field(103; "Redeemed Points (Deposit)"; Integer)
         {
-            CalcFormula = Sum("MM Membership Points Entry".Points WHERE ("Membership Entry No."=FIELD("Entry No."),
-                                                                         "Entry Type"=CONST(POINT_DEPOSIT),
-                                                                         "Posting Date"=FIELD("Date Filter")));
+            CalcFormula = Sum ("MM Membership Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+                                                                         "Entry Type" = CONST(POINT_DEPOSIT),
+                                                                         "Posting Date" = FIELD("Date Filter")));
             Caption = 'Redeemed Points (Deposit)';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(104;"Expired Points";Integer)
+        field(104; "Expired Points"; Integer)
         {
-            CalcFormula = Sum("MM Membership Points Entry".Points WHERE ("Membership Entry No."=FIELD("Entry No."),
-                                                                         "Entry Type"=CONST(EXPIRED),
-                                                                         "Posting Date"=FIELD("Date Filter")));
+            CalcFormula = Sum ("MM Membership Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+                                                                         "Entry Type" = CONST(EXPIRED),
+                                                                         "Posting Date" = FIELD("Date Filter")));
             Caption = 'Expired Points';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(110;"Remaining Points";Integer)
+        field(110; "Remaining Points"; Integer)
         {
-            CalcFormula = Sum("MM Membership Points Entry".Points WHERE ("Membership Entry No."=FIELD("Entry No."),
-                                                                         "Posting Date"=FIELD("Date Filter")));
+            CalcFormula = Sum ("MM Membership Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+                                                                         "Posting Date" = FIELD("Date Filter")));
             Caption = 'Remaining Points';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(120;"Date Filter";Date)
+        field(120; "Date Filter"; Date)
         {
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
         }
-        field(199;"Document ID";Text[100])
+        field(199; "Document ID"; Text[100])
         {
             Caption = 'Document ID';
+            DataClassification = CustomerContent;
         }
-        field(200;"Modified At";DateTime)
+        field(200; "Modified At"; DateTime)
         {
             Caption = 'Modified At';
+            DataClassification = CustomerContent;
         }
-        field(210;"Replicated At";DateTime)
+        field(210; "Replicated At"; DateTime)
         {
             Caption = 'Replicated At';
+            DataClassification = CustomerContent;
         }
-        field(215;"Synchronized At";DateTime)
+        field(215; "Synchronized At"; DateTime)
         {
             Caption = 'Synchronized At';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Has Membership Entry";Boolean)
+        field(1000; "Has Membership Entry"; Boolean)
         {
-            CalcFormula = Exist("MM Membership Entry" WHERE ("Membership Entry No."=FIELD("Entry No."),
-                                                             Blocked=CONST(false),
-                                                             Context=CONST(NEW)));
+            CalcFormula = Exist ("MM Membership Entry" WHERE("Membership Entry No." = FIELD("Entry No."),
+                                                             Blocked = CONST(false),
+                                                             Context = CONST(NEW)));
             Caption = 'Has Membership Entry';
             Editable = false;
             FieldClass = FlowField;
@@ -252,16 +272,16 @@ table 6060127 "MM Membership"
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Customer No.")
+        key(Key2; "Customer No.")
         {
         }
-        key(Key3;"Membership Code")
+        key(Key3; "Membership Code")
         {
         }
-        key(Key4;"External Membership No.")
+        key(Key4; "External Membership No.")
         {
         }
     }
@@ -280,7 +300,7 @@ table 6060127 "MM Membership"
         MembershipPointsEntry: Record "MM Membership Points Entry";
     begin
 
-        MembershipManagement.DeleteMembership ("Entry No.", false);
+        MembershipManagement.DeleteMembership("Entry No.", false);
     end;
 
     trigger OnModify()
@@ -291,13 +311,13 @@ table 6060127 "MM Membership"
     begin
 
         //+#308332 [308332]
-        Community.Get ("Community Code");
+        Community.Get("Community Code");
         if ("Customer No." = '') then
-          if (Community."Membership to Cust. Rel.") then
-            //-MM1.33 [326087]
-            //TESTFIELD(Blocked);
-            exit;
-            //+MM1.33 [326087]
+            if (Community."Membership to Cust. Rel.") then
+                //-MM1.33 [326087]
+                //TESTFIELD(Blocked);
+                exit;
+        //+MM1.33 [326087]
 
         //+#308332 [308332]
 
@@ -308,7 +328,7 @@ table 6060127 "MM Membership"
         //    MembershipManagement.SynchronizeCustomerAndContact (MembershipRole."Membership Entry No.");
         //  UNTIL (MembershipRole.NEXT () = 0);
         // END;
-        MembershipManagement.SynchronizeCustomerAndContact (Rec."Entry No.");
+        MembershipManagement.SynchronizeCustomerAndContact(Rec."Entry No.");
         //+MM1.45 [413622]
     end;
 

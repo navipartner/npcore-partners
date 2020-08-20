@@ -7,52 +7,63 @@ table 6151438 "Magento Shipment Mapping"
     // MAG2.22/MHA /20190610  CASE 357763 Added field 140 "Shipment Fee Type" and changed table relation of field 150
 
     Caption = 'Magento Shipment Mapping';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(5;"External Shipment Method Code";Text[50])
+        field(5; "External Shipment Method Code"; Text[50])
         {
             Caption = 'External Shipment Method Code';
+            DataClassification = CustomerContent;
         }
-        field(100;"Shipment Method Code";Code[10])
+        field(100; "Shipment Method Code"; Code[10])
         {
             Caption = 'Shipment Method Code';
+            DataClassification = CustomerContent;
             TableRelation = "Shipment Method";
         }
-        field(110;"Shipping Agent Code";Code[10])
+        field(110; "Shipping Agent Code"; Code[10])
         {
             Caption = 'Shipping Agent Code';
+            DataClassification = CustomerContent;
             TableRelation = "Shipping Agent";
         }
-        field(120;"Shipping Agent Service Code";Code[10])
+        field(120; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE ("Shipping Agent Code"=FIELD("Shipping Agent Code"));
+            DataClassification = CustomerContent;
+            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
         }
-        field(140;"Shipment Fee Type";Option)
+        field(140; "Shipment Fee Type"; Option)
         {
             Caption = 'Shipment Fee Type';
+            DataClassification = CustomerContent;
             Description = 'MAG2.22';
             OptionCaption = 'G/L Account,Item,Resource,Fixed Asset,Charge (Item)';
             OptionMembers = "G/L Account",Item,Resource,"Fixed Asset","Charge (Item)";
         }
-        field(150;"Shipment Fee No.";Code[20])
+        field(150; "Shipment Fee No."; Code[20])
         {
             Caption = 'Shipment Fee No.';
+            DataClassification = CustomerContent;
             Description = 'MAG2.03,MAG2.22';
-            TableRelation = IF ("Shipment Fee Type"=CONST("G/L Account")) "G/L Account" WHERE ("Direct Posting"=CONST(true),
-                                                                                               "Account Type"=CONST(Posting),
-                                                                                               Blocked=CONST(false))
-                                                                                               ELSE IF ("Shipment Fee Type"=CONST(Item)) Item
-                                                                                               ELSE IF ("Shipment Fee Type"=CONST(Resource)) Resource
-                                                                                               ELSE IF ("Shipment Fee Type"=CONST("Fixed Asset")) "Fixed Asset"
-                                                                                               ELSE IF ("Shipment Fee Type"=CONST("Charge (Item)")) "Item Charge";
+            TableRelation = IF ("Shipment Fee Type" = CONST("G/L Account")) "G/L Account" WHERE("Direct Posting" = CONST(true),
+                                                                                               "Account Type" = CONST(Posting),
+                                                                                               Blocked = CONST(false))
+            ELSE
+            IF ("Shipment Fee Type" = CONST(Item)) Item
+            ELSE
+            IF ("Shipment Fee Type" = CONST(Resource)) Resource
+            ELSE
+            IF ("Shipment Fee Type" = CONST("Fixed Asset")) "Fixed Asset"
+            ELSE
+            IF ("Shipment Fee Type" = CONST("Charge (Item)")) "Item Charge";
         }
     }
 
     keys
     {
-        key(Key1;"External Shipment Method Code")
+        key(Key1; "External Shipment Method Code")
         {
         }
     }

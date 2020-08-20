@@ -7,34 +7,37 @@ table 6151405 "Magento VAT Business Group"
     // MAG2.18/MHA /20190314  CASE 348660 Increased field 1 "VAT Business Posting Group" from 10 to 20 in NAV2018 and newer
 
     Caption = 'Magento VAT Business Group';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"VAT Business Posting Group";Code[20])
+        field(1; "VAT Business Posting Group"; Code[20])
         {
             Caption = 'VAT Product Posting Group';
+            DataClassification = CustomerContent;
             Description = 'MAG2.18';
             NotBlank = true;
             TableRelation = "VAT Business Posting Group";
         }
-        field(2;Description;Text[50])
+        field(2; Description; Text[50])
         {
-            CalcFormula = Lookup("VAT Business Posting Group".Description WHERE (Code=FIELD("VAT Business Posting Group")));
+            CalcFormula = Lookup ("VAT Business Posting Group".Description WHERE(Code = FIELD("VAT Business Posting Group")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059809;"Magento Tax Class";Text[250])
+        field(6059809; "Magento Tax Class"; Text[250])
         {
             Caption = 'Magento Tax Class';
+            DataClassification = CustomerContent;
             Description = 'MAG1.05';
-            TableRelation = "Magento Tax Class" WHERE (Type=CONST(Customer));
+            TableRelation = "Magento Tax Class" WHERE(Type = CONST(Customer));
         }
     }
 
     keys
     {
-        key(Key1;"VAT Business Posting Group")
+        key(Key1; "VAT Business Posting Group")
         {
         }
     }

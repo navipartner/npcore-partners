@@ -4,38 +4,44 @@ table 6184516 "EFT Transaction Async Request"
     // NPR5.54/MMV /20200219 CASE 364340 Added fields 40, 50
 
     Caption = 'EFT Transaction Async Request';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Request Entry No";Integer)
+        field(1; "Request Entry No"; Integer)
         {
             Caption = 'Request Entry No';
+            DataClassification = CustomerContent;
             TableRelation = "EFT Transaction Request";
         }
-        field(20;Done;Boolean)
+        field(20; Done; Boolean)
         {
             Caption = 'Done';
+            DataClassification = CustomerContent;
         }
-        field(30;"Abort Requested";Boolean)
+        field(30; "Abort Requested"; Boolean)
         {
             Caption = 'Abort Requested';
+            DataClassification = CustomerContent;
         }
-        field(40;Metadata;BLOB)
+        field(40; Metadata; BLOB)
         {
             Caption = 'Metadata';
+            DataClassification = CustomerContent;
         }
-        field(50;"Hardware ID";Text[200])
+        field(50; "Hardware ID"; Text[200])
         {
             Caption = 'Hardware ID';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Request Entry No")
+        key(Key1; "Request Entry No")
         {
         }
-        key(Key2;"Hardware ID")
+        key(Key2; "Hardware ID")
         {
         }
     }

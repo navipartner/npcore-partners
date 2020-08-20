@@ -5,21 +5,25 @@ table 6184511 "EFT BIN Group"
     // NPR5.53/MMV /20191204 CASE 349520 Added insert validation
 
     Caption = 'EFT BIN Group';
+    DataClassification = CustomerContent;
     LookupPageID = "EFT BIN Group List";
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[100])
+        field(2; Description; Text[100])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(4;Priority;Integer)
+        field(4; Priority; Integer)
         {
             Caption = 'Priority';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -33,7 +37,7 @@ table 6184511 "EFT BIN Group"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }

@@ -4,20 +4,24 @@ table 6184482 "EFT Type POS Unit BLOB Param."
     // NPR5.48/MMV /20181029 CASE 334105 Fixed invalid variant parameter.
 
     Caption = 'EFT Type POS Unit BLOB Param.';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Integration Type"; Code[20])
         {
             Caption = 'Integration Type';
+            DataClassification = CustomerContent;
         }
         field(2; Name; Text[30])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
         field(3; Value; BLOB)
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -32,10 +36,12 @@ table 6184482 "EFT Type POS Unit BLOB Param."
         field(4; "User Configurable"; Boolean)
         {
             Caption = 'User Configurable';
+            DataClassification = CustomerContent;
         }
         field(5; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Unit"."No.";
         }
     }

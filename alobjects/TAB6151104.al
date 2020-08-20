@@ -3,24 +3,28 @@ table 6151104 "NpRi Party Type"
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
 
     Caption = 'Reimbursement Party Type';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NpRi Party Types";
     LookupPageID = "NpRi Party Types";
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(5;Description;Text[50])
+        field(5; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(10;"Table No.";Integer)
+        field(10; "Table No."; Integer)
         {
             BlankZero = true;
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -30,22 +34,22 @@ table 6151104 "NpRi Party Type"
             begin
                 NpRiSetupMgt.SetupPartyTypeTableNoLookup(TempTableMetadata);
                 if not TempTableMetadata.FindSet then
-                  exit;
+                    exit;
 
                 repeat
-                  TempAllObjWithCaption.Init;
-                  TempAllObjWithCaption."Object Type" := TempAllObjWithCaption."Object Type"::Table;
-                  TempAllObjWithCaption."Object ID" := TempTableMetadata.ID;
-                  TempAllObjWithCaption."Object Name" := TempTableMetadata.Name;
-                  TempAllObjWithCaption."Object Caption" := TempTableMetadata.Caption;
-                  TempAllObjWithCaption.Insert;
+                    TempAllObjWithCaption.Init;
+                    TempAllObjWithCaption."Object Type" := TempAllObjWithCaption."Object Type"::Table;
+                    TempAllObjWithCaption."Object ID" := TempTableMetadata.ID;
+                    TempAllObjWithCaption."Object Name" := TempTableMetadata.Name;
+                    TempAllObjWithCaption."Object Caption" := TempTableMetadata.Caption;
+                    TempAllObjWithCaption.Insert;
                 until TempTableMetadata.Next = 0;
 
-                if TempAllObjWithCaption.Get(TempAllObjWithCaption."Object Type"::Table,"Table No.") then;
-                if PAGE.RunModal(PAGE::"Table Objects",TempAllObjWithCaption) <> ACTION::LookupOK then
-                  exit;
+                if TempAllObjWithCaption.Get(TempAllObjWithCaption."Object Type"::Table, "Table No.") then;
+                if PAGE.RunModal(PAGE::"Table Objects", TempAllObjWithCaption) <> ACTION::LookupOK then
+                    exit;
 
-                Validate("Table No.",TempAllObjWithCaption."Object ID");
+                Validate("Table No.", TempAllObjWithCaption."Object ID");
             end;
 
             trigger OnValidate()
@@ -54,34 +58,36 @@ table 6151104 "NpRi Party Type"
                 NpRiSetupMgt: Codeunit "NpRi Setup Mgt.";
             begin
                 if "Table No." = 0 then
-                  exit;
+                    exit;
 
                 NpRiSetupMgt.SetupPartyTypeTableNoLookup(TempTableMetadata);
                 if not TempTableMetadata.Get("Table No.") then
-                  Error(Text000);
+                    Error(Text000);
             end;
         }
-        field(15;"Table Name";Text[249])
+        field(15; "Table Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE ("Object Type"=CONST(Table),
-                                                                           "Object ID"=FIELD("Table No.")));
+            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+                                                                           "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(100;"Reimburse every";DateFormula)
+        field(100; "Reimburse every"; DateFormula)
         {
             Caption = 'Reimburse every';
+            DataClassification = CustomerContent;
         }
-        field(105;"Next Posting Date Calculation";DateFormula)
+        field(105; "Next Posting Date Calculation"; DateFormula)
         {
             Caption = 'Next Posting Date Calculation';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -94,9 +100,9 @@ table 6151104 "NpRi Party Type"
     var
         NpRiParty: Record "NpRi Party";
     begin
-        NpRiParty.SetRange("Party Type",Code);
+        NpRiParty.SetRange("Party Type", Code);
         if NpRiParty.FindFirst then
-          Error(Text001,NpRiParty."No.");
+            Error(Text001, NpRiParty."No.");
     end;
 
     var

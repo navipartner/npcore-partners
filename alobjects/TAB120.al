@@ -1,4 +1,4 @@
-tableextension 6014409 tableextension6014409 extends "Purch. Rcpt. Header" 
+tableextension 6014409 tableextension6014409 extends "Purch. Rcpt. Header"
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Field 6014414 "Pay-to E-mail" for defining Recipient when sending E-mail using PDF2NAV.
@@ -10,57 +10,59 @@ tableextension 6014409 tableextension6014409 extends "Purch. Rcpt. Header"
     // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
-        field(6014414;"Pay-to E-mail";Text[80])
+        field(6014414; "Pay-to E-mail"; Text[80])
         {
             Caption = 'Pay-to E-mail';
+            DataClassification = CustomerContent;
             Description = 'PN1.00';
         }
-        field(6014415;"Document Processing";Option)
+        field(6014415; "Document Processing"; Option)
         {
             Caption = 'Document Processing';
+            DataClassification = CustomerContent;
             Description = 'PN1.00';
             OptionCaption = 'Print,E-mail,,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
         }
-        field(6014420;"Sell-to Customer Name";Text[50])
+        field(6014420; "Sell-to Customer Name"; Text[50])
         {
-            CalcFormula = Lookup(Customer.Name WHERE ("No."=FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup (Customer.Name WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Customer Name';
             FieldClass = FlowField;
         }
-        field(6014421;"Sell-to Customer Name 2";Text[50])
+        field(6014421; "Sell-to Customer Name 2"; Text[50])
         {
-            CalcFormula = Lookup(Customer."Name 2" WHERE ("No."=FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup (Customer."Name 2" WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Customer Name 2';
             FieldClass = FlowField;
         }
-        field(6014422;"Sell-to Address";Text[50])
+        field(6014422; "Sell-to Address"; Text[50])
         {
-            CalcFormula = Lookup(Customer.Address WHERE ("No."=FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup (Customer.Address WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Address';
             FieldClass = FlowField;
         }
-        field(6014423;"Sell-to Address 2";Text[50])
+        field(6014423; "Sell-to Address 2"; Text[50])
         {
-            CalcFormula = Lookup(Customer."Address 2" WHERE ("No."=FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup (Customer."Address 2" WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Address 2';
             FieldClass = FlowField;
         }
-        field(6014424;"Sell-to City";Text[30])
+        field(6014424; "Sell-to City"; Text[30])
         {
-            CalcFormula = Lookup(Customer.City WHERE ("No."=FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup (Customer.City WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to City';
             FieldClass = FlowField;
         }
-        field(6014425;"Sell-to Post Code";Code[20])
+        field(6014425; "Sell-to Post Code"; Code[20])
         {
-            CalcFormula = Lookup(Customer."Post Code" WHERE ("No."=FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup (Customer."Post Code" WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Post Code';
             FieldClass = FlowField;
         }
-        field(6014430;"Sell-to Phone No.";Text[30])
+        field(6014430; "Sell-to Phone No."; Text[30])
         {
-            CalcFormula = Lookup(Customer."Phone No." WHERE ("No."=FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup (Customer."Phone No." WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Phone No.';
             FieldClass = FlowField;
         }

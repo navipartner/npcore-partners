@@ -9,39 +9,46 @@ table 6150617 "POS Payment Bin"
     // NPR5.50/MMV /20190417 CASE 350812 Renamed field 30
 
     Caption = 'POS Payment Bin';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Payment Bins";
     LookupPageID = "POS Payment Bins";
 
     fields
     {
-        field(1;"No.";Code[10])
+        field(1; "No."; Code[10])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(5;"POS Store Code";Code[10])
+        field(5; "POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Store";
         }
-        field(6;"Attached to POS Unit No.";Code[10])
+        field(6; "Attached to POS Unit No."; Code[10])
         {
             Caption = 'Attached to POS Unit No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Unit";
         }
-        field(10;Description;Text[50])
+        field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;Status;Option)
+        field(20; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Open,Closed,Being Counted';
             OptionMembers = OPEN,CLOSED,BEINGCOUNTED;
         }
-        field(30;"Eject Method";Code[20])
+        field(30; "Eject Method"; Code[20])
         {
             Caption = 'Eject Method';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -50,7 +57,7 @@ table 6150617 "POS Payment Bin"
             begin
                 //-NPR5.40 [300600]
                 if POSPaymentBinInvokeMgt.LookupInvokeMethods(Rec, SelectedMethod) then
-                  Validate("Eject Method",SelectedMethod);
+                    Validate("Eject Method", SelectedMethod);
                 //+NPR5.40 [300600]
             end;
 
@@ -60,15 +67,16 @@ table 6150617 "POS Payment Bin"
             begin
                 //-NPR5.40 [300600]
                 if (Rec."Eject Method" <> xRec."Eject Method") and (xRec."Eject Method" <> '') then begin
-                  POSPaymentBinInvokeParameter.SetRange("Bin No.", "No.");
-                  POSPaymentBinInvokeParameter.DeleteAll;
+                    POSPaymentBinInvokeParameter.SetRange("Bin No.", "No.");
+                    POSPaymentBinInvokeParameter.DeleteAll;
                 end;
                 //+NPR5.40 [300600]
             end;
         }
-        field(40;"Bin Type";Option)
+        field(40; "Bin Type"; Option)
         {
             Caption = 'Bin Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Cash Drawer,Bank,Safe,Virtual';
             OptionMembers = CASH_DRAWER,BANK,SAFE,VIRTUAL;
         }
@@ -76,7 +84,7 @@ table 6150617 "POS Payment Bin"
 
     keys
     {
-        key(Key1;"No.")
+        key(Key1; "No.")
         {
         }
     }
@@ -90,7 +98,7 @@ table 6150617 "POS Payment Bin"
         POSPostingSetup: Record "POS Posting Setup";
         POSPaymentBinInvokeParameter: Record "POS Payment Bin Eject Param.";
     begin
-        POSPostingSetup.SetRange("POS Payment Bin Code","No.");
+        POSPostingSetup.SetRange("POS Payment Bin Code", "No.");
         POSPostingSetup.DeleteAll(true);
 
         //-NPR5.40 [300660]

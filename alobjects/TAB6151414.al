@@ -18,32 +18,36 @@ table 6151414 "Magento Category"
     // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
     Caption = 'Magento Category';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Category List";
     LookupPageID = "Magento Category List";
 
     fields
     {
-        field(1;Id;Code[20])
+        field(1; Id; Code[20])
         {
             Caption = 'Id';
+            DataClassification = CustomerContent;
             Description = 'MAG2.26';
             NotBlank = true;
         }
-        field(2;Name;Text[50])
+        field(2; Name; Text[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 //-MAG2.17 [333862]
                 if "Seo Link" = '' then
-                  Validate("Seo Link",Name);
+                    Validate("Seo Link", Name);
                 //+MAG2.17 [333862]
             end;
         }
-        field(4;"Parent Category Id";Code[20])
+        field(4; "Parent Category Id"; Code[20])
         {
             Caption = 'Parent Category Id';
+            DataClassification = CustomerContent;
             Description = 'MAG2.26';
             TableRelation = "Magento Category";
 
@@ -55,51 +59,59 @@ table 6151414 "Magento Category"
             begin
             end;
         }
-        field(5;Level;Integer)
+        field(5; Level; Integer)
         {
             Caption = 'Level';
+            DataClassification = CustomerContent;
         }
-        field(10;Path;Text[250])
+        field(10; Path; Text[250])
         {
             Caption = 'Path';
+            DataClassification = CustomerContent;
             Description = 'MAG1.12';
         }
-        field(25;"Has Child Groups";Boolean)
+        field(25; "Has Child Groups"; Boolean)
         {
-            CalcFormula = Exist("Magento Category" WHERE ("Parent Category Id"=FIELD(Id)));
+            CalcFormula = Exist ("Magento Category" WHERE("Parent Category Id" = FIELD(Id)));
             Caption = 'Has Child Groups';
             Description = 'MAG2.26';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(30;"Is Active";Boolean)
+        field(30; "Is Active"; Boolean)
         {
             Caption = 'Is Active';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(40;"Is Anchor";Boolean)
+        field(40; "Is Anchor"; Boolean)
         {
             Caption = 'Is Anchor';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(45;"Show In Navigation Menu";Boolean)
+        field(45; "Show In Navigation Menu"; Boolean)
         {
             Caption = 'Show In Navigation Menu';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(100;Root;Boolean)
+        field(100; Root; Boolean)
         {
             Caption = 'Root';
+            DataClassification = CustomerContent;
             Description = 'MAG1.21';
         }
-        field(110;"Root No.";Code[20])
+        field(110; "Root No."; Code[20])
         {
             Caption = 'Root No.';
+            DataClassification = CustomerContent;
             Description = 'MAG1.21';
         }
-        field(120;Icon;Text[250])
+        field(120; Icon; Text[250])
         {
             Caption = 'Icon';
+            DataClassification = CustomerContent;
             Description = 'MAG2.17';
 
             trigger OnLookup()
@@ -108,15 +120,16 @@ table 6151414 "Magento Category"
                 IconName: Text;
             begin
                 //-MAG2.17 [324862]
-                IconName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.ItemGroup",Icon);
+                IconName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.ItemGroup", Icon);
                 if IconName <> '' then
-                  Icon := IconName;
+                    Icon := IconName;
                 //+324862 [324862]
             end;
         }
-        field(130;"Short Description";BLOB)
+        field(130; "Short Description"; BLOB)
         {
             Caption = 'Short Description';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -131,34 +144,37 @@ table 6151414 "Magento Category"
                 //+MAG2.20 [346352]
             end;
         }
-        field(1000;"Item Count";Integer)
+        field(1000; "Item Count"; Integer)
         {
-            CalcFormula = Count("Magento Category Link" WHERE ("Category Id"=FIELD(Id)));
+            CalcFormula = Count ("Magento Category Link" WHERE("Category Id" = FIELD(Id)));
             Caption = 'Item Count';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059806;Picture;Text[250])
+        field(6059806; Picture; Text[250])
         {
             Caption = 'Picture';
+            DataClassification = CustomerContent;
             Description = 'MAG1.21';
 
             trigger OnLookup()
             var
                 PictureName: Text;
             begin
-                PictureName := NaviConnectFunctions.LookupPicture(NaviConnectFunctions."PictureType.ItemGroup",Picture);
+                PictureName := NaviConnectFunctions.LookupPicture(NaviConnectFunctions."PictureType.ItemGroup", Picture);
                 if PictureName <> '' then
-                  Picture := PictureName;
+                    Picture := PictureName;
             end;
         }
-        field(6059808;Sorting;Integer)
+        field(6059808; Sorting; Integer)
         {
             Caption = 'Sorting';
+            DataClassification = CustomerContent;
         }
-        field(6059811;Description;BLOB)
+        field(6059811; Description; BLOB)
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -171,36 +187,40 @@ table 6151414 "Magento Category"
                 RecRef.Modify(true);
             end;
         }
-        field(6059825;"Seo Link";Text[250])
+        field(6059825; "Seo Link"; Text[250])
         {
             Caption = 'Seo Link';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 "Seo Link" := NaviConnectFunctions.SeoFormat("Seo Link");
             end;
         }
-        field(6060021;"Meta Title";Text[100])
+        field(6060021; "Meta Title"; Text[100])
         {
             Caption = 'Meta Title';
+            DataClassification = CustomerContent;
             Description = 'MAG2.07,MAG2.22';
         }
-        field(6060022;"Meta Keywords";Text[250])
+        field(6060022; "Meta Keywords"; Text[250])
         {
             Caption = 'Meta Keywords';
+            DataClassification = CustomerContent;
         }
-        field(6060023;"Meta Description";Text[250])
+        field(6060023; "Meta Description"; Text[250])
         {
             Caption = 'Meta Description';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Id)
+        key(Key1; Id)
         {
         }
-        key(Key2;Path)
+        key(Key2; Path)
         {
         }
     }
@@ -216,25 +236,27 @@ table 6151414 "Magento Category"
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
     begin
         if (not SilentDelete) and (not GuiAllowed) then
-          if not Confirm(Text000,false) then
-            Error('');
+            if not Confirm(Text000, false) then
+                Error('');
 
-        MagentoCategory.SetRange("Parent Category Id",Id);
+        MagentoCategory.SetRange("Parent Category Id", Id);
         MagentoCategory.SetSilentDelete(true);
-        if MagentoCategory.FindSet then repeat
-          MagentoCategory.Delete(true);
-        until MagentoCategory.Next = 0;
+        if MagentoCategory.FindSet then
+            repeat
+                MagentoCategory.Delete(true);
+            until MagentoCategory.Next = 0;
 
         //-MAG2.26 [404580]
         if (not SilentDelete) and (not GuiAllowed) then
-        //+MAG2.26 [404580]
-        //-MAG1.20
-          if not Confirm(Text000,false) then
-            Error('');
-        MagentoCategoryLink.SetRange("Category Id",Id);
-        if MagentoCategoryLink.FindSet then repeat
-           MagentoCategoryLink.Delete(true);
-        until MagentoCategoryLink.Next = 0;
+            //+MAG2.26 [404580]
+            //-MAG1.20
+            if not Confirm(Text000, false) then
+                Error('');
+        MagentoCategoryLink.SetRange("Category Id", Id);
+        if MagentoCategoryLink.FindSet then
+            repeat
+                MagentoCategoryLink.Delete(true);
+            until MagentoCategoryLink.Next = 0;
         //+MAG1.20
     end;
 
@@ -244,7 +266,7 @@ table 6151414 "Magento Category"
     begin
         //-MAG2.26 [404580]
         if MagentoSetupMgt.HasSetupCategories() then
-          exit;
+            exit;
         //+MAG2.26 [404580]
 
         Path := GetPath();
@@ -259,7 +281,7 @@ table 6151414 "Magento Category"
     begin
         //-MAG2.26 [404580]
         if MagentoSetupMgt.HasSetupCategories() then
-          exit;
+            exit;
         //+MAG2.26 [404580]
 
         Path := GetPath();
@@ -278,12 +300,12 @@ table 6151414 "Magento Category"
     var
         MagentoCategory: Record "Magento Category";
     begin
-        MagentoCategory.SetRange("Parent Category Id",Id);
+        MagentoCategory.SetRange("Parent Category Id", Id);
         ChildrenCount := MagentoCategory.Count;
         if MagentoCategory.FindSet then
-          repeat
-            ChildrenCount += MagentoCategory.GetChildrenCount();
-          until MagentoCategory.Next = 0;
+            repeat
+                ChildrenCount += MagentoCategory.GetChildrenCount();
+            until MagentoCategory.Next = 0;
 
         exit(ChildrenCount);
     end;
@@ -292,9 +314,9 @@ table 6151414 "Magento Category"
     var
         MagentoCategory: Record "Magento Category";
     begin
-        MagentoCategory.SetRange("Parent Category Id",Id);
+        MagentoCategory.SetRange("Parent Category Id", Id);
         if not MagentoCategory.FindLast then
-          exit(Id + '00');
+            exit(Id + '00');
 
         exit(IncStr(MagentoCategory.Id));
     end;
@@ -304,9 +326,10 @@ table 6151414 "Magento Category"
         MagentoCategory: Record "Magento Category";
     begin
         MagentoCategoryPath := Id;
-        if MagentoCategory.Get("Parent Category Id") then repeat
-          MagentoCategoryPath := MagentoCategory.Id + '/' + MagentoCategoryPath;
-        until (not MagentoCategory.Get(MagentoCategory."Parent Category Id")) or (MagentoCategory.Id = '');
+        if MagentoCategory.Get("Parent Category Id") then
+            repeat
+                MagentoCategoryPath := MagentoCategory.Id + '/' + MagentoCategoryPath;
+            until (not MagentoCategory.Get(MagentoCategory."Parent Category Id")) or (MagentoCategory.Id = '');
 
         exit(MagentoCategoryPath);
     end;
@@ -317,10 +340,10 @@ table 6151414 "Magento Category"
     begin
         //-MAG1.21
         if Root then
-          exit(Id);
+            exit(Id);
 
         if MagentoCategory.Get("Parent Category Id") then;
-          exit(MagentoCategory."Root No.");
+        exit(MagentoCategory."Root No.");
 
         exit('');
         //+MAG1.21
@@ -337,21 +360,21 @@ table 6151414 "Magento Category"
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         NewPath: Text;
     begin
-        MagentoCategory.SetRange("Parent Category Id",Id);
+        MagentoCategory.SetRange("Parent Category Id", Id);
         if MagentoCategory.FindSet then
-          repeat
-            //-MAG1.21
-            //MagentoCategory.Path := Path + '/' + MagentoCategory.Id;
-            //MagentoCategory.MODIFY;
-            NewPath := Path + '/' + MagentoCategory.Id;
-            if (MagentoCategory.Path <> NewPath) or (MagentoCategory."Root No." <> "Root No.") then begin
-              MagentoCategory.Path := NewPath;
-              MagentoCategory."Root No." := "Root No.";
-              MagentoCategory.Modify;
-            end;
-            //+MAG1.21
-            MagentoCategory.UpdateChildPath();
-          until MagentoCategory.Next = 0;
+            repeat
+                //-MAG1.21
+                //MagentoCategory.Path := Path + '/' + MagentoCategory.Id;
+                //MagentoCategory.MODIFY;
+                NewPath := Path + '/' + MagentoCategory.Id;
+                if (MagentoCategory.Path <> NewPath) or (MagentoCategory."Root No." <> "Root No.") then begin
+                    MagentoCategory.Path := NewPath;
+                    MagentoCategory."Root No." := "Root No.";
+                    MagentoCategory.Modify;
+                end;
+                //+MAG1.21
+                MagentoCategory.UpdateChildPath();
+            until MagentoCategory.Next = 0;
     end;
 }
 

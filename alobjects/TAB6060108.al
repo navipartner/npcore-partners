@@ -8,46 +8,55 @@ table 6060108 "Ean Box Parameter"
     // NPR5.49/MHA /20190220  CASE 344084 Updated LookupValue() and ValidateValue() to use POS Parameter Value framework
 
     Caption = 'Ean Box Parameter';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Ean Box Parameters";
     LookupPageID = "Ean Box Parameters";
 
     fields
     {
-        field(1;"Setup Code";Code[20])
+        field(1; "Setup Code"; Code[20])
         {
             Caption = 'Setup Code';
+            DataClassification = CustomerContent;
         }
-        field(2;"Event Code";Code[20])
+        field(2; "Event Code"; Code[20])
         {
             Caption = 'Event Code';
+            DataClassification = CustomerContent;
         }
-        field(6;"Action Code";Code[20])
+        field(6; "Action Code"; Code[20])
         {
             Caption = 'Action Code';
+            DataClassification = CustomerContent;
         }
-        field(7;Name;Text[30])
+        field(7; Name; Text[30])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(8;"Data Type";Option)
+        field(8; "Data Type"; Option)
         {
             Caption = 'Data Type';
+            DataClassification = CustomerContent;
             Editable = false;
             OptionCaption = 'Text,Integer,Decimal,Date,Boolean,Option';
             OptionMembers = Text,"Integer",Decimal,Date,Boolean,Option;
         }
-        field(9;"Default Value";Text[250])
+        field(9; "Default Value"; Text[250])
         {
             Caption = 'Default Value';
+            DataClassification = CustomerContent;
         }
-        field(10;Options;Text[250])
+        field(10; Options; Text[250])
         {
             Caption = 'Options';
+            DataClassification = CustomerContent;
         }
-        field(11;Value;Text[250])
+        field(11; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -59,23 +68,26 @@ table 6060108 "Ean Box Parameter"
                 ValidateValue();
             end;
         }
-        field(16;OptionValueInteger;Integer)
+        field(16; OptionValueInteger; Integer)
         {
             Caption = 'OptionValueInteger';
+            DataClassification = CustomerContent;
         }
-        field(20;"Ean Box Value";Boolean)
+        field(20; "Ean Box Value"; Boolean)
         {
             Caption = 'Ean Box Value';
+            DataClassification = CustomerContent;
         }
-        field(25;"Non Editable";Boolean)
+        field(25; "Non Editable"; Boolean)
         {
             Caption = 'Non Editable';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Setup Code","Event Code","Action Code",Name)
+        key(Key1; "Setup Code", "Event Code", "Action Code", Name)
         {
         }
     }
@@ -131,7 +143,7 @@ table 6060108 "Ean Box Parameter"
         Value := TempPOSParameterValue.Value;
         //+NPR5.49 [344084]
         if "Data Type" = "Data Type"::Option then
-          Validate(OptionValueInteger,TypeHelper.GetOptionNo(Value,Options));
+            Validate(OptionValueInteger, TypeHelper.GetOptionNo(Value, Options));
     end;
 
     local procedure InitPOSParameterValue(var TempPOSParameterValue: Record "POS Parameter Value" temporary)

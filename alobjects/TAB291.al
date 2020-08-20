@@ -1,4 +1,4 @@
-tableextension 6014429 tableextension6014429 extends "Shipping Agent" 
+tableextension 6014429 tableextension6014429 extends "Shipping Agent"
 {
     // PS1.00/LS/20141021  CASE  188056 : PacSoft Module Integration
     //                                    Added fields 6014440, 6014441
@@ -24,40 +24,47 @@ tableextension 6014429 tableextension6014429 extends "Shipping Agent"
         {
             Caption = 'Account No.';
         }
-        field(6014440;"Shipping Agent Demand";Option)
+        field(6014440; "Shipping Agent Demand"; Option)
         {
             Caption = 'Shipping Agent Demand';
+            DataClassification = CustomerContent;
             Description = 'PS1.00';
             OptionCaption = ' ,Select a Service,Customs Information';
             OptionMembers = " ","Select a Service","Customs Information";
         }
-        field(6014441;"Pacsoft Product";Boolean)
+        field(6014441; "Pacsoft Product"; Boolean)
         {
             Caption = 'Pacsoft Product';
+            DataClassification = CustomerContent;
             Description = 'PS1.00';
         }
-        field(6014442;"Custom Print Layout";Code[20])
+        field(6014442; "Custom Print Layout"; Code[20])
         {
             Caption = 'Custom Print Layout';
+            DataClassification = CustomerContent;
             TableRelation = "RP Template Header".Code;
         }
-        field(6014450;"Shipping Method";Option)
+        field(6014450; "Shipping Method"; Option)
         {
             Caption = 'Shipping Method';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,GLS,PDK';
             OptionMembers = " ",GLS,PDK;
         }
-        field(6014451;"Ship to Contact Mandatory";Boolean)
+        field(6014451; "Ship to Contact Mandatory"; Boolean)
         {
             Caption = 'Ship to Contact Mandatory';
+            DataClassification = CustomerContent;
         }
-        field(6014452;"Drop Point Service";Boolean)
+        field(6014452; "Drop Point Service"; Boolean)
         {
             Caption = 'Drop Point Service';
+            DataClassification = CustomerContent;
         }
-        field(6014453;"Return Shipping agent";Boolean)
+        field(6014453; "Return Shipping agent"; Boolean)
         {
             Caption = 'Return Shipping agent';
+            DataClassification = CustomerContent;
         }
     }
 }

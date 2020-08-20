@@ -5,59 +5,70 @@ table 6150678 "NPRE Kitchen Request"
     // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
 
     Caption = 'Kitchen Request';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NPRE Kitchen Request List";
     LookupPageID = "NPRE Kitchen Request List";
 
     fields
     {
-        field(1;"Request No.";BigInteger)
+        field(1; "Request No."; BigInteger)
         {
             AutoIncrement = true;
             Caption = 'Request No.';
+            DataClassification = CustomerContent;
         }
-        field(20;"Order ID";BigInteger)
+        field(20; "Order ID"; BigInteger)
         {
             Caption = 'Order ID';
+            DataClassification = CustomerContent;
             TableRelation = "NPRE Kitchen Order";
         }
-        field(30;"Line Status";Option)
+        field(30; "Line Status"; Option)
         {
             Caption = 'Line Status';
+            DataClassification = CustomerContent;
             InitValue = Planned;
             OptionCaption = 'Ready for Serving,Serving Requested,Planned,Served,Cancelled';
             OptionMembers = "Ready for Serving","Serving Requested",Planned,Served,Cancelled;
         }
-        field(40;"Production Status";Option)
+        field(40; "Production Status"; Option)
         {
             Caption = 'Production Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Not Started,Started,On Hold,Finished,Cancelled';
             OptionMembers = "Not Started",Started,"On Hold",Finished,Cancelled;
         }
-        field(50;"Restaurant Code";Code[20])
+        field(50; "Restaurant Code"; Code[20])
         {
             Caption = 'Restaurant Code';
+            DataClassification = CustomerContent;
             TableRelation = "NPRE Restaurant";
         }
-        field(60;"Serving Step";Code[10])
+        field(60; "Serving Step"; Code[10])
         {
             Caption = 'Serving Step';
-            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(WaiterPadLineMealFlow));
+            DataClassification = CustomerContent;
+            TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
-        field(70;"Created Date-Time";DateTime)
+        field(70; "Created Date-Time"; DateTime)
         {
             Caption = 'Created Date-Time';
+            DataClassification = CustomerContent;
         }
-        field(80;"Serving Requested Date-Time";DateTime)
+        field(80; "Serving Requested Date-Time"; DateTime)
         {
             Caption = 'Serving Requested Date-Time';
+            DataClassification = CustomerContent;
         }
-        field(90;Priority;Integer)
+        field(90; Priority; Integer)
         {
             Caption = 'Priority';
+            DataClassification = CustomerContent;
         }
-        field(100;Type;Option)
+        field(100; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             InitValue = Item;
             OptionCaption = ',Item,,,,,,,,Comment';
             OptionMembers = ,Item,,,,,,,,Comment;
@@ -65,55 +76,59 @@ table 6150678 "NPRE Kitchen Request"
             trigger OnValidate()
             begin
                 if Type <> xRec.Type then begin
-                  TestChangesAllowed;
-                  RevertToNewLineState;
+                    TestChangesAllowed;
+                    RevertToNewLineState;
                 end;
             end;
         }
-        field(110;"No.";Code[20])
+        field(110; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type=CONST(Item)) Item;
+            DataClassification = CustomerContent;
+            TableRelation = IF (Type = CONST(Item)) Item;
 
             trigger OnValidate()
             begin
                 if "No." <> xRec."No." then begin
-                  TestChangesAllowed;
-                  RevertToNewLineState;
-                  "No." := KitchenOrderLine."No.";
-                  if "No." = '' then
-                    exit;
-                  //-NPR5.55 [399170]-revoked
-                  //IF Type <> Type::Comment THEN
-                  //  Quantity := KitchenOrderLine.Quantity;
-                  //+NPR5.55 [399170]-revoked
+                    TestChangesAllowed;
+                    RevertToNewLineState;
+                    "No." := KitchenOrderLine."No.";
+                    if "No." = '' then
+                        exit;
+                    //-NPR5.55 [399170]-revoked
+                    //IF Type <> Type::Comment THEN
+                    //  Quantity := KitchenOrderLine.Quantity;
+                    //+NPR5.55 [399170]-revoked
                 end;
 
                 case Type of
-                  Type::Item: begin
-                    GetItem;
-                    Item.TestField(Blocked,false);
-                    Validate("Unit of Measure Code",Item."Sales Unit of Measure");
-                  end;
-                  else
-                    Validate("Unit of Measure Code");
+                    Type::Item:
+                        begin
+                            GetItem;
+                            Item.TestField(Blocked, false);
+                            Validate("Unit of Measure Code", Item."Sales Unit of Measure");
+                        end;
+                    else
+                        Validate("Unit of Measure Code");
                 end;
             end;
         }
-        field(111;"Variant Code";Code[10])
+        field(111; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type=CONST(Item)) "Item Variant".Code WHERE ("Item No."=FIELD("No."));
+            DataClassification = CustomerContent;
+            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
-        field(120;Description;Text[80])
+        field(120; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(130;Quantity;Decimal)
+        field(130; Quantity; Decimal)
         {
-            CalcFormula = Sum("NPRE Kitchen Req. Source Link".Quantity WHERE ("Request No."=FIELD("Request No.")));
+            CalcFormula = Sum ("NPRE Kitchen Req. Source Link".Quantity WHERE("Request No." = FIELD("Request No.")));
             Caption = 'Quantity';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
 
@@ -122,39 +137,42 @@ table 6150678 "NPRE Kitchen Request"
                 //"Quantity (Base)" := CalcBaseQty(Quantity);  //NPR5.55 [399170]-revoked
             end;
         }
-        field(140;"Unit of Measure Code";Code[10])
+        field(140; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type=CONST(Item),
-                                "No."=FILTER(<>'')) "Item Unit of Measure".Code WHERE ("Item No."=FIELD("No."));
+            DataClassification = CustomerContent;
+            TableRelation = IF (Type = CONST(Item),
+                                "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
 
             trigger OnValidate()
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
                 case Type of
-                  Type::Item: begin
-                    GetItem;
-                    "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item,"Unit of Measure Code");
-                  end;
-                  else
-                    "Qty. per Unit of Measure" := 1;
+                    Type::Item:
+                        begin
+                            GetItem;
+                            "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
+                        end;
+                    else
+                        "Qty. per Unit of Measure" := 1;
                 end;
                 //VALIDATE(Quantity); //NPR5.55 [399170]-revoked
             end;
         }
-        field(150;"Qty. per Unit of Measure";Decimal)
+        field(150; "Qty. per Unit of Measure"; Decimal)
         {
             Caption = 'Qty. per Unit of Measure';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             Editable = false;
             InitValue = 1;
         }
-        field(160;"Quantity (Base)";Decimal)
+        field(160; "Quantity (Base)"; Decimal)
         {
-            CalcFormula = Sum("NPRE Kitchen Req. Source Link"."Quantity (Base)" WHERE ("Request No."=FIELD("Request No.")));
+            CalcFormula = Sum ("NPRE Kitchen Req. Source Link"."Quantity (Base)" WHERE("Request No." = FIELD("Request No.")));
             Caption = 'Quantity (Base)';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
 
@@ -166,44 +184,45 @@ table 6150678 "NPRE Kitchen Request"
                 //+NPR5.55 [399170]-revoked
             end;
         }
-        field(170;"On Hold";Boolean)
+        field(170; "On Hold"; Boolean)
         {
             Caption = 'On Hold';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Kitchen Station Filter";Code[20])
+        field(1000; "Kitchen Station Filter"; Code[20])
         {
             Caption = 'Kitchen Station Filter';
             FieldClass = FlowFilter;
-            TableRelation = "NPRE Kitchen Station".Code WHERE ("Restaurant Code"=FIELD("Production Restaurant Filter"));
+            TableRelation = "NPRE Kitchen Station".Code WHERE("Restaurant Code" = FIELD("Production Restaurant Filter"));
         }
-        field(1010;"Production Restaurant Filter";Code[20])
+        field(1010; "Production Restaurant Filter"; Code[20])
         {
             Caption = 'Production Restaurant Filter';
             FieldClass = FlowFilter;
             TableRelation = "NPRE Restaurant";
         }
-        field(1100;"Applicable for Kitchen Station";Boolean)
+        field(1100; "Applicable for Kitchen Station"; Boolean)
         {
-            CalcFormula = Exist("NPRE Kitchen Request Station" WHERE ("Request No."=FIELD("Request No."),
-                                                                      "Production Restaurant Code"=FIELD("Production Restaurant Filter"),
-                                                                      "Kitchen Station"=FIELD("Kitchen Station Filter")));
+            CalcFormula = Exist ("NPRE Kitchen Request Station" WHERE("Request No." = FIELD("Request No."),
+                                                                      "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
+                                                                      "Kitchen Station" = FIELD("Kitchen Station Filter")));
             Caption = 'Applicable for Kitchen Station';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1110;"No. of Kitchen Stations";Integer)
+        field(1110; "No. of Kitchen Stations"; Integer)
         {
-            CalcFormula = Count("NPRE Kitchen Request Station" WHERE ("Request No."=FIELD("Request No.")));
+            CalcFormula = Count ("NPRE Kitchen Request Station" WHERE("Request No." = FIELD("Request No.")));
             Caption = 'No. of Kitchen Stations';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1120;"Qty. Changed";Boolean)
+        field(1120; "Qty. Changed"; Boolean)
         {
-            CalcFormula = Exist("NPRE Kitchen Request Station" WHERE ("Request No."=FIELD("Request No."),
-                                                                      "Production Restaurant Code"=FIELD("Production Restaurant Filter"),
-                                                                      "Kitchen Station"=FIELD("Kitchen Station Filter"),
-                                                                      "Qty. Change Not Accepted"=CONST(true)));
+            CalcFormula = Exist ("NPRE Kitchen Request Station" WHERE("Request No." = FIELD("Request No."),
+                                                                      "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
+                                                                      "Kitchen Station" = FIELD("Kitchen Station Filter"),
+                                                                      "Qty. Change Not Accepted" = CONST(true)));
             Caption = 'Qty. Changed';
             Editable = false;
             FieldClass = FlowField;
@@ -212,13 +231,13 @@ table 6150678 "NPRE Kitchen Request"
 
     keys
     {
-        key(Key1;"Request No.")
+        key(Key1; "Request No.")
         {
         }
-        key(Key2;"Order ID")
+        key(Key2; "Order ID")
         {
         }
-        key(Key3;"Restaurant Code","Line Status",Priority,"Order ID","Created Date-Time")
+        key(Key3; "Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time")
         {
         }
     }
@@ -233,7 +252,7 @@ table 6150678 "NPRE Kitchen Request"
     begin
         KitchenReqStation.SetRange("Request No.", "Request No.");
         if not KitchenReqStation.IsEmpty then
-          KitchenReqStation.DeleteAll;
+            KitchenReqStation.DeleteAll;
 
         DeleteSourceLinks();  //NPR5.55 [399170]
     end;
@@ -245,8 +264,8 @@ table 6150678 "NPRE Kitchen Request"
 
     local procedure TestChangesAllowed()
     begin
-        TestField("Line Status","Line Status"::"Ready for Serving");
-        TestField("Production Status","Production Status"::"Not Started");
+        TestField("Line Status", "Line Status"::"Ready for Serving");
+        TestField("Production Status", "Production Status"::"Not Started");
     end;
 
     procedure SuppressChangesAllowedTest(Suppress: Boolean)
@@ -270,19 +289,19 @@ table 6150678 "NPRE Kitchen Request"
 
     local procedure GetItem()
     begin
-        TestField(Type,Type::Item);
+        TestField(Type, Type::Item);
         TestField("No.");
         if "No." <> Item."No." then
-          Item.Get("No.");
+            Item.Get("No.");
     end;
 
     procedure GetNextStationReqLineNo(): Integer
     var
         KitchenReqStation: Record "NPRE Kitchen Request Station";
     begin
-        KitchenReqStation.SetRange("Request No.","Request No.");
+        KitchenReqStation.SetRange("Request No.", "Request No.");
         if not KitchenReqStation.FindLast then
-          KitchenReqStation."Line No." := 0;
+            KitchenReqStation."Line No." := 0;
         exit(KitchenReqStation."Line No." + 10000);
     end;
 
@@ -317,23 +336,24 @@ table 6150678 "NPRE Kitchen Request"
     begin
         //-NPR5.55 [399170]
         with KitchenReqSourceLink do begin
-          SetCurrentKey("Request No.");
-          SetRange("Request No.", Rec."Request No.");
-          if FindLast then
-        //+NPR5.55 [399170]
-            case "Source Document Type" of
-              "Source Document Type"::"Waiter Pad": begin
-                SeatingWaiterPadLink.SetRange("Waiter Pad No.","Source Document No.");
-                if not SeatingWaiterPadLink.FindFirst then
-                  SeatingWaiterPadLink."Seating Code" := '';
-                exit(SeatingWaiterPadLink."Seating Code");
-              end;
-        //-NPR5.55 [399170]-revoked
-        //      ELSE
-        //        EXIT('');
-        //+NPR5.55 [399170]-revoked
-            end;
-        //-NPR5.55 [399170]
+            SetCurrentKey("Request No.");
+            SetRange("Request No.", Rec."Request No.");
+            if FindLast then
+                //+NPR5.55 [399170]
+                case "Source Document Type" of
+                    "Source Document Type"::"Waiter Pad":
+                        begin
+                            SeatingWaiterPadLink.SetRange("Waiter Pad No.", "Source Document No.");
+                            if not SeatingWaiterPadLink.FindFirst then
+                                SeatingWaiterPadLink."Seating Code" := '';
+                            exit(SeatingWaiterPadLink."Seating Code");
+                        end;
+                //-NPR5.55 [399170]-revoked
+                //      ELSE
+                //        EXIT('');
+                //+NPR5.55 [399170]-revoked
+                end;
+            //-NPR5.55 [399170]
         end;
         exit('');
         //+NPR5.55 [399170]
@@ -347,7 +367,7 @@ table 6150678 "NPRE Kitchen Request"
         KitchenReqSourceLink.SetCurrentKey("Request No.");
         KitchenReqSourceLink.SetRange("Request No.", "Request No.");
         if not KitchenReqSourceLink.IsEmpty then
-          KitchenReqSourceLink.DeleteAll;
+            KitchenReqSourceLink.DeleteAll;
         //+NPR5.55 [399170]
     end;
 }

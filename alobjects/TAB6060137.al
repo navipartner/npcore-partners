@@ -6,129 +6,151 @@ table 6060137 "MM Member Notification Setup"
     // MM1.44/TSA /20200416 CASE 400601 Added Magento Password URL support
 
     Caption = 'MM Member Notification Setup';
+    DataClassification = CustomerContent;
     DrillDownPageID = "MM Member Notification Setup";
     LookupPageID = "MM Member Notification Setup";
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[50])
+        field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;Type;Option)
+        field(20; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create';
             OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE;
         }
-        field(30;"Days Before";Integer)
+        field(30; "Days Before"; Integer)
         {
             Caption = 'Days Before';
+            DataClassification = CustomerContent;
         }
-        field(40;"Days Past";Integer)
+        field(40; "Days Past"; Integer)
         {
             Caption = 'Days Past';
+            DataClassification = CustomerContent;
         }
-        field(50;"Template Filter Value";Code[20])
+        field(50; "Template Filter Value"; Code[20])
         {
             Caption = 'Template Filter Value';
+            DataClassification = CustomerContent;
         }
-        field(60;"Community Code";Code[20])
+        field(60; "Community Code"; Code[20])
         {
             Caption = 'Community Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Member Community";
         }
-        field(61;"Membership Code";Code[20])
+        field(61; "Membership Code"; Code[20])
         {
             Caption = 'Membership Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Membership Setup";
         }
-        field(70;"Next Notification Code";Code[10])
+        field(70; "Next Notification Code"; Code[10])
         {
             Caption = 'Next Notification Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Member Notification Setup";
         }
-        field(75;"Cancel Overdue Notif. (Days)";Integer)
+        field(75; "Cancel Overdue Notif. (Days)"; Integer)
         {
             Caption = 'Cancel Overdue Notif. (Days)';
+            DataClassification = CustomerContent;
         }
-        field(80;"Target Member Role";Option)
+        field(80; "Target Member Role"; Option)
         {
             Caption = 'Target Member Role';
+            DataClassification = CustomerContent;
             OptionCaption = 'First Admin,All Admins,All Member';
             OptionMembers = FIRST_ADMIN,ALL_ADMINS,ALL_MEMBERS;
         }
-        field(85;"Processing Method";Option)
+        field(85; "Processing Method"; Option)
         {
             Caption = 'Processing Method';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
             OptionCaption = 'Batch,Manual,Inline';
             OptionMembers = BATCH,MANUAL,INLINE;
         }
-        field(100;"NP Pass Server Base URL";Text[200])
+        field(100; "NP Pass Server Base URL"; Text[200])
         {
             Caption = 'NP Pass Server Base URL';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
             InitValue = 'https://passes.npecommerce.dk/api/v1';
         }
-        field(105;"Pass Notification Method";Option)
+        field(105; "Pass Notification Method"; Option)
         {
             Caption = 'Pass Notification Method';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
             OptionCaption = 'Asynchronous,Synchronous';
             OptionMembers = ASYNCHRONOUS,SYNCHRONOUS;
         }
-        field(110;"Passes API";Text[50])
+        field(110; "Passes API"; Text[50])
         {
             Caption = 'Passes API';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
             InitValue = '/passes/%1/%2';
         }
-        field(120;"PUT Passes Template";BLOB)
+        field(120; "PUT Passes Template"; BLOB)
         {
             Caption = 'PUT Passes Template';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(130;"Pass Token";Text[150])
+        field(130; "Pass Token"; Text[150])
         {
             Caption = 'Pass Token';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(135;"Pass Type Code";Text[30])
+        field(135; "Pass Type Code"; Text[30])
         {
             Caption = 'Pass Type Code';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(140;"Include NP Pass";Boolean)
+        field(140; "Include NP Pass"; Boolean)
         {
             Caption = 'Include NP Pass';
+            DataClassification = CustomerContent;
             Description = '//-MM1.29 [314131]';
         }
-        field(150;"Generate Magento PW URL";Boolean)
+        field(150; "Generate Magento PW URL"; Boolean)
         {
             Caption = 'Generate Magento PW URL';
+            DataClassification = CustomerContent;
             Description = '//-MM1.44 [400601]';
         }
-        field(155;"Fallback Magento PW URL";Text[150])
+        field(155; "Fallback Magento PW URL"; Text[150])
         {
             Caption = 'Fallback Magento PW URL';
+            DataClassification = CustomerContent;
             Description = '//-MM1.44 [400601]';
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
-        key(Key2;Type,"Community Code","Membership Code","Days Before")
+        key(Key2; Type, "Community Code", "Membership Code", "Days Before")
         {
         }
-        key(Key3;Type,"Community Code","Membership Code","Days Past")
+        key(Key3; Type, "Community Code", "Membership Code", "Days Past")
         {
         }
     }

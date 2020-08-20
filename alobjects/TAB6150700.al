@@ -4,68 +4,80 @@ table 6150700 "POS Menu"
     // NPR5.45/MHA /20180813  CASE 324677 Added cleanup to OnDelete()
 
     Caption = 'POS Menu';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Menus";
     LookupPageID = "POS Menus";
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[50])
+        field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(3;Caption;Text[50])
+        field(3; Caption; Text[50])
         {
             Caption = 'Caption';
+            DataClassification = CustomerContent;
         }
-        field(4;Tooltip;Text[250])
+        field(4; Tooltip; Text[250])
         {
             Caption = 'Tooltip';
+            DataClassification = CustomerContent;
         }
-        field(5;Blocked;Boolean)
+        field(5; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
         }
-        field(6;"Custom Class Attribute";Text[30])
+        field(6; "Custom Class Attribute"; Text[30])
         {
             Caption = 'Custom Class Attribute';
+            DataClassification = CustomerContent;
         }
-        field(41;"Register Type";Code[10])
+        field(41; "Register Type"; Code[10])
         {
             Caption = 'Cash Register Type';
+            DataClassification = CustomerContent;
             TableRelation = "Register Types";
         }
-        field(42;"Register No.";Code[10])
+        field(42; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             TableRelation = Register;
         }
-        field(43;"Salesperson Code";Code[20])
+        field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser".Code;
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(44;"Available on Desktop";Boolean)
+        field(44; "Available on Desktop"; Boolean)
         {
             Caption = 'Available on Desktop';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(45;"Available in App";Boolean)
+        field(45; "Available in App"; Boolean)
         {
             Caption = 'Available in App';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -80,14 +92,14 @@ table 6150700 "POS Menu"
         POSParameterValue: Record "POS Parameter Value";
     begin
         //-NPR5.45 [324677]
-        POSParameterValue.SetRange("Table No.",DATABASE::"POS Menu Button");
-        POSParameterValue.SetRange(Code,Code);
+        POSParameterValue.SetRange("Table No.", DATABASE::"POS Menu Button");
+        POSParameterValue.SetRange(Code, Code);
         if POSParameterValue.FindFirst then
-          POSParameterValue.DeleteAll;
+            POSParameterValue.DeleteAll;
 
-        POSMenuButton.SetRange("Menu Code",Code);
+        POSMenuButton.SetRange("Menu Code", Code);
         if POSMenuButton.FindFirst then
-          POSMenuButton.DeleteAll;
+            POSMenuButton.DeleteAll;
         //+NPR5.45 [324677]
     end;
 

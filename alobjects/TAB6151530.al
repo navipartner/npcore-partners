@@ -3,6 +3,7 @@ table 6151530 "Nc Collector Request Filter"
     // NC2.01\BR\20160909  CASE 250447 NaviConnect: Object created
 
     Caption = 'Nc Collector Request Filter';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,16 +11,19 @@ table 6151530 "Nc Collector Request Filter"
         {
             AutoIncrement = true;
             Caption = 'Nc Collector Request No.';
+            DataClassification = CustomerContent;
             TableRelation = "Nc Collector Request";
         }
         field(20; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(30; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnLookup()
@@ -47,6 +51,7 @@ table 6151530 "Nc Collector Request Filter"
         field(40; "Filter Text"; Text[250])
         {
             Caption = 'Filter Text';
+            DataClassification = CustomerContent;
         }
     }
 

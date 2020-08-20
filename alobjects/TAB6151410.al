@@ -6,29 +6,32 @@ table 6151410 "Magento Inventory Company"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object and field 1
 
     Caption = 'Magento Inventory Company';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Company Name";Text[30])
+        field(1; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Company;
         }
-        field(5;"Location Filter";Text[100])
+        field(5; "Location Filter"; Text[100])
         {
             Caption = 'Location Filter';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
                 Location: Record Location;
             begin
                 if "Company Name" <> CompanyName then
-                  if not Location.ChangeCompany("Company Name") then
-                    exit;
+                    if not Location.ChangeCompany("Company Name") then
+                        exit;
 
-                if PAGE.RunModal(PAGE::"Location List",Location) <> ACTION::LookupOK then
-                  exit;
+                if PAGE.RunModal(PAGE::"Location List", Location) <> ACTION::LookupOK then
+                    exit;
 
                 "Location Filter" := Location.Code;
             end;
@@ -38,28 +41,32 @@ table 6151410 "Magento Inventory Company"
                 "Location Filter" := UpperCase("Location Filter");
             end;
         }
-        field(10;"Api Url";Text[250])
+        field(10; "Api Url"; Text[250])
         {
             Caption = 'Api Url';
+            DataClassification = CustomerContent;
         }
-        field(15;"Api Username";Text[100])
+        field(15; "Api Username"; Text[100])
         {
             Caption = 'Api Username';
+            DataClassification = CustomerContent;
         }
-        field(20;"Api Password";Text[100])
+        field(20; "Api Password"; Text[100])
         {
             Caption = 'Api Password';
+            DataClassification = CustomerContent;
         }
-        field(25;"Api Domain";Text[100])
+        field(25; "Api Domain"; Text[100])
         {
             Caption = 'Api Domain';
+            DataClassification = CustomerContent;
             Description = 'MAG1.22.01';
         }
     }
 
     keys
     {
-        key(Key1;"Company Name")
+        key(Key1; "Company Name")
         {
         }
     }
@@ -84,11 +91,11 @@ table 6151410 "Magento Inventory Company"
         Position: Integer;
     begin
         if "Api Url" = '' then begin
-          "Api Url" := GetUrl(CLIENTTYPE::SOAP,"Company Name",OBJECTTYPE::Codeunit,CODEUNIT::"Magento Webservice");
-          if StrPos(LowerCase("Api Url"),'https://') = 1 then begin
-            Position := StrPos(CopyStr("Api Url",StrLen('https://')),':');
-            "Api Url" := 'https://localhost.dynamics-retail.com:' + CopyStr("Api Url",StrLen('https://') + Position);
-          end;
+            "Api Url" := GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"Magento Webservice");
+            if StrPos(LowerCase("Api Url"), 'https://') = 1 then begin
+                Position := StrPos(CopyStr("Api Url", StrLen('https://')), ':');
+                "Api Url" := 'https://localhost.dynamics-retail.com:' + CopyStr("Api Url", StrLen('https://') + Position);
+            end;
         end;
     end;
 }

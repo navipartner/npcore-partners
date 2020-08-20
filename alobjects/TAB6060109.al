@@ -3,82 +3,97 @@ table 6060109 "TM Offline Ticket Validation"
     // TM1.22/NPKNAV/20170612  CASE 274464 Transport T0007 - 12 June 2017
 
     Caption = 'Offline Ticket Validation';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(10;"Ticket Reference Type";Option)
+        field(10; "Ticket Reference Type"; Option)
         {
             Caption = 'Ticket Reference Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Ticket No.';
             OptionMembers = EXTERNALTICKETNO;
         }
-        field(15;"Ticket Reference No.";Code[20])
+        field(15; "Ticket Reference No."; Code[20])
         {
             Caption = 'Ticket Reference No.';
+            DataClassification = CustomerContent;
         }
-        field(20;"Member Reference Type";Option)
+        field(20; "Member Reference Type"; Option)
         {
             Caption = 'Member Reference Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Member Card No.,Member No.';
             OptionMembers = MEMBERCARDNO,MEMBERNO;
         }
-        field(25;"Member Reference No.";Code[20])
+        field(25; "Member Reference No."; Code[20])
         {
             Caption = 'Member Reference No.';
+            DataClassification = CustomerContent;
         }
-        field(30;"Event Type";Option)
+        field(30; "Event Type"; Option)
         {
             Caption = 'Event Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Admit,Depart';
             OptionMembers = ADMIT,DEPART;
         }
-        field(31;"Event Date";Date)
+        field(31; "Event Date"; Date)
         {
             Caption = 'Event Date';
+            DataClassification = CustomerContent;
         }
-        field(32;"Event Time";Time)
+        field(32; "Event Time"; Time)
         {
             Caption = 'Event Time';
+            DataClassification = CustomerContent;
         }
-        field(40;"Process Status";Option)
+        field(40; "Process Status"; Option)
         {
             Caption = 'Process Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Unhandled,Valid,Invalid';
             OptionMembers = UNHANDLED,VALID,INVALID;
         }
-        field(45;"Process Response Text";Text[250])
+        field(45; "Process Response Text"; Text[250])
         {
             Caption = 'Process Response Text';
+            DataClassification = CustomerContent;
         }
-        field(50;"Admission Code";Code[20])
+        field(50; "Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
+            DataClassification = CustomerContent;
         }
-        field(70;"Imported At";DateTime)
+        field(70; "Imported At"; DateTime)
         {
             Caption = 'Imported At';
+            DataClassification = CustomerContent;
         }
-        field(75;"Import Reference Name";Text[80])
+        field(75; "Import Reference Name"; Text[80])
         {
             Caption = 'Import Reference Name';
+            DataClassification = CustomerContent;
         }
-        field(76;"Import Reference No.";Integer)
+        field(76; "Import Reference No."; Integer)
         {
             Caption = 'Import Reference No.';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Import Reference No.")
+        key(Key2; "Import Reference No.")
         {
         }
     }
@@ -90,7 +105,7 @@ table 6060109 "TM Offline Ticket Validation"
     trigger OnDelete()
     begin
         if ("Process Status" = "Process Status"::VALID) then
-          Error (DELETE_NOT_ALLOWED, FieldCaption ("Process Status"), "Process Status", TableCaption, FieldCaption ("Entry No."), "Entry No.");
+            Error(DELETE_NOT_ALLOWED, FieldCaption("Process Status"), "Process Status", TableCaption, FieldCaption("Entry No."), "Entry No.");
     end;
 
     var

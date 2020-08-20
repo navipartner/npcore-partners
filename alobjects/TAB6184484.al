@@ -3,26 +3,31 @@ table 6184484 "EFT Type POS Unit Gen. Param."
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Type POS Unit Gen. Param.';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Integration Type";Code[20])
+        field(1; "Integration Type"; Code[20])
         {
             Caption = 'Integration Type';
+            DataClassification = CustomerContent;
         }
-        field(2;Name;Text[30])
+        field(2; Name; Text[30])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
-        field(3;"Data Type";Option)
+        field(3; "Data Type"; Option)
         {
             Caption = 'Data Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Text,Integer,Decimal,Date,Boolean,Option';
             OptionMembers = Text,"Integer",Decimal,Date,Boolean,Option;
         }
-        field(4;Value;Text[250])
+        field(4; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -34,24 +39,27 @@ table 6184484 "EFT Type POS Unit Gen. Param."
                 ValidateValue();
             end;
         }
-        field(5;OptionString;Text[250])
+        field(5; OptionString; Text[250])
         {
             Caption = 'OptionString';
+            DataClassification = CustomerContent;
         }
-        field(6;"User Configurable";Boolean)
+        field(6; "User Configurable"; Boolean)
         {
             Caption = 'User Configurable';
+            DataClassification = CustomerContent;
         }
-        field(7;"POS Unit No.";Code[10])
+        field(7; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Unit"."No.";
         }
     }
 
     keys
     {
-        key(Key1;"Integration Type","POS Unit No.",Name)
+        key(Key1; "Integration Type", "POS Unit No.", Name)
         {
         }
     }
@@ -66,7 +74,7 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         FieldErrorBase: Label 'is not a valid %1';
         FieldErrorOption: Label 'does not contain a valid option (%1)';
 
-    procedure GetTextParameterValue(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;DefaultValue: Text;UserConfigurable: Boolean): Text
+    procedure GetTextParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Text; UserConfigurable: Boolean): Text
     var
         InvokeParameter: Record "POS Payment Bin Eject Param.";
     begin
@@ -74,7 +82,7 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         exit(Value);
     end;
 
-    procedure GetIntegerParameterValue(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;DefaultValue: Integer;UserConfigurable: Boolean): Integer
+    procedure GetIntegerParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Integer; UserConfigurable: Boolean): Integer
     var
         InvokeParameter: Record "POS Payment Bin Eject Param.";
         "Integer": Integer;
@@ -84,7 +92,7 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         exit(Integer);
     end;
 
-    procedure GetBooleanParameterValue(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;DefaultValue: Boolean;UserConfigurable: Boolean): Boolean
+    procedure GetBooleanParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Boolean; UserConfigurable: Boolean): Boolean
     var
         InvokeParameter: Record "POS Payment Bin Eject Param.";
         Boolean: Boolean;
@@ -94,7 +102,7 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         exit(Boolean);
     end;
 
-    procedure GetOptionParameterValue(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;DefaultValue: Integer;OptionStringIn: Text;UserConfigurable: Boolean): Integer
+    procedure GetOptionParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Integer; OptionStringIn: Text; UserConfigurable: Boolean): Integer
     var
         InvokeParameter: Record "POS Payment Bin Eject Param.";
         "Integer": Integer;
@@ -104,7 +112,7 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         exit(Integer);
     end;
 
-    procedure GetDecimalParameterValue(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;DefaultValue: Decimal;UserConfigurable: Boolean): Decimal
+    procedure GetDecimalParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Decimal; UserConfigurable: Boolean): Decimal
     var
         InvokeParameter: Record "POS Payment Bin Eject Param.";
         Decimal: Decimal;
@@ -114,7 +122,7 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         exit(Decimal);
     end;
 
-    procedure GetDateParameterValue(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;DefaultValue: Date;UserConfigurable: Boolean): Date
+    procedure GetDateParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Date; UserConfigurable: Boolean): Date
     var
         InvokeParameter: Record "POS Payment Bin Eject Param.";
         Date: Date;
@@ -124,22 +132,22 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         exit(Date);
     end;
 
-    procedure FindOrCreateRecord(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;DataType: Integer;DefaultValue: Variant;OptionStringIn: Text;UserConfigurable: Boolean)
+    procedure FindOrCreateRecord(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DataType: Integer; DefaultValue: Variant; OptionStringIn: Text; UserConfigurable: Boolean)
     begin
         if not Get(IntegrationType, POSUnitNo, NameIn) then begin
-          Init;
-          "Integration Type" := IntegrationType;
-          "POS Unit No." := POSUnitNo;
-          Name := NameIn;
-          "Data Type" := DataType;
-          OptionString := OptionStringIn;
-          "User Configurable" := UserConfigurable;
-          Validate(Value, DefaultValue);
-          Insert;
+            Init;
+            "Integration Type" := IntegrationType;
+            "POS Unit No." := POSUnitNo;
+            Name := NameIn;
+            "Data Type" := DataType;
+            OptionString := OptionStringIn;
+            "User Configurable" := UserConfigurable;
+            Validate(Value, DefaultValue);
+            Insert;
         end;
     end;
 
-    procedure UpdateParameterValue(IntegrationType: Text;POSUnitNo: Text;NameIn: Text;ValueIn: Variant)
+    procedure UpdateParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; ValueIn: Variant)
     begin
         Get(IntegrationType, POSUnitNo, NameIn);
         Validate(Value, ValueIn);
@@ -156,31 +164,31 @@ table 6184484 "EFT Type POS Unit Gen. Param."
     begin
         OnLookupParameterValue(Rec, Handled);
         if Handled then
-          exit;
+            exit;
 
         if not "User Configurable" then
-          exit; //Only allow custom lookups on fields that should not be directly editable.
+            exit; //Only allow custom lookups on fields that should not be directly editable.
 
         if "Data Type" <> "Data Type"::Option then
-          exit;
+            exit;
 
         OnGetParameterOptionStringCaption(Rec, OptionStringCaption);
         if OptionStringCaption <> '' then
-          SplitString(OptionStringCaption, Parts)
+            SplitString(OptionStringCaption, Parts)
         else
-          SplitString(OptionString, Parts);
+            SplitString(OptionString, Parts);
 
         foreach Part in Parts do begin
-          tmpRetailList.Number += 1;
-          tmpRetailList.Choice := Part;
-          tmpRetailList.Insert;
+            tmpRetailList.Number += 1;
+            tmpRetailList.Choice := Part;
+            tmpRetailList.Insert;
         end;
 
         if tmpRetailList.IsEmpty then
-          exit;
+            exit;
 
         if PAGE.RunModal(0, tmpRetailList) = ACTION::LookupOK then
-          Validate(Value, tmpRetailList.Choice);
+            Validate(Value, tmpRetailList.Choice);
     end;
 
     procedure ValidateValue()
@@ -193,95 +201,95 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         OptionOut: Text;
     begin
         case "Data Type" of
-          "Data Type"::Boolean:
-            begin
-              case true of
-                Evaluate(Boolean,Value,9):
-                  Value := Format(Boolean,0,9);
-                Evaluate(Boolean,Value):
-                  Value := Format(Boolean,0,9);
-                UpperCase(Value) = UpperCase(BoolYes):
-                  Value := Format(true,0,9);
-                UpperCase(Value) = UpperCase(BoolNo):
-                  Value := Format(false,0,9);
-                else
-                  FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-              end;
-            end;
-          "Data Type"::Date:
-            case true of
-              Evaluate(Date,Value,9):
-                Value:= Format(Date,0,9);
-              Evaluate(Date,Value):
-                Value := Format(Date,0,9);
-              else
-                FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-            end;
-          "Data Type"::Integer:
-            case true of
-              Evaluate(Integer,Value,9):
-                Value:= Format(Integer,0,9);
-              Evaluate(Integer,Value):
-                Value := Format(Integer,0,9);
-              else
-                FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-            end;
-          "Data Type"::Decimal:
-            case true of
-              Evaluate(Decimal,Value,9):
-                Value:= Format(Decimal,0,9);
-              Evaluate(Decimal,Value):
-                Value := Format(Decimal,0,9);
-              else
-                FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-            end;
-          "Data Type"::Option:
-            begin
-              OnGetParameterOptionStringCaption(Rec, OptionsCaption);
-              if OptionsCaption <> '' then
-                if TrySelectStr(GetOptionInt(Value, OptionsCaption), OptionString, OptionOut) then
-                  Value := OptionOut;
-              case true of
-                Value = '':
-                  Value := '0';
-                Evaluate(Integer,Value):
-                  begin
-                    if not TrySelectStr(Integer, OptionString, OptionOut) then
-                      FieldError(Value,StrSubstNo(FieldErrorOption,Value));
-                    Value := Format(Integer);
-                  end;
-                GetOptionInt(Value, OptionString) >= 0:
-                  Value := Format(GetOptionInt(Value, OptionString));
-                else
-                  FieldError(Value,StrSubstNo(FieldErrorOption,Value));
-              end;
-            end;
+            "Data Type"::Boolean:
+                begin
+                    case true of
+                        Evaluate(Boolean, Value, 9):
+                            Value := Format(Boolean, 0, 9);
+                        Evaluate(Boolean, Value):
+                            Value := Format(Boolean, 0, 9);
+                        UpperCase(Value) = UpperCase(BoolYes):
+                            Value := Format(true, 0, 9);
+                        UpperCase(Value) = UpperCase(BoolNo):
+                            Value := Format(false, 0, 9);
+                        else
+                            FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                    end;
+                end;
+            "Data Type"::Date:
+                case true of
+                    Evaluate(Date, Value, 9):
+                        Value := Format(Date, 0, 9);
+                    Evaluate(Date, Value):
+                        Value := Format(Date, 0, 9);
+                    else
+                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                end;
+            "Data Type"::Integer:
+                case true of
+                    Evaluate(Integer, Value, 9):
+                        Value := Format(Integer, 0, 9);
+                    Evaluate(Integer, Value):
+                        Value := Format(Integer, 0, 9);
+                    else
+                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                end;
+            "Data Type"::Decimal:
+                case true of
+                    Evaluate(Decimal, Value, 9):
+                        Value := Format(Decimal, 0, 9);
+                    Evaluate(Decimal, Value):
+                        Value := Format(Decimal, 0, 9);
+                    else
+                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                end;
+            "Data Type"::Option:
+                begin
+                    OnGetParameterOptionStringCaption(Rec, OptionsCaption);
+                    if OptionsCaption <> '' then
+                        if TrySelectStr(GetOptionInt(Value, OptionsCaption), OptionString, OptionOut) then
+                            Value := OptionOut;
+                    case true of
+                        Value = '':
+                            Value := '0';
+                        Evaluate(Integer, Value):
+                            begin
+                                if not TrySelectStr(Integer, OptionString, OptionOut) then
+                                    FieldError(Value, StrSubstNo(FieldErrorOption, Value));
+                                Value := Format(Integer);
+                            end;
+                        GetOptionInt(Value, OptionString) >= 0:
+                            Value := Format(GetOptionInt(Value, OptionString));
+                        else
+                            FieldError(Value, StrSubstNo(FieldErrorOption, Value));
+                    end;
+                end;
         end;
 
         OnValidateParameterValue(Rec);
     end;
 
-    local procedure ValidateOptions(Ordinal: Integer;OptionStringIn: Text)
+    local procedure ValidateOptions(Ordinal: Integer; OptionStringIn: Text)
     begin
         if GetOptionInt(Value, OptionStringIn) = -1 then
-          Value := GetDefaultOption(OptionStringIn);
+            Value := GetDefaultOption(OptionStringIn);
     end;
 
-    procedure GetOptionInt(Value: Text;OptionStringIn: Text) Result: Integer
+    procedure GetOptionInt(Value: Text; OptionStringIn: Text) Result: Integer
     var
         TypeHelper: Codeunit "Type Helper";
     begin
-        exit(TypeHelper.GetOptionNo(Value,OptionStringIn));
+        exit(TypeHelper.GetOptionNo(Value, OptionStringIn));
     end;
 
-    procedure GetOptionString(Ordinal: Integer;OptionStringIn: Text): Text
+    procedure GetOptionString(Ordinal: Integer; OptionStringIn: Text): Text
     var
         OptionOut: Text;
     begin
         if TrySelectStr(Ordinal, OptionStringIn, OptionOut) then
-          exit(OptionOut)
+            exit(OptionOut)
         else
-          exit(Format(Ordinal));
+            exit(Format(Ordinal));
     end;
 
     procedure GetDefaultOption(OptionStringIn: Text): Text
@@ -289,16 +297,16 @@ table 6184484 "EFT Type POS Unit Gen. Param."
         OptionOut: Text;
     begin
         if TrySelectStr(1, OptionStringIn, OptionOut) then
-          exit(OptionOut);
+            exit(OptionOut);
     end;
 
     [TryFunction]
-    procedure TrySelectStr(Ordinal: Integer;OptionStringIn: Text;var OptionOut: Text)
+    procedure TrySelectStr(Ordinal: Integer; OptionStringIn: Text; var OptionOut: Text)
     begin
         OptionOut := SelectStr(Ordinal + 1, OptionStringIn);
     end;
 
-    local procedure SplitString(Text: Text;var Parts: DotNet npNetArray)
+    local procedure SplitString(Text: Text; var Parts: DotNet npNetArray)
     var
         String: DotNet npNetString;
         Char: DotNet npNetString;
@@ -309,22 +317,22 @@ table 6184484 "EFT Type POS Unit Gen. Param."
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterNameCaption(Parameter: Record "EFT Type POS Unit Gen. Param.";var Caption: Text)
+    procedure OnGetParameterNameCaption(Parameter: Record "EFT Type POS Unit Gen. Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterDescriptionCaption(Parameter: Record "EFT Type POS Unit Gen. Param.";var Caption: Text)
+    procedure OnGetParameterDescriptionCaption(Parameter: Record "EFT Type POS Unit Gen. Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterOptionStringCaption(Parameter: Record "EFT Type POS Unit Gen. Param.";var Caption: Text)
+    procedure OnGetParameterOptionStringCaption(Parameter: Record "EFT Type POS Unit Gen. Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnLookupParameterValue(var Parameter: Record "EFT Type POS Unit Gen. Param.";var Handled: Boolean)
+    procedure OnLookupParameterValue(var Parameter: Record "EFT Type POS Unit Gen. Param."; var Handled: Boolean)
     begin
     end;
 

@@ -12,65 +12,76 @@ table 6151426 "Magento Attribute"
     // MAG2.19/LS  /2019020  CASE 344251 Added field 15 Visible
 
     Caption = 'Magento Attribute';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Attribute List";
     LookupPageID = "Magento Attribute List";
 
     fields
     {
-        field(2;"Attribute ID";Integer)
+        field(2; "Attribute ID"; Integer)
         {
             Caption = 'Attribute ID';
+            DataClassification = CustomerContent;
         }
-        field(3;Description;Text[50])
+        field(3; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(7;Filterable;Boolean)
+        field(7; Filterable; Boolean)
         {
             Caption = 'Filterable';
+            DataClassification = CustomerContent;
         }
-        field(11;Position;Integer)
+        field(11; Position; Integer)
         {
             Caption = 'Position';
+            DataClassification = CustomerContent;
         }
-        field(15;Visible;Boolean)
+        field(15; Visible; Boolean)
         {
             Caption = 'Visible';
+            DataClassification = CustomerContent;
         }
-        field(20;Type;Option)
+        field(20; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             InitValue = Multiple;
             OptionCaption = ',Single,Multiple,Text Area (single)';
             OptionMembers = ,Single,Multiple,"Text Area (single)";
         }
-        field(30;"Used by Attribute Set";Integer)
+        field(30; "Used by Attribute Set"; Integer)
         {
-            CalcFormula = Count("Magento Attribute Set Value" WHERE ("Attribute ID"=FIELD("Attribute ID")));
+            CalcFormula = Count ("Magento Attribute Set Value" WHERE("Attribute ID" = FIELD("Attribute ID")));
             Caption = 'Used by Attribute Set';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(35;"Show Option Images Is Frontend";Boolean)
+        field(35; "Show Option Images Is Frontend"; Boolean)
         {
             Caption = 'Show Option Images Is Frontend';
+            DataClassification = CustomerContent;
         }
-        field(40;"Use in Product Listing";Boolean)
+        field(40; "Use in Product Listing"; Boolean)
         {
             Caption = 'Use in Product Listing';
+            DataClassification = CustomerContent;
         }
-        field(50;"Entry No.";Integer)
+        field(50; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(500;"Custom ID";Boolean)
+        field(500; "Custom ID"; Boolean)
         {
             Caption = 'Custom ID';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Used by Items";Integer)
+        field(1000; "Used by Items"; Integer)
         {
-            CalcFormula = Count("Magento Item Attribute" WHERE ("Attribute ID"=FIELD("Attribute ID")));
+            CalcFormula = Count ("Magento Item Attribute" WHERE("Attribute ID" = FIELD("Attribute ID")));
             Caption = 'Used by Items';
             Description = 'MAG2.00';
             Editable = false;
@@ -80,10 +91,10 @@ table 6151426 "Magento Attribute"
 
     keys
     {
-        key(Key1;"Attribute ID")
+        key(Key1; "Attribute ID")
         {
         }
-        key(Key2;Position)
+        key(Key2; Position)
         {
         }
     }
@@ -98,19 +109,20 @@ table 6151426 "Magento Attribute"
         AttributeLabel: Record "Magento Attribute Label";
         AttributeSetValue: Record "Magento Attribute Set Value";
     begin
-        CalcFields("Used by Attribute Set","Used by Items");
+        CalcFields("Used by Attribute Set", "Used by Items");
 
         if ("Used by Attribute Set" <> 0) or ("Used by Items" <> 0) then
-          if not Confirm(ConfimDeleteUsedAttribute,false) then Error('');
+            if not Confirm(ConfimDeleteUsedAttribute, false) then Error('');
 
         //-MAG1.04
-        AttributeLabel.SetRange("Attribute ID","Attribute ID");
+        AttributeLabel.SetRange("Attribute ID", "Attribute ID");
         AttributeLabel.DeleteAll(true);
 
-        AttributeSetValue.SetRange("Attribute ID","Attribute ID");
-        AttributeSetValue.DeleteAll(true);;
+        AttributeSetValue.SetRange("Attribute ID", "Attribute ID");
+        AttributeSetValue.DeleteAll(true);
+        ;
 
-        ItemAttributeValue.SetRange("Attribute ID","Attribute ID");
+        ItemAttributeValue.SetRange("Attribute ID", "Attribute ID");
         ItemAttributeValue.DeleteAll(true);
         //+MAG1.04
     end;

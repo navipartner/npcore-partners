@@ -4,29 +4,35 @@ table 6151600 "NpDc Valid Time Interval"
     // NPR5.37/MHA /20171010  CASE 292171 Added Period Type and Weekday fields
 
     Caption = 'Extra Coupon Item';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Coupon Type";Code[20])
+        field(1; "Coupon Type"; Code[20])
         {
             Caption = 'Coupon Type';
+            DataClassification = CustomerContent;
             TableRelation = "NpDc Coupon Type";
         }
-        field(5;"Line No.";Integer)
+        field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(10;"Start Time";Time)
+        field(10; "Start Time"; Time)
         {
             Caption = 'Start Time';
+            DataClassification = CustomerContent;
         }
-        field(15;"End Time";Time)
+        field(15; "End Time"; Time)
         {
             Caption = 'End Time';
+            DataClassification = CustomerContent;
         }
-        field(20;"Period Type";Option)
+        field(20; "Period Type"; Option)
         {
             Caption = 'Period Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
             OptionCaption = 'Every Day,Weekly';
             OptionMembers = "Every Day",Weekly;
@@ -38,9 +44,10 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(25;Monday;Boolean)
+        field(25; Monday; Boolean)
         {
             Caption = 'Monday';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
 
             trigger OnValidate()
@@ -50,9 +57,10 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(30;Tuesday;Boolean)
+        field(30; Tuesday; Boolean)
         {
             Caption = 'Tuesday';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
 
             trigger OnValidate()
@@ -62,9 +70,10 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(35;Wednesday;Boolean)
+        field(35; Wednesday; Boolean)
         {
             Caption = 'Wednesday';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
 
             trigger OnValidate()
@@ -74,9 +83,10 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(40;Thursday;Boolean)
+        field(40; Thursday; Boolean)
         {
             Caption = 'Thursday';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
 
             trigger OnValidate()
@@ -86,9 +96,10 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(45;Friday;Boolean)
+        field(45; Friday; Boolean)
         {
             Caption = 'Friday';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
 
             trigger OnValidate()
@@ -98,9 +109,10 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(50;Saturday;Boolean)
+        field(50; Saturday; Boolean)
         {
             Caption = 'Saturday';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
 
             trigger OnValidate()
@@ -110,9 +122,10 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(55;Sunday;Boolean)
+        field(55; Sunday; Boolean)
         {
             Caption = 'Sunday';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
 
             trigger OnValidate()
@@ -122,16 +135,17 @@ table 6151600 "NpDc Valid Time Interval"
                 //+NPR5.37 [292171]
             end;
         }
-        field(100;"Period Description";Text[250])
+        field(100; "Period Description"; Text[250])
         {
             Caption = 'Period Description';
+            DataClassification = CustomerContent;
             Description = 'NPR5.37';
         }
     }
 
     keys
     {
-        key(Key1;"Coupon Type","Line No.")
+        key(Key1; "Coupon Type", "Line No.")
         {
         }
     }
@@ -145,22 +159,22 @@ table 6151600 "NpDc Valid Time Interval"
         //-NPR5.37 [292171]
         "Period Description" := '';
         if "Period Type" = "Period Type"::"Every Day" then
-          exit;
+            exit;
 
         if Monday then
-          AppendPeriodDescription(FieldCaption(Monday));
+            AppendPeriodDescription(FieldCaption(Monday));
         if Tuesday then
-          AppendPeriodDescription(FieldCaption(Tuesday));
+            AppendPeriodDescription(FieldCaption(Tuesday));
         if Wednesday then
-          AppendPeriodDescription(FieldCaption(Wednesday));
+            AppendPeriodDescription(FieldCaption(Wednesday));
         if Thursday then
-          AppendPeriodDescription(FieldCaption(Thursday));
+            AppendPeriodDescription(FieldCaption(Thursday));
         if Friday then
-          AppendPeriodDescription(FieldCaption(Friday));
+            AppendPeriodDescription(FieldCaption(Friday));
         if Saturday then
-          AppendPeriodDescription(FieldCaption(Saturday));
+            AppendPeriodDescription(FieldCaption(Saturday));
         if Sunday then
-          AppendPeriodDescription(FieldCaption(Sunday));
+            AppendPeriodDescription(FieldCaption(Sunday));
         //+NPR5.37 [292171]
     end;
 
@@ -168,12 +182,12 @@ table 6151600 "NpDc Valid Time Interval"
     begin
         //-NPR5.37 [292171]
         if PeriodDescription = '' then
-          exit;
+            exit;
 
         if "Period Description" <> '' then
-          "Period Description" := CopyStr("Period Description" + ',' + PeriodDescription,1,MaxStrLen("Period Description"))
+            "Period Description" := CopyStr("Period Description" + ',' + PeriodDescription, 1, MaxStrLen("Period Description"))
         else
-          "Period Description" := CopyStr(PeriodDescription,1,MaxStrLen("Period Description"));
+            "Period Description" := CopyStr(PeriodDescription, 1, MaxStrLen("Period Description"));
         //+NPR5.37 [292171]
     end;
 }

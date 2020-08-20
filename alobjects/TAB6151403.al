@@ -7,30 +7,34 @@ table 6151403 "Magento Website Link"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'Magento Website Link';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Website Code";Code[32])
+        field(1; "Website Code"; Code[32])
         {
             Caption = 'Website Code';
+            DataClassification = CustomerContent;
             Description = 'MAG1.01';
             NotBlank = true;
             TableRelation = "Magento Website";
         }
-        field(3;"Item No.";Code[20])
+        field(3; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
             Description = 'MAG1.07';
             TableRelation = Item;
         }
-        field(10;"Variant Code";Code[10])
+        field(10; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
-        field(100;"Website Name";Text[250])
+        field(100; "Website Name"; Text[250])
         {
-            CalcFormula = Lookup("Magento Website".Name WHERE (Code=FIELD("Website Code")));
+            CalcFormula = Lookup ("Magento Website".Name WHERE(Code = FIELD("Website Code")));
             Caption = 'Website Name';
             Editable = false;
             FieldClass = FlowField;
@@ -39,7 +43,7 @@ table 6151403 "Magento Website Link"
 
     keys
     {
-        key(Key1;"Website Code","Item No.","Variant Code")
+        key(Key1; "Website Code", "Item No.", "Variant Code")
         {
         }
     }

@@ -16,19 +16,22 @@ table 6150620 "POS Period Register"
     // NPR5.39/BR /20180214 CASE 295007 Added Fields "From External Source","External Source Name","External Source Entry No."
 
     Caption = 'POS Period Register';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Period Register List";
     LookupPageID = "POS Period Register List";
 
     fields
     {
-        field(1;"No.";Integer)
+        field(1; "No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(2;"POS Store Code";Code[10])
+        field(2; "POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Store";
 
             trigger OnValidate()
@@ -37,46 +40,53 @@ table 6150620 "POS Period Register"
             begin
                 //-NPR5.38 [302803]
                 if "POS Store Code" <> '' then begin
-                  POSStore.Get("POS Store Code");
-                  Validate("Posting Compression",POSStore."Posting Compression");
+                    POSStore.Get("POS Store Code");
+                    Validate("Posting Compression", POSStore."Posting Compression");
                 end;
                 //+NPR5.38 [302803]
             end;
         }
-        field(3;"POS Unit No.";Code[10])
+        field(3; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Unit";
         }
-        field(5;"Document No.";Code[20])
+        field(5; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            DataClassification = CustomerContent;
         }
-        field(6;"No. Series";Code[10])
+        field(6; "No. Series"; Code[10])
         {
             Caption = 'No. Series';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "No. Series";
         }
-        field(10;"Opening Entry No.";Integer)
+        field(10; "Opening Entry No."; Integer)
         {
             Caption = 'From Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Entry";
         }
-        field(11;"Closing Entry No.";Integer)
+        field(11; "Closing Entry No."; Integer)
         {
             Caption = 'To Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Entry";
         }
-        field(20;Status;Option)
+        field(20; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'New,Open,End of Day,Closed';
             OptionMembers = NEW,OPEN,EOD,CLOSED;
         }
-        field(21;"Posting Compression";Option)
+        field(21; "Posting Compression"; Option)
         {
             Caption = 'Posting Compression';
+            DataClassification = CustomerContent;
             Description = 'NPR5.36';
             InitValue = "Per POS Entry";
             OptionCaption = 'Uncompressed,Per POS Entry,Per POS Period';
@@ -85,40 +95,45 @@ table 6150620 "POS Period Register"
             trigger OnValidate()
             begin
                 if "Posting Compression" > "Posting Compression"::"Per POS Entry" then
-                  TestField("Document No.");
+                    TestField("Document No.");
             end;
         }
-        field(30;"Opened Date";DateTime)
+        field(30; "Opened Date"; DateTime)
         {
             Caption = 'Opened Date';
+            DataClassification = CustomerContent;
         }
-        field(31;"End of Day Date";DateTime)
+        field(31; "End of Day Date"; DateTime)
         {
             Caption = 'End of Day Date';
+            DataClassification = CustomerContent;
         }
-        field(210;"From External Source";Boolean)
+        field(210; "From External Source"; Boolean)
         {
             Caption = 'From External Source';
+            DataClassification = CustomerContent;
             Description = 'NPR5.39';
         }
-        field(211;"External Source Name";Text[50])
+        field(211; "External Source Name"; Text[50])
         {
             Caption = 'External Source Name';
+            DataClassification = CustomerContent;
             Description = 'NPR5.39';
         }
-        field(212;"External Source Entry No.";Integer)
+        field(212; "External Source Entry No."; Integer)
         {
             Caption = 'External Source Entry No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.39';
         }
     }
 
     keys
     {
-        key(Key1;"No.")
+        key(Key1; "No.")
         {
         }
-        key(Key2;"POS Unit No.")
+        key(Key2; "POS Unit No.")
         {
         }
     }
@@ -135,7 +150,7 @@ table 6150620 "POS Period Register"
     trigger OnModify()
     begin
         if Status <> xRec.Status then
-          UpdateTimeStamps;
+            UpdateTimeStamps;
     end;
 
     local procedure GenerateDocumentNo()
@@ -144,24 +159,24 @@ table 6150620 "POS Period Register"
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         if ("Document No." <> '') then
-          exit;
+            exit;
         TestField("POS Store Code");
         POSStore.Get("POS Store Code");
         if POSStore."POS Period Register No. Series" <> '' then
-          NoSeriesMgt.InitSeries(POSStore."POS Period Register No. Series",xRec."No. Series",WorkDate,"Document No.","No. Series");
+            NoSeriesMgt.InitSeries(POSStore."POS Period Register No. Series", xRec."No. Series", WorkDate, "Document No.", "No. Series");
     end;
 
     local procedure UpdateTimeStamps()
     begin
         case Status of
-          Status::OPEN :
-            begin
-              "Opened Date" := CurrentDateTime;
-            end;
-          Status::EOD :
-            begin
-              "End of Day Date" := CurrentDateTime;
-            end;
+            Status::OPEN:
+                begin
+                    "Opened Date" := CurrentDateTime;
+                end;
+            Status::EOD:
+                begin
+                    "End of Day Date" := CurrentDateTime;
+                end;
         end;
     end;
 }

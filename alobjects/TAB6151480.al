@@ -6,72 +6,74 @@ table 6151480 "Magento Cue"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'Magento Cue';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Primary Key";Code[10])
+        field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
+            DataClassification = CustomerContent;
         }
-        field(10;"Import Pending";Integer)
+        field(10; "Import Pending"; Integer)
         {
-            CalcFormula = Count("Nc Import Entry" WHERE (Imported=CONST(false)));
+            CalcFormula = Count ("Nc Import Entry" WHERE(Imported = CONST(false)));
             Caption = 'Import Unprocessed';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(15;"Tasks Unprocessed";Integer)
+        field(15; "Tasks Unprocessed"; Integer)
         {
-            CalcFormula = Count("Nc Task" WHERE (Processed=CONST(false)));
+            CalcFormula = Count ("Nc Task" WHERE(Processed = CONST(false)));
             Caption = 'Tasks Unprocessed';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(20;"Sales Orders";Integer)
+        field(20; "Sales Orders"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE ("Document Type"=FILTER(Order),
-                                                      "External Order No."=FILTER(='')));
+            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER(Order),
+                                                      "External Order No." = FILTER(= '')));
             Caption = 'Sales Orders';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(21;"Sales Quotes";Integer)
+        field(21; "Sales Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE ("Document Type"=FILTER(Quote)));
+            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER(Quote)));
             Caption = 'Sales Quotes';
             FieldClass = FlowField;
         }
-        field(22;"Sales Return Orders";Integer)
+        field(22; "Sales Return Orders"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE ("Document Type"=FILTER("Return Order")));
+            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER("Return Order")));
             Caption = 'Sales Return Orders';
             FieldClass = FlowField;
         }
-        field(23;"Magento Orders";Integer)
+        field(23; "Magento Orders"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE ("Document Type"=FILTER(Order),
-                                                      "External Order No."=FILTER(<>'')));
+            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER(Order),
+                                                      "External Order No." = FILTER(<> '')));
             Caption = 'Magento Orders';
             FieldClass = FlowField;
         }
-        field(30;"Daily Sales Orders";Integer)
+        field(30; "Daily Sales Orders"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE ("Document Type"=FILTER(Order),
-                                                      "External Order No."=FILTER(<>''),
-                                                      "Posting Date"=FIELD("Date Filter")));
+            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER(Order),
+                                                      "External Order No." = FILTER(<> ''),
+                                                      "Posting Date" = FIELD("Date Filter")));
             Caption = 'Daily Sales Orders';
             Description = 'MAG1.17';
             FieldClass = FlowField;
         }
-        field(31;"Daily Sales Invoices";Integer)
+        field(31; "Daily Sales Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE ("Posting Date"=FIELD("Date Filter"),
-                                                              "External Order No."=FILTER(<>'')));
+            CalcFormula = Count ("Sales Invoice Header" WHERE("Posting Date" = FIELD("Date Filter"),
+                                                              "External Order No." = FILTER(<> '')));
             Caption = 'Daily Sales Invoices';
             Description = 'MAG1.17';
             FieldClass = FlowField;
         }
-        field(32;"Date Filter";Date)
+        field(32; "Date Filter"; Date)
         {
             Caption = 'Date Filter';
             Description = 'MAG1.17';
@@ -81,7 +83,7 @@ table 6151480 "Magento Cue"
 
     keys
     {
-        key(Key1;"Primary Key")
+        key(Key1; "Primary Key")
         {
         }
     }

@@ -7,52 +7,57 @@ table 6151386 "CS Rfid Data"
     // NPR5.48/BHR /20190111  CASE 341967  Add missing caption
 
     Caption = 'CS Rfid Data';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Key";Text[30])
+        field(1; "Key"; Text[30])
         {
             Caption = 'Key';
+            DataClassification = CustomerContent;
         }
-        field(11;"Cross-Reference Item No.";Code[20])
+        field(11; "Cross-Reference Item No."; Code[20])
         {
             Caption = 'Cross-Reference Item No.';
+            DataClassification = CustomerContent;
             TableRelation = Item."No.";
 
             trigger OnValidate()
             begin
-                Validate("Cross-Reference Variant Code",'');
-                Validate("Item Group Code",'');
+                Validate("Cross-Reference Variant Code", '');
+                Validate("Item Group Code", '');
             end;
         }
-        field(12;"Cross-Reference Variant Code";Code[10])
+        field(12; "Cross-Reference Variant Code"; Code[10])
         {
             Caption = 'Cross-Reference Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Cross-Reference Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Cross-Reference Item No."));
         }
-        field(13;"Item Description";Text[50])
+        field(13; "Item Description"; Text[50])
         {
-            CalcFormula = Lookup(Item.Description WHERE ("No."=FIELD("Cross-Reference Item No.")));
+            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Cross-Reference Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(14;"Variant Description";Text[50])
+        field(14; "Variant Description"; Text[50])
         {
-            CalcFormula = Lookup("Item Variant".Description WHERE (Code=FIELD("Cross-Reference Variant Code"),
-                                                                   "Item No."=FIELD("Cross-Reference Item No.")));
+            CalcFormula = Lookup ("Item Variant".Description WHERE(Code = FIELD("Cross-Reference Variant Code"),
+                                                                   "Item No." = FIELD("Cross-Reference Item No.")));
             Caption = 'Variant Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(15;"Item Group Code";Code[10])
+        field(15; "Item Group Code"; Code[10])
         {
             Caption = 'Item Group Code';
+            DataClassification = CustomerContent;
             TableRelation = "Item Group";
         }
-        field(16;"Item Group Description";Text[50])
+        field(16; "Item Group Description"; Text[50])
         {
-            CalcFormula = Lookup("Item Group".Description WHERE ("No."=FIELD("Item Group Code")));
+            CalcFormula = Lookup ("Item Group".Description WHERE("No." = FIELD("Item Group Code")));
             Caption = 'Item Group Description';
             Editable = false;
             FieldClass = FlowField;
@@ -63,50 +68,59 @@ table 6151386 "CS Rfid Data"
             begin
             end;
         }
-        field(17;"Combined key";Code[30])
+        field(17; "Combined key"; Code[30])
         {
             Caption = 'Combined key';
+            DataClassification = CustomerContent;
         }
-        field(18;"Image Url";Text[250])
+        field(18; "Image Url"; Text[250])
         {
             Caption = 'Image Url';
+            DataClassification = CustomerContent;
         }
-        field(19;"Time Stamp";BigInteger)
+        field(19; "Time Stamp"; BigInteger)
         {
             Caption = 'Time Stamp';
+            DataClassification = CustomerContent;
             SQLTimestamp = true;
         }
-        field(20;"Cross-Reference UoM";Code[10])
+        field(20; "Cross-Reference UoM"; Code[10])
         {
             Caption = 'Cross-Reference UoM';
-            TableRelation = "Item Unit of Measure".Code WHERE ("Item No."=FIELD("Cross-Reference Item No."));
+            DataClassification = CustomerContent;
+            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Cross-Reference Item No."));
         }
-        field(21;"Cross-Reference Description";Text[50])
+        field(21; "Cross-Reference Description"; Text[50])
         {
             Caption = 'Cross-Reference Description';
+            DataClassification = CustomerContent;
         }
-        field(22;"Cross-Reference Discontinue";Boolean)
+        field(22; "Cross-Reference Discontinue"; Boolean)
         {
             Caption = 'Cross-Reference Discontinue';
+            DataClassification = CustomerContent;
         }
-        field(23;"Last Known Store Location";Code[10])
+        field(23; "Last Known Store Location"; Code[10])
         {
             Caption = 'Last Known Store Location';
+            DataClassification = CustomerContent;
             TableRelation = "POS Store".Code;
         }
-        field(24;Created;DateTime)
+        field(24; Created; DateTime)
         {
             Caption = 'Created';
+            DataClassification = CustomerContent;
         }
-        field(25;Heartbeat;DateTime)
+        field(25; Heartbeat; DateTime)
         {
             Caption = 'Heartbeat';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Key")
+        key(Key1; "Key")
         {
         }
     }
@@ -119,18 +133,18 @@ table 6151386 "CS Rfid Data"
     begin
         Created := CurrentDateTime;
         if "Cross-Reference Variant Code" <> '' then
-          "Combined key" := "Cross-Reference Item No." + '-' + "Cross-Reference Variant Code"
+            "Combined key" := "Cross-Reference Item No." + '-' + "Cross-Reference Variant Code"
         else
-          "Combined key" := "Cross-Reference Item No.";
+            "Combined key" := "Cross-Reference Item No.";
     end;
 
     trigger OnModify()
     begin
         Heartbeat := CurrentDateTime;
         if "Cross-Reference Variant Code" <> '' then
-          "Combined key" := "Cross-Reference Item No." + '-' + "Cross-Reference Variant Code"
+            "Combined key" := "Cross-Reference Item No." + '-' + "Cross-Reference Variant Code"
         else
-          "Combined key" := "Cross-Reference Item No.";
+            "Combined key" := "Cross-Reference Item No.";
     end;
 }
 

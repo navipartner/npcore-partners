@@ -3,23 +3,27 @@ table 6060054 "Item Status"
     // NPR5.25\BR  \20160720  CASE 246088 Object Created
 
     Caption = 'Item Status';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Item Status";
     LookupPageID = "Item Status";
 
     fields
     {
-        field(10;"Code";Code[10])
+        field(10; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(50;Description;Text[50])
+        field(50; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(200;Initial;Boolean)
+        field(200; Initial; Boolean)
         {
             Caption = 'Initial';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -27,93 +31,102 @@ table 6060054 "Item Status"
                 TextOnlyOne: Label 'Only one Status is allowed with field %1 active.';
             begin
                 if Initial then begin
-                  ItemStatus.SetFilter(Code,'<>%1',Code);
-                  ItemStatus.SetRange(Initial,true);
-                  if not ItemStatus.IsEmpty then
-                    Error(TextOnlyOne,FieldCaption(Initial));
+                    ItemStatus.SetFilter(Code, '<>%1', Code);
+                    ItemStatus.SetRange(Initial, true);
+                    if not ItemStatus.IsEmpty then
+                        Error(TextOnlyOne, FieldCaption(Initial));
                 end;
             end;
         }
-        field(210;Blocked;Boolean)
+        field(210; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
             InitValue = false;
         }
-        field(230;"Delete Allowed";Boolean)
+        field(230; "Delete Allowed"; Boolean)
         {
             Caption = 'Delete Allowed';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(240;"Rename Allowed";Boolean)
+        field(240; "Rename Allowed"; Boolean)
         {
             Caption = 'Rename Allowed';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(300;"Purchase Insert";Boolean)
+        field(300; "Purchase Insert"; Boolean)
         {
             Caption = 'Purchase Insert';
+            DataClassification = CustomerContent;
             InitValue = true;
 
             trigger OnValidate()
             begin
-                CheckOtherStatusExists(FieldNo("Purchase Insert"),"Purchase Insert");
+                CheckOtherStatusExists(FieldNo("Purchase Insert"), "Purchase Insert");
             end;
         }
-        field(310;"Purchase Release";Boolean)
+        field(310; "Purchase Release"; Boolean)
         {
             Caption = 'Purchase Release';
+            DataClassification = CustomerContent;
             InitValue = true;
 
             trigger OnValidate()
             begin
-                CheckOtherStatusExists(FieldNo("Purchase Release"),"Purchase Release");
+                CheckOtherStatusExists(FieldNo("Purchase Release"), "Purchase Release");
             end;
         }
-        field(320;"Purchase Post";Boolean)
+        field(320; "Purchase Post"; Boolean)
         {
             Caption = 'Purchase Post';
+            DataClassification = CustomerContent;
             InitValue = true;
 
             trigger OnValidate()
             begin
-                CheckOtherStatusExists(FieldNo("Purchase Post"),"Purchase Post");
+                CheckOtherStatusExists(FieldNo("Purchase Post"), "Purchase Post");
             end;
         }
-        field(400;"Sales Insert";Boolean)
+        field(400; "Sales Insert"; Boolean)
         {
             Caption = 'Sales Insert';
+            DataClassification = CustomerContent;
             InitValue = true;
 
             trigger OnValidate()
             begin
-                CheckOtherStatusExists(FieldNo("Sales Insert"),"Sales Insert");
+                CheckOtherStatusExists(FieldNo("Sales Insert"), "Sales Insert");
             end;
         }
-        field(410;"Sales Release";Boolean)
+        field(410; "Sales Release"; Boolean)
         {
             Caption = 'Sales Release';
+            DataClassification = CustomerContent;
             InitValue = true;
 
             trigger OnValidate()
             begin
-                CheckOtherStatusExists(FieldNo("Sales Release"),"Sales Release");
+                CheckOtherStatusExists(FieldNo("Sales Release"), "Sales Release");
             end;
         }
-        field(420;"Sales Post";Boolean)
+        field(420; "Sales Post"; Boolean)
         {
             Caption = 'Sales Post';
+            DataClassification = CustomerContent;
             InitValue = true;
 
             trigger OnValidate()
             begin
-                CheckOtherStatusExists(FieldNo("Sales Post"),"Sales Post");
+                CheckOtherStatusExists(FieldNo("Sales Post"), "Sales Post");
             end;
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -122,7 +135,7 @@ table 6060054 "Item Status"
     {
     }
 
-    local procedure CheckOtherStatusExists(ParFieldNo: Integer;ParFieldValue: Boolean)
+    local procedure CheckOtherStatusExists(ParFieldNo: Integer; ParFieldValue: Boolean)
     var
         RecRef: RecordRef;
         FldRefBoolean: FieldRef;
@@ -130,14 +143,14 @@ table 6060054 "Item Status"
         TextStatusDoesNotExist: Label 'You cannot switch off this option because no other status exists with option %1 activated.';
     begin
         if ParFieldValue then
-          exit;
+            exit;
         RecRef.Open(DATABASE::"Item Status");
         FldRefBoolean := RecRef.Field(ParFieldNo);
         FldRefBoolean.SetRange(true);
         FldRefCode := RecRef.Field(10);
-        FldRefCode.SetFilter('<>%1',Code);
+        FldRefCode.SetFilter('<>%1', Code);
         if not RecRef.FindFirst then
-          Error(StrSubstNo(TextStatusDoesNotExist),FldRefBoolean.Caption);
+            Error(StrSubstNo(TextStatusDoesNotExist), FldRefBoolean.Caption);
     end;
 }
 

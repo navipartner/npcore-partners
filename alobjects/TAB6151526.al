@@ -4,22 +4,26 @@ table 6151526 "Nc Collector Filter"
     // NC2.08/BR  /20171220  CASE 300634 Added field Collect When Modified
 
     Caption = 'Nc Collector Filter';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(10; "Collector Code"; Code[20])
         {
             Caption = 'Collector Code';
+            DataClassification = CustomerContent;
             TableRelation = "Nc Collector";
         }
         field(20; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(30; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnLookup()
@@ -47,10 +51,12 @@ table 6151526 "Nc Collector Filter"
         field(40; "Filter Text"; Text[250])
         {
             Caption = 'Filter Text';
+            DataClassification = CustomerContent;
         }
         field(50; "Collect When Modified"; Boolean)
         {
             Caption = 'Collect When Modified';
+            DataClassification = CustomerContent;
             Description = 'NC2.08';
         }
     }

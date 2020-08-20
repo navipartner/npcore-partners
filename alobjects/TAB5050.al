@@ -1,4 +1,4 @@
-tableextension 6014437 tableextension6014437 extends Contact 
+tableextension 6014437 tableextension6014437 extends Contact
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014400..6060150
@@ -21,41 +21,48 @@ tableextension 6014437 tableextension6014437 extends Contact
     // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized and Anonymized Date
     fields
     {
-        field(6151060;Anonymized;Boolean)
+        field(6151060; Anonymized; Boolean)
         {
             Caption = 'Anonymized';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
             Editable = false;
         }
-        field(6151061;"Anonymized Date";DateTime)
+        field(6151061; "Anonymized Date"; DateTime)
         {
             Caption = 'Anonymized Date';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
             Editable = false;
         }
-        field(6151400;"Magento Contact";Boolean)
+        field(6151400; "Magento Contact"; Boolean)
         {
             Caption = 'Magento Contact';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
-        field(6151405;"Magento Password";Text[80])
+        field(6151405; "Magento Password"; Text[80])
         {
             Caption = 'Magento Password';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
-        field(6151410;"Magento Password (Md5)";Text[80])
+        field(6151410; "Magento Password (Md5)"; Text[80])
         {
             Caption = 'Magento Password (Encrypted)';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
-        field(6151415;"Magento Administrator";Boolean)
+        field(6151415; "Magento Administrator"; Boolean)
         {
             Caption = 'Magento Administrator';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
-        field(6151420;"Magento Customer Group";Text[30])
+        field(6151420; "Magento Customer Group"; Text[30])
         {
             Caption = 'Magento Customer Group';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
             TableRelation = "Magento Customer Group";
             //This property is currently not supported
@@ -80,32 +87,34 @@ tableextension 6014437 tableextension6014437 extends Contact
                 //+MAG2.20 [320423]
             end;
         }
-        field(6151425;"Magento Payment Methods";Integer)
+        field(6151425; "Magento Payment Methods"; Integer)
         {
-            CalcFormula = Count("Magento Contact Pmt. Method" WHERE ("Contact No."=FIELD("No.")));
+            CalcFormula = Count ("Magento Contact Pmt. Method" WHERE("Contact No." = FIELD("No.")));
             Caption = 'Magento Payment Methods';
             Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6151430;"Magento Shipment Methods";Integer)
+        field(6151430; "Magento Shipment Methods"; Integer)
         {
-            CalcFormula = Count("Magento Contact Shpt. Method" WHERE ("Contact No."=FIELD("No.")));
+            CalcFormula = Count ("Magento Contact Shpt. Method" WHERE("Contact No." = FIELD("No.")));
             Caption = 'Magento Shipment Methods';
             Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6151435;"Magento Account Status";Option)
+        field(6151435; "Magento Account Status"; Option)
         {
             Caption = 'Magento Account Status';
+            DataClassification = CustomerContent;
             Description = '//-NPR5.48 [320424]';
             OptionCaption = 'Active,Blocked,Checkout Blocked';
             OptionMembers = ACTIVE,BLOCKED,CHECKOUT_BLOCKED;
         }
-        field(6151440;"Magento Price Visibility";Option)
+        field(6151440; "Magento Price Visibility"; Option)
         {
             Caption = 'Magento Price Visibility';
+            DataClassification = CustomerContent;
             Description = '//-NPR5.48 [320424]';
             OptionCaption = 'Visible,Hidden';
             OptionMembers = VISIBLE,HIDDEN;

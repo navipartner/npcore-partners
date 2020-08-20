@@ -16,56 +16,64 @@ table 6151411 "Magento Picture"
     // MAG2.22/MHA /20190716  CASE 361234 Added function TryCheckPicture()
 
     Caption = 'Magento Picture';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Pictures";
     LookupPageID = "Magento Pictures";
     PasteIsValid = false;
 
     fields
     {
-        field(1;Type;Option)
+        field(1; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             Description = 'MAG1.04,MAG1.16';
             OptionCaption = 'Item,Brand,Item Group,Customer';
             OptionMembers = Item,Brand,"Item Group",Customer;
         }
-        field(90;Name;Text[250])
+        field(90; Name; Text[250])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(100;Picture;BLOB)
+        field(100; Picture; BLOB)
         {
             Caption = 'Picture';
+            DataClassification = CustomerContent;
             Description = 'MAG1.09';
             SubType = Bitmap;
         }
-        field(101;"Size (kb)";Decimal)
+        field(101; "Size (kb)"; Decimal)
         {
             Caption = 'Size (kb)';
+            DataClassification = CustomerContent;
             Description = 'MAG1.01';
             Editable = false;
         }
-        field(110;"Entry No.";BigInteger)
+        field(110; "Entry No."; BigInteger)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Last Date Modified";Date)
+        field(1000; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(1001;"Last Time Modified";Time)
+        field(1001; "Last Time Modified"; Time)
         {
             Caption = 'Last Time Modified';
+            DataClassification = CustomerContent;
             Editable = false;
         }
     }
 
     keys
     {
-        key(Key1;Type,Name)
+        key(Key1; Type, Name)
         {
         }
     }
@@ -82,29 +90,29 @@ table 6151411 "Magento Picture"
     begin
         //-MAG2.22 [361234]
         case Type of
-          Type::Item:
-            begin
-              MagentoPictureLink.SetRange("Picture Name",Name);
-              if MagentoPictureLink.FindFirst then
-                MagentoPictureLink.DeleteAll;
-            end;
-          Type::Brand:
-            begin
-              MagentoBrand.SetRange(Picture,Name);
-              if MagentoBrand.FindFirst then
-                MagentoBrand.ModifyAll(Picture,'');
+            Type::Item:
+                begin
+                    MagentoPictureLink.SetRange("Picture Name", Name);
+                    if MagentoPictureLink.FindFirst then
+                        MagentoPictureLink.DeleteAll;
+                end;
+            Type::Brand:
+                begin
+                    MagentoBrand.SetRange(Picture, Name);
+                    if MagentoBrand.FindFirst then
+                        MagentoBrand.ModifyAll(Picture, '');
 
-              Clear(MagentoBrand);
-              MagentoBrand.SetRange("Logo Picture",Name);
-              if MagentoBrand.FindFirst then
-                MagentoBrand.ModifyAll("Logo Picture",'');
-            end;
-          Type::"Item Group":
-            begin
-              MagentoItemGroup.SetRange(Picture,Name);
-              if MagentoItemGroup.FindFirst then
-                MagentoItemGroup.ModifyAll(Picture,'');
-            end;
+                    Clear(MagentoBrand);
+                    MagentoBrand.SetRange("Logo Picture", Name);
+                    if MagentoBrand.FindFirst then
+                        MagentoBrand.ModifyAll("Logo Picture", '');
+                end;
+            Type::"Item Group":
+                begin
+                    MagentoItemGroup.SetRange(Picture, Name);
+                    if MagentoItemGroup.FindFirst then
+                        MagentoItemGroup.ModifyAll(Picture, '');
+                end;
         end;
         //+MAG2.22 [361234]
     end;
@@ -147,13 +155,13 @@ table 6151411 "Magento Picture"
         //+MAG10.00.2.00 [258544]
         PictureUrl := GetMagentotUrl();
         if PictureUrl = '' then
-          exit;
+            exit;
         //-MAG2.01
-        if not TryDownloadPicture(PictureUrl,MemoryStream) then
-          exit;
+        if not TryDownloadPicture(PictureUrl, MemoryStream) then
+            exit;
         //+MAG2.01
         if MemoryStream.Length = 0 then
-          exit;
+            exit;
         //-MAG10.00.2.00 [258544]
         TempMagentoPicture.Picture.CreateOutStream(OutStream);
         //+MAG10.00.2.00 [258544]
@@ -166,7 +174,7 @@ table 6151411 "Magento Picture"
     end;
 
     [TryFunction]
-    procedure TryDownloadPicture(PictureUrl: Text;var MemoryStream: DotNet npNetMemoryStream)
+    procedure TryDownloadPicture(PictureUrl: Text; var MemoryStream: DotNet npNetMemoryStream)
     var
         WebClient: DotNet npNetWebClient;
     begin
@@ -200,12 +208,12 @@ table 6151411 "Magento Picture"
         Value := '';
 
         if Picture.HasValue then begin
-          CalcFields(Picture);
-          Picture.CreateInStream(InStr);
-          MemoryStream := InStr;
-          BinaryReader := BinaryReader.BinaryReader(InStr);
-          Value := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-          MemoryStream.Dispose;
+            CalcFields(Picture);
+            Picture.CreateInStream(InStr);
+            MemoryStream := InStr;
+            BinaryReader := BinaryReader.BinaryReader(InStr);
+            Value := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+            MemoryStream.Dispose;
         end;
 
         exit(Value);
@@ -214,12 +222,16 @@ table 6151411 "Magento Picture"
     procedure GetMagentoType(): Text
     begin
         case Type of
-          Type::Item: exit('product');
-          //-MAG2.01
-          Type::Brand: exit('manufacturer');
-          //+MAG2.01
-          Type::"Item Group": exit('category');
-          Type::Customer: exit('customer');
+            Type::Item:
+                exit('product');
+            //-MAG2.01
+            Type::Brand:
+                exit('manufacturer');
+            //+MAG2.01
+            Type::"Item Group":
+                exit('category');
+            Type::Customer:
+                exit('customer');
         end;
 
         exit('');
@@ -230,17 +242,17 @@ table 6151411 "Magento Picture"
         Handled: Boolean;
     begin
         //-MAG2.08 [292926]
-        OnGetMagentoUrl(MagentoUrl,Handled);
+        OnGetMagentoUrl(MagentoUrl, Handled);
         if Handled then
-          exit(MagentoUrl);
+            exit(MagentoUrl);
 
         MagentoUrl := '';
         //+MAG2.08 [292926]
         if Name = '' then
-          exit('');
+            exit('');
 
         if MagentoSetup."Magento Url" = '' then
-          MagentoSetup.Get;
+            MagentoSetup.Get;
         //-MAG2.09 [296169]
         MagentoUrl := MagentoSetup."Magento Url" + 'media/catalog/' + GetMagentoType() + '/api/' + Name;
         exit(MagentoUrl);
@@ -251,18 +263,18 @@ table 6151411 "Magento Picture"
     begin
         //-MAG1.22
         if "Size (kb)" <= 0 then
-          exit;
+            exit;
 
         if (not MagentoSetup.Get) or (MagentoSetup."Max. Picture Size" <= 0) then
-          MagentoSetup."Max. Picture Size" := 512;
+            MagentoSetup."Max. Picture Size" := 512;
 
         if "Size (kb)" > MagentoSetup."Max. Picture Size" then
-          Error(Text000);
+            Error(Text000);
         //+MAG1.22
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnGetMagentoUrl(var MagentoUrl: Text;var Handled: Boolean)
+    local procedure OnGetMagentoUrl(var MagentoUrl: Text; var Handled: Boolean)
     begin
         //-MAG2.08 [292926]
         //+MAG2.08 [292926]

@@ -3,140 +3,160 @@ table 6060081 "MCS Recommendations Model"
     // NPR5.30/BR  /20170215  CASE 252646 Object Created
 
     Caption = 'MCS Recommendations Model';
+    DataClassification = CustomerContent;
     DrillDownPageID = "MCS Recommendations Model Card";
     LookupPageID = "MCS Recommendations Model List";
 
     fields
     {
-        field(10;"Code";Code[10])
+        field(10; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(20;Description;Text[50])
+        field(20; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(30;Enabled;Boolean)
+        field(30; Enabled; Boolean)
         {
             Caption = 'Enabled';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
                 MCSRecommendationsModel: Record "MCS Recommendations Model";
             begin
                 if Enabled and (not xRec.Enabled) then begin
-                  MCSRecommendationsModel.SetRange(Enabled,true);
-                  if MCSRecommendationsModel.Count >= 10 then begin
-                    if GuiAllowed then
-                      Message(TextMaxActiveReached);
-                    Enabled := false;
-                  end else
-                    AskRefreshRecommendationsLines;
+                    MCSRecommendationsModel.SetRange(Enabled, true);
+                    if MCSRecommendationsModel.Count >= 10 then begin
+                        if GuiAllowed then
+                            Message(TextMaxActiveReached);
+                        Enabled := false;
+                    end else
+                        AskRefreshRecommendationsLines;
                 end else begin
-                  if (not Enabled) and xRec.Enabled then begin
-                    DeleteRecommendationsLines;
-                  end;
+                    if (not Enabled) and xRec.Enabled then begin
+                        DeleteRecommendationsLines;
+                    end;
                 end;
             end;
         }
-        field(40;"Model ID";Text[50])
+        field(40; "Model ID"; Text[50])
         {
             Caption = 'Model ID';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(50;"Last Build ID";BigInteger)
+        field(50; "Last Build ID"; BigInteger)
         {
             Caption = 'Last Build ID';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(60;"Last Build Date Time";DateTime)
+        field(60; "Last Build Date Time"; DateTime)
         {
             Caption = 'Last Build Date Time';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(70;"Last Item Ledger Entry No.";Integer)
+        field(70; "Last Item Ledger Entry No."; Integer)
         {
             Caption = 'Last Item Ledger Entry No.';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(80;"Build Status";Option)
+        field(80; "Build Status"; Option)
         {
             Caption = 'Build Status';
+            DataClassification = CustomerContent;
             Editable = false;
             OptionCaption = 'Not Started,Running,Cancelling,Cancelled,Succeded,Failed';
             OptionMembers = NotStarted,Running,Cancelling,Cancelled,Succeded,Failed;
         }
-        field(100;"Item View";Text[250])
+        field(100; "Item View"; Text[250])
         {
             Caption = 'Item View';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
                 LookupItemView;
             end;
         }
-        field(110;"Attribute View";Text[250])
+        field(110; "Attribute View"; Text[250])
         {
             Caption = 'Attribute View';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
                 LookupAttributeView;
             end;
         }
-        field(120;"Customer View";Text[250])
+        field(120; "Customer View"; Text[250])
         {
             Caption = 'Customer View';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
                 LookupCustomerView;
             end;
         }
-        field(130;"Item Ledger Entry View";Text[250])
+        field(130; "Item Ledger Entry View"; Text[250])
         {
             Caption = 'Item Ledger Entry View';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
                 //SetItemLedgerEntryView
             end;
         }
-        field(200;Categories;Option)
+        field(200; Categories; Option)
         {
             Caption = 'Categories';
+            DataClassification = CustomerContent;
             OptionCaption = 'Item Category,Product Group,Item Category - Product Group,Item Group';
             OptionMembers = "Item Category","Product Group","Item Category - Product Group","Item Group";
         }
-        field(210;"Language Code";Code[10])
+        field(210; "Language Code"; Code[10])
         {
             Caption = 'Language Code';
+            DataClassification = CustomerContent;
             TableRelation = Language;
         }
-        field(220;"Last Catalog Export Date Time";DateTime)
+        field(220; "Last Catalog Export Date Time"; DateTime)
         {
             Caption = 'Last Catalog Export Date Time';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(230;"Last Usage Export Date Time";DateTime)
+        field(230; "Last Usage Export Date Time"; DateTime)
         {
             Caption = 'Last Usage Export Date Time';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(240;"Catalog Uploaded";Boolean)
+        field(240; "Catalog Uploaded"; Boolean)
         {
             Caption = 'Catalog Uploaded';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(250;"Usage Data Uploaded";Boolean)
+        field(250; "Usage Data Uploaded"; Boolean)
         {
             Caption = 'Usage Data Uploaded';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(300;"Recommendations per Seed";Integer)
+        field(300; "Recommendations per Seed"; Integer)
         {
             Caption = 'Recommendations per Seed';
+            DataClassification = CustomerContent;
             InitValue = 5;
             MinValue = 1;
         }
@@ -144,7 +164,7 @@ table 6060081 "MCS Recommendations Model"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -175,12 +195,12 @@ table 6060081 "MCS Recommendations Model"
         RetailItemList: Page "Retail Item List";
     begin
         if "Item View" <> '' then begin
-          Item.SetView("Item View");
-          RetailItemList.SetTableView(Item);
+            Item.SetView("Item View");
+            RetailItemList.SetTableView(Item);
         end;
         RetailItemList.LookupMode := true;
         if RetailItemList.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
         "Item View" := RetailItemList.GetViewText;
     end;
 
@@ -190,12 +210,12 @@ table 6060081 "MCS Recommendations Model"
         NPRAttributes: Page "NPR Attributes";
     begin
         if "Attribute View" <> '' then begin
-          NPRAttribute.SetView("Attribute View");
-          NPRAttributes.SetTableView(NPRAttribute);
+            NPRAttribute.SetView("Attribute View");
+            NPRAttributes.SetTableView(NPRAttribute);
         end;
         NPRAttributes.LookupMode := true;
         if NPRAttributes.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
         "Attribute View" := NPRAttributes.GetViewText;
     end;
 
@@ -205,12 +225,12 @@ table 6060081 "MCS Recommendations Model"
         TouchScreenCustomers: Page "Touch Screen - Customers";
     begin
         if "Customer View" <> '' then begin
-          Customer.SetView("Customer View");
-          TouchScreenCustomers.SetTableView(Customer);
+            Customer.SetView("Customer View");
+            TouchScreenCustomers.SetTableView(Customer);
         end;
         TouchScreenCustomers.LookupMode := true;
         if TouchScreenCustomers.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
         "Customer View" := TouchScreenCustomers.GetViewText;
     end;
 
@@ -220,12 +240,12 @@ table 6060081 "MCS Recommendations Model"
         ItemLedgerEntries: Page "Item Ledger Entries";
     begin
         if "Item Ledger Entry View" <> '' then begin
-          ItemLedgerEntry.SetView("Item Ledger Entry View");
-          ItemLedgerEntries.SetTableView(ItemLedgerEntry);
+            ItemLedgerEntry.SetView("Item Ledger Entry View");
+            ItemLedgerEntries.SetTableView(ItemLedgerEntry);
         end;
         ItemLedgerEntries.LookupMode := true;
         if ItemLedgerEntries.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
         //"Item Ledger Entry View" := ItemLedgerEntries.GetViewText;
     end;
 
@@ -234,7 +254,7 @@ table 6060081 "MCS Recommendations Model"
         if ("Item View" <> xRec."Item View") or
            ("Attribute View" <> xRec."Attribute View") or
            (Categories <> xRec.Categories) then
-          "Last Catalog Export Date Time" := 0DT;
+            "Last Catalog Export Date Time" := 0DT;
     end;
 
     local procedure CheckNotOnlineModel()
@@ -243,29 +263,29 @@ table 6060081 "MCS Recommendations Model"
     begin
         MCSRecommendationsSetup.Get;
         if MCSRecommendationsSetup."Online Recommendations Model" = Code then
-          Error(StrSubstNo(TextDeleteDisableNotAllowed,MCSRecommendationsSetup.FieldCaption(MCSRecommendationsSetup."Online Recommendations Model"),MCSRecommendationsSetup.TableCaption));
+            Error(StrSubstNo(TextDeleteDisableNotAllowed, MCSRecommendationsSetup.FieldCaption(MCSRecommendationsSetup."Online Recommendations Model"), MCSRecommendationsSetup.TableCaption));
     end;
 
     local procedure AskRefreshRecommendationsLines()
     begin
         if GuiAllowed then
-          if "Model ID" <> '' then
-            if Confirm(StrSubstNo(TextRefreshRecommendationsLines,Format(Code))) then
-              RefreshRecommendationsLines;
+            if "Model ID" <> '' then
+                if Confirm(StrSubstNo(TextRefreshRecommendationsLines, Format(Code))) then
+                    RefreshRecommendationsLines;
     end;
 
     local procedure RefreshRecommendationsLines()
     var
         MCSRecommendationsHandler: Codeunit "MCS Recommendations Handler";
     begin
-        MCSRecommendationsHandler.RefreshRecommendations(Rec,GuiAllowed);
+        MCSRecommendationsHandler.RefreshRecommendations(Rec, GuiAllowed);
     end;
 
     local procedure DeleteRecommendationsLines()
     var
         MCSRecommendationsLine: Record "MCS Recommendations Line";
     begin
-        MCSRecommendationsLine.SetRange("Model No.",Code);
+        MCSRecommendationsLine.SetRange("Model No.", Code);
         MCSRecommendationsLine.DeleteAll(true);
     end;
 }

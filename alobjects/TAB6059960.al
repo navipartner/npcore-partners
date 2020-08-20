@@ -4,59 +4,72 @@ table 6059960 "MCS Webcam Argument Table"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 12
 
     Caption = 'MCS Webcam Argument Table';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Key";RecordID)
+        field(1; "Key"; RecordID)
         {
             Caption = 'Key';
+            DataClassification = CustomerContent;
         }
-        field(2;Name;Text[250])
+        field(2; Name; Text[250])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
-        field(3;Picture;BLOB)
+        field(3; Picture; BLOB)
         {
             Caption = 'Picture';
+            DataClassification = CustomerContent;
         }
-        field(4;"Person Group Id";Text[50])
+        field(4; "Person Group Id"; Text[50])
         {
             Caption = 'Person Group Id';
+            DataClassification = CustomerContent;
         }
-        field(5;"Person Id";Text[50])
+        field(5; "Person Id"; Text[50])
         {
             Caption = 'Person Id';
+            DataClassification = CustomerContent;
         }
-        field(6;"Allow Saving On Identifyed";Boolean)
+        field(6; "Allow Saving On Identifyed"; Boolean)
         {
             Caption = 'Allow Saving On Identifyed';
+            DataClassification = CustomerContent;
         }
-        field(7;"Action";Option)
+        field(7; "Action"; Option)
         {
             Caption = 'Action';
+            DataClassification = CustomerContent;
             OptionCaption = 'Capture Image,Capture And Identify Faces,Identify Faces';
             OptionMembers = CaptureImage,CaptureAndIdentifyFaces,IdentifyFaces;
         }
-        field(8;"API Key 1";Text[50])
+        field(8; "API Key 1"; Text[50])
         {
             Caption = 'API Key 1';
+            DataClassification = CustomerContent;
         }
-        field(9;"API Key 2";Text[50])
+        field(9; "API Key 2"; Text[50])
         {
             Caption = 'API Key 2';
+            DataClassification = CustomerContent;
         }
-        field(11;"Is Identified";Boolean)
+        field(11; "Is Identified"; Boolean)
         {
             Caption = 'Is Identified';
+            DataClassification = CustomerContent;
         }
-        field(12;"Table Id";Integer)
+        field(12; "Table Id"; Integer)
         {
             Caption = 'Table Id';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(13;"Image Orientation";Option)
+        field(13; "Image Orientation"; Option)
         {
             Caption = 'Image Orientation';
+            DataClassification = CustomerContent;
             OptionCaption = 'Landscape,Portrait';
             OptionMembers = Landscape,Portrait;
         }
@@ -64,7 +77,7 @@ table 6059960 "MCS Webcam Argument Table"
 
     keys
     {
-        key(Key1;"Key")
+        key(Key1; "Key")
         {
         }
     }

@@ -6,90 +6,106 @@ table 6151603 "NpDc Sale Line POS New Coupon"
     // NPR5.55/ALPO/20200424  CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
 
     Caption = 'NpDc Sale Line POS New Coupon';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Register No.";Code[10])
+        field(1; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Register;
         }
-        field(5;"Sales Ticket No.";Code[20])
+        field(5; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
+            DataClassification = CustomerContent;
             Editable = false;
             NotBlank = true;
         }
-        field(10;"Sale Type";Option)
+        field(10; "Sale Type"; Option)
         {
             Caption = 'Sale Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
         }
-        field(15;"Sale Date";Date)
+        field(15; "Sale Date"; Date)
         {
             Caption = 'Sale Date';
+            DataClassification = CustomerContent;
         }
-        field(20;"Sale Line No.";Integer)
+        field(20; "Sale Line No."; Integer)
         {
             Caption = 'Sale Line No.';
+            DataClassification = CustomerContent;
         }
-        field(25;"Line No.";Integer)
+        field(25; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(30;"Starting Date";DateTime)
+        field(30; "Starting Date"; DateTime)
         {
             Caption = 'Starting Date';
+            DataClassification = CustomerContent;
             Description = 'NPR5.41';
         }
-        field(35;"Ending Date";DateTime)
+        field(35; "Ending Date"; DateTime)
         {
             Caption = 'Ending Date';
+            DataClassification = CustomerContent;
             Description = 'NPR5.41';
         }
-        field(50;"Coupon Type";Code[20])
+        field(50; "Coupon Type"; Code[20])
         {
             Caption = 'Coupon Type';
+            DataClassification = CustomerContent;
             TableRelation = "NpDc Coupon Type";
         }
-        field(55;Quantity;Decimal)
+        field(55; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             Description = 'NPR5.41';
         }
-        field(60;"Discount Type";Option)
+        field(60; "Discount Type"; Option)
         {
             Caption = 'Discount Type';
+            DataClassification = CustomerContent;
             Description = 'NPR5.41';
             OptionCaption = 'Discount Amount,Discount %';
             OptionMembers = "Discount Amount","Discount %";
         }
-        field(65;"Discount %";Decimal)
+        field(65; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             Description = 'NPR5.41';
             MaxValue = 100;
             MinValue = 0;
         }
-        field(70;"Max. Discount Amount";Decimal)
+        field(70; "Max. Discount Amount"; Decimal)
         {
             BlankZero = true;
             Caption = 'Max. Discount Amount';
+            DataClassification = CustomerContent;
             Description = 'NPR5.41';
         }
-        field(75;"Amount per Qty.";Decimal)
+        field(75; "Amount per Qty."; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Amount per Qty.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.41';
         }
-        field(80;"Max Use per Sale";Integer)
+        field(80; "Max Use per Sale"; Integer)
         {
             Caption = 'Max Use per Sale';
+            DataClassification = CustomerContent;
             Description = 'NPR5.41';
             InitValue = 1;
             MinValue = 1;
@@ -98,7 +114,7 @@ table 6151603 "NpDc Sale Line POS New Coupon"
 
     keys
     {
-        key(Key1;"Register No.","Sales Ticket No.","Sale Type","Sale Date","Sale Line No.","Line No.")
+        key(Key1; "Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.")
         {
         }
     }

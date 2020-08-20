@@ -3,34 +3,40 @@ table 6151601 "NpDc Issue On-Sale Setup"
     // NPR5.36/MHA /20170831  CASE 286812 Object created - Discount Coupon Issue Module
 
     Caption = 'Issue On-Sale Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Coupon Type";Code[20])
+        field(1; "Coupon Type"; Code[20])
         {
             Caption = 'Coupon Type';
+            DataClassification = CustomerContent;
             TableRelation = "NpDc Coupon Type";
         }
-        field(5;Type;Option)
+        field(5; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Item Sales Amount,Item Sales Qty.,Lot';
             OptionMembers = "Item Sales Amount","Item Sales Qty.",Lot;
         }
-        field(20;"Item Sales Amount";Decimal)
+        field(20; "Item Sales Amount"; Decimal)
         {
             Caption = 'Item Sales Amount';
+            DataClassification = CustomerContent;
         }
-        field(25;"Item Sales Qty.";Decimal)
+        field(25; "Item Sales Qty."; Decimal)
         {
             Caption = 'Item Sales Qty.';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
         }
-        field(50;"Max. Allowed Issues per Sale";Decimal)
+        field(50; "Max. Allowed Issues per Sale"; Decimal)
         {
             BlankZero = true;
             Caption = 'Max. Allowed Issues per Sale';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
             InitValue = 1;
             MinValue = 0;
         }
@@ -38,7 +44,7 @@ table 6151601 "NpDc Issue On-Sale Setup"
 
     keys
     {
-        key(Key1;"Coupon Type")
+        key(Key1; "Coupon Type")
         {
         }
     }

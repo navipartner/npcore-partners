@@ -3,22 +3,25 @@ table 6151025 "NpRv Partner Relation"
     // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company vouchers
 
     Caption = 'Retail Voucher Partner Relation';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Partner Code";Code[20])
+        field(1; "Partner Code"; Code[20])
         {
             Caption = 'Partner Code';
+            DataClassification = CustomerContent;
             TableRelation = "NpRv Partner";
         }
-        field(5;"Voucher Type";Code[20])
+        field(5; "Voucher Type"; Code[20])
         {
             Caption = 'Voucher Type';
+            DataClassification = CustomerContent;
             TableRelation = "NpRv Voucher Type";
         }
-        field(1000;"Partner Name";Text[50])
+        field(1000; "Partner Name"; Text[50])
         {
-            CalcFormula = Lookup("NpRv Partner".Name WHERE (Code=FIELD("Partner Code")));
+            CalcFormula = Lookup ("NpRv Partner".Name WHERE(Code = FIELD("Partner Code")));
             Caption = 'Partner Name';
             Editable = false;
             FieldClass = FlowField;
@@ -27,7 +30,7 @@ table 6151025 "NpRv Partner Relation"
 
     keys
     {
-        key(Key1;"Partner Code","Voucher Type")
+        key(Key1; "Partner Code", "Voucher Type")
         {
         }
     }

@@ -11,47 +11,55 @@ table 6151402 "Magento Website"
     // MAG2.26/MHA /20200505  CASE 402828 Added field 40 "Sales Order No. Series"
 
     Caption = 'Magento Website';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Website List";
     LookupPageID = "Magento Website List";
 
     fields
     {
-        field(1;"Code";Code[32])
+        field(1; "Code"; Code[32])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(10;Name;Text[64])
+        field(10; Name; Text[64])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
-        field(20;"Default Website";Boolean)
+        field(20; "Default Website"; Boolean)
         {
             Caption = 'Std. Website';
+            DataClassification = CustomerContent;
         }
-        field(25;"Global Dimension 1 Code";Code[20])
+        field(25; "Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
+            DataClassification = CustomerContent;
             Description = 'MAG1.22';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
-        field(30;"Global Dimension 2 Code";Code[20])
+        field(30; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
+            DataClassification = CustomerContent;
             Description = 'MAG1.22';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
-        field(35;"Location Code";Code[20])
+        field(35; "Location Code"; Code[20])
         {
             Caption = 'Location Code';
+            DataClassification = CustomerContent;
             Description = 'MAG2.01';
             TableRelation = Location.Code;
         }
-        field(40;"Sales Order No. Series";Code[20])
+        field(40; "Sales Order No. Series"; Code[20])
         {
             Caption = 'Sales Order No. Series';
+            DataClassification = CustomerContent;
             Description = 'MAG2.26';
             TableRelation = "No. Series";
         }
@@ -59,7 +67,7 @@ table 6151402 "Magento Website"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -73,7 +81,7 @@ table 6151402 "Magento Website"
         MagentoStore: Record "Magento Store";
     begin
         //-MAG1.21
-        MagentoStore.SetRange("Website Code",Code);
+        MagentoStore.SetRange("Website Code", Code);
         //+MAG1.21
         //-MAG1.22
         MagentoStore.DeleteAll;

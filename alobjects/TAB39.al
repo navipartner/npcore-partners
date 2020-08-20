@@ -1,4 +1,4 @@
-tableextension 6014435 tableextension6014435 extends "Purchase Line" 
+tableextension 6014435 tableextension6014435 extends "Purchase Line"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields : 6014400..6014609
@@ -15,65 +15,76 @@ tableextension 6014435 tableextension6014435 extends "Purchase Line"
     // NPR5.50/LS  /20190506  CASE 347542 Removed codes for field 6014420 + Global Variable ExchangeLabel
     fields
     {
-        field(6014400;"Gift Voucher";Code[20])
+        field(6014400; "Gift Voucher"; Code[20])
         {
             Caption = 'Gift Voucher';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014401;"Credit Note";Code[20])
+        field(6014401; "Credit Note"; Code[20])
         {
             Caption = 'Credit Note';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014402;Sendt;Boolean)
+        field(6014402; Sendt; Boolean)
         {
             Caption = 'Sendt';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014405;"Compaign Order";Boolean)
+        field(6014405; "Compaign Order"; Boolean)
         {
             Caption = 'Campaign Order';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014410;"Procure Quantity";Decimal)
+        field(6014410; "Procure Quantity"; Decimal)
         {
             Caption = 'Procure Quantity';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014411;"Gift Voucher no.";Code[20])
+        field(6014411; "Gift Voucher no."; Code[20])
         {
             Caption = 'Gift Voucher no.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014412;"Credit Note No.";Code[20])
+        field(6014412; "Credit Note No."; Code[20])
         {
             Caption = 'Credit Note No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014413;"Former Order No.";Code[20])
+        field(6014413; "Former Order No."; Code[20])
         {
             Caption = 'Former Order No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014414;Accessory;Boolean)
+        field(6014414; Accessory; Boolean)
         {
             Caption = 'Accessory';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014415;"Belongs to Item";Code[20])
+        field(6014415; "Belongs to Item"; Code[20])
         {
             Caption = 'Belongs to Item';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014416;"Belongs to Line No.";Integer)
+        field(6014416; "Belongs to Line No."; Integer)
         {
             Caption = 'Belongs to Line No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014420;"Exchange Label";Code[13])
+        field(6014420; "Exchange Label"; Code[13])
         {
             Caption = 'Exchange Label';
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             Description = 'NPR5.49';
 
             trigger OnValidate()
@@ -100,49 +111,58 @@ tableextension 6014435 tableextension6014435 extends "Purchase Line"
                 //+NPR5.50 [347542]
             end;
         }
-        field(6014602;Color;Code[20])
+        field(6014602; Color; Code[20])
         {
             Caption = 'Color';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014603;Size;Code[20])
+        field(6014603; Size; Code[20])
         {
             Caption = 'Size';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014606;Create;Code[20])
+        field(6014606; Create; Code[20])
         {
             Caption = 'Create';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014607;Label;Boolean)
+        field(6014607; Label; Boolean)
         {
             Caption = 'Label';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014608;"Hide Line";Boolean)
+        field(6014608; "Hide Line"; Boolean)
         {
             Caption = 'Hide Line';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014609;"Main Line";Boolean)
+        field(6014609; "Main Line"; Boolean)
         {
             Caption = 'Main Line';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6059970;"Is Master";Boolean)
+        field(6059970; "Is Master"; Boolean)
         {
             Caption = 'Is Master';
+            DataClassification = CustomerContent;
             Description = 'VRT1.00';
         }
-        field(6059971;"Master Line No.";Integer)
+        field(6059971; "Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
+            DataClassification = CustomerContent;
             Description = 'VRT1.00';
         }
-        field(6151051;"Retail Replenisment No.";Integer)
+        field(6151051; "Retail Replenisment No."; Integer)
         {
             Caption = 'Retail Replenisment No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38.01';
         }
     }

@@ -3,41 +3,46 @@ table 6151121 "GDPR Agreement"
     // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Agreement';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"No.";Code[20])
+        field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(10;Description;Text[80])
+        field(10; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;"Created At";DateTime)
+        field(20; "Created At"; DateTime)
         {
             Caption = 'Created At';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(100;"Anonymize After";DateFormula)
+        field(100; "Anonymize After"; DateFormula)
         {
             Caption = 'Anonymize After';
+            DataClassification = CustomerContent;
         }
-        field(1000;"Latest Version";Integer)
+        field(1000; "Latest Version"; Integer)
         {
-            CalcFormula = Max("GDPR Agreement Version".Version WHERE ("No."=FIELD("No.")));
+            CalcFormula = Max ("GDPR Agreement Version".Version WHERE("No." = FIELD("No.")));
             Caption = 'Latest Version';
             FieldClass = FlowField;
         }
-        field(1001;"Current Version";Integer)
+        field(1001; "Current Version"; Integer)
         {
-            CalcFormula = Max("GDPR Agreement Version".Version WHERE ("No."=FIELD("No."),
-                                                                      "Activation Date"=FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = Max ("GDPR Agreement Version".Version WHERE("No." = FIELD("No."),
+                                                                      "Activation Date" = FIELD(UPPERLIMIT("Date Filter"))));
             Caption = 'Current Version';
             FieldClass = FlowField;
         }
-        field(1010;"Date Filter";Date)
+        field(1010; "Date Filter"; Date)
         {
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
@@ -46,7 +51,7 @@ table 6151121 "GDPR Agreement"
 
     keys
     {
-        key(Key1;"No.")
+        key(Key1; "No.")
         {
         }
     }
@@ -63,13 +68,13 @@ table 6151121 "GDPR Agreement"
     begin
 
         if ("No." = '') then begin
-          GDPRSetup.Get ();
-          GDPRSetup.TestField ("Agreement Nos.");
-          "No." := NoSeriesManagement.GetNextNo (GDPRSetup."Agreement Nos.", Today, true);
+            GDPRSetup.Get();
+            GDPRSetup.TestField("Agreement Nos.");
+            "No." := NoSeriesManagement.GetNextNo(GDPRSetup."Agreement Nos.", Today, true);
         end;
 
-        if (Format ("Anonymize After") = '') then
-          Evaluate ("Anonymize After", '<+0D>');
+        if (Format("Anonymize After") = '') then
+            Evaluate("Anonymize After", '<+0D>');
 
         GDPRAgreementVersion.Init;
         GDPRAgreementVersion."No." := "No.";
@@ -77,13 +82,13 @@ table 6151121 "GDPR Agreement"
         GDPRAgreementVersion.Description := Description;
         GDPRAgreementVersion."Activation Date" := Today;
         GDPRAgreementVersion."Anonymize After" := "Anonymize After";
-        GDPRAgreementVersion.Insert ();
+        GDPRAgreementVersion.Insert();
     end;
 
     trigger OnModify()
     begin
 
-        TestField ("Anonymize After");
+        TestField("Anonymize After");
     end;
 }
 

@@ -13,12 +13,14 @@ table 6151556 "NpXml Template Trigger Link"
     // NC2.00/MHA/20160525  CASE 240005 NaviConnect
 
     Caption = 'NpXml Template Trigger Link';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Xml Template Code"; Code[20])
         {
             Caption = 'Xml Template Code';
+            DataClassification = CustomerContent;
             TableRelation = "NpXml Template";
             //This property is currently not supported
             //TestTableRelation = false;
@@ -27,20 +29,24 @@ table 6151556 "NpXml Template Trigger Link"
         field(5; "Xml Template Trigger Line No."; Integer)
         {
             Caption = 'Xml Template Trigger Line No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
         field(10; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(20; "Template Version No."; Code[20])
         {
             Caption = 'Template Version No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
         field(100; "Parent Table No."; Integer)
         {
             Caption = 'Parent Table No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.11';
             Editable = false;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
@@ -48,6 +54,7 @@ table 6151556 "NpXml Template Trigger Link"
         field(110; "Parent Field No."; Integer)
         {
             Caption = 'Parent Field No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.11';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Parent Table No."));
 
@@ -94,11 +101,13 @@ table 6151556 "NpXml Template Trigger Link"
         field(200; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
         field(210; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
@@ -143,6 +152,7 @@ table 6151556 "NpXml Template Trigger Link"
         field(300; "Link Type"; Option)
         {
             Caption = 'Link Type';
+            DataClassification = CustomerContent;
             Description = 'NC1.06,NC1.11';
             OptionCaption = 'Table Link,Constant (Parent),Filter (Parent),Constant,Filter,Table Link (Previous),Constant (Previous)';
             OptionMembers = TableLink,ParentConstant,ParentFilter,Constant,"Filter",PreviousTableLink,PreviousConstant;
@@ -150,6 +160,7 @@ table 6151556 "NpXml Template Trigger Link"
         field(310; "Parent Filter Value"; Text[250])
         {
             Caption = 'Parent Filter Value';
+            DataClassification = CustomerContent;
             Description = 'NC1.08';
 
             trigger OnLookup()
@@ -165,6 +176,7 @@ table 6151556 "NpXml Template Trigger Link"
         field(320; "Filter Value"; Text[250])
         {
             Caption = 'Filter Value';
+            DataClassification = CustomerContent;
             Description = 'NC1.08';
 
             trigger OnLookup()
@@ -180,6 +192,7 @@ table 6151556 "NpXml Template Trigger Link"
         field(330; "Previous Filter Value"; Text[250])
         {
             Caption = 'Previous Filter Value';
+            DataClassification = CustomerContent;
             Description = 'NC1.03,NC1.11';
 
             trigger OnLookup()
@@ -195,6 +208,7 @@ table 6151556 "NpXml Template Trigger Link"
         field(340; "Last Modified at"; DateTime)
         {
             Caption = 'Last Modified at';
+            DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
     }

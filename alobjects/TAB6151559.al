@@ -6,12 +6,14 @@ table 6151559 "NpXml Template Archive"
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'NpXml Template Archive';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             Description = 'NC2.01';
             NotBlank = true;
             TableRelation = "NpXml Template";
@@ -19,34 +21,39 @@ table 6151559 "NpXml Template Archive"
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(2;"Template Version No.";Code[20])
+        field(2; "Template Version No."; Code[20])
         {
             Caption = 'Template Version No.';
+            DataClassification = CustomerContent;
         }
-        field(5;"Version Description";Text[250])
+        field(5; "Version Description"; Text[250])
         {
             Caption = 'Version Description';
+            DataClassification = CustomerContent;
         }
-        field(10;"Archived Template";BLOB)
+        field(10; "Archived Template"; BLOB)
         {
             Caption = 'Archived Template';
+            DataClassification = CustomerContent;
         }
-        field(30;"Archived by";Code[50])
+        field(30; "Archived by"; Code[50])
         {
             Caption = 'Archived by';
+            DataClassification = CustomerContent;
         }
-        field(31;"Archived at";DateTime)
+        field(31; "Archived at"; DateTime)
         {
             Caption = 'Archived at';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Code","Template Version No.")
+        key(Key1; "Code", "Template Version No.")
         {
         }
-        key(Key2;"Archived at")
+        key(Key2; "Archived at")
         {
         }
     }

@@ -17,6 +17,7 @@ table 6150703 "POS Action"
     // NPR5.55/MMV /20200420 CASE 386254 Default "Blocking UI" to TRUE, since we only have 2 workflows that should not block UI while executing.
 
     Caption = 'POS Action';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Actions";
     LookupPageID = "POS Actions";
 
@@ -25,26 +26,32 @@ table 6150703 "POS Action"
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(2; Description; Text[250])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(3; Version; Text[30])
         {
             Caption = 'Version';
+            DataClassification = CustomerContent;
         }
         field(4; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
         }
         field(5; Workflow; BLOB)
         {
             Caption = 'Workflow';
+            DataClassification = CustomerContent;
         }
         field(6; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             Editable = false;
             OptionCaption = 'Generic,Button,BackEnd';
             OptionMembers = Generic,Button,BackEnd;
@@ -52,21 +59,25 @@ table 6150703 "POS Action"
         field(7; "Subscriber Instances Allowed"; Option)
         {
             Caption = 'Subscriber Instances Allowed';
+            DataClassification = CustomerContent;
             OptionCaption = 'Single,Multiple';
             OptionMembers = Single,Multiple;
         }
         field(8; "Bound to DataSource"; Boolean)
         {
             Caption = 'Bound to DataSource';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(9; "Custom JavaScript Logic"; BLOB)
         {
             Caption = 'Custom JavaScript Logic';
+            DataClassification = CustomerContent;
         }
         field(10; "Data Source Name"; Code[50])
         {
             Caption = 'Data Source Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -78,33 +89,39 @@ table 6150703 "POS Action"
         field(11; "Blocking UI"; Boolean)
         {
             Caption = 'Blocking UI';
+            DataClassification = CustomerContent;
             Description = 'NPR5.32.11';
         }
         field(12; Tooltip; Text[250])
         {
             Caption = 'Tooltip';
+            DataClassification = CustomerContent;
             Description = 'NPR5.32.11';
         }
         field(13; "Codeunit ID"; Integer)
         {
             Caption = 'Codeunit ID';
+            DataClassification = CustomerContent;
             Description = 'NPR5.32.11';
             Editable = false;
         }
         field(14; "Secure Method Code"; Code[10])
         {
             Caption = 'Secure Method Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.43';
             TableRelation = "POS Secure Method";
         }
         field(15; "Workflow Engine Version"; Text[30])
         {
             Caption = 'Workflow Engine Version';
+            DataClassification = CustomerContent;
             InitValue = '1.0';
         }
-        field(20;"Requires POS Type";Option)
+        field(20; "Requires POS Type"; Option)
         {
             Caption = 'Requires POS Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Attended,Unattended';
             OptionMembers = ATTENDED,UNATTENDED;
         }
@@ -149,7 +166,7 @@ table 6150703 "POS Action"
         Text007: Label 'You have called a Workflow 1.0 function in the context of a Workflow 2.0 discovery process.';
         Text008: Label 'You have called a Workflow 2.0 function in the context of a Workflow 1.0 discovery process.';
 
-        procedure SetSession(SessionIn: Codeunit "POS Session")
+    procedure SetSession(SessionIn: Codeunit "POS Session")
     begin
         POSSession := SessionIn;
     end;
@@ -186,7 +203,7 @@ table 6150703 "POS Action"
         DiscoveredAction.Insert;
     end;
 
-        procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
+    procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
     begin
         if (ActionInRefresh <> '') and (ActionInRefresh <> Code) then
             exit(false);
@@ -213,7 +230,7 @@ table 6150703 "POS Action"
 
         //-NPR5.55 [335834]
         if not ActionUpdateRequired then
-          UpdateMLDescription(Code, Description);
+            UpdateMLDescription(Code, Description);
         //+NPR5.55 [335834]
 
         if not (IsTemporary or ActionUpdateRequired) then
@@ -342,12 +359,12 @@ table 6150703 "POS Action"
                 //   POSAction.MODIFY;
                 // OnAfterActionUpdated(POSAction);
                 OnAfterActionUpdated(tmpUpdatedActions);
-                //+NPR5.46 [329621]
+            //+NPR5.46 [329621]
             until tmpUpdatedActions.Next = 0;
         //+NPR5.40 [307453]
     end;
 
-        procedure RegisterWorkflowStep(Label: Text; "Code": Text)
+    procedure RegisterWorkflowStep(Label: Text; "Code": Text)
     var
         FrontEnd: Codeunit "POS Front End Management";
         WorkflowStep: DotNet npNetWorkflowStep;
@@ -365,7 +382,7 @@ table 6150703 "POS Action"
         WorkflowObj.Steps.Add(WorkflowStep);
     end;
 
-        procedure RegisterWorkflow(WithOnBeforeWorkflowEvent: Boolean)
+    procedure RegisterWorkflow(WithOnBeforeWorkflowEvent: Boolean)
     var
         FrontEnd: Codeunit "POS Front End Management";
     begin
@@ -386,7 +403,7 @@ table 6150703 "POS Action"
         InitializeWorkflowDiscovery();
     end;
 
-        procedure RegisterWorkflow20("Code": Text)
+    procedure RegisterWorkflow20("Code": Text)
     var
         FrontEnd: Codeunit "POS Front End Management";
         WorkflowStep: DotNet npNetWorkflowStep;
@@ -409,42 +426,42 @@ table 6150703 "POS Action"
         //+NPR5.50 [338666]
     end;
 
-        procedure RegisterTextParameter(Name: Text; DefaultValue: Text)
+    procedure RegisterTextParameter(Name: Text; DefaultValue: Text)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Text, DefaultValue, '');
     end;
 
-        procedure RegisterIntegerParameter(Name: Text; DefaultValue: Integer)
+    procedure RegisterIntegerParameter(Name: Text; DefaultValue: Integer)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Integer, Format(DefaultValue, 0, 9), '');
     end;
 
-        procedure RegisterDateParameter(Name: Text; DefaultValue: Date)
+    procedure RegisterDateParameter(Name: Text; DefaultValue: Date)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Date, Format(DefaultValue, 0, 9), '');
     end;
 
-        procedure RegisterBooleanParameter(Name: Text; DefaultValue: Boolean)
+    procedure RegisterBooleanParameter(Name: Text; DefaultValue: Boolean)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Boolean, Format(DefaultValue, 0, 9), '');
     end;
 
-        procedure RegisterDecimalParameter(Name: Text; DefaultValue: Decimal)
+    procedure RegisterDecimalParameter(Name: Text; DefaultValue: Decimal)
     var
         Param: Record "POS Action Parameter";
     begin
         RegisterParameter(Name, Param."Data Type"::Decimal, Format(DefaultValue, 0, 9), '');
     end;
 
-        procedure RegisterOptionParameter(Name: Text; Options: Text; DefaultValue: Text)
+    procedure RegisterOptionParameter(Name: Text; Options: Text; DefaultValue: Text)
     var
         Param: Record "POS Action Parameter";
     begin
@@ -475,7 +492,7 @@ table 6150703 "POS Action"
         Param.Insert;
     end;
 
-        procedure RegisterDataBinding()
+    procedure RegisterDataBinding()
     begin
         "Bound to DataSource" := true;
         Modify;
@@ -484,7 +501,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-        procedure RegisterDataSourceBinding(DataSource: Code[50])
+    procedure RegisterDataSourceBinding(DataSource: Code[50])
     begin
         "Bound to DataSource" := true;
         "Data Source Name" := DataSource;
@@ -494,7 +511,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-        procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
+    procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
         Dictionary: DotNet npNetDictionary_Of_T_U;
         MemStr: DotNet npNetMemoryStream;
@@ -520,7 +537,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-        procedure RegisterDataSource(Name: Code[50])
+    procedure RegisterDataSource(Name: Code[50])
     begin
         "Data Source Name" := Name;
         //-NPR5.40 [306347]
@@ -531,7 +548,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-        procedure RegisterBlockingUI(Blocking: Boolean)
+    procedure RegisterBlockingUI(Blocking: Boolean)
     begin
         //-NPR5.32.11 [281618]
         "Blocking UI" := Blocking;
@@ -542,7 +559,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-        procedure RegisterTooltip(TooltipIn: Text)
+    procedure RegisterTooltip(TooltipIn: Text)
     begin
         //-NPR5.32.11 [281618]
         Tooltip := CopyStr(TooltipIn, 1, MaxStrLen(Tooltip));
@@ -553,14 +570,14 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-        procedure RegisterSecureMethod(SecureMethodCode: Code[10])
+    procedure RegisterSecureMethod(SecureMethodCode: Code[10])
     begin
         //-NPR5.43 [314603]
         "Secure Method Code" := SecureMethodCode;
         //+NPR5.43
     end;
 
-        procedure IsThisAction("Code": Code[20]): Boolean
+    procedure IsThisAction("Code": Code[20]): Boolean
     begin
         exit(Rec.Code = Code);
     end;
@@ -578,7 +595,7 @@ table 6150703 "POS Action"
         //+NPR5.40 [307453]
     end;
 
-        procedure RefreshWorkflow()
+    procedure RefreshWorkflow()
     var
         "Action": Record "POS Action";
     begin
@@ -628,7 +645,7 @@ table 6150703 "POS Action"
         //+NPR5.44 [286547]
     end;
 
-        procedure GetCustomJavaScriptLogic(var "Object": DotNet npNetObject)
+    procedure GetCustomJavaScriptLogic(var "Object": DotNet npNetObject)
     var
         Dictionary: DotNet npNetDictionary_Of_T_U;
         KeyValuePair: DotNet npNetKeyValuePair_Of_T_U;
@@ -704,24 +721,24 @@ table 6150703 "POS Action"
         Dictionary.Add(Name, Value);
     end;
 
-        procedure SetWorkflowInvocationParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "POS Front End Management")
+    procedure SetWorkflowInvocationParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "POS Front End Management")
     begin
         CheckParameter(Name, Value, FrontEnd);
         SetWorkflowInvocationDictionary(WorkflowInvocationParameters, Name, Value);
     end;
 
-        procedure SetWorkflowInvocationContext(Name: Text; Value: Variant)
+    procedure SetWorkflowInvocationContext(Name: Text; Value: Variant)
     begin
         SetWorkflowInvocationDictionary(WorkflowInvocationContext, Name, Value);
     end;
 
-        procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: DotNet npNetDictionary_Of_T_U; var WorkflowInvocationContextOut: DotNet npNetDictionary_Of_T_U)
+    procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: DotNet npNetDictionary_Of_T_U; var WorkflowInvocationContextOut: DotNet npNetDictionary_Of_T_U)
     begin
         WorkflowInvocationParametersOut := WorkflowInvocationParameters;
         WorkflowInvocationContextOut := WorkflowInvocationContext;
     end;
 
-        procedure DiscoverActions()
+    procedure DiscoverActions()
     var
         CodeunitInstanceDetector: Codeunit "POS Action Management";
     begin
@@ -791,12 +808,12 @@ table 6150703 "POS Action"
 
         //-NPR5.54 [392247]
         "Requires POS Type" := "Requires POS Type"::ATTENDED;
-        POSSession.DiscoverSessionAction (Rec);
-        if (IsTemporary ()) then begin
-          if (POSAction.Get (Code)) then begin
-            POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
-            POSAction.Modify ();
-          end;
+        POSSession.DiscoverSessionAction(Rec);
+        if (IsTemporary()) then begin
+            if (POSAction.Get(Code)) then begin
+                POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
+                POSAction.Modify();
+            end;
         end;
         //+NPR5.54 [392247]
     end;
@@ -808,12 +825,12 @@ table 6150703 "POS Action"
 
         //-NPR5.54 [392247]
         "Requires POS Type" := "Requires POS Type"::UNATTENDED;
-        POSSession.DiscoverSessionAction (Rec);
-        if (IsTemporary ()) then begin
-          if (POSAction.Get (Code)) then begin
-            POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
-            POSAction.Modify ();
-          end;
+        POSSession.DiscoverSessionAction(Rec);
+        if (IsTemporary()) then begin
+            if (POSAction.Get(Code)) then begin
+                POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
+                POSAction.Modify();
+            end;
         end;
         //+NPR5.54 [392247]
     end;
@@ -822,20 +839,20 @@ table 6150703 "POS Action"
     begin
 
         //-NPR5.54 [392247]
-        exit ("Requires POS Type");
+        exit("Requires POS Type");
         //+NPR5.54 [392247]
     end;
 
-    local procedure UpdateMLDescription("Code": Code[20];Description: Text[250])
+    local procedure UpdateMLDescription("Code": Code[20]; Description: Text[250])
     var
         POSAction: Record "POS Action";
     begin
         //-NPR5.55 [335834]
         if POSAction.Get(Code) then
-          if POSAction.Description <> Description then begin
-            POSAction.Description := Description;
-            POSAction.Modify;
-          end;
+            if POSAction.Description <> Description then begin
+                POSAction.Description := Description;
+                POSAction.Modify;
+            end;
         //+NPR5.55 [335834]
     end;
 }

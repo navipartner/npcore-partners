@@ -8,81 +8,93 @@ table 6150640 "POS Info"
     // NPR5.53/TJ  /20191022 CASE 370575 New Type option: "Write Default Message"
 
     Caption = 'POS Info';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Info List";
     LookupPageID = "POS Info List";
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[50])
+        field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(5;Message;Text[50])
+        field(5; Message; Text[50])
         {
             Caption = 'Message';
+            DataClassification = CustomerContent;
         }
-        field(10;Type;Option)
+        field(10; Type; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Show Message,Request Data,Write Default Message';
             OptionMembers = "Show Message","Request Data","Write Default Message";
         }
-        field(20;"Input Type";Option)
+        field(20; "Input Type"; Option)
         {
             Caption = 'Input Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Text,SubCode,Table';
             OptionMembers = Text,SubCode,"Table";
         }
-        field(21;"Table No.";Integer)
+        field(21; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(30;"Input Mandatory";Boolean)
+        field(30; "Input Mandatory"; Boolean)
         {
             Caption = 'Input Mandatory';
+            DataClassification = CustomerContent;
         }
-        field(40;"Once per Transaction";Boolean)
+        field(40; "Once per Transaction"; Boolean)
         {
             Caption = 'Once per Transaction';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 //-NPR5.51 [364558]
                 if "Once per Transaction" then
-                  "Copy from Header" := false;
+                    "Copy from Header" := false;
                 //+NPR5.51 [364558]
             end;
         }
-        field(50;"Copy from Header";Boolean)
+        field(50; "Copy from Header"; Boolean)
         {
             Caption = 'Copy from Header';
+            DataClassification = CustomerContent;
             Description = 'NPR5.51';
 
             trigger OnValidate()
             begin
-                TestField("Once per Transaction",false);  //NPR5.51 [364558]
+                TestField("Once per Transaction", false);  //NPR5.51 [364558]
             end;
         }
-        field(60;"Available in Front-End";Boolean)
+        field(60; "Available in Front-End"; Boolean)
         {
             Caption = 'Available in Front-End';
+            DataClassification = CustomerContent;
             Description = 'NPR5.51';
         }
-        field(70;"Set POS Sale Line Color to Red";Boolean)
+        field(70; "Set POS Sale Line Color to Red"; Boolean)
         {
             Caption = 'Set POS Sale Line Color to Red';
+            DataClassification = CustomerContent;
             Description = 'NPR5.51';
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -97,18 +109,18 @@ table 6150640 "POS Info"
         POSInfoLinkTable: Record "POS Info Link Table";
         POSInfoLookupSetup: Record "POS Info Lookup Setup";
     begin
-        POSInfoLinkTable.SetRange("POS Info Code",Rec.Code);
+        POSInfoLinkTable.SetRange("POS Info Code", Rec.Code);
         if POSInfoLinkTable.FindFirst then
-          if not Confirm(StrSubstNo(ConfText001,Rec.TableCaption),true) then
-            Error(ErrText001);
+            if not Confirm(StrSubstNo(ConfText001, Rec.TableCaption), true) then
+                Error(ErrText001);
 
-        POSInfoSubcode.SetRange(Code,Rec.Code);
+        POSInfoSubcode.SetRange(Code, Rec.Code);
         POSInfoSubcode.DeleteAll;
 
-        POSInfoLinkTable.SetRange("POS Info Code",Code);
+        POSInfoLinkTable.SetRange("POS Info Code", Code);
         POSInfoLinkTable.DeleteAll;
 
-        POSInfoLookupSetup.SetRange("POS Info Code",Code);
+        POSInfoLookupSetup.SetRange("POS Info Code", Code);
         POSInfoLookupSetup.DeleteAll;
     end;
 
