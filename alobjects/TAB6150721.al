@@ -3,26 +3,30 @@ table 6150721 "POS Theme"
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
 
     Caption = 'POS Theme';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[50])
+        field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(3;Blocked;Boolean)
+        field(3; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -35,7 +39,7 @@ table 6150721 "POS Theme"
     var
         Dependency: Record "POS Theme Dependency";
     begin
-        Dependency.SetRange("POS Theme Code",Code);
+        Dependency.SetRange("POS Theme Code", Code);
         Dependency.DeleteAll();
     end;
 }

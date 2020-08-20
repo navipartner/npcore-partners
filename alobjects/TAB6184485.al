@@ -3,18 +3,21 @@ table 6184485 "EFT Setup"
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Setup';
+    DataClassification = CustomerContent;
     LookupPageID = "EFT Setup";
 
     fields
     {
-        field(1;"Payment Type POS";Code[10])
+        field(1; "Payment Type POS"; Code[10])
         {
             Caption = 'Payment Type POS';
+            DataClassification = CustomerContent;
             TableRelation = "Payment Type POS"."No.";
         }
-        field(2;"EFT Integration Type";Code[20])
+        field(2; "EFT Integration Type"; Code[20])
         {
             Caption = 'EFT Integration Type';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -30,16 +33,17 @@ table 6184485 "EFT Setup"
                 tmpEFTIntegrationType.Get("EFT Integration Type");
             end;
         }
-        field(3;"POS Unit No.";Code[10])
+        field(3; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Unit"."No.";
         }
     }
 
     keys
     {
-        key(Key1;"Payment Type POS","POS Unit No.")
+        key(Key1; "Payment Type POS", "POS Unit No.")
         {
         }
     }
@@ -64,8 +68,8 @@ table 6184485 "EFT Setup"
     trigger OnModify()
     begin
         if xRec."EFT Integration Type" <> '' then
-          if "EFT Integration Type" <> xRec."EFT Integration Type" then
-            ClearSetupParameters();
+            if "EFT Integration Type" <> xRec."EFT Integration Type" then
+                ClearSetupParameters();
     end;
 
     local procedure LookupIntegrationType()
@@ -75,7 +79,7 @@ table 6184485 "EFT Setup"
     begin
         EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
         if PAGE.RunModal(0, tmpEFTIntegrationType) = ACTION::LookupOK then
-          "EFT Integration Type" := tmpEFTIntegrationType.Code;
+            "EFT Integration Type" := tmpEFTIntegrationType.Code;
     end;
 
     procedure ShowEftPOSUnitParameters()
@@ -90,10 +94,10 @@ table 6184485 "EFT Setup"
         PAGE.RunModal(PAGE::"EFT Payment Parameter Setup", Rec);
     end;
 
-    procedure FindSetup(POSUnitNo: Code[10];PaymentTypePOS: Code[10])
+    procedure FindSetup(POSUnitNo: Code[10]; PaymentTypePOS: Code[10])
     begin
         if Get(PaymentTypePOS, POSUnitNo) then
-          exit;
+            exit;
         Get(PaymentTypePOS, '');
     end;
 

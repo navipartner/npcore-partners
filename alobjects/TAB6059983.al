@@ -3,43 +3,50 @@ table 6059983 "Item Repair Tests"
     // VRT1.20/JDH /20170106 CASE 251896 TestTool to analyse and fix Variants
 
     Caption = 'Item Repair Tests';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Item Repair Tests";
     LookupPageID = "Item Repair Tests";
 
     fields
     {
-        field(1;"Item No.";Code[20])
+        field(1; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
         }
-        field(2;"Variant Code";Code[10])
+        field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
+            DataClassification = CustomerContent;
         }
-        field(3;"Test No.";Integer)
+        field(3; "Test No."; Integer)
         {
             Caption = 'Test No.';
+            DataClassification = CustomerContent;
         }
-        field(5;"Test Group";Integer)
+        field(5; "Test Group"; Integer)
         {
             Caption = 'Test Group';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[100])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(20;Success;Boolean)
+        field(20; Success; Boolean)
         {
             Caption = 'Success';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Item No.","Variant Code","Test No.")
+        key(Key1; "Item No.", "Variant Code", "Test No.")
         {
         }
-        key(Key2;Success)
+        key(Key2; Success)
         {
         }
     }

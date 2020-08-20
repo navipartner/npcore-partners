@@ -1,4 +1,4 @@
-tableextension 6014449 tableextension6014449 extends "Return Receipt Header" 
+tableextension 6014449 tableextension6014449 extends "Return Receipt Header"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Field 6014400
@@ -6,9 +6,10 @@ tableextension 6014449 tableextension6014449 extends "Return Receipt Header"
     // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
-        field(6014400;"Sales Ticket No.";Code[20])
+        field(6014400; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
     }

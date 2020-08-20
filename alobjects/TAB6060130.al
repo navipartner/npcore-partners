@@ -9,147 +9,175 @@ table 6060130 "MM Membership Points Entry"
     // MM1.37/TSA /20190130 CASE 338215 Added Entry Type Reserved and Captured, Authorization Code, added a key for auth code and type
 
     Caption = 'Membership Points Entry';
+    DataClassification = CustomerContent;
     DrillDownPageID = "MM Membership Point Entry";
     LookupPageID = "MM Membership Point Entry";
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(10;"Entry Type";Option)
+        field(10; "Entry Type"; Option)
         {
             Caption = 'Entry Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Sale,Refund,Withdrawal,Deposit,Expired,Synchronization,Reserve,Capture';
             OptionMembers = SALE,REFUND,POINT_WITHDRAW,POINT_DEPOSIT,EXPIRED,SYNCHRONIZATION,RESERVE,CAPTURE;
         }
-        field(11;"Posting Date";Date)
+        field(11; "Posting Date"; Date)
         {
             Caption = 'Posting Date';
+            DataClassification = CustomerContent;
         }
-        field(12;"Value Entry No.";Integer)
+        field(12; "Value Entry No."; Integer)
         {
             Caption = 'Value Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "Value Entry";
         }
-        field(13;"Customer No.";Code[20])
+        field(13; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
+            DataClassification = CustomerContent;
         }
-        field(14;"Membership Entry No.";Integer)
+        field(14; "Membership Entry No."; Integer)
         {
             Caption = 'Membership Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "MM Membership";
         }
-        field(18;"POS Store Code";Code[10])
+        field(18; "POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Store";
         }
-        field(19;"POS Unit Code";Code[10])
+        field(19; "POS Unit Code"; Code[10])
         {
             Caption = 'POS Unit Code';
+            DataClassification = CustomerContent;
         }
-        field(20;"Document No.";Code[20])
+        field(20; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            DataClassification = CustomerContent;
         }
-        field(21;"Loyalty Code";Code[20])
+        field(21; "Loyalty Code"; Code[20])
         {
             Caption = 'Loyalty Code';
+            DataClassification = CustomerContent;
             TableRelation = "MM Loyalty Setup";
         }
-        field(22;"Loyalty Item Point Line No.";Integer)
+        field(22; "Loyalty Item Point Line No."; Integer)
         {
             Caption = 'Loyalty Item Point Line No.';
+            DataClassification = CustomerContent;
         }
-        field(23;"Point Constraint";Option)
+        field(23; "Point Constraint"; Option)
         {
             Caption = 'Point Constraint';
+            DataClassification = CustomerContent;
             OptionCaption = 'Include,Exclude';
             OptionMembers = INCLUDE,EXCLUDE;
         }
-        field(25;Adjustment;Boolean)
+        field(25; Adjustment; Boolean)
         {
             Caption = 'Adjustment';
+            DataClassification = CustomerContent;
         }
-        field(30;"Amount (LCY)";Decimal)
+        field(30; "Amount (LCY)"; Decimal)
         {
             Caption = 'Amount (LCY)';
+            DataClassification = CustomerContent;
         }
-        field(31;"Awarded Amount (LCY)";Decimal)
+        field(31; "Awarded Amount (LCY)"; Decimal)
         {
             Caption = 'Awarded Amount (LCY)';
+            DataClassification = CustomerContent;
         }
-        field(32;"Awarded Points";Integer)
+        field(32; "Awarded Points"; Integer)
         {
             Caption = 'Awarded Points';
+            DataClassification = CustomerContent;
         }
-        field(33;"Redeemed Points";Integer)
+        field(33; "Redeemed Points"; Integer)
         {
             Caption = 'Redeemed Points';
+            DataClassification = CustomerContent;
         }
-        field(34;Points;Integer)
+        field(34; Points; Integer)
         {
             Caption = 'Points';
+            DataClassification = CustomerContent;
         }
-        field(40;"Period Start";Date)
+        field(40; "Period Start"; Date)
         {
             Caption = 'Period Start';
+            DataClassification = CustomerContent;
         }
-        field(41;"Period End";Date)
+        field(41; "Period End"; Date)
         {
             Caption = 'Period End';
+            DataClassification = CustomerContent;
         }
-        field(50;"Item No.";Code[20])
+        field(50; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
         }
-        field(51;"Variant Code";Code[10])
+        field(51; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
+            DataClassification = CustomerContent;
         }
-        field(52;Quantity;Decimal)
+        field(52; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
         }
-        field(55;Description;Text[80])
+        field(55; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(60;"Redeem Ref. Type";Option)
+        field(60; "Redeem Ref. Type"; Option)
         {
             Caption = 'Redeem Ref. Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Coupon';
             OptionMembers = NA,COUPON;
         }
-        field(65;"Redeem Reference No.";Code[20])
+        field(65; "Redeem Reference No."; Code[20])
         {
             Caption = 'Redeem Reference No.';
+            DataClassification = CustomerContent;
         }
-        field(70;"Authorization Code";Text[40])
+        field(70; "Authorization Code"; Text[40])
         {
             Caption = 'Authorization Code';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Membership Entry No.","Entry Type","Posting Date")
+        key(Key2; "Membership Entry No.", "Entry Type", "Posting Date")
         {
         }
-        key(Key3;"Membership Entry No.","Posting Date","Entry Type")
+        key(Key3; "Membership Entry No.", "Posting Date", "Entry Type")
         {
         }
-        key(Key4;"Loyalty Code","Membership Entry No.","Entry Type","Point Constraint","Loyalty Item Point Line No.","Period Start")
+        key(Key4; "Loyalty Code", "Membership Entry No.", "Entry Type", "Point Constraint", "Loyalty Item Point Line No.", "Period Start")
         {
         }
-        key(Key5;"Authorization Code","Entry Type")
+        key(Key5; "Authorization Code", "Entry Type")
         {
         }
     }

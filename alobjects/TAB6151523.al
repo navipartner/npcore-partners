@@ -3,41 +3,47 @@ table 6151523 "Nc Endpoint E-mail"
     // NC2.01/BR /20160818  CASE 248630 NaviConnect
 
     Caption = 'Nc Endpoint E-mail';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Nc Endpoint E-mail List";
     LookupPageID = "Nc Endpoint E-mail List";
 
     fields
     {
-        field(10;"Code";Code[20])
+        field(10; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(20;Description;Text[50])
+        field(20; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(40;Enabled;Boolean)
+        field(40; Enabled; Boolean)
         {
             Caption = 'Enabled';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(50;"Output Nc Task Entry No.";BigInteger)
+        field(50; "Output Nc Task Entry No."; BigInteger)
         {
             Caption = 'Output Nc Task Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(110;"Recipient E-Mail Address";Text[80])
+        field(110; "Recipient E-Mail Address"; Text[80])
         {
             Caption = 'Recipient E-Mail Address';
+            DataClassification = CustomerContent;
             ExtendedDatatype = EMail;
 
             trigger OnValidate()
@@ -45,47 +51,54 @@ table 6151523 "Nc Endpoint E-mail"
                 UpdateNcEndpoint;
             end;
         }
-        field(115;"CC E-Mail Address";Text[80])
+        field(115; "CC E-Mail Address"; Text[80])
         {
             Caption = 'CC E-Mail Address';
+            DataClassification = CustomerContent;
             ExtendedDatatype = EMail;
         }
-        field(116;"BCC E-Mail Address";Text[80])
+        field(116; "BCC E-Mail Address"; Text[80])
         {
             Caption = 'BCC E-Mail Address';
+            DataClassification = CustomerContent;
             ExtendedDatatype = EMail;
         }
-        field(120;"Subject Text";Text[150])
+        field(120; "Subject Text"; Text[150])
         {
             Caption = 'Subject Text';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint;
             end;
         }
-        field(130;"Body Text";Text[250])
+        field(130; "Body Text"; Text[250])
         {
             Caption = 'Body Text';
+            DataClassification = CustomerContent;
         }
-        field(140;"Filename Attachment";Text[250])
+        field(140; "Filename Attachment"; Text[250])
         {
             Caption = 'Filename Attachment';
+            DataClassification = CustomerContent;
         }
-        field(150;"Sender Name";Text[80])
+        field(150; "Sender Name"; Text[80])
         {
             Caption = 'Sender Name';
+            DataClassification = CustomerContent;
         }
-        field(160;"Sender E-Mail Address";Text[80])
+        field(160; "Sender E-Mail Address"; Text[80])
         {
             Caption = 'Sender E-Mail Address';
+            DataClassification = CustomerContent;
             ExtendedDatatype = EMail;
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -96,12 +109,12 @@ table 6151523 "Nc Endpoint E-mail"
 
     trigger OnDelete()
     begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode,Code);
+        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
     end;
 
     trigger OnRename()
     begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode,Code);
+        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
     end;
 
     var
@@ -120,7 +133,7 @@ table 6151523 "Nc Endpoint E-mail"
         Clear(NcEndpointTriggerLinks);
         NcEndpointTriggerLink.Reset;
         //NcEndpointTriggerLink.SETRANGE("Endpoint Type Code",GetEndpointTypeCode);
-        NcEndpointTriggerLink.SetRange("Endpoint Code",Code);
+        NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
         NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
         NcEndpointTriggerLinks.RunModal;
     end;
@@ -133,33 +146,33 @@ table 6151523 "Nc Endpoint E-mail"
     begin
         ToBeUpdated := false;
         if not NcEndpoint.Get(Code) then begin
-          NcEndpoint.Init;
-          NcEndpoint.Validate(Code,Code);
-          NcEndpoint.Validate("Endpoint Type",GetEndpointTypeCode);
-          NcEndpoint.Insert;
+            NcEndpoint.Init;
+            NcEndpoint.Validate(Code, Code);
+            NcEndpoint.Validate("Endpoint Type", GetEndpointTypeCode);
+            NcEndpoint.Insert;
         end;
         if Description <> NcEndpoint.Description then begin
-          NcEndpoint.Description := Description;
-          ToBeUpdated := true;
+            NcEndpoint.Description := Description;
+            ToBeUpdated := true;
         end;
         SetupSummary := BuildSetupSummary;
         if SetupSummary <> NcEndpoint."Setup Summary" then begin
-          NcEndpoint."Setup Summary" := CopyStr(SetupSummary,1,MaxStrLen(NcEndpoint."Setup Summary"));
-          ToBeUpdated := true;
+            NcEndpoint."Setup Summary" := CopyStr(SetupSummary, 1, MaxStrLen(NcEndpoint."Setup Summary"));
+            ToBeUpdated := true;
         end;
         if Enabled <> NcEndpoint.Enabled then begin
-          NcEndpoint.Enabled := Enabled;
-          ToBeUpdated := true;
+            NcEndpoint.Enabled := Enabled;
+            ToBeUpdated := true;
         end;
         if ToBeUpdated then
-          NcEndpoint.Modify(true);
+            NcEndpoint.Modify(true);
     end;
 
     local procedure BuildSetupSummary(): Text
     var
         TextSetupSummary: Label 'E-Mail Recipient %1, subject %2.';
     begin
-        exit(StrSubstNo(TextSetupSummary,"Recipient E-Mail Address","Subject Text"));
+        exit(StrSubstNo(TextSetupSummary, "Recipient E-Mail Address", "Subject Text"));
     end;
 }
 

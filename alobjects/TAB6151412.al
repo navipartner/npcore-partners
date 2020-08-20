@@ -24,39 +24,46 @@ table 6151412 "Magento Picture Link"
     // MAG2.22/MHA /20190625  CASE 359285 Added fields 40 "Variety Type", 50 "Variety Table", 60 "Variety Value"
 
     Caption = 'Magento Picture Link';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(2;"Item No.";Code[20])
+        field(2; "Item No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
             TableRelation = Item;
         }
-        field(3;Path;Text[150])
+        field(3; Path; Text[150])
         {
             Caption = 'Path';
+            DataClassification = CustomerContent;
         }
-        field(7;"Short Text";Text[250])
+        field(7; "Short Text"; Text[250])
         {
             Caption = 'Short Text';
+            DataClassification = CustomerContent;
         }
-        field(11;"Variant Value Code";Code[20])
+        field(11; "Variant Value Code"; Code[20])
         {
             Caption = 'Variant Value Code';
+            DataClassification = CustomerContent;
             Description = 'MAG1.21';
         }
-        field(15;"Line No.";Integer)
+        field(15; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 Sorting := "Line No.";
             end;
         }
-        field(25;"Base Image";Boolean)
+        field(25; "Base Image"; Boolean)
         {
             Caption = 'Base Image';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -64,17 +71,18 @@ table 6151412 "Magento Picture Link"
             begin
                 //-MAG1.21
                 //MagPicture.SETRANGE(Type,Type);
-                MagPicture.SetRange("Variant Value Code","Variant Value Code");
+                MagPicture.SetRange("Variant Value Code", "Variant Value Code");
                 //+MAG1.21
-                MagPicture.SetRange("Item No.","Item No.");
-                MagPicture.SetFilter("Line No.",'<>%1',"Line No.");
+                MagPicture.SetRange("Item No.", "Item No.");
+                MagPicture.SetFilter("Line No.", '<>%1', "Line No.");
                 if "Base Image" then
-                  MagPicture.ModifyAll("Base Image",false);
+                    MagPicture.ModifyAll("Base Image", false);
             end;
         }
-        field(26;"Small Image";Boolean)
+        field(26; "Small Image"; Boolean)
         {
             Caption = 'Small Image';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -82,17 +90,18 @@ table 6151412 "Magento Picture Link"
             begin
                 //-MAG1.21
                 //MagPicture.SETRANGE(Type,Type);
-                MagPicture.SetRange("Variant Value Code","Variant Value Code");
+                MagPicture.SetRange("Variant Value Code", "Variant Value Code");
                 //+MAG1.21
-                MagPicture.SetRange("Item No.","Item No.");
-                MagPicture.SetFilter("Line No.",'<>%1',"Line No.");
+                MagPicture.SetRange("Item No.", "Item No.");
+                MagPicture.SetFilter("Line No.", '<>%1', "Line No.");
                 if "Small Image" then
-                  MagPicture.ModifyAll("Small Image",false);
+                    MagPicture.ModifyAll("Small Image", false);
             end;
         }
-        field(27;Thumbnail;Boolean)
+        field(27; Thumbnail; Boolean)
         {
             Caption = 'Thumbnail';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -100,42 +109,47 @@ table 6151412 "Magento Picture Link"
             begin
                 //-MAG1.21
                 //MagPicture.SETRANGE(Type,Type);
-                MagPicture.SetRange("Variant Value Code","Variant Value Code");
+                MagPicture.SetRange("Variant Value Code", "Variant Value Code");
                 //+MAG1.21
-                MagPicture.SetRange("Item No.","Item No.");
-                MagPicture.SetFilter("Line No.",'<>%1',"Line No.");
+                MagPicture.SetRange("Item No.", "Item No.");
+                MagPicture.SetFilter("Line No.", '<>%1', "Line No.");
                 if Thumbnail then
-                  MagPicture.ModifyAll(Thumbnail,false);
+                    MagPicture.ModifyAll(Thumbnail, false);
             end;
         }
-        field(30;Sorting;Integer)
+        field(30; Sorting; Integer)
         {
             Caption = 'Sorting';
+            DataClassification = CustomerContent;
         }
-        field(40;"Variety Type";Code[10])
+        field(40; "Variety Type"; Code[10])
         {
             Caption = 'Variety Type';
+            DataClassification = CustomerContent;
             Description = 'MAG2.22';
             TableRelation = Variety;
         }
-        field(50;"Variety Table";Code[40])
+        field(50; "Variety Table"; Code[40])
         {
             Caption = 'Variety Table';
+            DataClassification = CustomerContent;
             Description = 'MAG2.22';
-            TableRelation = "Variety Table".Code WHERE (Type=FIELD("Variety Type"));
+            TableRelation = "Variety Table".Code WHERE(Type = FIELD("Variety Type"));
         }
-        field(60;"Variety Value";Code[20])
+        field(60; "Variety Value"; Code[20])
         {
             Caption = 'Variety Value';
+            DataClassification = CustomerContent;
             Description = 'MAG2.22';
-            TableRelation = "Variety Value".Value WHERE (Type=FIELD("Variety Type"),
-                                                         Table=FIELD("Variety Table"));
+            TableRelation = "Variety Value".Value WHERE(Type = FIELD("Variety Type"),
+                                                         Table = FIELD("Variety Table"));
         }
-        field(90;"Picture Name";Text[250])
+        field(90; "Picture Name"; Text[250])
         {
             Caption = 'Picture Name';
+            DataClassification = CustomerContent;
             Description = 'MAG2.20';
-            TableRelation = "Magento Picture".Name WHERE (Type=CONST(Item));
+            TableRelation = "Magento Picture".Name WHERE(Type = CONST(Item));
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
@@ -144,11 +158,11 @@ table 6151412 "Magento Picture Link"
             var
                 PictureName: Text;
             begin
-                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Item","Picture Name");
+                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Item", "Picture Name");
                 if PictureName <> '' then begin
-                  "Picture Name" := PictureName;
-                  if "Short Text" = '' then
-                    "Short Text" := "Picture Name";
+                    "Picture Name" := PictureName;
+                    if "Short Text" = '' then
+                        "Short Text" := "Picture Name";
                 end;
             end;
         }
@@ -156,10 +170,10 @@ table 6151412 "Magento Picture Link"
 
     keys
     {
-        key(Key1;"Item No.","Line No.")
+        key(Key1; "Item No.", "Line No.")
         {
         }
-        key(Key2;"Variant Value Code")
+        key(Key2; "Variant Value Code")
         {
         }
     }
@@ -190,18 +204,18 @@ table 6151412 "Magento Picture Link"
         //+MAG2.01 [259281]
         //-MAG1.21
         ///MagPicture.SETRANGE(Type,Type);
-        MagPicture.SetRange("Variant Value Code","Variant Value Code");
+        MagPicture.SetRange("Variant Value Code", "Variant Value Code");
         //+MAG1.21
-        MagPicture.SetRange("Item No.","Item No.");
+        MagPicture.SetRange("Item No.", "Item No.");
 
-        MagPicture.SetRange("Base Image",true);
+        MagPicture.SetRange("Base Image", true);
         if MagPicture.IsEmpty then
-          "Base Image" := true;
+            "Base Image" := true;
         if MagPicture.IsEmpty then
-          "Small Image" := true;
-        MagPicture.SetRange(Thumbnail,true);
+            "Small Image" := true;
+        MagPicture.SetRange(Thumbnail, true);
         if MagPicture.IsEmpty then
-          Thumbnail := true;
+            Thumbnail := true;
     end;
 
     trigger OnModify()

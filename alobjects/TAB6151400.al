@@ -5,54 +5,63 @@ table 6151400 "Magento Generic Setup Buffer"
     // MAG2.17/JDH /20181112 CASE 334163 Added missing object caption and caption on field Line No.
 
     Caption = 'Magento Generic Setup Buffer';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Line No.";Integer)
+        field(1; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(5;"Data Type";Text[50])
+        field(5; "Data Type"; Text[50])
         {
             Caption = 'Data Type';
+            DataClassification = CustomerContent;
         }
-        field(10;Name;Text[250])
+        field(10; Name; Text[250])
         {
             Caption = 'Field Name';
+            DataClassification = CustomerContent;
         }
-        field(15;Value;Text[250])
+        field(15; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
                 if Container then
-                  exit;
+                    exit;
 
-                Value := GenericSetupMgt.ValidateValue("Data Type",Value);
+                Value := GenericSetupMgt.ValidateValue("Data Type", Value);
             end;
         }
-        field(100;Container;Boolean)
+        field(100; Container; Boolean)
         {
             Caption = 'Group';
+            DataClassification = CustomerContent;
         }
-        field(110;Level;Integer)
+        field(110; Level; Integer)
         {
             Caption = 'Level';
+            DataClassification = CustomerContent;
         }
-        field(115;"Node Path";Text[250])
+        field(115; "Node Path"; Text[250])
         {
             Caption = 'Node Path';
+            DataClassification = CustomerContent;
         }
-        field(120;"Root Element";Text[250])
+        field(120; "Root Element"; Text[250])
         {
             Caption = 'Root Element';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Line No.")
+        key(Key1; "Line No.")
         {
         }
     }

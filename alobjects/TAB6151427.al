@@ -6,23 +6,27 @@ table 6151427 "Magento Attribute Label"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'Magento Attribute Label';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Magento Attribute Labels";
     LookupPageID = "Magento Attribute Labels";
 
     fields
     {
-        field(2;"Attribute ID";Integer)
+        field(2; "Attribute ID"; Integer)
         {
             Caption = 'Attribute ID';
+            DataClassification = CustomerContent;
             TableRelation = "Magento Attribute";
         }
-        field(3;"Line No.";Integer)
+        field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
-        field(4;Value;Text[100])
+        field(4; Value; Text[100])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -30,17 +34,20 @@ table 6151427 "Magento Attribute Label"
             begin
             end;
         }
-        field(6;Image;Text[200])
+        field(6; Image; Text[200])
         {
             Caption = 'Image';
+            DataClassification = CustomerContent;
         }
-        field(9;Sorting;Integer)
+        field(9; Sorting; Integer)
         {
             Caption = 'Sorting';
+            DataClassification = CustomerContent;
         }
-        field(100;"Text Field";BLOB)
+        field(100; "Text Field"; BLOB)
         {
             Caption = 'Text Field';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -57,7 +64,7 @@ table 6151427 "Magento Attribute Label"
 
     keys
     {
-        key(Key1;"Attribute ID","Line No.")
+        key(Key1; "Attribute ID", "Line No.")
         {
         }
     }
@@ -71,8 +78,8 @@ table 6151427 "Magento Attribute Label"
         ItemAttributeValue: Record "Magento Item Attribute Value";
     begin
         //-MAG1.04
-        ItemAttributeValue.SetRange("Attribute ID","Attribute ID");
-        ItemAttributeValue.SetRange("Attribute Label Line No.","Line No.");
+        ItemAttributeValue.SetRange("Attribute ID", "Attribute ID");
+        ItemAttributeValue.SetRange("Attribute Label Line No.", "Line No.");
         ItemAttributeValue.DeleteAll(true);
         //+MAG1.04
     end;

@@ -3,6 +3,7 @@ table 6151080 "ExRv Voucher Type"
     // NPR5.40/MHA /20180212  CASE 301346 Object created - External Retail Voucher
 
     Caption = 'External Retail Voucher Type';
+    DataClassification = CustomerContent;
     DrillDownPageID = "ExRv Voucher Types";
     LookupPageID = "ExRv Voucher Types";
 
@@ -11,16 +12,19 @@ table 6151080 "ExRv Voucher Type"
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
         }
         field(5; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
+            DataClassification = CustomerContent;
             TableRelation = Customer;
         }
         field(10; "Account No."; Code[20])
         {
             Caption = 'Account No.';
+            DataClassification = CustomerContent;
             TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true),
                                                  "Account Type" = CONST(Posting),
                                                  Blocked = CONST(false));
@@ -28,16 +32,19 @@ table 6151080 "ExRv Voucher Type"
         field(15; "Source Type"; Option)
         {
             Caption = 'Source Table No.';
+            DataClassification = CustomerContent;
             OptionCaption = 'Gift Voucher';
             OptionMembers = "Gift Voucher";
         }
         field(20; "Direct Posting"; Boolean)
         {
             Caption = 'Direct Posting';
+            DataClassification = CustomerContent;
         }
         field(25; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(64; "Date Filter"; Date)
         {
@@ -47,6 +54,7 @@ table 6151080 "ExRv Voucher Type"
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "Dimension Set Entry";
 
@@ -59,6 +67,7 @@ table 6151080 "ExRv Voucher Type"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
+            DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
             trigger OnValidate()
@@ -70,6 +79,7 @@ table 6151080 "ExRv Voucher Type"
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
+            DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
             trigger OnValidate()

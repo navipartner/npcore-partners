@@ -6,6 +6,7 @@ table 6059964 "MPOS QR Code"
     // NPR5.42/CLVA/20180302 CASE 304559 Added Company and "Cash Register Id" to the primary key
 
     Caption = 'MPOS QR Code';
+    DataClassification = CustomerContent;
     DataPerCompany = false;
 
     fields
@@ -28,50 +29,60 @@ table 6059964 "MPOS QR Code"
         field(10; Password; Text[30])
         {
             Caption = 'Password';
+            DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
         }
         field(11; Url; Text[250])
         {
             Caption = 'Url';
+            DataClassification = CustomerContent;
         }
         field(12; "Client Type"; Option)
         {
             Caption = 'Client Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Standard,Transcendence';
             OptionMembers = Standard,Transcendence;
         }
         field(13; Company; Text[30])
         {
             Caption = 'Company';
+            DataClassification = CustomerContent;
             TableRelation = Company;
             ValidateTableRelation = false;
         }
         field(14; "Payment Gateway"; Option)
         {
             Caption = 'Payment Gateway';
+            DataClassification = CustomerContent;
             OptionCaption = 'None,Nets,Adyen';
             OptionMembers = "None",Nets,Adyen;
         }
         field(15; Tenant; Text[30])
         {
             Caption = 'Tenant';
+            DataClassification = CustomerContent;
         }
         field(16; "E-mail"; Text[30])
         {
             Caption = 'E-mail';
+            DataClassification = CustomerContent;
         }
         field(17; "Webservice Url"; Text[250])
         {
             Caption = 'Webservice Url';
+            DataClassification = CustomerContent;
         }
         field(20; "QR code"; BLOB)
         {
             Caption = 'QR code';
+            DataClassification = CustomerContent;
             SubType = Bitmap;
         }
         field(21; "Cash Register Id"; Code[10])
         {
             Caption = 'Cash Register Id';
+            DataClassification = CustomerContent;
             TableRelation = Register."Register No.";
             ValidateTableRelation = false;
         }

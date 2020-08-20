@@ -3,6 +3,7 @@ table 6151093 "Nc RapidConnect Trigger Field"
     // NC2.14/MHA /20180716  CASE 322308 Object created - Partial Trigger functionality
 
     Caption = 'Nc RapidConnect Trigger Field';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Nc RapidConnect Trigger Fields";
     LookupPageID = "Nc RapidConnect Trigger Fields";
 
@@ -11,12 +12,14 @@ table 6151093 "Nc RapidConnect Trigger Field"
         field(1; "Setup Code"; Code[20])
         {
             Caption = 'Setup Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "Nc RapidConnect Setup";
         }
         field(5; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
         }
@@ -24,6 +27,7 @@ table 6151093 "Nc RapidConnect Trigger Field"
         {
             BlankZero = true;
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
 

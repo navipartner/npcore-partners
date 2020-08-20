@@ -7,19 +7,22 @@ table 6151429 "Magento Attribute Set Value"
     // MAG2.18/TS  /20180910  CASE 323934 Added field Attribute Group ID
 
     Caption = 'Magento Attribute Set Value';
+    DataClassification = CustomerContent;
     LookupPageID = "Magento Attribute Set Values";
 
     fields
     {
-        field(1;"Attribute Set ID";Integer)
+        field(1; "Attribute Set ID"; Integer)
         {
             Caption = 'Attribute Set ID';
+            DataClassification = CustomerContent;
             TableRelation = "Magento Attribute Set";
         }
-        field(2;"Attribute ID";Integer)
+        field(2; "Attribute ID"; Integer)
         {
             AutoIncrement = false;
             Caption = 'Attribute ID';
+            DataClassification = CustomerContent;
             TableRelation = "Magento Attribute";
 
             trigger OnValidate()
@@ -31,26 +34,29 @@ table 6151429 "Magento Attribute Set Value"
                 Position := MagentoAttribute.Position;
             end;
         }
-        field(3;Description;Text[50])
+        field(3; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(11;Position;Integer)
+        field(11; Position; Integer)
         {
             Caption = 'Position';
+            DataClassification = CustomerContent;
             Description = 'MAG1.04';
         }
-        field(15;"Attribute Group ID";Integer)
+        field(15; "Attribute Group ID"; Integer)
         {
             Caption = 'Attribute Group ID';
+            DataClassification = CustomerContent;
             Description = 'MAG2.18';
             TableRelation = "Magento Attribute Group";
         }
-        field(1000;"Used by Items";Integer)
+        field(1000; "Used by Items"; Integer)
         {
-            CalcFormula = Count("Magento Item Attribute Value" WHERE ("Attribute ID"=FIELD("Attribute ID"),
-                                                                      Selected=CONST(true)));
+            CalcFormula = Count ("Magento Item Attribute Value" WHERE("Attribute ID" = FIELD("Attribute ID"),
+                                                                      Selected = CONST(true)));
             Caption = 'Used by Items';
             Description = 'MAG2.00';
             Editable = false;
@@ -60,10 +66,10 @@ table 6151429 "Magento Attribute Set Value"
 
     keys
     {
-        key(Key1;"Attribute Set ID","Attribute ID","Attribute Group ID")
+        key(Key1; "Attribute Set ID", "Attribute ID", "Attribute Group ID")
         {
         }
-        key(Key2;Position)
+        key(Key2; Position)
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
@@ -80,12 +86,12 @@ table 6151429 "Magento Attribute Set Value"
     begin
         //-MAG2.00
         //IF "Used by Item" <>  0 THEN
-        if "Used by Items" <>  0 then
-        //+MAG2.00
-          if not Confirm(Text001,false) then Error('');
+        if "Used by Items" <> 0 then
+            //+MAG2.00
+            if not Confirm(Text001, false) then Error('');
 
-        MagentoItemAttribute.SetRange("Attribute Set ID","Attribute Set ID");
-        MagentoItemAttribute.SetRange("Attribute ID","Attribute ID");
+        MagentoItemAttribute.SetRange("Attribute Set ID", "Attribute Set ID");
+        MagentoItemAttribute.SetRange("Attribute ID", "Attribute ID");
         MagentoItemAttribute.DeleteAll(true);
     end;
 

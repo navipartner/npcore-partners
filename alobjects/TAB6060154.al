@@ -4,23 +4,26 @@ table 6060154 "Event Attribute Row Template"
     // NPR5.33/TJ  /20170529 CASE 277946 Added code for deletion and a check
 
     Caption = 'Event Attribute Row Template';
+    DataClassification = CustomerContent;
     LookupPageID = "Event Attribute Row Templates";
 
     fields
     {
-        field(1;Name;Code[20])
+        field(1; Name; Code[20])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
-        field(10;Description;Text[30])
+        field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Name)
+        key(Key1; Name)
         {
         }
     }
@@ -35,8 +38,8 @@ table 6060154 "Event Attribute Row Template"
         EventAttrRowValue: Record "Event Attribute Row Value";
     begin
         //-NPR5.33 [277946]
-        EventAttrMgt.TemplateHasEntries(0,Name);
-        EventAttrRowValue.SetRange("Template Name",Name);
+        EventAttrMgt.TemplateHasEntries(0, Name);
+        EventAttrRowValue.SetRange("Template Name", Name);
         EventAttrRowValue.DeleteAll;
         //+NPR5.33 [277946]
     end;

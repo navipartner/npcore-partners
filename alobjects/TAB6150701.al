@@ -23,24 +23,28 @@ table 6150701 "POS Menu Button"
     // NPR5.54/VB  /20200408 CASE 399736 Added "Show Plus/Minus Buttons" field.
 
     Caption = 'POS Menu Button';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Menu Buttons";
     LookupPageID = "POS Menu Buttons";
 
     fields
     {
-        field(1;"Menu Code";Code[20])
+        field(1; "Menu Code"; Code[20])
         {
             Caption = 'Menu Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Menu";
         }
-        field(2;ID;Integer)
+        field(2; ID; Integer)
         {
             Caption = 'ID';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(3;"Parent ID";Integer)
+        field(3; "Parent ID"; Integer)
         {
             Caption = 'Parent ID';
+            DataClassification = CustomerContent;
             Editable = false;
 
             trigger OnValidate()
@@ -50,50 +54,61 @@ table 6150701 "POS Menu Button"
                 //+NPR5.39 [255773]
             end;
         }
-        field(4;Ordinal;Integer)
+        field(4; Ordinal; Integer)
         {
             Caption = 'Ordinal';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(5;Path;Text[250])
+        field(5; Path; Text[250])
         {
             Caption = 'Path';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(6;Level;Integer)
+        field(6; Level; Integer)
         {
             Caption = 'Indentation';
+            DataClassification = CustomerContent;
         }
-        field(11;Caption;Text[250])
+        field(11; Caption; Text[250])
         {
             Caption = 'Caption';
+            DataClassification = CustomerContent;
         }
-        field(12;Tooltip;Text[250])
+        field(12; Tooltip; Text[250])
         {
             Caption = 'Tooltip';
+            DataClassification = CustomerContent;
         }
-        field(13;"Action Type";Option)
+        field(13; "Action Type"; Option)
         {
             Caption = 'Action Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Popup Menu,Action,Workflow,Item,,Customer,Payment Type';
             OptionMembers = Submenu,PopupMenu,"Action",Workflow,Item,ItemGroup_DISCONTINUED,Customer,PaymentType;
 
             trigger OnValidate()
             begin
                 if "Action Type" <> xRec."Action Type" then begin
-                  ClearActionSpecifics();
+                    ClearActionSpecifics();
                 end;
             end;
         }
-        field(14;"Action Code";Code[20])
+        field(14; "Action Code"; Code[20])
         {
             Caption = 'Action Code';
-            TableRelation = IF ("Action Type"=CONST(PopupMenu)) "POS Menu"
-                            ELSE IF ("Action Type"=CONST(Item)) Item
-                            ELSE IF ("Action Type"=CONST(Action)) "POS Action" WHERE (Type=FILTER(Generic|Button),
-                                                                                      Blocked=CONST(false))
-                                                                                      ELSE IF ("Action Type"=CONST(Customer)) Customer
-                                                                                      ELSE IF ("Action Type"=CONST(PaymentType)) "Payment Type POS";
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Action Type" = CONST(PopupMenu)) "POS Menu"
+            ELSE
+            IF ("Action Type" = CONST(Item)) Item
+            ELSE
+            IF ("Action Type" = CONST(Action)) "POS Action" WHERE(Type = FILTER(Generic | Button),
+                                                                                      Blocked = CONST(false))
+            ELSE
+            IF ("Action Type" = CONST(Customer)) Customer
+            ELSE
+            IF ("Action Type" = CONST(PaymentType)) "Payment Type POS";
 
             trigger OnLookup()
             begin
@@ -109,9 +124,10 @@ table 6150701 "POS Menu Button"
                 CopyParameters();
             end;
         }
-        field(15;"Data Source Name";Code[50])
+        field(15; "Data Source Name"; Code[50])
         {
             Caption = 'Data Source Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -120,55 +136,65 @@ table 6150701 "POS Menu Button"
                 TempDataSource.LookupDataSource("Data Source Name");
             end;
         }
-        field(19;Blocked;Boolean)
+        field(19; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
         }
-        field(21;"Background Color";Text[30])
+        field(21; "Background Color"; Text[30])
         {
             Caption = 'Background Color';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
                 LookupBackgroundColor();
             end;
         }
-        field(22;"Foreground Color";Text[30])
+        field(22; "Foreground Color"; Text[30])
         {
             Caption = 'Foreground Color';
+            DataClassification = CustomerContent;
         }
-        field(23;"Icon Class";Text[30])
+        field(23; "Icon Class"; Text[30])
         {
             Caption = 'Icon Class';
+            DataClassification = CustomerContent;
         }
-        field(24;"Custom Class Attribute";Text[30])
+        field(24; "Custom Class Attribute"; Text[30])
         {
             Caption = 'Custom Class Attribute';
+            DataClassification = CustomerContent;
         }
-        field(25;Bold;Boolean)
+        field(25; Bold; Boolean)
         {
             Caption = 'Bold';
+            DataClassification = CustomerContent;
         }
-        field(26;"Font Size";Option)
+        field(26; "Font Size"; Option)
         {
             Caption = 'Font Size';
+            DataClassification = CustomerContent;
             InitValue = Normal;
             OptionCaption = 'Extra Small,Small,Normal,Medium,Large,Extra Large';
             OptionMembers = XSmall,Small,Normal,Medium,Large,XLarge;
         }
-        field(27;"Position X";Integer)
+        field(27; "Position X"; Integer)
         {
             BlankZero = true;
             Caption = 'Position X';
+            DataClassification = CustomerContent;
         }
-        field(28;"Position Y";Integer)
+        field(28; "Position Y"; Integer)
         {
             BlankZero = true;
             Caption = 'Position Y';
+            DataClassification = CustomerContent;
         }
-        field(29;Enabled;Option)
+        field(29; Enabled; Option)
         {
             Caption = 'Enabled';
+            DataClassification = CustomerContent;
             OptionCaption = 'Yes,Auto,No';
             OptionMembers = Yes,Auto,No;
 
@@ -177,25 +203,29 @@ table 6150701 "POS Menu Button"
                 HandleEnabled();
             end;
         }
-        field(30;"Blocking UI";Boolean)
+        field(30; "Blocking UI"; Boolean)
         {
             Caption = 'Blocking UI';
+            DataClassification = CustomerContent;
         }
-        field(31;"Background Image Url";Text[250])
+        field(31; "Background Image Url"; Text[250])
         {
             Caption = 'Background Image Url';
+            DataClassification = CustomerContent;
             Description = 'NPR5.36';
         }
-        field(32;"Caption Position";Option)
+        field(32; "Caption Position"; Option)
         {
             Caption = 'Caption Position';
+            DataClassification = CustomerContent;
             Description = 'NPR5.36';
             OptionCaption = 'Center,Top,Bottom';
             OptionMembers = Center,Top,Bottom;
         }
-        field(33;"Secure Method Code";Code[10])
+        field(33; "Secure Method Code"; Code[10])
         {
             Caption = 'Secure Method Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.43';
             TableRelation = "POS Secure Method";
             ValidateTableRelation = false;
@@ -206,59 +236,65 @@ table 6150701 "POS Menu Button"
             begin
                 //-NPR5.43 [314603]
                 if ("Secure Method Code" = '') then
-                  exit;
+                    exit;
 
                 SecureMethodTmp.RunDiscovery();
                 SecureMethodTmp.Get("Secure Method Code");
                 //+NPR5.43 [314603]
             end;
         }
-        field(34;"Show Plus/Minus Buttons";Boolean)
+        field(34; "Show Plus/Minus Buttons"; Boolean)
         {
             Caption = 'Show Plus/Minus Buttons';
+            DataClassification = CustomerContent;
             Description = 'NPR5.54';
 
             trigger OnValidate()
             begin
                 //-NPR5.54 [399736]
                 if "Show Plus/Minus Buttons" then
-                  TestField("Action Type","Action Type"::Item);
+                    TestField("Action Type", "Action Type"::Item);
                 //+NPR5.54 [399736]
             end;
         }
-        field(41;"Register Type";Code[10])
+        field(41; "Register Type"; Code[10])
         {
             Caption = 'Cash Register Type';
+            DataClassification = CustomerContent;
             TableRelation = "Register Types";
         }
-        field(42;"Register No.";Code[10])
+        field(42; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             TableRelation = Register;
         }
-        field(43;"Salesperson Code";Code[20])
+        field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser".Code;
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(44;"Available on Desktop";Boolean)
+        field(44; "Available on Desktop"; Boolean)
         {
             Caption = 'Available on Desktop';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(45;"Available in App";Boolean)
+        field(45; "Available in App"; Boolean)
         {
             Caption = 'Available in App';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
     }
 
     keys
     {
-        key(Key1;"Menu Code",ID)
+        key(Key1; "Menu Code", ID)
         {
         }
     }
@@ -295,12 +331,15 @@ table 6150701 "POS Menu Button"
     local procedure AssignCaption()
     begin
         if ("Action Code" = xRec."Action Code") or (Caption <> '') then
-          exit;
+            exit;
 
         case "Action Type" of
-          "Action Type"::Item: AssignCaptionForItem();
-          "Action Type"::PaymentType: AssignCaptionForPaymentType();
-          "Action Type"::Customer: AssignCaptionForCustomer();
+            "Action Type"::Item:
+                AssignCaptionForItem();
+            "Action Type"::PaymentType:
+                AssignCaptionForPaymentType();
+            "Action Type"::Customer:
+                AssignCaptionForCustomer();
         end;
     end;
 
@@ -309,7 +348,7 @@ table 6150701 "POS Menu Button"
         Item: Record Item;
     begin
         if Item.Get("Action Code") then begin
-          Caption := Item.Description;
+            Caption := Item.Description;
         end;
     end;
 
@@ -317,9 +356,9 @@ table 6150701 "POS Menu Button"
     var
         PaymentType: Record "Payment Type POS";
     begin
-        PaymentType.SetRange("No.","Action Code");
+        PaymentType.SetRange("No.", "Action Code");
         if PaymentType.FindFirst then begin
-          Caption := PaymentType.Description;
+            Caption := PaymentType.Description;
         end;
     end;
 
@@ -328,7 +367,7 @@ table 6150701 "POS Menu Button"
         Customer: Record Customer;
     begin
         if Customer.Get("Action Code") then begin
-          Caption := Customer.Name;
+            Caption := Customer.Name;
         end;
     end;
 
@@ -337,24 +376,24 @@ table 6150701 "POS Menu Button"
         POSAction: Record "POS Action";
     begin
         if ("Action Type" = "Action Type"::Action) then begin
-          if POSAction.Get("Action Code") then begin
-            if POSAction."Bound to DataSource" then
-              Enabled := Enabled::Auto;
-            "Data Source Name" := POSAction."Data Source Name";
-        //-NPR5.36 [281618]
-            "Blocking UI" := POSAction."Blocking UI";
-            if (POSAction.Tooltip <> '') and (Tooltip = '') then
-              Tooltip := POSAction.Tooltip;
-        //+NPR5.36 [281618]
-        //-NPR5.43 [314603]
-            if (POSAction."Secure Method Code" <> '') and ("Secure Method Code" = '') then
-              "Secure Method Code" := POSAction."Secure Method Code";
-        //+NPR5.43 [314603]
-          end else begin
-            if "Action Code" = '' then begin
-              ClearActionSpecifics();
+            if POSAction.Get("Action Code") then begin
+                if POSAction."Bound to DataSource" then
+                    Enabled := Enabled::Auto;
+                "Data Source Name" := POSAction."Data Source Name";
+                //-NPR5.36 [281618]
+                "Blocking UI" := POSAction."Blocking UI";
+                if (POSAction.Tooltip <> '') and (Tooltip = '') then
+                    Tooltip := POSAction.Tooltip;
+                //+NPR5.36 [281618]
+                //-NPR5.43 [314603]
+                if (POSAction."Secure Method Code" <> '') and ("Secure Method Code" = '') then
+                    "Secure Method Code" := POSAction."Secure Method Code";
+                //+NPR5.43 [314603]
+            end else begin
+                if "Action Code" = '' then begin
+                    ClearActionSpecifics();
+                end;
             end;
-          end;
         end;
     end;
 
@@ -377,7 +416,7 @@ table 6150701 "POS Menu Button"
         ParamMgt: Codeunit "POS Action Parameter Mgt.";
     begin
         //-NPR5.40 [306347]
-        ParamMgt.ClearParametersForRecord(RecordId,0);
+        ParamMgt.ClearParametersForRecord(RecordId, 0);
         //+NPR5.40 [306347]
     end;
 
@@ -386,16 +425,16 @@ table 6150701 "POS Menu Button"
         ParamMgt: Codeunit "POS Action Parameter Mgt.";
     begin
         if "Action Code" = xRec."Action Code" then
-          exit;
+            exit;
 
         //-NPR5.40 [306347]
         //SetDefaultParameters();
         ClearParameters();
         case "Action Type" of
-          "Action Type"::Action:
-            ParamMgt.CopyFromActionToMenuButton("Action Code",Rec);
-          "Action Type"::PopupMenu:
-            SetupPopupSizeParameters();
+            "Action Type"::Action:
+                ParamMgt.CopyFromActionToMenuButton("Action Code", Rec);
+            "Action Type"::PopupMenu:
+                SetupPopupSizeParameters();
         end;
         //+NPR5.40 [306347]
     end;
@@ -413,50 +452,50 @@ table 6150701 "POS Menu Button"
     begin
         //-NPR5.40 [306347]
         case "Action Type" of
-          "Action Type"::Action:
-            if POSActionMgt.LookupAction("Action Code") then
-              Validate("Action Code");
-          "Action Type"::Customer:
-            begin
-              if Customer.Get("Action Code") then
-                CustomerList.SetRecord(Customer);
-              CustomerList.LookupMode := true;
-              if CustomerList.RunModal() = ACTION::LookupOK then begin
-                CustomerList.GetRecord(Customer);
-                Validate("Action Code",Customer."No.");
-              end;
-            end;
-          "Action Type"::Item:
-            begin
-              if Item.Get("Action Code") then
-                ItemList.SetRecord(Item);
-              ItemList.LookupMode := true;
-              if ItemList.RunModal() = ACTION::LookupOK then begin
-                ItemList.GetRecord(Item);
-                Validate("Action Code",Item."No.");
-              end;
-            end;
-          "Action Type"::PaymentType:
-            begin
-              PaymentType.SetRange("No.","Action Code");
-              if PaymentType.Find() then
-                PaymentTypes.SetRecord(PaymentType);
-              PaymentTypes.LookupMode := true;
-              if PaymentTypes.RunModal() = ACTION::LookupOK then begin
-                PaymentTypes.GetRecord(PaymentType);
-                Validate("Action Code",PaymentType."No.");
-              end;
-            end;
-          "Action Type"::PopupMenu:
-            begin
-              if POSMenu.Get("Action Code") then
-                POSMenus.SetRecord(POSMenu);
-              POSMenus.LookupMode := true;
-              if POSMenus.RunModal() = ACTION::LookupOK then begin
-                POSMenus.GetRecord(POSMenu);
-                Validate("Action Code",POSMenu.Code);
-              end;
-            end;
+            "Action Type"::Action:
+                if POSActionMgt.LookupAction("Action Code") then
+                    Validate("Action Code");
+            "Action Type"::Customer:
+                begin
+                    if Customer.Get("Action Code") then
+                        CustomerList.SetRecord(Customer);
+                    CustomerList.LookupMode := true;
+                    if CustomerList.RunModal() = ACTION::LookupOK then begin
+                        CustomerList.GetRecord(Customer);
+                        Validate("Action Code", Customer."No.");
+                    end;
+                end;
+            "Action Type"::Item:
+                begin
+                    if Item.Get("Action Code") then
+                        ItemList.SetRecord(Item);
+                    ItemList.LookupMode := true;
+                    if ItemList.RunModal() = ACTION::LookupOK then begin
+                        ItemList.GetRecord(Item);
+                        Validate("Action Code", Item."No.");
+                    end;
+                end;
+            "Action Type"::PaymentType:
+                begin
+                    PaymentType.SetRange("No.", "Action Code");
+                    if PaymentType.Find() then
+                        PaymentTypes.SetRecord(PaymentType);
+                    PaymentTypes.LookupMode := true;
+                    if PaymentTypes.RunModal() = ACTION::LookupOK then begin
+                        PaymentTypes.GetRecord(PaymentType);
+                        Validate("Action Code", PaymentType."No.");
+                    end;
+                end;
+            "Action Type"::PopupMenu:
+                begin
+                    if POSMenu.Get("Action Code") then
+                        POSMenus.SetRecord(POSMenu);
+                    POSMenus.LookupMode := true;
+                    if POSMenus.RunModal() = ACTION::LookupOK then begin
+                        POSMenus.GetRecord(POSMenu);
+                        Validate("Action Code", POSMenu.Code);
+                    end;
+                end;
         end;
         //+NPR5.40 [306347]
     end;
@@ -491,27 +530,27 @@ table 6150701 "POS Menu Button"
     begin
         //-NPR5.40 [306347]
         case "Action Type" of
-          "Action Type"::Action:
-            ParamMgt.RefreshParameters(RecordId,"Menu Code",ID,"Action Code");
-          "Action Type"::PopupMenu:
-            begin
-              ParColumnsKnown := ParColumns.GetParameter(RecordId,ID,'Columns');
-              ParRowsKnown := ParRows.GetParameter(RecordId,ID,'Rows');
-              ParamMgt.ClearParametersForRecord(RecordId,ID);
-              SetupPopupSizeParameters();
-              if ParColumnsKnown then begin
-                ParamValue := ParColumns;
-                ParamValue.Find();
-                ParamValue.Value := ParColumns.Value;
-                ParamValue.Modify;
-              end;
-              if ParRowsKnown then begin
-                ParamValue := ParRows;
-                ParamValue.Find();
-                ParamValue.Value := ParRows.Value;
-                ParamValue.Modify;
-              end;
-            end;
+            "Action Type"::Action:
+                ParamMgt.RefreshParameters(RecordId, "Menu Code", ID, "Action Code");
+            "Action Type"::PopupMenu:
+                begin
+                    ParColumnsKnown := ParColumns.GetParameter(RecordId, ID, 'Columns');
+                    ParRowsKnown := ParRows.GetParameter(RecordId, ID, 'Rows');
+                    ParamMgt.ClearParametersForRecord(RecordId, ID);
+                    SetupPopupSizeParameters();
+                    if ParColumnsKnown then begin
+                        ParamValue := ParColumns;
+                        ParamValue.Find();
+                        ParamValue.Value := ParColumns.Value;
+                        ParamValue.Modify;
+                    end;
+                    if ParRowsKnown then begin
+                        ParamValue := ParRows;
+                        ParamValue.Find();
+                        ParamValue.Value := ParRows.Value;
+                        ParamValue.Modify;
+                    end;
+                end;
         end;
         //+NPR5.40 [306347]
     end;
@@ -522,43 +561,48 @@ table 6150701 "POS Menu Button"
     begin
         //-NPR5.40 [306347]
         if ("Action Type" <> "Action Type"::Action) then
-          exit (false)
+            exit(false)
         else
-          exit(ParamMgt.RefreshParametersRequired(RecordId,"Menu Code",ID,"Action Code"));
+            exit(ParamMgt.RefreshParametersRequired(RecordId, "Menu Code", ID, "Action Code"));
         //+NPR5.40 [306347]
     end;
 
-    procedure GetAction(var ActionOut: DotNet npNetAction;POSSession: Codeunit "POS Session";Source: Text;var POSParameterValue: Record "POS Parameter Value")
+    procedure GetAction(var ActionOut: DotNet npNetAction; POSSession: Codeunit "POS Session"; Source: Text; var POSParameterValue: Record "POS Parameter Value")
     var
         ActionMgt: Codeunit "POS Action Management";
         ErrorText: Text;
         POSAction: Record "POS Action";
     begin
         case "Action Type" of
-          "Action Type"::Action: GetWorkflowAction(ActionOut,POSSession);
-          "Action Type"::Item: GetItemAction(ActionOut);
-          "Action Type"::PopupMenu: GetMenuAction(ActionOut);
-          "Action Type"::PaymentType: GetPaymentAction(ActionOut);
-          "Action Type"::Customer: GetCustomerAction(ActionOut);
+            "Action Type"::Action:
+                GetWorkflowAction(ActionOut, POSSession);
+            "Action Type"::Item:
+                GetItemAction(ActionOut);
+            "Action Type"::PopupMenu:
+                GetMenuAction(ActionOut);
+            "Action Type"::PaymentType:
+                GetPaymentAction(ActionOut);
+            "Action Type"::Customer:
+                GetCustomerAction(ActionOut);
         end;
         if not IsNull(ActionOut) then begin
-          //-NPR5.42 [314128]
-          //StoreButtonParameters(ActionOut,POSParameterValue,POSActionParameter);
-          StoreButtonParameters(ActionOut,POSParameterValue);
-          //+NPR5.42 [314128]
-          StoreDataSource(ActionOut);
+            //-NPR5.42 [314128]
+            //StoreButtonParameters(ActionOut,POSParameterValue,POSActionParameter);
+            StoreButtonParameters(ActionOut, POSParameterValue);
+            //+NPR5.42 [314128]
+            StoreDataSource(ActionOut);
 
-          //-NPR5.54 [392247]
-          // StoreActionOtherConfiguration(ActionOut);
-          StoreActionOtherConfiguration(ActionOut, POSSession);
-          //+NPR5.54 [392247]
+            //-NPR5.54 [392247]
+            // StoreActionOtherConfiguration(ActionOut);
+            StoreActionOtherConfiguration(ActionOut, POSSession);
+            //+NPR5.54 [392247]
 
-          ActionMgt.IsValidActionConfiguration(POSSession,ActionOut,Source,ErrorText,true);
+            ActionMgt.IsValidActionConfiguration(POSSession, ActionOut, Source, ErrorText, true);
 
         end;
     end;
 
-    local procedure GetWorkflowAction(var ActionOut: DotNet npNetAction;POSSession: Codeunit "POS Session")
+    local procedure GetWorkflowAction(var ActionOut: DotNet npNetAction; POSSession: Codeunit "POS Session")
     var
         POSAction: Record "POS Action" temporary;
         WorkflowAction: DotNet npNetWorkflowAction;
@@ -569,38 +613,38 @@ table 6150701 "POS Menu Button"
         Calculated: Boolean;
     begin
         with POSAction do begin
-          WorkflowAction := WorkflowAction.WorkflowAction();
-        //-NPR5.40 [306347]
-        //  IF GET("Action Code") THEN BEGIN
-        //    CALCFIELDS(Workflow);
-          if POSSession.RetrieveSessionAction("Action Code",POSAction) then begin
-            if Workflow.HasValue then begin
-        //+NPR5.40 [306347]
-              Workflow.CreateInStream(InStr);
-              StreamReader := StreamReader.StreamReader(InStr);
-              WorkflowAction.Workflow:= WorkflowObj.FromJsonString(StreamReader.ReadToEnd(),GetDotNetType(WorkflowObj));
-              if "Bound to DataSource" then
-                WorkflowAction.Content.Add('DataBinding',true);
-              if "Custom JavaScript Logic".HasValue then begin
-                GetCustomJavaScriptLogic(Object);
-                WorkflowAction.Content.Add('CustomJavaScript',Object);
-              end;
-              //-NPR5.32.11 [281618]
-              if Description <> '' then
-                WorkflowAction.Content.Add('Description', Description);
-              //+NPR5.32.11 [281618]
-        //-NPR5.40 [306347]
-        //    END ELSE BEGIN
-              Calculated := true;
+            WorkflowAction := WorkflowAction.WorkflowAction();
+            //-NPR5.40 [306347]
+            //  IF GET("Action Code") THEN BEGIN
+            //    CALCFIELDS(Workflow);
+            if POSSession.RetrieveSessionAction("Action Code", POSAction) then begin
+                if Workflow.HasValue then begin
+                    //+NPR5.40 [306347]
+                    Workflow.CreateInStream(InStr);
+                    StreamReader := StreamReader.StreamReader(InStr);
+                    WorkflowAction.Workflow := WorkflowObj.FromJsonString(StreamReader.ReadToEnd(), GetDotNetType(WorkflowObj));
+                    if "Bound to DataSource" then
+                        WorkflowAction.Content.Add('DataBinding', true);
+                    if "Custom JavaScript Logic".HasValue then begin
+                        GetCustomJavaScriptLogic(Object);
+                        WorkflowAction.Content.Add('CustomJavaScript', Object);
+                    end;
+                    //-NPR5.32.11 [281618]
+                    if Description <> '' then
+                        WorkflowAction.Content.Add('Description', Description);
+                    //+NPR5.32.11 [281618]
+                    //-NPR5.40 [306347]
+                    //    END ELSE BEGIN
+                    Calculated := true;
+                end;
             end;
-          end;
-          if not Calculated then begin
-        //+NPR5.40 [306347]
-            WorkflowAction.Workflow := WorkflowObj.FromJsonString('{}',GetDotNetType(WorkflowObj));
-            WorkflowAction.Workflow.Name := Code;
-          end;
+            if not Calculated then begin
+                //+NPR5.40 [306347]
+                WorkflowAction.Workflow := WorkflowObj.FromJsonString('{}', GetDotNetType(WorkflowObj));
+                WorkflowAction.Workflow.Name := Code;
+            end;
 
-          ActionOut := WorkflowAction;
+            ActionOut := WorkflowAction;
         end;
     end;
 
@@ -613,12 +657,12 @@ table 6150701 "POS Menu Button"
         //-NPR5.50 [338666]
         Metadata := Metadata.Dictionary();
         OnRetrieveItemMetadata(Metadata);
-        ActionOut.Content.Add('Metadata',Metadata);
+        ActionOut.Content.Add('Metadata', Metadata);
         //+NPR5.50 [338666]
 
         //-NPR5.54 [399736]
         if "Show Plus/Minus Buttons" then
-          ActionOut.Content.Add('ShowPlusMinus',true);
+            ActionOut.Content.Add('ShowPlusMinus', true);
         //+NPR5.54 [399736]
     end;
 
@@ -641,7 +685,7 @@ table 6150701 "POS Menu Button"
         //-NPR5.50 [338666]
         Metadata := Metadata.Dictionary();
         OnRetrievePaymentMetadata(Metadata);
-        ActionOut.Content.Add('Metadata',Metadata);
+        ActionOut.Content.Add('Metadata', Metadata);
         //+NPR5.50 [338666]
     end;
 
@@ -654,7 +698,7 @@ table 6150701 "POS Menu Button"
         //-NPR5.50 [338666]
         Metadata := Metadata.Dictionary();
         OnRetrieveCustomerMetadata(Metadata);
-        ActionOut.Content.Add('Metadata',Metadata);
+        ActionOut.Content.Add('Metadata', Metadata);
         //+NPR5.50 [338666]
     end;
 
@@ -663,13 +707,13 @@ table 6150701 "POS Menu Button"
         POSAction: Record "POS Action";
     begin
         if Enabled = Enabled::Auto then begin
-          TestField("Action Type","Action Type"::Action);
-          POSAction.Get("Action Code");
-          POSAction.TestField("Bound to DataSource");
+            TestField("Action Type", "Action Type"::Action);
+            POSAction.Get("Action Code");
+            POSAction.TestField("Bound to DataSource");
         end;
     end;
 
-    local procedure StoreButtonParameters(ActionIn: DotNet npNetAction;var POSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure StoreButtonParameters(ActionIn: DotNet npNetAction; var POSParameterValue: Record "POS Parameter Value" temporary)
     begin
         //-NPR5.42 [314128]
         // POSActionParameter.SETRANGE("POS Action Code", "Action Code");
@@ -680,27 +724,27 @@ table 6150701 "POS Menu Button"
 
         //-NPR5.50 [338666]
         if not POSParameterValue.GetParamFilterIndicator() then begin
-        //+NPR5.50 [338666]
+            //+NPR5.50 [338666]
 
-          POSParameterValue.SetRange("Table No.",DATABASE::"POS Menu Button");
-          POSParameterValue.SetRange(Code,"Menu Code");
-          //-NPR5.42.01 [320622]
-          POSParameterValue.SetRange("Record ID", RecordId);
-          //+NPR5.42.01 [320622]
-          POSParameterValue.SetRange(ID,ID);
+            POSParameterValue.SetRange("Table No.", DATABASE::"POS Menu Button");
+            POSParameterValue.SetRange(Code, "Menu Code");
+            //-NPR5.42.01 [320622]
+            POSParameterValue.SetRange("Record ID", RecordId);
+            //+NPR5.42.01 [320622]
+            POSParameterValue.SetRange(ID, ID);
 
-        //-NPR5.50 [338666]
+            //-NPR5.50 [338666]
         end;
         //+NPR5.50 [338666]
 
         if POSParameterValue.FindSet then
-          repeat
-            POSParameterValue.AddParameterToAction(ActionIn);
-          until POSParameterValue.Next = 0;
+            repeat
+                POSParameterValue.AddParameterToAction(ActionIn);
+            until POSParameterValue.Next = 0;
         //+NPR5.42 [314128]
     end;
 
-    local procedure StoreActionOtherConfiguration(ActionIn: DotNet npNetAction;POSSession: Codeunit "POS Session")
+    local procedure StoreActionOtherConfiguration(ActionIn: DotNet npNetAction; POSSession: Codeunit "POS Session")
     var
         TempParam: Record "POS Parameter Value" temporary;
         POSAction: Record "POS Action";
@@ -709,56 +753,56 @@ table 6150701 "POS Menu Button"
     begin
         //-NPR5.36 [281618]
         if "Blocking UI" then
-          ActionIn.Content.Add('Blocking',true);
+            ActionIn.Content.Add('Blocking', true);
         //+NPR5.36 [281618]
 
         //-NPR5.54 [392247]
         if (not POSSession.RetrieveSessionAction("Action Code", POSAction)) then
-          exit;
+            exit;
 
-        ActionIn.Content.Add ('requirePosUnitType', Format (POSAction."Requires POS Type", 0, 9));
+        ActionIn.Content.Add('requirePosUnitType', Format(POSAction."Requires POS Type", 0, 9));
         //+NPR5.54 [392247]
     end;
 
     local procedure StoreDataSource(ActionIn: DotNet npNetAction)
     begin
         if "Data Source Name" <> '' then
-          ActionIn.Content.Add('dataSource',"Data Source Name");
+            ActionIn.Content.Add('dataSource', "Data Source Name");
     end;
 
     procedure StoreButtonConfiguration(MenuButtonObj: DotNet npNetMenuButton)
     begin
         //-NPR5.36 [291454]
         if Tooltip <> '' then
-        //-290485 [290485]
-        //  MenuButtonObj.Tooltip := Tooltip;
-          MenuButtonObj.Tooltip := GetLocalizedCaption(FieldNo(Tooltip));
+            //-290485 [290485]
+            //  MenuButtonObj.Tooltip := Tooltip;
+            MenuButtonObj.Tooltip := GetLocalizedCaption(FieldNo(Tooltip));
         //+290485 [290485]
         if "Background Image Url" <> '' then begin
-          MenuButtonObj.Content.Add('BackgroundImageUrl',"Background Image Url");
-          MenuButtonObj.Content.Add('CaptionPosition',"Caption Position");
+            MenuButtonObj.Content.Add('BackgroundImageUrl', "Background Image Url");
+            MenuButtonObj.Content.Add('CaptionPosition', "Caption Position");
         end;
         //+NPR5.36 [291454]
         //-NPR5.43 [314603]
         if "Secure Method Code" <> '' then
-          MenuButtonObj.Content.Add('SecureMethod',"Secure Method Code");
+            MenuButtonObj.Content.Add('SecureMethod', "Secure Method Code");
         //+NPR5.43 [314603]
     end;
 
     procedure SetSortOrderAndBaseMenuFilter(MenuCode: Code[20])
     begin
         Rec.Reset();
-        Rec.SetCurrentKey("Menu Code",Ordinal);
-        Rec.SetRange("Menu Code",MenuCode);
+        Rec.SetCurrentKey("Menu Code", Ordinal);
+        Rec.SetRange("Menu Code", MenuCode);
     end;
 
-    procedure FilterSubtree(MenuButton: Record "POS Menu Button";IncludingThis: Boolean)
+    procedure FilterSubtree(MenuButton: Record "POS Menu Button"; IncludingThis: Boolean)
     var
         This: Text;
     begin
         if IncludingThis then
-          This := MenuButton.Path + '|';
-        Rec.SetFilter(Path,StrSubstNo('%2%1.*',MenuButton.Path,This));
+            This := MenuButton.Path + '|';
+        Rec.SetFilter(Path, StrSubstNo('%2%1.*', MenuButton.Path, This));
     end;
 
     procedure IndentAllowed(): Boolean
@@ -768,9 +812,9 @@ table 6150701 "POS Menu Button"
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton := Rec;
         if MenuButton.Next(-1) = 0 then
-          exit(false)
+            exit(false)
         else
-          exit(MenuButton.Level >= Level);
+            exit(MenuButton.Level >= Level);
     end;
 
     procedure UnIndentAllowed(): Boolean
@@ -809,7 +853,7 @@ table 6150701 "POS Menu Button"
         MenuButton: Record "POS Menu Button";
     begin
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
-        MenuButton.SetRange("Parent ID",ID);
+        MenuButton.SetRange("Parent ID", ID);
         exit(MenuButton.IsEmpty);
     end;
 
@@ -822,24 +866,24 @@ table 6150701 "POS Menu Button"
         NextOrdinal := xRec.Ordinal;
 
         MenuButton.SetSortOrderAndBaseMenuFilter(xRec."Menu Code");
-        MenuButton.SetFilter(Ordinal,'>=%1',xRec.Ordinal);
+        MenuButton.SetFilter(Ordinal, '>=%1', xRec.Ordinal);
         if MenuButton.FindSet() then
-          repeat
-            NextOrdinal += 1;
-            TempMenuButton := MenuButton;
-            TempMenuButton.Ordinal := NextOrdinal;
-            TempMenuButton.Insert();
-          until MenuButton.Next() = 0;
+            repeat
+                NextOrdinal += 1;
+                TempMenuButton := MenuButton;
+                TempMenuButton.Ordinal := NextOrdinal;
+                TempMenuButton.Insert();
+            until MenuButton.Next() = 0;
 
         if TempMenuButton.FindSet() then
-          repeat
-            MenuButton := TempMenuButton;
-            MenuButton.Modify();
-          until TempMenuButton.Next = 0;
+            repeat
+                MenuButton := TempMenuButton;
+                MenuButton.Modify();
+            until TempMenuButton.Next = 0;
 
         Init();
         Ordinal := xRec.Ordinal;
-        "Parent ID":= xRec."Parent ID";
+        "Parent ID" := xRec."Parent ID";
         Level := xRec.Level;
         CalculateID();
     end;
@@ -850,22 +894,22 @@ table 6150701 "POS Menu Button"
         MenuButton2: Record "POS Menu Button";
     begin
         if not IndentAllowed() then
-          exit;
+            exit;
 
         Level := Level + 1;
 
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
-        MenuButton.SetFilter(Ordinal,'<%1',Ordinal);
-        MenuButton.SetRange(Level,Level - 1);
+        MenuButton.SetFilter(Ordinal, '<%1', Ordinal);
+        MenuButton.SetRange(Level, Level - 1);
         MenuButton := Rec;
         MenuButton.Find('<');
         MenuButton2 := Rec;
 
-        "Parent ID":= MenuButton.ID;
+        "Parent ID" := MenuButton.ID;
         CalculatePath();
         Modify();
 
-        MenuButton.Get("Menu Code","Parent ID");
+        MenuButton.Get("Menu Code", "Parent ID");
         MenuButton."Action Type" := "Action Type"::Submenu;
         MenuButton."Action Code" := '';
         MenuButton.Modify();
@@ -873,13 +917,13 @@ table 6150701 "POS Menu Button"
         MenuButton.Reset();
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton.Ascending(false);
-        MenuButton.FilterSubtree(MenuButton2,false);
+        MenuButton.FilterSubtree(MenuButton2, false);
         if MenuButton.FindSet(true) then
-          repeat
-            MenuButton.Level += 1;
-            MenuButton.CalculatePath();
-            MenuButton.Modify();
-          until MenuButton.Next = 0;
+            repeat
+                MenuButton.Level += 1;
+                MenuButton.CalculatePath();
+                MenuButton.Modify();
+            until MenuButton.Next = 0;
     end;
 
     procedure UnIndent()
@@ -888,25 +932,25 @@ table 6150701 "POS Menu Button"
         MenuButton2: Record "POS Menu Button";
     begin
         if not UnIndentAllowed() then
-          exit;
+            exit;
 
-        MenuButton.Get("Menu Code","Parent ID");
+        MenuButton.Get("Menu Code", "Parent ID");
         MenuButton2 := Rec;
 
         Level := Level - 1;
-        "Parent ID":= MenuButton."Parent ID";
+        "Parent ID" := MenuButton."Parent ID";
         CalculatePath();
         Modify();
 
         MenuButton.Reset();
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
-        MenuButton.FilterSubtree(MenuButton2,false);
+        MenuButton.FilterSubtree(MenuButton2, false);
         if MenuButton.FindSet(true) then
-          repeat
-            MenuButton.Level -= 1;
-            MenuButton.CalculatePath();
-            MenuButton.Modify();
-          until MenuButton.Next = 0;
+            repeat
+                MenuButton.Level -= 1;
+                MenuButton.CalculatePath();
+                MenuButton.Modify();
+            until MenuButton.Next = 0;
     end;
 
     procedure MoveUp()
@@ -917,7 +961,7 @@ table 6150701 "POS Menu Button"
         TempMoveDown: Record "POS Menu Button" temporary;
     begin
         if not MoveUpAllowed() then
-          exit;
+            exit;
 
         CopyRec := Rec;
 
@@ -932,8 +976,8 @@ table 6150701 "POS Menu Button"
         //SwitchHierarchies(TempMoveUp,TempMoveDown,-1);
 
         if not MenuButton.FindTarget('<') then
-          exit;
-        SwitchNodes(Rec,MenuButton);
+            exit;
+        SwitchNodes(Rec, MenuButton);
         //+NPR5.39
         MenuButton := CopyRec;
         MenuButton.Reset();
@@ -949,7 +993,7 @@ table 6150701 "POS Menu Button"
         TempMoveDown: Record "POS Menu Button" temporary;
     begin
         if not MoveDownAllowed() then
-          exit;
+            exit;
 
         CopyRec := Rec;
 
@@ -965,8 +1009,8 @@ table 6150701 "POS Menu Button"
         //SwitchHierarchies(TempMoveUp,TempMoveDown,1);
 
         if not MenuButton.FindTarget('>') then
-          exit;
-        SwitchNodes(Rec,MenuButton);
+            exit;
+        SwitchNodes(Rec, MenuButton);
         //+NPR5.39
 
         MenuButton := CopyRec;
@@ -983,36 +1027,36 @@ table 6150701 "POS Menu Button"
         MenuButton := Rec;
 
         SetSortOrderAndBaseMenuFilter("Menu Code");
-        SetFilter(Level,'%1|%2',Level,Level - 1);
+        SetFilter(Level, '%1|%2', Level, Level - 1);
         if not Find(Direction) then
-          exit(false);
+            exit(false);
 
         if MenuButton."Parent ID" = "Parent ID" then
-          exit(true);
+            exit(true);
 
         // Crossing hierarchy boundary
-        if not Get("Menu Code",MenuButton."Parent ID") then
-          exit(false);
+        if not Get("Menu Code", MenuButton."Parent ID") then
+            exit(false);
 
         MenuButtonSibling.SetSortOrderAndBaseMenuFilter("Menu Code");
-        MenuButtonSibling.SetRange("Parent ID","Parent ID");
+        MenuButtonSibling.SetRange("Parent ID", "Parent ID");
         MenuButtonSibling := Rec;
         if MenuButtonSibling.Find(Direction) then begin
-          if Direction = '>' then
-            Rec := MenuButtonSibling;
-          exit(true);
+            if Direction = '>' then
+                Rec := MenuButtonSibling;
+            exit(true);
         end;
 
         exit(false);
     end;
 
-    local procedure SwitchNodes(Source: Record "POS Menu Button";Target: Record "POS Menu Button")
+    local procedure SwitchNodes(Source: Record "POS Menu Button"; Target: Record "POS Menu Button")
     var
         SourceHierarchy: Record "POS Menu Button" temporary;
         TargetHierarchy: Record "POS Menu Button" temporary;
     begin
-        Source.CopyHierarchy(SourceHierarchy,true);
-        Target.CopyHierarchy(TargetHierarchy,true);
+        Source.CopyHierarchy(SourceHierarchy, true);
+        Target.CopyHierarchy(TargetHierarchy, true);
 
         //PAGE.RUNMODAL(50505,SourceHierarchy);
         //PAGE.RUNMODAL(50505,TargetHierarchy);
@@ -1022,49 +1066,49 @@ table 6150701 "POS Menu Button"
         TargetHierarchy.FindFirst();
 
         case true of
-           // Case 1: same parent
-          Source."Parent ID" = Target."Parent ID":
-            begin
-              if Source.Ordinal < Target.Ordinal then
-                SwitchNodesSameParent(TargetHierarchy,SourceHierarchy,Source.Ordinal)
-              else
-                SwitchNodesSameParent(SourceHierarchy,TargetHierarchy,Target.Ordinal);
-            end;
+            // Case 1: same parent
+            Source."Parent ID" = Target."Parent ID":
+                begin
+                    if Source.Ordinal < Target.Ordinal then
+                        SwitchNodesSameParent(TargetHierarchy, SourceHierarchy, Source.Ordinal)
+                    else
+                        SwitchNodesSameParent(SourceHierarchy, TargetHierarchy, Target.Ordinal);
+                end;
 
-          // Case 2: Cross-hierarchy move, moving up
-          Source.Ordinal > Target.Ordinal:
-            MoveSubtreeAboveNode(SourceHierarchy,Target);
+            // Case 2: Cross-hierarchy move, moving up
+            Source.Ordinal > Target.Ordinal:
+                MoveSubtreeAboveNode(SourceHierarchy, Target);
 
-          // Case 3: Cross-hierarchy move, moving down:
-          else
-            MoveSubtreeBelowNode(SourceHierarchy,Target);
+            // Case 3: Cross-hierarchy move, moving down:
+            else
+                MoveSubtreeBelowNode(SourceHierarchy, Target);
         end;
     end;
 
-    local procedure SwitchNodesSameParent(var FirstHierarchy: Record "POS Menu Button" temporary;var SecondHierarchy: Record "POS Menu Button" temporary;NextOrdinal: Integer)
+    local procedure SwitchNodesSameParent(var FirstHierarchy: Record "POS Menu Button" temporary; var SecondHierarchy: Record "POS Menu Button" temporary; NextOrdinal: Integer)
     var
         MenuButton: Record "POS Menu Button";
     begin
         FirstHierarchy.SetCurrentKey(Ordinal);
         if FirstHierarchy.FindSet then
-          repeat
-            MenuButton := FirstHierarchy;
-            MenuButton.Ordinal := NextOrdinal;
-            MenuButton.Modify();
-            NextOrdinal += 1;
-          until FirstHierarchy.Next = 0;
+            repeat
+                MenuButton := FirstHierarchy;
+                MenuButton.Ordinal := NextOrdinal;
+                MenuButton.Modify();
+                NextOrdinal += 1;
+            until FirstHierarchy.Next = 0;
 
         SecondHierarchy.SetCurrentKey(Ordinal);
         if SecondHierarchy.FindSet then
-          repeat
-            MenuButton := SecondHierarchy;
-            MenuButton.Ordinal := NextOrdinal;
-            MenuButton.Modify();
-            NextOrdinal += 1;
-          until SecondHierarchy.Next = 0;
+            repeat
+                MenuButton := SecondHierarchy;
+                MenuButton.Ordinal := NextOrdinal;
+                MenuButton.Modify();
+                NextOrdinal += 1;
+            until SecondHierarchy.Next = 0;
     end;
 
-    local procedure MoveSubtreeAboveNode(var Hierarchy: Record "POS Menu Button" temporary;Node: Record "POS Menu Button")
+    local procedure MoveSubtreeAboveNode(var Hierarchy: Record "POS Menu Button" temporary; Node: Record "POS Menu Button")
     var
         MenuButton: Record "POS Menu Button";
         NextOrdinal: Integer;
@@ -1082,19 +1126,19 @@ table 6150701 "POS Menu Button"
         // Move the hierarchy above node
         First := true;
         if Hierarchy.FindSet then
-          repeat
-            MenuButton := Hierarchy;
-            MenuButton.Ordinal := NextOrdinal;
-            if First then
-              MenuButton.CalculateParentID();
-            MenuButton.CalculatePath();
-            MenuButton.Modify();
-            NextOrdinal += 1;
-            First := false;
-          until Hierarchy.Next = 0;
+            repeat
+                MenuButton := Hierarchy;
+                MenuButton.Ordinal := NextOrdinal;
+                if First then
+                    MenuButton.CalculateParentID();
+                MenuButton.CalculatePath();
+                MenuButton.Modify();
+                NextOrdinal += 1;
+                First := false;
+            until Hierarchy.Next = 0;
     end;
 
-    local procedure MoveSubtreeBelowNode(var Hierarchy: Record "POS Menu Button" temporary;Node: Record "POS Menu Button")
+    local procedure MoveSubtreeBelowNode(var Hierarchy: Record "POS Menu Button" temporary; Node: Record "POS Menu Button")
     var
         MenuButton: Record "POS Menu Button";
         NextOrdinal: Integer;
@@ -1113,16 +1157,16 @@ table 6150701 "POS Menu Button"
         // Move the hierarchy below node
         First := true;
         if Hierarchy.FindSet then
-          repeat
-            MenuButton := Hierarchy;
-            MenuButton.Ordinal := NextOrdinal;
-            if First then
-              MenuButton."Parent ID" := Node.ID;
-            MenuButton.CalculatePath();
-            MenuButton.Modify();
-            NextOrdinal += 1;
-            First := false;
-          until Hierarchy.Next = 0;
+            repeat
+                MenuButton := Hierarchy;
+                MenuButton.Ordinal := NextOrdinal;
+                if First then
+                    MenuButton."Parent ID" := Node.ID;
+                MenuButton.CalculatePath();
+                MenuButton.Modify();
+                NextOrdinal += 1;
+                First := false;
+            until Hierarchy.Next = 0;
     end;
 
     local procedure HandleDescendantsOnDelete()
@@ -1132,25 +1176,27 @@ table 6150701 "POS Menu Button"
     begin
         //-NPR5.39 [255773]
         //MenuButton.SETRANGE("Parent ID",ID);
-        MenuButton.FilterSubtree(Rec,false);
+        MenuButton.FilterSubtree(Rec, false);
         //+NPR5.39 [255773]
         if MenuButton.IsEmpty then
-          exit;
+            exit;
 
         //-NPR5.39 [255773]
         if not UnattendedDelete then begin
-        //+NPR5.39 [255773]
-          Choice := StrMenu(Text002,1,Text001);
-          if Choice = Choice::Cancel then
-            Error('');
-        //-NPR5.39 [255773]
+            //+NPR5.39 [255773]
+            Choice := StrMenu(Text002, 1, Text001);
+            if Choice = Choice::Cancel then
+                Error('');
+            //-NPR5.39 [255773]
         end else
-          Choice := Choice::Delete;
+            Choice := Choice::Delete;
         //+NPR5.39 [255773]
 
         case Choice of
-          Choice::Unindent: UnindentDescendantsOnDelete();
-          Choice::Delete: DeleteDescendantsOnDelete();
+            Choice::Unindent:
+                UnindentDescendantsOnDelete();
+            Choice::Delete:
+                DeleteDescendantsOnDelete();
         end;
     end;
 
@@ -1161,24 +1207,24 @@ table 6150701 "POS Menu Button"
     begin
         First := true;
 
-        MenuButton.FilterSubtree(Rec,false);
+        MenuButton.FilterSubtree(Rec, false);
         if MenuButton.FindSet(true) then
-          repeat
-            if First then begin
-              MenuButton."Parent ID" := "Parent ID";
-              First := false;
-            end;
-            MenuButton.Level -= 1;
-            MenuButton.CalculatePath();
-            MenuButton.Modify();
-          until MenuButton.Next = 0;
+            repeat
+                if First then begin
+                    MenuButton."Parent ID" := "Parent ID";
+                    First := false;
+                end;
+                MenuButton.Level -= 1;
+                MenuButton.CalculatePath();
+                MenuButton.Modify();
+            until MenuButton.Next = 0;
     end;
 
     local procedure DeleteDescendantsOnDelete()
     var
         MenuButton: Record "POS Menu Button";
     begin
-        MenuButton.FilterSubtree(Rec,false);
+        MenuButton.FilterSubtree(Rec, false);
         MenuButton.DeleteAll();
     end;
 
@@ -1192,16 +1238,16 @@ table 6150701 "POS Menu Button"
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton := Rec;
         if MenuButton.Next(-1) <> 0 then
-          NewOrdinal := MenuButton.Ordinal + 1;
+            NewOrdinal := MenuButton.Ordinal + 1;
 
-        MenuButton.SetFilter(Ordinal,'>%1',Ordinal);
+        MenuButton.SetFilter(Ordinal, '>%1', Ordinal);
         if MenuButton.FindSet(false) then
-          repeat
-            MenuButton.Ordinal := NewOrdinal;
-            MenuButton.CalculatePath();
-            MenuButton.Modify();
-            NewOrdinal += 1;
-          until MenuButton.Next() = 0;
+            repeat
+                MenuButton.Ordinal := NewOrdinal;
+                MenuButton.CalculatePath();
+                MenuButton.Modify();
+                NewOrdinal += 1;
+            until MenuButton.Next() = 0;
     end;
 
     local procedure CalculateID()
@@ -1210,10 +1256,10 @@ table 6150701 "POS Menu Button"
         NewOrdinal: Integer;
     begin
         if ID <> 0 then
-          exit;
+            exit;
 
-        MenuButton.SetCurrentKey("Menu Code",ID);
-        MenuButton.SetRange("Menu Code","Menu Code");
+        MenuButton.SetCurrentKey("Menu Code", ID);
+        MenuButton.SetRange("Menu Code", "Menu Code");
         if MenuButton.FindLast then;
         ID := MenuButton.ID + 1;
     end;
@@ -1223,10 +1269,10 @@ table 6150701 "POS Menu Button"
         MenuButton: Record "POS Menu Button";
     begin
         if Ordinal > 0 then
-          exit;
+            exit;
 
-        MenuButton.SetCurrentKey("Menu Code",Ordinal);
-        MenuButton.SetRange("Menu Code","Menu Code");
+        MenuButton.SetCurrentKey("Menu Code", Ordinal);
+        MenuButton.SetRange("Menu Code", "Menu Code");
         if MenuButton.FindLast then;
         Ordinal := MenuButton.Ordinal + 1;
     end;
@@ -1237,20 +1283,20 @@ table 6150701 "POS Menu Button"
     begin
         MenuButton := Rec;
         Path := Format(MenuButton.ID);
-        while MenuButton.Get("Menu Code",MenuButton."Parent ID") do begin
-          Path := StrSubstNo('%1.%2',MenuButton.ID,Path);
+        while MenuButton.Get("Menu Code", MenuButton."Parent ID") do begin
+            Path := StrSubstNo('%1.%2', MenuButton.ID, Path);
         end;
-        Path := StrSubstNo('%1.%2',"Menu Code",Path);
+        Path := StrSubstNo('%1.%2', "Menu Code", Path);
     end;
 
     local procedure CalculateLevel()
     var
         MenuButton: Record "POS Menu Button";
     begin
-        if MenuButton.Get("Menu Code","Parent ID") then
-          Level := MenuButton.Level + 1
+        if MenuButton.Get("Menu Code", "Parent ID") then
+            Level := MenuButton.Level + 1
         else
-          Level := 0;
+            Level := 0;
     end;
 
     procedure CalculateParentID()
@@ -1259,41 +1305,41 @@ table 6150701 "POS Menu Button"
     begin
         "Parent ID" := 0;
         if Level > 0 then begin
-          MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
-          MenuButton := Rec;
-          MenuButton.Next(-1);
+            MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
+            MenuButton := Rec;
+            MenuButton.Next(-1);
 
-          if MenuButton.Level >= Level then begin
-            while MenuButton.Level > Level do
-              MenuButton.Get("Menu Code",MenuButton."Parent ID");
-            "Parent ID" := MenuButton."Parent ID";
-          end else
-            "Parent ID" := MenuButton.ID;
-          CalculatePath();
+            if MenuButton.Level >= Level then begin
+                while MenuButton.Level > Level do
+                    MenuButton.Get("Menu Code", MenuButton."Parent ID");
+                "Parent ID" := MenuButton."Parent ID";
+            end else
+                "Parent ID" := MenuButton.ID;
+            CalculatePath();
         end;
     end;
 
-    procedure CopyHierarchy(var TempMenuButton: Record "POS Menu Button" temporary;Traverse: Boolean)
+    procedure CopyHierarchy(var TempMenuButton: Record "POS Menu Button" temporary; Traverse: Boolean)
     var
         MenuButton: Record "POS Menu Button";
     begin
         MenuButton := Rec;
-        MenuButton.FilterSubtree(Rec,true);
+        MenuButton.FilterSubtree(Rec, true);
         TempMenuButton.DeleteAll();
         if MenuButton.FindSet() then
-          repeat
-            TempMenuButton := MenuButton;
-            TempMenuButton.Insert();
-          until (MenuButton.Next() = 0) or (not Traverse);
+            repeat
+                TempMenuButton := MenuButton;
+                TempMenuButton.Insert();
+            until (MenuButton.Next() = 0) or (not Traverse);
     end;
 
-    local procedure RemoveSubset(var FromSuperset: Record "POS Menu Button" temporary;var Subset: Record "POS Menu Button" temporary) Removed: Boolean
+    local procedure RemoveSubset(var FromSuperset: Record "POS Menu Button" temporary; var Subset: Record "POS Menu Button" temporary) Removed: Boolean
     begin
         if Subset.FindSet then
-          repeat
-            FromSuperset := Subset;
-            Removed := Removed or FromSuperset.Delete();
-          until Subset.Next = 0;
+            repeat
+                FromSuperset := Subset;
+                Removed := Removed or FromSuperset.Delete();
+            until Subset.Next = 0;
     end;
 
     local procedure LookupBackgroundColor()
@@ -1308,13 +1354,13 @@ table 6150701 "POS Menu Button"
         ColorArray := String.Split(Separator.ToCharArray());
 
         foreach String in ColorArray do begin
-          TempRetailList.Number += 1;
-          TempRetailList.Choice := String;
-          TempRetailList.Insert;
+            TempRetailList.Number += 1;
+            TempRetailList.Choice := String;
+            TempRetailList.Insert;
         end;
 
         if PAGE.RunModal(PAGE::"Retail List", TempRetailList) = ACTION::LookupOK then
-          Validate("Background Color", TempRetailList.Choice);
+            Validate("Background Color", TempRetailList.Choice);
     end;
 
     procedure LocalizeData()
@@ -1331,7 +1377,7 @@ table 6150701 "POS Menu Button"
         FieldTmp."No." := FieldNo(Tooltip);
         FieldTmp.Insert();
 
-        LocalizedCaptions.PrepareLocalizationForRecord(RecordId,FieldTmp);
+        LocalizedCaptions.PrepareLocalizationForRecord(RecordId, FieldTmp);
         LocalizedCaptions.RunModal();
         //+290485 [290485]
     end;
@@ -1342,8 +1388,8 @@ table 6150701 "POS Menu Button"
         RecRef: RecordRef;
     begin
         //-290485 [290485]
-        if Localization.GetLocalization(RecordId,FieldNo) then
-          exit(Localization.Caption);
+        if Localization.GetLocalization(RecordId, FieldNo) then
+            exit(Localization.Caption);
         RecRef.GetTable(Rec);
         exit(RecRef.Field(FieldNo).Value);
         //+290485 [290485]

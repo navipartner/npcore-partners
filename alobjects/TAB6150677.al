@@ -3,55 +3,62 @@ table 6150677 "NPRE Kitchen Order"
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
 
     Caption = 'Kitchen Order';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Order ID";BigInteger)
+        field(1; "Order ID"; BigInteger)
         {
             AutoIncrement = true;
             Caption = 'Order ID';
+            DataClassification = CustomerContent;
         }
-        field(10;Status;Option)
+        field(10; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             InitValue = Planned;
             OptionCaption = 'Active,Planned,Finished,Cancelled';
             OptionMembers = Active,Planned,Finished,Cancelled;
         }
-        field(20;Priority;Integer)
+        field(20; Priority; Integer)
         {
             Caption = 'Priority';
+            DataClassification = CustomerContent;
         }
-        field(30;"Created Date-Time";DateTime)
+        field(30; "Created Date-Time"; DateTime)
         {
             Caption = 'Created Date-Time';
+            DataClassification = CustomerContent;
         }
-        field(40;"On Hold";Boolean)
+        field(40; "On Hold"; Boolean)
         {
             Caption = 'On Hold';
+            DataClassification = CustomerContent;
         }
-        field(50;"Restaurant Code";Code[20])
+        field(50; "Restaurant Code"; Code[20])
         {
             Caption = 'Restaurant Code';
+            DataClassification = CustomerContent;
             TableRelation = "NPRE Restaurant";
         }
-        field(500;"Kitchen Station Filter";Code[20])
+        field(500; "Kitchen Station Filter"; Code[20])
         {
             Caption = 'Kitchen Station Filter';
             FieldClass = FlowFilter;
-            TableRelation = "NPRE Kitchen Station".Code WHERE ("Restaurant Code"=FIELD("Production Restaurant Filter"));
+            TableRelation = "NPRE Kitchen Station".Code WHERE("Restaurant Code" = FIELD("Production Restaurant Filter"));
         }
-        field(510;"Production Restaurant Filter";Code[20])
+        field(510; "Production Restaurant Filter"; Code[20])
         {
             Caption = 'Production Restaurant Filter';
             FieldClass = FlowFilter;
             TableRelation = "NPRE Restaurant";
         }
-        field(600;"Applicable for Kitchen Station";Boolean)
+        field(600; "Applicable for Kitchen Station"; Boolean)
         {
-            CalcFormula = Exist("NPRE Kitchen Request Station" WHERE ("Order ID"=FIELD("Order ID"),
-                                                                      "Production Restaurant Code"=FIELD("Production Restaurant Filter"),
-                                                                      "Kitchen Station"=FIELD("Kitchen Station Filter")));
+            CalcFormula = Exist ("NPRE Kitchen Request Station" WHERE("Order ID" = FIELD("Order ID"),
+                                                                      "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
+                                                                      "Kitchen Station" = FIELD("Kitchen Station Filter")));
             Caption = 'Applicable for Kitchen Station';
             Editable = false;
             FieldClass = FlowField;
@@ -60,10 +67,10 @@ table 6150677 "NPRE Kitchen Order"
 
     keys
     {
-        key(Key1;"Order ID")
+        key(Key1; "Order ID")
         {
         }
-        key(Key2;"Restaurant Code",Status,Priority,"Created Date-Time")
+        key(Key2; "Restaurant Code", Status, Priority, "Created Date-Time")
         {
         }
     }
@@ -76,9 +83,9 @@ table 6150677 "NPRE Kitchen Order"
     var
         KitchenOrderLine: Record "NPRE Kitchen Request";
     begin
-        KitchenOrderLine.SetRange("Order ID","Order ID");
+        KitchenOrderLine.SetRange("Order ID", "Order ID");
         if not KitchenOrderLine.IsEmpty then
-          KitchenOrderLine.DeleteAll(true);
+            KitchenOrderLine.DeleteAll(true);
     end;
 }
 

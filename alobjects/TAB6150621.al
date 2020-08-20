@@ -33,6 +33,7 @@ table 6150621 "POS Entry"
     // NPR5.55/MMV /20200701 CASE 412426 Added index for "Document No."
 
     Caption = 'POS Entry';
+    DataClassification = CustomerContent;
     DrillDownPageID = "POS Entries";
     LookupPageID = "POS Entries";
 
@@ -42,116 +43,140 @@ table 6150621 "POS Entry"
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
         field(3; "POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';
+            DataClassification = CustomerContent;
             TableRelation = "POS Store";
         }
         field(4; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Unit";
         }
         field(5; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            DataClassification = CustomerContent;
         }
         field(6; "Fiscal No."; Code[20])
         {
             Caption = 'Fiscal No.';
+            DataClassification = CustomerContent;
         }
         field(7; "POS Period Register No."; Integer)
         {
             Caption = 'POS Period Register No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Period Register";
         }
         field(9; "Entry Type"; Option)
         {
             Caption = 'Entry Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Comment,Direct Sale,Other,Credit Sale,Balancing,Cancelled Sale';
             OptionMembers = Comment,"Direct Sale",Other,"Credit Sale",Balancing,"Cancelled Sale";
         }
         field(10; "Entry Date"; Date)
         {
             Caption = 'Entry Date';
+            DataClassification = CustomerContent;
         }
         field(11; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
+            DataClassification = CustomerContent;
         }
         field(12; "Ending Time"; Time)
         {
             Caption = 'Ending Time';
+            DataClassification = CustomerContent;
         }
         field(14; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(20; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
+            DataClassification = CustomerContent;
             TableRelation = Customer;
         }
         field(30; "System Entry"; Boolean)
         {
             Caption = 'System Entry';
+            DataClassification = CustomerContent;
         }
         field(40; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
+            DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
+            DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
         field(43; "Salesperson Code"; Code[10])
         {
             Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser";
         }
         field(47; "No. Printed"; Integer)
         {
             Caption = 'No. Printed';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(52; "Post Item Entry Status"; Option)
         {
             Caption = 'Post Item Entry Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Unposted,Error while Posting,Posted,Not To Be Posted';
             OptionMembers = Unposted,"Error while Posting",Posted,"Not To Be Posted";
         }
         field(53; "Post Entry Status"; Option)
         {
             Caption = 'Post Entry Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Unposted,Error while Posting,Posted,Not To Be Posted';
             OptionMembers = Unposted,"Error while Posting",Posted,"Not To Be Posted";
         }
         field(54; "POS Posting Log Entry No."; Integer)
         {
             Caption = 'POS Posting Log Entry No.';
+            DataClassification = CustomerContent;
             TableRelation = "POS Posting Log";
         }
         field(60; "Posting Date"; Date)
         {
             Caption = 'Posting Date';
+            DataClassification = CustomerContent;
         }
         field(61; "Document Date"; Date)
         {
             Caption = 'Document Date';
+            DataClassification = CustomerContent;
         }
         field(70; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
+            DataClassification = CustomerContent;
             TableRelation = Currency;
         }
         field(71; "Currency Factor"; Decimal)
         {
             Caption = 'Currency Factor';
+            DataClassification = CustomerContent;
             DecimalPlaces = 0 : 15;
             Editable = false;
             InitValue = 1;
@@ -160,105 +185,128 @@ table 6150621 "POS Entry"
         field(100; "Item Sales (LCY)"; Decimal)
         {
             Caption = 'Item Sales (LCY)';
+            DataClassification = CustomerContent;
         }
         field(101; "Discount Amount"; Decimal)
         {
             Caption = 'Discount Amount';
+            DataClassification = CustomerContent;
         }
         field(102; "Sales Quantity"; Decimal)
         {
             Caption = 'Sales Quantity';
+            DataClassification = CustomerContent;
         }
         field(103; "Return Sales Quantity"; Decimal)
         {
             Caption = 'Return Sales Quantity';
+            DataClassification = CustomerContent;
         }
         field(104; "Amount Excl. Tax"; Decimal)
         {
             Caption = 'Amount Excl. Tax';
+            DataClassification = CustomerContent;
         }
         field(105; "Tax Amount"; Decimal)
         {
             Caption = 'Tax Amount';
+            DataClassification = CustomerContent;
         }
         field(106; "Amount Incl. Tax"; Decimal)
         {
             Caption = 'Amount Incl. Tax';
+            DataClassification = CustomerContent;
         }
         field(108; "No. of Sales Lines"; Integer)
         {
             Caption = 'No. of Sales Lines';
+            DataClassification = CustomerContent;
         }
         field(109; "Item Returns (LCY)"; Decimal)
         {
             Caption = 'Item Returns (LCY)';
+            DataClassification = CustomerContent;
         }
         field(110; "Rounding Amount (LCY)"; Decimal)
         {
             Caption = 'Rounding Amount (LCY)';
+            DataClassification = CustomerContent;
         }
         field(111; "Amount Incl. Tax & Round"; Decimal)
         {
             Caption = 'Amount Incl. Tax & Round';
+            DataClassification = CustomerContent;
         }
         field(114; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
+            DataClassification = CustomerContent;
             TableRelation = "Tax Area";
         }
         field(160; "POS Sale ID"; Integer)
         {
             Caption = 'POS Sale ID';
+            DataClassification = CustomerContent;
         }
         field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
+            DataClassification = CustomerContent;
         }
         field(180; "Event No."; Code[20])
         {
             Caption = 'Active Event No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53 [376035]';
             TableRelation = Job WHERE(Event = CONST(true));
         }
         field(200; "Customer Posting Group"; Code[10])
         {
             Caption = 'Customer Posting Group';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "Customer Posting Group";
         }
         field(201; "Country/Region Code"; Code[10])
         {
             Caption = 'Country/Region Code';
+            DataClassification = CustomerContent;
             TableRelation = "Country/Region";
         }
         field(202; "Transaction Type"; Code[10])
         {
             Caption = 'Transaction Type';
+            DataClassification = CustomerContent;
             TableRelation = "Transaction Type";
         }
         field(203; "Transport Method"; Code[10])
         {
             Caption = 'Transport Method';
+            DataClassification = CustomerContent;
             TableRelation = "Transport Method";
         }
         field(204; "Exit Point"; Code[10])
         {
             Caption = 'Exit Point';
+            DataClassification = CustomerContent;
             TableRelation = "Entry/Exit Point";
         }
         field(205; "Area"; Code[10])
         {
             Caption = 'Area';
+            DataClassification = CustomerContent;
             TableRelation = Area;
         }
         field(206; "Transaction Specification"; Code[10])
         {
             Caption = 'Transaction Specification';
+            DataClassification = CustomerContent;
             TableRelation = "Transaction Specification";
         }
         field(207; "Prices Including VAT"; Boolean)
         {
             Caption = 'Prices Including VAT';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -271,19 +319,23 @@ table 6150621 "POS Entry"
         field(208; "Reason Code"; Code[10])
         {
             Caption = 'Reason Code';
+            DataClassification = CustomerContent;
             TableRelation = "Reason Code";
         }
         field(210; "From External Source"; Boolean)
         {
             Caption = 'From External Source';
+            DataClassification = CustomerContent;
         }
         field(211; "External Source Name"; Text[50])
         {
             Caption = 'External Source Name';
+            DataClassification = CustomerContent;
         }
         field(212; "External Source Entry No."; Integer)
         {
             Caption = 'External Source Entry No.';
+            DataClassification = CustomerContent;
         }
         field(230; "No. of Print Output Entries"; Integer)
         {
@@ -296,10 +348,12 @@ table 6150621 "POS Entry"
         field(240; "Fiscal No. Series"; Code[10])
         {
             Caption = 'Fiscal No. Series';
+            DataClassification = CustomerContent;
         }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
+            DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "Dimension Set Entry";
 
@@ -313,12 +367,14 @@ table 6150621 "POS Entry"
         field(500; "Sales Document Type"; Option)
         {
             Caption = 'Sales Document Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
             OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         }
         field(501; "Sales Document No."; Code[20])
         {
             Caption = 'Sales Document No.';
+            DataClassification = CustomerContent;
             TableRelation = "Sales Header"."No." WHERE("Document Type" = FIELD("Sales Document Type"));
         }
         field(600; "Sale Lines"; Integer)
@@ -374,11 +430,13 @@ table 6150621 "POS Entry"
         field(710; "NPRE Number of Guests"; Integer)
         {
             Caption = 'Number of Guests';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
         field(5052; "Contact No."; Code[20])
         {
             Caption = 'Contact No.';
+            DataClassification = CustomerContent;
             TableRelation = Contact;
         }
     }
@@ -394,7 +452,7 @@ table 6150621 "POS Entry"
         key(Key3; "POS Store Code", "POS Unit No.", "Document No.")
         {
         }
-        key(Key4;"Document No.")
+        key(Key4; "Document No.")
         {
         }
     }

@@ -4,6 +4,7 @@ table 6151024 "NpRv Partner"
     // NPR5.53/MHA /20191206  CASE 379761 Added Validation and loose Table Relation to field 5 "Name"
 
     Caption = 'Retail Voucher Partner';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NpRv Partners";
     LookupPageID = "NpRv Partners";
 
@@ -12,6 +13,7 @@ table 6151024 "NpRv Partner"
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
             NotBlank = true;
 
             trigger OnValidate()
@@ -24,6 +26,7 @@ table 6151024 "NpRv Partner"
         field(5; Name; Text[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
             TableRelation = Company;
             //This property is currently not supported
             //TestTableRelation = false;
@@ -45,6 +48,7 @@ table 6151024 "NpRv Partner"
         field(10; "Service Url"; Text[250])
         {
             Caption = 'Service Url';
+            DataClassification = CustomerContent;
         }
         field(15; "Service Username"; Code[50])
         {
@@ -63,6 +67,7 @@ table 6151024 "NpRv Partner"
         field(20; "Service Password"; Text[100])
         {
             Caption = 'Service Password';
+            DataClassification = CustomerContent;
         }
     }
 

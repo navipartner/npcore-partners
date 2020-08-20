@@ -32,21 +32,25 @@ table 6150613 "NP Retail Setup"
     // NPR5.55/JAVA/20200717  CASE 413695 NPR Core for AL: Merge Role Centers extension into the core (add dummy/disabled fields in C/AL, true fields added in AL).
 
     Caption = 'NP Retail Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
+            DataClassification = CustomerContent;
         }
         field(10; "Source Code"; Code[10])
         {
             Caption = 'Source Code';
+            DataClassification = CustomerContent;
             TableRelation = "Source Code";
         }
         field(150; "Sale Fiscal No. Series"; Code[10])
         {
             Caption = 'Sale Fiscal No. Series';
+            DataClassification = CustomerContent;
             Description = 'NPR5.39';
             TableRelation = "No. Series";
 
@@ -65,12 +69,14 @@ table 6150613 "NP Retail Setup"
         field(151; "Balancing Fiscal No. Series"; Code[10])
         {
             Caption = 'Balancing Fiscal No. Series';
+            DataClassification = CustomerContent;
             Description = 'NPR5.40';
             TableRelation = "No. Series";
         }
         field(160; "Fill Sale Fiscal No. On"; Option)
         {
             Caption = 'Fill Sale Fiscal No. On';
+            DataClassification = CustomerContent;
             Description = 'NPR5.40';
             OptionCaption = 'All Sales,Successful Sales';
             OptionMembers = All,Successful;
@@ -78,37 +84,44 @@ table 6150613 "NP Retail Setup"
         field(200; "Allow Zero Amount Sales"; Boolean)
         {
             Caption = 'Allow Zero Amount Sales';
+            DataClassification = CustomerContent;
             Description = 'NPR5.42 [312104]';
         }
         field(210; "Default POS Posting Profile"; Code[20])
         {
             Caption = 'Default POS Posting Profile';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52';
             TableRelation = "POS Posting Profile";
         }
         field(231; "Standard Conditions"; Text[250])
         {
             Caption = 'Standard Conditions';
+            DataClassification = CustomerContent;
             ExtendedDatatype = URL;
         }
         field(232; Privacy; Text[250])
         {
             Caption = 'Privacy';
+            DataClassification = CustomerContent;
             ExtendedDatatype = URL;
         }
         field(233; "License Agreement"; Text[250])
         {
             Caption = 'License Agreement';
+            DataClassification = CustomerContent;
             ExtendedDatatype = URL;
         }
 
         field(10000; "Data Model Build"; Integer)
         {
             Caption = 'Data Model Build';
+            DataClassification = CustomerContent;
         }
         field(10001; "Last Data Model Build Upgrade"; DateTime)
         {
             Caption = 'Last Data Model Build Upgrade';
+            DataClassification = CustomerContent;
         }
         field(10002; "Last Data Model Build User ID"; Code[50])
         {
@@ -127,10 +140,12 @@ table 6150613 "NP Retail Setup"
         field(10003; "Prev. Data Model Build"; Integer)
         {
             Caption = 'Prev. Data Model Build';
+            DataClassification = CustomerContent;
         }
         field(10010; "Advanced POS Entries Activated"; Boolean)
         {
             Caption = 'Advanced POS Entries Activated';
+            DataClassification = CustomerContent;
             Description = 'NPR5.32';
 
             trigger OnValidate()
@@ -148,6 +163,7 @@ table 6150613 "NP Retail Setup"
         field(10020; "Advanced Posting Activated"; Boolean)
         {
             Caption = 'Advanced Posting Activated';
+            DataClassification = CustomerContent;
             Description = 'NPR5.36';
 
             trigger OnValidate()
@@ -165,24 +181,29 @@ table 6150613 "NP Retail Setup"
         field(20000; "Environment Database Name"; Text[250])
         {
             Caption = 'Environment Database Name';
+            DataClassification = CustomerContent;
         }
         field(20001; "Environment Company Name"; Text[250])
         {
             Caption = 'Environment Company Name';
+            DataClassification = CustomerContent;
         }
         field(20002; "Environment Tenant Name"; Text[250])
         {
             Caption = 'Environment Tenant Name';
+            DataClassification = CustomerContent;
         }
         field(20003; "Environment Type"; Option)
         {
             Caption = 'Environment Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'PROD,DEMO,TEST,DEV';
             OptionMembers = PROD,DEMO,TEST,DEV;
         }
         field(20004; "Environment Verified"; Boolean)
         {
             Caption = 'Environment Verified';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -202,10 +223,12 @@ table 6150613 "NP Retail Setup"
         field(20005; "Environment Template"; Boolean)
         {
             Caption = 'Environment Template';
+            DataClassification = CustomerContent;
         }
         field(30000; "Enable Client Diagnostics"; Boolean)
         {
             Caption = 'Enable Client Diagnostics';
+            DataClassification = CustomerContent;
             Description = 'NPR5.38,NPR5.40';
             InitValue = true;
         }

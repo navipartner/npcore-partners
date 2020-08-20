@@ -1,4 +1,4 @@
-tableextension 6014432 tableextension6014432 extends "Sales Header" 
+tableextension 6014432 tableextension6014432 extends "Sales Header"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                         Added fields : 6014400..6060009
@@ -22,90 +22,103 @@ tableextension 6014432 tableextension6014432 extends "Sales Header"
     // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
-        field(6014400;"Sales Ticket No.";Code[20])
+        field(6014400; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014401;"Buy-From Vendor No.";Code[20])
+        field(6014401; "Buy-From Vendor No."; Code[20])
         {
             Caption = 'Buy-from Vendor No.';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014402;"Sale Total";Decimal)
+        field(6014402; "Sale Total"; Decimal)
         {
-            CalcFormula = Sum("Sales Line"."Outstanding Amount" WHERE ("Document Type"=FIELD("Document Type"),
-                                                                       "Document No."=FIELD("No.")));
+            CalcFormula = Sum ("Sales Line"."Outstanding Amount" WHERE("Document Type" = FIELD("Document Type"),
+                                                                       "Document No." = FIELD("No.")));
             Caption = 'Sale Total';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
-        field(6014406;"Document Time";Time)
+        field(6014406; "Document Time"; Time)
         {
             Caption = 'Document Time';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
-        field(6014407;"Bill-to Company";Text[30])
+        field(6014407; "Bill-to Company"; Text[30])
         {
             Caption = 'Bill-to Company (IC)';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             TableRelation = Company;
         }
-        field(6014408;"Bill-To Vendor No.";Code[10])
+        field(6014408; "Bill-To Vendor No."; Code[10])
         {
             Caption = 'Bill-to Vendor No. (IC)';
+            DataClassification = CustomerContent;
         }
-        field(6014414;"Bill-to E-mail";Text[80])
+        field(6014414; "Bill-to E-mail"; Text[80])
         {
             Caption = 'Bill-to E-mail';
+            DataClassification = CustomerContent;
             Description = 'PN1.00';
         }
-        field(6014415;"Document Processing";Option)
+        field(6014415; "Document Processing"; Option)
         {
             Caption = 'Document Processing';
+            DataClassification = CustomerContent;
             Description = 'PN1.00';
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
         }
-        field(6014420;"Delivery Location";Code[10])
+        field(6014420; "Delivery Location"; Code[10])
         {
             Caption = 'Delivery Location';
+            DataClassification = CustomerContent;
             Description = 'PS1.00';
         }
-        field(6014425;"Order Type";Option)
+        field(6014425; "Order Type"; Option)
         {
             Caption = 'Order Type';
+            DataClassification = CustomerContent;
             OptionCaption = ',Order,Lending';
             OptionMembers = ,"Order",Lending;
         }
-        field(6014450;Kolli;Integer)
+        field(6014450; Kolli; Integer)
         {
             Caption = 'Number of packages';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             InitValue = 1;
         }
-        field(6014452;"Delivery Instructions";Text[50])
+        field(6014452; "Delivery Instructions"; Text[50])
         {
             Caption = 'Delivery Instructions';
+            DataClassification = CustomerContent;
         }
-        field(6151400;"Magento Payment Amount";Decimal)
+        field(6151400; "Magento Payment Amount"; Decimal)
         {
-            CalcFormula = Sum("Magento Payment Line".Amount WHERE ("Document Table No."=CONST(36),
-                                                                   "Document Type"=FIELD("Document Type"),
-                                                                   "Document No."=FIELD("No.")));
+            CalcFormula = Sum ("Magento Payment Line".Amount WHERE("Document Table No." = CONST(36),
+                                                                   "Document Type" = FIELD("Document Type"),
+                                                                   "Document No." = FIELD("No.")));
             Caption = 'Payment Amount';
             Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6151405;"External Order No.";Code[20])
+        field(6151405; "External Order No."; Code[20])
         {
             Caption = 'External Order No.';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
-        field(6151415;"Payment No.";Text[50])
+        field(6151415; "Payment No."; Text[50])
         {
             Caption = 'Payment No.';
+            DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
     }

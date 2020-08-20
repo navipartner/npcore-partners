@@ -8,44 +8,49 @@ table 6151501 "Nc Task Setup"
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
 
     Caption = 'Nc Task Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
             Editable = false;
         }
-        field(5;"Table No.";Integer)
+        field(5; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(6;"Table Name";Text[30])
+        field(6; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Table),
-                                                             "Object ID"=FIELD("Table No.")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+                                                             "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(10;"Codeunit ID";Integer)
+        field(10; "Codeunit ID"; Integer)
         {
             Caption = 'Codeunit ID';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Codeunit));
+            DataClassification = CustomerContent;
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
-        field(11;"Codeunit Name";Text[30])
+        field(11; "Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Codeunit),
-                                                             "Object ID"=FIELD("Codeunit ID")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+                                                             "Object ID" = FIELD("Codeunit ID")));
             Caption = 'Codeunit Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059906;"Task Processor Code";Code[20])
+        field(6059906; "Task Processor Code"; Code[20])
         {
             Caption = 'Task Processor Code';
+            DataClassification = CustomerContent;
             Description = 'NC1.22,NC2.01';
             TableRelation = "Nc Task Processor";
         }
@@ -53,10 +58,10 @@ table 6151501 "Nc Task Setup"
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Table No.")
+        key(Key2; "Table No.")
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
@@ -79,9 +84,9 @@ table 6151501 "Nc Task Setup"
         "Entry No." := 0;
         //-NC1.22
         if "Task Processor Code" = '' then
-          "Task Processor Code" := 'nC';
+            "Task Processor Code" := 'nC';
         //+NC1.22
-        UpdateDataLogSubscriber("Task Processor Code",'',"Table No.");
+        UpdateDataLogSubscriber("Task Processor Code", '', "Table No.");
     end;
 
     trigger OnModify()
@@ -90,23 +95,23 @@ table 6151501 "Nc Task Setup"
         TestField("Task Processor Code");
         //+NC1.22
         if xRec."Task Processor Code" <> "Task Processor Code" then
-          UpdateDataLogSubscriber("Task Processor Code",xRec."Task Processor Code","Table No.");
+            UpdateDataLogSubscriber("Task Processor Code", xRec."Task Processor Code", "Table No.");
     end;
 
-    procedure DeleteDataLogSubscriber(SubscriberCode: Code[30];TableNo: Integer)
+    procedure DeleteDataLogSubscriber(SubscriberCode: Code[30]; TableNo: Integer)
     var
         DataLogSubscriber: Record "Data Log Subscriber";
     begin
         if SubscriberCode = '' then
-          exit;
+            exit;
         //-NC1.22
         //IF DataLogSubscriber.GET(SubscriberCode,TableNo) THEN
-        if DataLogSubscriber.Get(SubscriberCode,TableNo,'') then
-        //+NC1.22
-          DataLogSubscriber.Delete(true);
+        if DataLogSubscriber.Get(SubscriberCode, TableNo, '') then
+            //+NC1.22
+            DataLogSubscriber.Delete(true);
     end;
 
-    procedure UpdateDataLogSubscriber(SubscriberCode: Code[30];xRecSubscriberCode: Code[30];TableNo: Integer)
+    procedure UpdateDataLogSubscriber(SubscriberCode: Code[30]; xRecSubscriberCode: Code[30]; TableNo: Integer)
     var
         DataLogSubscriber: Record "Data Log Subscriber";
         DataLogSubscriber2: Record "Data Log Subscriber";
@@ -114,27 +119,27 @@ table 6151501 "Nc Task Setup"
         LastLogEntryNo: BigInteger;
     begin
         if TableNo <= 0 then
-          exit;
+            exit;
         if SubscriberCode = '' then
-          exit;
+            exit;
         //-NC1.22
         //IF DataLogSubscriber.GET(SubscriberCode,TableNo) THEN
-        if DataLogSubscriber.Get(SubscriberCode,TableNo,'') then
-        //+NC1.22
-          exit;
+        if DataLogSubscriber.Get(SubscriberCode, TableNo, '') then
+            //+NC1.22
+            exit;
 
         if (xRecSubscriberCode <> '') and (xRecSubscriberCode <> SubscriberCode) and
             //-NC1.22
             //DataLogSubscriber2.GET(xRecSubscriberCode,TableNo) THEN BEGIN
-            DataLogSubscriber2.Get(xRecSubscriberCode,TableNo,'') then begin
+            DataLogSubscriber2.Get(xRecSubscriberCode, TableNo, '') then begin
             //+NC1.22
-          LastLogEntryNo := DataLogSubscriber2."Last Log Entry No.";
-          DataLogSubscriber2.Delete(true);
+            LastLogEntryNo := DataLogSubscriber2."Last Log Entry No.";
+            DataLogSubscriber2.Delete(true);
         end else begin
-          Clear(DataLogRecord);
-          DataLogRecord.SetRange("Table ID",TableNo);
-          if DataLogRecord.FindLast then;
-          LastLogEntryNo := DataLogRecord."Entry No.";
+            Clear(DataLogRecord);
+            DataLogRecord.SetRange("Table ID", TableNo);
+            if DataLogRecord.FindLast then;
+            LastLogEntryNo := DataLogRecord."Entry No.";
         end;
 
         DataLogSubscriber.Init;

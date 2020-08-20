@@ -7,66 +7,74 @@ table 6150666 "NPRE Seating Location"
     // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
 
     Caption = 'Seating Location';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NPRE Seating Location";
     LookupPageID = "NPRE Seating Location";
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(2;Description;Text[50])
+        field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(3;"Restaurant Code";Code[20])
+        field(3; "Restaurant Code"; Code[20])
         {
             Caption = 'Restaurant Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "NPRE Restaurant";
         }
-        field(10;Seatings;Integer)
+        field(10; Seatings; Integer)
         {
-            CalcFormula = Count("NPRE Seating" WHERE ("Seating Location"=FIELD(Code)));
+            CalcFormula = Count ("NPRE Seating" WHERE("Seating Location" = FIELD(Code)));
             Caption = 'Seatings';
             FieldClass = FlowField;
         }
-        field(11;Seats;Integer)
+        field(11; Seats; Integer)
         {
-            CalcFormula = Sum("NPRE Seating".Capacity WHERE ("Seating Location"=FIELD(Code)));
+            CalcFormula = Sum ("NPRE Seating".Capacity WHERE("Seating Location" = FIELD(Code)));
             Caption = 'Seats';
             FieldClass = FlowField;
         }
-        field(20;"POS Store";Code[10])
+        field(20; "POS Store"; Code[10])
         {
             Caption = 'POS Store';
+            DataClassification = CustomerContent;
             TableRelation = "POS Store".Code;
         }
-        field(30;"Auto Send Kitchen Order";Option)
+        field(30; "Auto Send Kitchen Order"; Option)
         {
             Caption = 'Auto Send Kitchen Order';
+            DataClassification = CustomerContent;
             Description = 'NPR5.52,NPR5.54';
             OptionCaption = 'Default,No,Yes,Ask';
             OptionMembers = Default,No,Yes,Ask;
         }
-        field(31;"Resend All On New Lines";Option)
+        field(31; "Resend All On New Lines"; Option)
         {
             Caption = 'Resend All On New Lines';
+            DataClassification = CustomerContent;
             Description = 'NPR5.54';
             OptionCaption = 'Default,No,Yes,Ask';
             OptionMembers = Default,No,Yes,Ask;
         }
-        field(40;"Send by Print Category";Boolean)
+        field(40; "Send by Print Category"; Boolean)
         {
             Caption = 'Send by Print Category';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53,NPR5.54';
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }

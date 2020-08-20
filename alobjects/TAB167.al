@@ -1,4 +1,4 @@
-tableextension 6014422 tableextension6014422 extends Job 
+tableextension 6014422 tableextension6014422 extends Job
 {
     // NPR5.29/TJ/20161206 CASE 248723 Added new fields 6060150..6060161
     // NPR5.31/TJ/20170315 CASE 269162 Added new option "Ready to be Invoiced" to field "Event Status"
@@ -14,109 +14,123 @@ tableextension 6014422 tableextension6014422 extends Job
     // NPR5.54/TJ/20200324 CASE 397743 Added field "Admission Code"
     fields
     {
-        field(6060150;"Starting Time";Time)
+        field(6060150; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060151;"Ending Time";Time)
+        field(6060151; "Ending Time"; Time)
         {
             Caption = 'Ending Time';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060152;"Preparation Period";DateFormula)
+        field(6060152; "Preparation Period"; DateFormula)
         {
             Caption = 'Preparation Period';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060153;"Event Status";Option)
+        field(6060153; "Event Status"; Option)
         {
             Caption = 'Event Status';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
             OptionCaption = 'Planning,Quote,Order,Completed,,,,,,Postponed,Cancelled,Ready to be Invoiced';
             OptionMembers = Planning,Quote,"Order",Completed,,,,,,Postponed,Cancelled,"Ready to be Invoiced";
         }
-        field(6060154;"Calendar Item ID";Text[250])
+        field(6060154; "Calendar Item ID"; Text[250])
         {
             Caption = 'Calendar Item ID';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060155;"Calendar Item Status";Option)
+        field(6060155; "Calendar Item Status"; Option)
         {
             Caption = 'Calendar Item Status';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
             OptionCaption = ' ,Send,Error,Removed,Sent';
             OptionMembers = " ",Send,Error,Removed,Sent;
         }
-        field(6060156;"Mail Item Status";Option)
+        field(6060156; "Mail Item Status"; Option)
         {
             Caption = 'Mail Item Status';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
             OptionCaption = ' ,Sent,Error';
             OptionMembers = " ",Sent,Error;
         }
-        field(6060157;"Event";Boolean)
+        field(6060157; "Event"; Boolean)
         {
             Caption = 'Event';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060158;"Bill-to E-Mail";Text[80])
+        field(6060158; "Bill-to E-Mail"; Text[80])
         {
             Caption = 'Bill-to E-Mail';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
             ExtendedDatatype = EMail;
         }
-        field(6060159;"Organizer E-Mail";Text[80])
+        field(6060159; "Organizer E-Mail"; Text[80])
         {
             Caption = 'Organizer E-Mail';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
             ExtendedDatatype = EMail;
             TableRelation = "Event Exch. Int. E-Mail";
         }
-        field(6060160;"Est. Total Amount Incl. VAT";Decimal)
+        field(6060160; "Est. Total Amount Incl. VAT"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Est. Line Amt. Incl. VAT (LCY)" WHERE ("Job No."=FIELD("No.")));
+            CalcFormula = Sum ("Job Planning Line"."Est. Line Amt. Incl. VAT (LCY)" WHERE("Job No." = FIELD("No.")));
             Caption = 'Est. Total Amount Incl. VAT';
             Description = 'NPR5.48';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6060161;"Source Job No.";Code[20])
+        field(6060161; "Source Job No."; Code[20])
         {
             Caption = 'Source Job No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
             TableRelation = Job;
         }
-        field(6060162;"Total Amount";Decimal)
+        field(6060162; "Total Amount"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Line Amount (LCY)" WHERE ("Job No."=FIELD("No.")));
+            CalcFormula = Sum ("Job Planning Line"."Line Amount (LCY)" WHERE("Job No." = FIELD("No.")));
             Caption = 'Total Amount';
             Description = 'NPR5.31';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6060163;"Person Responsible Name";Text[50])
+        field(6060163; "Person Responsible Name"; Text[50])
         {
-            CalcFormula = Lookup(Resource.Name WHERE ("No."=FIELD("Person Responsible")));
+            CalcFormula = Lookup (Resource.Name WHERE("No." = FIELD("Person Responsible")));
             Caption = 'Person Responsible Name';
             Description = 'NPR5.31';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6060164;"Event Customer No.";Code[20])
+        field(6060164; "Event Customer No."; Code[20])
         {
             Caption = 'Event Customer No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.35';
             TableRelation = Customer;
         }
-        field(6151578;Locked;Boolean)
+        field(6151578; Locked; Boolean)
         {
             Caption = 'Locked';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
-        field(6151580;"Admission Code";Code[20])
+        field(6151580; "Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
+            DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "TM Admission";
         }

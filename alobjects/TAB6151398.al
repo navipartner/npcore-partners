@@ -5,6 +5,7 @@ table 6151398 "CS Store Users"
     // NPR5.53/CLVA  /20191204  CASE 375919 Added field "Adjust Inventory"
 
     Caption = 'CS Store Users';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -26,17 +27,20 @@ table 6151398 "CS Store Users"
         field(2; "POS Store"; Code[10])
         {
             Caption = 'POS Store';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "POS Store";
         }
         field(10; Supervisor; Code[10])
         {
             Caption = 'Supervisor';
+            DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser" WHERE("Supervisor POS" = FILTER(true));
         }
         field(11; "Adjust Inventory"; Boolean)
         {
             Caption = 'Adjust Inventory';
+            DataClassification = CustomerContent;
         }
     }
 

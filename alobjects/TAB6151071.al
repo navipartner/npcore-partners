@@ -4,28 +4,32 @@ table 6151071 "Customers to Anonymize"
     // NPR5.55/ZESO/20200513 CASE 388813 Increased length of Customer Name to 100 as Length of Customer Name is 100 in BC.
 
     Caption = 'Customers to Anonymize';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Customers to Anonymize List";
     LookupPageID = "Customers to Anonymize List";
 
     fields
     {
-        field(1;"Entry No";Integer)
+        field(1; "Entry No"; Integer)
         {
             Caption = 'Entry No';
+            DataClassification = CustomerContent;
         }
-        field(2;"Customer No";Code[20])
+        field(2; "Customer No"; Code[20])
         {
             Caption = 'Customer No';
+            DataClassification = CustomerContent;
         }
-        field(3;"Customer Name";Text[100])
+        field(3; "Customer Name"; Text[100])
         {
             Caption = 'Customer Name';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No")
+        key(Key1; "Entry No")
         {
         }
     }

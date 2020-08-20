@@ -7,55 +7,61 @@ table 6059973 "Variety Value"
     // NPR5.47/JDH /20180913 CASE 327541  Changed field length of Table to 40 characters
 
     Caption = 'Variety Value';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Variety Value";
     LookupPageID = "Variety Value";
 
     fields
     {
-        field(1;Type;Code[10])
+        field(1; Type; Code[10])
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Variety;
         }
-        field(2;"Table";Code[40])
+        field(2; "Table"; Code[40])
         {
             Caption = 'Table';
+            DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "Variety Table".Code WHERE (Type=FIELD(Type));
+            TableRelation = "Variety Table".Code WHERE(Type = FIELD(Type));
         }
-        field(3;Value;Code[20])
+        field(3; Value; Code[20])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
             NotBlank = true;
 
             trigger OnValidate()
             begin
 
                 if Description = '' then begin
-                  if StrLen(Value) = 1 then
-                    Description := Value
-                  else
-                    Description := CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2));
+                    if StrLen(Value) = 1 then
+                        Description := Value
+                    else
+                        Description := CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2));
                 end;
             end;
         }
-        field(10;"Sort Order";Integer)
+        field(10; "Sort Order"; Integer)
         {
             Caption = 'Sort Order';
+            DataClassification = CustomerContent;
         }
-        field(20;Description;Text[30])
+        field(20; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;Type,"Table",Value)
+        key(Key1; Type, "Table", Value)
         {
         }
-        key(Key2;Type,"Table","Sort Order")
+        key(Key2; Type, "Table", "Sort Order")
         {
         }
     }
@@ -70,10 +76,10 @@ table 6059973 "Variety Value"
     begin
         //-VRT1.10
         if CheckTableLocked() then
-          //-NPR5.38 [268786]
-          //ERROR(Text001);
-          Error(Text003,Value,Table);
-          //+NPR5.38 [268786]
+            //-NPR5.38 [268786]
+            //ERROR(Text001);
+            Error(Text003, Value, Table);
+        //+NPR5.38 [268786]
         //+VRT1.10
 
         VRTCheck.CheckDeleteVarietyValue(Rec);
@@ -83,10 +89,10 @@ table 6059973 "Variety Value"
     begin
         //-VRT1.10
         if CheckTableLocked() then
-          //-NPR5.38 [268786]
-          //ERROR(Text001);
-          Error(Text002,Value,Table);
-          //+NPR5.38 [268786]
+            //-NPR5.38 [268786]
+            //ERROR(Text001);
+            Error(Text002, Value, Table);
+        //+NPR5.38 [268786]
         //+VRT1.10
 
         AssignSortOrder;
@@ -96,7 +102,7 @@ table 6059973 "Variety Value"
     begin
         //-VRT1.10
         if CheckTableLocked() then
-          Error(Text001);
+            Error(Text001);
         //+VRT1.10
     end;
 
@@ -114,35 +120,35 @@ table 6059973 "Variety Value"
         Value2: Code[20];
     begin
         if Evaluate(Dec, Value) then begin
-          //its a number. take the sort order from here (if possible)
-          //convert '.' with ',' so we can use the number correct
-          DecSep := GetDecimalSeperator;
-          if DecSep = '.' then
-            Value2 := ConvertStr(Value, ',', DecSep)
-          else
-            Value2 := ConvertStr(Value, '.', DecSep);
-          Evaluate(Dec, Value2);
+            //its a number. take the sort order from here (if possible)
+            //convert '.' with ',' so we can use the number correct
+            DecSep := GetDecimalSeperator;
+            if DecSep = '.' then
+                Value2 := ConvertStr(Value, ',', DecSep)
+            else
+                Value2 := ConvertStr(Value, '.', DecSep);
+            Evaluate(Dec, Value2);
 
-          //number 10 will be 100. Number 10,5 will be 105
-          NewSortOrder := Round(Dec, 0.1) * 10;
-          VRTValue.SetCurrentKey(Type,Table,"Sort Order");
-          VRTValue.SetRange(Type, Type);
-          VRTValue.SetRange(Table, Table);
-          VRTValue.SetRange("Sort Order", NewSortOrder);
-          if not VRTValue.IsEmpty then
-            NewSortOrder := 0;
+            //number 10 will be 100. Number 10,5 will be 105
+            NewSortOrder := Round(Dec, 0.1) * 10;
+            VRTValue.SetCurrentKey(Type, Table, "Sort Order");
+            VRTValue.SetRange(Type, Type);
+            VRTValue.SetRange(Table, Table);
+            VRTValue.SetRange("Sort Order", NewSortOrder);
+            if not VRTValue.IsEmpty then
+                NewSortOrder := 0;
         end;
 
         if NewSortOrder = 0 then begin
-          //either its not a number, or the number is already used for sorting
-          VRTValue.SetCurrentKey(Type,Table,"Sort Order");
-          VRTValue.SetRange(Type, Type);
-          VRTValue.SetRange(Table, Table);
-          if VRTValue.FindLast then begin
-            NewSortOrder := Round(VRTValue."Sort Order",10, '<');
-            NewSortOrder += 10;
-          end else
-            NewSortOrder := 10;
+            //either its not a number, or the number is already used for sorting
+            VRTValue.SetCurrentKey(Type, Table, "Sort Order");
+            VRTValue.SetRange(Type, Type);
+            VRTValue.SetRange(Table, Table);
+            if VRTValue.FindLast then begin
+                NewSortOrder := Round(VRTValue."Sort Order", 10, '<');
+                NewSortOrder += 10;
+            end else
+                NewSortOrder := 10;
 
         end;
         "Sort Order" := NewSortOrder;
@@ -154,9 +160,9 @@ table 6059973 "Variety Value"
     begin
         Dec := 1.2;
         if StrPos(Format(Dec), '.') <> 0 then
-          exit('.')
+            exit('.')
         else
-          exit(',');
+            exit(',');
     end;
 
     procedure CheckTableLocked(): Boolean

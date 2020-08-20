@@ -4,57 +4,66 @@ table 6150675 "NPRE Kitchen Req. Source Link"
     // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Kitchen Request Source Link';
+    DataClassification = CustomerContent;
     DrillDownPageID = "NPRE Kitchen Req. Source Links";
     LookupPageID = "NPRE Kitchen Req. Source Links";
 
     fields
     {
-        field(1;"Entry No.";BigInteger)
+        field(1; "Entry No."; BigInteger)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(10;"Request No.";BigInteger)
+        field(10; "Request No."; BigInteger)
         {
             Caption = 'Request No.';
+            DataClassification = CustomerContent;
             TableRelation = "NPRE Kitchen Request";
         }
-        field(20;"Source Document Type";Option)
+        field(20; "Source Document Type"; Option)
         {
             Caption = 'Source Document Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Waiter Pad';
             OptionMembers = " ","Waiter Pad";
         }
-        field(21;"Source Document Subtype";Option)
+        field(21; "Source Document Subtype"; Option)
         {
             Caption = 'Source Document Subtype';
+            DataClassification = CustomerContent;
             OptionCaption = '0,1,2,3,4,5,6,7,8,9,10';
             OptionMembers = "0","1","2","3","4","5","6","7","8","9","10";
         }
-        field(22;"Source Document No.";Code[20])
+        field(22; "Source Document No."; Code[20])
         {
             Caption = 'Source Document No.';
-            TableRelation = IF ("Source Document Type"=CONST("Waiter Pad")) "NPRE Waiter Pad";
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Source Document Type" = CONST("Waiter Pad")) "NPRE Waiter Pad";
         }
-        field(23;"Source Document Line No.";Integer)
+        field(23; "Source Document Line No."; Integer)
         {
             Caption = 'Source Document Line No.';
-            TableRelation = IF ("Source Document Type"=CONST("Waiter Pad")) "NPRE Waiter Pad Line"."Line No." WHERE ("Waiter Pad No."=FIELD("Source Document No."));
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Source Document Type" = CONST("Waiter Pad")) "NPRE Waiter Pad Line"."Line No." WHERE("Waiter Pad No." = FIELD("Source Document No."));
         }
-        field(30;Quantity;Decimal)
+        field(30; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
             begin
                 "Quantity (Base)" := CalcBaseQty(Quantity);
             end;
         }
-        field(40;"Quantity (Base)";Decimal)
+        field(40; "Quantity (Base)"; Decimal)
         {
             Caption = 'Quantity (Base)';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
             begin
@@ -63,38 +72,42 @@ table 6150675 "NPRE Kitchen Req. Source Link"
                 Validate(Quantity, "Quantity (Base)");
             end;
         }
-        field(50;Context;Option)
+        field(50; Context; Option)
         {
             Caption = 'Context';
+            DataClassification = CustomerContent;
             OptionCaption = 'Ordering,Line Splitting';
             OptionMembers = Ordering,"Line Splitting";
         }
-        field(55;"Restaurant Code";Code[20])
+        field(55; "Restaurant Code"; Code[20])
         {
             Caption = 'Restaurant Code';
+            DataClassification = CustomerContent;
             TableRelation = "NPRE Restaurant";
         }
-        field(60;"Serving Step";Code[10])
+        field(60; "Serving Step"; Code[10])
         {
             Caption = 'Serving Step';
-            TableRelation = "NPRE Flow Status".Code WHERE ("Status Object"=CONST(WaiterPadLineMealFlow));
+            DataClassification = CustomerContent;
+            TableRelation = "NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
-        field(70;"Created Date-Time";DateTime)
+        field(70; "Created Date-Time"; DateTime)
         {
             Caption = 'Created Date-Time';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Request No.")
+        key(Key2; "Request No.")
         {
-            SumIndexFields = Quantity,"Quantity (Base)";
+            SumIndexFields = Quantity, "Quantity (Base)";
         }
-        key(Key3;"Source Document Type","Source Document Subtype","Source Document No.","Source Document Line No.","Serving Step","Request No.")
+        key(Key3; "Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.")
         {
         }
     }
@@ -113,17 +126,18 @@ table 6150675 "NPRE Kitchen Req. Source Link"
         RecRef: RecordRef;
     begin
         case SourceRecID.TableNo of
-          DATABASE::"NPRE Waiter Pad Line": begin
-            RecRef.Get(SourceRecID);
-            RecRef.SetTable(WaiterPadLine);
-            "Source Document Type" := "Source Document Type"::"Waiter Pad";
-            "Source Document Subtype" := 0;
-            "Source Document No." := WaiterPadLine."Waiter Pad No.";
-            "Source Document Line No." := WaiterPadLine."Line No.";
-          end;
+            DATABASE::"NPRE Waiter Pad Line":
+                begin
+                    RecRef.Get(SourceRecID);
+                    RecRef.SetTable(WaiterPadLine);
+                    "Source Document Type" := "Source Document Type"::"Waiter Pad";
+                    "Source Document Subtype" := 0;
+                    "Source Document No." := WaiterPadLine."Waiter Pad No.";
+                    "Source Document Line No." := WaiterPadLine."Line No.";
+                end;
 
-          else
-            Error(UnsupportedSourceRec, SourceRecID.TableNo);
+            else
+                Error(UnsupportedSourceRec, SourceRecID.TableNo);
         end;
     end;
 
@@ -137,7 +151,7 @@ table 6150675 "NPRE Kitchen Req. Source Link"
     local procedure GetKitchenRequest()
     begin
         if "Request No." = KitchenRequest."Request No." then
-          exit;
+            exit;
         TestField("Request No.");
         KitchenRequest.Get("Request No.");
     end;

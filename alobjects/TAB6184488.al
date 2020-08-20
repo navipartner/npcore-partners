@@ -6,47 +6,55 @@ table 6184488 "Pepper EFT Transaction Type"
     // NPR5.46/MMV /20180714 CASE 290734 Renamed
 
     Caption = 'Pepper EFT Transaction Type';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Pepper EFT Transaction Types";
     LookupPageID = "Pepper EFT Transaction Types";
 
     fields
     {
-        field(5;"Integration Type";Code[10])
+        field(5; "Integration Type"; Code[10])
         {
             Caption = 'Integration Type';
+            DataClassification = CustomerContent;
         }
-        field(10;"Code";Code[10])
+        field(10; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(20;Description;Text[50])
+        field(20; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(30;"Allow Test Modes";Boolean)
+        field(30; "Allow Test Modes"; Boolean)
         {
             Caption = 'Allow Test Modes';
+            DataClassification = CustomerContent;
         }
-        field(40;"Processing Type";Option)
+        field(40; "Processing Type"; Option)
         {
             Caption = 'Processing Type';
+            DataClassification = CustomerContent;
             OptionCaption = ',Payment,Refund,Open,Close,Auxiliary,Other';
             OptionMembers = ,Payment,Refund,Open,Close,Auxiliary,Other;
         }
-        field(50;"POS Timeout (Seconds)";Integer)
+        field(50; "POS Timeout (Seconds)"; Integer)
         {
             Caption = 'POS Timeout (Seconds)';
+            DataClassification = CustomerContent;
         }
-        field(60;"Suppress Receipt Print";Boolean)
+        field(60; "Suppress Receipt Print"; Boolean)
         {
             Caption = 'Suppress Receipt Print';
+            DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
     }
 
     keys
     {
-        key(Key1;"Integration Type","Code")
+        key(Key1; "Integration Type", "Code")
         {
         }
     }

@@ -13,6 +13,7 @@ table 6184492 "Pepper Terminal"
     // NPR5.30/TJ/20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
 
     Caption = 'Pepper Terminal';
+    DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
     DrillDownPageID = "Pepper Terminal List";
     LookupPageID = "Pepper Terminal List";
@@ -22,14 +23,17 @@ table 6184492 "Pepper Terminal"
         field(10; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(20; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(30; "Instance ID"; Integer)
         {
             Caption = 'Instance ID';
+            DataClassification = CustomerContent;
             TableRelation = "Pepper Instance";
 
             trigger OnValidate()
@@ -51,6 +55,7 @@ table 6184492 "Pepper Terminal"
         field(50; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             TableRelation = Register;
 
             trigger OnValidate()
@@ -63,15 +68,18 @@ table 6184492 "Pepper Terminal"
         field(60; "Open Automatically"; Boolean)
         {
             Caption = 'Open Automatically';
+            DataClassification = CustomerContent;
         }
         field(70; "Close Automatically"; Boolean)
         {
             Caption = 'Close Automatically';
+            DataClassification = CustomerContent;
             Description = 'CASE255131';
         }
         field(100; "Com Port"; Integer)
         {
             Caption = 'Com Port';
+            DataClassification = CustomerContent;
             InitValue = 1;
             MaxValue = 10;
             MinValue = 1;
@@ -79,17 +87,20 @@ table 6184492 "Pepper Terminal"
         field(110; Language; Option)
         {
             Caption = 'Language';
+            DataClassification = CustomerContent;
             OptionCaption = 'English,German,French,Italian,Slovene,Dutch,Czech,Spanish,Polish,Slovakian,Danish,Norwegian,Swedish,Finnish,Romanian,15,16,17,18,19,20,21,22,23,24,25';
             OptionMembers = English,German,French,Italian,Slovene,Dutch,Czech,Spanish,Polish,Slovakian,Danish,Norwegian,Swedish,Finnish,Romanian,"15","16","17","18","19","20","21","22","23","24","25";
         }
         field(120; "IP Address"; Text[30])
         {
             Caption = 'IP Address';
+            DataClassification = CustomerContent;
             CharAllowed = '09::..';
         }
         field(130; "Terminal Type Code"; Integer)
         {
             Caption = 'Terminal Type Code';
+            DataClassification = CustomerContent;
             MinValue = 0;
             TableRelation = "Pepper Terminal Type";
 
@@ -104,6 +115,7 @@ table 6184492 "Pepper Terminal"
         field(140; "Receipt Format"; Integer)
         {
             Caption = 'Receipt Format';
+            DataClassification = CustomerContent;
             InitValue = 40;
             MaxValue = 99;
             MinValue = 20;
@@ -111,85 +123,104 @@ table 6184492 "Pepper Terminal"
         field(150; "Pepper Receipt Encoding"; Option)
         {
             Caption = 'Pepper Receipt Encoding';
+            DataClassification = CustomerContent;
             OptionCaption = 'Default,utf-8,iso-8859-1,iso-8859-2,iso-8859-3,iso-8859-4,iso-8859-5,iso-8859-6,iso-8859-7,iso-8859-8,iso-8859-9,iso-8859-13,iso-8859-15';
             OptionMembers = Default,"utf-8","iso-8859-1","iso-8859-2","iso-8859-3","iso-8859-4","iso-8859-5","iso-8859-6","iso-8859-7","iso-8859-8","iso-8859-9","iso-8859-13","iso-8859-15";
         }
         field(151; "NAV Receipt Encoding"; Option)
         {
             Caption = 'NAV Receipt Encoding';
+            DataClassification = CustomerContent;
             OptionCaption = 'Default,utf-8,iso-8859-1,iso-8859-2,iso-8859-3,iso-8859-4,iso-8859-5,iso-8859-6,iso-8859-7,iso-8859-8,iso-8859-9,iso-8859-13,iso-8859-15';
             OptionMembers = Default,"utf-8","iso-8859-1","iso-8859-2","iso-8859-3","iso-8859-4","iso-8859-5","iso-8859-6","iso-8859-7","iso-8859-8","iso-8859-9","iso-8859-13","iso-8859-15";
         }
         field(160; "Add Customer Signature Space"; Boolean)
         {
             Caption = 'Add Customer Signature Space';
+            DataClassification = CustomerContent;
         }
         field(170; "Cancel at Wrong Signature"; Boolean)
         {
             Caption = 'Cancel at Wrong Signature';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
         field(200; "Matchbox Files"; Option)
         {
             Caption = 'Matchbox Files';
+            DataClassification = CustomerContent;
             OptionCaption = 'No Matchbox output,Succesful transactions only,All succesful operactions,All operations';
             OptionMembers = "0","1","2","3";
         }
         field(210; "Matchbox Company ID"; Code[10])
         {
             Caption = 'Matchbox Company ID';
+            DataClassification = CustomerContent;
         }
         field(220; "Matchbox Shop ID"; Code[10])
         {
             Caption = 'Matchbox Shop ID';
+            DataClassification = CustomerContent;
         }
         field(230; "Matchbox POS ID"; Code[10])
         {
             Caption = 'Matchbox POS ID';
+            DataClassification = CustomerContent;
         }
         field(240; "Matchbox File Name"; Text[250])
         {
             Caption = 'Matchbox File Name';
+            DataClassification = CustomerContent;
         }
         field(300; "Print File Open"; Text[250])
         {
             Caption = 'Print File Open';
+            DataClassification = CustomerContent;
         }
         field(310; "Print File Close"; Text[250])
         {
             Caption = 'Print File Close';
+            DataClassification = CustomerContent;
         }
         field(320; "Print File Transaction"; Text[250])
         {
             Caption = 'Print File Transaction';
+            DataClassification = CustomerContent;
         }
         field(330; "Print File CC Transaction"; Text[250])
         {
             Caption = 'Print File CC Transaction';
+            DataClassification = CustomerContent;
         }
         field(340; "Print File Difference"; Text[250])
         {
             Caption = 'Print File Difference';
+            DataClassification = CustomerContent;
         }
         field(350; "Print File End of Day"; Text[250])
         {
             Caption = 'Print File End of Day';
+            DataClassification = CustomerContent;
         }
         field(360; "Print File Journal"; Text[250])
         {
             Caption = 'Print File Journal';
+            DataClassification = CustomerContent;
         }
         field(370; "Print File Initialisation"; Text[250])
         {
             Caption = 'Print File Initialisation';
+            DataClassification = CustomerContent;
         }
         field(500; "Additional Parameters File"; BLOB)
         {
             Caption = 'Additional Parameters File';
+            DataClassification = CustomerContent;
         }
         field(600; Status; Option)
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
             OptionCaption = 'Unknown,Open,Closed,ActiveOffline';
             OptionMembers = Unknown,Open,Closed,ActiveOffline;
 
@@ -207,6 +238,7 @@ table 6184492 "Pepper Terminal"
         field(650; "Fixed Currency Code"; Code[10])
         {
             Caption = 'Fixed Currency Code';
+            DataClassification = CustomerContent;
             TableRelation = Currency;
             //This property is currently not supported
             //TestTableRelation = false;
@@ -215,14 +247,17 @@ table 6184492 "Pepper Terminal"
         field(700; "Customer ID"; Text[8])
         {
             Caption = 'Customer ID';
+            DataClassification = CustomerContent;
         }
         field(710; "License ID"; Text[8])
         {
             Caption = 'License ID';
+            DataClassification = CustomerContent;
         }
         field(900; "License File"; BLOB)
         {
             Caption = 'License File';
+            DataClassification = CustomerContent;
         }
     }
 

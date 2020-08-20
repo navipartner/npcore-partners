@@ -4,28 +4,32 @@ table 6151507 "Nc Task Processor"
     // NC2.00/MHA/20160525  CASE 240005 NaviConnect
 
     Caption = 'NaviConnect Task Processor';
+    DataClassification = CustomerContent;
     DrillDownPageID = "Nc Task Proces. List";
     LookupPageID = "Nc Task Proces. List";
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
-        field(5;Description;Text[50])
+        field(5; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
-        field(100;"Filter Code";Code[20])
+        field(100; "Filter Code"; Code[20])
         {
             Caption = 'Filter Code';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }

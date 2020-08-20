@@ -5,6 +5,7 @@ table 6060151 "Event Word Layout"
     // NPR5.51/TJ  /20190717 CASE 361677 Field 10 renamed from "Basic Layout ID" to "Basic Layout Code" and data type changed from Integer to Code 20
 
     Caption = 'Event Word Layout';
+    DataClassification = CustomerContent;
     LookupPageID = "Event Word Layouts";
 
     fields
@@ -12,10 +13,12 @@ table 6060151 "Event Word Layout"
         field(1; "Source Record ID"; RecordID)
         {
             Caption = 'Source Record ID';
+            DataClassification = CustomerContent;
         }
         field(2; Usage; Option)
         {
             Caption = 'Usage';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Customer,Team';
             OptionMembers = " ",Customer,Team;
 
@@ -34,10 +37,12 @@ table 6060151 "Event Word Layout"
         field(5; "Report ID"; Integer)
         {
             Caption = 'Report ID';
+            DataClassification = CustomerContent;
         }
         field(10; "Basic Layout Code"; Code[20])
         {
             Caption = 'Basic Layout ID';
+            DataClassification = CustomerContent;
             TableRelation = "Custom Report Layout".Code WHERE("Report ID" = FIELD("Report ID"));
 
             trigger OnValidate()
@@ -68,19 +73,23 @@ table 6060151 "Event Word Layout"
         field(20; "Layout"; BLOB)
         {
             Caption = 'Layout';
+            DataClassification = CustomerContent;
         }
         field(30; "XML Part"; BLOB)
         {
             Caption = 'XML Part';
+            DataClassification = CustomerContent;
         }
         field(40; "Last Modified"; DateTime)
         {
             Caption = 'Last Modified';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(50; "Last Modified by User"; Code[50])
         {
             Caption = 'Last Modified by User';
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(60; "Basic Layout Description"; Text[80])
@@ -93,6 +102,7 @@ table 6060151 "Event Word Layout"
         field(70; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 

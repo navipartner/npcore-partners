@@ -5,27 +5,32 @@ table 6150633 "POS Payment Bin Eject Param."
     // NPR5.50/MMV /20190417 CASE Add events for lookup & validation
 
     Caption = 'POS Payment Bin Eject Param.';
+    DataClassification = CustomerContent;
     LookupPageID = "POS Payment Bin Eject Params";
 
     fields
     {
-        field(1;"Bin No.";Code[10])
+        field(1; "Bin No."; Code[10])
         {
             Caption = 'Bin No.';
+            DataClassification = CustomerContent;
         }
-        field(2;Name;Text[30])
+        field(2; Name; Text[30])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
-        field(3;"Data Type";Option)
+        field(3; "Data Type"; Option)
         {
             Caption = 'Data Type';
+            DataClassification = CustomerContent;
             OptionCaption = 'Text,Integer,Decimal,Date,Boolean,Option';
             OptionMembers = Text,"Integer",Decimal,Date,Boolean,Option;
         }
-        field(4;Value;Text[250])
+        field(4; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -37,15 +42,16 @@ table 6150633 "POS Payment Bin Eject Param."
                 ValidateValue();
             end;
         }
-        field(5;OptionString;Text[250])
+        field(5; OptionString; Text[250])
         {
             Caption = 'OptionString';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Bin No.",Name)
+        key(Key1; "Bin No.", Name)
         {
         }
     }
@@ -60,17 +66,17 @@ table 6150633 "POS Payment Bin Eject Param."
         FieldErrorBase: Label 'is not a valid %1';
         FieldErrorOption: Label 'does not contain a valid option (%1)';
 
-    procedure FindOrCreateRecord(BinNoIn: Code[10];NameIn: Text;DataType: Integer;DefaultValue: Variant;OptionStringIn: Text)
+    procedure FindOrCreateRecord(BinNoIn: Code[10]; NameIn: Text; DataType: Integer; DefaultValue: Variant; OptionStringIn: Text)
     begin
         if not Get(BinNoIn, NameIn) then begin
-          Init;
-          "Bin No." := BinNoIn;
-          Name := NameIn;
-          "Data Type" := DataType;
-          OptionString := OptionStringIn;
-          Validate(Value, DefaultValue);
-          Insert;
-          Commit;
+            Init;
+            "Bin No." := BinNoIn;
+            Name := NameIn;
+            "Data Type" := DataType;
+            OptionString := OptionStringIn;
+            Validate(Value, DefaultValue);
+            Insert;
+            Commit;
         end;
     end;
 
@@ -86,25 +92,25 @@ table 6150633 "POS Payment Bin Eject Param."
         //+NPR5.50 [350812]
 
         if "Data Type" <> "Data Type"::Option then
-          exit;
+            exit;
 
         OnGetParameterOptionStringCaption(Rec, OptionStringCaption);
         if OptionStringCaption <> '' then
-          SplitString(OptionStringCaption, Parts)
+            SplitString(OptionStringCaption, Parts)
         else
-          SplitString(OptionString, Parts);
+            SplitString(OptionString, Parts);
 
         foreach Part in Parts do begin
-          tmpRetailList.Number += 1;
-          tmpRetailList.Choice := Part;
-          tmpRetailList.Insert;
+            tmpRetailList.Number += 1;
+            tmpRetailList.Choice := Part;
+            tmpRetailList.Insert;
         end;
 
         if tmpRetailList.IsEmpty then
-          exit;
+            exit;
 
         if PAGE.RunModal(0, tmpRetailList) = ACTION::LookupOK then
-          Validate(Value, tmpRetailList.Choice);
+            Validate(Value, tmpRetailList.Choice);
     end;
 
     procedure ValidateValue()
@@ -117,93 +123,93 @@ table 6150633 "POS Payment Bin Eject Param."
         OptionOut: Text;
     begin
         case "Data Type" of
-          "Data Type"::Boolean:
-            begin
-              case true of
-                Evaluate(Boolean,Value,9):
-                  Value := Format(Boolean,0,9);
-                Evaluate(Boolean,Value):
-                  Value := Format(Boolean,0,9);
-                UpperCase(Value) = UpperCase(BoolYes):
-                  Value := Format(true,0,9);
-                UpperCase(Value) = UpperCase(BoolNo):
-                  Value := Format(false,0,9);
-                else
-                  FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-              end;
-            end;
-          "Data Type"::Date:
-            case true of
-              Evaluate(Date,Value,9):
-                Value:= Format(Date,0,9);
-              Evaluate(Date,Value):
-                Value := Format(Date,0,9);
-              else
-                FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-            end;
-          "Data Type"::Integer:
-            case true of
-              Evaluate(Integer,Value,9):
-                Value:= Format(Integer,0,9);
-              Evaluate(Integer,Value):
-                Value := Format(Integer,0,9);
-              else
-                FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-            end;
-          "Data Type"::Decimal:
-            case true of
-              Evaluate(Decimal,Value,9):
-                Value:= Format(Decimal,0,9);
-              Evaluate(Decimal,Value):
-                Value := Format(Decimal,0,9);
-              else
-                FieldError(Value,StrSubstNo(FieldErrorBase,"Data Type"));
-            end;
-          "Data Type"::Option:
-            begin
-              OnGetParameterOptionStringCaption(Rec, OptionsCaption);
-              if OptionsCaption <> '' then
-                if TrySelectStr(GetOptionInt(Value, OptionsCaption), OptionString, OptionOut) then
-                  Value := OptionOut;
-              case true of
-                Value = '':
-                  Value := '0';
-                Evaluate(Integer,Value):
-                  begin
-                    if not TrySelectStr(Integer, OptionString, OptionOut) then
-                      FieldError(Value,StrSubstNo(FieldErrorOption,Value));
-                    Value := Format(Integer);
-                  end;
-                GetOptionInt(Value, OptionString) >= 0:
-                  Value := Format(GetOptionInt(Value, OptionString));
-                else
-                  FieldError(Value,StrSubstNo(FieldErrorOption,Value));
-              end;
-            end;
+            "Data Type"::Boolean:
+                begin
+                    case true of
+                        Evaluate(Boolean, Value, 9):
+                            Value := Format(Boolean, 0, 9);
+                        Evaluate(Boolean, Value):
+                            Value := Format(Boolean, 0, 9);
+                        UpperCase(Value) = UpperCase(BoolYes):
+                            Value := Format(true, 0, 9);
+                        UpperCase(Value) = UpperCase(BoolNo):
+                            Value := Format(false, 0, 9);
+                        else
+                            FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                    end;
+                end;
+            "Data Type"::Date:
+                case true of
+                    Evaluate(Date, Value, 9):
+                        Value := Format(Date, 0, 9);
+                    Evaluate(Date, Value):
+                        Value := Format(Date, 0, 9);
+                    else
+                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                end;
+            "Data Type"::Integer:
+                case true of
+                    Evaluate(Integer, Value, 9):
+                        Value := Format(Integer, 0, 9);
+                    Evaluate(Integer, Value):
+                        Value := Format(Integer, 0, 9);
+                    else
+                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                end;
+            "Data Type"::Decimal:
+                case true of
+                    Evaluate(Decimal, Value, 9):
+                        Value := Format(Decimal, 0, 9);
+                    Evaluate(Decimal, Value):
+                        Value := Format(Decimal, 0, 9);
+                    else
+                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                end;
+            "Data Type"::Option:
+                begin
+                    OnGetParameterOptionStringCaption(Rec, OptionsCaption);
+                    if OptionsCaption <> '' then
+                        if TrySelectStr(GetOptionInt(Value, OptionsCaption), OptionString, OptionOut) then
+                            Value := OptionOut;
+                    case true of
+                        Value = '':
+                            Value := '0';
+                        Evaluate(Integer, Value):
+                            begin
+                                if not TrySelectStr(Integer, OptionString, OptionOut) then
+                                    FieldError(Value, StrSubstNo(FieldErrorOption, Value));
+                                Value := Format(Integer);
+                            end;
+                        GetOptionInt(Value, OptionString) >= 0:
+                            Value := Format(GetOptionInt(Value, OptionString));
+                        else
+                            FieldError(Value, StrSubstNo(FieldErrorOption, Value));
+                    end;
+                end;
         end;
     end;
 
-    local procedure ValidateOptions(Ordinal: Integer;OptionStringIn: Text)
+    local procedure ValidateOptions(Ordinal: Integer; OptionStringIn: Text)
     begin
         if GetOptionInt(Value, OptionStringIn) = -1 then
-          Value := GetDefaultOption(OptionStringIn);
+            Value := GetDefaultOption(OptionStringIn);
     end;
 
-    procedure GetOptionInt(Value: Text;OptionStringIn: Text) Result: Integer
+    procedure GetOptionInt(Value: Text; OptionStringIn: Text) Result: Integer
     var
         TypeHelper: Codeunit "Type Helper";
     begin
-        exit(TypeHelper.GetOptionNo(Value,OptionStringIn));
+        exit(TypeHelper.GetOptionNo(Value, OptionStringIn));
     end;
 
-    procedure GetOptionString(Ordinal: Integer;OptionStringIn: Text): Text
+    procedure GetOptionString(Ordinal: Integer; OptionStringIn: Text): Text
     var
         OptionOut: Text;
     begin
         if TrySelectStr(Ordinal, OptionStringIn, OptionOut) then
-          exit(OptionOut)
+            exit(OptionOut)
         else
-          exit(Format(Ordinal));
+            exit(Format(Ordinal));
     end;
 
     procedure GetDefaultOption(OptionStringIn: Text): Text
@@ -211,16 +217,16 @@ table 6150633 "POS Payment Bin Eject Param."
         OptionOut: Text;
     begin
         if TrySelectStr(1, OptionStringIn, OptionOut) then
-          exit(OptionOut);
+            exit(OptionOut);
     end;
 
     [TryFunction]
-    procedure TrySelectStr(Ordinal: Integer;OptionStringIn: Text;var OptionOut: Text)
+    procedure TrySelectStr(Ordinal: Integer; OptionStringIn: Text; var OptionOut: Text)
     begin
         OptionOut := SelectStr(Ordinal + 1, OptionStringIn);
     end;
 
-    local procedure SplitString(Text: Text;var Parts: DotNet npNetArray)
+    local procedure SplitString(Text: Text; var Parts: DotNet npNetArray)
     var
         String: DotNet npNetString;
         Char: DotNet npNetString;
@@ -231,17 +237,17 @@ table 6150633 "POS Payment Bin Eject Param."
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterNameCaption(PaymentBinInvokeParameter: Record "POS Payment Bin Eject Param.";var Caption: Text)
+    procedure OnGetParameterNameCaption(PaymentBinInvokeParameter: Record "POS Payment Bin Eject Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterDescriptionCaption(PaymentBinInvokeParameter: Record "POS Payment Bin Eject Param.";var Caption: Text)
+    procedure OnGetParameterDescriptionCaption(PaymentBinInvokeParameter: Record "POS Payment Bin Eject Param."; var Caption: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetParameterOptionStringCaption(PaymentBinInvokeParameter: Record "POS Payment Bin Eject Param.";var Caption: Text)
+    procedure OnGetParameterOptionStringCaption(PaymentBinInvokeParameter: Record "POS Payment Bin Eject Param."; var Caption: Text)
     begin
     end;
 

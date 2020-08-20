@@ -3,59 +3,71 @@ table 6151604 "NpDc Item Buffer"
     // NPR5.38/MHA /20171204  CASE 298276 Object created
 
     Caption = 'Discount Item Buffer';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Item No.";Code[20])
+        field(1; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            DataClassification = CustomerContent;
         }
-        field(5;"Variant Code";Code[10])
+        field(5; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
+            DataClassification = CustomerContent;
         }
-        field(10;"Item Group";Code[10])
+        field(10; "Item Group"; Code[10])
         {
             Caption = 'Item Group';
+            DataClassification = CustomerContent;
         }
-        field(15;"Item Disc. Group";Code[10])
+        field(15; "Item Disc. Group"; Code[10])
         {
             Caption = 'Item Disc. Group';
+            DataClassification = CustomerContent;
         }
-        field(20;"Unit Price";Decimal)
+        field(20; "Unit Price"; Decimal)
         {
             Caption = 'Unit Price';
+            DataClassification = CustomerContent;
         }
-        field(25;"Discount Type";Integer)
+        field(25; "Discount Type"; Integer)
         {
             Caption = 'Discount Type';
+            DataClassification = CustomerContent;
         }
-        field(30;"Discount Code";Code[20])
+        field(30; "Discount Code"; Code[20])
         {
             Caption = 'Discount Code';
+            DataClassification = CustomerContent;
         }
-        field(32;"Discount %";Decimal)
+        field(32; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
-            DecimalPlaces = 0:5;
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
         }
-        field(35;"Discount Amount";Decimal)
+        field(35; "Discount Amount"; Decimal)
         {
             Caption = 'Discount Amount';
+            DataClassification = CustomerContent;
         }
-        field(50;Quantity;Decimal)
+        field(50; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
         }
-        field(60;"Line Amount";Decimal)
+        field(60; "Line Amount"; Decimal)
         {
             Caption = 'Line Amount';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Item No.","Variant Code","Item Group","Item Disc. Group","Unit Price","Discount Type","Discount Code","Discount %")
+        key(Key1; "Item No.", "Variant Code", "Item Group", "Item Disc. Group", "Unit Price", "Discount Type", "Discount Code", "Discount %")
         {
         }
     }

@@ -8,77 +8,91 @@ table 6184508 "EFT Adyen Payment Type Setup"
     // NPR5.55/MMV /20200421 CASE 386254 Added field 13
 
     Caption = 'EFT Adyen Payment Type Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Payment Type POS";Code[10])
+        field(1; "Payment Type POS"; Code[10])
         {
             Caption = 'Payment Type POS';
+            DataClassification = CustomerContent;
             TableRelation = "Payment Type POS"."No.";
         }
-        field(2;"API Key";Text[250])
+        field(2; "API Key"; Text[250])
         {
             Caption = 'API Key';
+            DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
         }
-        field(3;Environment;Option)
+        field(3; Environment; Option)
         {
             Caption = 'Environment';
+            DataClassification = CustomerContent;
             OptionCaption = 'Production,Test';
             OptionMembers = PRODUCTION,TEST;
         }
-        field(4;"Transaction Condition";Option)
+        field(4; "Transaction Condition"; Option)
         {
             Caption = 'Transaction Condition';
+            DataClassification = CustomerContent;
             OptionCaption = 'None,Alipay,WeChat,Gift Card';
             OptionMembers = "NONE",ALIPAY,WECHAT,GIFTCARD;
         }
-        field(5;"Create Recurring Contract";Option)
+        field(5; "Create Recurring Contract"; Option)
         {
             Caption = 'Create Recurring Contract';
+            DataClassification = CustomerContent;
             OptionCaption = 'No,Recurring,One Click,Recurring & One Click';
             OptionMembers = NO,RECURRING,ONECLICK,RECURRING_ONECLICK;
         }
-        field(6;"Acquire Card First";Boolean)
+        field(6; "Acquire Card First"; Boolean)
         {
             Caption = 'Acquire Card First';
+            DataClassification = CustomerContent;
         }
-        field(7;"Log Level";Option)
+        field(7; "Log Level"; Option)
         {
             Caption = 'Log Level';
+            DataClassification = CustomerContent;
             OptionCaption = 'Errors,Full,None';
             OptionMembers = ERROR,FULL,"NONE";
         }
-        field(8;"Silent Discount Allowed";Boolean)
+        field(8; "Silent Discount Allowed"; Boolean)
         {
             Caption = 'Silent Discount Allowed';
+            DataClassification = CustomerContent;
         }
-        field(9;"Capture Delay Hours";Integer)
+        field(9; "Capture Delay Hours"; Integer)
         {
             BlankZero = true;
             Caption = 'Capture Delay Hours';
+            DataClassification = CustomerContent;
         }
-        field(10;"Cashback Allowed";Boolean)
+        field(10; "Cashback Allowed"; Boolean)
         {
             Caption = 'Cashback Allowed';
+            DataClassification = CustomerContent;
         }
-        field(11;"Merchant Account";Text[250])
+        field(11; "Merchant Account"; Text[250])
         {
             Caption = 'Merchant Account';
+            DataClassification = CustomerContent;
         }
-        field(12;"Recurring API URL Prefix";Text[250])
+        field(12; "Recurring API URL Prefix"; Text[250])
         {
             Caption = 'Recurring API URL Prefix';
+            DataClassification = CustomerContent;
         }
-        field(13;Unattended;Boolean)
+        field(13; Unattended; Boolean)
         {
             Caption = 'Unattended';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1;"Payment Type POS")
+        key(Key1; "Payment Type POS")
         {
         }
     }

@@ -1,4 +1,4 @@
-tableextension 6014430 tableextension6014430 extends "Jobs Setup" 
+tableextension 6014430 tableextension6014430 extends "Jobs Setup"
 {
     // NPR5.29/TJ/20161014 CASE 248723 New fields 6060150..6060163
     // NPR5.32/TJ/20170515 CASE 275946 New field "Organizer Exchange Url"
@@ -10,49 +10,57 @@ tableextension 6014430 tableextension6014430 extends "Jobs Setup"
     // NPR5.53/TJ/20200109 CASE 346821 New field "Block Event Deletion"
     fields
     {
-        field(6060150;"Auto. Create Job Task Line";Boolean)
+        field(6060150; "Auto. Create Job Task Line"; Boolean)
         {
             Caption = 'Auto. Create Job Task Line';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060151;"Def. Job Task No.";Code[20])
+        field(6060151; "Def. Job Task No."; Code[20])
         {
             Caption = 'Def. Job Task No.';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060152;"Def. Job Task Description";Text[50])
+        field(6060152; "Def. Job Task Description"; Text[50])
         {
             Caption = 'Def. Job Task Description';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060153;"Time Calc. Unit of Measure";Code[10])
+        field(6060153; "Time Calc. Unit of Measure"; Code[10])
         {
             Caption = 'Time Calc. Unit of Measure';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
             TableRelation = "Unit of Measure";
         }
-        field(6060154;"Qty. Relates to Start/End Time";Boolean)
+        field(6060154; "Qty. Relates to Start/End Time"; Boolean)
         {
             Caption = 'Qty. Relates to Start/End Time';
+            DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060155;"Over Capacitate Resource";Option)
+        field(6060155; "Over Capacitate Resource"; Option)
         {
             Caption = 'Over Capacitate Resource';
+            DataClassification = CustomerContent;
             Description = 'NPR5.32';
             OptionCaption = ' ,Allow,Warn,Disallow';
             OptionMembers = " ",Allow,Warn,Disallow;
         }
-        field(6060156;"Post Event on Sales Inv. Post";Option)
+        field(6060156; "Post Event on Sales Inv. Post"; Option)
         {
             Caption = 'Post Event on Sales Inv. Post';
+            DataClassification = CustomerContent;
             Description = 'NPR5.48';
             OptionCaption = ' ,Only Inventory,Both Inventory and Job';
             OptionMembers = " ","Only Inventory","Both Inventory and Job";
         }
-        field(6060157;"Block Event Deletion";BLOB)
+        field(6060157; "Block Event Deletion"; BLOB)
         {
             Caption = 'Block Event Deletion';
+            DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
     }

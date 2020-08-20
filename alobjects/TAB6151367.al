@@ -3,6 +3,7 @@ table 6151367 "CS Counting Supervisor"
     // NPR5.53/CLVA  /20191203  CASE 375919 Object created - NP Capture Service
 
     Caption = 'CS Counting Supervisor';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -31,6 +32,7 @@ table 6151367 "CS Counting Supervisor"
         field(11; Pin; Code[6])
         {
             Caption = 'Pin';
+            DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
             Numeric = true;
         }

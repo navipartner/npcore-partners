@@ -7,49 +7,57 @@ table 6151503 "Nc Task Field"
     // NC2.05 /MHA /20170615  CASE 280860 Added field 1000 "Task Exists" and deleted field 9 Processed
 
     Caption = 'Nc Task Field';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;"Entry No.";BigInteger)
+        field(1; "Entry No."; BigInteger)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
-        field(2;"Field No.";Integer)
+        field(2; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
-        field(3;"Field Name";Text[50])
+        field(3; "Field Name"; Text[50])
         {
             Caption = 'Field Name';
+            DataClassification = CustomerContent;
         }
-        field(4;"Previous Value";Text[250])
+        field(4; "Previous Value"; Text[250])
         {
             Caption = 'Previous Value';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
-        field(5;"New Value";Text[250])
+        field(5; "New Value"; Text[250])
         {
             Caption = 'New Value';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
-        field(6;"Log Date";DateTime)
+        field(6; "Log Date"; DateTime)
         {
             Caption = 'Log Date';
+            DataClassification = CustomerContent;
         }
-        field(10;"Task Entry No.";BigInteger)
+        field(10; "Task Entry No."; BigInteger)
         {
             Caption = 'Task Entry No.';
+            DataClassification = CustomerContent;
             Description = 'NC1.07';
             TableRelation = "Nc Task";
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(1000;"Task Exists";Boolean)
+        field(1000; "Task Exists"; Boolean)
         {
-            CalcFormula = Exist("Nc Task" WHERE ("Entry No."=FIELD("Task Entry No.")));
+            CalcFormula = Exist ("Nc Task" WHERE("Entry No." = FIELD("Task Entry No.")));
             Caption = 'Task Exists';
             Description = 'NC2.05';
             FieldClass = FlowField;
@@ -58,13 +66,13 @@ table 6151503 "Nc Task Field"
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1; "Entry No.")
         {
         }
-        key(Key2;"Log Date")
+        key(Key2; "Log Date")
         {
         }
-        key(Key3;"Task Entry No.")
+        key(Key3; "Task Entry No.")
         {
         }
     }

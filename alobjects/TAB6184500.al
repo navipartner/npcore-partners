@@ -7,46 +7,56 @@ table 6184500 "CleanCash Setup"
     // NPR5.31/JLK /20170313 CASE 268274 Changed ENU Caption
 
     Caption = 'CleanCash Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1;Register;Code[20])
+        field(1; Register; Code[20])
         {
             Caption = 'Cash Register No.';
+            DataClassification = CustomerContent;
             TableRelation = Register;
         }
-        field(2;"Connection String";Text[100])
+        field(2; "Connection String"; Text[100])
         {
             Caption = 'Connection String';
+            DataClassification = CustomerContent;
         }
-        field(3;"Organization ID";Text[10])
+        field(3; "Organization ID"; Text[10])
         {
             Caption = 'Organization ID';
+            DataClassification = CustomerContent;
         }
-        field(4;"Last Z Reort Date";Date)
+        field(4; "Last Z Reort Date"; Date)
         {
             Caption = 'Last Report Date';
+            DataClassification = CustomerContent;
         }
-        field(5;"Last Z Report Time";Time)
+        field(5; "Last Z Report Time"; Time)
         {
             Caption = 'Last Report Time';
+            DataClassification = CustomerContent;
         }
-        field(6;"Multi Organization ID Per POS";Boolean)
+        field(6; "Multi Organization ID Per POS"; Boolean)
         {
             Caption = 'Multi Organization ID Per POS';
+            DataClassification = CustomerContent;
         }
-        field(7;Training;Boolean)
+        field(7; Training; Boolean)
         {
             Caption = 'Training';
+            DataClassification = CustomerContent;
         }
-        field(8;"Show Error Message";Boolean)
+        field(8; "Show Error Message"; Boolean)
         {
             Caption = 'Show Error Message';
+            DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(9;"CleanCash Register No.";Text[16])
+        field(9; "CleanCash Register No."; Text[16])
         {
             Caption = 'CleanCash Cash Register No.';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -54,16 +64,17 @@ table 6184500 "CleanCash Setup"
             begin
             end;
         }
-        field(10;"Run Local";Boolean)
+        field(10; "Run Local"; Boolean)
         {
             Caption = 'Run Local';
+            DataClassification = CustomerContent;
             Description = 'Used to tell where the CleanCashAPI dll is placed (third part application)';
         }
     }
 
     keys
     {
-        key(Key1;Register)
+        key(Key1; Register)
         {
         }
     }
@@ -74,8 +85,8 @@ table 6184500 "CleanCash Setup"
 
     trigger OnInsert()
     begin
-        if Rec."CleanCash Register No."  = '' then
-          Rec."CleanCash Register No." := Register;
+        if Rec."CleanCash Register No." = '' then
+            Rec."CleanCash Register No." := Register;
     end;
 }
 
