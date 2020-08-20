@@ -7,7 +7,7 @@ page 6150679 "NPRE Flow Statuses"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NPRE Flow Status";
-    SourceTableView = SORTING("Status Object","Flow Order");
+    SourceTableView = SORTING("Status Object", "Flow Order");
     UsageCategory = Administration;
 
     layout
@@ -16,21 +16,21 @@ page 6150679 "NPRE Flow Statuses"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field("Status Object";"Status Object")
+                field("Status Object"; "Status Object")
                 {
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Flow Order";"Flow Order")
+                field("Flow Order"; "Flow Order")
                 {
                 }
-                field(PrintCategories;AssignedPrintCategoriesAsFilterString())
+                field(AssignedPrintCategories; AssignedPrintCategoriesAsFilterString())
                 {
                     Caption = 'Print/Prod. Categories';
                     Visible = ShowPrintCategories;
@@ -84,15 +84,15 @@ page 6150679 "NPRE Flow Statuses"
         StatusObjectVisible := not CurrPage.LookupMode;
         ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
         if ServingStepDiscoveryMethod = 0 then begin
-          ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
-          if not ShowPrintCategories then begin
-            CurrFilterGr := FilterGroup;
-            if CurrFilterGr <> 2 then begin
-              FilterGroup(2);
-              ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
-              FilterGroup(CurrFilterGr);
+            ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
+            if not ShowPrintCategories then begin
+                CurrFilterGr := FilterGroup;
+                if CurrFilterGr <> 2 then begin
+                    FilterGroup(2);
+                    ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
+                    FilterGroup(CurrFilterGr);
+                end;
             end;
-          end;
         end;
     end;
 
@@ -107,7 +107,7 @@ page 6150679 "NPRE Flow Statuses"
     var
         WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
     begin
-        TestField("Status Object","Status Object"::WaiterPadLineMealFlow);
+        TestField("Status Object", "Status Object"::WaiterPadLineMealFlow);
         TestField(Code);
         WaiterPadMgt.SelectPrintCategories(RecordId);
     end;
@@ -115,10 +115,10 @@ page 6150679 "NPRE Flow Statuses"
     local procedure GetDataCaptionExpr(): Text
     begin
         case "Status Object" of
-          "Status Object"::WaiterPadLineMealFlow:
-            exit(ServStepsLb);
-          else
-            exit(Format("Status Object"));
+            "Status Object"::WaiterPadLineMealFlow:
+                exit(ServStepsLb);
+            else
+                exit(Format("Status Object"));
         end;
     end;
 }

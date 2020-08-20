@@ -18,7 +18,7 @@ page 6150661 "NPRE Waiter Pad Subform"
         {
             repeater(Group)
             {
-                field(LineIsMarked;LineIsMarked)
+                field(LineIsMarked; LineIsMarked)
                 {
                     Caption = 'Select';
 
@@ -27,155 +27,155 @@ page 6150661 "NPRE Waiter Pad Subform"
                         Mark(not Mark);  //NPR5.53 [360258]
                     end;
                 }
-                field("Waiter Pad No.";"Waiter Pad No.")
+                field("Waiter Pad No."; "Waiter Pad No.")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Start Date";"Start Date")
+                field("Start Date"; "Start Date")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                     Editable = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
                     Editable = false;
                 }
-                field("Billed Quantity";"Billed Quantity")
+                field("Billed Quantity"; "Billed Quantity")
                 {
                     Editable = false;
                 }
-                field("Sale Type";"Sale Type")
-                {
-                    Editable = false;
-                    Visible = false;
-                }
-                field("Description 2";"Description 2")
+                field("Sale Type"; "Sale Type")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Variant Code";"Variant Code")
-                {
-                    Editable = false;
-                }
-                field("Order No. from Web";"Order No. from Web")
+                field("Description 2"; "Description 2")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Order Line No. from Web";"Order Line No. from Web")
+                field("Variant Code"; "Variant Code")
+                {
+                    Editable = false;
+                }
+                field("Order No. from Web"; "Order No. from Web")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Unit Price";"Unit Price")
+                field("Order Line No. from Web"; "Order Line No. from Web")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Discount Type";"Discount Type")
+                field("Unit Price"; "Unit Price")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Discount Code";"Discount Code")
+                field("Discount Type"; "Discount Type")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Allow Invoice Discount";"Allow Invoice Discount")
+                field("Discount Code"; "Discount Code")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Allow Line Discount";"Allow Line Discount")
+                field("Allow Invoice Discount"; "Allow Invoice Discount")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Discount %";"Discount %")
+                field("Allow Line Discount"; "Allow Line Discount")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount %"; "Discount %")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Invoice Discount Amount";"Invoice Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Currency Code";"Currency Code")
+                field("Invoice Discount Amount"; "Invoice Discount Amount")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Currency Code"; "Currency Code")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Amount Excl. VAT";"Amount Excl. VAT")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Amount Incl. VAT";"Amount Incl. VAT")
+                field("Amount Excl. VAT"; "Amount Excl. VAT")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Meal Flow";"Meal Flow")
-                {
-                    Visible = false;
-                }
-                field("Meal Flow Description";"Meal Flow Description")
+                field("Amount Incl. VAT"; "Amount Incl. VAT")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Line Status";"Line Status")
+                field("Meal Flow"; "Meal Flow")
                 {
                     Visible = false;
                 }
-                field("Line Status Description";"Line Status Description")
+                field("Meal Flow Description"; "Meal Flow Description")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("AssignedFlowStatusesAsString(FlowStatus.""Status Object""::WaiterPadLineMealFlow)";AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
+                field("Line Status"; "Line Status")
+                {
+                    Visible = false;
+                }
+                field("Line Status Description"; "Line Status Description")
+                {
+                    Editable = false;
+                    Visible = false;
+                }
+                field(AssignedFlowStatuses; AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
                     Caption = 'Serving Steps';
                     Editable = false;
@@ -185,7 +185,7 @@ page 6150661 "NPRE Waiter Pad Subform"
                         ShowFlowStatuses(FlowStatus."Status Object"::WaiterPadLineMealFlow);  //NPR5.55 [382428]
                     end;
                 }
-                field("AssignedPrintCategoriesAsString()";AssignedPrintCategoriesAsString())
+                field(AssignedPrintCategories; AssignedPrintCategoriesAsString())
                 {
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
@@ -196,10 +196,10 @@ page 6150661 "NPRE Waiter Pad Subform"
                         ShowPrintCategories();  //NPR5.53 [360258]
                     end;
                 }
-                field("Kitchen Order Sent";"Kitchen Order Sent")
+                field("Kitchen Order Sent"; "Kitchen Order Sent")
                 {
                 }
-                field("Serving Requested";"Serving Requested")
+                field("Serving Requested"; "Serving Requested")
                 {
                 }
             }
