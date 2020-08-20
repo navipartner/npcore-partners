@@ -30,7 +30,7 @@ codeunit 6150704 "POS Front End Management"
     var
         POSSession: Codeunit "POS Session";
         Stargate: Codeunit "POS Stargate Management";
-        Transcendence: ControlAddIn Transcendence;
+        Framework: Interface "Framework Interface";
         Text001: Label '%1\\This is a programming bug, not a user error.';
         Text002: Label 'A function that requires a POS session to be running has been invoked outside of a POS session.';
         Text003: Label 'Unsupported view type requested: %1.';
@@ -58,9 +58,9 @@ codeunit 6150704 "POS Front End Management"
         Text015: Label 'A function that requires Workflow 2.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
         IsMock: Boolean;
 
-        procedure Initialize(TranscendenceIn: ControlAddIn Transcendence; SessionIn: Codeunit "POS Session")
+    procedure Initialize(FrameworkIn: Interface "Framework Interface"; SessionIn: Codeunit "POS Session")
     begin
-        Transcendence := TranscendenceIn;
+        Framework := FrameworkIn;
         POSSession := SessionIn;
 
         RegisteredWorkflows := RegisteredWorkflows.List();
@@ -93,7 +93,7 @@ codeunit 6150704 "POS Front End Management"
 
     local procedure IsActiveSession(): Boolean
     var
-        FrameworkCheck: ControlAddIn Transcendence;
+        FrameworkCheck: Interface "Framework Interface";
         POSSessionCheck: Codeunit "POS Session";
         Handled: Boolean;
     begin
@@ -105,7 +105,7 @@ codeunit 6150704 "POS Front End Management"
             exit(false);
     end;
 
-        procedure GetSession(var SessionOut: Codeunit "POS Session")
+    procedure GetSession(var SessionOut: Codeunit "POS Session")
     begin
         if not Initialized then
             Error(Text005);
@@ -117,13 +117,13 @@ codeunit 6150704 "POS Front End Management"
     begin
     end;
 
-        procedure WorkflowBackEndStepBegin(WorkflowId: Integer; ActionId: Integer)
+    procedure WorkflowBackEndStepBegin(WorkflowId: Integer; ActionId: Integer)
     begin
         WorkflowStack.Push(WorkflowId);
         ActionStack.Push(ActionId);
     end;
 
-        procedure WorkflowBackEndStepEnd()
+    procedure WorkflowBackEndStepEnd()
     begin
         if StepToContinueAt <> '' then begin
             RequestWorkflowStep(StepToContinueAt);
@@ -152,7 +152,7 @@ codeunit 6150704 "POS Front End Management"
             exit(ActionStack.Peek());
     end;
 
-        procedure AbortWorkflow(WorkflowID: Integer)
+    procedure AbortWorkflow(WorkflowID: Integer)
     begin
         if WorkflowID = CurrentWorkflowID() then begin
             WorkflowStack.Pop();
@@ -162,7 +162,7 @@ codeunit 6150704 "POS Front End Management"
             PausedWorkflowID := 0;
     end;
 
-        procedure AbortWorkflows()
+    procedure AbortWorkflows()
     begin
         Pausing := false;
         PausedWorkflowID := 0;
@@ -171,7 +171,7 @@ codeunit 6150704 "POS Front End Management"
         POSSession.ClearActionState();
     end;
 
-        procedure ContinueAtStep(Step: Text)
+    procedure ContinueAtStep(Step: Text)
     begin
         if CurrentWorkflowID = 0 then
             ReportBug(StrSubstNo(Text011, Step));
@@ -179,7 +179,7 @@ codeunit 6150704 "POS Front End Management"
         StepToContinueAt := Step;
     end;
 
-        procedure IsPaused(): Boolean
+    procedure IsPaused(): Boolean
     begin
         exit(PausedWorkflowID > 0);
     end;
@@ -191,7 +191,7 @@ codeunit 6150704 "POS Front End Management"
     procedure CloneForWorkflow20(WorkflowIDIn: Integer; var FrontEndIn: Codeunit "POS Front End Management")
     begin
         //-NPR5.50 [338666]
-        FrontEndIn.Initialize(Transcendence, POSSession);
+        FrontEndIn.Initialize(Framework, POSSession);
         FrontEndIn.SetWorkflowID(WorkflowIDIn);
         //+NPR5.50 [338666]
     end;
@@ -283,35 +283,35 @@ codeunit 6150704 "POS Front End Management"
     begin
     end;
 
-        procedure LoginView(Setup: Codeunit "POS Setup")
+    procedure LoginView(Setup: Codeunit "POS Setup")
     var
         ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.Login, Setup);
     end;
 
-        procedure SaleView(Setup: Codeunit "POS Setup")
+    procedure SaleView(Setup: Codeunit "POS Setup")
     var
         ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.Sale, Setup);
     end;
 
-        procedure PaymentView(Setup: Codeunit "POS Setup")
+    procedure PaymentView(Setup: Codeunit "POS Setup")
     var
         ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.Payment, Setup);
     end;
 
-        procedure BalancingView(Setup: Codeunit "POS Setup")
+    procedure BalancingView(Setup: Codeunit "POS Setup")
     var
         ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.BalanceRegister, Setup);
     end;
 
-        procedure LockedView(Setup: Codeunit "POS Setup")
+    procedure LockedView(Setup: Codeunit "POS Setup")
     var
         ViewType: DotNet npNetViewType0;
     begin
@@ -342,10 +342,10 @@ codeunit 6150704 "POS Front End Management"
             Trace(Request, 'server_stopwatch', ServerStopwatch);
 
         JRequest.ReadFrom(Request.ToJsonString());
-        Transcendence.InvokeFrontEndAsync(JRequest);
+        Framework.InvokeFrontEndAsync(JRequest);
     end;
 
-        procedure InvokeFrontEndMethod(Request: DotNet npNetJsonRequest)
+    procedure InvokeFrontEndMethod(Request: DotNet npNetJsonRequest)
     begin
         MakeSureFrameworkIsAvailable(true);
 
@@ -355,7 +355,7 @@ codeunit 6150704 "POS Front End Management"
         InvokeFrontEndAsync(Request);
     end;
 
-        procedure ReportBug(ErrorText: Text)
+    procedure ReportBug(ErrorText: Text)
     var
         Request: DotNet npNetReportBugJsonRequest;
         ErrorObject: DotNet npNetObject;
@@ -375,7 +375,7 @@ codeunit 6150704 "POS Front End Management"
             Error(GetBugErrorMessage(ErrorText));
     end;
 
-        procedure ReportWarning(ErrorText: Text; WithError: Boolean)
+    procedure ReportWarning(ErrorText: Text; WithError: Boolean)
     var
         Request: DotNet npNetReportBugJsonRequest;
         ErrorObject: DotNet npNetObject;
@@ -420,7 +420,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.50 [338666]
     end;
 
-        procedure AppGatewayProtocolResponse(EventName: Text; EventData: Text)
+    procedure AppGatewayProtocolResponse(EventName: Text; EventData: Text)
     var
         Request: DotNet npNetAppGatewayProtocolResponse;
     begin
@@ -431,7 +431,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure AdvertiseStargatePackages()
+    procedure AdvertiseStargatePackages()
     var
         Package: Record "POS Stargate Package";
         PackageMethod: Record "POS Stargate Package Method";
@@ -486,7 +486,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.51 [352582]
     end;
 
-        procedure ConfigureActionSequences(var TempSessionAction: Record "POS Action" temporary)
+    procedure ConfigureActionSequences(var TempSessionAction: Record "POS Action" temporary)
     var
         Sequence: Record "POS Action Sequence";
         Request: DotNet npNetJsonRequest;
@@ -517,7 +517,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.53 [362777]
     end;
 
-        procedure ConfigureCaptions(Captions: DotNet npNetDictionary_Of_T_U)
+    procedure ConfigureCaptions(Captions: DotNet npNetDictionary_Of_T_U)
     var
         Request: DotNet npNetSetCaptionsJsonRequest;
     begin
@@ -528,7 +528,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure ConfigureFormat(NumberFormat: DotNet npNetNumberFormatInfo; DateFormat: DotNet npNetDateTimeFormatInfo)
+    procedure ConfigureFormat(NumberFormat: DotNet npNetNumberFormatInfo; DateFormat: DotNet npNetDateTimeFormatInfo)
     var
         Request: DotNet npNetSetFormatJsonRequest;
     begin
@@ -539,7 +539,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure ConfigureLogo(LogoBase64: Text)
+    procedure ConfigureLogo(LogoBase64: Text)
     var
         Request: DotNet npNetSetImageJsonRequest;
     begin
@@ -550,7 +550,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure ConfigureMenu(Menus: DotNet npNetList_Of_T)
+    procedure ConfigureMenu(Menus: DotNet npNetList_Of_T)
     var
         Request: DotNet npNetMenuRequest;
         Menu: DotNet npNetMenu;
@@ -565,7 +565,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure ConfigureFont(Font: DotNet npNetFont0)
+    procedure ConfigureFont(Font: DotNet npNetFont0)
     var
         Request: DotNet npNetConfigureFontJsonRequest;
     begin
@@ -576,7 +576,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure ConfigureKeyboardBindings(KeyboardBindings: DotNet npNetList_Of_T)
+    procedure ConfigureKeyboardBindings(KeyboardBindings: DotNet npNetList_Of_T)
     var
         Request: DotNet npNetJsonRequest;
     begin
@@ -591,7 +591,7 @@ codeunit 6150704 "POS Front End Management"
         //-NPR5.38 [295800]
     end;
 
-        procedure ConfigureReusableWorkflow("Action": DotNet npNetWorkflowAction)
+    procedure ConfigureReusableWorkflow("Action": DotNet npNetWorkflowAction)
     var
         Request: DotNet npNetConfigureReusableWorkflowRequest;
     begin
@@ -605,7 +605,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure ConfigureWatermark(WatermarkBase64: Text; WatermarkText: Text)
+    procedure ConfigureWatermark(WatermarkBase64: Text; WatermarkText: Text)
     var
         Request: DotNet npNetSetImageJsonRequest;
     begin
@@ -621,7 +621,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.32.11 [281618]
     end;
 
-        procedure ConfigureSecureMethods()
+    procedure ConfigureSecureMethods()
     var
         SecureMethodTmp: Record "POS Secure Method" temporary;
         Request: DotNet npNetJsonRequest;
@@ -654,7 +654,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.43 [314603]
     end;
 
-        procedure ConfigureSecureMethodsClientPasswords(Method: Text; CommaDelimitedPasswords: Text)
+    procedure ConfigureSecureMethodsClientPasswords(Method: Text; CommaDelimitedPasswords: Text)
     var
         Request: DotNet npNetJsonRequest;
     begin
@@ -681,7 +681,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.49 [335141]
     end;
 
-        procedure ValidateSecureMethodPassword(RequestId: Integer; Success: Boolean; SkipUI: Boolean; Reason: Text; AuthorizedBy: Text)
+    procedure ValidateSecureMethodPassword(RequestId: Integer; Success: Boolean; SkipUI: Boolean; Reason: Text; AuthorizedBy: Text)
     var
         Request: DotNet npNetJsonRequest;
     begin
@@ -703,7 +703,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.43 [314603]
     end;
 
-        procedure HardwareInitializationComplete()
+    procedure HardwareInitializationComplete()
     var
         Request: DotNet npNetJsonRequest;
     begin
@@ -715,7 +715,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure InvokeDevice(Request: DotNet npNetRequest0; ActionName: Text; Step: Text)
+    procedure InvokeDevice(Request: DotNet npNetRequest0; ActionName: Text; Step: Text)
     var
         Stargate: Codeunit "POS Stargate Management";
         DeviceRequest: DotNet npNetInvokeDeviceRequest;
@@ -743,7 +743,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure InvokeDeviceInternal(Request: DotNet npNetRequest0; ActionName: Text; Step: Text; Repeating: Boolean)
+    procedure InvokeDeviceInternal(Request: DotNet npNetRequest0; ActionName: Text; Step: Text; Repeating: Boolean)
     var
         Stargate: Codeunit "POS Stargate Management";
         DeviceRequest: DotNet npNetInvokeDeviceRequest;
@@ -774,7 +774,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure InvokeDeviceAsync(Request: DotNet npNetRequest0; ActionName: Text; Step: Text)
+    procedure InvokeDeviceAsync(Request: DotNet npNetRequest0; ActionName: Text; Step: Text)
     var
         Stargate: Codeunit "POS Stargate Management";
         DeviceRequest: DotNet npNetInvokeDeviceRequest;
@@ -805,7 +805,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.39 [305029]
     end;
 
-        procedure InvokeWorkflow(var POSAction: Record "POS Action")
+    procedure InvokeWorkflow(var POSAction: Record "POS Action")
     var
         Request: DotNet npNetWorkflowRequest;
         WorkflowInvocationParameters: DotNet npNetDictionary_Of_T_U;
@@ -831,7 +831,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure PauseWorkflow(): Integer
+    procedure PauseWorkflow(): Integer
     var
         Request: DotNet npNetPauseWorkflowJsonRequest;
         ErrorText: Text;
@@ -857,7 +857,7 @@ codeunit 6150704 "POS Front End Management"
         exit(PausedWorkflowID);
     end;
 
-        procedure RefreshData(DataSets: DotNet npNetIEnumerable_Of_T)
+    procedure RefreshData(DataSets: DotNet npNetIEnumerable_Of_T)
     var
         Request: DotNet npNetRefreshDataJsonRequest;
         DataSetLine: DotNet npNetDataSet;
@@ -910,7 +910,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure RequestCustomWorkflowStep(FrontEnd: Codeunit "POS Front End Management")
+    procedure RequestCustomWorkflowStep(FrontEnd: Codeunit "POS Front End Management")
     begin
         // TODO: Implement this method.
 
@@ -920,7 +920,7 @@ codeunit 6150704 "POS Front End Management"
         // However, right now it's not implemented.
     end;
 
-        procedure ResumeWorkflow()
+    procedure ResumeWorkflow()
     var
         Request: DotNet npNetResumeWorkflowJsonRequest;
         ErrorText: Text;
@@ -947,7 +947,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure SetOption(Option: Text; Value: Variant)
+    procedure SetOption(Option: Text; Value: Variant)
     var
         Request: DotNet npNetSetOptionJsonRequest;
     begin
@@ -958,7 +958,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure SetOptions(Options: DotNet npNetDictionary_Of_T_U)
+    procedure SetOptions(Options: DotNet npNetDictionary_Of_T_U)
     var
         Request: DotNet npNetJsonRequest;
     begin
@@ -972,7 +972,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure SetView(ViewType: DotNet npNetViewType0; Setup: Codeunit "POS Setup")
+    procedure SetView(ViewType: DotNet npNetViewType0; Setup: Codeunit "POS Setup")
     var
         POSView: Record "POS View";
         DefaultView: Record "POS Default View";
@@ -1080,7 +1080,7 @@ codeunit 6150704 "POS Front End Management"
         POSSession.SetView(Request.View);
     end;
 
-        procedure ShowModel(Model: DotNet npNetModel) ModelID: Guid
+    procedure ShowModel(Model: DotNet npNetModel) ModelID: Guid
     var
         Request: DotNet npNetJsonRequest;
         Html: Text;
@@ -1109,7 +1109,7 @@ codeunit 6150704 "POS Front End Management"
         //+266990 [266990]
     end;
 
-        procedure UpdateModel(Model: DotNet npNetModel; ModelID: Guid)
+    procedure UpdateModel(Model: DotNet npNetModel; ModelID: Guid)
     var
         Request: DotNet npNetJsonRequest;
         Html: Text;
@@ -1137,7 +1137,7 @@ codeunit 6150704 "POS Front End Management"
         //+266990 [266990]
     end;
 
-        procedure CloseModel(ModelID: Guid)
+    procedure CloseModel(ModelID: Guid)
     var
         Request: DotNet npNetJsonRequest;
     begin
@@ -1152,7 +1152,7 @@ codeunit 6150704 "POS Front End Management"
         //+266990 [266990]
     end;
 
-        procedure StartTransaction(Sale: Record "Sale POS")
+    procedure StartTransaction(Sale: Record "Sale POS")
     var
         Request: DotNet npNetStartTransactionJsonRequest;
     begin
@@ -1166,7 +1166,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure SetActionContext("Action": Text; Context: Codeunit "POS JSON Management")
+    procedure SetActionContext("Action": Text; Context: Codeunit "POS JSON Management")
     var
         Request: DotNet npNetProvideContextRequest;
         ContextObj: DotNet npNetDictionary_Of_T_U;
@@ -1182,7 +1182,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure SetActionObject("Action": Text; ObjectName: Text; Context: Codeunit "POS JSON Management")
+    procedure SetActionObject("Action": Text; ObjectName: Text; Context: Codeunit "POS JSON Management")
     var
         Request: DotNet npNetProvideContextRequest;
         ContextObj: DotNet npNetDictionary_Of_T_U;
@@ -1198,7 +1198,7 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-        procedure WorkflowCallCompleted(Request: DotNet npNetWorkflowCallCompletedRequest)
+    procedure WorkflowCallCompleted(Request: DotNet npNetWorkflowCallCompletedRequest)
     begin
         MakeSureFrameworkfIsInitialized();
         //-NPR5.40 [306347]
@@ -1270,7 +1270,7 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDetectFramework(var FrameworkOut: ControlAddIn Transcendence; var POSSessionOut: Codeunit "POS Session"; var Handled: Boolean)
+    local procedure OnDetectFramework(var FrameworkOut: Interface "Framework Interface"; var POSSessionOut: Codeunit "POS Session"; var Handled: Boolean)
     begin
     end;
 

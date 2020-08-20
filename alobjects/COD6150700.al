@@ -98,7 +98,7 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-        procedure Constructor(FrameworkIn: ControlAddIn Transcendence; FrontEndIn: Codeunit "POS Front End Management"; SetupIn: Codeunit "POS Setup"; SessionIn: Codeunit "POS Session")
+    procedure Constructor(FrameworkIn: Interface "Framework Interface"; FrontEndIn: Codeunit "POS Front End Management"; SetupIn: Codeunit "POS Setup"; SessionIn: Codeunit "POS Session")
     var
         JavaScriptInterface: Codeunit "POS JavaScript Interface";
         OldPOSSession: Codeunit "POS Session";
@@ -134,7 +134,7 @@ codeunit 6150700 "POS Session"
         Initialized := true;
     end;
 
-        procedure MockConstructor(FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";SessionIn: Codeunit "POS Session")
+    procedure MockConstructor(FrontEndIn: Codeunit "POS Front End Management"; SetupIn: Codeunit "POS Setup"; SessionIn: Codeunit "POS Session")
     var
         NullObject: DotNet npNetObject;
     begin
@@ -147,7 +147,7 @@ codeunit 6150700 "POS Session"
 
         IsMock := true;
 
-        FrontEndKeeper.Initialize(NullObject,FrontEnd,This);
+        FrontEndKeeper.Initialize(NullObject, FrontEnd, This);
         BindSubscription(FrontEndKeeper);
 
         OnInitialize(FrontEnd);
@@ -157,7 +157,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.54 [364340]
     end;
 
-        procedure InitializeUI()
+    procedure InitializeUI()
     var
         Salesperson: Record "Salesperson/Purchaser";
         UI: Codeunit "POS UI Management";
@@ -255,7 +255,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.41 [307453]
     end;
 
-        procedure InitializeSession(ResendMenus: Boolean)
+    procedure InitializeSession(ResendMenus: Boolean)
     var
         Salesperson: Record "Salesperson/Purchaser";
         UI: Codeunit "POS UI Management";
@@ -295,11 +295,11 @@ codeunit 6150700 "POS Session"
         end;
     end;
 
-        procedure InitializeSessionId(HardwareIdIn: Text; SessionNameIn: Text; HostNameIn: Text)
+    procedure InitializeSessionId(HardwareIdIn: Text; SessionNameIn: Text; HostNameIn: Text)
     begin
         //-NPR5.55 [398235]
         if HardwareIdIn = '' then
-          Error('Hardware ID from front end is blank. This is a programming error.');
+            Error('Hardware ID from front end is blank. This is a programming error.');
         //+NPR5.55 [398235]
         HardwareId := HardwareIdIn;
         SessionName := SessionNameIn;
@@ -322,7 +322,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.38 [295800]
     end;
 
-        procedure StartPOSSession()
+    procedure StartPOSSession()
     var
         RetailFormCode: Codeunit "Retail Form Code";
         CultureInfo: DotNet npNetCultureInfo;
@@ -343,7 +343,7 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-        procedure Destructor()
+    procedure Destructor()
     begin
         //-NPR5.43 [318028]
         if not Finalized then begin
@@ -356,7 +356,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.43 [318028]
     end;
 
-        procedure IsFinalized(): Boolean
+    procedure IsFinalized(): Boolean
     begin
         //-NPR5.43 [318028]
         exit(Finalized);
@@ -422,7 +422,7 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-        procedure StartTransaction()
+    procedure StartTransaction()
     var
         Request: DotNet npNetStartTransactionJsonRequest;
         TransactionNo: Text;
@@ -431,15 +431,15 @@ codeunit 6150700 "POS Session"
         Sale.InitializeNewSale(Register, FrontEnd, Setup, Sale);
     end;
 
-        procedure ResumeTransaction(SalePOS: Record "Sale POS")
+    procedure ResumeTransaction(SalePOS: Record "Sale POS")
     begin
         //-NPR5.54 [364658]
         Clear(Sale);
-        Sale.ResumeExistingSale(SalePOS,Register,FrontEnd,Setup,Sale);
+        Sale.ResumeExistingSale(SalePOS, Register, FrontEnd, Setup, Sale);
         //+NPR5.54 [364658]
     end;
 
-        procedure BeginAction("Action": Text): Guid
+    procedure BeginAction("Action": Text): Guid
     begin
         if ActionStateInAction then
             FrontEnd.ReportBug(StrSubstNo(Text004, Action, ActionStateCurrentAction, ActionStateCurrentActionId));
@@ -453,7 +453,7 @@ codeunit 6150700 "POS Session"
         exit(ActionStateCurrentActionId);
     end;
 
-        procedure StoreActionState("Key": Text; "Object": Variant)
+    procedure StoreActionState("Key": Text; "Object": Variant)
     begin
         if Object.IsRecord then
             Object := StoreActionStateRecRef(Object);
@@ -462,12 +462,12 @@ codeunit 6150700 "POS Session"
             FrontEnd.ReportBug(StrSubstNo(Text003, ActionStateCurrentAction, GetLastErrorText));
     end;
 
-        procedure RetrieveActionState("Key": Text; var "Object": Variant)
+    procedure RetrieveActionState("Key": Text; var "Object": Variant)
     begin
         Object := ActionState.Item(Key);
     end;
 
-        procedure RetrieveActionStateSafe("Key": Text; var "Object": Variant): Boolean
+    procedure RetrieveActionStateSafe("Key": Text; var "Object": Variant): Boolean
     begin
 
         if ActionState.ContainsKey(Key) then begin
@@ -476,7 +476,7 @@ codeunit 6150700 "POS Session"
         end;
     end;
 
-        procedure RetrieveActionStateRecordRef("Key": Text; var RecRef: RecordRef)
+    procedure RetrieveActionStateRecordRef("Key": Text; var RecRef: RecordRef)
     var
         Index: Integer;
     begin
@@ -484,7 +484,7 @@ codeunit 6150700 "POS Session"
         RecRef := ActionStateRecRef[Index];
     end;
 
-        procedure EndAction("Action": Text; Id: Guid)
+    procedure EndAction("Action": Text; Id: Guid)
     begin
         if (Action <> ActionStateCurrentAction) or (Id <> ActionStateCurrentActionId) then
             FrontEnd.ReportBug(StrSubstNo(Text005, Action, Id, ActionStateCurrentAction, ActionStateCurrentActionId));
@@ -492,7 +492,7 @@ codeunit 6150700 "POS Session"
         ClearActionState();
     end;
 
-        procedure ClearActionState()
+    procedure ClearActionState()
     begin
         Clear(ActionStateInAction);
         Clear(ActionState);
@@ -507,7 +507,7 @@ codeunit 6150700 "POS Session"
         // Primarily this is used to prevent invalid action setup.
     end;
 
-        procedure DiscoverActionsOnce()
+    procedure DiscoverActionsOnce()
     var
         POSAction: Record "POS Action";
     begin
@@ -520,7 +520,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.40 [306347]
     end;
 
-        procedure DiscoverSessionAction(var ActionIn: Record "POS Action" temporary)
+    procedure DiscoverSessionAction(var ActionIn: Record "POS Action" temporary)
     begin
         //-NPR5.40 [306347]
         //SessionActions.Code := Code;
@@ -539,7 +539,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.40 [306347]
     end;
 
-        procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "POS Action"): Boolean
+    procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "POS Action"): Boolean
     begin
         //-NPR5.40 [306347]
         if not SessionActions.Get(ActionCode) then
@@ -556,7 +556,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.40 [306347]
     end;
 
-        procedure IsSessionAction("Code": Code[20]): Boolean
+    procedure IsSessionAction("Code": Code[20]): Boolean
     begin
         exit(SessionActions.Get(Code));
     end;
@@ -565,52 +565,52 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-        procedure GetSetup(var SetupOut: Codeunit "POS Setup")
+    procedure GetSetup(var SetupOut: Codeunit "POS Setup")
     begin
         SetupOut := Setup;
     end;
 
-        procedure GetCurrentView(var ViewOut: DotNet npNetView0)
+    procedure GetCurrentView(var ViewOut: DotNet npNetView0)
     begin
         ViewOut := CurrentView;
     end;
 
-        procedure GetSaleContext(var SaleOut: Codeunit "POS Sale"; var SaleLineOut: Codeunit "POS Sale Line"; var PaymentLineOut: Codeunit "POS Payment Line")
+    procedure GetSaleContext(var SaleOut: Codeunit "POS Sale"; var SaleLineOut: Codeunit "POS Sale Line"; var PaymentLineOut: Codeunit "POS Payment Line")
     begin
         SaleOut := Sale;
         Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
-        procedure GetSale(var SaleOut: Codeunit "POS Sale")
+    procedure GetSale(var SaleOut: Codeunit "POS Sale")
     begin
         SaleOut := Sale;
     end;
 
-        procedure GetSaleLine(var SaleLineOut: Codeunit "POS Sale Line")
+    procedure GetSaleLine(var SaleLineOut: Codeunit "POS Sale Line")
     var
         PaymentLineOut: Codeunit "POS Payment Line";
     begin
         Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
-        procedure GetPaymentLine(var PaymentLineOut: Codeunit "POS Payment Line")
+    procedure GetPaymentLine(var PaymentLineOut: Codeunit "POS Payment Line")
     var
         SaleLineOut: Codeunit "POS Sale Line";
     begin
         Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
-        procedure GetDataStore(var DataStoreOut: DotNet npNetDataStore)
+    procedure GetDataStore(var DataStoreOut: DotNet npNetDataStore)
     begin
         DataStoreOut := DataStore;
     end;
 
-        procedure GetStargate(var StargateOut: Codeunit "POS Stargate Management")
+    procedure GetStargate(var StargateOut: Codeunit "POS Stargate Management")
     begin
         StargateOut := Stargate;
     end;
 
-        procedure ProcessKeyPress(KeyPress: Text) Handled: Boolean
+    procedure ProcessKeyPress(KeyPress: Text) Handled: Boolean
     begin
         //-NPR5.38 [295800]
         if IsNull(KeyboardBindings) then
@@ -626,37 +626,37 @@ codeunit 6150700 "POS Session"
         //+NPR5.38 [295800]
     end;
 
-        procedure IsInAction(): Boolean
+    procedure IsInAction(): Boolean
     begin
         exit(InAction);
     end;
 
-        procedure SetInAction(InActionNew: Boolean)
+    procedure SetInAction(InActionNew: Boolean)
     begin
         InAction := InActionNew;
     end;
 
-        procedure SetView(View: DotNet npNetView0)
+    procedure SetView(View: DotNet npNetView0)
     begin
         CurrentView := View;
         InitializeDataSources();
     end;
 
-        procedure GetSessionId(var HardwareIdOut: Text; var SessionNameOut: Text; var HostNameOut: Text)
+    procedure GetSessionId(var HardwareIdOut: Text; var SessionNameOut: Text; var HostNameOut: Text)
     begin
         HardwareIdOut := HardwareId;
         SessionNameOut := SessionName;
         HostNameOut := HostName;
     end;
 
-        procedure DebugWithTimestamp(Trace: Text)
+    procedure DebugWithTimestamp(Trace: Text)
     begin
         //-NPR5.40 [306347]
         DebugTrace += Trace + ' at ' + Format(CurrentDateTime, 0, '<Hours24,2>:<Minutes,2>:<Seconds,2><Second dec>') + ';';
         //+NPR5.40 [306347]
     end;
 
-        procedure DebugFlush() Result: Text
+    procedure DebugFlush() Result: Text
     begin
         //-NPR5.40 [306347]
         Result := DebugTrace;
@@ -664,7 +664,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.40 [306347]
     end;
 
-        procedure AddServerStopwatch(Keyword: Text; Duration: Duration)
+    procedure AddServerStopwatch(Keyword: Text; Duration: Duration)
     var
         Durationms: Integer;
     begin
@@ -674,7 +674,7 @@ codeunit 6150700 "POS Session"
         //+NPR5.43 [315838]
     end;
 
-        procedure ServerStopwatchFlush() Result: Text
+    procedure ServerStopwatchFlush() Result: Text
     begin
         //-NPR5.43 [315838]
         Result := ServerStopwatch;
@@ -707,12 +707,12 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-        procedure RequestRefreshData()
+    procedure RequestRefreshData()
     begin
         DataRefreshRequested := true;
     end;
 
-        procedure IsDataRefreshNeeded() IsNeeded: Boolean
+    procedure IsDataRefreshNeeded() IsNeeded: Boolean
     begin
         IsNeeded := DataRefreshRequested;
         DataRefreshRequested := false;
@@ -756,21 +756,21 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-        procedure ChangeViewLogin()
+    procedure ChangeViewLogin()
     begin
         // TODO: any business logic goes here
 
         FrontEnd.LoginView(Setup);
     end;
 
-        procedure ChangeViewSale()
+    procedure ChangeViewSale()
     begin
         // TODO: any business logic goes here
 
         FrontEnd.SaleView(Setup);
     end;
 
-        procedure ChangeViewPayment()
+    procedure ChangeViewPayment()
     var
         POSViewChangeWorkflowMgt: Codeunit "POS View Change Workflow Mgt.";
     begin
@@ -781,14 +781,14 @@ codeunit 6150700 "POS Session"
         FrontEnd.PaymentView(Setup);
     end;
 
-        procedure ChangeViewLocked()
+    procedure ChangeViewLocked()
     begin
         //-NPR5.37 [293905]
         FrontEnd.LockedView(Setup);
         //+NPR5.37 [293905]
     end;
 
-        procedure ChangeViewBalancing()
+    procedure ChangeViewBalancing()
     begin
         // TODO: any business logic goes here
 
@@ -800,13 +800,13 @@ codeunit 6150700 "POS Session"
 
         //-NPR5.55 [406862]
         if (IsDragonglassSession()) then begin
-          //FrontEnd.RestaurantView (Setup);
-          Error ('FrontEnd.RestaurantView() missing');
-          exit;
+            //FrontEnd.RestaurantView (Setup);
+            Error('FrontEnd.RestaurantView() missing');
+            exit;
         end;
 
-        Message ('Restaurant view is not supported in this version. Change the setup on the POS View Profile. The default view is selected.');
-        ChangeViewSale ();
+        Message('Restaurant view is not supported in this version. Change the setup on the POS View Profile. The default view is selected.');
+        ChangeViewSale();
         //+NPR5.55 [406862]
     end;
 
@@ -814,7 +814,7 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-        procedure IsActiveSession(var FrontEndOut: Codeunit "POS Front End Management"): Boolean
+    procedure IsActiveSession(var FrontEndOut: Codeunit "POS Front End Management"): Boolean
     var
         POSSessionCheck: Codeunit "POS Session";
         Active: Boolean;
