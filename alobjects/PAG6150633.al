@@ -12,7 +12,7 @@ page 6150633 "NPRE Select Flow Status"
     InsertAllowed = false;
     PageType = ListPlus;
     SourceTable = "NPRE Flow Status";
-    SourceTableView = SORTING("Status Object","Flow Order");
+    SourceTableView = SORTING("Status Object", "Flow Order");
     UsageCategory = Administration;
 
     layout
@@ -21,7 +21,7 @@ page 6150633 "NPRE Select Flow Status"
         {
             repeater(Group)
             {
-                field(Selected;Selected)
+                field(Selected; Selected)
                 {
                     Caption = 'Selected';
                     Editable = true;
@@ -32,25 +32,25 @@ page 6150633 "NPRE Select Flow Status"
                         Mark(Selected);  //NPR5.55 [382428]
                     end;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
                     Editable = false;
                 }
-                field("Status Object";"Status Object")
+                field("Status Object"; "Status Object")
                 {
                     Editable = false;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                     Editable = false;
                 }
-                field("Flow Order";"Flow Order")
+                field("Flow Order"; "Flow Order")
                 {
                     Editable = false;
                 }
-                field(PrintCategories;AssignedPrintCategoriesAsFilterString())
+                field(AssignedPrintCategories; AssignedPrintCategoriesAsFilterString())
                 {
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
@@ -120,23 +120,23 @@ page 6150633 "NPRE Select Flow Status"
         CurrFilterGr: Integer;
     begin
         if CurrPage.LookupMode then begin
-          StatusObjectVisible := false;
+            StatusObjectVisible := false;
         end else begin
-          StatusObjectVisible := true;
+            StatusObjectVisible := true;
         end;
         ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);  //NPR5.53 [360258]
         //-NPR5.55 [382428]
         if not ShowPrintCategories then begin
-          CurrFilterGr := FilterGroup;
-          if CurrFilterGr <> 2 then begin
-            FilterGroup(2);
-            ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
-            FilterGroup(CurrFilterGr);
-          end;
+            CurrFilterGr := FilterGroup;
+            if CurrFilterGr <> 2 then begin
+                FilterGroup(2);
+                ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
+                FilterGroup(CurrFilterGr);
+            end;
         end;
         ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
         if ShowPrintCategories then
-          ShowPrintCategories := ServingStepDiscoveryMethod = 0;
+            ShowPrintCategories := ServingStepDiscoveryMethod = 0;
         //+NPR5.55 [382428]
     end;
 
@@ -154,7 +154,7 @@ page 6150633 "NPRE Select Flow Status"
         WaiterPadMgt: Codeunit "NPRE Waiter Pad Management";
     begin
         //-NPR5.55 [382428]
-        TestField("Status Object","Status Object"::WaiterPadLineMealFlow);
+        TestField("Status Object", "Status Object"::WaiterPadLineMealFlow);
         TestField(Code);
         WaiterPadMgt.SelectPrintCategories(RecordId);
         //+NPR5.55 [382428]
@@ -183,12 +183,12 @@ page 6150633 "NPRE Select Flow Status"
         //-NPR5.55 [382428]
         FlowStatus.Copy(Rec);
         if FlowStatus.GetFilters <> '' then begin
-          RecRef.GetTable(FlowStatus);
-          for i := 1 to RecRef.FieldCount do begin
-            FldRef := RecRef.FieldIndex(i);
-            if FldRef.GetFilter <> '' then
-              FldRef.SetRange();
-          end;
+            RecRef.GetTable(FlowStatus);
+            for i := 1 to RecRef.FieldCount do begin
+                FldRef := RecRef.FieldIndex(i);
+                if FldRef.GetFilter <> '' then
+                    FldRef.SetRange();
+            end;
         end;
         //+NPR5.55 [382428]
     end;
@@ -197,10 +197,10 @@ page 6150633 "NPRE Select Flow Status"
     begin
         //-NPR5.55 [382428]
         case "Status Object" of
-          "Status Object"::WaiterPadLineMealFlow:
-            exit(ServStepsLb);
-          else
-            exit(Format("Status Object"));
+            "Status Object"::WaiterPadLineMealFlow:
+                exit(ServStepsLb);
+            else
+                exit(Format("Status Object"));
         end;
         //+NPR5.55 [382428]
     end;

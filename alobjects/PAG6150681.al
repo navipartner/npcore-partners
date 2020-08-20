@@ -16,13 +16,13 @@ page 6150681 "NPRE Item Routing Profiles"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("AssignedFlowStatusesAsString(FlowStatus.""Status Object""::WaiterPadLineMealFlow)";AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
+                field(AssignedFlowStatuses; AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
                     Caption = 'Serving Steps';
                     Editable = false;
@@ -32,7 +32,7 @@ page 6150681 "NPRE Item Routing Profiles"
                         ShowFlowStatuses(FlowStatus."Status Object"::WaiterPadLineMealFlow);
                     end;
                 }
-                field("AssignedPrintCategoriesAsString()";AssignedPrintCategoriesAsString())
+                field(AssignedPrintCategories; AssignedPrintCategoriesAsString())
                 {
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
