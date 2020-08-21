@@ -18,68 +18,76 @@ page 6060105 "MM Loyalty Setup"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Collection Period";"Collection Period")
+                field("Collection Period"; "Collection Period")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         //-MM1.37 [343053]
-                        CurrPage.Update (true);
+                        CurrPage.Update(true);
                         //+MM1.37 [343053]
                     end;
                 }
-                field("Fixed Period Start";"Fixed Period Start")
+                field("Fixed Period Start"; "Fixed Period Start")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
 
                     trigger OnValidate()
                     begin
                         //-MM1.37 [343053]
-                        CurrPage.Update (true);
+                        CurrPage.Update(true);
                         //+MM1.37 [343053]
                     end;
                 }
-                field("Collection Period Length";"Collection Period Length")
+                field("Collection Period Length"; "Collection Period Length")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
 
                     trigger OnValidate()
                     begin
                         //-MM1.37 [343053]
-                        CurrPage.Update (true);
+                        CurrPage.Update(true);
                         //+MM1.37 [343053]
                     end;
                 }
-                field("Expire Uncollected Points";"Expire Uncollected Points")
+                field("Expire Uncollected Points"; "Expire Uncollected Points")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         //-MM1.37 [343053]
-                        CurrPage.Update (true);
+                        CurrPage.Update(true);
                         //+MM1.37 [343053]
                     end;
                 }
-                field("Expire Uncollected After";"Expire Uncollected After")
+                field("Expire Uncollected After"; "Expire Uncollected After")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         //-MM1.37 [343053]
-                        CurrPage.Update (true);
+                        CurrPage.Update(true);
                         //+MM1.37 [343053]
                     end;
                 }
-                field(TestDate;TestDate)
+                field(TestDate; TestDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Period Test Date';
                     Visible = false;
 
@@ -88,55 +96,68 @@ page 6060105 "MM Loyalty Setup"
                         LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
                     begin
                         //-MM1.37 [343053]
-                        LoyaltyPointManagement.CalcultatePointsValidPeriod (Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
-                        CurrPage.Update (true);
+                        LoyaltyPointManagement.CalcultatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
+                        CurrPage.Update(true);
                         //+MM1.37 [343053]
                     end;
                 }
-                field(CollectionPeriodStart;CollectionPeriodStart)
+                field(CollectionPeriodStart; CollectionPeriodStart)
                 {
+                    ApplicationArea = All;
                     Caption = 'Earn Period Start';
                     Editable = false;
                 }
-                field(CollectionPeriodEnd;CollectionPeriodEnd)
+                field(CollectionPeriodEnd; CollectionPeriodEnd)
                 {
+                    ApplicationArea = All;
                     Caption = 'Earn Period End';
                     Editable = false;
                 }
-                field(ExpirePointsAt;ExpirePointsAt)
+                field(ExpirePointsAt; ExpirePointsAt)
                 {
+                    ApplicationArea = All;
                     Caption = 'Expire Points At';
                     Editable = false;
                 }
-                field("Voucher Point Source";"Voucher Point Source")
+                field("Voucher Point Source"; "Voucher Point Source")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voucher Point Threshold";"Voucher Point Threshold")
+                field("Voucher Point Threshold"; "Voucher Point Threshold")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voucher Creation";"Voucher Creation")
+                field("Voucher Creation"; "Voucher Creation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Point Base";"Point Base")
+                field("Point Base"; "Point Base")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Base";"Amount Base")
+                field("Amount Base"; "Amount Base")
                 {
+                    ApplicationArea = All;
                 }
-                field("Points On Discounted Sales";"Points On Discounted Sales")
+                field("Points On Discounted Sales"; "Points On Discounted Sales")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Factor";"Amount Factor")
+                field("Amount Factor"; "Amount Factor")
                 {
+                    ApplicationArea = All;
                 }
-                field("Point Rate";"Point Rate")
+                field("Point Rate"; "Point Rate")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Upgrade Point Source";"Auto Upgrade Point Source")
+                field("Auto Upgrade Point Source"; "Auto Upgrade Point Source")
                 {
+                    ApplicationArea = All;
                 }
-                field(ReasonText;ReasonText)
+                field(ReasonText; ReasonText)
                 {
+                    ApplicationArea = All;
                     Caption = 'ReasonText';
                     Editable = false;
                     Style = Attention;
@@ -159,7 +180,7 @@ page 6060105 "MM Loyalty Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "MM Loyalty Points Setup";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
             }
             action("Item Points Setup")
             {
@@ -169,7 +190,7 @@ page 6060105 "MM Loyalty Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "MM Loyalty Item Point Setup";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
             }
             separator(Separator6014432)
             {
@@ -181,7 +202,7 @@ page 6060105 "MM Loyalty Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "MM Loyalty Alter Membership";
-                RunPageLink = "Loyalty Code"=FIELD(Code);
+                RunPageLink = "Loyalty Code" = FIELD(Code);
             }
             group("Cross Company Loyalty")
             {
@@ -221,7 +242,7 @@ page 6060105 "MM Loyalty Setup"
                 trigger OnAction()
                 begin
 
-                    ExpirePoints ();
+                    ExpirePoints();
                 end;
             }
         }
@@ -237,23 +258,23 @@ page 6060105 "MM Loyalty Setup"
         CollectionPeriodStart := 0D;
         ReasonText := '';
         if (Rec."Collection Period" = Rec."Collection Period"::FIXED) then begin
-          LoyaltyPointManagement.CalcultatePointsValidPeriod (Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
+            LoyaltyPointManagement.CalcultatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
 
-          ExpirePointsAt := 0D;
-          if ("Expire Uncollected Points") then
-            if (Format ("Expire Uncollected After") <> '') then
-              if (CollectionPeriodEnd <> 0D) then
-                ExpirePointsAt := CalcDate ("Expire Uncollected After", CollectionPeriodEnd);
+            ExpirePointsAt := 0D;
+            if ("Expire Uncollected Points") then
+                if (Format("Expire Uncollected After") <> '') then
+                    if (CollectionPeriodEnd <> 0D) then
+                        ExpirePointsAt := CalcDate("Expire Uncollected After", CollectionPeriodEnd);
 
-          PeriodCalculationIssue := not LoyaltyPointManagement.ValidateFixedPeriodCalculation (Rec, ReasonText);
+            PeriodCalculationIssue := not LoyaltyPointManagement.ValidateFixedPeriodCalculation(Rec, ReasonText);
         end;
         //+MM1.37 [343053]
 
         //-MM1.43 [388058]
         if (Rec."Collection Period" = Rec."Collection Period"::AS_YOU_GO) then begin
-          if ("Expire Uncollected Points") then
-            if (Format ("Expire Uncollected After") <> '') then
-              ExpirePointsAt := CalcDate ("Expire Uncollected After", Today);
+            if ("Expire Uncollected Points") then
+                if (Format("Expire Uncollected After") <> '') then
+                    ExpirePointsAt := CalcDate("Expire Uncollected After", Today);
         end;
         //+MM1.43 [388058]
     end;
@@ -278,7 +299,7 @@ page 6060105 "MM Loyalty Setup"
         LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
     begin
 
-        LoyaltyPointManagement.ExpireFixedPeriodPoints (Rec.Code);
+        LoyaltyPointManagement.ExpireFixedPeriodPoints(Rec.Code);
     end;
 }
 

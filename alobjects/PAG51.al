@@ -1,4 +1,4 @@
-pageextension 6014454 pageextension6014454 extends "Purchase Invoice" 
+pageextension 6014454 pageextension6014454 extends "Purchase Invoice"
 {
     // NPR4.15/TS/20151013 CASE 224751 Added NpAttribute Factbox
     // NPR4.18/TS/20151211  CASE 228030 Added field Posting Description
@@ -12,16 +12,17 @@ pageextension 6014454 pageextension6014454 extends "Purchase Invoice"
     {
         addafter(Status)
         {
-            field(PostingDescription;"Posting Description")
+            field(PostingDescription; "Posting Description")
             {
+                ApplicationArea = All;
             }
         }
         addafter(Control1906949207)
         {
-            part(Control6150614;"NP Attributes FactBox")
+            part(Control6150614; "NP Attributes FactBox")
             {
                 Provider = PurchLines;
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
             }
         }
     }

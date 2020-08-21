@@ -15,12 +15,14 @@ page 6014499 "Dynamic Modules"
         {
             repeater(Group)
             {
-                field("Module Name";"Module Name")
+                field("Module Name"; "Module Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

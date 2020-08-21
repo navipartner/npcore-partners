@@ -22,8 +22,9 @@ page 6151443 "Magento Display Config"
             group(Control6150616)
             {
                 ShowCaption = false;
-                field(ItemTypeFilter;ItemTypeFilter)
+                field(ItemTypeFilter; ItemTypeFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Type Filter';
 
                     trigger OnValidate()
@@ -33,8 +34,9 @@ page 6151443 "Magento Display Config"
                         SetRecFilters;
                     end;
                 }
-                field(NumberFilterCtrl;NumberFilter)
+                field(NumberFilterCtrl; NumberFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Code Filter';
                     Editable = NumberFilterCtrlEnabled;
                     Enabled = NumberFilterCtrlEnabled;
@@ -46,30 +48,30 @@ page 6151443 "Magento Display Config"
                         Brands: Page "Magento Brands";
                     begin
                         case Type of
-                          Type::Item:
-                            begin
-                              ItemList.LookupMode := true;
-                              if ItemList.RunModal = ACTION::LookupOK then
-                                Text := ItemList.GetSelectionFilter
-                              else
-                                exit(false);
-                            end;
-                          Type::"Item Group":
-                            begin
-                              ItemGroups.LookupMode := true;
-                              if ItemGroups.RunModal = ACTION::LookupOK then
-                                Text := ItemGroups.GetSelectionFilter
-                              else
-                                exit(false);
-                            end;
-                          Type::Brand:
-                            begin
-                              Brands.LookupMode := true;
-                              if Brands.RunModal = ACTION::LookupOK then
-                                Text := Brands.GetSelectionFilter
-                              else
-                                exit(false);
-                            end;
+                            Type::Item:
+                                begin
+                                    ItemList.LookupMode := true;
+                                    if ItemList.RunModal = ACTION::LookupOK then
+                                        Text := ItemList.GetSelectionFilter
+                                    else
+                                        exit(false);
+                                end;
+                            Type::"Item Group":
+                                begin
+                                    ItemGroups.LookupMode := true;
+                                    if ItemGroups.RunModal = ACTION::LookupOK then
+                                        Text := ItemGroups.GetSelectionFilter
+                                    else
+                                        exit(false);
+                                end;
+                            Type::Brand:
+                                begin
+                                    Brands.LookupMode := true;
+                                    if Brands.RunModal = ACTION::LookupOK then
+                                        Text := Brands.GetSelectionFilter
+                                    else
+                                        exit(false);
+                                end;
                         end;
 
                         exit(true);
@@ -85,32 +87,41 @@ page 6151443 "Magento Display Config"
             repeater(Control6150617)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Type";"Sales Type")
+                field("Sales Type"; "Sales Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Code";"Sales Code")
+                field("Sales Code"; "Sales Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Is Visible";"Is Visible")
+                field("Is Visible"; "Is Visible")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -140,17 +151,17 @@ page 6151443 "Magento Display Config"
         TempTypeFilter: Text;
     begin
         if GetFilters <> '' then begin
-          //-MAG1.21
-          //IF GETFILTER("No.") <> '' THEN
-          TempTypeFilter := GetFilter(Type);
-          if TempTypeFilter <> '' then begin
-            Evaluate(Type,TempTypeFilter);
-          //+MAG1.21
-            ItemTypeFilter := Type;
-          end else
-            ItemTypeFilter := ItemTypeFilter::None;
+            //-MAG1.21
+            //IF GETFILTER("No.") <> '' THEN
+            TempTypeFilter := GetFilter(Type);
+            if TempTypeFilter <> '' then begin
+                Evaluate(Type, TempTypeFilter);
+                //+MAG1.21
+                ItemTypeFilter := Type;
+            end else
+                ItemTypeFilter := ItemTypeFilter::None;
 
-          NumberFilter := GetFilter("No.");
+            NumberFilter := GetFilter("No.");
         end;
     end;
 
@@ -160,14 +171,17 @@ page 6151443 "Magento Display Config"
 
         SetRange(Type);
         case ItemTypeFilter of
-          ItemTypeFilter::Item : SetRange(Type,Type::Item);
-          ItemTypeFilter::"Item Group" : SetRange(Type,Type::"Item Group");
-          ItemTypeFilter::Brand : SetRange(Type,Type::Brand);
+            ItemTypeFilter::Item:
+                SetRange(Type, Type::Item);
+            ItemTypeFilter::"Item Group":
+                SetRange(Type, Type::"Item Group");
+            ItemTypeFilter::Brand:
+                SetRange(Type, Type::Brand);
         end;
 
         if ItemTypeFilter = ItemTypeFilter::None then begin
-          NumberFilterCtrlEnabled := false;
-          NumberFilter := '';
+            NumberFilterCtrlEnabled := false;
+            NumberFilter := '';
         end;
 
         //-MAG1.21
@@ -190,25 +204,25 @@ page 6151443 "Magento Display Config"
         GetRecFilters;
 
         if "Sales Type" <> "Sales Type"::"All Customers" then
-          SalesCodeEnabled := true
+            SalesCodeEnabled := true
         else
-          SalesCodeEnabled := false;
+            SalesCodeEnabled := false;
 
         SourceTableName := '';
         case ItemTypeFilter of
-          ItemTypeFilter::Item:
-            begin
-              SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table,27);
-              Item."No." := NumberFilter;
-            end;
-          ItemTypeFilter::"Item Group":
-            begin
-              SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table,6059852);
-              ItemGroup.Id := NumberFilter;
-            end;
+            ItemTypeFilter::Item:
+                begin
+                    SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 27);
+                    Item."No." := NumberFilter;
+                end;
+            ItemTypeFilter::"Item Group":
+                begin
+                    SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 6059852);
+                    ItemGroup.Id := NumberFilter;
+                end;
         end;
 
-        exit(StrSubstNo('%1 %2 %3 %4',SalesSrcTableName,Description,SourceTableName,NumberFilter));
+        exit(StrSubstNo('%1 %2 %3 %4', SalesSrcTableName, Description, SourceTableName, NumberFilter));
     end;
 }
 

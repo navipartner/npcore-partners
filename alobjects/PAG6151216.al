@@ -12,17 +12,19 @@ page 6151216 "NpCs Open. Hour Set Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
-            part("Opening Hours";"NpCs Open. Hour Set Subpage")
+            part("Opening Hours"; "NpCs Open. Hour Set Subpage")
             {
                 Caption = 'Opening Hours';
-                SubPageLink = "Set Code"=FIELD(Code);
+                SubPageLink = "Set Code" = FIELD(Code);
             }
         }
     }

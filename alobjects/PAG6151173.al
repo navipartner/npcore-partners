@@ -13,38 +13,49 @@ page 6151173 "NpGp POS Info POS Entry"
         {
             repeater(Group)
             {
-                field("POS Info Code";"POS Info Code")
+                field("POS Info Code"; "POS Info Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Info";"POS Info")
+                field("POS Info"; "POS Info")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field(Price;Price)
+                field(Price; Price)
                 {
+                    ApplicationArea = All;
                 }
-                field("Net Amount";"Net Amount")
+                field("Net Amount"; "Net Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gross Amount";"Gross Amount")
+                field("Gross Amount"; "Gross Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Line No.";"Sales Line No.")
+                field("Sales Line No."; "Sales Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

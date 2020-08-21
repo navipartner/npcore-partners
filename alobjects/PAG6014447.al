@@ -7,8 +7,8 @@ page 6014447 "Mixed Discount Part List"
     Editable = false;
     PageType = List;
     SourceTable = "Mixed Discount";
-    SourceTableView = SORTING("Starting date","Starting time","Ending date","Ending time")
-                      WHERE("Mix Type"=CONST("Combination Part"));
+    SourceTableView = SORTING("Starting date", "Starting time", "Ending date", "Ending time")
+                      WHERE("Mix Type" = CONST("Combination Part"));
 
     layout
     {
@@ -17,29 +17,36 @@ page 6014447 "Mixed Discount Part List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Caption = 'Mix No.';
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Lot;Lot)
+                field(Lot; Lot)
                 {
+                    ApplicationArea = All;
                 }
-                field("Min. Quantity";"Min. Quantity")
+                field("Min. Quantity"; "Min. Quantity")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                 }
-                field("Max. Quantity";"Max. Quantity")
+                field("Max. Quantity"; "Max. Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created the";"Created the")
+                field("Created the"; "Created the")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

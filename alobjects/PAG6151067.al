@@ -12,33 +12,42 @@ page 6151067 "Distribution Orders"
         {
             repeater(Group)
             {
-                field("Distribution Item";"Distribution Item")
+                field("Distribution Item"; "Distribution Item")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Location;Location)
+                field(Location; Location)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Variant";"Item Variant")
+                field("Item Variant"; "Item Variant")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Quantity";"Distribution Quantity")
+                field("Distribution Quantity"; "Distribution Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Avaliable Quantity";"Avaliable Quantity")
+                field("Avaliable Quantity"; "Avaliable Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Demanded Quantity";"Demanded Quantity")
+                field("Demanded Quantity"; "Demanded Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty On PO";"Qty On PO")
+                field("Qty On PO"; "Qty On PO")
                 {
+                    ApplicationArea = All;
                     Caption = '<Qty On Purchase Orders>';
                 }
-                field("Qty On Transfer";"Qty On Transfer")
+                field("Qty On Transfer"; "Qty On Transfer")
                 {
+                    ApplicationArea = All;
                     Caption = '<Qty On Transfer Orders>';
                 }
             }

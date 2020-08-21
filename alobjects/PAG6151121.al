@@ -13,18 +13,22 @@ page 6151121 "GDPR Agreement List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Latest Version";"Latest Version")
+                field("Latest Version"; "Latest Version")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Version";"Current Version")
+                field("Current Version"; "Current Version")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -36,8 +40,8 @@ page 6151121 "GDPR Agreement List"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange ("Date Filter", Today);
-        CalcFields ("Current Version");
+        SetRange("Date Filter", Today);
+        CalcFields("Current Version");
     end;
 }
 

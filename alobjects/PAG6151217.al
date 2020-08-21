@@ -19,22 +19,27 @@ page 6151217 "NpCs Open. Hour Set Subpage"
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field("Entry Type";"Entry Type")
+                    field("Entry Type"; "Entry Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Start Time";"Start Time")
+                    field("Start Time"; "Start Time")
                     {
+                        ApplicationArea = All;
                         Editable = "Entry Type" = 0;
                     }
-                    field("End Time";"End Time")
+                    field("End Time"; "End Time")
                     {
+                        ApplicationArea = All;
                         Editable = "Entry Type" = 0;
                     }
-                    field("Period Type";"Period Type")
+                    field("Period Type"; "Period Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Period Description";"Period Description")
+                    field("Period Description"; "Period Description")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
@@ -45,34 +50,42 @@ page 6151217 "NpCs Open. Hour Set Subpage"
                     {
                         ShowCaption = false;
                         Visible = ("Period Type" = 1);
-                        field(Monday;Monday)
+                        field(Monday; Monday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Tuesday;Tuesday)
+                        field(Tuesday; Tuesday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Wednesday;Wednesday)
+                        field(Wednesday; Wednesday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Thursday;Thursday)
+                        field(Thursday; Thursday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Friday;Friday)
+                        field(Friday; Friday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Saturday;Saturday)
+                        field(Saturday; Saturday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Sunday;Sunday)
+                        field(Sunday; Sunday)
                         {
+                            ApplicationArea = All;
                         }
                     }
                     group(Control6014420)
                     {
                         ShowCaption = false;
                         Visible = ("Period Type" = 2) OR ("Period Type" = 3);
-                        field("Entry Date";"Entry Date")
+                        field("Entry Date"; "Entry Date")
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }

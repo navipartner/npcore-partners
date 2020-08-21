@@ -16,57 +16,68 @@ page 6060128 "MM Membership Member ListPart"
         {
             repeater(Group)
             {
-                field("Member Role";"Member Role")
+                field("Member Role"; "Member Role")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member No.";"External Member No.")
+                field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "MM Member Card";
                     LookupPageID = "MM Member Card";
                 }
-                field("Member Display Name";"Member Display Name")
+                field("Member Display Name"; "Member Display Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("GDPR Approval";"GDPR Approval")
+                field("GDPR Approval"; "GDPR Approval")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GDPRConsentLog: Record "GDPR Consent Log";
                         GDPRConsentLogPage: Page "GDPR Consent Log";
                     begin
-                        GDPRConsentLog.FilterGroup (2);
-                        GDPRConsentLog.SetFilter ("Agreement No.", '=%1', "GDPR Agreement No.");
-                        GDPRConsentLog.SetFilter ("Data Subject Id", '=%1', "GDPR Data Subject Id");
-                        GDPRConsentLog.FilterGroup (0);
-                        GDPRConsentLogPage.SetTableView (GDPRConsentLog);
-                        GDPRConsentLogPage.RunModal ();
+                        GDPRConsentLog.FilterGroup(2);
+                        GDPRConsentLog.SetFilter("Agreement No.", '=%1', "GDPR Agreement No.");
+                        GDPRConsentLog.SetFilter("Data Subject Id", '=%1', "GDPR Data Subject Id");
+                        GDPRConsentLog.FilterGroup(0);
+                        GDPRConsentLogPage.SetTableView(GDPRConsentLog);
+                        GDPRConsentLogPage.RunModal();
                     end;
                 }
-                field("User Logon ID";"User Logon ID")
+                field("User Logon ID"; "User Logon ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Password Hash";"Password Hash")
+                field("Password Hash"; "Password Hash")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Count";"Member Count")
+                field("Member Count"; "Member Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("GDPR Agreement No.";"GDPR Agreement No.")
+                field("GDPR Agreement No."; "GDPR Agreement No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("GDPR Data Subject Id";"GDPR Data Subject Id")
+                field("GDPR Data Subject Id"; "GDPR Data Subject Id")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
@@ -82,7 +93,7 @@ page 6060128 "MM Membership Member ListPart"
     begin
 
         //-MM1.22 [287080]
-        SetFilter ("Member Role", '<> %1', "Member Role"::ANONYMOUS);
+        SetFilter("Member Role", '<> %1', "Member Role"::ANONYMOUS);
     end;
 }
 

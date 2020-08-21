@@ -13,24 +13,27 @@ page 6151455 "Magento Video Links"
         {
             repeater(Group)
             {
-                field("Video Url";"Video Url")
+                field("Video Url"; "Video Url")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     var
                         MagentoVideoLink: Record "Magento Video Link";
                     begin
-                        if ((StrPos("Video Url",'youtube.com') = 0  ) and (StrPos("Video Url",'vimeo.com') = 0) and (StrPos("Video Url",'youtu.be') = 0)) then
-                         Error(Text00001);
-                        if (StrPos("Video Url",'http://') <> 0) or (StrPos("Video Url",'https://') <> 0) then
-                          exit;
+                        if ((StrPos("Video Url", 'youtube.com') = 0) and (StrPos("Video Url", 'vimeo.com') = 0) and (StrPos("Video Url", 'youtu.be') = 0)) then
+                            Error(Text00001);
+                        if (StrPos("Video Url", 'http://') <> 0) or (StrPos("Video Url", 'https://') <> 0) then
+                            exit;
                     end;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
-                field("Short Text";"Short Text")
+                field("Short Text"; "Short Text")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

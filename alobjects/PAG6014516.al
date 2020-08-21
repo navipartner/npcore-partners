@@ -27,54 +27,67 @@ page 6014516 "I-Comm"
                 group(SMTP)
                 {
                     Caption = 'SMTP';
-                    field("Local E-Mail Address";"Local E-Mail Address")
+                    field("Local E-Mail Address"; "Local E-Mail Address")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Local SMTP Pickup Library";"Local SMTP Pickup Library")
+                    field("Local SMTP Pickup Library"; "Local SMTP Pickup Library")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(SMS)
             {
                 Caption = 'SMS';
-                field("SMS-Address Postfix";"SMS-Address Postfix")
+                field("SMS-Address Postfix"; "SMS-Address Postfix")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Club Sender";"E-Club Sender")
+                field("E-Club Sender"; "E-Club Sender")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tailor Message";"Tailor Message")
+                field("Tailor Message"; "Tailor Message")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rental Message";"Rental Message")
+                field("Rental Message"; "Rental Message")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reg. Turnover Mobile No.";"Reg. Turnover Mobile No.")
+                field("Reg. Turnover Mobile No."; "Reg. Turnover Mobile No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register Turnover Mobile 2";"Register Turnover Mobile 2")
+                field("Register Turnover Mobile 2"; "Register Turnover Mobile 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register Turnover Mobile 3";"Register Turnover Mobile 3")
+                field("Register Turnover Mobile 3"; "Register Turnover Mobile 3")
                 {
+                    ApplicationArea = All;
                 }
-                field("SMS Type";"SMS Type")
+                field("SMS Type"; "SMS Type")
                 {
+                    ApplicationArea = All;
                 }
                 group(Control6014407)
                 {
                     ShowCaption = false;
                     Visible = ("SMS Type" = "SMS Type"::Endpoint);
-                    field("SMS Endpoint";"SMS Endpoint")
+                    field("SMS Endpoint"; "SMS Endpoint")
                     {
+                        ApplicationArea = All;
                     }
                 }
-                field("SMS Provider";"SMS Provider")
+                field("SMS Provider"; "SMS Provider")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Name and Numbers")
@@ -83,14 +96,17 @@ page 6014516 "I-Comm"
                 group(PhoneNoLookup)
                 {
                     Caption = 'Phone No. Lookup';
-                    field("Use Auto. Cust. Lookup";"Use Auto. Cust. Lookup")
+                    field("Use Auto. Cust. Lookup"; "Use Auto. Cust. Lookup")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Tunnel URL Address";"Tunnel URL Address")
+                    field("Tunnel URL Address"; "Tunnel URL Address")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Number Info Codeunit ID";"Number Info Codeunit ID")
+                    field("Number Info Codeunit ID"; "Number Info Codeunit ID")
                     {
+                        ApplicationArea = All;
                         LookupPageID = "All Objects with Caption";
 
                         trigger OnLookup(var Text: Text): Boolean
@@ -99,38 +115,45 @@ page 6014516 "I-Comm"
                         begin
                             //-NPR5.23 [226819]
                             GetPhoneLookupCU(TempAllObjWithCaption);
-                            if PAGE.RunModal(PAGE::"All Objects with Caption",TempAllObjWithCaption) = ACTION::LookupOK then begin
-                              "Number Info Codeunit ID" := TempAllObjWithCaption."Object ID";
-                              "Number Info Codeunit Name" := TempAllObjWithCaption."Object Name";
+                            if PAGE.RunModal(PAGE::"All Objects with Caption", TempAllObjWithCaption) = ACTION::LookupOK then begin
+                                "Number Info Codeunit ID" := TempAllObjWithCaption."Object ID";
+                                "Number Info Codeunit Name" := TempAllObjWithCaption."Object Name";
                             end;
                             //+NPR5.23 [226819]
                         end;
                     }
-                    field("Number Info Codeunit Name";"Number Info Codeunit Name")
+                    field("Number Info Codeunit Name"; "Number Info Codeunit Name")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
                 group(ConfigTemplate)
                 {
                     Caption = 'Config. Template';
-                    field("Config. Template (Customer)";"Config. Template (Customer)")
+                    field("Config. Template (Customer)"; "Config. Template (Customer)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Config Request (Customer)";"Config Request (Customer)")
+                    field("Config Request (Customer)"; "Config Request (Customer)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Config. Template (Vendor)";"Config. Template (Vendor)")
+                    field("Config. Template (Vendor)"; "Config. Template (Vendor)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Config Request (Vendor)";"Config Request (Vendor)")
+                    field("Config Request (Vendor)"; "Config Request (Vendor)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Config. Template (Contact)";"Config. Template (Contact)")
+                    field("Config. Template (Contact)"; "Config. Template (Contact)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Config Request (Contact)";"Config Request (Contact)")
+                    field("Config Request (Contact)"; "Config Request (Contact)")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -140,11 +163,13 @@ page 6014516 "I-Comm"
                 group(Control6150683)
                 {
                     ShowCaption = false;
-                    field("NAS - Enabled";"NAS - Enabled")
+                    field("NAS - Enabled"; "NAS - Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("NAS - Administrator CRM";"NAS - Administrator CRM")
+                    field("NAS - Administrator CRM"; "NAS - Administrator CRM")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -154,22 +179,26 @@ page 6014516 "I-Comm"
                 group("Document Clearing")
                 {
                     Caption = 'Document Clearing';
-                    field("Company - Clearing";"Company - Clearing")
+                    field("Company - Clearing"; "Company - Clearing")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Clearing - SQL";"Clearing - SQL")
+                    field("Clearing - SQL"; "Clearing - SQL")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group("Virtual PDF")
             {
                 Caption = 'Virtual PDF';
-                field("VirtualPDF Name";"VirtualPDF Name")
+                field("VirtualPDF Name"; "VirtualPDF Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Turnover - Email Addresses";"Turnover - Email Addresses")
+                field("Turnover - Email Addresses"; "Turnover - Email Addresses")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

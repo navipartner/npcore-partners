@@ -18,43 +18,55 @@ page 6014554 "Touch Screen - Sales Line Zoom"
             group(Control6014400)
             {
                 ShowCaption = false;
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No. not Created";"Serial No. not Created")
+                field("Serial No. not Created"; "Serial No. not Created")
                 {
+                    ApplicationArea = All;
                 }
-                field("Insurance Category";"Insurance Category")
+                field("Insurance Category"; "Insurance Category")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Reference;Reference)
+                field(Reference; Reference)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Dimension Set ID";"Dimension Set ID")
+                field("Dimension Set ID"; "Dimension Set ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Discount Type";"Discount Type")
+                field("Discount Type"; "Discount Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Discount Code";"Discount Code")
+                field("Discount Code"; "Discount Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

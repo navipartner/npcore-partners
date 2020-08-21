@@ -15,179 +15,226 @@ page 6059991 "Item Repair"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Item Ledger Entry Qty.";"Item Ledger Entry Qty.")
+                field("Item Ledger Entry Qty."; "Item Ledger Entry Qty.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Item Ledger Entry Exist";"Item Ledger Entry Exist")
+                field("Item Ledger Entry Exist"; "Item Ledger Entry Exist")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Item Ledger Entry Open";"Item Ledger Entry Open")
+                field("Item Ledger Entry Open"; "Item Ledger Entry Open")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Of tests";"No. Of tests")
+                field("No. Of tests"; "No. Of tests")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("No.Of Errors";"No.Of Errors")
+                field("No.Of Errors"; "No.Of Errors")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Errors Exists";"Errors Exists")
+                field("Errors Exists"; "Errors Exists")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("No. Of Item Actions";"No. Of Item Actions")
+                field("No. Of Item Actions"; "No. Of Item Actions")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field("No. Of Variant Actions";"No. Of Variant Actions")
+                field("No. Of Variant Actions"; "No. Of Variant Actions")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field("Variant Action";"Variant Action")
+                field("Variant Action"; "Variant Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1 Action";"Variety 1 Action")
+                field("Variety 1 Action"; "Variety 1 Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 Action";"Variety 2 Action")
+                field("Variety 2 Action"; "Variety 2 Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 3 Action";"Variety 3 Action")
+                field("Variety 3 Action"; "Variety 3 Action")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety3;
                 }
-                field("Variety 4 Action";"Variety 4 Action")
+                field("Variety 4 Action"; "Variety 4 Action")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety4;
                 }
-                field("Variety 1 Used";"Variety 1 Used")
+                field("Variety 1 Used"; "Variety 1 Used")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 2 Used";"Variety 2 Used")
+                field("Variety 2 Used"; "Variety 2 Used")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 3 Used";"Variety 3 Used")
+                field("Variety 3 Used"; "Variety 3 Used")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = ShowVariety3;
                 }
-                field("Variety 4 Used";"Variety 4 Used")
+                field("Variety 4 Used"; "Variety 4 Used")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = ShowVariety4;
                 }
-                field("Blocked (Var)";"Blocked (Var)")
+                field("Blocked (Var)"; "Blocked (Var)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 1 (Item)";"Variety 1 (Item)")
+                field("Variety 1 (Item)"; "Variety 1 (Item)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1 Table (Item)";"Variety 1 Table (Item)")
+                field("Variety 1 Table (Item)"; "Variety 1 Table (Item)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1 (Var)";"Variety 1 (Var)")
+                field("Variety 1 (Var)"; "Variety 1 (Var)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1 Table (Var)";"Variety 1 Table (Var)")
+                field("Variety 1 Table (Var)"; "Variety 1 Table (Var)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1 Value (Var)";"Variety 1 Value (Var)")
+                field("Variety 1 Value (Var)"; "Variety 1 Value (Var)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1 Value (Var) (NEW)";"Variety 1 Value (Var) (NEW)")
+                field("Variety 1 Value (Var) (NEW)"; "Variety 1 Value (Var) (NEW)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 (Item)";"Variety 2 (Item)")
+                field("Variety 2 (Item)"; "Variety 2 (Item)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 Table (Item)";"Variety 2 Table (Item)")
+                field("Variety 2 Table (Item)"; "Variety 2 Table (Item)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 (Var)";"Variety 2 (Var)")
+                field("Variety 2 (Var)"; "Variety 2 (Var)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 Table (Var)";"Variety 2 Table (Var)")
+                field("Variety 2 Table (Var)"; "Variety 2 Table (Var)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 Value (Var)";"Variety 2 Value (Var)")
+                field("Variety 2 Value (Var)"; "Variety 2 Value (Var)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 Value (Var) (NEW)";"Variety 2 Value (Var) (NEW)")
+                field("Variety 2 Value (Var) (NEW)"; "Variety 2 Value (Var) (NEW)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 3 (Item)";"Variety 3 (Item)")
+                field("Variety 3 (Item)"; "Variety 3 (Item)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety3;
                 }
-                field("Variety 3 Table (Item)";"Variety 3 Table (Item)")
+                field("Variety 3 Table (Item)"; "Variety 3 Table (Item)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety3;
                 }
-                field("Variety 3 (Var)";"Variety 3 (Var)")
+                field("Variety 3 (Var)"; "Variety 3 (Var)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety3;
                 }
-                field("Variety 3 Table (Var)";"Variety 3 Table (Var)")
+                field("Variety 3 Table (Var)"; "Variety 3 Table (Var)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety3;
                 }
-                field("Variety 3 Value (Var)";"Variety 3 Value (Var)")
+                field("Variety 3 Value (Var)"; "Variety 3 Value (Var)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety3;
                 }
-                field("Variety 3 Value (Var) (NEW)";"Variety 3 Value (Var) (NEW)")
+                field("Variety 3 Value (Var) (NEW)"; "Variety 3 Value (Var) (NEW)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety3;
                 }
-                field("Variety 4 (Item)";"Variety 4 (Item)")
+                field("Variety 4 (Item)"; "Variety 4 (Item)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety4;
                 }
-                field("Variety 4 Table (Item)";"Variety 4 Table (Item)")
+                field("Variety 4 Table (Item)"; "Variety 4 Table (Item)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety4;
                 }
-                field("Variety 4 (Var)";"Variety 4 (Var)")
+                field("Variety 4 (Var)"; "Variety 4 (Var)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety4;
                 }
-                field("Variety 4 Table (Var)";"Variety 4 Table (Var)")
+                field("Variety 4 Table (Var)"; "Variety 4 Table (Var)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety4;
                 }
-                field("Variety 4 Value (Var)";"Variety 4 Value (Var)")
+                field("Variety 4 Value (Var)"; "Variety 4 Value (Var)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety4;
                 }
-                field("Variety 4 Value (Var) (NEW)";"Variety 4 Value (Var) (NEW)")
+                field("Variety 4 Value (Var) (NEW)"; "Variety 4 Value (Var) (NEW)")
                 {
+                    ApplicationArea = All;
                     Visible = ShowVariety4;
                 }
-                field("Cross Variety No.";"Cross Variety No.")
+                field("Cross Variety No."; "Cross Variety No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Group";"Variety Group")
+                field("Variety Group"; "Variety Group")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -345,7 +392,7 @@ page 6059991 "Item Repair"
 
                     trigger OnAction()
                     begin
-                        ItemRepair.ManualSetAction(Rec,1,1);
+                        ItemRepair.ManualSetAction(Rec, 1, 1);
                     end;
                 }
                 action("Delete Variant")
@@ -356,7 +403,7 @@ page 6059991 "Item Repair"
                     trigger OnAction()
                     begin
                         TestField("Item Ledger Entry Exist", false);
-                        ItemRepair.ManualSetAction(Rec,1,2);
+                        ItemRepair.ManualSetAction(Rec, 1, 2);
                     end;
                 }
                 action("Force New Variety Value (Var)")

@@ -13,15 +13,19 @@ page 6151260 "NP Retail POS Entry Cue"
                 ShowCaption = false;
                 field("Failed G/L Posting Trans."; "Failed G/L Posting Trans.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Unposted Item Trans."; "Unposted Item Trans.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Unposted G/L Trans."; "Unposted G/L Trans.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Failed Item Transaction."; "Failed Item Transaction.")
                 {
+                    ApplicationArea = All;
                 }
             }
 

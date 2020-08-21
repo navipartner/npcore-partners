@@ -18,38 +18,48 @@ page 6150703 "POS Actions"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Workflow.HASVALUE()";Workflow.HasValue())
+                field("Workflow.HASVALUE()"; Workflow.HasValue())
                 {
+                    ApplicationArea = All;
                     Caption = 'Workflow Defined';
                 }
-                field("Data Source Name";"Data Source Name")
+                field("Data Source Name"; "Data Source Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocking UI";"Blocking UI")
+                field("Blocking UI"; "Blocking UI")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("<Blocking UI>";"Codeunit ID")
+                field("<Blocking UI>"; "Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Secure Method Code";"Secure Method Code")
+                field("Secure Method Code"; "Secure Method Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -83,7 +93,7 @@ page 6150703 "POS Actions"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Action Parameters";
-                RunPageLink = "POS Action Code"=FIELD(Code);
+                RunPageLink = "POS Action Code" = FIELD(Code);
             }
             action(Workflow)
             {
@@ -94,7 +104,7 @@ page 6150703 "POS Actions"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Action Workflow";
-                RunPageLink = "POS Action Code"=FIELD(Code);
+                RunPageLink = "POS Action Code" = FIELD(Code);
             }
         }
     }
@@ -108,25 +118,25 @@ page 6150703 "POS Actions"
     begin
         //-NPR5.40 [306347]
         if not SkipDiscovery then begin
-        //+NPR5.40 [306347]
-          //-NPR5.32.11 [281618]
-        //-NPR5.40 [306347]
-        //  CodeunitInstanceDetector.InitializeActionDiscovery();
-        //  BINDSUBSCRIPTION(CodeunitInstanceDetector);
-        //+NPR5.40 [306347]
-          //-NPR5.32.11 [281618]
-          //-NPR5.39 [299114]
-          Rec.DiscoverActions();
-          //Rec.OnDiscoverActions();
-          //+NPR5.39 [299114]
-        //-NPR5.40 [306347]
+            //+NPR5.40 [306347]
+            //-NPR5.32.11 [281618]
+            //-NPR5.40 [306347]
+            //  CodeunitInstanceDetector.InitializeActionDiscovery();
+            //  BINDSUBSCRIPTION(CodeunitInstanceDetector);
+            //+NPR5.40 [306347]
+            //-NPR5.32.11 [281618]
+            //-NPR5.39 [299114]
+            Rec.DiscoverActions();
+            //Rec.OnDiscoverActions();
+            //+NPR5.39 [299114]
+            //-NPR5.40 [306347]
         end;
 
         if ActionSpecified then begin
-          Rec.Code := POSActionCode;
-          Rec.Find('=><');
+            Rec.Code := POSActionCode;
+            Rec.Find('=><');
         end else
-          if Rec.FindFirst then;
+            if Rec.FindFirst then;
         //+NPR5.40 [306347]
     end;
 
@@ -143,11 +153,11 @@ page 6150703 "POS Actions"
     begin
         CurrPage.SetSelectionFilter(Action);
         if Action.FindSet then begin
-          repeat
-            ActionCopy := Action;
-            ActionCopy.RefreshWorkflow();
-          until Action.Next = 0;
-          Message(Text001,Action.Count);
+            repeat
+                ActionCopy := Action;
+                ActionCopy.RefreshWorkflow();
+            until Action.Next = 0;
+            Message(Text001, Action.Count);
         end;
     end;
 

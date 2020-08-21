@@ -18,53 +18,69 @@ page 6151382 "CS Stock-Take Rfid List"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch Id";"Batch Id")
+                field("Batch Id"; "Batch Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Function";"Request Function")
+                field("Request Function"; "Request Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch No.";"Batch No.")
+                field("Batch No."; "Batch No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Device Id";"Device Id")
+                field("Device Id"; "Device Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Tags;Tags)
+                field(Tags; Tags)
                 {
+                    ApplicationArea = All;
                 }
-                field(Handled;Handled)
+                field(Handled; Handled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch Posting";"Batch Posting")
+                field("Batch Posting"; "Batch Posting")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Started";"Posting Started")
+                field("Posting Started"; "Posting Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Ended";"Posting Ended")
+                field("Posting Ended"; "Posting Ended")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Error";"Posting Error")
+                field("Posting Error"; "Posting Error")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Error Detail";"Posting Error Detail")
+                field("Posting Error Detail"; "Posting Error Detail")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

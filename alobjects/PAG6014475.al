@@ -18,49 +18,63 @@ page 6014475 "Retail Price Log Entries"
         {
             repeater(Group)
             {
-                field("Date and Time";"Date and Time")
+                field("Date and Time"; "Date and Time")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Date;Date)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
-                field(Time;Time)
+                field(Time; Time)
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Change Log Entry No.";"Change Log Entry No.")
+                field("Change Log Entry No."; "Change Log Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Caption";"Table Caption")
+                field("Table Caption"; "Table Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Old Value";"Old Value")
+                field("Old Value"; "Old Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Value";"New Value")
+                field("New Value"; "New Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -73,7 +87,7 @@ page 6014475 "Retail Price Log Entries"
         {
             action("Update Price Log")
             {
-                AccessByPermission = TableData "Change Log Entry"=R;
+                AccessByPermission = TableData "Change Log Entry" = R;
                 Caption = 'Update Price Log';
                 Image = RefreshLines;
                 Promoted = true;

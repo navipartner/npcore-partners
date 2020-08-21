@@ -20,63 +20,82 @@ page 6151015 "NpRv Vouchers"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voucher Type";"Voucher Type")
+                field("Voucher Type"; "Voucher Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue Date";"Issue Date")
+                field("Issue Date"; "Issue Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("Initial Amount";"Initial Amount")
+                field("Initial Amount"; "Initial Amount")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue Register No.";"Issue Register No.")
+                field("Issue Register No."; "Issue Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue Document Type";"Issue Document Type")
+                field("Issue Document Type"; "Issue Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue Document No.";"Issue Document No.")
+                field("Issue Document No."; "Issue Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue External Document No.";"Issue External Document No.")
+                field("Issue External Document No."; "Issue External Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue User ID";"Issue User ID")
+                field("Issue User ID"; "Issue User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue Partner Code";"Issue Partner Code")
+                field("Issue Partner Code"; "Issue Partner Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Partner Clearing";"Partner Clearing")
+                field("Partner Clearing"; "Partner Clearing")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Send";"No. Send")
+                field("No. Send"; "No. Send")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -102,8 +121,8 @@ page 6151015 "NpRv Vouchers"
                         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
                     begin
                         CurrPage.SetSelectionFilter(Voucher);
-                        if not Confirm(Text000,false,Voucher.Count) then
-                          exit;
+                        if not Confirm(Text000, false, Voucher.Count) then
+                            exit;
 
                         NpRvVoucherMgt.ArchiveVouchers(Voucher);
                     end;
@@ -115,7 +134,7 @@ page 6151015 "NpRv Vouchers"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Ending Date",'<%1',CurrentDateTime);
+                        SetFilter("Ending Date", '<%1', CurrentDateTime);
                     end;
                 }
             }
@@ -127,7 +146,7 @@ page 6151015 "NpRv Vouchers"
                 Caption = 'Voucher Entries';
                 Image = Entries;
                 RunObject = Page "NpRv Voucher Entries";
-                RunPageLink = "Voucher No."=FIELD("No.");
+                RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
             }
             action("Sending Log")
@@ -135,7 +154,7 @@ page 6151015 "NpRv Vouchers"
                 Caption = 'Sending Log';
                 Image = Log;
                 RunObject = Page "NpRv Sending Log";
-                RunPageLink = "Voucher No."=FIELD("No.");
+                RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
             }
             action("Show Archived Vouchers")

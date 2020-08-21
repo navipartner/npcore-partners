@@ -12,8 +12,9 @@ page 6059953 "Display Content Lines Image"
     {
         area(content)
         {
-            field(Image;Image)
+            field(Image; Image)
             {
+                ApplicationArea = All;
             }
         }
     }

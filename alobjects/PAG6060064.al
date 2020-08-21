@@ -15,14 +15,17 @@ page 6060064 "EAN Prefixes per Countries"
         {
             repeater(Group)
             {
-                field("Country Code";"Country Code")
+                field("Country Code"; "Country Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Country Name";"Country Name")
+                field("Country Name"; "Country Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Prefix;Prefix)
+                field(Prefix; Prefix)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

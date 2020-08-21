@@ -14,17 +14,21 @@ page 6151041 "Notification List"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Title;Title)
+                field(Title; Title)
                 {
+                    ApplicationArea = All;
                 }
-                field(Handled;Handled)
+                field(Handled; Handled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Handled By";"Handled By")
+                field("Handled By"; "Handled By")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -44,7 +48,7 @@ page 6151041 "Notification List"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCompletedFlag(UserId,gRegisterNo,Format(Id));
+                    AFAPIWebService.SetNotificationCompletedFlag(UserId, gRegisterNo, Format(Id));
                     CurrPage.Update;
                 end;
             }
@@ -58,7 +62,7 @@ page 6151041 "Notification List"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCancelledFlag(UserId,gRegisterNo,Format(Id));
+                    AFAPIWebService.SetNotificationCancelledFlag(UserId, gRegisterNo, Format(Id));
                     CurrPage.Update;
                 end;
             }
@@ -74,9 +78,9 @@ page 6151041 "Notification List"
     trigger OnOpenPage()
     begin
         FilterGroup(2);
-        SetRange(Cancelled,0DT);
-        SetRange(Completed,0DT);
-        SetRange("Notification Delivered to Hub",true);
+        SetRange(Cancelled, 0DT);
+        SetRange(Completed, 0DT);
+        SetRange("Notification Delivered to Hub", true);
         FilterGroup(0);
     end;
 

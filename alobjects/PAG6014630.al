@@ -19,147 +19,173 @@ page 6014630 "RP Template Line Designer"
                 IndentationColumn = Level;
                 IndentationControls = Type;
                 ShowCaption = false;
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = "Type" = 1;
                 }
-                field("Type Option";"Type Option")
+                field("Type Option"; "Type Option")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field("Prefix Next Line";"Prefix Next Line")
+                field("Prefix Next Line"; "Prefix Next Line")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Data Item Name";"Data Item Name")
+                field("Data Item Name"; "Data Item Name")
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = "Type" = 1;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Operator;Operator)
+                field(Operator; Operator)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Field 2 Name";"Field 2 Name")
+                field("Field 2 Name"; "Field 2 Name")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Attribute;Attribute)
+                field(Attribute; Attribute)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Template Column No.";"Template Column No.")
+                field("Template Column No."; "Template Column No.")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(Prefix;Prefix)
+                field(Prefix; Prefix)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Postfix;Postfix)
+                field(Postfix; Postfix)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Default Value";"Default Value")
+                field("Default Value"; "Default Value")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Pad Char";"Pad Char")
+                field("Pad Char"; "Pad Char")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(Align;Align)
+                field(Align; Align)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(Bold;Bold)
+                field(Bold; Bold)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Width;Width)
+                field(Width; Width)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(Height;Height)
+                field(Height; Height)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field("Start Char";"Start Char")
+                field("Start Char"; "Start Char")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Max Length";"Max Length")
+                field("Max Length"; "Max Length")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Underline;Underline)
+                field(Underline; Underline)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Blank Zero";"Blank Zero")
+                field("Blank Zero"; "Blank Zero")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Skip If Empty";"Skip If Empty")
+                field("Skip If Empty"; "Skip If Empty")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Comments;Comments)
+                field(Comments; Comments)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Codeunit";"Processing Codeunit")
+                field("Processing Codeunit"; "Processing Codeunit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Function ID";"Processing Function ID")
+                field("Processing Function ID"; "Processing Function ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Function Parameter";"Processing Function Parameter")
+                field("Processing Function Parameter"; "Processing Function Parameter")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -178,10 +204,11 @@ page 6014630 "RP Template Line Designer"
         // VALIDATE(Level,Level+1);
         // MODIFY(TRUE);
         CurrPage.SetSelectionFilter(TemplateLine);
-        if TemplateLine.FindSet then repeat
-          TemplateLine.Validate(Level, TemplateLine.Level+1);
-          TemplateLine.Modify(true);
-        until TemplateLine.Next = 0;
+        if TemplateLine.FindSet then
+            repeat
+                TemplateLine.Validate(Level, TemplateLine.Level + 1);
+                TemplateLine.Modify(true);
+            until TemplateLine.Next = 0;
         //+NPR5.34 [284505]
     end;
 
@@ -196,12 +223,13 @@ page 6014630 "RP Template Line Designer"
         // MODIFY(TRUE);
 
         CurrPage.SetSelectionFilter(TemplateLine);
-        if TemplateLine.FindSet then repeat
-          if TemplateLine.Level > 0 then begin
-            TemplateLine.Validate(Level, TemplateLine.Level-1);
-            TemplateLine.Modify(true);
-          end;
-        until TemplateLine.Next = 0;
+        if TemplateLine.FindSet then
+            repeat
+                if TemplateLine.Level > 0 then begin
+                    TemplateLine.Validate(Level, TemplateLine.Level - 1);
+                    TemplateLine.Modify(true);
+                end;
+            until TemplateLine.Next = 0;
         //+NPR5.34 [284505]
     end;
 }

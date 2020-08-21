@@ -1,4 +1,4 @@
-pageextension 6014447 pageextension6014447 extends "Sales Order Subform" 
+pageextension 6014447 pageextension6014447 extends "Sales Order Subform"
 {
     // NPR4.04/MH/20150423  CASE 212082 Changed "Variant Code".VISIBLE from FALSE to TRUE
     // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"
@@ -11,22 +11,25 @@ pageextension 6014447 pageextension6014447 extends "Sales Order Subform"
     {
         addafter(Description)
         {
-            field("Description 2";"Description 2")
+            field("Description 2"; "Description 2")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
         addafter("Unit Cost (LCY)")
         {
-            field("Units per Parcel";"Units per Parcel")
+            field("Units per Parcel"; "Units per Parcel")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
         addafter("Inv. Discount Amount")
         {
-            field("Net Weight";"Net Weight")
+            field("Net Weight"; "Net Weight")
             {
+                ApplicationArea = All;
                 Importance = Additional;
             }
         }

@@ -11,14 +11,17 @@ page 6151331 "NP Retail Legal Page"
             {
                 field("Standard Conditions"; "Standard Conditions")
                 {
+                    ApplicationArea = All;
 
                 }
                 field("License Agreement"; "License Agreement")
                 {
+                    ApplicationArea = All;
 
                 }
                 field(Privacy; Privacy)
                 {
+                    ApplicationArea = All;
 
                 }
             }

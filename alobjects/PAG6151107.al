@@ -16,17 +16,21 @@ page 6151107 "NpRi Purch. Doc. Disc. Setup"
                 group(Control6014410)
                 {
                     ShowCaption = false;
-                    field("Discount %";"Discount %")
+                    field("Discount %"; "Discount %")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bal. Account No.";"Bal. Account No.")
+                    field("Bal. Account No."; "Bal. Account No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bal. Gen. Prod. Posting Group";"Bal. Gen. Prod. Posting Group")
+                    field("Bal. Gen. Prod. Posting Group"; "Bal. Gen. Prod. Posting Group")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bal. VAT Prod. Posting Group";"Bal. VAT Prod. Posting Group")
+                    field("Bal. VAT Prod. Posting Group"; "Bal. VAT Prod. Posting Group")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

@@ -18,6 +18,7 @@ page 6014460 "Inventory Pick Scan"
                 Caption = 'General';
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     QuickEntry = false;
 
                     trigger OnAssistEdit()
@@ -28,16 +29,19 @@ page 6014460 "Inventory Pick Scan"
                 }
                 field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                     QuickEntry = false;
                 }
                 field("Source Document"; "Source Document")
                 {
+                    ApplicationArea = All;
                     DrillDown = false;
                     Lookup = false;
                     QuickEntry = false;
                 }
                 field("Source No."; "Source No.")
                 {
+                    ApplicationArea = All;
                     QuickEntry = false;
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -56,32 +60,38 @@ page 6014460 "Inventory Pick Scan"
                 }
                 field("Destination No."; "Destination No.")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 0));
                     Editable = false;
                     QuickEntry = false;
                 }
                 field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationName("Destination Type", "Destination No."))
                 {
+                    ApplicationArea = All;
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 1));
                     Caption = 'Name';
                     Editable = false;
                 }
                 field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                     QuickEntry = false;
                 }
                 field("Shipment Date"; "Shipment Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     QuickEntry = false;
                 }
                 field("External Document No."; "External Document No.")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 2));
                     QuickEntry = false;
                 }
                 field("External Document No.2"; "External Document No.2")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 3));
                     QuickEntry = false;
                 }
@@ -91,11 +101,13 @@ page 6014460 "Inventory Pick Scan"
                 Caption = 'Scan';
                 field(QtyToHandleGlobal; QtyToHandleGlobal)
                 {
+                    ApplicationArea = All;
                     CaptionClass = QtyToHandleCaption;
                     QuickEntry = false;
                 }
                 field(Barcode; Barcode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Barcode';
 
                     trigger OnValidate()
@@ -141,6 +153,7 @@ page 6014460 "Inventory Pick Scan"
                 }
                 field(SerialNo; SerialNo)
                 {
+                    ApplicationArea = All;
                     CaptionClass = SerialNoCaption;
                     QuickEntry = false;
 
@@ -151,6 +164,7 @@ page 6014460 "Inventory Pick Scan"
                 }
                 field(LotNo; LotNo)
                 {
+                    ApplicationArea = All;
                     CaptionClass = LotNoCaption;
                     QuickEntry = false;
 

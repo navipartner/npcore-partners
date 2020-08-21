@@ -14,8 +14,9 @@ page 6014541 "Report Selection - Contract"
     {
         area(content)
         {
-            field(ReportType;ReportType)
+            field(ReportType; ReportType)
             {
+                ApplicationArea = All;
                 Caption = 'Report Type';
 
                 trigger OnValidate()
@@ -30,32 +31,41 @@ page 6014541 "Report Selection - Contract"
             repeater(Control6150615)
             {
                 ShowCaption = false;
-                field(Sequence;Sequence)
+                field(Sequence; Sequence)
                 {
+                    ApplicationArea = All;
                 }
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("XML Port ID";"XML Port ID")
+                field("XML Port ID"; "XML Port ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("XML Port Name";"XML Port Name")
+                field("XML Port Name"; "XML Port Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Report Name";"Report Name")
+                field("Report Name"; "Report Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit ID";"Codeunit ID")
+                field("Codeunit ID"; "Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit Name";"Codeunit Name")
+                field("Codeunit Name"; "Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Template";"Print Template")
+                field("Print Template"; "Print Template")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -88,7 +98,7 @@ page 6014541 "Report Selection - Contract"
     local procedure SetReportTypeFilter()
     begin
         FilterGroup(2);
-        SetRange( "Report Type", ReportType );
+        SetRange("Report Type", ReportType);
         FilterGroup(0);
         CurrPage.Update(false);
     end;

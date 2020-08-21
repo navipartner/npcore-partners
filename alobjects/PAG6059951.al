@@ -13,14 +13,17 @@ page 6059951 "Display Content"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Content Lines";"Content Lines")
+                field("Content Lines"; "Content Lines")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

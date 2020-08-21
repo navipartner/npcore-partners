@@ -12,53 +12,69 @@ page 6151394 "CS Counting Schedule"
         {
             repeater(Group)
             {
-                field("POS Store";"POS Store")
+                field("POS Store"; "POS Store")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Job Queue Created";"Job Queue Created")
+                field("Job Queue Created"; "Job Queue Created")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Executed";"Last Executed")
+                field("Last Executed"; "Last Executed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Earliest Start Date/Time";"Earliest Start Date/Time")
+                field("Earliest Start Date/Time"; "Earliest Start Date/Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expiration Date/Time";"Expiration Date/Time")
+                field("Expiration Date/Time"; "Expiration Date/Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Recurring Job";"Recurring Job")
+                field("Recurring Job"; "Recurring Job")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run on Mondays";"Run on Mondays")
+                field("Run on Mondays"; "Run on Mondays")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run on Tuesdays";"Run on Tuesdays")
+                field("Run on Tuesdays"; "Run on Tuesdays")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run on Wednesdays";"Run on Wednesdays")
+                field("Run on Wednesdays"; "Run on Wednesdays")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run on Thursdays";"Run on Thursdays")
+                field("Run on Thursdays"; "Run on Thursdays")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run on Fridays";"Run on Fridays")
+                field("Run on Fridays"; "Run on Fridays")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run on Saturdays";"Run on Saturdays")
+                field("Run on Saturdays"; "Run on Saturdays")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run on Sundays";"Run on Sundays")
+                field("Run on Sundays"; "Run on Sundays")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Minutes between Runs";"No. of Minutes between Runs")
+                field("No. of Minutes between Runs"; "No. of Minutes between Runs")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -98,7 +114,7 @@ page 6151394 "CS Counting Schedule"
                     CSStockTakes: Record "CS Stock-Takes";
                 begin
                     POSStore.Get("POS Store");
-                    CSStockTakes.SetFilter(Location,POSStore."Location Code");
+                    CSStockTakes.SetFilter(Location, POSStore."Location Code");
                     CSStockTakesList.SetTableView(CSStockTakes);
                     CSStockTakesList.Run;
                 end;
@@ -111,7 +127,7 @@ page 6151394 "CS Counting Schedule"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Job Queue Entry Card";
-                RunPageLink = ID=FIELD("Job Queue Entry ID");
+                RunPageLink = ID = FIELD("Job Queue Entry ID");
             }
         }
     }

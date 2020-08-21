@@ -14,14 +14,17 @@ page 6184893 "Storage Operation Types"
         {
             repeater(Group)
             {
-                field("Storage Type";"Storage Type")
+                field("Storage Type"; "Storage Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Operation Code";"Operation Code")
+                field("Operation Code"; "Operation Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -113,7 +116,7 @@ page 6184893 "Storage Operation Types"
     procedure HandleStorageID(StorageCode: Text[24])
     begin
         if StorageCode > '' then
-          StorageID := StorageCode;
+            StorageID := StorageCode;
     end;
 }
 

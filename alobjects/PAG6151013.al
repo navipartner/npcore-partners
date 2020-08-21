@@ -16,23 +16,29 @@ page 6151013 "NpRv Voucher Types"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid Period";"Valid Period")
+                field("Valid Period"; "Valid Period")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voucher Qty. (Open)";"Voucher Qty. (Open)")
+                field("Voucher Qty. (Open)"; "Voucher Qty. (Open)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Arch. Voucher Qty.";"Arch. Voucher Qty.")
+                field("Arch. Voucher Qty."; "Arch. Voucher Qty.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -47,7 +53,7 @@ page 6151013 "NpRv Voucher Types"
                 Caption = 'Vouchers';
                 Image = Voucher;
                 RunObject = Page "NpRv Vouchers";
-                RunPageLink = "Voucher Type"=FIELD(Code);
+                RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
             }
             action("Partner Relations")
@@ -55,7 +61,7 @@ page 6151013 "NpRv Voucher Types"
                 Caption = 'Partner Relations';
                 Image = UserCertificate;
                 RunObject = Page "NpRv Partner Relations";
-                RunPageLink = "Voucher Type"=FIELD(Code);
+                RunPageLink = "Voucher Type" = FIELD(Code);
             }
         }
     }

@@ -13,42 +13,54 @@ page 6151185 "MM Sponsorship Ticket Setup"
         {
             repeater(Group)
             {
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Event Type";"Event Type")
+                field("Event Type"; "Event Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery Method";"Delivery Method")
+                field("Delivery Method"; "Delivery Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Mode";"Distribution Mode")
+                field("Distribution Mode"; "Distribution Mode")
                 {
+                    ApplicationArea = All;
                 }
-                field("Once Per Period (On Demand)";"Once Per Period (On Demand)")
+                field("Once Per Period (On Demand)"; "Once Per Period (On Demand)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -68,7 +80,7 @@ page 6151185 "MM Sponsorship Ticket Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "E-mail Templates";
-                RunPageView = WHERE("Table No."=CONST(6151186));
+                RunPageView = WHERE("Table No." = CONST(6151186));
             }
             action("SMS Template")
             {
@@ -79,7 +91,7 @@ page 6151185 "MM Sponsorship Ticket Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "SMS Template List";
-                RunPageView = WHERE("Table No."=CONST(6151186));
+                RunPageView = WHERE("Table No." = CONST(6151186));
             }
         }
         area(processing)
@@ -98,8 +110,8 @@ page 6151185 "MM Sponsorship Ticket Setup"
                     SponsorshipTicketMgmt: Codeunit "MM Sponsorship Ticket Mgmt.";
                 begin
 
-                    if (Confirm (SEND_CONFIRM, true)) then
-                      SponsorshipTicketMgmt.NotifyRecipients ();
+                    if (Confirm(SEND_CONFIRM, true)) then
+                        SponsorshipTicketMgmt.NotifyRecipients();
                 end;
             }
         }

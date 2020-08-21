@@ -13,11 +13,13 @@ page 6184863 "Azure Storage Dir. Select"
         {
             repeater(Group)
             {
-                field("Container Name";"Container Name")
+                field("Container Name"; "Container Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("File Name";"File Name")
+                field("File Name"; "File Name")
                 {
+                    ApplicationArea = All;
                     Caption = 'Directory';
                 }
             }

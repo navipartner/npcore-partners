@@ -17,32 +17,41 @@ page 6151599 "NpDc Arch. Coupons"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Coupon Type";"Coupon Type")
+                field("Coupon Type"; "Coupon Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Quantity";"Remaining Quantity")
+                field("Remaining Quantity"; "Remaining Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -57,7 +66,7 @@ page 6151599 "NpDc Arch. Coupons"
                 Caption = 'Archived Coupon Entries';
                 Image = Entries;
                 RunObject = Page "NpDc Arch. Coupon Entries";
-                RunPageLink = "Arch. Coupon No."=FIELD("No.");
+                RunPageLink = "Arch. Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
             }
         }

@@ -15,63 +15,80 @@ page 6151574 "AF Notification Hub Card"
         {
             group(General)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Title;Title)
+                field(Title; Title)
                 {
+                    ApplicationArea = All;
                 }
-                field(Body;Body)
+                field(Body; Body)
                 {
+                    ApplicationArea = All;
                 }
-                field(Platform;Platform)
+                field(Platform; Platform)
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Color";"Notification Color")
+                field("Notification Color"; "Notification Color")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Register No.";"From Register No.")
+                field("From Register No."; "From Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Register No.";"To Register No.")
+                field("To Register No."; "To Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Action Type";"Action Type")
+                field("Action Type"; "Action Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Action Value";"Action Value")
+                field("Action Value"; "Action Value")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Delivered to Hub";"Notification Delivered to Hub")
+                field("Notification Delivered to Hub"; "Notification Delivered to Hub")
                 {
+                    ApplicationArea = All;
                 }
-                field(Handled;Handled)
+                field(Handled; Handled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Handled By";"Handled By")
+                field("Handled By"; "Handled By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Handled Register";"Handled Register")
+                field("Handled Register"; "Handled Register")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Data)
             {
                 Caption = 'Data';
-                field(Request;RequestData)
+                field(Request; RequestData)
                 {
+                    ApplicationArea = All;
                     Caption = 'Request';
                     Editable = false;
                     MultiLine = true;
                 }
-                field(Response;ResponseData)
+                field(Response; ResponseData)
                 {
+                    ApplicationArea = All;
                     Caption = 'Response';
                     Editable = false;
                     MultiLine = true;
@@ -104,20 +121,20 @@ page 6151574 "AF Notification Hub Card"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Request Data","Response Data");
+        CalcFields("Request Data", "Response Data");
 
         if not "Request Data".HasValue then
-          RequestData := ''
+            RequestData := ''
         else begin
-          "Request Data".CreateInStream(IStream);
-          IStream.Read(RequestData,MaxStrLen(RequestData));
+            "Request Data".CreateInStream(IStream);
+            IStream.Read(RequestData, MaxStrLen(RequestData));
         end;
 
         if not "Response Data".HasValue then
-          ResponseData := ''
+            ResponseData := ''
         else begin
-          "Response Data".CreateInStream(IStream);
-          IStream.Read(ResponseData,MaxStrLen(RequestData));
+            "Response Data".CreateInStream(IStream);
+            IStream.Read(ResponseData, MaxStrLen(RequestData));
         end;
     end;
 

@@ -22,41 +22,53 @@ page 6060130 "MM Member Card List"
             repeater(Group)
             {
                 Editable = false;
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Card No.";"External Card No.")
+                field("External Card No."; "External Card No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member No.";"External Member No.")
+                field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Display Name";"Display Name")
+                field("Display Name"; "Display Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail Address";"E-Mail Address")
+                field("E-Mail Address"; "E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid Until";"Valid Until")
+                field("Valid Until"; "Valid Until")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Blocked";"Member Blocked")
+                field("Member Blocked"; "Member Blocked")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Blocked";"Membership Blocked")
+                field("Membership Blocked"; "Membership Blocked")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Is Temporary";"Card Is Temporary")
+                field("Card Is Temporary"; "Card Is Temporary")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -75,7 +87,7 @@ page 6060130 "MM Member Card List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Membership Card";
-                RunPageLink = "Entry No."=FIELD("Membership Entry No.");
+                RunPageLink = "Entry No." = FIELD("Membership Entry No.");
             }
             action(Members)
             {
@@ -86,7 +98,7 @@ page 6060130 "MM Member Card List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Card";
-                RunPageLink = "Entry No."=FIELD("Member Entry No.");
+                RunPageLink = "Entry No." = FIELD("Member Entry No.");
             }
             separator(Separator6014401)
             {
@@ -100,7 +112,7 @@ page 6060130 "MM Member Card List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Arrival Log";
-                RunPageLink = "External Card No."=FIELD("External Card No.");
+                RunPageLink = "External Card No." = FIELD("External Card No.");
             }
         }
     }

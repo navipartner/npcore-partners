@@ -17,30 +17,37 @@ page 6060166 "Event Next 10 Events"
             group(Control6014410)
             {
                 ShowCaption = false;
-                field(GETFILTERS;GetFilters)
+                field(GETFILTERS; GetFilters)
                 {
+                    ApplicationArea = All;
                     Caption = 'Filters';
                 }
             }
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Bill-to Customer No.";"Bill-to Customer No.")
+                field("Bill-to Customer No."; "Bill-to Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Status";"Event Status")
+                field("Event Status"; "Event Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount";"Total Amount")
+                field("Total Amount"; "Total Amount")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -55,7 +62,7 @@ page 6060166 "Event Next 10 Events"
                 Caption = 'View';
                 Image = View;
                 RunObject = Page "Event Card";
-                RunPageLink = "No."=FIELD("No.");
+                RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
             }
             group("Select Filter")
@@ -74,10 +81,10 @@ page 6060166 "Event Next 10 Events"
                     begin
                         ResourceList.LookupMode := true;
                         if ResourceList.RunModal = ACTION::LookupOK then begin
-                          ResourceList.GetRecord(Resource);
-                        //  PersonResponsible := Resource."No.";
-                        //  PersonResponsibleName := Resource.Name;
-                          SetRange("Person Responsible",Resource."No.");
+                            ResourceList.GetRecord(Resource);
+                            //  PersonResponsible := Resource."No.";
+                            //  PersonResponsibleName := Resource.Name;
+                            SetRange("Person Responsible", Resource."No.");
                         end;
                     end;
                 }
@@ -114,15 +121,15 @@ page 6060166 "Event Next 10 Events"
     begin
         Job.SetCurrentKey("Starting Date");
         FilterGroup := 2;
-        Job.SetRange("Event",true);
-        Job.SetFilter("Starting Date",'>=%1',WorkDate);
+        Job.SetRange("Event", true);
+        Job.SetFilter("Starting Date", '>=%1', WorkDate);
         FilterGroup := 0;
         if Job.FindSet then
-          repeat
-            JobCount += 1;
-            Rec := Job;
-            Rec.Insert;
-          until (Job.Next = 0) or (JobCount = MaxNoOfEvents);
+            repeat
+                JobCount += 1;
+                Rec := Job;
+                Rec.Insert;
+            until (Job.Next = 0) or (JobCount = MaxNoOfEvents);
     end;
 }
 

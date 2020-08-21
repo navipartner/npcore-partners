@@ -12,7 +12,7 @@ page 6060074 "MM Membership Print Jnl"
     PageType = List;
     SourceTable = "MM Member Info Capture";
     SourceTableView = SORTING("Entry No.")
-                      WHERE("Source Type"=CONST(PRINT_JNL));
+                      WHERE("Source Type" = CONST(PRINT_JNL));
     UsageCategory = Tasks;
 
     layout
@@ -21,55 +21,70 @@ page 6060074 "MM Membership Print Jnl"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Member Entry No";"Member Entry No")
+                field("Member Entry No"; "Member Entry No")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Membership Entry No.";"Membership Entry No.")
+                field("Membership Entry No."; "Membership Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Card Entry No.";"Card Entry No.")
+                field("Card Entry No."; "Card Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Information Context";"Information Context")
+                field("Information Context"; "Information Context")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member No";"External Member No")
+                field("External Member No"; "External Member No")
                 {
+                    ApplicationArea = All;
                 }
-                field("First Name";"First Name")
+                field("First Name"; "First Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Name";"Last Name")
+                field("Last Name"; "Last Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail Address";"E-Mail Address")
+                field("E-Mail Address"; "E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Card No.";"External Card No.")
+                field("External Card No."; "External Card No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Card No. Last 4";"External Card No. Last 4")
+                field("External Card No. Last 4"; "External Card No. Last 4")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -92,11 +107,11 @@ page 6060074 "MM Membership Print Jnl"
                     MemberInfoCapture: Record "MM Member Info Capture";
                 begin
 
-                    CurrPage.SetSelectionFilter (MemberInfoCapture);
-                    if (MemberInfoCapture.FindSet ()) then begin
-                      repeat
-                        PrintMemberAccount (MemberInfoCapture."Member Entry No");
-                      until (MemberInfoCapture.Next () = 0);
+                    CurrPage.SetSelectionFilter(MemberInfoCapture);
+                    if (MemberInfoCapture.FindSet()) then begin
+                        repeat
+                            PrintMemberAccount(MemberInfoCapture."Member Entry No");
+                        until (MemberInfoCapture.Next() = 0);
                     end;
                 end;
             }
@@ -114,11 +129,11 @@ page 6060074 "MM Membership Print Jnl"
                     MemberInfoCapture: Record "MM Member Info Capture";
                 begin
 
-                    CurrPage.SetSelectionFilter (MemberInfoCapture);
-                    if (MemberInfoCapture.FindSet ()) then begin
-                      repeat
-                        PrintCard (MemberInfoCapture."Card Entry No.");
-                      until (MemberInfoCapture.Next () = 0);
+                    CurrPage.SetSelectionFilter(MemberInfoCapture);
+                    if (MemberInfoCapture.FindSet()) then begin
+                        repeat
+                            PrintCard(MemberInfoCapture."Card Entry No.");
+                        until (MemberInfoCapture.Next() = 0);
                     end;
                 end;
             }
@@ -135,11 +150,11 @@ page 6060074 "MM Membership Print Jnl"
                     MemberInfoCapture: Record "MM Member Info Capture";
                 begin
 
-                    CurrPage.SetSelectionFilter (MemberInfoCapture);
-                    if (MemberInfoCapture.FindSet ()) then begin
-                      repeat
-                        PrintOwner (MemberInfoCapture."Card Entry No.");
-                      until (MemberInfoCapture.Next () = 0);
+                    CurrPage.SetSelectionFilter(MemberInfoCapture);
+                    if (MemberInfoCapture.FindSet()) then begin
+                        repeat
+                            PrintOwner(MemberInfoCapture."Card Entry No.");
+                        until (MemberInfoCapture.Next() = 0);
                     end;
                 end;
             }
@@ -155,7 +170,7 @@ page 6060074 "MM Membership Print Jnl"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Membership Card";
-                RunPageLink = "Entry No."=FIELD("Membership Entry No.");
+                RunPageLink = "Entry No." = FIELD("Membership Entry No.");
             }
             action(MembershipSetup)
             {
@@ -181,17 +196,17 @@ page 6060074 "MM Membership Print Jnl"
                 begin
 
                     //-MM1.33 [323652]
-                    SalesShipmentHeader.SetFilter ("External Document No.", '=%1', Rec."Document No.");
-                    if (SalesShipmentHeader.IsEmpty ()) then begin
-                      SalesShipmentHeader.Reset;
-                      SalesShipmentHeader.SetFilter ("External Order No.", '=%1', Rec."Document No.");
+                    SalesShipmentHeader.SetFilter("External Document No.", '=%1', Rec."Document No.");
+                    if (SalesShipmentHeader.IsEmpty()) then begin
+                        SalesShipmentHeader.Reset;
+                        SalesShipmentHeader.SetFilter("External Order No.", '=%1', Rec."Document No.");
                     end;
 
-                    if ((SalesShipmentHeader.FindFirst ()) and (Rec."Document No." <> '')) then begin
-                      PostedSalesShipment.SetRecord (SalesShipmentHeader);
-                      PostedSalesShipment.Run ();
+                    if ((SalesShipmentHeader.FindFirst()) and (Rec."Document No." <> '')) then begin
+                        PostedSalesShipment.SetRecord(SalesShipmentHeader);
+                        PostedSalesShipment.Run();
                     end else begin
-                      Error (NoShippingFound, Rec."Document No.");
+                        Error(NoShippingFound, Rec."Document No.");
                     end;
                     //+MM1.33 [323652]
                 end;
@@ -211,17 +226,17 @@ page 6060074 "MM Membership Print Jnl"
         MembershipSetup: Record "MM Membership Setup";
     begin
 
-        Member.Get (MemberEntryNo);
-        Member.SetRecFilter ();
+        Member.Get(MemberEntryNo);
+        Member.SetRecFilter();
 
-        MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
-        if (MembershipRole.FindSet ()) then begin
-          repeat
-            Membership.Get (MembershipRole."Membership Entry No.");
-            MembershipSetup.Get (Membership."Membership Code");
+        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+        if (MembershipRole.FindSet()) then begin
+            repeat
+                Membership.Get(MembershipRole."Membership Entry No.");
+                MembershipSetup.Get(Membership."Membership Code");
 
-            MemberRetailIntegration.PrintMemberAccountCardWorker (Member, MembershipSetup);
-          until (MembershipRole.Next() = 0);
+                MemberRetailIntegration.PrintMemberAccountCardWorker(Member, MembershipSetup);
+            until (MembershipRole.Next() = 0);
         end;
     end;
 
@@ -233,12 +248,12 @@ page 6060074 "MM Membership Print Jnl"
         MembershipSetup: Record "MM Membership Setup";
     begin
 
-        MemberCard.Get (CardEntryNo);
-        MemberCard.SetRecFilter ();
-        Membership.Get (MemberCard."Membership Entry No.");
-        MembershipSetup.Get (Membership."Membership Code");
+        MemberCard.Get(CardEntryNo);
+        MemberCard.SetRecFilter();
+        Membership.Get(MemberCard."Membership Entry No.");
+        MembershipSetup.Get(Membership."Membership Code");
 
-        MemberRetailIntegration.PrintMemberCardWorker (MemberCard, MembershipSetup);
+        MemberRetailIntegration.PrintMemberCardWorker(MemberCard, MembershipSetup);
     end;
 
     local procedure PrintOwner(CardEntryNo: Integer)
@@ -247,11 +262,11 @@ page 6060074 "MM Membership Print Jnl"
         MemberCard: Record "MM Member Card";
     begin
 
-        MemberCard.Get ("Card Entry No.");
-        MemberCard.SetRecFilter ();
-        MemberCardOwner.SetTableView (MemberCard);
+        MemberCard.Get("Card Entry No.");
+        MemberCard.SetRecFilter();
+        MemberCardOwner.SetTableView(MemberCard);
 
-        MemberCardOwner.Run ();
+        MemberCardOwner.Run();
     end;
 }
 

@@ -16,23 +16,29 @@ page 6014566 "Retail Logo Setup"
         {
             repeater(Group)
             {
-                field(Sequence;Sequence)
+                field(Sequence; Sequence)
                 {
+                    ApplicationArea = All;
                 }
-                field(Keyword;Keyword)
+                field(Keyword; Keyword)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Date";"Start Date")
+                field("Start Date"; "Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Date";"End Date")
+                field("End Date"; "End Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("OneBitLogo.HASVALUE";OneBitLogo.HasValue)
+                field("OneBitLogo.HASVALUE"; OneBitLogo.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Boca Compatible';
                     Editable = false;
                 }
@@ -40,9 +46,9 @@ page 6014566 "Retail Logo Setup"
         }
         area(factboxes)
         {
-            part(Control6150624;"Retail Logo Factbox")
+            part(Control6150624; "Retail Logo Factbox")
             {
-                SubPageLink = Sequence=FIELD(Sequence);
+                SubPageLink = Sequence = FIELD(Sequence);
             }
         }
     }
@@ -64,7 +70,7 @@ page 6014566 "Retail Logo Setup"
                     RetailLogoMgt: Codeunit "Retail Logo Mgt.";
                 begin
                     if RetailLogoMgt.UploadLogoFromFile('') then
-                      FindLast;
+                        FindLast;
                 end;
             }
             action("Print Logo")

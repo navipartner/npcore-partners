@@ -14,56 +14,73 @@ page 6059954 "MCS Faces Card"
         {
             group(General)
             {
-                field(PersonId;PersonId)
+                field(PersonId; PersonId)
                 {
+                    ApplicationArea = All;
                 }
-                field(FaceId;FaceId)
+                field(FaceId; FaceId)
                 {
+                    ApplicationArea = All;
                 }
-                field(Gender;Gender)
+                field(Gender; Gender)
                 {
+                    ApplicationArea = All;
                 }
-                field(Age;Age)
+                field(Age; Age)
                 {
+                    ApplicationArea = All;
                 }
-                field("Face Height";"Face Height")
+                field("Face Height"; "Face Height")
                 {
+                    ApplicationArea = All;
                 }
-                field("Face Width";"Face Width")
+                field("Face Width"; "Face Width")
                 {
+                    ApplicationArea = All;
                 }
-                field("Face Position X";"Face Position X")
+                field("Face Position X"; "Face Position X")
                 {
+                    ApplicationArea = All;
                 }
-                field("Face Position Y";"Face Position Y")
+                field("Face Position Y"; "Face Position Y")
                 {
+                    ApplicationArea = All;
                 }
-                field(Beard;Beard)
+                field(Beard; Beard)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sideburns;Sideburns)
+                field(Sideburns; Sideburns)
                 {
+                    ApplicationArea = All;
                 }
-                field(Moustache;Moustache)
+                field(Moustache; Moustache)
                 {
+                    ApplicationArea = All;
                 }
-                field(IsSmiling;IsSmiling)
+                field(IsSmiling; IsSmiling)
                 {
+                    ApplicationArea = All;
                 }
-                field(Glasses;Glasses)
+                field(Glasses; Glasses)
                 {
+                    ApplicationArea = All;
                 }
-                field(Identified;Identified)
+                field(Identified; Identified)
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
-                field("Action";Action)
+                field("Action"; Action)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

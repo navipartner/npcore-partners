@@ -12,9 +12,11 @@ page 6150711 "POS View Card"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
             usercontrol(Editor; JsonEditor)

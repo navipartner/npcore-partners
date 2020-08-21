@@ -14,32 +14,41 @@ page 6150904 "HC Payment Types"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Account Type";"Account Type")
+                field("Account Type"; "Account Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("G/L Account No.";"G/L Account No.")
+                field("G/L Account No."; "G/L Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bank Acc. No.";"Bank Acc. No.")
+                field("Bank Acc. No."; "Bank Acc. No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("HQ Processing";"HQ Processing")
+                field("HQ Processing"; "HQ Processing")
                 {
+                    ApplicationArea = All;
                 }
-                field("HQ Post Sales Document";"HQ Post Sales Document")
+                field("HQ Post Sales Document"; "HQ Post Sales Document")
                 {
+                    ApplicationArea = All;
                 }
-                field("HQ Post Payment";"HQ Post Payment")
+                field("HQ Post Payment"; "HQ Post Payment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Method Code";"Payment Method Code")
+                field("Payment Method Code"; "Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

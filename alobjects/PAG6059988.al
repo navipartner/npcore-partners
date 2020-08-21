@@ -14,23 +14,26 @@ page 6059988 "Sale Statistics Activities"
     {
         area(content)
         {
-            usercontrol(SalesChart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
+            usercontrol(SalesChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
 
                 trigger AddInReady()
                 begin
                 end;
             }
-            field("Date.GETFILTER(""Period Start"")";Date.GetFilter("Period Start"))
+            field("Date.GETFILTER(""Period Start"")"; Date.GetFilter("Period Start"))
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
-            field("SELECTSTR(FigureToDisplay+1,Text0001)";SelectStr(FigureToDisplay+1,Text0001))
+            field("SELECTSTR(FigureToDisplay+1,Text0001)"; SelectStr(FigureToDisplay + 1, Text0001))
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
-            field("Date.""Period Type""";Date."Period Type")
+            field("Date.""Period Type"""; Date."Period Type")
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
         }
@@ -304,11 +307,12 @@ page 6059988 "Sale Statistics Activities"
     trigger OnOpenPage()
     begin
         case true of
-          ID = Context::Retail : ;
+            ID = Context::Retail:
+                ;
         end;
 
-        PeriodType  := PeriodType::Day;
-        ChartType   := ChartType::Column;
+        PeriodType := PeriodType::Day;
+        ChartType := ChartType::Column;
         ColumnCount := 7;
         ApplyDateFilter();
     end;
@@ -351,38 +355,39 @@ page 6059988 "Sale Statistics Activities"
     begin
         Initialize;
 
-        SetXAxis(SelectStr(FigureToDisplay+1,Text0001),"Data Type"::String);
+        SetXAxis(SelectStr(FigureToDisplay + 1, Text0001), "Data Type"::String);
 
-        AddMeasure(Text0002 ,0,"Data Type"::Decimal,ChartType);
-        AddMeasure(Text0003 ,1,"Data Type"::Decimal,ChartType);
+        AddMeasure(Text0002, 0, "Data Type"::Decimal, ChartType);
+        AddMeasure(Text0003, 1, "Data Type"::Decimal, ChartType);
 
-        if Date.FindSet then repeat
-          Calc();
-          AddColumn(StrSubstNo('%1', Date."Period Name"));
-          case FigureToDisplay of
-            FigureToDisplay::"Sale (Qty.)" :
-              begin
-                SetValue(Text0002, Itt, -"Sale (QTY)");
-                SetValue(Text0003, Itt, -"LastYear Sale (QTY)");
-              end;
-            FigureToDisplay::"Sale (LCY)" :
-              begin
-                SetValue(Text0002, Itt, "Sale (LCY)");
-                SetValue(Text0003, Itt, "LastYear Sale (LCY)");
-              end;
-            FigureToDisplay::"Profit (LCY)" :
-              begin
-                SetValue(Text0002, Itt, "Profit (LCY)");
-                SetValue(Text0003, Itt, "LastYear Profit (LCY)");
-              end;
-            FigureToDisplay::"Profit (Pct.)" :
-              begin
-                SetValue(Text0002, Itt, "Profit %");
-                SetValue(Text0003, Itt, "LastYear Profit %");
-              end;
-          end;
-          Itt += 1;
-        until (Date.Next = 0) or (Itt = ColumnCount);
+        if Date.FindSet then
+            repeat
+                Calc();
+                AddColumn(StrSubstNo('%1', Date."Period Name"));
+                case FigureToDisplay of
+                    FigureToDisplay::"Sale (Qty.)":
+                        begin
+                            SetValue(Text0002, Itt, -"Sale (QTY)");
+                            SetValue(Text0003, Itt, -"LastYear Sale (QTY)");
+                        end;
+                    FigureToDisplay::"Sale (LCY)":
+                        begin
+                            SetValue(Text0002, Itt, "Sale (LCY)");
+                            SetValue(Text0003, Itt, "LastYear Sale (LCY)");
+                        end;
+                    FigureToDisplay::"Profit (LCY)":
+                        begin
+                            SetValue(Text0002, Itt, "Profit (LCY)");
+                            SetValue(Text0003, Itt, "LastYear Profit (LCY)");
+                        end;
+                    FigureToDisplay::"Profit (Pct.)":
+                        begin
+                            SetValue(Text0002, Itt, "Profit %");
+                            SetValue(Text0003, Itt, "LastYear Profit %");
+                        end;
+                end;
+                Itt += 1;
+            until (Date.Next = 0) or (Itt = ColumnCount);
 
         Update(CurrPage.SalesChart);
     end;
@@ -394,43 +399,43 @@ page 6059988 "Sale Statistics Activities"
         AuditRoll: Record "Audit Roll";
     begin
         //Calc()
-        SetValueEntryFilter( ValueEntry );
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        SetValueEntryFilter(ValueEntry);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcSums( Quantity );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcSums(Quantity);
 
         "Sale (QTY)" := ItemLedgerEntry.Quantity;
         "Sale (LCY)" := ValueEntry."Sales Amount (Actual)";
         "Profit (LCY)" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
         if "Sale (LCY)" <> 0 then
-          "Profit %" := "Profit (LCY)" / "Sale (LCY)" * 100
+            "Profit %" := "Profit (LCY)" / "Sale (LCY)" * 100
         else
-          "Profit %" := 0;
+            "Profit %" := 0;
 
         // Calc last year
         LastYear := true;
-        if ( (PeriodType = PeriodType::Day) and ShowSameWeekday ) or (PeriodType = PeriodType::Week) then
-          LastYearCalc := '<-52W>'
+        if ((PeriodType = PeriodType::Day) and ShowSameWeekday) or (PeriodType = PeriodType::Week) then
+            LastYearCalc := '<-52W>'
         else
-          LastYearCalc := '<-1Y>';
+            LastYearCalc := '<-1Y>';
 
-        if (Date2DMY(Date."Period Start", 3) < 1) or ( Date2DMY(Date."Period Start", 3) > 9998 ) then
-          LastYearCalc := '';
+        if (Date2DMY(Date."Period Start", 3) < 1) or (Date2DMY(Date."Period Start", 3) > 9998) then
+            LastYearCalc := '';
 
-        SetValueEntryFilter( ValueEntry );
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        SetValueEntryFilter(ValueEntry);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcSums( Quantity );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcSums(Quantity);
 
-        "LastYear Sale (QTY)"   := ItemLedgerEntry.Quantity;
-        "LastYear Sale (LCY)"   := ValueEntry."Sales Amount (Actual)";
+        "LastYear Sale (QTY)" := ItemLedgerEntry.Quantity;
+        "LastYear Sale (LCY)" := ValueEntry."Sales Amount (Actual)";
         "LastYear Profit (LCY)" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
         if "LastYear Sale (LCY)" <> 0 then
-          "LastYear Profit %" := "LastYear Profit (LCY)" / "LastYear Sale (LCY)" * 100
+            "LastYear Profit %" := "LastYear Profit (LCY)" / "LastYear Sale (LCY)" * 100
         else
-          "LastYear Profit %" := 0;
+            "LastYear Profit %" := 0;
 
         LastYear := false;
     end;
@@ -439,50 +444,60 @@ page 6059988 "Sale Statistics Activities"
     begin
         Date.FindSet;
         case PeriodType of
-          PeriodType::Day :     Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<%1%2D>',Direction,1),Date."Period Start"));
-          PeriodType::Week :    Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<%1%2W>',Direction,1),Date."Period Start"));
-          PeriodType::Month :   Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<%1%2M>',Direction,1),Date."Period Start"));
-          PeriodType::Quarter : Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<%1%2Q>',Direction,1),Date."Period Start"));
-          PeriodType::Year :    Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<%1%2Y>',Direction,1),Date."Period Start"));
+            PeriodType::Day:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2D>', Direction, 1), Date."Period Start"));
+            PeriodType::Week:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2W>', Direction, 1), Date."Period Start"));
+            PeriodType::Month:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2M>', Direction, 1), Date."Period Start"));
+            PeriodType::Quarter:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2Q>', Direction, 1), Date."Period Start"));
+            PeriodType::Year:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2Y>', Direction, 1), Date."Period Start"));
         end;
     end;
 
     local procedure ApplyDateFilter()
     begin
-        Date.SetRange("Period Type",PeriodType);
+        Date.SetRange("Period Type", PeriodType);
         case PeriodType of
-          PeriodType::Day :     Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<CW-1W-%1D+2D>',ColumnCount),Today));
-          PeriodType::Week :    Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<CW-%1W>',ColumnCount),Today));
-          PeriodType::Month :   Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<CM-%1M>',ColumnCount),Today));
-          PeriodType::Quarter : Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<CQ-%1Q>',ColumnCount),Today));
-          PeriodType::Year :    Date.SetFilter("Period Start",'%1..',CalcDate(StrSubstNo('<CY-%1Y>',ColumnCount),Today));
+            PeriodType::Day:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CW-1W-%1D+2D>', ColumnCount), Today));
+            PeriodType::Week:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CW-%1W>', ColumnCount), Today));
+            PeriodType::Month:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CM-%1M>', ColumnCount), Today));
+            PeriodType::Quarter:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CQ-%1Q>', ColumnCount), Today));
+            PeriodType::Year:
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CY-%1Y>', ColumnCount), Today));
         end;
     end;
 
     local procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
         //SetItemLedgerEntryFilter
-        ItemLedgerEntry.SetCurrentKey( "Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        ItemLedgerEntry.SetRange( "Entry Type", ItemLedgerEntry."Entry Type"::Sale );
+        ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
         if not LastYear then
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', Date."Period Start", Date."Period End" )
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Date."Period Start", Date."Period End")
         else
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', CalcDate(LastYearCalc,Date."Period Start"), CalcDate(LastYearCalc,Date."Period End"));
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, Date."Period Start"), CalcDate(LastYearCalc, Date."Period End"));
 
         if ItemGroupFilter <> '' then
-          ItemLedgerEntry.SetRange( "Item Group No.", ItemGroupFilter )
+            ItemLedgerEntry.SetRange("Item Group No.", ItemGroupFilter)
         else
-          ItemLedgerEntry.SetRange( "Item Group No." );
+            ItemLedgerEntry.SetRange("Item Group No.");
 
         if Dim1Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code" );
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code" );
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
     local procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
@@ -491,26 +506,26 @@ page 6059988 "Sale Statistics Activities"
         //-NPR5.55 [361515]
         //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
         //+NPR5.55 [361515]
-        ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
+        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
         if not LastYear then
-          ValueEntry.SetFilter( "Posting Date", '%1..%2', Date."Period Start", Date."Period End" )
+            ValueEntry.SetFilter("Posting Date", '%1..%2', Date."Period Start", Date."Period End")
         else
-          ValueEntry.SetFilter( "Posting Date", '%1..%2',CalcDate(LastYearCalc,Date."Period Start"), CalcDate(LastYearCalc,Date."Period End") );
+            ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, Date."Period Start"), CalcDate(LastYearCalc, Date."Period End"));
 
         if ItemGroupFilter <> '' then
-          ValueEntry.SetRange( "Item Group No.", ItemGroupFilter )
+            ValueEntry.SetRange("Item Group No.", ItemGroupFilter)
         else
-          ValueEntry.SetRange( "Item Group No." );
+            ValueEntry.SetRange("Item Group No.");
 
         if Dim1Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 1 Code" );
+            ValueEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 2 Code" );
+            ValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
     procedure "-- Public Functions"()

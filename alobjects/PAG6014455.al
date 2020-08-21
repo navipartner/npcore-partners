@@ -13,7 +13,7 @@ page 6014455 "Campaign Discount List"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Period Discount";
-    SourceTableView = SORTING("Starting Date","Starting Time","Ending Date","Ending Time");
+    SourceTableView = SORTING("Starting Date", "Starting Time", "Ending Date", "Ending Time");
     UsageCategory = Lists;
 
     layout
@@ -23,44 +23,54 @@ page 6014455 "Campaign Discount List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Period Type";"Period Type")
+                field("Period Type"; "Period Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Period Description";"Period Description")
+                field("Period Description"; "Period Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Created Date";"Created Date")
+                field("Created Date"; "Created Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -76,8 +86,8 @@ page 6014455 "Campaign Discount List"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6014413),
-                              "No."=FIELD(Code);
+                RunPageLink = "Table ID" = CONST(6014413),
+                              "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
             }
         }
@@ -85,13 +95,13 @@ page 6014455 "Campaign Discount List"
 
     local procedure CodeOnActivate()
     begin
-        SetCurrentKey( Code );
+        SetCurrentKey(Code);
         CurrPage.Update;
     end;
 
     local procedure DescriptionOnActivate()
     begin
-        SetCurrentKey( Description );
+        SetCurrentKey(Description);
         CurrPage.Update;
     end;
 }

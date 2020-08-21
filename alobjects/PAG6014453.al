@@ -47,6 +47,7 @@ page 6014453 "Campaign Discount"
                 Caption = 'General';
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     begin
@@ -56,25 +57,31 @@ page 6014453 "Campaign Discount"
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Created Date"; "Created Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Changed';
                     Editable = false;
                 }
                 field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
                 field("Block Custom Disc."; "Block Custom Disc.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Control6014404; Comment)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -83,21 +90,26 @@ page 6014453 "Campaign Discount"
                 Caption = 'Conditions';
                 field("Starting date 2"; "Starting Date")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                     Lookup = false;
                 }
                 field("Ending date 2"; "Ending Date")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Period Type"; "Period Type")
                 {
+                    ApplicationArea = All;
                 }
                 group(Period)
                 {
@@ -105,32 +117,41 @@ page 6014453 "Campaign Discount"
                     Visible = ("Period Type" = 1);
                     field("Period Description"; "Period Description")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                     field(Monday; Monday)
                     {
+                        ApplicationArea = All;
                     }
                     field(Tuesday; Tuesday)
                     {
+                        ApplicationArea = All;
                     }
                     field(Wednesday; Wednesday)
                     {
+                        ApplicationArea = All;
                     }
                     field(Thursday; Thursday)
                     {
+                        ApplicationArea = All;
                     }
                     field(Friday; Friday)
                     {
+                        ApplicationArea = All;
                     }
                     field(Saturday; Saturday)
                     {
+                        ApplicationArea = All;
                     }
                     field(Sunday; Sunday)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     begin
@@ -157,8 +178,8 @@ page 6014453 "Campaign Discount"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6014413),
-                              "No."=FIELD(Code);
+                RunPageLink = "Table ID" = CONST(6014413),
+                              "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
 
                 trigger OnAction()
@@ -167,7 +188,7 @@ page 6014453 "Campaign Discount"
                 begin
                     RetailSetup.Get;
                     if RetailSetup."Use Adv. dimensions" then
-                      NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"Period Discount",Code);
+                        NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"Period Discount", Code);
                 end;
             }
         }

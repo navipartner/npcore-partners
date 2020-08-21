@@ -17,18 +17,22 @@ page 6151557 "NpXml Batch Filters"
         {
             repeater(Group)
             {
-                field("Filter Type";"Filter Type")
+                field("Filter Type"; "Filter Type")
                 {
+                    ApplicationArea = All;
                     OptionCaption = ',Constant,Filter';
                 }
-                field("Parent Field No.";"Parent Field No.")
+                field("Parent Field No."; "Parent Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Parent Field Name";"Parent Field Name")
+                field("Parent Field Name"; "Parent Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Value";"Filter Value")
+                field("Filter Value"; "Filter Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

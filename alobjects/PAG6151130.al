@@ -12,17 +12,21 @@ page 6151130 "TM Seating Setup"
         {
             repeater(Group)
             {
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Seat Numbering";"Seat Numbering")
+                field("Seat Numbering"; "Seat Numbering")
                 {
+                    ApplicationArea = All;
                 }
-                field("Row Numbering";"Row Numbering")
+                field("Row Numbering"; "Row Numbering")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Cache";"Template Cache")
+                field("Template Cache"; "Template Cache")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -44,7 +48,7 @@ page 6151130 "TM Seating Setup"
                     SeatingManagement: Codeunit "TM Seating Management";
                 begin
 
-                    SeatingManagement.ShowSeatingTemplate ("Admission Code");
+                    SeatingManagement.ShowSeatingTemplate("Admission Code");
                 end;
             }
         }

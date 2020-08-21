@@ -18,66 +18,84 @@ page 6151102 "NpRi Reimbursements"
         {
             repeater(Group)
             {
-                field("Party Type";"Party Type")
+                field("Party Type"; "Party Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Party No.";"Party No.")
+                field("Party No."; "Party No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Code";"Template Code")
+                field("Template Code"; "Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Collection Module";"Data Collection Module")
+                field("Data Collection Module"; "Data Collection Module")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Data Collection Company";"Data Collection Company")
+                field("Data Collection Company"; "Data Collection Company")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Data Collection Summary";"Data Collection Summary")
+                field("Data Collection Summary"; "Data Collection Summary")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Date";"From Date")
+                field("From Date"; "From Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Date";"To Date")
+                field("To Date"; "To Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Data Collect Entry No.";"Last Data Collect Entry No.")
+                field("Last Data Collect Entry No."; "Last Data Collect Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Last Data Collection at";"Last Data Collection at")
+                field("Last Data Collection at"; "Last Data Collection at")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Reimbursement Module";"Reimbursement Module")
+                field("Reimbursement Module"; "Reimbursement Module")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Reimbursement Summary";"Reimbursement Summary")
+                field("Reimbursement Summary"; "Reimbursement Summary")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Posting Date";"Last Posting Date")
+                field("Last Posting Date"; "Last Posting Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Last Reimbursement at";"Last Reimbursement at")
+                field("Last Reimbursement at"; "Last Reimbursement at")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Reimbursement Date";"Reimbursement Date")
+                field("Reimbursement Date"; "Reimbursement Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Balance;Balance)
+                field(Balance; Balance)
                 {
+                    ApplicationArea = All;
                 }
-                field(Deactivated;Deactivated)
+                field(Deactivated; Deactivated)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -131,9 +149,9 @@ page 6151102 "NpRi Reimbursements"
                 Caption = 'Entries';
                 Image = List;
                 RunObject = Page "NpRi Reimbursement Entries";
-                RunPageLink = "Party Type"=FIELD("Party Type"),
-                              "Party No."=FIELD("Party No."),
-                              "Template Code"=FIELD("Template Code");
+                RunPageLink = "Party Type" = FIELD("Party Type"),
+                              "Party No." = FIELD("Party No."),
+                              "Template Code" = FIELD("Template Code");
                 ShortCutKey = 'Ctrl+F7';
             }
         }

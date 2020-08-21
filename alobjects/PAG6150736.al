@@ -13,30 +13,36 @@ page 6150736 "POS Theme Dependencies"
         {
             repeater(Group)
             {
-                field("Target Type";"Target Type")
+                field("Target Type"; "Target Type")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CalculateEditables();
                     end;
                 }
-                field("Target Code";"Target Code")
+                field("Target Code"; "Target Code")
                 {
+                    ApplicationArea = All;
                     Enabled = TargetCodeEditable;
                 }
-                field("Target View Type";"Target View Type")
+                field("Target View Type"; "Target View Type")
                 {
+                    ApplicationArea = All;
                     Enabled = TargetViewTypeEditable;
                 }
-                field("Dependency Type";"Dependency Type")
+                field("Dependency Type"; "Dependency Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Dependency Code";"Dependency Code")
+                field("Dependency Code"; "Dependency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -64,7 +70,7 @@ page 6150736 "POS Theme Dependencies"
     trigger OnOpenPage()
     begin
         if (GetRangeMax("POS Theme Code") <> GetRangeMin("POS Theme Code")) or (GetFilter("POS Theme Code") = '') then
-          Error(Text001,FieldCaption("POS Theme Code"));
+            Error(Text001, FieldCaption("POS Theme Code"));
     end;
 
     var

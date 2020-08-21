@@ -75,6 +75,7 @@ page 6014424 "Retail Setup"
                     Caption = 'Company Information';
                     field("Company No."; "Company No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Security)
@@ -82,15 +83,19 @@ page 6014424 "Retail Setup"
                     Caption = 'Security';
                     field("Password on unblock discount"; "Password on unblock discount")
                     {
+                        ApplicationArea = All;
                     }
                     field("Open Register Password"; "Open Register Password")
                     {
+                        ApplicationArea = All;
                     }
                     field("Use WIN User Profile"; "Use WIN User Profile")
                     {
+                        ApplicationArea = All;
                     }
                     field("Auto Changelog Level"; "Auto Changelog Level")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -102,75 +107,99 @@ page 6014424 "Retail Setup"
                     Caption = 'Diverse';
                     field("Posting No. Management"; "Posting No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variance No. Management"; "Variance No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Credit Voucher No. Management"; "Credit Voucher No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Gift Voucher No. Management"; "Gift Voucher No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Period Discount Management"; "Period Discount Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Mixed Discount No. Management"; "Mixed Discount No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer Repair Management"; "Customer Repair Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variant No. Series"; "Variant No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Internal EAN No. Management"; "Internal EAN No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("External EAN-No. Management"; "External EAN-No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Exchange Label  No. Series"; "Exchange Label  No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Used Goods No. Management"; "Used Goods No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Cash Cust. No. Series"; "Cash Cust. No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Foreign Gift Voucher no.Series"; "Foreign Gift Voucher no.Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Foreign Credit Voucher No.Seri"; "Foreign Credit Voucher No.Seri")
                     {
+                        ApplicationArea = All;
                     }
                     field("Quantity Discount Nos."; "Quantity Discount Nos.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Retail Journal No. Management"; "Retail Journal No. Management")
                     {
+                        ApplicationArea = All;
                     }
                     field("Selection No. Series"; "Selection No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Order  No. Series"; "Order  No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Rental Contract  No. Series"; "Rental Contract  No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Purchase Contract  No. Series"; "Purchase Contract  No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customization  No. Series"; "Customization  No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Quote  No. Series"; "Quote  No. Series")
                     {
+                        ApplicationArea = All;
                     }
                     field("Reason Code No. Series"; "Reason Code No. Series")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Item Group")
@@ -178,15 +207,19 @@ page 6014424 "Retail Setup"
                     Caption = 'Item Group';
                     field("Itemgroup Pre No. Serie"; "Itemgroup Pre No. Serie")
                     {
+                        ApplicationArea = All;
                     }
                     field("Itemgroup No. Serie StartNo."; "Itemgroup No. Serie StartNo.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Itemgroup No. Serie EndNo."; "Itemgroup No. Serie EndNo.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Itemgroup No. Serie Warning"; "Itemgroup No. Serie Warning")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Barcodes And Prefix")
@@ -194,27 +227,35 @@ page 6014424 "Retail Setup"
                     Caption = 'Barcodes and Prefix';
                     field("EAN-Internal"; "EAN-Internal")
                     {
+                        ApplicationArea = All;
                     }
                     field("EAN-External"; "EAN-External")
                     {
+                        ApplicationArea = All;
                     }
                     field("ISBN Bookland EAN"; "ISBN Bookland EAN")
                     {
+                        ApplicationArea = All;
                     }
                     field("EAN Price Code"; "EAN Price Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("EAN Mgt. Gift voucher"; "EAN Mgt. Gift voucher")
                     {
+                        ApplicationArea = All;
                     }
                     field("EAN Mgt. Credit voucher"; "EAN Mgt. Credit voucher")
                     {
+                        ApplicationArea = All;
                     }
                     field("EAN Prefix Exhange Label"; "EAN Prefix Exhange Label")
                     {
+                        ApplicationArea = All;
                     }
                     field("Shelve module"; "Shelve module")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -226,18 +267,23 @@ page 6014424 "Retail Setup"
                     Caption = 'Exchange';
                     field("Purchace Price Code"; "Purchace Price Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("Exchange label default date"; "Exchange label default date")
                     {
+                        ApplicationArea = All;
                     }
                     field("Exchange Label Exchange Period"; "Exchange Label Exchange Period")
                     {
+                        ApplicationArea = All;
                     }
                     field("Skip Warranty Voucher Dialog"; "Skip Warranty Voucher Dialog")
                     {
+                        ApplicationArea = All;
                     }
                     field("Warranty Standard Date"; "Warranty Standard Date")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Gift Voucher")
@@ -247,12 +293,15 @@ page 6014424 "Retail Setup"
                     //GridLayout = Columns;
                     field("Copy of Gift Voucher etc."; "Copy of Gift Voucher etc.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Copy Sales Ticket on Giftvo."; "Copy Sales Ticket on Giftvo.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Gift and Credit Valid Period"; "Gift and Credit Valid Period")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Register Report")
@@ -260,9 +309,11 @@ page 6014424 "Retail Setup"
                     Caption = 'Register Report';
                     field("Show Counting on Counter Rep."; "Show Counting on Counter Rep.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Print Register Report"; "Print Register Report")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Documents)
@@ -270,36 +321,47 @@ page 6014424 "Retail Setup"
                     Caption = 'Documents';
                     field("Retail Debitnote"; "Retail Debitnote")
                     {
+                        ApplicationArea = All;
                     }
                     field("Receipt for Debit Sale"; "Receipt for Debit Sale")
                     {
+                        ApplicationArea = All;
                     }
                     field("Faktura udskrifts valg"; "Faktura udskrifts valg")
                     {
+                        ApplicationArea = All;
                     }
                     field("Base for FIK-71"; "Base for FIK-71")
                     {
+                        ApplicationArea = All;
                     }
                     field("FIK No."; "FIK No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Auto Print Retail Doc"; "Auto Print Retail Doc")
                     {
+                        ApplicationArea = All;
                     }
                     field("Copies of Selection"; "Copies of Selection")
                     {
+                        ApplicationArea = All;
                     }
                     field("No. of Copies of Selection"; "No. of Copies of Selection")
                     {
+                        ApplicationArea = All;
                     }
                     field("Signature for Return 1"; "Signature for Return")
                     {
+                        ApplicationArea = All;
                     }
                     field("Use Standard Order Document"; "Use Standard Order Document")
                     {
+                        ApplicationArea = All;
                     }
                     field("Navision Creditnote"; "Navision Creditnote")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -311,24 +373,31 @@ page 6014424 "Retail Setup"
                     Caption = 'Text';
                     field("Sales Ticket Line Text1"; "Sales Ticket Line Text1")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sales Ticket Line Text2"; "Sales Ticket Line Text2")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sales Ticket Line Text3"; "Sales Ticket Line Text3")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sales Ticket Line Text4"; "Sales Ticket Line Text4")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sales Ticket Line Text5"; "Sales Ticket Line Text5")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sales Ticket Line Text6"; "Sales Ticket Line Text6")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sales Ticket Line Text7"; "Sales Ticket Line Text7")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -340,12 +409,15 @@ page 6014424 "Retail Setup"
                     Caption = 'SMS';
                     field("Rental Msg."; "Rental Msg.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Repair Msg."; "Repair Msg.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Receive Register Turnover"; "Receive Register Turnover")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -357,45 +429,59 @@ page 6014424 "Retail Setup"
                     Caption = 'Information and Popup';
                     field("Popup Gift Voucher Quantity"; "Popup Gift Voucher Quantity")
                     {
+                        ApplicationArea = All;
                     }
                     field("Show Create Giftcertificat"; "Show Create Giftcertificat")
                     {
+                        ApplicationArea = All;
                     }
                     field("Show Create Credit Voucher"; "Show Create Credit Voucher")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ask for Reference"; "Ask for Reference")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ask for Attention Name"; "Ask for Attention Name")
                     {
+                        ApplicationArea = All;
                     }
                     field("Reason for Return Mandatory"; "Reason for Return Mandatory")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sales Lines from Selection"; "Sales Lines from Selection")
                     {
+                        ApplicationArea = All;
                     }
                     field("Auto edit debit sale"; "Auto edit debit sale")
                     {
+                        ApplicationArea = All;
                     }
                     field("Editable eksp. reverse sale"; "Editable eksp. reverse sale")
                     {
+                        ApplicationArea = All;
                     }
                     field("Warning - Sale with no lines"; "Warning - Sale with no lines")
                     {
+                        ApplicationArea = All;
                     }
                     field("Use deposit in Retail Doc"; "Use deposit in Retail Doc")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer Credit Level Warning"; "Customer Credit Level Warning")
                     {
+                        ApplicationArea = All;
                     }
                     field("Global Sale POS"; "Global Sale POS")
                     {
+                        ApplicationArea = All;
                     }
                     field("Use NAV Lookup in POS"; "Use NAV Lookup in POS")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Buttons And Fields")
@@ -403,6 +489,7 @@ page 6014424 "Retail Setup"
                     Caption = 'Button and Fields';
                     field("POS - Show discount fields"; "POS - Show discount fields")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Sales Flow")
@@ -410,33 +497,43 @@ page 6014424 "Retail Setup"
                     Caption = 'Sales Flow';
                     field("Reset unit price on neg. sale"; "Reset unit price on neg. sale")
                     {
+                        ApplicationArea = All;
                     }
                     field("Show Stored Tickets"; "Show Stored Tickets")
                     {
+                        ApplicationArea = All;
                     }
                     field("Unit Cost Control"; "Unit Cost Control")
                     {
+                        ApplicationArea = All;
                     }
                     field("Serialno. (Itemno nonexist)"; "Serialno. (Itemno nonexist)")
                     {
+                        ApplicationArea = All;
                     }
                     field("Not use Dim filter SerialNo"; "Not use Dim filter SerialNo")
                     {
+                        ApplicationArea = All;
                     }
                     field("Show saved expeditions"; "Show saved expeditions")
                     {
+                        ApplicationArea = All;
                     }
                     field("Get register no. using"; "Get register no. using")
                     {
+                        ApplicationArea = All;
                     }
                     field("Path Filename to User Profile"; "Path Filename to User Profile")
                     {
+                        ApplicationArea = All;
                     }
                     field("Profit on Gifvouchers"; "Profit on Gifvouchers")
                     {
+                        ApplicationArea = All;
                     }
                     field("Description control"; "Description control")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Discount)
@@ -444,6 +541,7 @@ page 6014424 "Retail Setup"
                     Caption = 'Discount';
                     field("Reason on Discount"; "Reason on Discount")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -455,6 +553,7 @@ page 6014424 "Retail Setup"
                     Caption = 'GL,Customer,Vendor';
                     field("Auto Replication"; "Auto Replication")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Item Reorder")
@@ -462,6 +561,7 @@ page 6014424 "Retail Setup"
                     Caption = 'Item Reorder';
                     field("Check Purchase Lines if vendor"; "Check Purchase Lines if vendor")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Item Creation")
@@ -469,33 +569,43 @@ page 6014424 "Retail Setup"
                     Caption = 'Item Creation';
                     field("Item Group on Creation"; "Item Group on Creation")
                     {
+                        ApplicationArea = All;
                     }
                     field("Item group in Item no."; "Item group in Item no.")
                     {
+                        ApplicationArea = All;
                     }
                     field("EAN-No. at Item Create"; "EAN-No. at Item Create")
                     {
+                        ApplicationArea = All;
                     }
                     field("Autocreate EAN-Number"; "Autocreate EAN-Number")
                     {
+                        ApplicationArea = All;
                     }
                     field("EAN No. at 1 star"; "EAN No. at 1 star")
                     {
+                        ApplicationArea = All;
                     }
                     field("Item Description at 1 star"; "Item Description at 1 star")
                     {
+                        ApplicationArea = All;
                     }
                     field("Item Description at 2 star"; "Item Description at 2 star")
                     {
+                        ApplicationArea = All;
                     }
                     field("Vendor When Creation"; "Vendor When Creation")
                     {
+                        ApplicationArea = All;
                     }
                     field("Prices Include VAT"; "Prices Include VAT")
                     {
+                        ApplicationArea = All;
                     }
                     field("Costing Method Standard"; "Costing Method Standard")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("POS Sale")
@@ -503,9 +613,11 @@ page 6014424 "Retail Setup"
                     Caption = 'POS Sale';
                     field("Create retail order"; "Create retail order")
                     {
+                        ApplicationArea = All;
                     }
                     field("Item No. Shipping"; "Item No. Shipping")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -517,24 +629,31 @@ page 6014424 "Retail Setup"
                     Caption = 'Security';
                     field("Create New Customer"; "Create New Customer")
                     {
+                        ApplicationArea = All;
                     }
                     field("Allow Customer Cash Sale"; "Allow Customer Cash Sale")
                     {
+                        ApplicationArea = All;
                     }
                     field("Demand Cash Cust on Neg Sale"; "Demand Cash Cust on Neg Sale")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer No."; "Customer No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Default Rental"; "Default Rental")
                     {
+                        ApplicationArea = All;
                     }
                     field("Rep. Cust. Default"; "Rep. Cust. Default")
                     {
+                        ApplicationArea = All;
                     }
                     field("Cash Customer Deposit rel."; "Cash Customer Deposit rel.")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("G/L Details")
@@ -542,12 +661,15 @@ page 6014424 "Retail Setup"
                     Caption = 'G/L Details';
                     field("Customer Config. Template"; "Customer Config. Template")
                     {
+                        ApplicationArea = All;
                     }
                     field("Prices incl. VAT"; "Prices incl. VAT")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer type"; "Customer type")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Employee)
@@ -555,18 +677,23 @@ page 6014424 "Retail Setup"
                     Caption = 'Employee';
                     field("Staff Disc. Group"; "Staff Disc. Group")
                     {
+                        ApplicationArea = All;
                     }
                     field("Staff Price Group"; "Staff Price Group")
                     {
+                        ApplicationArea = All;
                     }
                     field("Internal Unit Price"; "Internal Unit Price")
                     {
+                        ApplicationArea = All;
                     }
                     field("Internal Dept. Code"; "Internal Dept. Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("Staff SalesPrice Calc Codeunit"; "Staff SalesPrice Calc Codeunit")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -578,21 +705,27 @@ page 6014424 "Retail Setup"
                     Caption = 'Posting Group';
                     field("Poste Sales Ticket Immediately"; "Poste Sales Ticket Immediately")
                     {
+                        ApplicationArea = All;
                     }
                     field("Post Customer Payment imme."; "Post Customer Payment imme.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Post Payouts imme."; "Post Payouts imme.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Immediate postings"; "Immediate postings")
                     {
+                        ApplicationArea = All;
                     }
                     field("Appendix no. eq Sales Ticket"; "Appendix no. eq Sales Ticket")
                     {
+                        ApplicationArea = All;
                     }
                     field("Create POS Entries Only"; "Create POS Entries Only")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -603,36 +736,47 @@ page 6014424 "Retail Setup"
                     }
                     field("Post Sale"; "Post Sale")
                     {
+                        ApplicationArea = All;
                     }
                     field("Posting Audit Roll"; "Posting Audit Roll")
                     {
+                        ApplicationArea = All;
                     }
                     field("Posting When Balancing"; "Posting When Balancing")
                     {
+                        ApplicationArea = All;
                     }
                     field("Debug Posting"; "Debug Posting")
                     {
+                        ApplicationArea = All;
                     }
                     field("Post to Journal"; "Post to Journal")
                     {
+                        ApplicationArea = All;
                     }
                     field("Journal Type"; "Journal Type")
                     {
+                        ApplicationArea = All;
                     }
                     field("Journal Name"; "Journal Name")
                     {
+                        ApplicationArea = All;
                     }
                     field("Salespersoncode on Salesdoc."; "Salespersoncode on Salesdoc.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Posting Source Code"; "Posting Source Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("Post registers compressed"; "Post registers compressed")
                     {
+                        ApplicationArea = All;
                     }
                     field("Automatic inventory posting"; "Automatic inventory posting")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Currency)
@@ -640,9 +784,11 @@ page 6014424 "Retail Setup"
                     Caption = 'Currency';
                     field("Register Cnt. Units"; "Register Cnt. Units")
                     {
+                        ApplicationArea = All;
                     }
                     field("Euro Exchange Rate"; "Euro Exchange Rate")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Statistics)
@@ -650,21 +796,27 @@ page 6014424 "Retail Setup"
                     Caption = 'Statistics';
                     field("No. of Sales pr. Stat"; "No. of Sales pr. Stat")
                     {
+                        ApplicationArea = All;
                     }
                     field("Dim Stat Method"; "Dim Stat Method")
                     {
+                        ApplicationArea = All;
                     }
                     field("Dim Stat Value"; "Dim Stat Value")
                     {
+                        ApplicationArea = All;
                     }
                     field("Stat. Dimension"; "Stat. Dimension")
                     {
+                        ApplicationArea = All;
                     }
                     field("F9 Statistics When Login"; "F9 Statistics When Login")
                     {
+                        ApplicationArea = All;
                     }
                     field("Use Adv. dimensions"; "Use Adv. dimensions")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Chart)
@@ -672,6 +824,7 @@ page 6014424 "Retail Setup"
                     Caption = 'Chart on RoleCenter';
                     field("Margin and Turnover By Shop"; "Margin and Turnover By Shop")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(SalesDocuments)
@@ -679,24 +832,31 @@ page 6014424 "Retail Setup"
                     Caption = 'Sales Documents';
                     field("Sale Doc. Type On Post. Pstv."; "Sale Doc. Type On Post. Pstv.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sale Doc. Type On Post. Negt."; "Sale Doc. Type On Post. Negt.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sale Doc. Post. On Order"; "Sale Doc. Post. On Order")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sale Doc. Post. On Invoice"; "Sale Doc. Post. On Invoice")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sale Doc. Post. On Cred. Memo"; "Sale Doc. Post. On Cred. Memo")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sale Doc. Post. On Ret. Order"; "Sale Doc. Post. On Ret. Order")
                     {
+                        ApplicationArea = All;
                     }
                     field("Sale Doc. Print On Post"; "Sale Doc. Print On Post")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -708,9 +868,11 @@ page 6014424 "Retail Setup"
                     Caption = 'Payment';
                     field("Fixed Price of Mending"; "Fixed Price of Mending")
                     {
+                        ApplicationArea = All;
                     }
                     field("Fixed Price of Denied Mending"; "Fixed Price of Denied Mending")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -719,15 +881,19 @@ page 6014424 "Retail Setup"
                 Caption = 'Document Description';
                 field("Sales Line Description Code"; "Sales Line Description Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Purchase Line Description Code"; "Purchase Line Description Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Transfer Line Description Code"; "Transfer Line Description Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("POS Line Description Code"; "POS Line Description Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

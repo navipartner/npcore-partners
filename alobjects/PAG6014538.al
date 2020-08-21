@@ -11,8 +11,9 @@ page 6014538 "Insurance Companies"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

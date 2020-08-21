@@ -16,29 +16,37 @@ page 6151399 "CS RFID Header Card"
             group(General)
             {
                 Caption = 'General';
-                field("Sell-to Customer No.";"Sell-to Customer No.")
+                field("Sell-to Customer No."; "Sell-to Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sell-to Customer Name";"Sell-to Customer Name")
+                field("Sell-to Customer Name"; "Sell-to Customer Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Item Quantity";"Document Item Quantity")
+                field("Document Item Quantity"; "Document Item Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field(Closed;Closed)
+                field(Closed; Closed)
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Matched";"Document Matched")
+                field("Document Matched"; "Document Matched")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Tags to Shipping Doc.";"Import Tags to Shipping Doc.")
+                field("Import Tags to Shipping Doc."; "Import Tags to Shipping Doc.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Tag Info")
@@ -47,92 +55,112 @@ page 6151399 "CS RFID Header Card"
                 group("Tags Shipped")
                 {
                     Caption = 'Tags Shipped';
-                    field("Total Tags Shipped";"Total Tags Shipped")
+                    field("Total Tags Shipped"; "Total Tags Shipped")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
-                    field("Unknown Tags Shipped";"Unknown Tags Shipped")
+                    field("Unknown Tags Shipped"; "Unknown Tags Shipped")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Valid Tags Shipped";"Valid Tags Shipped")
+                    field("Valid Tags Shipped"; "Valid Tags Shipped")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Tags Received")
                 {
                     Caption = 'Tags Received';
-                    field("Total Tags Received";"Total Tags Received")
+                    field("Total Tags Received"; "Total Tags Received")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Unknown Tags Received";"Unknown Tags Received")
+                    field("Unknown Tags Received"; "Unknown Tags Received")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
-                    field("Valid Tags Received";"Valid Tags Received")
+                    field("Valid Tags Received"; "Valid Tags Received")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Total)
                 {
                     Caption = 'Total';
-                    field("Total Matched Tags";"Total Matched Tags")
+                    field("Total Matched Tags"; "Total Matched Tags")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Total Valid Matched Tags";"Total Valid Matched Tags")
+                    field("Total Valid Matched Tags"; "Total Valid Matched Tags")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Total Unknown Matched Tags";"Total Unknown Matched Tags")
+                    field("Total Unknown Matched Tags"; "Total Unknown Matched Tags")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Received not Shipped Tags";"Received not Shipped Tags")
+                    field("Received not Shipped Tags"; "Received not Shipped Tags")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(Documents)
             {
                 Caption = 'Documents';
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Document Type";"To Document Type")
+                field("To Document Type"; "To Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Document No.";"To Document No.")
+                field("To Document No."; "To Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Warehouse Receipt No.";"Warehouse Receipt No.")
+                field("Warehouse Receipt No."; "Warehouse Receipt No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Process)
             {
                 Caption = 'Process';
-                field("From Company";"From Company")
+                field("From Company"; "From Company")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Closed";"Shipping Closed")
+                field("Shipping Closed"; "Shipping Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Closed By";"Shipping Closed By")
+                field("Shipping Closed By"; "Shipping Closed By")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Company";"To Company")
+                field("To Company"; "To Company")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receiving Closed";"Receiving Closed")
+                field("Receiving Closed"; "Receiving Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receiving Closed By";"Receiving Closed By")
+                field("Receiving Closed By"; "Receiving Closed By")
                 {
                 }
             }
-            part(Control6014414;"CS RFID Lines Subpage")
+            part(Control6014414; "CS RFID Lines Subpage")
             {
-                SubPageLink = Id=FIELD(Id);
+                SubPageLink = Id = FIELD(Id);
             }
         }
     }
@@ -149,7 +177,7 @@ page 6151399 "CS RFID Header Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "CS Transfer Handling Batch";
-                RunPageLink = "Rfid Header Id"=FIELD(Id);
+                RunPageLink = "Rfid Header Id" = FIELD(Id);
             }
             action("Delete Collected Tags")
             {
@@ -204,9 +232,9 @@ page 6151399 "CS RFID Header Card"
                     WarehouseReceiptHeader: Record "Warehouse Receipt Header";
                 begin
                     if not WarehouseReceiptHeader.Get("Warehouse Receipt No.") then
-                      exit;
+                        exit;
 
-                    PAGE.Run(PAGE::"Warehouse Receipt",WarehouseReceiptHeader);
+                    PAGE.Run(PAGE::"Warehouse Receipt", WarehouseReceiptHeader);
                 end;
             }
         }

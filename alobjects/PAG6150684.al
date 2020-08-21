@@ -16,54 +16,63 @@ page 6150684 "NPRE Restaurant Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Name 2";"Name 2")
+                field("Name 2"; "Name 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Service Flow Profile";"Service Flow Profile")
+                field("Service Flow Profile"; "Service Flow Profile")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Kitchen Integration")
             {
                 Caption = 'Kitchen Integration';
-                field("Auto Send Kitchen Order";"Auto Send Kitchen Order")
+                field("Auto Send Kitchen Order"; "Auto Send Kitchen Order")
                 {
+                    ApplicationArea = All;
                 }
-                field("Resend All On New Lines";"Resend All On New Lines")
+                field("Resend All On New Lines"; "Resend All On New Lines")
                 {
+                    ApplicationArea = All;
                 }
                 group(Print)
                 {
                     Caption = 'Print';
-                    field("Kitchen Printing Active";"Kitchen Printing Active")
+                    field("Kitchen Printing Active"; "Kitchen Printing Active")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(KDS)
                 {
                     Caption = 'KDS';
                     Visible = ShowKDS;
-                    field("KDS Active";"KDS Active")
+                    field("KDS Active"; "KDS Active")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Order ID Assign. Method";"Order ID Assign. Method")
+                    field("Order ID Assign. Method"; "Order ID Assign. Method")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014412;Notes)
+            systempart(Control6014412; Notes)
             {
             }
-            systempart(Control6014413;Links)
+            systempart(Control6014413; Links)
             {
                 Visible = false;
             }
@@ -85,7 +94,7 @@ page 6150684 "NPRE Restaurant Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPRE Kitchen Stations";
-                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                    RunPageLink = "Restaurant Code" = FIELD(Code);
                 }
                 action(KitchenStationSelection)
                 {
@@ -95,7 +104,7 @@ page 6150684 "NPRE Restaurant Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPRE Kitchen Station Selection";
-                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                    RunPageLink = "Restaurant Code" = FIELD(Code);
                 }
                 action(ShowKitchenRequests)
                 {
@@ -126,7 +135,7 @@ page 6150684 "NPRE Restaurant Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPRE Seating Location";
-                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                    RunPageLink = "Restaurant Code" = FIELD(Code);
                 }
                 action(Seatings)
                 {

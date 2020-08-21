@@ -16,11 +16,13 @@ page 6014605 "NPR Attributes"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -35,7 +37,7 @@ page 6014605 "NPR Attributes"
                 Caption = 'Attribute ID';
                 Image = LinkWithExisting;
                 RunObject = Page "NPR Attribute IDs";
-                RunPageLink = "Attribute Code"=FIELD(Code);
+                RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code")
                               ORDER(Ascending);
             }
@@ -44,15 +46,15 @@ page 6014605 "NPR Attributes"
                 Caption = 'Translations';
                 Image = Translation;
                 RunObject = Page "NPR Attribute Translations";
-                RunPageLink = "Attribute Code"=FIELD(Code);
-                RunPageView = SORTING("Attribute Code","Language ID");
+                RunPageLink = "Attribute Code" = FIELD(Code);
+                RunPageView = SORTING("Attribute Code", "Language ID");
             }
             action(Values)
             {
                 Caption = 'Values';
                 Image = List;
                 RunObject = Page "NPR Attribute Value Lookup";
-                RunPageLink = "Attribute Code"=FIELD(Code);
+                RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code");
             }
         }

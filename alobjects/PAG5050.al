@@ -1,4 +1,4 @@
-pageextension 6014452 pageextension6014452 extends "Contact Card" 
+pageextension 6014452 pageextension6014452 extends "Contact Card"
 {
     // MAG1.05/MHA /20150220  CASE 206395 Added Webshop Group
     // MAG1.07/MHA /20150309  CASE 206395 Added Field 6059825 "Webshop Display Group"
@@ -16,8 +16,9 @@ pageextension 6014452 pageextension6014452 extends "Contact Card"
     {
         addafter(Name)
         {
-            field("Name 2";"Name 2")
+            field("Name 2"; "Name 2")
             {
+                ApplicationArea = All;
                 Importance = Additional;
             }
         }
@@ -26,26 +27,33 @@ pageextension 6014452 pageextension6014452 extends "Contact Card"
             group(Magento)
             {
                 Caption = 'Magento';
-                field("Magento Contact";"Magento Contact")
+                field("Magento Contact"; "Magento Contact")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Customer Group";"Magento Customer Group")
+                field("Magento Customer Group"; "Magento Customer Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Administrator";"Magento Administrator")
+                field("Magento Administrator"; "Magento Administrator")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Payment Methods";"Magento Payment Methods")
+                field("Magento Payment Methods"; "Magento Payment Methods")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Shipment Methods";"Magento Shipment Methods")
+                field("Magento Shipment Methods"; "Magento Shipment Methods")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Account Status";"Magento Account Status")
+                field("Magento Account Status"; "Magento Account Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Price Visibility";"Magento Price Visibility")
+                field("Magento Price Visibility"; "Magento Price Visibility")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

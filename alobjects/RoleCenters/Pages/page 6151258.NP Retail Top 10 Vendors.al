@@ -20,6 +20,7 @@ page 6151258 "NP Retail Top 10 Vendors"
                 ShowCaption = false;
                 field(StartDate; StartDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Start Date';
 
                     trigger OnValidate()
@@ -29,6 +30,7 @@ page 6151258 "NP Retail Top 10 Vendors"
                 }
                 field(Enddate; Enddate)
                 {
+                    ApplicationArea = All;
                     Caption = 'End date';
 
                     trigger OnValidate()
@@ -44,6 +46,7 @@ page 6151258 "NP Retail Top 10 Vendors"
                 {
                     field("No."; "No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
 
                         trigger OnDrillDown()
@@ -54,14 +57,17 @@ page 6151258 "NP Retail Top 10 Vendors"
                     }
                     field(Name; Name)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                     field("Phone No."; "Phone No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                     field("Sales (LCY)"; "Sales (LCY)")
                     {
+                        ApplicationArea = All;
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         Editable = false;

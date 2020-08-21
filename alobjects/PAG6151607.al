@@ -18,24 +18,30 @@ page 6151607 "NpDc Extra Item Qty. Subform"
             {
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Qty. per Lot"; "Validation Quantity")
                 {
+                    ApplicationArea = All;
                     Caption = 'Qty. per Lot';
                     Visible = (LotValidation);
                 }

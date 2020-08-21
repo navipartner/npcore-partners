@@ -14,18 +14,21 @@ page 6151588 "Event Atributes Info"
             repeater(Control6014403)
             {
                 ShowCaption = false;
-                field("Template Name";"Template Name")
+                field("Template Name"; "Template Name")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = UseAttributeMatrix;
                 }
-                field(Promote;Promote)
+                field(Promote; Promote)
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = UseAttributeMatrix;
                 }
-                field(UseAttributeMatrix;UseAttributeMatrix)
+                field(UseAttributeMatrix; UseAttributeMatrix)
                 {
+                    ApplicationArea = All;
                     Caption = 'Attribute Matrix Suggested';
                     Style = Attention;
                     StyleExpr = UseAttributeMatrix;
@@ -60,15 +63,15 @@ page 6151588 "Event Atributes Info"
         EventAttributeTemplate.Get("Template Name");
 
         EventAttributeRowValue.Reset;
-        EventAttributeRowValue.SetRange("Template Name",EventAttributeTemplate."Row Template Name");
+        EventAttributeRowValue.SetRange("Template Name", EventAttributeTemplate."Row Template Name");
         NoOfRows := EventAttributeRowValue.Count;
-        EventAttributeRowValue.SetRange(Promote,true);
+        EventAttributeRowValue.SetRange(Promote, true);
         NoOfPromotedRows := EventAttributeRowValue.Count;
 
         EventAttributeColValue.Reset;
-        EventAttributeColValue.SetRange("Template Name",EventAttributeTemplate."Column Template Name");
+        EventAttributeColValue.SetRange("Template Name", EventAttributeTemplate."Column Template Name");
         NoOfColumns := EventAttributeColValue.Count;
-        EventAttributeColValue.SetRange(Promote,true);
+        EventAttributeColValue.SetRange(Promote, true);
         NoOfPromotedColumns := EventAttributeColValue.Count;
 
         UseAttributeMatrix := (MaxNoOfRows < NoOfRows) or (NoOfPromotedRows < NoOfRows) or (MaxNoOfColumns < NoOfColumns) or (NoOfPromotedColumns < NoOfColumns);

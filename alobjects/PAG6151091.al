@@ -16,26 +16,33 @@ page 6151091 "Nc RapidConnect Setup"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Package Code";"Package Code")
+                field("Package Code"; "Package Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Export Enabled";"Export Enabled")
+                field("Export Enabled"; "Export Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Processor Code";"Task Processor Code")
+                field("Task Processor Code"; "Task Processor Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Enabled";"Import Enabled")
+                field("Import Enabled"; "Import Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Type";"Import Type")
+                field("Import Type"; "Import Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

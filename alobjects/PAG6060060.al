@@ -14,38 +14,48 @@ page 6060060 "Item Worksheet Variety Mapping"
         {
             repeater(Group)
             {
-                field("Worksheet Template Name";"Worksheet Template Name")
+                field("Worksheet Template Name"; "Worksheet Template Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Wksh. Maping Field";"Item Wksh. Maping Field")
+                field("Item Wksh. Maping Field"; "Item Wksh. Maping Field")
                 {
+                    ApplicationArea = All;
                     LookupPageID = "Item Worksheet Field Setup";
                 }
-                field("Item Wksh. Maping Field Name";"Item Wksh. Maping Field Name")
+                field("Item Wksh. Maping Field Name"; "Item Wksh. Maping Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Wksh. Maping Field Value";"Item Wksh. Maping Field Value")
+                field("Item Wksh. Maping Field Value"; "Item Wksh. Maping Field Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Variety Value";"Vendor Variety Value")
+                field("Vendor Variety Value"; "Vendor Variety Value")
                 {
+                    ApplicationArea = All;
                 }
-                field(Variety;Variety)
+                field(Variety; Variety)
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Table";"Variety Table")
+                field("Variety Table"; "Variety Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Value";"Variety Value")
+                field("Variety Value"; "Variety Value")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -54,8 +64,9 @@ page 6060060 "Item Worksheet Variety Mapping"
                         //+NPR5.46 [314287]
                     end;
                 }
-                field("Variety Value Description";"Variety Value Description")
+                field("Variety Value Description"; "Variety Value Description")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

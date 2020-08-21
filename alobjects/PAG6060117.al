@@ -26,16 +26,20 @@ page 6060117 "TM Ticket Access Stat. Lines"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field(LINE_Total; LINE_Total)
                 {
+                    ApplicationArea = All;
                     Caption = 'Admissions';
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     StyleExpr = 'Strong';
 
@@ -46,6 +50,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field2; MATRIX_CellData[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
 
@@ -56,6 +61,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field3; MATRIX_CellData[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
 
@@ -66,6 +72,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field4; MATRIX_CellData[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
 
@@ -76,6 +83,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field5; MATRIX_CellData[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
 
@@ -86,6 +94,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field6; MATRIX_CellData[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
 
@@ -96,6 +105,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field7; MATRIX_CellData[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
 
@@ -106,6 +116,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field8; MATRIX_CellData[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
 
@@ -116,6 +127,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field9; MATRIX_CellData[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
 
@@ -126,6 +138,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field10; MATRIX_CellData[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
 
@@ -136,6 +149,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field11; MATRIX_CellData[11])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
 
@@ -146,6 +160,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 }
                 field(Field12; MATRIX_CellData[12])
                 {
+                    ApplicationArea = All;
 
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
@@ -317,10 +332,10 @@ page 6060117 "TM Ticket Access Stat. Lines"
                 TicketFactLineFilter.SetFilter("Fact Code", DateFactFilter);
             LineFactOption::ADMISSION_HOUR:
                 TicketFactLineFilter.SetFilter("Fact Code", HourFactFilter);
-                //-TM1.36 [323024]
+            //-TM1.36 [323024]
             LineFactOption::VARIANT_CODE:
                 TicketFactLineFilter.SetFilter("Fact Code", VariantCodeFactFilter);
-                //+TM1.36 [323024]
+        //+TM1.36 [323024]
         end;
     end;
 

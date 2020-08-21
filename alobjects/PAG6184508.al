@@ -12,20 +12,25 @@ page 6184508 "EFT NETS Cloud Payment Setup"
         {
             group(General)
             {
-                field("API Username";"API Username")
+                field("API Username"; "API Username")
                 {
+                    ApplicationArea = All;
                 }
-                field("API Password";"API Password")
+                field("API Password"; "API Password")
                 {
+                    ApplicationArea = All;
                 }
-                field(Environment;Environment)
+                field(Environment; Environment)
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Level";"Log Level")
+                field("Log Level"; "Log Level")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Reconcile on EOD";"Auto Reconcile on EOD")
+                field("Auto Reconcile on EOD"; "Auto Reconcile on EOD")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

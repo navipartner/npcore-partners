@@ -16,17 +16,21 @@ page 6151562 "NpXml Template Archive List"
         {
             repeater(Group)
             {
-                field("Template Version No.";"Template Version No.")
+                field("Template Version No."; "Template Version No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Version Description";"Version Description")
+                field("Version Description"; "Version Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Archived by";"Archived by")
+                field("Archived by"; "Archived by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Archived at";"Archived at")
+                field("Archived at"; "Archived at")
                 {
+                    ApplicationArea = All;
                     Caption = 'Archived At';
                 }
             }
@@ -50,14 +54,14 @@ page 6151562 "NpXml Template Archive List"
                     NpXmlTemplateMgt: Codeunit "NpXml Template Mgt.";
                 begin
                     //-NC1.21
-                    if not(Confirm(Text400)) then
-                      exit;
+                    if not (Confirm(Text400)) then
+                        exit;
 
                     Clear(NpXmlTemplateMgt);
-                    if not NpXmlTemplateMgt.RestoreArchivedNpXmlTemplate(Code,"Template Version No.") then
-                      Message(Text200)
+                    if not NpXmlTemplateMgt.RestoreArchivedNpXmlTemplate(Code, "Template Version No.") then
+                        Message(Text200)
                     else
-                     Message(StrSubstNo(Text100,"Template Version No."));
+                        Message(StrSubstNo(Text100, "Template Version No."));
                     CurrPage.Close;
                     //+NC1.21
                 end;

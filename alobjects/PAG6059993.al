@@ -13,26 +13,33 @@ page 6059993 "Item Repair Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("From value";"From value")
+                field("From value"; "From value")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Value";"To Value")
+                field("To Value"; "To Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Changed By";"Changed By")
+                field("Changed By"; "Changed By")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -12,17 +12,21 @@ page 6014607 "NPR Attribute IDs"
         {
             repeater(Group)
             {
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute Code";"Attribute Code")
+                field("Attribute Code"; "Attribute Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Attribute ID";"Shortcut Attribute ID")
+                field("Shortcut Attribute ID"; "Shortcut Attribute ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entity Attribute ID";"Entity Attribute ID")
+                field("Entity Attribute ID"; "Entity Attribute ID")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

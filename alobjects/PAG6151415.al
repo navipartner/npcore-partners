@@ -23,14 +23,17 @@ page 6151415 "Magento Category List"
                 IndentationColumn = Level;
                 IndentationControls = Id;
                 ShowCaption = false;
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

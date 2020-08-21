@@ -12,14 +12,17 @@ page 6060044 "Item Worksheet Variety Values"
         {
             repeater(Group)
             {
-                field("Table";Table)
+                field("Table"; Table)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sort Order";"Sort Order")
+                field("Sort Order"; "Sort Order")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

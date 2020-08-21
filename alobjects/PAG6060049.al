@@ -6,9 +6,9 @@ page 6060049 "Item Worksheet Missing Setup"
     Caption = 'Item Worksheet Missing Setup';
     PageType = List;
     SourceTable = "Missing Setup Table";
-    SourceTableView = SORTING("Table ID","Field No.")
+    SourceTableView = SORTING("Table ID", "Field No.")
                       ORDER(Ascending)
-                      WHERE("Missing Records"=FILTER(>0));
+                      WHERE("Missing Records" = FILTER(> 0));
 
     layout
     {
@@ -16,24 +16,28 @@ page 6060049 "Item Worksheet Missing Setup"
         {
             repeater(Group)
             {
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Related Table Name";"Related Table Name")
+                field("Related Table Name"; "Related Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Missing Records";"Missing Records")
+                field("Missing Records"; "Missing Records")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create New";"Create New")
+                field("Create New"; "Create New")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6150620;"Item Worksheet Setup Subpage")
+            part(Control6150620; "Item Worksheet Setup Subpage")
             {
-                SubPageLink = "Table ID"=FIELD("Table ID"),
-                              "Field No."=FIELD("Field No.");
-                SubPageView = SORTING("Table ID","Field No.",Value)
+                SubPageLink = "Table ID" = FIELD("Table ID"),
+                              "Field No." = FIELD("Field No.");
+                SubPageView = SORTING("Table ID", "Field No.", Value)
                               ORDER(Ascending);
             }
         }

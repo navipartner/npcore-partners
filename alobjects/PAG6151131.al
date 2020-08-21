@@ -20,25 +20,32 @@ page 6151131 "TM Seating Template"
                 ShowAsTree = true;
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("Seating Code"; "Seating Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
                 field(Capacity; Capacity)
                 {
+                    ApplicationArea = All;
                 }
                 field("Reservation Category"; "Reservation Category")
                 {
+                    ApplicationArea = All;
                 }
                 field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Style = StandardAccent;
                     StyleExpr = AccentuatedPrice;
                     Visible = false;
@@ -59,6 +66,7 @@ page 6151131 "TM Seating Template"
                 }
                 field(UnitPrice; UnitPrice)
                 {
+                    ApplicationArea = All;
                     Caption = 'Unit Price';
                     Style = StandardAccent;
                     StyleExpr = AccentuatedPrice;
@@ -78,12 +86,15 @@ page 6151131 "TM Seating Template"
                 }
                 field(Ordinal; Ordinal)
                 {
+                    ApplicationArea = All;
                 }
                 field(Path; Path)
                 {
+                    ApplicationArea = All;
                 }
                 field("Indent Level"; "Indent Level")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

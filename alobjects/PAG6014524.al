@@ -20,24 +20,31 @@ page 6014524 "Touch Screen - CRM Contacts"
                 ShowCaption = false;
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Mobile Phone No."; "Mobile Phone No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
                 field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(City; City)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

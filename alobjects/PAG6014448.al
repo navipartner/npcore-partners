@@ -16,41 +16,51 @@ page 6014448 "Mixed Discount Time Intervals"
         {
             repeater(Group)
             {
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Time";"End Time")
+                field("End Time"; "End Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Period Type";"Period Type")
+                field("Period Type"; "Period Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Monday;Monday)
+                field(Monday; Monday)
                 {
-                    Editable = "Period Type"=1;
-                }
-                field(Tuesday;Tuesday)
-                {
+                    ApplicationArea = All;
                     Editable = "Period Type" = 1;
                 }
-                field(Wednesday;Wednesday)
+                field(Tuesday; Tuesday)
                 {
+                    ApplicationArea = All;
                     Editable = "Period Type" = 1;
                 }
-                field(Thursday;Thursday)
+                field(Wednesday; Wednesday)
                 {
+                    ApplicationArea = All;
                     Editable = "Period Type" = 1;
                 }
-                field(Friday;Friday)
+                field(Thursday; Thursday)
                 {
+                    ApplicationArea = All;
                     Editable = "Period Type" = 1;
                 }
-                field(Saturday;Saturday)
+                field(Friday; Friday)
                 {
+                    ApplicationArea = All;
                     Editable = "Period Type" = 1;
                 }
-                field(Sunday;Sunday)
+                field(Saturday; Saturday)
                 {
+                    ApplicationArea = All;
+                    Editable = "Period Type" = 1;
+                }
+                field(Sunday; Sunday)
+                {
+                    ApplicationArea = All;
                     Editable = "Period Type" = 1;
                 }
             }

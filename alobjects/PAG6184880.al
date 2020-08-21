@@ -15,22 +15,28 @@ page 6184880 "FTP Setup"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field("FTP Host"; "FTP Host")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(Timeout; Timeout)
                 {
+                    ApplicationArea = All;
                     ToolTip = 'Miliseconds';
                 }
                 field(User; User)
                 {
+                    ApplicationArea = All;
                 }
                 field(Password; Password)
                 {
+                    ApplicationArea = All;
                     Caption = 'Password';
                     ExtendedDatatype = Masked;
 
@@ -39,11 +45,13 @@ page 6184880 "FTP Setup"
                         HandlePassword(Password);
                     end;
                 }
-                field("Port Number";"Port Number")
+                field("Port Number"; "Port Number")
                 {
+                    ApplicationArea = All;
                 }
                 field("Storage On Server"; "Storage On Server")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

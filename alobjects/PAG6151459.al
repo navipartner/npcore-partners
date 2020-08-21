@@ -14,22 +14,27 @@ page 6151459 "Magento Contact Ship-to List"
         {
             repeater(Group)
             {
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Created By Contact No.";"Created By Contact No.")
+                field("Created By Contact No."; "Created By Contact No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Ship-to Code";"Ship-to Code")
+                field("Ship-to Code"; "Ship-to Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created At";"Created At")
+                field("Created At"; "Created At")
                 {
+                    ApplicationArea = All;
                 }
-                field(Visibility;Visibility)
+                field(Visibility; Visibility)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -17,26 +17,33 @@ page 6060041 "Item Worksheets"
         {
             repeater(Group)
             {
-                field("Item Template Name";"Item Template Name")
+                field("Item Template Name"; "Item Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prefix Code";"Prefix Code")
+                field("Prefix Code"; "Prefix Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group";"Item Group")
+                field("Item Group"; "Item Group")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -64,8 +71,8 @@ page 6060041 "Item Worksheets"
                 Caption = 'Registered Worksheets';
                 Image = Registered;
                 RunObject = Page "Registered Item Worksheets";
-                RunPageLink = "Worksheet Name"=FIELD(Name),
-                              "Item Worksheet Template"=FIELD("Item Template Name");
+                RunPageLink = "Worksheet Name" = FIELD(Name),
+                              "Item Worksheet Template" = FIELD("Item Template Name");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
             }
@@ -85,8 +92,8 @@ page 6060041 "Item Worksheets"
                     //-NPR5.25 [246088]
                     InsertDefaultFieldSetup;
                     ItemWorksheetFieldSetup.Reset;
-                    ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name","Item Template Name");
-                    ItemWorksheetFieldSetup.SetFilter("Worksheet Name",Name);
+                    ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", "Item Template Name");
+                    ItemWorksheetFieldSetup.SetFilter("Worksheet Name", Name);
                     ItemWorksheetFieldSetupPage.SetTableView(ItemWorksheetFieldSetup);
                     ItemWorksheetFieldSetupPage.Run;
                     //+NPR5.25 [246088]

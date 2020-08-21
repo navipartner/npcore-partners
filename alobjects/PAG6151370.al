@@ -16,15 +16,18 @@ page 6151370 "CS Users"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Password;Password)
+                field(Password; Password)
                 {
+                    ApplicationArea = All;
                     ExtendedDatatype = Masked;
                 }
-                field("View All Documents";"View All Documents")
+                field("View All Documents"; "View All Documents")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

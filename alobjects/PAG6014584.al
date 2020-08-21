@@ -8,23 +8,26 @@ page 6014584 "Touch Screen - Validate Ticket"
     {
         area(content)
         {
-            field(Control6150618;'')
+            field(Control6150618; '')
             {
+                ApplicationArea = All;
                 Caption = 'Scan Ticket';
                 HideValue = true;
                 Style = Strong;
                 StyleExpr = TRUE;
             }
-            field(Input;Validering)
+            field(Input; Validering)
             {
+                ApplicationArea = All;
 
                 trigger OnValidate()
                 begin
                     ValidateTicket(Validering);
                 end;
             }
-            field(TextMessage;MessageText)
+            field(TextMessage; MessageText)
             {
+                ApplicationArea = All;
                 Editable = false;
                 MultiLine = true;
             }
@@ -48,8 +51,8 @@ page 6014584 "Touch Screen - Validate Ticket"
                 begin
 
                     if Validering <> '' then begin
-                      Validering := '<CANCEL>';
-                      exit;
+                        Validering := '<CANCEL>';
+                        exit;
                     end;
                     Validering := '<CANCEL>';
                     CurrPage.Close;
@@ -87,24 +90,24 @@ page 6014584 "Touch Screen - Validate Ticket"
     begin
         Ticket.SetRange("No.", TicketBarCode);
         if not Ticket.FindFirst then begin
-          Clear(Ticket);
-          Ticket.SetCurrentKey("Ticket No. for Printing");
-          Ticket.SetRange("Ticket No. for Printing", TicketBarCode);
+            Clear(Ticket);
+            Ticket.SetCurrentKey("Ticket No. for Printing");
+            Ticket.SetRange("Ticket No. for Printing", TicketBarCode);
         end;
 
         if Ticket.FindFirst then begin
-          if not Ticket.Blocked then begin
-            FontColor      := FontColor::Green;
-            MessageText    := TextTicketApproved;
-            Ticket.Blocked := true;
-            Ticket.Modify;
-          end else begin
-            FontColor   := FontColor::Red;
-            MessageText := TextAllreadyUsed;
-          end
+            if not Ticket.Blocked then begin
+                FontColor := FontColor::Green;
+                MessageText := TextTicketApproved;
+                Ticket.Blocked := true;
+                Ticket.Modify;
+            end else begin
+                FontColor := FontColor::Red;
+                MessageText := TextAllreadyUsed;
+            end
         end else begin
-          FontColor   := FontColor::Red;
-          MessageText := TextTicketNotFound;
+            FontColor := FontColor::Red;
+            MessageText := TextTicketNotFound;
         end;
     end;
 }

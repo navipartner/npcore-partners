@@ -13,41 +13,53 @@ page 6060056 "Item Status"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Initial;Initial)
+                field(Initial; Initial)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Allowed";"Delete Allowed")
+                field("Delete Allowed"; "Delete Allowed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rename Allowed";"Rename Allowed")
+                field("Rename Allowed"; "Rename Allowed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Insert";"Purchase Insert")
+                field("Purchase Insert"; "Purchase Insert")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Release";"Purchase Release")
+                field("Purchase Release"; "Purchase Release")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Post";"Purchase Post")
+                field("Purchase Post"; "Purchase Post")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Insert";"Sales Insert")
+                field("Sales Insert"; "Sales Insert")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Release";"Sales Release")
+                field("Sales Release"; "Sales Release")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Post";"Sales Post")
+                field("Sales Post"; "Sales Post")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

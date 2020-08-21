@@ -13,35 +13,44 @@ page 6060077 "MM Recurring Payment Setup"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Service Provider Code";"Payment Service Provider Code")
+                field("Payment Service Provider Code"; "Payment Service Provider Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("PSP Recurring Plan ID";"PSP Recurring Plan ID")
+                field("PSP Recurring Plan ID"; "PSP Recurring Plan ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Period Alignment";"Period Alignment")
+                field("Period Alignment"; "Period Alignment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Period Size";"Period Size")
+                field("Period Size"; "Period Size")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Posting)
             {
-                field("Gen. Journal Template Name";"Gen. Journal Template Name")
+                field("Gen. Journal Template Name"; "Gen. Journal Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No. Series";"Document No. Series")
+                field("Document No. Series"; "Document No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Terms Code";"Payment Terms Code")
+                field("Payment Terms Code"; "Payment Terms Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Revenue Account";"Revenue Account")
+                field("Revenue Account"; "Revenue Account")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

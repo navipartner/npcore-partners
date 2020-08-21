@@ -16,33 +16,41 @@ page 6150730 "POS Sales Workflow Steps"
         {
             repeater(Group)
             {
-                field("Set Code";"Set Code")
+                field("Set Code"; "Set Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Workflow Code";"Workflow Code")
+                field("Workflow Code"; "Workflow Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Subscriber Codeunit ID";"Subscriber Codeunit ID")
+                field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Subscriber Codeunit Name";"Subscriber Codeunit Name")
+                field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Subscriber Function";"Subscriber Function")
+                field("Subscriber Function"; "Subscriber Function")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sequence No.";"Sequence No.")
+                field("Sequence No."; "Sequence No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

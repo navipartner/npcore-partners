@@ -10,7 +10,7 @@ page 6150689 "NPRE Kitchen Requests"
     PageType = Worksheet;
     PromotedActionCategories = 'New,Process,Report,Page';
     SourceTable = "NPRE Kitchen Request";
-    SourceTableView = SORTING("Restaurant Code","Line Status",Priority,"Order ID","Created Date-Time");
+    SourceTableView = SORTING("Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time");
     UsageCategory = Lists;
 
     layout
@@ -21,68 +21,85 @@ page 6150689 "NPRE Kitchen Requests"
             {
                 Caption = 'Order Lines';
                 IndentationColumn = 0;
-                field("Request No.";"Request No.")
+                field("Request No."; "Request No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Order ID";"Order ID")
+                field("Order ID"; "Order ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. Changed";"Qty. Changed")
+                field("Qty. Changed"; "Qty. Changed")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                 }
-                field("Serving Step";"Serving Step")
+                field("Serving Step"; "Serving Step")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created Date-Time";"Created Date-Time")
+                field("Created Date-Time"; "Created Date-Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serving Requested Date-Time";"Serving Requested Date-Time")
+                field("Serving Requested Date-Time"; "Serving Requested Date-Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Status";"Line Status")
+                field("Line Status"; "Line Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Production Status";"Production Status")
+                field("Production Status"; "Production Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Kitchen Stations";"No. of Kitchen Stations")
+                field("No. of Kitchen Stations"; "No. of Kitchen Stations")
                 {
+                    ApplicationArea = All;
                     Visible = IsExpediteMode;
                 }
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("SeatingCode()";SeatingCode())
+                field("SeatingCode()"; SeatingCode())
                 {
+                    ApplicationArea = All;
                     Caption = 'Seating Code';
                 }
             }
-            part("Kitchen Stations";"NPRE Kitchen Requests Subpage")
+            part("Kitchen Stations"; "NPRE Kitchen Requests Subpage")
             {
                 Caption = 'Kitchen Stations';
-                SubPageLink = "Request No."=FIELD("Request No."),
-                              "Production Restaurant Code"=FIELD("Production Restaurant Filter"),
-                              "Kitchen Station"=FIELD("Kitchen Station Filter");
+                SubPageLink = "Request No." = FIELD("Request No."),
+                              "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
+                              "Kitchen Station" = FIELD("Kitchen Station Filter");
                 Visible = IsExpediteMode;
             }
         }
@@ -176,10 +193,10 @@ page 6150689 "NPRE Kitchen Requests"
                     begin
                         //-NPR5.55 [382428]
                         if GetFilter("Production Status") <> '' then
-                          if GetRangeMax("Production Status") = "Production Status"::Finished then begin
-                            SetRange("Production Status", "Production Status"::"Not Started", "Production Status"::"On Hold");
-                            exit;
-                          end;
+                            if GetRangeMax("Production Status") = "Production Status"::Finished then begin
+                                SetRange("Production Status", "Production Status"::"Not Started", "Production Status"::"On Hold");
+                                exit;
+                            end;
                         SetRange("Production Status", "Production Status"::"Not Started", "Production Status"::Finished);
                         //+NPR5.55 [382428]
                     end;
@@ -197,10 +214,10 @@ page 6150689 "NPRE Kitchen Requests"
                     begin
                         //-NPR5.55 [382428]
                         if GetFilter("Line Status") <> '' then
-                          if GetRangeMax("Line Status") = "Line Status"::Served then begin
-                            SetRange("Line Status", "Line Status"::"Ready for Serving", "Line Status"::Planned);
-                            exit;
-                          end;
+                            if GetRangeMax("Line Status") = "Line Status"::Served then begin
+                                SetRange("Line Status", "Line Status"::"Ready for Serving", "Line Status"::Planned);
+                                exit;
+                            end;
                         SetRange("Line Status", "Line Status"::"Ready for Serving", "Line Status"::Served);
                         //+NPR5.55 [382428]
                     end;
@@ -216,13 +233,13 @@ page 6150689 "NPRE Kitchen Requests"
         //-NPR5.55 [382428]
         IsExpediteMode := ViewMode = ViewMode::Expedite;
         if IsExpediteMode then begin
-          if GetFilter("Restaurant Code") = '' then
-            if not Restaurant.IsEmpty then begin
-              if PAGE.RunModal(0, Restaurant) <> ACTION::LookupOK then
-                Error('');
-              SetRange("Restaurant Code", Restaurant.Code);
-            end;
-          SetRange("Line Status", "Line Status"::"Ready for Serving", "Line Status"::Planned);
+            if GetFilter("Restaurant Code") = '' then
+                if not Restaurant.IsEmpty then begin
+                    if PAGE.RunModal(0, Restaurant) <> ACTION::LookupOK then
+                        Error('');
+                    SetRange("Restaurant Code", Restaurant.Code);
+                end;
+            SetRange("Line Status", "Line Status"::"Ready for Serving", "Line Status"::Planned);
         end;
         CurrPage."Kitchen Stations".PAGE.SetViewMode(ViewMode);
         //+NPR5.55 [382428]
@@ -251,34 +268,34 @@ page 6150689 "NPRE Kitchen Requests"
         //-NPR5.55 [382428]
         CurrPage.SetSelectionFilter(KitchenRequest);
         if KitchenRequest.Count = 1 then begin  //Copy all auxiliary filters, if only one record is selected
-          KitchenRequest.FindFirst;
-          KitchenRequest.CopyFilters(Rec);
-          KitchenRequest.SetRange("Request No.", KitchenRequest."Request No.");
+            KitchenRequest.FindFirst;
+            KitchenRequest.CopyFilters(Rec);
+            KitchenRequest.SetRange("Request No.", KitchenRequest."Request No.");
         end;
         if KitchenRequest.FindSet then
-          repeat
-            GetRequestStation(KitchenRequest, KitchenRequestStation);
-            case ActionToRun of
-              KitchenStationAction::"Accept Qty. Change":
-                KitchenOrderMgt.AcceptQtyChange(KitchenRequestStation);
-              KitchenStationAction::"Start Production":
-                KitchenOrderMgt.StartProduction(KitchenRequestStation);
-              KitchenStationAction::"End Production":
-                KitchenOrderMgt.EndProduction(KitchenRequestStation);
-            end;
-            Commit;
-          until KitchenRequest.Next = 0;
+            repeat
+                GetRequestStation(KitchenRequest, KitchenRequestStation);
+                case ActionToRun of
+                    KitchenStationAction::"Accept Qty. Change":
+                        KitchenOrderMgt.AcceptQtyChange(KitchenRequestStation);
+                    KitchenStationAction::"Start Production":
+                        KitchenOrderMgt.StartProduction(KitchenRequestStation);
+                    KitchenStationAction::"End Production":
+                        KitchenOrderMgt.EndProduction(KitchenRequestStation);
+                end;
+                Commit;
+            until KitchenRequest.Next = 0;
         //+NPR5.55 [382428]
     end;
 
-    local procedure GetRequestStation(var KitchenRequest: Record "NPRE Kitchen Request";var KitchenRequestStation: Record "NPRE Kitchen Request Station")
+    local procedure GetRequestStation(var KitchenRequest: Record "NPRE Kitchen Request"; var KitchenRequestStation: Record "NPRE Kitchen Request Station")
     begin
         //-NPR5.55 [382428]
         KitchenRequestStation.SetRange("Request No.", KitchenRequest."Request No.");
         KitchenRequest.CopyFilter("Production Restaurant Filter", KitchenRequestStation."Production Restaurant Code");
         KitchenRequest.CopyFilter("Kitchen Station Filter", KitchenRequestStation."Kitchen Station");
         if KitchenRequestStation.Count <> 1 then
-          Error(StationNotFound);
+            Error(StationNotFound);
         KitchenRequestStation.FindFirst;
         //+NPR5.55 [382428]
     end;

@@ -18,33 +18,42 @@ page 6059896 "Data Log Subscribers"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Last Log Entry No.";"Last Log Entry No.")
+                field("Last Log Entry No."; "Last Log Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Data Processing";"Direct Data Processing")
+                field("Direct Data Processing"; "Direct Data Processing")
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Processing Codeunit ID";"Data Processing Codeunit ID")
+                field("Data Processing Codeunit ID"; "Data Processing Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Processing Codeunit Name";"Data Processing Codeunit Name")
+                field("Data Processing Codeunit Name"; "Data Processing Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

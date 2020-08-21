@@ -14,23 +14,26 @@ page 6151123 "GDPR Agreement Card"
         {
             group(General)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Control6014407)
             {
                 ShowCaption = false;
-                field("Anonymize After";"Anonymize After")
+                field("Anonymize After"; "Anonymize After")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014404;"GDPR Agreement Versions")
+            part(Control6014404; "GDPR Agreement Versions")
             {
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
             }
         }
     }
@@ -50,7 +53,7 @@ page 6151123 "GDPR Agreement Card"
                 trigger OnAction()
                 begin
 
-                    GDPRManagement.OnNewAgreementVersion ("No.");
+                    GDPRManagement.OnNewAgreementVersion("No.");
                 end;
             }
         }

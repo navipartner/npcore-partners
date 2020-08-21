@@ -16,21 +16,25 @@ page 6151088 "RIS Retail Inventory Buffer"
         {
             repeater(Group)
             {
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = "Processing Error";
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = "Processing Error";
                 }
-                field("Location Filter";"Location Filter")
+                field("Location Filter"; "Location Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Error Message";"Processing Error Message")
+                field("Processing Error Message"; "Processing Error Message")
                 {
+                    ApplicationArea = All;
                     Visible = ProcessingErrorExists;
                 }
             }
@@ -46,11 +50,11 @@ page 6151088 "RIS Retail Inventory Buffer"
         RetailInventoryBuffer: Record "RIS Retail Inventory Buffer" temporary;
     begin
         if IsTemporary then
-          RetailInventoryBuffer.Copy(Rec,true)
+            RetailInventoryBuffer.Copy(Rec, true)
         else
-          RetailInventoryBuffer.Copy(Rec);
+            RetailInventoryBuffer.Copy(Rec);
         RetailInventoryBuffer.Reset;
-        RetailInventoryBuffer.SetRange("Processing Error",true);
+        RetailInventoryBuffer.SetRange("Processing Error", true);
         ProcessingErrorExists := RetailInventoryBuffer.FindFirst;
     end;
 

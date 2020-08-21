@@ -7,8 +7,9 @@ page 6059787 "Ticket Access Capacity List"
     {
         area(content)
         {
-            field(TicketTypeFilter;TicketTypeFilter)
+            field(TicketTypeFilter; TicketTypeFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Type';
 
                 trigger OnLookup(var Text: Text): Boolean
@@ -24,14 +25,15 @@ page 6059787 "Ticket Access Capacity List"
                     SetTicketTypeFilter;
                 end;
             }
-            field(DateFilter;DateFilter)
+            field(DateFilter; DateFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Date';
 
                 trigger OnValidate()
                 begin
 
-                    SetFilter("Access Date",DateFilter);
+                    SetFilter("Access Date", DateFilter);
                     DateFilter := GetFilter("Access Date");
                     CurrPage.Update;
                 end;
@@ -39,26 +41,33 @@ page 6059787 "Ticket Access Capacity List"
             repeater(Control6150616)
             {
                 ShowCaption = false;
-                field("Ticket Type Code";"Ticket Type Code")
+                field("Ticket Type Code"; "Ticket Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Access Date";"Access Date")
+                field("Access Date"; "Access Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Access Start";"Access Start")
+                field("Access Start"; "Access Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("Access End";"Access End")
+                field("Access End"; "Access End")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity Reserved";"Quantity Reserved")
+                field("Quantity Reserved"; "Quantity Reserved")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -77,15 +86,15 @@ page 6059787 "Ticket Access Capacity List"
     procedure SetTicketTypeFilter()
     begin
         if TicketTypeFilter <> '' then begin
-          FilterGroup(2);
-          SetFilter("Ticket Type Code",TicketTypeFilter);
-          CurrPage.Update(false);
-          FilterGroup(0);
+            FilterGroup(2);
+            SetFilter("Ticket Type Code", TicketTypeFilter);
+            CurrPage.Update(false);
+            FilterGroup(0);
         end else begin
-          FilterGroup(2);
-          SetRange("Ticket Type Code");
-          CurrPage.Update(false);
-          FilterGroup(0);
+            FilterGroup(2);
+            SetRange("Ticket Type Code");
+            CurrPage.Update(false);
+            FilterGroup(0);
         end;
     end;
 }

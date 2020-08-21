@@ -20,8 +20,9 @@ page 6014549 "Event Planning Lines"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Job Task No.";"Job Task No.")
+                field("Job Task No."; "Job Task No.")
                 {
+                    ApplicationArea = All;
                     Visible = "Job Task No.Visible";
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -30,23 +31,25 @@ page 6014549 "Event Planning Lines"
                         JobTask: Record "Job Task";
                     begin
                         //-NPR5.49 [331208]
-                        JobTask.SetRange("Job No.",Rec."Job No.");
+                        JobTask.SetRange("Job No.", Rec."Job No.");
                         if "Job Task No." <> '' then
-                          JobTask.Get("Job No.","Job Task No.");
+                            JobTask.Get("Job No.", "Job Task No.");
                         EventTaskLines.LookupMode := true;
                         EventTaskLines.SetTableView(JobTask);
                         if EventTaskLines.RunModal = ACTION::LookupOK then begin
-                          EventTaskLines.GetRecord(JobTask);
-                          Validate("Job Task No.",JobTask."Job Task No.");
+                            EventTaskLines.GetRecord(JobTask);
+                            Validate("Job Task No.", JobTask."Job Task No.");
                         end;
                         //+NPR5.49 [331208]
                     end;
                 }
-                field("Line Type";"Line Type")
+                field("Line Type"; "Line Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Usage Link";"Usage Link")
+                field("Usage Link"; "Usage Link")
                 {
+                    ApplicationArea = All;
                     Visible = false;
 
                     trigger OnValidate()
@@ -54,8 +57,9 @@ page 6014549 "Event Planning Lines"
                         UsageLinkOnAfterValidate;
                     end;
                 }
-                field("Planning Date";"Planning Date")
+                field("Planning Date"; "Planning Date")
                 {
+                    ApplicationArea = All;
                     Editable = "Planning DateEditable";
 
                     trigger OnValidate()
@@ -63,46 +67,57 @@ page 6014549 "Event Planning Lines"
                         PlanningDateOnAfterValidate;
                     end;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("""Calendar Item ID"" <> ''";"Calendar Item ID" <> '')
+                field("""Calendar Item ID"" <> ''"; "Calendar Item ID" <> '')
                 {
+                    ApplicationArea = All;
                     Caption = 'Meeting Req. Exists';
                     Editable = false;
                 }
-                field("Calendar Item Status";"Calendar Item Status")
+                field("Calendar Item Status"; "Calendar Item Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Meeting Request Response";"Meeting Request Response")
+                field("Meeting Request Response"; "Meeting Request Response")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Mail Item Status";"Mail Item Status")
+                field("Mail Item Status"; "Mail Item Status")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Planned Delivery Date";"Planned Delivery Date")
+                field("Planned Delivery Date"; "Planned Delivery Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Date";"Currency Date")
+                field("Currency Date"; "Currency Date")
                 {
+                    ApplicationArea = All;
                     Editable = "Currency DateEditable";
                     Visible = false;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                     Editable = "Document No.Editable";
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Editable = TypeEditable;
 
                     trigger OnValidate()
@@ -110,8 +125,9 @@ page 6014549 "Event Planning Lines"
                         NoOnAfterValidate;
                     end;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = "No.Editable";
 
                     trigger OnValidate()
@@ -119,30 +135,37 @@ page 6014549 "Event Planning Lines"
                         NoOnAfterValidate;
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = DescriptionEditable;
                 }
-                field("Resource E-Mail";"Resource E-Mail")
+                field("Resource E-Mail"; "Resource E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Status";"Ticket Status")
+                field("Ticket Status"; "Ticket Status")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Ticket Collect Status";"Ticket Collect Status")
+                field("Ticket Collect Status"; "Ticket Collect Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Editable = "Variant CodeEditable";
                     Visible = false;
 
@@ -151,8 +174,9 @@ page 6014549 "Event Planning Lines"
                         VariantCodeOnAfterValidate;
                     end;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                     Editable = "Location CodeEditable";
 
                     trigger OnValidate()
@@ -160,13 +184,15 @@ page 6014549 "Event Planning Lines"
                         LocationCodeOnAfterValidate;
                     end;
                 }
-                field("Work Type Code";"Work Type Code")
+                field("Work Type Code"; "Work Type Code")
                 {
+                    ApplicationArea = All;
                     Editable = "Work Type CodeEditable";
                     Visible = false;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                     Editable = "Unit of Measure CodeEditable";
 
                     trigger OnValidate()
@@ -174,8 +200,9 @@ page 6014549 "Event Planning Lines"
                         UnitofMeasureCodeOnAfterValida;
                     end;
                 }
-                field(Control5;Reserve)
+                field(Control5; Reserve)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                     Visible = false;
 
@@ -184,138 +211,170 @@ page 6014549 "Event Planning Lines"
                         ReserveOnAfterValidate;
                     end;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         QuantityOnAfterValidate;
                     end;
                 }
-                field("Reserved Quantity";"Reserved Quantity")
+                field("Reserved Quantity"; "Reserved Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity (Base)";"Quantity (Base)")
+                field("Quantity (Base)"; "Quantity (Base)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Remaining Qty.";"Remaining Qty.")
+                field("Remaining Qty."; "Remaining Qty.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Direct Unit Cost (LCY)";"Direct Unit Cost (LCY)")
+                field("Direct Unit Cost (LCY)"; "Direct Unit Cost (LCY)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                     Editable = "Unit CostEditable";
                 }
-                field("Unit Cost (LCY)";"Unit Cost (LCY)")
+                field("Unit Cost (LCY)"; "Unit Cost (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Cost";"Total Cost")
+                field("Total Cost"; "Total Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Total Cost";"Remaining Total Cost")
+                field("Remaining Total Cost"; "Remaining Total Cost")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Total Cost (LCY)";"Total Cost (LCY)")
+                field("Total Cost (LCY)"; "Total Cost (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Total Cost (LCY)";"Remaining Total Cost (LCY)")
+                field("Remaining Total Cost (LCY)"; "Remaining Total Cost (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Editable = "Unit PriceEditable";
                 }
-                field("Unit Price (LCY)";"Unit Price (LCY)")
+                field("Unit Price (LCY)"; "Unit Price (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Line Amount";"Line Amount")
+                field("Line Amount"; "Line Amount")
                 {
+                    ApplicationArea = All;
                     Editable = "Line AmountEditable";
                 }
-                field("Remaining Line Amount";"Remaining Line Amount")
+                field("Remaining Line Amount"; "Remaining Line Amount")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Line Amount (LCY)";"Line Amount (LCY)")
+                field("Line Amount (LCY)"; "Line Amount (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Remaining Line Amount (LCY)";"Remaining Line Amount (LCY)")
+                field("Remaining Line Amount (LCY)"; "Remaining Line Amount (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Line Discount Amount";"Line Discount Amount")
+                field("Line Discount Amount"; "Line Discount Amount")
                 {
+                    ApplicationArea = All;
                     Editable = "Line Discount AmountEditable";
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                     Editable = "Line Discount %Editable";
                 }
-                field("Total Price";"Total Price")
+                field("Total Price"; "Total Price")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Total Price (LCY)";"Total Price (LCY)")
+                field("Total Price (LCY)"; "Total Price (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Qty. Posted";"Qty. Posted")
+                field("Qty. Posted"; "Qty. Posted")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Qty. to Transfer to Journal";"Qty. to Transfer to Journal")
+                field("Qty. to Transfer to Journal"; "Qty. to Transfer to Journal")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posted Total Cost";"Posted Total Cost")
+                field("Posted Total Cost"; "Posted Total Cost")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Posted Total Cost (LCY)";"Posted Total Cost (LCY)")
+                field("Posted Total Cost (LCY)"; "Posted Total Cost (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Posted Line Amount";"Posted Line Amount")
+                field("Posted Line Amount"; "Posted Line Amount")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Posted Line Amount (LCY)";"Posted Line Amount (LCY)")
+                field("Posted Line Amount (LCY)"; "Posted Line Amount (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Qty. Transferred to Invoice";"Qty. Transferred to Invoice")
+                field("Qty. Transferred to Invoice"; "Qty. Transferred to Invoice")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         DrillDownJobInvoices;
                     end;
                 }
-                field("Qty. to Transfer to Invoice";"Qty. to Transfer to Invoice")
+                field("Qty. to Transfer to Invoice"; "Qty. to Transfer to Invoice")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. Invoiced";"Qty. Invoiced")
+                field("Qty. Invoiced"; "Qty. Invoiced")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         DrillDownJobInvoices;
                     end;
                 }
-                field("Qty. to Invoice";"Qty. to Invoice")
+                field("Qty. to Invoice"; "Qty. to Invoice")
                 {
+                    ApplicationArea = All;
                 }
-                field("Invoiced Amount (LCY)";"Invoiced Amount (LCY)")
+                field("Invoiced Amount (LCY)"; "Invoiced Amount (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
 
                     trigger OnDrillDown()
@@ -323,8 +382,9 @@ page 6014549 "Event Planning Lines"
                         DrillDownJobInvoices;
                     end;
                 }
-                field("Invoiced Cost Amount (LCY)";"Invoiced Cost Amount (LCY)")
+                field("Invoiced Cost Amount (LCY)"; "Invoiced Cost Amount (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
 
                     trigger OnDrillDown()
@@ -332,46 +392,56 @@ page 6014549 "Event Planning Lines"
                         DrillDownJobInvoices;
                     end;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Lot No.";"Lot No.")
+                field("Lot No."; "Lot No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Job Contract Entry No.";"Job Contract Entry No.")
+                field("Job Contract Entry No."; "Job Contract Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ledger Entry Type";"Ledger Entry Type")
+                field("Ledger Entry Type"; "Ledger Entry Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ledger Entry No.";"Ledger Entry No.")
+                field("Ledger Entry No."; "Ledger Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("System-Created Entry";"System-Created Entry")
+                field("System-Created Entry"; "System-Created Entry")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Overdue;Overdue)
+                field(Overdue; Overdue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Overdue';
                     Editable = false;
                     Visible = false;
                 }
-                field("Est. Unit Price Incl. VAT";"Est. Unit Price Incl. VAT")
+                field("Est. Unit Price Incl. VAT"; "Est. Unit Price Incl. VAT")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Est. Line Amount Incl. VAT";"Est. Line Amount Incl. VAT")
+                field("Est. Line Amount Incl. VAT"; "Est. Line Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -394,8 +464,8 @@ page 6014549 "Event Planning Lines"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "Event Task Lines";
-                    RunPageLink = "Job No."=FIELD("Job No."),
-                                  "Job Task No."=FIELD("Job Task No.");
+                    RunPageLink = "Job No." = FIELD("Job No."),
+                                  "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'Shift+Ctrl+T';
                 }
                 separator(Separator6014408)
@@ -412,23 +482,23 @@ page 6014549 "Event Planning Lines"
                         JobLedgerEntry: Record "Job Ledger Entry";
                         JobUsageLink: Record "Job Usage Link";
                     begin
-                        JobUsageLink.SetRange("Job No.","Job No.");
-                        JobUsageLink.SetRange("Job Task No.","Job Task No.");
-                        JobUsageLink.SetRange("Line No.","Line No.");
+                        JobUsageLink.SetRange("Job No.", "Job No.");
+                        JobUsageLink.SetRange("Job Task No.", "Job Task No.");
+                        JobUsageLink.SetRange("Line No.", "Line No.");
 
                         if JobUsageLink.FindSet then
-                          repeat
-                            JobLedgerEntry.Get(JobUsageLink."Entry No.");
-                            JobLedgerEntry.Mark := true;
-                          until JobUsageLink.Next = 0;
+                            repeat
+                                JobLedgerEntry.Get(JobUsageLink."Entry No.");
+                                JobLedgerEntry.Mark := true;
+                            until JobUsageLink.Next = 0;
 
                         JobLedgerEntry.MarkedOnly(true);
-                        PAGE.Run(PAGE::"Job Ledger Entries",JobLedgerEntry);
+                        PAGE.Run(PAGE::"Job Ledger Entries", JobLedgerEntry);
                     end;
                 }
                 action("&Reservation Entries")
                 {
-                    AccessByPermission = TableData Item=R;
+                    AccessByPermission = TableData Item = R;
                     Caption = '&Reservation Entries';
                     Image = ReservationLedger;
 
@@ -471,7 +541,7 @@ page 6014549 "Event Planning Lines"
 
                         trigger OnAction()
                         begin
-                            EventCalendarMgt.RemoveLineFromCalendarAction(Rec,true);
+                            EventCalendarMgt.RemoveLineFromCalendarAction(Rec, true);
                             CurrPage.Update(false);
                         end;
                     }
@@ -542,8 +612,8 @@ page 6014549 "Event Planning Lines"
                             ConfirmRegister: Label 'You''re about to register a ticket. Do you want to continue?';
                         begin
                             if not Confirm(ConfirmRegister) then
-                              exit;
-                            EventTicketMgt.CreateTicketReservRequest(Rec,true,true);
+                                exit;
+                            EventTicketMgt.CreateTicketReservRequest(Rec, true, true);
                             CurrPage.Update(false);
                         end;
                     }
@@ -559,7 +629,7 @@ page 6014549 "Event Planning Lines"
                             ConfirmRevoke: Label 'You''re about to revoke a ticket. Do you want to continue?';
                         begin
                             if not Confirm(ConfirmRevoke) then
-                              exit;
+                                exit;
                             EventTicketMgt.RevokeTicketWithLog(Rec);
                             CurrPage.Update(false);
                         end;
@@ -575,8 +645,8 @@ page 6014549 "Event Planning Lines"
                             ConfirmIssue: Label 'You''re about to issue a ticket. Do you want to continue?';
                         begin
                             if not Confirm(ConfirmIssue) then
-                              exit;
-                            EventTicketMgt.IssueTicketWithLog(Rec,true);
+                                exit;
+                            EventTicketMgt.IssueTicketWithLog(Rec, true);
                             CurrPage.Update(false);
                         end;
                     }
@@ -591,7 +661,7 @@ page 6014549 "Event Planning Lines"
                             ConfirmConfirm: Label 'You''re about to confirm a ticket. Do you want to continue?';
                         begin
                             if not Confirm(ConfirmConfirm) then
-                              exit;
+                                exit;
                             EventTicketMgt.ConfirmTicketWithLog(Rec);
                             CurrPage.Update(false);
                         end;
@@ -606,7 +676,7 @@ page 6014549 "Event Planning Lines"
 
                         trigger OnAction()
                         begin
-                            EventTicketMgt.CollectSingleTicket(Rec,true);
+                            EventTicketMgt.CollectSingleTicket(Rec, true);
                             CurrPage.Update(false);
                         end;
                     }
@@ -642,18 +712,18 @@ page 6014549 "Event Planning Lines"
                         JobTransferJobPlanningLine: Page "Job Transfer Job Planning Line";
                     begin
                         if JobTransferJobPlanningLine.RunModal = ACTION::OK then begin
-                          JobPlanningLine.Copy(Rec);
-                          CurrPage.SetSelectionFilter(JobPlanningLine);
+                            JobPlanningLine.Copy(Rec);
+                            CurrPage.SetSelectionFilter(JobPlanningLine);
 
-                          if JobPlanningLine.FindSet then
-                            repeat
-                              JobTransferLine.FromPlanningLineToJnlLine(
-                                JobPlanningLine,JobTransferJobPlanningLine.GetPostingDate,JobTransferJobPlanningLine.GetJobJournalTemplateName,
-                                JobTransferJobPlanningLine.GetJobJournalBatchName,JobJnlLine);
-                            until JobPlanningLine.Next = 0;
+                            if JobPlanningLine.FindSet then
+                                repeat
+                                    JobTransferLine.FromPlanningLineToJnlLine(
+                                      JobPlanningLine, JobTransferJobPlanningLine.GetPostingDate, JobTransferJobPlanningLine.GetJobJournalTemplateName,
+                                      JobTransferJobPlanningLine.GetJobJournalBatchName, JobJnlLine);
+                                until JobPlanningLine.Next = 0;
 
-                          CurrPage.Update(false);
-                          Message(Text002,JobPlanningLine.TableCaption,JobJnlLine.TableCaption);
+                            CurrPage.Update(false);
+                            Message(Text002, JobPlanningLine.TableCaption, JobJnlLine.TableCaption);
                         end;
                     end;
                 }
@@ -664,8 +734,8 @@ page 6014549 "Event Planning Lines"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "Job Journal";
-                    RunPageLink = "Job No."=FIELD("Job No."),
-                                  "Job Task No."=FIELD("Job Task No.");
+                    RunPageLink = "Job No." = FIELD("Job No."),
+                                  "Job Task No." = FIELD("Job Task No.");
                 }
                 separator(Separator16)
                 {
@@ -751,13 +821,13 @@ page 6014549 "Event Planning Lines"
                     begin
                         DemandOverview.SetCalculationParameter(true);
 
-                        DemandOverview.Initialize(0D,3,"Job No.",'','');
+                        DemandOverview.Initialize(0D, 3, "Job No.", '', '');
                         DemandOverview.RunModal;
                     end;
                 }
                 action("Insert Ext. Texts")
                 {
-                    AccessByPermission = TableData "Extended Text Header"=R;
+                    AccessByPermission = TableData "Extended Text Header" = R;
                     Caption = 'Insert &Ext. Texts';
                     Image = Text;
 
@@ -844,10 +914,10 @@ page 6014549 "Event Planning Lines"
     trigger OnModifyRecord(): Boolean
     begin
         if "System-Created Entry" then begin
-          if Confirm(Text001,false) then
-            "System-Created Entry" := false
-          else
-            Error('');
+            if Confirm(Text001, false) then
+                "System-Created Entry" := false
+            else
+                Error('');
         end;
     end;
 
@@ -862,8 +932,8 @@ page 6014549 "Event Planning Lines"
         //Job.GET(Rec."Job No.");
         //IF Job."Starting Date" <> 0D THEN
         if Job.Get(Rec."Job No.") and (Job."Starting Date" <> 0D) then
-        //+NPR5.32 [278090]
-          Validate("Planning Date",Job."Starting Date");
+            //+NPR5.32 [278090]
+            Validate("Planning Date", Job."Starting Date");
         //+NPR5.31 [269162]
     end;
 
@@ -872,7 +942,7 @@ page 6014549 "Event Planning Lines"
         Job: Record Job;
     begin
         if Job.Get(JobNo) then
-          CurrPage.Editable(not (Job.Blocked = Job.Blocked::All));
+            CurrPage.Editable(not (Job.Blocked = Job.Blocked::All));
 
         if ActiveField = 1 then;
         if ActiveField = 2 then;
@@ -933,7 +1003,7 @@ page 6014549 "Event Planning Lines"
         TestField("Line No.");
         JobPlanningLine.Copy(Rec);
         CurrPage.SetSelectionFilter(JobPlanningLine);
-        JobCreateInvoice.CreateSalesInvoice(JobPlanningLine,CrMemo)
+        JobCreateInvoice.CreateSalesInvoice(JobPlanningLine, CrMemo)
     end;
 
     local procedure SetEditable(Edit: Boolean)
@@ -980,9 +1050,9 @@ page 6014549 "Event Planning Lines"
         if (Reserve = Reserve::Always) and
            ("Remaining Qty. (Base)" <> 0)
         then begin
-          CurrPage.SaveRecord;
-          AutoReserve;
-          CurrPage.Update(false);
+            CurrPage.SaveRecord;
+            AutoReserve;
+            CurrPage.Update(false);
         end;
     end;
 
@@ -994,7 +1064,7 @@ page 6014549 "Event Planning Lines"
     local procedure PlanningDateOnAfterValidate()
     begin
         if "Planning Date" <> xRec."Planning Date" then
-          PerformAutoReserve;
+            PerformAutoReserve;
     end;
 
     local procedure NoOnAfterValidate()
@@ -1003,19 +1073,19 @@ page 6014549 "Event Planning Lines"
         InsertExtendedText(false);
         //+NPR5.49 [345047]
         if "No." <> xRec."No." then
-          PerformAutoReserve;
+            PerformAutoReserve;
     end;
 
     local procedure VariantCodeOnAfterValidate()
     begin
         if "Variant Code" <> xRec."Variant Code" then
-          PerformAutoReserve;
+            PerformAutoReserve;
     end;
 
     local procedure LocationCodeOnAfterValidate()
     begin
         if "Location Code" <> xRec."Location Code" then
-          PerformAutoReserve;
+            PerformAutoReserve;
     end;
 
     local procedure UnitofMeasureCodeOnAfterValida()
@@ -1032,7 +1102,7 @@ page 6014549 "Event Planning Lines"
     begin
         PerformAutoReserve;
         if (Type = Type::Item) and (Quantity <> xRec.Quantity) then
-          CurrPage.Update(true);
+            CurrPage.Update(true);
     end;
 
     local procedure InsertExtendedText(Unconditionally: Boolean)
@@ -1040,13 +1110,13 @@ page 6014549 "Event Planning Lines"
         EventTransferExtText: Codeunit "Event Transfer Ext. Text Mgt.";
     begin
         //-NPR5.49 [345047]
-        if EventTransferExtText.EventCheckIfAnyExtText(Rec,Unconditionally) then begin
-          CurrPage.SaveRecord;
-          Commit;
-          EventTransferExtText.InsertEventExtText(Rec);
+        if EventTransferExtText.EventCheckIfAnyExtText(Rec, Unconditionally) then begin
+            CurrPage.SaveRecord;
+            Commit;
+            EventTransferExtText.InsertEventExtText(Rec);
         end;
         if EventTransferExtText.MakeUpdate then
-          CurrPage.Update(true);
+            CurrPage.Update(true);
         //+NPR5.49 [345047]
     end;
 }

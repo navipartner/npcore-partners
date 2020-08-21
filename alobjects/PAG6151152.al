@@ -12,11 +12,13 @@ page 6151152 "Customers to Anonymize List"
         {
             repeater(Group)
             {
-                field("Customer No";"Customer No")
+                field("Customer No"; "Customer No")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Name";"Customer Name")
+                field("Customer Name"; "Customer Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

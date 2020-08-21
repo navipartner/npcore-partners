@@ -18,18 +18,22 @@ page 6151575 "Event Notes"
             {
                 field(URL1; URL1)
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                 }
                 field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                     Caption = 'From User';
                 }
                 field("To User ID"; "To User ID")
                 {
+                    ApplicationArea = All;
                     Caption = 'To User';
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Caption = 'Note';
                 }
             }

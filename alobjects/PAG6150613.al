@@ -78,6 +78,7 @@ page 6150613 "NP Retail Setup"
                 Caption = 'General';
                 field("Source Code"; "Source Code")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(System)
@@ -85,29 +86,36 @@ page 6150613 "NP Retail Setup"
                 Caption = 'System';
                 field("Data Model Build"; "Data Model Build")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Retail Data Model Upgrade Log";
                     Editable = false;
                 }
                 field("Last Data Model Build Upgrade"; "Last Data Model Build Upgrade")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Last Data Model Build User ID"; "Last Data Model Build User ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Prev. Data Model Build"; "Prev. Data Model Build")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Advanced POS Entries Activated"; "Advanced POS Entries Activated")
                 {
+                    ApplicationArea = All;
                 }
                 field("Advanced Posting Activated"; "Advanced Posting Activated")
                 {
+                    ApplicationArea = All;
                 }
                 field("Default POS Posting Profile"; "Default POS Posting Profile")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Environment)
@@ -123,11 +131,13 @@ page 6150613 "NP Retail Setup"
                         Caption = 'Database Name';
                         field("Environment Database Name"; "Environment Database Name")
                         {
+                            ApplicationArea = All;
                             Caption = 'Stored';
                             Editable = false;
                         }
                         field("ActiveSession.""Database Name"""; ActiveSession."Database Name")
                         {
+                            ApplicationArea = All;
                             Caption = 'Current';
                             Editable = false;
                         }
@@ -137,12 +147,14 @@ page 6150613 "NP Retail Setup"
                         Caption = 'Company Name';
                         field("Environment Company Name"; "Environment Company Name")
                         {
+                            ApplicationArea = All;
                             Caption = 'Stored';
                             Editable = false;
                             ShowCaption = false;
                         }
                         field(CURRENTCOMPANY; CurrentCompany)
                         {
+                            ApplicationArea = All;
                             Caption = 'Current';
                             Editable = false;
                             ShowCaption = false;
@@ -153,12 +165,14 @@ page 6150613 "NP Retail Setup"
                         Caption = 'Tenant Name';
                         field("Environment Tenant Name"; "Environment Tenant Name")
                         {
+                            ApplicationArea = All;
                             Caption = 'Stored';
                             Editable = false;
                             ShowCaption = false;
                         }
                         field(TENANTID; TenantId)
                         {
+                            ApplicationArea = All;
                             Caption = 'Current';
                             Editable = false;
                             ShowCaption = false;
@@ -170,16 +184,20 @@ page 6150613 "NP Retail Setup"
                     Caption = 'Settings';
                     field("Environment Type"; "Environment Type")
                     {
+                        ApplicationArea = All;
                     }
                     field("Environment Verified"; "Environment Verified")
                     {
+                        ApplicationArea = All;
                     }
                     field("Environment Template"; "Environment Template")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
                     field("Enable Client Diagnostics"; "Enable Client Diagnostics")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -187,12 +205,15 @@ page 6150613 "NP Retail Setup"
             {
                 field("Standard Conditions"; "Standard Conditions")
                 {
+                    ApplicationArea = All;
                 }
                 field(Privacy; Privacy)
                 {
+                    ApplicationArea = All;
                 }
                 field("License Agreement"; "License Agreement")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

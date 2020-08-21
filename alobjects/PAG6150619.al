@@ -17,49 +17,62 @@ page 6150619 "POS Payment Method Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Type";"Processing Type")
+                field("Processing Type"; "Processing Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vouched By";"Vouched By")
+                field("Vouched By"; "Vouched By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Is Finance Agreement";"Is Finance Agreement")
+                field("Is Finance Agreement"; "Is Finance Agreement")
                 {
+                    ApplicationArea = All;
                 }
-                field("Include In Counting";"Include In Counting")
+                field("Include In Counting"; "Include In Counting")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bin for Virtual-Count";"Bin for Virtual-Count")
+                field("Bin for Virtual-Count"; "Bin for Virtual-Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Condensed";"Post Condensed")
+                field("Post Condensed"; "Post Condensed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Condensed Posting Description";"Condensed Posting Description")
+                field("Condensed Posting Description"; "Condensed Posting Description")
                 {
+                    ApplicationArea = All;
                     ToolTip = '%1 = POS Unit Code, %2 = POS Store Code, %3 = Posting Date, %4 = POS Period Register No, %5 = POS Payment Date';
                 }
             }
             group(Rounding)
             {
                 Caption = 'Rounding';
-                field("Rounding Precision";"Rounding Precision")
+                field("Rounding Precision"; "Rounding Precision")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rounding Type";"Rounding Type")
+                field("Rounding Type"; "Rounding Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rounding Gains Account";"Rounding Gains Account")
+                field("Rounding Gains Account"; "Rounding Gains Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rounding Losses Account";"Rounding Losses Account")
+                field("Rounding Losses Account"; "Rounding Losses Account")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -77,7 +90,7 @@ page 6150619 "POS Payment Method Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Posting Setup";
-                RunPageLink = "POS Payment Method Code"=FIELD(Code);
+                RunPageLink = "POS Payment Method Code" = FIELD(Code);
             }
             group(History)
             {
@@ -90,7 +103,7 @@ page 6150619 "POS Payment Method Card"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Payment Line List";
-                    RunPageLink = "POS Payment Method Code"=FIELD(Code);
+                    RunPageLink = "POS Payment Method Code" = FIELD(Code);
                 }
             }
         }

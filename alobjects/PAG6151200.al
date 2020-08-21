@@ -13,110 +13,145 @@ page 6151200 "NpCs Document List"
         {
             repeater(Group)
             {
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sell-to Customer Name";"Sell-to Customer Name")
+                field("Sell-to Customer Name"; "Sell-to Customer Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Workflow Code";"Workflow Code")
+                field("Workflow Code"; "Workflow Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Next Workflow Step";"Next Workflow Step")
+                field("Next Workflow Step"; "Next Workflow Step")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Document No.";"From Document No.")
+                field("From Document No."; "From Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Store Code";"From Store Code")
+                field("From Store Code"; "From Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Document Type";"To Document Type")
+                field("To Document Type"; "To Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Document No.";"To Document No.")
+                field("To Document No."; "To Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Store Code";"To Store Code")
+                field("To Store Code"; "To Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Status";"Processing Status")
+                field("Processing Status"; "Processing Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing updated at";"Processing updated at")
+                field("Processing updated at"; "Processing updated at")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing updated by";"Processing updated by")
+                field("Processing updated by"; "Processing updated by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer E-mail";"Customer E-mail")
+                field("Customer E-mail"; "Customer E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Phone No.";"Customer Phone No.")
+                field("Customer Phone No."; "Customer Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Notification from Store";"Send Notification from Store")
+                field("Send Notification from Store"; "Send Notification from Store")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify Customer via E-mail";"Notify Customer via E-mail")
+                field("Notify Customer via E-mail"; "Notify Customer via E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify Customer via Sms";"Notify Customer via Sms")
+                field("Notify Customer via Sms"; "Notify Customer via Sms")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery Status";"Delivery Status")
+                field("Delivery Status"; "Delivery Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery updated at";"Delivery updated at")
+                field("Delivery updated at"; "Delivery updated at")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery updated by";"Delivery updated by")
+                field("Delivery updated by"; "Delivery updated by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Stock";"Store Stock")
+                field("Store Stock"; "Store Stock")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bill via";"Bill via")
+                field("Bill via"; "Bill via")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery Print Template (POS)";"Delivery Print Template (POS)")
+                field("Delivery Print Template (POS)"; "Delivery Print Template (POS)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery Print Template (S.)";"Delivery Print Template (S.)")
+                field("Delivery Print Template (S.)"; "Delivery Print Template (S.)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prepaid Amount";"Prepaid Amount")
+                field("Prepaid Amount"; "Prepaid Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prepayment Account No.";"Prepayment Account No.")
+                field("Prepayment Account No."; "Prepayment Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery Document Type";"Delivery Document Type")
+                field("Delivery Document Type"; "Delivery Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery Document No.";"Delivery Document No.")
+                field("Delivery Document No."; "Delivery Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Archive on Delivery";"Archive on Delivery")
+                field("Archive on Delivery"; "Archive on Delivery")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Order Module";"Send Order Module")
+                field("Send Order Module"; "Send Order Module")
                 {
+                    ApplicationArea = All;
                 }
-                field("Order Status Module";"Order Status Module")
+                field("Order Status Module"; "Order Status Module")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Processing Module";"Post Processing Module")
+                field("Post Processing Module"; "Post Processing Module")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -154,7 +189,7 @@ page 6151200 "NpCs Document List"
                     NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
                 begin
                     NpCsWorkflowMgt.ScheduleRunWorkflow(Rec);
-                    NpCsCollectMgt.RunLog(Rec,true);
+                    NpCsCollectMgt.RunLog(Rec, true);
                 end;
             }
             group("Send Order")
@@ -181,7 +216,7 @@ page 6151200 "NpCs Document List"
                     var
                         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
                     begin
-                        TestField(Type,Type::"Send to Store");
+                        TestField(Type, Type::"Send to Store");
                         NpCsWorkflowMgt.SendNotificationToStore(Rec);
                     end;
                 }
@@ -244,7 +279,7 @@ page 6151200 "NpCs Document List"
                 var
                     NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
                 begin
-                    NpCsCollectMgt.RunLog(Rec,false);
+                    NpCsCollectMgt.RunLog(Rec, false);
                 end;
             }
         }

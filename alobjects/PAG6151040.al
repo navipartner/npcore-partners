@@ -9,28 +9,33 @@ page 6151040 "Notification Dialog"
     {
         area(content)
         {
-            field(TitleTxt;TitleTxt)
+            field(TitleTxt; TitleTxt)
             {
+                ApplicationArea = All;
                 Caption = 'Title';
             }
-            field(MessageTxt;MessageTxt)
+            field(MessageTxt; MessageTxt)
             {
+                ApplicationArea = All;
                 Caption = 'Message';
             }
             group(Options)
             {
                 Caption = 'Options';
                 Description = 'Options';
-                field(NotificationColor;NotificationColor)
+                field(NotificationColor; NotificationColor)
                 {
+                    ApplicationArea = All;
                     Caption = 'Notification Color';
                 }
-                field(ActionType;ActionType)
+                field(ActionType; ActionType)
                 {
+                    ApplicationArea = All;
                     Caption = 'Action Type';
                 }
-                field(ActionValue;ActionValue)
+                field(ActionValue; ActionValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Action Value';
                 }
             }
@@ -48,8 +53,8 @@ page 6151040 "Notification Dialog"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if CloseAction in [ACTION::OK,ACTION::LookupOK] then
-          OKOnPush;
+        if CloseAction in [ACTION::OK, ACTION::LookupOK] then
+            OKOnPush;
     end;
 
     var
@@ -67,7 +72,7 @@ page 6151040 "Notification Dialog"
         AFNotificationHub: Record "AF Notification Hub";
     begin
         if TitleTxt = '' then
-          Error(Text001);
+            Error(Text001);
 
         AFNotificationHub.Init;
         AFNotificationHub.Title := TitleTxt;

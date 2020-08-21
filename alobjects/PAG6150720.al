@@ -19,8 +19,9 @@ page 6150720 "POS Stargate Package Creator"
                 group(Control6150626)
                 {
                     ShowCaption = false;
-                    field(AssemblyPath;AssemblyPath)
+                    field(AssemblyPath; AssemblyPath)
                     {
+                        ApplicationArea = All;
                         AssistEdit = true;
                         Caption = 'Select Assembly';
                         Editable = false;
@@ -30,16 +31,19 @@ page 6150720 "POS Stargate Package Creator"
                             LoadAssembly();
                         end;
                     }
-                    field(Control6150627;'')
+                    field(Control6150627; '')
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
-                    field(PackageName;PackageName)
+                    field(PackageName; PackageName)
                     {
+                        ApplicationArea = All;
                         Caption = 'Package Name';
                     }
-                    field(PackageVersion;PackageVersion)
+                    field(PackageVersion; PackageVersion)
                     {
+                        ApplicationArea = All;
                         Caption = 'Package Version';
                     }
                 }
@@ -48,12 +52,14 @@ page 6150720 "POS Stargate Package Creator"
             {
                 Caption = 'Dependencies';
                 Editable = false;
-                field("Assembly Name";"Assembly Name")
+                field("Assembly Name"; "Assembly Name")
                 {
+                    ApplicationArea = All;
                     StyleExpr = Style;
                 }
-                field(Path;Path)
+                field(Path; Path)
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Editable = false;
                     StyleExpr = Style;
@@ -63,8 +69,9 @@ page 6150720 "POS Stargate Package Creator"
                         MapAssembly();
                     end;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     StyleExpr = Style;
                 }
             }
@@ -153,13 +160,13 @@ page 6150720 "POS Stargate Package Creator"
         Assembly: DotNet npNetAssembly;
         FilePath: Text;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001,AssemblyPath,'Assembly files (*.dll)|*.dll');
+        FilePath := FileMgt.OpenFileDialog(Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll');
         if String.IsNullOrWhiteSpace(FilePath) then
-          exit;
+            exit;
 
         Package := Package.Package(FilePath);
         if Package.Methods.Length = 0 then
-          Error(Text006);
+            Error(Text006);
 
         AssemblyPath := FilePath;
 
@@ -182,11 +189,11 @@ page 6150720 "POS Stargate Package Creator"
         Detector := Detector.AssemblyDetector();
         Detector.DetectDependencies(Path);
 
-        PopulateAssemblies(Detector.Resolved,Rec.Status::Mapped);
-        PopulateAssemblies(Detector.Unknown,Rec.Status::Unknown);
+        PopulateAssemblies(Detector.Resolved, Rec.Status::Mapped);
+        PopulateAssemblies(Detector.Unknown, Rec.Status::Unknown);
 
         if Rec.FindFirst() then
-          CurrPage.Update(false);
+            CurrPage.Update(false);
     end;
 
     local procedure IsKnownAssembly(Name: Text): Boolean
@@ -198,32 +205,36 @@ page 6150720 "POS Stargate Package Creator"
           ]);
     end;
 
-    local procedure PopulateAssemblies(Dependencies: DotNet npNetIEnumerable_Of_T;Status: Option)
+    local procedure PopulateAssemblies(Dependencies: DotNet npNetIEnumerable_Of_T; Status: Option)
     var
         [RunOnClient]
         Dependency: DotNet npNetDetectionResult;
     begin
         foreach Dependency in Dependencies do begin
-          Rec.Init;
-          Rec."Assembly Name" := Dependency.AssemblyName;
-          Rec.Status := Status;
-          if Status = Rec.Status::Mapped then
-            Rec.Path := Dependency.ResolvedPath;
-          if IsKnownAssembly(Dependency.AssemblyName) then begin
-            Rec.Status := Rec.Status::Known;
-            Rec.Path := '';
-          end;
-          Rec.Insert;
+            Rec.Init;
+            Rec."Assembly Name" := Dependency.AssemblyName;
+            Rec.Status := Status;
+            if Status = Rec.Status::Mapped then
+                Rec.Path := Dependency.ResolvedPath;
+            if IsKnownAssembly(Dependency.AssemblyName) then begin
+                Rec.Status := Rec.Status::Known;
+                Rec.Path := '';
+            end;
+            Rec.Insert;
         end;
     end;
 
     local procedure GetStyle()
     begin
         case Rec.Status of
-          Rec.Status::Known: Style := 'Subordinate';
-          Rec.Status::Mapped: Style := 'Favorable';
-          Rec.Status::Unknown: Style := 'Unfavorable';
-          Rec.Status::Additional: Style := 'StandardAccent';
+            Rec.Status::Known:
+                Style := 'Subordinate';
+            Rec.Status::Mapped:
+                Style := 'Favorable';
+            Rec.Status::Unknown:
+                Style := 'Unfavorable';
+            Rec.Status::Additional:
+                Style := 'StandardAccent';
         end;
     end;
 
@@ -237,17 +248,17 @@ page 6150720 "POS Stargate Package Creator"
         Detector: DotNet npNetAssemblyDetector;
         FilePath: Text;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001,AssemblyPath,'Assembly files (*.dll)|*.dll');
+        FilePath := FileMgt.OpenFileDialog(Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll');
         if String.IsNullOrWhiteSpace(FilePath) then
-          exit;
+            exit;
 
         Assembly := Assembly.ReflectionOnlyLoadFrom(FilePath);
         if Assembly.FullName <> "Assembly Name" then
-          Error(Text002,"Assembly Name",Assembly.FullName);
+            Error(Text002, "Assembly Name", Assembly.FullName);
 
         Detector := Detector.AssemblyDetector();
-        if not Detector.IsSameAssembly("Assembly Name",FilePath) then
-          Error(Text003,"Assembly Name");
+        if not Detector.IsSameAssembly("Assembly Name", FilePath) then
+            Error(Text003, "Assembly Name");
 
         Rec.Path := FilePath;
         Rec.Status := Rec.Status::Mapped;
@@ -264,9 +275,9 @@ page 6150720 "POS Stargate Package Creator"
         Detector: DotNet npNetAssemblyDetector;
         FilePath: Text;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001,AssemblyPath,'Assembly files (*.dll)|*.dll');
+        FilePath := FileMgt.OpenFileDialog(Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll');
         if String.IsNullOrWhiteSpace(FilePath) then
-          exit;
+            exit;
 
         Assembly := Assembly.ReflectionOnlyLoadFrom(FilePath);
         Rec.Init;
@@ -296,23 +307,23 @@ page 6150720 "POS Stargate Package Creator"
         Package.Version := PackageVersion;
 
         if Rec.FindSet then
-          repeat
-            if Rec.Status in [Rec.Status::Mapped,Rec.Status::Additional] then begin
-              AssemblyContent := AssemblyContent.AssemblyPackageContent(Rec.Path);
-              Package.AddContent(AssemblyContent);
-            end;
-          until Rec.Next = 0;
+            repeat
+                if Rec.Status in [Rec.Status::Mapped, Rec.Status::Additional] then begin
+                    AssemblyContent := AssemblyContent.AssemblyPackageContent(Rec.Path);
+                    Package.AddContent(AssemblyContent);
+                end;
+            until Rec.Next = 0;
 
         Rec := Rec2;
 
-        FilePath := FileMgt.SaveFileDialog(Text005,PackageName + '.' + PackageVersion + '.stargate','Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json');
+        FilePath := FileMgt.SaveFileDialog(Text005, PackageName + '.' + PackageVersion + '.stargate', 'Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json');
         if String.IsNullOrWhiteSpace(FilePath) then
-          exit;
+            exit;
 
         if IOFile.Exists(FilePath) then
-          IOFile.Delete(FilePath);
+            IOFile.Delete(FilePath);
 
-        IOFile.AppendAllText(FilePath,Package.ToJsonString());
+        IOFile.AppendAllText(FilePath, Package.ToJsonString());
     end;
 }
 

@@ -15,14 +15,17 @@ page 6150680 "NPRE Print/Prod. Categories"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Tag";"Print Tag")
+                field("Print Tag"; "Print Tag")
                 {
+                    ApplicationArea = All;
                     Visible = ShowPrintTags;
                 }
             }

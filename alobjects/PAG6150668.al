@@ -21,6 +21,7 @@ page 6150668 "NPRE Select Print Categories"
             {
                 field(Selected; Selected)
                 {
+                    ApplicationArea = All;
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
@@ -32,19 +33,23 @@ page 6150668 "NPRE Select Print Categories"
                 }
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Print Tag"; "Print Tag")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = ShowPrintTags;
                 }
                 field(AssignedServingSteps; AssignedServingStepsAsString())
                 {
+                    ApplicationArea = All;
                     Caption = 'Appl. Only for Serving Steps';
                     Editable = false;
                     Visible = ShowApplOnServingStep;

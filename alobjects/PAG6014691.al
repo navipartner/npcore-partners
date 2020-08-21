@@ -14,17 +14,21 @@ page 6014691 "Retail Admin Activities - Memb"
             cuegroup(Members)
             {
                 Caption = 'Members';
-                field("Membership Setup";"Membership Setup")
+                field("Membership Setup"; "Membership Setup")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Sales Setup";"Membership Sales Setup")
+                field("Membership Sales Setup"; "Membership Sales Setup")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Alteration";"Member Alteration")
+                field("Member Alteration"; "Member Alteration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Community";"Member Community")
+                field("Member Community"; "Member Community")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -38,8 +42,8 @@ page 6014691 "Retail Admin Activities - Memb"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

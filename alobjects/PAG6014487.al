@@ -13,8 +13,9 @@ page 6014487 "Report Usage Setup"
         {
             group(General)
             {
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -28,8 +29,8 @@ page 6014487 "Report Usage Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

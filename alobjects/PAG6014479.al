@@ -14,11 +14,13 @@ page 6014479 "Comment Line - Retail"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

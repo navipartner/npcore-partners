@@ -16,20 +16,25 @@ page 6151602 "NpDc Coupon Setup"
         {
             group(General)
             {
-                field("Coupon No. Series";"Coupon No. Series")
+                field("Coupon No. Series"; "Coupon No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Arch. Coupon No. Series";"Arch. Coupon No. Series")
+                field("Arch. Coupon No. Series"; "Arch. Coupon No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No. Pattern";"Reference No. Pattern")
+                field("Reference No. Pattern"; "Reference No. Pattern")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Template Code";"Print Template Code")
+                field("Print Template Code"; "Print Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print on Issue";"Print on Issue")
+                field("Print on Issue"; "Print on Issue")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -57,7 +62,7 @@ page 6151602 "NpDc Coupon Setup"
     trigger OnOpenPage()
     begin
         if not Get then
-          Insert;
+            Insert;
     end;
 }
 

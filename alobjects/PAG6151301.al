@@ -13,37 +13,47 @@ page 6151301 "NpEc Store Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson/Purchaser Code";"Salesperson/Purchaser Code")
+                field("Salesperson/Purchaser Code"; "Salesperson/Purchaser Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Control6014408;"Customer Mapping")
+                field(Control6014408; "Customer Mapping")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("Customer Config. Template Code";"Customer Config. Template Code")
+                field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Create Customers";"Allow Create Customers")
+                field("Allow Create Customers"; "Allow Create Customers")
                 {
+                    ApplicationArea = All;
                 }
-                field("Update Customers from S. Order";"Update Customers from S. Order")
+                field("Update Customers from S. Order"; "Update Customers from S. Order")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -58,7 +68,7 @@ page 6151301 "NpEc Store Card"
                 Caption = 'Customer Mapping';
                 Image = List;
                 RunObject = Page "NpEc Customer Mapping";
-                RunPageLink = "Store Code"=FIELD(Code);
+                RunPageLink = "Store Code" = FIELD(Code);
             }
         }
     }

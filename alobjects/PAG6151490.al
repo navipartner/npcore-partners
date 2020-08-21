@@ -15,8 +15,9 @@ page 6151490 "Salesperson List"
         {
             repeater(Group)
             {
-                field(Selected;Selected)
+                field(Selected; Selected)
                 {
+                    ApplicationArea = All;
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
@@ -26,12 +27,14 @@ page 6151490 "Salesperson List"
                         Mark(Selected);
                     end;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -58,7 +61,7 @@ page 6151490 "Salesperson List"
 
     procedure SetDataset(var Salesperson: Record "Salesperson/Purchaser")
     begin
-        Copy(Salesperson,true);
+        Copy(Salesperson, true);
     end;
 
     procedure GetDataset(var Salesperson: Record "Salesperson/Purchaser")
@@ -67,14 +70,14 @@ page 6151490 "Salesperson List"
         FldRef: FieldRef;
         i: Integer;
     begin
-        Salesperson.Copy(Rec,true);
+        Salesperson.Copy(Rec, true);
         if Salesperson.GetFilters <> '' then begin
-          RecRef.GetTable(Salesperson);
-          for i := 1 to RecRef.FieldCount do begin
-            FldRef := RecRef.FieldIndex(i);
-            if FldRef.GetFilter <> '' then
-              FldRef.SetRange();
-          end;
+            RecRef.GetTable(Salesperson);
+            for i := 1 to RecRef.FieldCount do begin
+                FldRef := RecRef.FieldIndex(i);
+                if FldRef.GetFilter <> '' then
+                    FldRef.SetRange();
+            end;
         end;
     end;
 }

@@ -13,30 +13,36 @@ page 6151060 "Distribution Plan"
         {
             group(General)
             {
-                field("Distribution Group";"Distribution Group")
+                field("Distribution Group"; "Distribution Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Hiearachy";"Item Hiearachy")
+                field("Item Hiearachy"; "Item Hiearachy")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Type";"Distribution Type")
+                field("Distribution Type"; "Distribution Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(View;View)
+                field(View; View)
                 {
+                    ApplicationArea = All;
                     Caption = 'View';
                     Visible = false;
                 }
-                field("Required Date";"Required Date")
+                field("Required Date"; "Required Date")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(DistMatrix;"Distribution Matrix")
+            part(DistMatrix; "Distribution Matrix")
             {
-                SubPageLink = "Item Hierarchy Code"=FIELD("Item Hiearachy");
+                SubPageLink = "Item Hierarchy Code" = FIELD("Item Hiearachy");
             }
         }
     }
@@ -59,7 +65,7 @@ page 6151060 "Distribution Plan"
                 begin
                     ItemHierarchy.Get("Item Hiearachy");
                     DistributionGroups.Get("Distribution Group");
-                    DistributionMgmt.CreateDistributionItem("Distribution Id",ItemHierarchy,DistributionGroups);
+                    DistributionMgmt.CreateDistributionItem("Distribution Id", ItemHierarchy, DistributionGroups);
                 end;
             }
             action("Create Distribution Orders")
@@ -87,9 +93,9 @@ page 6151060 "Distribution Plan"
                 Image = CreateDocument;
                 Promoted = true;
                 RunObject = Page "Distribution Orders";
-                RunPageLink = "Distribution Id"=FIELD("Distribution Id"),
-                              "Distribution Item"=CONST('<>'''),
-                              "Distribution Quantity"=FILTER(>0);
+                RunPageLink = "Distribution Id" = FIELD("Distribution Id"),
+                              "Distribution Item" = CONST('<>'''),
+                              "Distribution Quantity" = FILTER(> 0);
             }
             action("Import Demands")
             {
@@ -124,9 +130,9 @@ page 6151060 "Distribution Plan"
                         //Previous Set
                         LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown;
                         if LastColumn - 12 < 0 then
-                          LastColumn := 0
+                            LastColumn := 0
                         else
-                          LastColumn := 0;
+                            LastColumn := 0;
                         CurrPage.DistMatrix.PAGE.SetLastColumnShown(LastColumn);
                         CurrPage.DistMatrix.PAGE.Load(Rec);
                     end;
@@ -147,9 +153,9 @@ page 6151060 "Distribution Plan"
                         //Previous Column
                         LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown;
                         if LastColumn - 1 < 0 then
-                          LastColumn := 0
+                            LastColumn := 0
                         else
-                          LastColumn := LastColumn - 1;
+                            LastColumn := LastColumn - 1;
                         CurrPage.DistMatrix.PAGE.SetLastColumnShown(LastColumn);
                         CurrPage.DistMatrix.PAGE.Load(Rec);
                     end;
@@ -170,9 +176,9 @@ page 6151060 "Distribution Plan"
                         //Next Column
                         LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown;
                         if LastColumn < 0 then
-                          LastColumn := 0
+                            LastColumn := 0
                         else
-                          LastColumn := LastColumn + 1;
+                            LastColumn := LastColumn + 1;
                         CurrPage.DistMatrix.PAGE.SetLastColumnShown(LastColumn);
                         CurrPage.DistMatrix.PAGE.Load(Rec);
                         // MATRIX_GenerateColumnCaptions(MATRIX_Step::NextColumn);
@@ -197,7 +203,7 @@ page 6151060 "Distribution Plan"
                         //IF LastColumn < 12 THEN
                         //  LastColumn := 0
                         //ELSE
-                          LastColumn :=  12 ;
+                        LastColumn := 12;
                         CurrPage.DistMatrix.PAGE.SetLastColumnShown(LastColumn);
                         CurrPage.DistMatrix.PAGE.Load(Rec);
                         // MATRIX_GenerateColumnCaptions(MATRIX_Step::Next);

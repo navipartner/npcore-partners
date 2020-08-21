@@ -13,44 +13,57 @@ page 6151391 "CS Whse. Receipt Data"
         {
             repeater(Group)
             {
-                field("Tag Id";"Tag Id")
+                field("Tag Id"; "Tag Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Code";"Item Group Code")
+                field("Item Group Code"; "Item Group Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Description";"Item Group Description")
+                field("Item Group Description"; "Item Group Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Description";"Item Description")
+                field("Item Description"; "Item Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description";"Variant Description")
+                field("Variant Description"; "Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tag Type";"Tag Type")
+                field("Tag Type"; "Tag Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Transferred;Transferred)
+                field(Transferred; Transferred)
                 {
+                    ApplicationArea = All;
                 }
-                field("Transferred By";"Transferred By")
+                field("Transferred By"; "Transferred By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transferred To Doc";"Transferred To Doc")
+                field("Transferred To Doc"; "Transferred To Doc")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

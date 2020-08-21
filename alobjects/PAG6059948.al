@@ -19,8 +19,9 @@ page 6059948 "Tax Free GB I2 Service Select"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

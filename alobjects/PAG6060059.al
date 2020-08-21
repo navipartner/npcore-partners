@@ -23,8 +23,9 @@ page 6060059 "POS Inventory Overview"
             group(Control6014413)
             {
                 ShowCaption = false;
-                field(ItemCode;ItemCode)
+                field(ItemCode; ItemCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item No.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -37,8 +38,9 @@ page 6060059 "POS Inventory Overview"
                         RefreshLines;
                     end;
                 }
-                field(VariantCode;VariantCode)
+                field(VariantCode; VariantCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variant Code';
                     Visible = VariantVisible;
 
@@ -52,8 +54,9 @@ page 6060059 "POS Inventory Overview"
                         RefreshLines;
                     end;
                 }
-                field(Variety1ValueCode;Variety1ValueCode)
+                field(Variety1ValueCode; Variety1ValueCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 1';
                     Visible = Variety1ValueVisible;
 
@@ -67,8 +70,9 @@ page 6060059 "POS Inventory Overview"
                         RefreshLines;
                     end;
                 }
-                field(Variety2ValueCode;Variety2ValueCode)
+                field(Variety2ValueCode; Variety2ValueCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 2';
                     Visible = Variety2ValueVisible;
 
@@ -82,8 +86,9 @@ page 6060059 "POS Inventory Overview"
                         RefreshLines;
                     end;
                 }
-                field(Variety3ValueCode;Variety3ValueCode)
+                field(Variety3ValueCode; Variety3ValueCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 3';
                     Visible = Variety3ValueVisible;
 
@@ -97,8 +102,9 @@ page 6060059 "POS Inventory Overview"
                         RefreshLines;
                     end;
                 }
-                field(Variety4ValueCode;Variety4ValueCode)
+                field(Variety4ValueCode; Variety4ValueCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 4';
                     Visible = Variety4ValueVisible;
 
@@ -116,22 +122,27 @@ page 6060059 "POS Inventory Overview"
             repeater(Group)
             {
                 Editable = false;
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description";"Variant Description")
+                field("Variant Description"; "Variant Description")
                 {
+                    ApplicationArea = All;
                     Visible = VariantVisible;
                 }
-                field("Location Name";"Location Name")
+                field("Location Name"; "Location Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
-                    DecimalPlaces = 0:2;
+                    ApplicationArea = All;
+                    DecimalPlaces = 0 : 2;
                 }
-                field("Item Description";"Item Description")
+                field("Item Description"; "Item Description")
                 {
+                    ApplicationArea = All;
                     Caption = 'Description 2';
                 }
             }
@@ -166,7 +177,7 @@ page 6060059 "POS Inventory Overview"
         TextSelectItemFirst: Label 'Please select an item.';
         OnlyCurentLoc: Boolean;
 
-    procedure SetParameters(ItemCodeIn: Code[20];VariantCodeIn: Code[10];CurrentLocationIn: Code[10];OnlyCurentLocIn: Boolean)
+    procedure SetParameters(ItemCodeIn: Code[20]; VariantCodeIn: Code[10]; CurrentLocationIn: Code[10]; OnlyCurentLocIn: Boolean)
     begin
         ItemCode := ItemCodeIn;
         VariantCode := VariantCodeIn;
@@ -182,16 +193,16 @@ page 6060059 "POS Inventory Overview"
         POSInventoryOverview: Page "POS Inventory Overview";
     begin
         if ItemCode = '' then
-          exit;
+            exit;
         DeleteAll;
         QtyCurrentLocation := 0;
 
-        if  (Item."No." <> '') and (ItemCode <> Item."No.") then begin
-          //Open a new page with new Visible properties
-          //POSInventoryOverview.SetParameters(ItemCode,VariantCode,CurrentLocationCode);  //NPR5.52 [370333]-revoked
-          POSInventoryOverview.SetParameters(ItemCode,VariantCode,CurrentLocationCode,OnlyCurentLoc);  //NPR5.52 [370333]
-          POSInventoryOverview.Run;
-          CurrPage.Close;
+        if (Item."No." <> '') and (ItemCode <> Item."No.") then begin
+            //Open a new page with new Visible properties
+            //POSInventoryOverview.SetParameters(ItemCode,VariantCode,CurrentLocationCode);  //NPR5.52 [370333]-revoked
+            POSInventoryOverview.SetParameters(ItemCode, VariantCode, CurrentLocationCode, OnlyCurentLoc);  //NPR5.52 [370333]
+            POSInventoryOverview.Run;
+            CurrPage.Close;
         end;
 
         Item.Get(ItemCode);
@@ -201,64 +212,66 @@ page 6060059 "POS Inventory Overview"
         Variety4ValueVisible := Item."Variety 4" <> '';
 
         ItemVariant.Reset;
-        ItemVariant.SetRange("Item No.",ItemCode);
+        ItemVariant.SetRange("Item No.", ItemCode);
         HasVariants := not (ItemVariant.IsEmpty);
         VariantVisible := HasVariants;
         if VariantCode <> '' then
-          ItemVariant.SetFilter(Code,VariantCode);
+            ItemVariant.SetFilter(Code, VariantCode);
         if Variety1ValueCode <> '' then
-          ItemVariant.SetFilter("Variety 1 Value",Variety1ValueCode);
+            ItemVariant.SetFilter("Variety 1 Value", Variety1ValueCode);
         if Variety2ValueCode <> '' then
-          ItemVariant.SetFilter("Variety 2 Value",Variety2ValueCode);
+            ItemVariant.SetFilter("Variety 2 Value", Variety2ValueCode);
         if Variety3ValueCode <> '' then
-          ItemVariant.SetFilter("Variety 3 Value",Variety3ValueCode);
+            ItemVariant.SetFilter("Variety 3 Value", Variety3ValueCode);
         if Variety4ValueCode <> '' then
-          ItemVariant.SetFilter("Variety 4 Value",Variety4ValueCode);
+            ItemVariant.SetFilter("Variety 4 Value", Variety4ValueCode);
 
         //-NPR5.52 [370333]
         if OnlyCurentLoc then
-          Location.SetRange(Code,CurrentLocationCode);
+            Location.SetRange(Code, CurrentLocationCode);
         //+NPR5.52 [370333]
-        if Location.FindSet then repeat
-          Item.SetFilter("Location Filter",Location.Code);
-          if HasVariants then begin
-            if ItemVariant.FindSet then repeat
-              Item.SetFilter("Variant Filter",ItemVariant.Code);
-              Item.CalcFields(Inventory);
-              //-NPR5.55 [404868]
-              //IF Item.Inventory > 0 THEN BEGIN
-              if Item.Inventory <> 0 then begin
-              //+NPR5.55 [404868]
-                "Item No." := Item."No.";
-                "Item Description" := Item.Description;
-                "Variant Code" := ItemVariant.Code;
-                "Variant Description" := ItemVariant.Description;
-                "Location Code" := Location.Code;
-                "Location Name" := Location.Name;
-                Quantity := Item.Inventory;
-                Insert;
-                if CurrentLocationCode = Location.Code then
-                  QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
-              end;
-            until ItemVariant.Next =0;
-          end else begin
-            Item.SetFilter("Variant Filter",'');
-            Item.CalcFields(Inventory);
-            //-NPR5.55 [404868]
-            //IF Item.Inventory > 0 THEN BEGIN
-            if Item.Inventory <> 0 then begin
-            //+NPR5.55 [404868]
-              "Item No." := Item."No.";
-              "Item Description" := Item.Description;
-              "Location Code" := Location.Code;
-              "Location Name" := Location.Name;
-              Quantity := Item.Inventory;
-              Insert;
-              if CurrentLocationCode = Location.Code then
-                QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
-            end;
-          end;
-        until Location.Next = 0;
+        if Location.FindSet then
+            repeat
+                Item.SetFilter("Location Filter", Location.Code);
+                if HasVariants then begin
+                    if ItemVariant.FindSet then
+                        repeat
+                            Item.SetFilter("Variant Filter", ItemVariant.Code);
+                            Item.CalcFields(Inventory);
+                            //-NPR5.55 [404868]
+                            //IF Item.Inventory > 0 THEN BEGIN
+                            if Item.Inventory <> 0 then begin
+                                //+NPR5.55 [404868]
+                                "Item No." := Item."No.";
+                                "Item Description" := Item.Description;
+                                "Variant Code" := ItemVariant.Code;
+                                "Variant Description" := ItemVariant.Description;
+                                "Location Code" := Location.Code;
+                                "Location Name" := Location.Name;
+                                Quantity := Item.Inventory;
+                                Insert;
+                                if CurrentLocationCode = Location.Code then
+                                    QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
+                            end;
+                        until ItemVariant.Next = 0;
+                end else begin
+                    Item.SetFilter("Variant Filter", '');
+                    Item.CalcFields(Inventory);
+                    //-NPR5.55 [404868]
+                    //IF Item.Inventory > 0 THEN BEGIN
+                    if Item.Inventory <> 0 then begin
+                        //+NPR5.55 [404868]
+                        "Item No." := Item."No.";
+                        "Item Description" := Item.Description;
+                        "Location Code" := Location.Code;
+                        "Location Name" := Location.Name;
+                        Quantity := Item.Inventory;
+                        Insert;
+                        if CurrentLocationCode = Location.Code then
+                            QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
+                    end;
+                end;
+            until Location.Next = 0;
         CurrPage.Update(false);
     end;
 
@@ -272,99 +285,99 @@ page 6060059 "POS Inventory Overview"
         ItemVariants: Page "Item Variants";
     begin
         case FieldType of
-          FieldType::ItemNo :
-            begin
-              if LookupItem.Get(ItemCode) then;
-              LookupItem.SetRange("Blocked on Pos",false);
-              LookupItem.SetRange(Blocked,false);
-              RetailItemList.LookupMode := true;
-              RetailItemList.SetRecord(LookupItem);
-              RetailItemList.SetTableView(LookupItem);
-              if RetailItemList.RunModal = ACTION::LookupOK then begin
-                RetailItemList.GetRecord(LookupItem);
-                ItemCode := LookupItem."No.";
-                RefreshLines;
-              end;
-            end;
-          FieldType::VariantCode :
-            begin
-              if not Item.Get(ItemCode) then
-               Error(TextSelectItemFirst);
-              ItemVariant.SetRange("Item No.",Item."No.");
-              ItemVariant.SetRange(Blocked,false);
-              ItemVariants.LookupMode := true;
-              ItemVariants.SetRecord(ItemVariant);
-              ItemVariants.SetTableView(ItemVariant);
-              if ItemVariants.RunModal = ACTION::LookupOK then begin
-                ItemVariants.GetRecord(ItemVariant);
-                VariantCode := ItemVariant.Code;
-                RefreshLines;
-              end;
-            end;
-          FieldType::Variety1 :
-            begin
-              if not Item.Get(ItemCode) then
-                Error(TextSelectItemFirst);
-              VarietyValue.SetRange(Type,Item."Variety 1");
-              VarietyValue.SetRange(Table,Item."Variety 1 Table");
-              VarietyValue.SetCurrentKey(Type,Table,"Sort Order");
-              VarietyValuePage.LookupMode := true;
-              VarietyValuePage.SetRecord(VarietyValue);
-              VarietyValuePage.SetTableView(VarietyValue);
-              if VarietyValuePage.RunModal = ACTION::LookupOK then begin
-                VarietyValuePage.GetRecord(VarietyValue);
-                Variety1ValueCode := VarietyValue.Value;
-                RefreshLines;
-              end;
-            end;
-          FieldType::Variety2 :
-            begin
-              if not Item.Get(ItemCode) then
-                Error(TextSelectItemFirst);
-              VarietyValue.SetRange(Type,Item."Variety 2");
-              VarietyValue.SetRange(Table,Item."Variety 2 Table");
-              VarietyValue.SetCurrentKey(Type,Table,"Sort Order");
-              VarietyValuePage.LookupMode := true;
-              VarietyValuePage.SetRecord(VarietyValue);
-              VarietyValuePage.SetTableView(VarietyValue);
-              if VarietyValuePage.RunModal = ACTION::LookupOK then begin
-                VarietyValuePage.GetRecord(VarietyValue);
-                Variety2ValueCode := VarietyValue.Value;
-                RefreshLines;
-              end;
-            end;
-          FieldType::Variety3 :
-            begin
-              if not Item.Get(ItemCode) then
-                Error(TextSelectItemFirst);
-              VarietyValue.SetRange(Type,Item."Variety 3");
-              VarietyValue.SetRange(Table,Item."Variety 3 Table");
-              VarietyValue.SetCurrentKey(Type,Table,"Sort Order");
-              VarietyValuePage.LookupMode := true;
-              VarietyValuePage.SetRecord(VarietyValue);
-              VarietyValuePage.SetTableView(VarietyValue);
-              if VarietyValuePage.RunModal = ACTION::LookupOK then begin
-                VarietyValuePage.GetRecord(VarietyValue);
-                Variety3ValueCode := VarietyValue.Value;
-                RefreshLines;
-              end;
-            end;
-          FieldType::Variety4 :
-            begin
-              if not Item.Get(ItemCode) then
-                Error(TextSelectItemFirst);
-              VarietyValue.SetRange(Type,Item."Variety 4");
-              VarietyValue.SetRange(Table,Item."Variety 4 Table");
-              VarietyValue.SetCurrentKey(Type,Table,"Sort Order");
-              VarietyValuePage.LookupMode := true;
-              VarietyValuePage.SetRecord(VarietyValue);
-              VarietyValuePage.SetTableView(VarietyValue);
-              if VarietyValuePage.RunModal = ACTION::LookupOK then begin
-                VarietyValuePage.GetRecord(VarietyValue);
-                Variety4ValueCode := VarietyValue.Value;
-                RefreshLines;
-              end;
-            end;
+            FieldType::ItemNo:
+                begin
+                    if LookupItem.Get(ItemCode) then;
+                    LookupItem.SetRange("Blocked on Pos", false);
+                    LookupItem.SetRange(Blocked, false);
+                    RetailItemList.LookupMode := true;
+                    RetailItemList.SetRecord(LookupItem);
+                    RetailItemList.SetTableView(LookupItem);
+                    if RetailItemList.RunModal = ACTION::LookupOK then begin
+                        RetailItemList.GetRecord(LookupItem);
+                        ItemCode := LookupItem."No.";
+                        RefreshLines;
+                    end;
+                end;
+            FieldType::VariantCode:
+                begin
+                    if not Item.Get(ItemCode) then
+                        Error(TextSelectItemFirst);
+                    ItemVariant.SetRange("Item No.", Item."No.");
+                    ItemVariant.SetRange(Blocked, false);
+                    ItemVariants.LookupMode := true;
+                    ItemVariants.SetRecord(ItemVariant);
+                    ItemVariants.SetTableView(ItemVariant);
+                    if ItemVariants.RunModal = ACTION::LookupOK then begin
+                        ItemVariants.GetRecord(ItemVariant);
+                        VariantCode := ItemVariant.Code;
+                        RefreshLines;
+                    end;
+                end;
+            FieldType::Variety1:
+                begin
+                    if not Item.Get(ItemCode) then
+                        Error(TextSelectItemFirst);
+                    VarietyValue.SetRange(Type, Item."Variety 1");
+                    VarietyValue.SetRange(Table, Item."Variety 1 Table");
+                    VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
+                    VarietyValuePage.LookupMode := true;
+                    VarietyValuePage.SetRecord(VarietyValue);
+                    VarietyValuePage.SetTableView(VarietyValue);
+                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                        VarietyValuePage.GetRecord(VarietyValue);
+                        Variety1ValueCode := VarietyValue.Value;
+                        RefreshLines;
+                    end;
+                end;
+            FieldType::Variety2:
+                begin
+                    if not Item.Get(ItemCode) then
+                        Error(TextSelectItemFirst);
+                    VarietyValue.SetRange(Type, Item."Variety 2");
+                    VarietyValue.SetRange(Table, Item."Variety 2 Table");
+                    VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
+                    VarietyValuePage.LookupMode := true;
+                    VarietyValuePage.SetRecord(VarietyValue);
+                    VarietyValuePage.SetTableView(VarietyValue);
+                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                        VarietyValuePage.GetRecord(VarietyValue);
+                        Variety2ValueCode := VarietyValue.Value;
+                        RefreshLines;
+                    end;
+                end;
+            FieldType::Variety3:
+                begin
+                    if not Item.Get(ItemCode) then
+                        Error(TextSelectItemFirst);
+                    VarietyValue.SetRange(Type, Item."Variety 3");
+                    VarietyValue.SetRange(Table, Item."Variety 3 Table");
+                    VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
+                    VarietyValuePage.LookupMode := true;
+                    VarietyValuePage.SetRecord(VarietyValue);
+                    VarietyValuePage.SetTableView(VarietyValue);
+                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                        VarietyValuePage.GetRecord(VarietyValue);
+                        Variety3ValueCode := VarietyValue.Value;
+                        RefreshLines;
+                    end;
+                end;
+            FieldType::Variety4:
+                begin
+                    if not Item.Get(ItemCode) then
+                        Error(TextSelectItemFirst);
+                    VarietyValue.SetRange(Type, Item."Variety 4");
+                    VarietyValue.SetRange(Table, Item."Variety 4 Table");
+                    VarietyValue.SetCurrentKey(Type, Table, "Sort Order");
+                    VarietyValuePage.LookupMode := true;
+                    VarietyValuePage.SetRecord(VarietyValue);
+                    VarietyValuePage.SetTableView(VarietyValue);
+                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                        VarietyValuePage.GetRecord(VarietyValue);
+                        Variety4ValueCode := VarietyValue.Value;
+                        RefreshLines;
+                    end;
+                end;
         end;
     end;
 }

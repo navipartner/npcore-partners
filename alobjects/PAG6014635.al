@@ -16,15 +16,17 @@ page 6014635 "GCP Auth Setup"
             {
                 Caption = 'Google Cloud Print';
                 InstructionalText = 'Please visit the following URL in a browser, login with a Google account you wish to print through & paste the given code back here.';
-                field(AuthURL;AuthURL)
+                field(AuthURL; AuthURL)
                 {
+                    ApplicationArea = All;
                     Caption = 'URL';
                     Editable = false;
                     Enabled = true;
                     ExtendedDatatype = URL;
                 }
-                field(AuthCode;AuthCode)
+                field(AuthCode; AuthCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Code';
                 }
             }

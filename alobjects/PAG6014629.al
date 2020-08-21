@@ -10,16 +10,19 @@ page 6014629 "RP Template Media Factbox"
     {
         area(content)
         {
-            field(Picture;Picture)
+            field(Picture; Picture)
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
-            field(URL;URL)
+            field(URL; URL)
             {
+                ApplicationArea = All;
                 ExtendedDatatype = URL;
             }
-            field(Description;Description)
+            field(Description; Description)
             {
+                ApplicationArea = All;
             }
         }
     }

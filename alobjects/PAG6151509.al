@@ -21,32 +21,41 @@ page 6151509 "Nc Import Type Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Keep Import Entries for";"Keep Import Entries for")
+                field("Keep Import Entries for"; "Keep Import Entries for")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lookup Codeunit ID";"Lookup Codeunit ID")
+                field("Lookup Codeunit ID"; "Lookup Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Codeunit ID";"Import Codeunit ID")
+                field("Import Codeunit ID"; "Import Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send e-mail on Error";"Send e-mail on Error")
+                field("Send e-mail on Error"; "Send e-mail on Error")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-mail address on Error";"E-mail address on Error")
+                field("E-mail address on Error"; "E-mail address on Error")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max. Retry Count";"Max. Retry Count")
+                field("Max. Retry Count"; "Max. Retry Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delay between Retries";"Delay between Retries")
+                field("Delay between Retries"; "Delay between Retries")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Transfer)
@@ -55,69 +64,86 @@ page 6151509 "Nc Import Type Card"
                 group(API)
                 {
                     Caption = 'API';
-                    field("Webservice Enabled";"Webservice Enabled")
+                    field("Webservice Enabled"; "Webservice Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Webservice Codeunit ID";"Webservice Codeunit ID")
+                    field("Webservice Codeunit ID"; "Webservice Codeunit ID")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Webservice Function";"Webservice Function")
+                    field("Webservice Function"; "Webservice Function")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Ftp)
                 {
                     Caption = 'Ftp';
-                    field("Ftp Enabled";"Ftp Enabled")
+                    field("Ftp Enabled"; "Ftp Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Sftp;Sftp)
+                    field(Sftp; Sftp)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Host";"Ftp Host")
+                    field("Ftp Host"; "Ftp Host")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Port";"Ftp Port")
+                    field("Ftp Port"; "Ftp Port")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Binary";"Ftp Binary")
+                    field("Ftp Binary"; "Ftp Binary")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp User";"Ftp User")
+                    field("Ftp User"; "Ftp User")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Password";"Ftp Password")
+                    field("Ftp Password"; "Ftp Password")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Passive";"Ftp Passive")
+                    field("Ftp Passive"; "Ftp Passive")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Path";"Ftp Path")
+                    field("Ftp Path"; "Ftp Path")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Backup Path";"Ftp Backup Path")
+                    field("Ftp Backup Path"; "Ftp Backup Path")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ftp Filename";"Ftp Filename")
+                    field("Ftp Filename"; "Ftp Filename")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(File)
                 {
                     Caption = 'File';
-                    field("Server File Enabled";"Server File Enabled")
+                    field("Server File Enabled"; "Server File Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Server File Path";"Server File Path")
+                    field("Server File Path"; "Server File Path")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group("XML Stylesheet")
             {
                 Caption = 'XML Stylesheet';
-                field(XMLStylesheetData;XMLStylesheetData)
+                field(XMLStylesheetData; XMLStylesheetData)
                 {
+                    ApplicationArea = All;
                     MultiLine = true;
                     ShowCaption = false;
 
@@ -125,16 +151,16 @@ page 6151509 "Nc Import Type Card"
                     begin
                         //-NPR5.55 [366790]
                         if "XML Stylesheet".HasValue then begin
-                          CalcFields("XML Stylesheet");
-                          Clear("XML Stylesheet");
-                          Modify(false);
+                            CalcFields("XML Stylesheet");
+                            Clear("XML Stylesheet");
+                            Modify(false);
                         end;
 
                         if XMLStylesheetData <> '' then begin
-                          Request.AddText(XMLStylesheetData);
-                          "XML Stylesheet".CreateOutStream(OStream);
-                          Request.Write(OStream);
-                          Modify(false);
+                            Request.AddText(XMLStylesheetData);
+                            "XML Stylesheet".CreateOutStream(OStream);
+                            Request.Write(OStream);
+                            Modify(false);
                         end;
                         //+NPR5.55 [366790]
                     end;
@@ -211,10 +237,10 @@ page 6151509 "Nc Import Type Card"
         CalcFields("XML Stylesheet");
 
         if not "XML Stylesheet".HasValue then
-          XMLStylesheetData := ''
+            XMLStylesheetData := ''
         else begin
-          "XML Stylesheet".CreateInStream(IStream);
-          IStream.Read(XMLStylesheetData,MaxStrLen(XMLStylesheetData));
+            "XML Stylesheet".CreateInStream(IStream);
+            IStream.Read(XMLStylesheetData, MaxStrLen(XMLStylesheetData));
         end;
         //+NPR5.55 [366790]
     end;

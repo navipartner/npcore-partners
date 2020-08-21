@@ -16,34 +16,42 @@ page 6151053 "Item Hiearachy Lines"
                 IndentationColumn = "Item Hierarchy Level";
                 IndentationControls = "Linked Table Key Value";
                 ShowAsTree = true;
-                field(Hierachy;"Related Table Desc Field Value")
+                field(Hierachy; "Related Table Desc Field Value")
                 {
+                    ApplicationArea = All;
                     Caption = 'Hierachy';
                 }
-                field("Item Hierarchy Level";"Item Hierarchy Level")
+                field("Item Hierarchy Level"; "Item Hierarchy Level")
                 {
+                    ApplicationArea = All;
                     Caption = 'Level';
                 }
-                field("Item Hierachy Description";"Item Hierachy Description")
+                field("Item Hierachy Description"; "Item Hierachy Description")
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;"Item Desc.")
+                field(Description; "Item Desc.")
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Description';
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Linked Table Key Value";"Linked Table Key Value")
+                field("Linked Table Key Value"; "Linked Table Key Value")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Related Table Key Field Value";"Related Table Key Field Value")
+                field("Related Table Key Field Value"; "Related Table Key Field Value")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -77,7 +85,7 @@ page 6151053 "Item Hiearachy Lines"
                 trigger OnAction()
                 begin
                     CurrPage.SetSelectionFilter(Rec);
-                    REPORT.RunModal(6151050,true,true,Rec);
+                    REPORT.RunModal(6151050, true, true, Rec);
                 end;
             }
         }

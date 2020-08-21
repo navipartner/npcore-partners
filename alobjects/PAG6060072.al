@@ -12,38 +12,49 @@ page 6060072 "MM NPR Endpoint Setup"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Community Code";"Community Code")
+                field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Credentials Type";"Credentials Type")
+                field("Credentials Type"; "Credentials Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("User Domain";"User Domain")
+                field("User Domain"; "User Domain")
                 {
+                    ApplicationArea = All;
                 }
-                field("User Account";"User Account")
+                field("User Account"; "User Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("User Password";"User Password")
+                field("User Password"; "User Password")
                 {
+                    ApplicationArea = All;
                 }
-                field("Endpoint URI";"Endpoint URI")
+                field("Endpoint URI"; "Endpoint URI")
                 {
+                    ApplicationArea = All;
                 }
-                field(Disabled;Disabled)
+                field(Disabled; Disabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Connection Timeout (ms)";"Connection Timeout (ms)")
+                field("Connection Timeout (ms)"; "Connection Timeout (ms)")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

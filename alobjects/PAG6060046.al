@@ -14,26 +14,33 @@ page 6060046 "Registered Item Worksheets"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Worksheet Template";"Item Worksheet Template")
+                field("Item Worksheet Template"; "Item Worksheet Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Registered Date Time";"Registered Date Time")
+                field("Registered Date Time"; "Registered Date Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Registered by User ID";"Registered by User ID")
+                field("Registered by User ID"; "Registered by User ID")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -51,8 +58,8 @@ page 6060046 "Registered Item Worksheets"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Registered Item Worksheet Page";
-                RunPageLink = "Registered Worksheet No."=FIELD("No.");
-                RunPageView = SORTING("Registered Worksheet No.","Line No.")
+                RunPageLink = "Registered Worksheet No." = FIELD("No.");
+                RunPageView = SORTING("Registered Worksheet No.", "Line No.")
                               ORDER(Ascending);
             }
         }

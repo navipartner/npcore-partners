@@ -13,15 +13,18 @@ page 6059823 "Smart Email Variables"
         {
             repeater(Group)
             {
-                field("Variable Name";"Variable Name")
+                field("Variable Name"; "Variable Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variable Type";"Variable Type")
+                field("Variable Type"; "Variable Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -29,21 +32,23 @@ page 6059823 "Smart Email Variables"
                         TableFilter: Record "Table Filter";
                         FieldsLookup: Page "Fields Lookup";
                     begin
-                        Field.SetRange(TableNo,"Merge Table ID");
+                        Field.SetRange(TableNo, "Merge Table ID");
                         FieldsLookup.SetTableView(Field);
                         FieldsLookup.LookupMode(true);
 
                         if FieldsLookup.RunModal = ACTION::LookupOK then begin
-                          FieldsLookup.GetRecord(Field);
-                          Validate("Field No.",Field."No.");
+                            FieldsLookup.GetRecord(Field);
+                            Validate("Field No.", Field."No.");
                         end;
                     end;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Const Value";"Const Value")
+                field("Const Value"; "Const Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

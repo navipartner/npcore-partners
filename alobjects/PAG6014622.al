@@ -25,26 +25,33 @@ page 6014622 "POS Web Fonts"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field("Font Face"; "Font Face")
                 {
+                    ApplicationArea = All;
                 }
                 field(Prefix; Prefix)
                 {
+                    ApplicationArea = All;
                 }
                 field("FORMAT(WoffHasValue)"; Format(WoffHasValue))
                 {
+                    ApplicationArea = All;
                     Caption = 'Woff Exists';
                     Editable = false;
                 }
                 field("FORMAT(CssHasValue)"; Format(CssHasValue))
                 {
+                    ApplicationArea = All;
                     Caption = 'Css Exists';
                     Editable = false;
                 }

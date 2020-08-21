@@ -17,26 +17,30 @@ page 6014530 "Touch Screen - Info"
             repeater(Control6150618)
             {
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                     StyleExpr = Description1Style;
                     Visible = Col1Visible;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                     StyleExpr = Description2Style;
                     Visible = Col1Visible;
                 }
-                field("Description 3";"Description 3")
+                field("Description 3"; "Description 3")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                     StyleExpr = Description3Style;
                     Visible = Col1Visible;
                 }
-                field("Description 4";"Description 4")
+                field("Description 4"; "Description 4")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                     StyleExpr = Description3Style;
                     Visible = Col1Visible;
@@ -81,33 +85,37 @@ page 6014530 "Touch Screen - Info"
     procedure SetLineStyle()
     begin
         if Bold then
-          Description1Style := 'Strong'
-        else if Color > 0 then
-          Description1Style := 'Attention'
+            Description1Style := 'Strong'
         else
-          Description1Style := 'Normal';
+            if Color > 0 then
+                Description1Style := 'Attention'
+            else
+                Description1Style := 'Normal';
 
         if "Bold 2" then
-          Description2Style := 'Strong'
-        else if "Color 2" > 0 then
-          Description2Style := 'Attention'
+            Description2Style := 'Strong'
         else
-          Description2Style := 'Normal';
+            if "Color 2" > 0 then
+                Description2Style := 'Attention'
+            else
+                Description2Style := 'Normal';
 
         if "Bold 3" then
-          Description3Style := 'Strong'
-        else if "Color 3" > 0 then
-          Description3Style := 'Attention'
+            Description3Style := 'Strong'
         else
-          Description3Style := 'Normal';
+            if "Color 3" > 0 then
+                Description3Style := 'Attention'
+            else
+                Description3Style := 'Normal';
 
 
         if "Bold 4" then
-          Description4Style := 'Strong'
-        else if "Color 4" > 0 then
-          Description4Style := 'Attention'
+            Description4Style := 'Strong'
         else
-          Description4Style := 'Normal';
+            if "Color 4" > 0 then
+                Description4Style := 'Attention'
+            else
+                Description4Style := 'Normal';
     end;
 }
 

@@ -20,45 +20,58 @@ page 6060115 "TM Ticket Access Statistics"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Type";"Ticket Type")
+                field("Ticket Type"; "Ticket Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Date";"Admission Date")
+                field("Admission Date"; "Admission Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Hour";"Admission Hour")
+                field("Admission Hour"; "Admission Hour")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Count";"Admission Count")
+                field("Admission Count"; "Admission Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Count (Neg)";"Admission Count (Neg)")
+                field("Admission Count (Neg)"; "Admission Count (Neg)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Count (Re-Entry)";"Admission Count (Re-Entry)")
+                field("Admission Count (Re-Entry)"; "Admission Count (Re-Entry)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Generated Count (Pos)";"Generated Count (Pos)")
+                field("Generated Count (Pos)"; "Generated Count (Pos)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Generated Count (Neg)";"Generated Count (Neg)")
+                field("Generated Count (Neg)"; "Generated Count (Neg)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sum Admission Count";"Sum Admission Count")
+                field("Sum Admission Count"; "Sum Admission Count")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

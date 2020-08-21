@@ -33,53 +33,65 @@ page 6060140 "MM POS Member Card"
         {
             group(General)
             {
-                field("External Member No.";"External Member No.")
+                field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Display Name";"Display Name")
+                field("Display Name"; "Display Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail Address";"E-Mail Address")
+                field("E-Mail Address"; "E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("MembershipRoleDisplay.""GDPR Approval""";MembershipRoleDisplay."GDPR Approval")
+                field("MembershipRoleDisplay.""GDPR Approval"""; MembershipRoleDisplay."GDPR Approval")
                 {
+                    ApplicationArea = All;
                     Caption = 'GDPR Approval';
                     Editable = false;
                 }
             }
             group(CRM)
             {
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
-                field(Gender;Gender)
+                field(Gender; Gender)
                 {
+                    ApplicationArea = All;
                 }
-                field(Birthday;Birthday)
+                field(Birthday; Birthday)
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = IsBirthday;
                 }
-                field("E-Mail News Letter";"E-Mail News Letter")
+                field("E-Mail News Letter"; "E-Mail News Letter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Method";"Notification Method")
+                field("Notification Method"; "Notification Method")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Membership)
@@ -88,55 +100,62 @@ page 6060140 "MM POS Member Card"
                 Editable = false;
                 //The GridLayout property is only supported on controls of type Grid
                 //GridLayout = Columns;
-                field("Membership.""External Membership No.""";Membership."External Membership No.")
+                field("Membership.""External Membership No."""; Membership."External Membership No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'External Membership No.';
                 }
-                field("Membership.""Membership Code""";Membership."Membership Code")
+                field("Membership.""Membership Code"""; Membership."Membership Code")
                 {
+                    ApplicationArea = All;
                     Caption = 'Membership Code';
                 }
-                field("Membership.""Company Name""";Membership."Company Name")
+                field("Membership.""Company Name"""; Membership."Company Name")
                 {
+                    ApplicationArea = All;
                     Caption = 'Company Name';
                 }
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    field(RemainingPoints;RemainingPoints)
+                    field(RemainingPoints; RemainingPoints)
                     {
+                        ApplicationArea = All;
                         Caption = 'Remaining Points';
                         Editable = false;
                     }
-                    field(ValidFromDate;ValidFromDate)
+                    field(ValidFromDate; ValidFromDate)
                     {
+                        ApplicationArea = All;
                         Caption = 'Valid From Date';
                         Visible = false;
                     }
-                    field(ValidUntilDate;ValidUntilDate)
+                    field(ValidUntilDate; ValidUntilDate)
                     {
+                        ApplicationArea = All;
                         Caption = 'Valid Until Date';
                         Style = Unfavorable;
                         StyleExpr = UntilDateAttentionAccent;
                     }
-                    field(RemainingAmountText;RemainingAmountText)
+                    field(RemainingAmountText; RemainingAmountText)
                     {
+                        ApplicationArea = All;
                         Caption = 'Open / Due Amount.';
                         Style = Unfavorable;
                         StyleExpr = AccentuateDueAmount;
                     }
                 }
             }
-            part(MemberCardsSubpage;"MM Member Cards ListPart")
+            part(MemberCardsSubpage; "MM Member Cards ListPart")
             {
-                SubPageLink = "Member Entry No."=FIELD("Entry No.");
+                SubPageLink = "Member Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Descending);
             }
         }
         area(factboxes)
         {
-            systempart(Control6014400;Notes)
+            systempart(Control6014400; Notes)
             {
             }
         }
@@ -154,7 +173,7 @@ page 6060140 "MM POS Member Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Card";
-                RunPageLink = "Entry No."=FIELD("Entry No.");
+                RunPageLink = "Entry No." = FIELD("Entry No.");
             }
             action("Register Arrival")
             {
@@ -171,10 +190,10 @@ page 6060140 "MM POS Member Card"
                 begin
 
                     //-MM1.41 [366261]
-                    if (not MemberWebService.MemberRegisterArrival ("External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
-                      Error (ResponseMessage);
+                    if (not MemberWebService.MemberRegisterArrival("External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
+                        Error(ResponseMessage);
 
-                    Message (ResponseMessage);
+                    Message(ResponseMessage);
                     //+MM1.41 [366261]
                 end;
             }
@@ -190,7 +209,7 @@ page 6060140 "MM POS Member Card"
                 begin
 
                     //-MM1.22 [278175]
-                    ActivateMembership ();
+                    ActivateMembership();
 
                     //+MM1.22 [278175]
                 end;
@@ -205,8 +224,8 @@ page 6060140 "MM POS Member Card"
 
                 trigger OnAction()
                 begin
-                    AddMembershipGuardian ();
-                    CurrPage.Update (false);
+                    AddMembershipGuardian();
+                    CurrPage.Update(false);
                 end;
             }
             action(Profiles)
@@ -217,7 +236,7 @@ page 6060140 "MM POS Member Card"
 
                 trigger OnAction()
                 begin
-                    ContactQuestionnaire ();
+                    ContactQuestionnaire();
                 end;
             }
             action(PrintCard)
@@ -235,10 +254,10 @@ page 6060140 "MM POS Member Card"
                     MemberCardEntryNo: Integer;
                 begin
                     //-MM1.22 [289434]
-                    if (Confirm (CONFIRM_PRINT, true, StrSubstNo (CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
-                      //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
-                      MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo ();
-                      MemberRetailIntegration.PrintMemberCard ("Entry No.", MemberCardEntryNo);
+                    if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
+                        //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
+                        MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo();
+                        MemberRetailIntegration.PrintMemberCard("Entry No.", MemberCardEntryNo);
                     end;
                 end;
             }
@@ -265,15 +284,15 @@ page 6060140 "MM POS Member Card"
 
                         //-MM1.42 [378190]
                         if (Membership."Customer No." = '') then
-                          Error (NO_ENTRIES, Rec."External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
 
-                        CustLedgerEntry.FilterGroup (2);
-                        CustLedgerEntry.SetFilter ("Customer No.", '=%1', Membership."Customer No.");
-                        CustLedgerEntry.FilterGroup (0);
+                        CustLedgerEntry.FilterGroup(2);
+                        CustLedgerEntry.SetFilter("Customer No.", '=%1', Membership."Customer No.");
+                        CustLedgerEntry.FilterGroup(0);
 
-                        CustomerLedgerEntries.Editable (false);
-                        CustomerLedgerEntries.SetTableView (CustLedgerEntry);
-                        CustomerLedgerEntries.RunModal ();
+                        CustomerLedgerEntries.Editable(false);
+                        CustomerLedgerEntries.SetTableView(CustLedgerEntry);
+                        CustomerLedgerEntries.RunModal();
                         //+MM1.42 [378190]
                     end;
                 }
@@ -290,16 +309,16 @@ page 6060140 "MM POS Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,Rec."External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
 
-                        ItemLedgerEntry.SetCurrentKey("Source Type","Source No.","Posting Date");
+                        ItemLedgerEntry.SetCurrentKey("Source Type", "Source No.", "Posting Date");
                         ItemLedgerEntry.FilterGroup(2);
-                        ItemLedgerEntry.SetRange("Source Type",ItemLedgerEntry."Source Type"::Customer);
-                        ItemLedgerEntry.SetRange("Source No.",Membership."Customer No.");
+                        ItemLedgerEntry.SetRange("Source Type", ItemLedgerEntry."Source Type"::Customer);
+                        ItemLedgerEntry.SetRange("Source No.", Membership."Customer No.");
                         ItemLedgerEntry.FilterGroup(0);
                         ItemLedgerEntry.Ascending(false);
                         if ItemLedgerEntry.FindFirst then;
-                        PAGE.RunModal(0,ItemLedgerEntry);
+                        PAGE.RunModal(0, ItemLedgerEntry);
                         //+MM1.42 [377727]
                     end;
                 }
@@ -319,12 +338,12 @@ page 6060140 "MM POS Member Card"
 
                         //-MM1.42 [378190]
                         if (Membership."Customer No." = '') then
-                          Error (NO_ENTRIES, Rec."External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
 
-                        Customer.Get (Membership."Customer No.");
-                        CustomerStatistics.SetRecord (Customer);
-                        CustomerStatistics.Editable (false);
-                        CustomerStatistics.RunModal ();
+                        Customer.Get(Membership."Customer No.");
+                        CustomerStatistics.SetRecord(Customer);
+                        CustomerStatistics.Editable(false);
+                        CustomerStatistics.RunModal();
                         //+MM1.42 [378190]
                     end;
                 }
@@ -348,9 +367,9 @@ page 6060140 "MM POS Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,"External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                            Error(NO_ENTRIES, "External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
                         //+MM1.42 [377727]
                     end;
                 }
@@ -370,9 +389,9 @@ page 6060140 "MM POS Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,"External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                            Error(NO_ENTRIES, "External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
                         //+MM1.42 [377727]
                     end;
                 }
@@ -393,65 +412,65 @@ page 6060140 "MM POS Member Card"
         DueAmount: Decimal;
         DueDate: Date;
     begin
-        Clear (Membership);
+        Clear(Membership);
         ValidFromDate := 0D;
         ValidUntilDate := 0D;
 
         if (GMembershipEntryNo <> 0) then
-          MembershipRole.SetFilter ("Membership Entry No.", '=%1', GMembershipEntryNo);
+            MembershipRole.SetFilter("Membership Entry No.", '=%1', GMembershipEntryNo);
 
-        MembershipRole.SetFilter ("Member Entry No.", '=%1', "Entry No.");
-        MembershipRole.SetFilter (Blocked, '=%1', false);
-        if (MembershipRole.FindFirst ()) then begin
-          Membership.Get (MembershipRole."Membership Entry No.");
+        MembershipRole.SetFilter("Member Entry No.", '=%1', "Entry No.");
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        if (MembershipRole.FindFirst()) then begin
+            Membership.Get(MembershipRole."Membership Entry No.");
 
-          Membership.CalcFields ("Remaining Points");
-          RemainingPoints := Membership."Remaining Points";
+            Membership.CalcFields("Remaining Points");
+            RemainingPoints := Membership."Remaining Points";
 
-          MembershipRoleDisplay.Get (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
-          MembershipRoleDisplay.CalcFields ("GDPR Approval");
+            MembershipRoleDisplay.Get(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
+            MembershipRoleDisplay.CalcFields("GDPR Approval");
 
-          MembershipManagement.GetMembershipMaxValidUntilDate (MembershipRole."Membership Entry No.", ValidUntilDate);
+            MembershipManagement.GetMembershipMaxValidUntilDate(MembershipRole."Membership Entry No.", ValidUntilDate);
 
-          if (ValidUntilDate <> 0D) then
-            IsAboutToExpire := ((CalcDate ('<-1M>', ValidUntilDate) < Today) and (ValidUntilDate > Today));
+            if (ValidUntilDate <> 0D) then
+                IsAboutToExpire := ((CalcDate('<-1M>', ValidUntilDate) < Today) and (ValidUntilDate > Today));
 
-          if (IsAboutToExpire) then begin
-            MembershipManagement.GetMembershipValidDate (MembershipRole."Membership Entry No.", CalcDate ('<+1D>', ValidUntilDate), ValidFrom2, ValidUntil2);
+            if (IsAboutToExpire) then begin
+                MembershipManagement.GetMembershipValidDate(MembershipRole."Membership Entry No.", CalcDate('<+1D>', ValidUntilDate), ValidFrom2, ValidUntil2);
 
-            if (ValidUntil2 > ValidUntilDate) then begin
-              ValidUntilDate := ValidUntil2;
-              IsAboutToExpire := false;
+                if (ValidUntil2 > ValidUntilDate) then begin
+                    ValidUntilDate := ValidUntil2;
+                    IsAboutToExpire := false;
+                end;
+
             end;
 
-          end;
+            if (ValidUntilDate < Today) then
+                UntilDateAttentionAccent := true;
 
-          if (ValidUntilDate < Today) then
-            UntilDateAttentionAccent := true;
+            if (IsAboutToExpire) then
+                UntilDateAttentionAccent := true;
 
-          if (IsAboutToExpire) then
-            UntilDateAttentionAccent := true;
-
-          OrigAmt := 0;
-          RemainAmt := 0;
-          MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
-          if (MembershipEntry.FindSet ()) then begin
-            repeat
-              if (MembershipManagement.CalculateRemainingAmount (MembershipEntry, OrigAmt, RemainAmt, DueDate)) then begin
-                if (DueDate < Today) then
-                  DueAmount += RemainAmt
-                else
-                  RemainingAmount += RemainAmt;
-              end;
-            until (MembershipEntry.Next () = 0);
-          end;
-          AccentuateDueAmount := (DueAmount > 0);
-          RemainingAmountText := StrSubstNo ('%1 / %2', Format (RemainingAmount,0, '<Precision,2:2><Integer><Decimals>'), Format (DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
+            OrigAmt := 0;
+            RemainAmt := 0;
+            MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
+            if (MembershipEntry.FindSet()) then begin
+                repeat
+                    if (MembershipManagement.CalculateRemainingAmount(MembershipEntry, OrigAmt, RemainAmt, DueDate)) then begin
+                        if (DueDate < Today) then
+                            DueAmount += RemainAmt
+                        else
+                            RemainingAmount += RemainAmt;
+                    end;
+                until (MembershipEntry.Next() = 0);
+            end;
+            AccentuateDueAmount := (DueAmount > 0);
+            RemainingAmountText := StrSubstNo('%1 / %2', Format(RemainingAmount, 0, '<Precision,2:2><Integer><Decimals>'), Format(DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
 
         end;
 
         if (Birthday <> 0D) then
-          IsBirthday := ((Date2DMY (Birthday,1 ) = Date2DMY (Today, 1)) and (Date2DMY (Birthday, 2) = Date2DMY (Today,2 )));
+            IsBirthday := ((Date2DMY(Birthday, 1) = Date2DMY(Today, 1)) and (Date2DMY(Birthday, 2) = Date2DMY(Today, 2)));
 
         IsInvalid := (Blocked);
     end;
@@ -490,7 +509,7 @@ page 6060140 "MM POS Member Card"
     begin
 
         GMembershipEntryNo := MembershipEntryNo;
-        Membership.Get (MembershipEntryNo);
+        Membership.Get(MembershipEntryNo);
     end;
 
     local procedure AddMembershipGuardian()
@@ -505,19 +524,19 @@ page 6060140 "MM POS Member Card"
 
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
-        MemberInfoCapture.Insert ();
+        MemberInfoCapture.Insert();
 
-        MemberInfoCapturePage.SetRecord (MemberInfoCapture);
-        MemberInfoCapture.SetFilter ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
-        MemberInfoCapturePage.SetTableView (MemberInfoCapture);
-        Commit ();
+        MemberInfoCapturePage.SetRecord(MemberInfoCapture);
+        MemberInfoCapture.SetFilter("Entry No.", '=%1', MemberInfoCapture."Entry No.");
+        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+        Commit();
 
-        MemberInfoCapturePage.SetAddMembershipGuardianMode ();
-        MemberInfoCapturePage.LookupMode (true);
-        PageAction := MemberInfoCapturePage.RunModal ();
+        MemberInfoCapturePage.SetAddMembershipGuardianMode();
+        MemberInfoCapturePage.LookupMode(true);
+        PageAction := MemberInfoCapturePage.RunModal();
         if (PageAction = ACTION::LookupOK) then begin
-          MemberInfoCapturePage.GetRecord (MemberInfoCapture);
-          MembershipManagement.AddGuardianMember (Membership."Entry No.", MemberInfoCapture."Guardian External Member No.", MemberInfoCapture."GDPR Approval");
+            MemberInfoCapturePage.GetRecord(MemberInfoCapture);
+            MembershipManagement.AddGuardianMember(Membership."Entry No.", MemberInfoCapture."Guardian External Member No.", MemberInfoCapture."GDPR Approval");
 
         end;
     end;
@@ -530,21 +549,21 @@ page 6060140 "MM POS Member Card"
         MemberInfoCapture: Record "MM Member Info Capture";
     begin
 
-        MembershipEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-        if (MembershipEntry.IsEmpty ()) then begin
-          MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
-          MembershipSalesSetup.SetFilter ("Membership Code", '=%1', Membership."Membership Code");
-          MembershipSalesSetup.SetFilter (Blocked, '=%1', false);
-          MembershipSalesSetup.FindFirst ();
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        if (MembershipEntry.IsEmpty()) then begin
+            MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+            MembershipSalesSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+            MembershipSalesSetup.SetFilter(Blocked, '=%1', false);
+            MembershipSalesSetup.FindFirst();
 
-          MemberInfoCapture.Init;
-          MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+            MemberInfoCapture.Init;
+            MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
 
-          MembershipManagement.AddMembershipLedgerEntry_NEW (Membership."Entry No.", Membership."Issued Date", MembershipSalesSetup, MemberInfoCapture);
+            MembershipManagement.AddMembershipLedgerEntry_NEW(Membership."Entry No.", Membership."Issued Date", MembershipSalesSetup, MemberInfoCapture);
 
         end;
 
-        MembershipManagement.ActivateMembershipLedgerEntry (Membership."Entry No.", Today);
+        MembershipManagement.ActivateMembershipLedgerEntry(Membership."Entry No.", Today);
     end;
 
     local procedure ContactQuestionnaire()
@@ -554,13 +573,13 @@ page 6060140 "MM POS Member Card"
         Contact: Record Contact;
     begin
 
-        if (not MembershipRole.Get (GMembershipEntryNo, Rec."Entry No.")) then
-          Error (NO_QUESTIONNAIR);
+        if (not MembershipRole.Get(GMembershipEntryNo, Rec."Entry No.")) then
+            Error(NO_QUESTIONNAIR);
 
-        if (not Contact.Get (MembershipRole."Contact No.")) then
-          Error (NO_QUESTIONNAIR);
+        if (not Contact.Get(MembershipRole."Contact No.")) then
+            Error(NO_QUESTIONNAIR);
 
-        ProfileManagement.ShowContactQuestionnaireCard (Contact, '', 0);
+        ProfileManagement.ShowContactQuestionnaireCard(Contact, '', 0);
     end;
 
     local procedure CreateMembership()
@@ -569,13 +588,13 @@ page 6060140 "MM POS Member Card"
         MembershipSalesSetupPage: Page "MM Membership Sales Setup";
     begin
 
-        MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
-        if (MembershipSalesSetup.Count () = 1) then begin
-          MembershipSalesSetup.FindFirst ();
-          MembershipSalesSetupPage.CreateMembership (MembershipSalesSetup);
+        MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+        if (MembershipSalesSetup.Count() = 1) then begin
+            MembershipSalesSetup.FindFirst();
+            MembershipSalesSetupPage.CreateMembership(MembershipSalesSetup);
         end else begin
-          MembershipSalesSetupPage.SetTableView (MembershipSalesSetup);
-          MembershipSalesSetupPage.RunModal ();
+            MembershipSalesSetupPage.SetTableView(MembershipSalesSetup);
+            MembershipSalesSetupPage.RunModal();
         end;
     end;
 }

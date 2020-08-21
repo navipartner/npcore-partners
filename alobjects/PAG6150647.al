@@ -15,53 +15,69 @@ page 6150647 "POS Info POS Entry"
         {
             repeater(Group)
             {
-                field("Entry Date";"Entry Date")
+                field("Entry Date"; "Entry Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Line No.";"Sales Line No.")
+                field("Sales Line No."; "Sales Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Type";"Receipt Type")
+                field("Receipt Type"; "Receipt Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Info Code";"POS Info Code")
+                field("POS Info Code"; "POS Info Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Info";"POS Info")
+                field("POS Info"; "POS Info")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field(Price;Price)
+                field(Price; Price)
                 {
+                    ApplicationArea = All;
                 }
-                field("Net Amount";"Net Amount")
+                field("Net Amount"; "Net Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gross Amount";"Gross Amount")
+                field("Gross Amount"; "Gross Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

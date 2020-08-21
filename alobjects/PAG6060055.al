@@ -14,63 +14,78 @@ page 6060055 "Item Worksheet Field Changes"
         {
             repeater(Group)
             {
-                field("Worksheet Template Name";"Worksheet Template Name")
+                field("Worksheet Template Name"; "Worksheet Template Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Worksheet Line No.";"Worksheet Line No.")
+                field("Worksheet Line No."; "Worksheet Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Field Number";"Field Number")
+                field("Field Number"; "Field Number")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Table No. Update";"Target Table No. Update")
+                field("Target Table No. Update"; "Target Table No. Update")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Target Field Number Update";"Target Field Number Update")
+                field("Target Field Number Update"; "Target Field Number Update")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Target Field Name Update";"Target Field Name Update")
+                field("Target Field Name Update"; "Target Field Name Update")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Target Field Caption Update";"Target Field Caption Update")
+                field("Target Field Caption Update"; "Target Field Caption Update")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Value";"Current Value")
+                field("Current Value"; "Current Value")
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = Warning;
                 }
-                field("New Value";"New Value")
+                field("New Value"; "New Value")
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = Warning;
                 }
-                field(Warning;Warning)
+                field(Warning; Warning)
                 {
+                    ApplicationArea = All;
                 }
-                field(Process;Process)
+                field(Process; Process)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

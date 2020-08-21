@@ -33,6 +33,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     Caption = 'Matrix';
                     field(fld_LineFactOption; LineFactOption)
                     {
+                        ApplicationArea = All;
                         Caption = 'Show as Lines';
                         Importance = Promoted;
                         OptionCaption = 'Item,Ticket Type,Admission Date,Admission Hour,Period,Admission Code,Variant Code';
@@ -51,6 +52,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     }
                     field(fld_ColumnFactOption; ColumnFactOption)
                     {
+                        ApplicationArea = All;
                         Caption = 'Show as Columns';
                         Importance = Promoted;
                         OptionCaption = 'Item,Ticket Type,Admission Date,Admission Hour,Period,Admission Code,Variant Code';
@@ -75,6 +77,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     Caption = 'Display';
                     field(fld_FactNameAsColumnHeading; FactNameAsColumnHeading)
                     {
+                        ApplicationArea = All;
                         Caption = 'Fact Name As Column Heading';
                         Importance = Additional;
 
@@ -86,6 +89,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     }
                     field(fld_HideAdmission; HideLinesWithZeroAdmissionCount)
                     {
+                        ApplicationArea = All;
                         Caption = 'Hide Lines having Zero Admitted';
                         Importance = Additional;
 
@@ -103,12 +107,14 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     Caption = 'Metrics';
                     field(VerticalTotalText; VerticalTotalText)
                     {
+                        ApplicationArea = All;
                         Caption = 'Matrix Total';
                         Editable = false;
                         Importance = Promoted;
                     }
                     field(AdmissionDefinition; AdmissionDefinition)
                     {
+                        ApplicationArea = All;
                         Caption = 'Admission Count Def.';
                         Importance = Additional;
                         OptionCaption = 'Admitted Count,Admitted minus Revoked,Admitted incl. Revisits';
@@ -121,6 +127,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     }
                     field(fld_DisplayOption; DisplayOption)
                     {
+                        ApplicationArea = All;
                         Caption = 'Show Value As';
                         Importance = Promoted;
                         OptionCaption = 'Admission Count,Count & Trend,Trend';
@@ -133,6 +140,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     }
                     field(fld_PeriodType; PeriodType)
                     {
+                        ApplicationArea = All;
                         Caption = 'View by';
                         Importance = Additional;
                         OptionCaption = 'Day,Week,Month,Quarter,Year,Accounting Period';
@@ -147,6 +155,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     }
                     field(fld_TrendPeriodType; TrendPeriodType)
                     {
+                        ApplicationArea = All;
                         Caption = 'Trend Period Type';
                         Importance = Additional;
                         OptionCaption = 'Period,Year';
@@ -168,6 +177,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 Caption = 'Matrix Filters';
                 field(ItemFactFilter; ItemFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -186,6 +196,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 }
                 field(TicketTypeFactFilter; TicketTypeFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Ticket Type Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -204,6 +215,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 }
                 field(DateFactFilter; DateFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Date Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -239,6 +251,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 }
                 field(HourFactFilter; HourFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Hour Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -255,6 +268,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 }
                 field(AdmissionCodeFilter; AdmissionCodeFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Admission Code Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -271,6 +285,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 }
                 field(VariantCodeFilter; VariantCodeFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variant Code Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -291,26 +306,31 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 Caption = 'Blocked Facts';
                 field(BlockedItemFactFilter; BlockedItemFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Blocked Item Filter';
                     Editable = false;
                 }
                 field(BlockedTicketTypeFactFilter; BlockedTicketTypeFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Blocked Ticket Type Filter';
                     Editable = false;
                 }
                 field(BlockedHourFactFilter; BlockedHourFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Blocked Hour Filter';
                     Editable = false;
                 }
                 field(BlockedAdmissionFactFilter; BlockedAdmissionFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Blocked Admisson Filter';
                     Editable = false;
                 }
                 field(BlockedVariantFactFilter; BlockedVariantFactFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Blocked Variant Code Filter';
                     Editable = false;
                 }
@@ -333,7 +353,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 begin
 
                     //-TM1.47 [401250]
-                    TicketAccessStatisticsMgr.BuildCompressedStatistics (Today);
+                    TicketAccessStatisticsMgr.BuildCompressedStatistics(Today);
                     UpdateMatrixSubForm;
                     //+TM1.47 [401250]
                 end;

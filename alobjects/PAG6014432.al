@@ -59,7 +59,7 @@ page 6014432 "Audit Roll"
     PageType = List;
     PromotedActionCategories = 'New,Process,Prints,Posting,Test5,Test6,Test7,Test8';
     SourceTable = "Audit Roll";
-    SourceTableView = SORTING("Sale Date","Sales Ticket No.","Sale Type","Line No.")
+    SourceTableView = SORTING("Sale Date", "Sales Ticket No.", "Sale Type", "Line No.")
                       ORDER(Descending);
     UsageCategory = Lists;
 
@@ -67,8 +67,9 @@ page 6014432 "Audit Roll"
     {
         area(content)
         {
-            field(AdvancedPostingWarning;TextAdvancedPosting)
+            field(AdvancedPostingWarning; TextAdvancedPosting)
             {
+                ApplicationArea = All;
                 Caption = 'Advanced Posting Warning';
                 Editable = false;
                 MultiLine = false;
@@ -77,8 +78,9 @@ page 6014432 "Audit Roll"
                 StyleExpr = TRUE;
                 Visible = AdvancedPosting;
             }
-            field(ClicktoSeePOSEntries;ClicktoSeePOSEntries)
+            field(ClicktoSeePOSEntries; ClicktoSeePOSEntries)
             {
+                ApplicationArea = All;
                 Caption = 'Click to See POS Entriies';
                 LookupPageID = "POS Entries";
                 ShowCaption = false;
@@ -92,8 +94,9 @@ page 6014432 "Audit Roll"
                     //+NPR5.38 [301600]
                 end;
             }
-            field(TypeFilter;TypeFilter)
+            field(TypeFilter; TypeFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Type Filter';
                 Visible = false;
 
@@ -101,19 +104,20 @@ page 6014432 "Audit Roll"
                 begin
                     // SalesColor := TRUE;
                     if TypeFilter > TypeFilter::" " then begin
-                      SetRange(Type,TypeFilter - 1);
-                      HideCancelled := false;
+                        SetRange(Type, TypeFilter - 1);
+                        HideCancelled := false;
                     end else begin
-                      SetRange(Type);
-                      HideCancelled := true;
-                      SetFilter(Type,'<>%1',Type::Cancelled);
+                        SetRange(Type);
+                        HideCancelled := true;
+                        SetFilter(Type, '<>%1', Type::Cancelled);
                     end;
 
                     CurrPage.Update(true);
                 end;
             }
-            field(CounterNoFilter;CounterNoFilter)
+            field(CounterNoFilter; CounterNoFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Counter No.Filter';
                 TableRelation = Register."Register No.";
                 Visible = false;
@@ -121,18 +125,19 @@ page 6014432 "Audit Roll"
                 trigger OnValidate()
                 begin
                     if CounterNoFilter <> '' then begin
-                      SetCurrentKey("Register No.","Sales Ticket No.");
-                      SetRange("Register No.",CounterNoFilter)
+                        SetCurrentKey("Register No.", "Sales Ticket No.");
+                        SetRange("Register No.", CounterNoFilter)
                     end else begin
-                      SetRange("Register No.");
-                      SetCurrentKey("Sales Ticket No.");
+                        SetRange("Register No.");
+                        SetCurrentKey("Sales Ticket No.");
                     end;
 
                     CurrPage.Update(false);
                 end;
             }
-            field(SalespersonCodeFilter;SalespersonCodeFilter)
+            field(SalespersonCodeFilter; SalespersonCodeFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Sales Person Code Filter';
                 TableRelation = "Salesperson/Purchaser".Code;
                 Visible = false;
@@ -140,90 +145,94 @@ page 6014432 "Audit Roll"
                 trigger OnValidate()
                 begin
                     if SalespersonCodeFilter <> '' then
-                      SetRange("Salesperson Code",SalespersonCodeFilter)
+                        SetRange("Salesperson Code", SalespersonCodeFilter)
                     else
-                      SetRange("Salesperson Code");
+                        SetRange("Salesperson Code");
 
                     CurrPage.Update(false);
                 end;
             }
-            field(CustomerNoFilter;CustomerNoFilter)
+            field(CustomerNoFilter; CustomerNoFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Customer No. Filter';
                 Visible = false;
 
                 trigger OnValidate()
                 begin
                     if CustomerNoFilter <> '' then
-                      SetRange("Customer No.",CustomerNoFilter)
+                        SetRange("Customer No.", CustomerNoFilter)
                     else
-                      SetRange("Customer No.");
-                     CurrPage.Update(true);
+                        SetRange("Customer No.");
+                    CurrPage.Update(true);
                 end;
             }
-            field(SaleDateFilter;SaleDateFilter)
+            field(SaleDateFilter; SaleDateFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Sales Date Filter';
                 Visible = false;
 
                 trigger OnValidate()
                 begin
                     if SaleDateFilter <> 0D then begin
-                      SetRange("Sale Date",SaleDateFilter);
+                        SetRange("Sale Date", SaleDateFilter);
                     end else begin
-                      SetRange("Sale Date");
+                        SetRange("Sale Date");
                     end;
 
                     CurrPage.Update(true);
                 end;
             }
-            field(HideCancelled;HideCancelled)
+            field(HideCancelled; HideCancelled)
             {
+                ApplicationArea = All;
                 Caption = 'Hide Cancelled';
                 Visible = false;
 
                 trigger OnValidate()
                 begin
                     if HideCancelled then begin
-                      SetFilter(Type,'<>%1',Type::Cancelled);
+                        SetFilter(Type, '<>%1', Type::Cancelled);
                     end else begin
-                      SetRange(Type);
+                        SetRange(Type);
                     end;
 
                     TypeFilter := TypeFilter::" ";
                     CurrPage.Update(true);
                 end;
             }
-            field(PostedFilter;PostedFilter)
+            field(PostedFilter; PostedFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Posted Filter';
                 OptionCaption = ' ,No,Yes';
                 Visible = false;
 
                 trigger OnValidate()
                 begin
-                     /*
-                    CASE Bogf¢rtfilter OF
-                      Bogf¢rtfilter::" " :
-                        SETRANGE(Posted);
-                      Bogf¢rtfilter::No :
-                        SETRANGE(Posted,FALSE);
-                      Bogf¢rtfilter::Yes :
-                        SETRANGE(Posted,TRUE);
-                    END;
-                    */
+                    /*
+                   CASE Bogf¢rtfilter OF
+                     Bogf¢rtfilter::" " :
+                       SETRANGE(Posted);
+                     Bogf¢rtfilter::No :
+                       SETRANGE(Posted,FALSE);
+                     Bogf¢rtfilter::Yes :
+                       SETRANGE(Posted,TRUE);
+                   END;
+                   */
                     if PostedFilter = PostedFilter::" " then begin
-                      SetRange(Posted);
+                        SetRange(Posted);
                     end else begin
-                      if PostedFilter = PostedFilter::No then begin
-                        SetRange(Posted,false);
+                        if PostedFilter = PostedFilter::No then begin
+                            SetRange(Posted, false);
                         end else begin
-                          if PostedFilter = PostedFilter::Yes then begin
-                            SetRange(Posted,true);
-                          end;
-                      end;
+                            if PostedFilter = PostedFilter::Yes then begin
+                                SetRange(Posted, true);
+                            end;
+                        end;
                     end;
-                    
+
                     CurrPage.Update(true);
 
                 end;
@@ -231,133 +240,160 @@ page 6014432 "Audit Roll"
             repeater(Control6150622)
             {
                 ShowCaption = false;
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                     StyleExpr = StyleExpr;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = FieldRegisterNo;
                     StyleExpr = StyleExpr;
                 }
-                field("Sale Type";"Sale Type")
+                field("Sale Type"; "Sale Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Sale Date";"Sale Date")
+                field("Sale Date"; "Sale Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Closing Time";"Closing Time")
+                field("Closing Time"; "Closing Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Gift voucher ref.";"Gift voucher ref.")
+                field("Gift voucher ref."; "Gift voucher ref.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     Visible = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field(Posted;Posted)
+                field(Posted; Posted)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Item Entry Posted";"Item Entry Posted")
+                field("Item Entry Posted"; "Item Entry Posted")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Line Discount Amount";"Line Discount Amount")
+                field("Line Discount Amount"; "Line Discount Amount")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("VAT %";"VAT %")
+                field("VAT %"; "VAT %")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("<Item Entry Posted1>";"Item Entry Posted")
+                field("<Item Entry Posted1>"; "Item Entry Posted")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field(Offline;Offline)
+                field(Offline; Offline)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                 }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Authorised by";"Discount Authorised by")
+                field("Discount Authorised by"; "Discount Authorised by")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Reason Code";"Reason Code")
+                field("Reason Code"; "Reason Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
-            usercontrol(PingPong;"Microsoft.Dynamics.Nav.Client.PingPong")
+            usercontrol(PingPong; "Microsoft.Dynamics.Nav.Client.PingPong")
             {
 
                 trigger AddInReady()
@@ -406,10 +442,10 @@ page 6014432 "Audit Roll"
                         //
                         // Revisionsrulle.SETRANGE( "Cash Terminal Approved");
                         //+NPR5.34 [283125]
-                        
+
                         /** Print receipt **/
                         if (Type = Type::"Open/Close") or (Type = Type::Cancelled) then
-                          Error(Text10600005);
+                            Error(Text10600005);
                         AuditRollGlobal.Reset;
                         //CurrPage.SETSELECTIONFILTER(Revisionsrulle);
                         AuditRollGlobal := Rec;
@@ -421,7 +457,7 @@ page 6014432 "Audit Roll"
                         AuditRollGlobal.SetRange("No.");
                         //Revisionsrulle.IncrementCount; //MIJ. Done in std. codeunit code
                         //Revisionsrulle.UdskrivBon( FALSE );
-                        StdCodeunitCode.PrintReceipt(AuditRollGlobal,true);
+                        StdCodeunitCode.PrintReceipt(AuditRollGlobal, true);
 
                     end;
                 }
@@ -448,9 +484,9 @@ page 6014432 "Audit Roll"
                         Revisionsrulle.IncrementCount;
                         Revisionsrulle.UdskrivBonA4(FALSE);
                         */
-                        
+
                         if (Type = Type::"Open/Close") or (Type = Type::Cancelled) then
-                          Error(Text10600005);
+                            Error(Text10600005);
                         AuditRoll.Reset;
                         AuditRoll := Rec;
                         AuditRoll.SetRecFilter;
@@ -473,14 +509,14 @@ page 6014432 "Audit Roll"
                     var
                         AuditRoll3: Record "Audit Roll";
                     begin
-                        AuditRoll3.SetRange("Sales Ticket No.","Sales Ticket No.");
+                        AuditRoll3.SetRange("Sales Ticket No.", "Sales Ticket No.");
                         AuditRoll3.Find('-');
-                        AuditRoll3.TestField("Sale Type","Sale Type"::"Debit Sale");
+                        AuditRoll3.TestField("Sale Type", "Sale Type"::"Debit Sale");
                         AuditRoll3.TestField("Allocated No.");
                         //TESTFIELD("Document No.");
                         //Salgsfakturahoved.GET("Document No.");
                         SalesInvoiceHeader.FilterGroup := 2;
-                        SalesInvoiceHeader.SetRange("Pre-Assigned No.","Sales Ticket No.");
+                        SalesInvoiceHeader.SetRange("Pre-Assigned No.", "Sales Ticket No.");
                         SalesInvoiceHeader.Find('-');
                         SalesInvoiceHeader.FilterGroup := 0;
                         //Salgsfakturahoved.SETRANGE("No.","Document No.");
@@ -499,16 +535,16 @@ page 6014432 "Audit Roll"
                     var
                         RetailSalesCode: Codeunit "Retail Sales Code";
                     begin
-                        AuditRollGlobal.SetRange("Sales Ticket No.","Sales Ticket No.");
-                        AuditRollGlobal.SetRange("Register No.","Register No.");
-                        AuditRollGlobal.SetRange("Sale Date","Sale Date");
+                        AuditRollGlobal.SetRange("Sales Ticket No.", "Sales Ticket No.");
+                        AuditRollGlobal.SetRange("Register No.", "Register No.");
+                        AuditRollGlobal.SetRange("Sale Date", "Sale Date");
 
                         if (AuditRollGlobal.Count <> 0) then begin
-                          if AuditRollGlobal.FindFirst() then;
-                          AuditRollGlobal.SetRecFilter();
-                          RetailSalesCode.Run(AuditRollGlobal);
+                            if AuditRollGlobal.FindFirst() then;
+                            AuditRollGlobal.SetRecFilter();
+                            RetailSalesCode.Run(AuditRollGlobal);
                         end else
-                          Message(Text10600007);
+                            Message(Text10600007);
                     end;
                 }
                 action("Insurance Offer")
@@ -518,7 +554,7 @@ page 6014432 "Audit Roll"
 
                     trigger OnAction()
                     begin
-                        RetailContractMgt.PrintInsurance("Register No.","Sales Ticket No.",true);
+                        RetailContractMgt.PrintInsurance("Register No.", "Sales Ticket No.", true);
                     end;
                 }
                 action("Retail Order")
@@ -531,8 +567,8 @@ page 6014432 "Audit Roll"
                         RetailDocumentHeader: Record "Retail Document Header";
                     begin
                         RetailDocumentHeader.Reset;
-                        RetailDocumentHeader.SetRange("Document Type",RetailDocumentHeader."Document Type"::"Retail Order");
-                        RetailDocumentHeader.SetRange("No.","Retail Document No.");
+                        RetailDocumentHeader.SetRange("Document Type", RetailDocumentHeader."Document Type"::"Retail Order");
+                        RetailDocumentHeader.SetRange("No.", "Retail Document No.");
                         RetailDocumentHeader.Find('-');
                         RetailDocumentHeader.PrintRetailDocument(false);
                     end;
@@ -625,8 +661,8 @@ page 6014432 "Audit Roll"
                         TaxFreeVoucher: Record "Tax Free Voucher";
                         TaxFreeMgt: Codeunit "Tax Free Handler Mgt.";
                     begin
-                        if (Type=Type::"Open/Close") or (Type=Type::Cancelled) then
-                          Error(Text10600005);
+                        if (Type = Type::"Open/Close") or (Type = Type::Cancelled) then
+                            Error(Text10600005);
                         AuditRollGlobal.Reset;
                         CurrPage.SetSelectionFilter(AuditRollGlobal);
                         AuditRollGlobal.MarkedOnly(false);
@@ -681,9 +717,9 @@ page 6014432 "Audit Roll"
                         EFTTransactionRequest.SetRange("Sales Ticket No.", "Sales Ticket No.");
                         EFTTransactionRequest.SetRange("Register No.", "Register No.");
                         if EFTTransactionRequest.FindSet then
-                          repeat
-                            EFTTransactionRequest.PrintReceipts(true);
-                          until EFTTransactionRequest.Next = 0;
+                            repeat
+                                EFTTransactionRequest.PrintReceipts(true);
+                            until EFTTransactionRequest.Next = 0;
                         //+NPR5.46 [290734]
                     end;
                 }
@@ -696,16 +732,16 @@ page 6014432 "Audit Roll"
                     begin
                         CreditCardTransaction.Reset;
                         CreditCardTransaction.FilterGroup := 2;
-                        CreditCardTransaction.SetCurrentKey("Register No.","Sales Ticket No.",Date);
-                        CreditCardTransaction.SetRange("Register No.","Register No.");
-                        CreditCardTransaction.SetRange("Sales Ticket No.","Sales Ticket No.");
-                        CreditCardTransaction.SetRange(Date,"Sale Date");
+                        CreditCardTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", Date);
+                        CreditCardTransaction.SetRange("Register No.", "Register No.");
+                        CreditCardTransaction.SetRange("Sales Ticket No.", "Sales Ticket No.");
+                        CreditCardTransaction.SetRange(Date, "Sale Date");
                         CreditCardTransaction.FilterGroup := 0;
                         if CreditCardTransaction.Find('-') then
-                          //FORM.RUNMODAL(FORM::"Credit card transaction ticket",Dankorttransaktion)
-                          PAGE.RunModal(PAGE::"Credit card transaction ticket",CreditCardTransaction)
+                            //FORM.RUNMODAL(FORM::"Credit card transaction ticket",Dankorttransaktion)
+                            PAGE.RunModal(PAGE::"Credit card transaction ticket", CreditCardTransaction)
                         else
-                          Message(Text10600006,"Sales Ticket No.","Register No.");
+                            Message(Text10600006, "Sales Ticket No.", "Register No.");
                     end;
                 }
                 action("EFT Transaction Requests")
@@ -713,7 +749,7 @@ page 6014432 "Audit Roll"
                     Caption = 'EFT Transaction Requests';
                     Image = CreditCardLog;
                     RunObject = Page "EFT Transaction Requests";
-                    RunPageLink = "Sales Ticket No."=FIELD("Sales Ticket No.");
+                    RunPageLink = "Sales Ticket No." = FIELD("Sales Ticket No.");
                 }
             }
             group(Functions)
@@ -797,33 +833,33 @@ page 6014432 "Audit Roll"
                         SalesTicketNo: Code[20];
                     begin
                         if "Sales Ticket No." = '' then
-                          Error(Text10600004);
+                            Error(Text10600004);
                         SalesTicketNo := "Sales Ticket No.";
                         case "Document Type" of
-                          "Document Type"::Invoice:
-                            begin
-                              SalesInvoiceHeader.FilterGroup := 2;
-                              SalesInvoiceHeader.SetRange("Pre-Assigned No.",SalesTicketNo);
-                              SalesInvoiceHeader.FilterGroup := 0;
-                              //FORM.RUNMODAL(FORM::"Posted Sales Invoice",Salgsfakturahoved);
-                              PAGE.RunModal(PAGE::"Posted Sales Invoice",SalesInvoiceHeader);
-                            end;
-                          "Document Type"::Order:
-                            begin
-                              SalesShipmentHeader.FilterGroup := 2;
-                              SalesShipmentHeader.SetRange("Sales Ticket No.",SalesTicketNo);
-                              SalesShipmentHeader.FilterGroup := 0;
-                              //FORM.RUNMODAL(FORM::"Posted Sales Shipment", SalgsLevHoved);
-                              PAGE.RunModal(PAGE::"Posted Sales Shipment",SalesShipmentHeader);
-                            end;
-                          "Document Type"::"Credit Memo":
-                            begin
-                              SalesCrMemoHeader.FilterGroup := 2;
-                              SalesCrMemoHeader.SetRange("Pre-Assigned No.",SalesTicketNo);
-                              SalesCrMemoHeader.FilterGroup := 0;
-                              //FORM.RUNMODAL(FORM::"Posted Sales Credit Memo", SalgsKreditnotaHoved);
-                              PAGE.RunModal(PAGE::"Posted Sales Credit Memo",SalesCrMemoHeader);
-                            end;
+                            "Document Type"::Invoice:
+                                begin
+                                    SalesInvoiceHeader.FilterGroup := 2;
+                                    SalesInvoiceHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
+                                    SalesInvoiceHeader.FilterGroup := 0;
+                                    //FORM.RUNMODAL(FORM::"Posted Sales Invoice",Salgsfakturahoved);
+                                    PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
+                                end;
+                            "Document Type"::Order:
+                                begin
+                                    SalesShipmentHeader.FilterGroup := 2;
+                                    SalesShipmentHeader.SetRange("Sales Ticket No.", SalesTicketNo);
+                                    SalesShipmentHeader.FilterGroup := 0;
+                                    //FORM.RUNMODAL(FORM::"Posted Sales Shipment", SalgsLevHoved);
+                                    PAGE.RunModal(PAGE::"Posted Sales Shipment", SalesShipmentHeader);
+                                end;
+                            "Document Type"::"Credit Memo":
+                                begin
+                                    SalesCrMemoHeader.FilterGroup := 2;
+                                    SalesCrMemoHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
+                                    SalesCrMemoHeader.FilterGroup := 0;
+                                    //FORM.RUNMODAL(FORM::"Posted Sales Credit Memo", SalgsKreditnotaHoved);
+                                    PAGE.RunModal(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
+                                end;
                         end;
                     end;
                 }
@@ -832,8 +868,8 @@ page 6014432 "Audit Roll"
                     Caption = 'Show Period';
                     Image = Period;
                     RunObject = Page Periods;
-                    RunPageLink = "Sales Ticket No."=FIELD("Sales Ticket No."),
-                                  "Register No."=FIELD("Register No.");
+                    RunPageLink = "Sales Ticket No." = FIELD("Sales Ticket No."),
+                                  "Register No." = FIELD("Register No.");
                 }
                 action("&Navigate")
                 {
@@ -844,7 +880,7 @@ page 6014432 "Audit Roll"
                     var
                         Navigate: Page Navigate;
                     begin
-                        Navigate.SetDoc("Sale Date","Posted Doc. No.");
+                        Navigate.SetDoc("Sale Date", "Posted Doc. No.");
                         Navigate.Run;
                     end;
                 }
@@ -881,9 +917,9 @@ page 6014432 "Audit Roll"
                         RetailComment: Record "Retail Comment";
                         RetailComments: Page "Retail Comments";
                     begin
-                        RetailComment.SetRange("Table ID",DATABASE::"Audit Roll");
-                        RetailComment.SetRange("No.","Register No.");
-                        RetailComment.SetRange("No. 2","Sales Ticket No.");
+                        RetailComment.SetRange("Table ID", DATABASE::"Audit Roll");
+                        RetailComment.SetRange("No.", "Register No.");
+                        RetailComment.SetRange("No. 2", "Sales Ticket No.");
                         RetailComments.SetTableView(RetailComment);
                         RetailComments.Editable(false);
                         RetailComments.RunModal;
@@ -894,8 +930,8 @@ page 6014432 "Audit Roll"
                     Caption = 'POS Info';
                     Image = Info;
                     RunObject = Page "POS Info Audit Roll";
-                    RunPageLink = "Register No."=FIELD("Register No."),
-                                  "Sales Ticket No."=FIELD("Sales Ticket No.");
+                    RunPageLink = "Register No." = FIELD("Register No."),
+                                  "Sales Ticket No." = FIELD("Sales Ticket No.");
                 }
                 action("POS Entry")
                 {
@@ -909,12 +945,12 @@ page 6014432 "Audit Roll"
                         POSEntryList: Page "POS Entry List";
                     begin
                         //-NPR5.38 [295255]
-                        AuditRolltoPOSEntryLink.SetRange("Audit Roll Clustered Key","Clustered Key");
+                        AuditRolltoPOSEntryLink.SetRange("Audit Roll Clustered Key", "Clustered Key");
                         if AuditRolltoPOSEntryLink.FindFirst then begin
-                          POSEntry.SetRange("Entry No.",AuditRolltoPOSEntryLink."POS Entry No.");
-                          Clear(POSEntryList);
-                          POSEntryList.SetTableView(POSEntry);
-                          POSEntryList.Run;
+                            POSEntry.SetRange("Entry No.", AuditRolltoPOSEntryLink."POS Entry No.");
+                            Clear(POSEntryList);
+                            POSEntryList.SetTableView(POSEntry);
+                            POSEntryList.Run;
                         end;
                         //+NPR5.38 [295255]
                     end;
@@ -946,9 +982,9 @@ page 6014432 "Audit Roll"
                         AuditRoll.CopyFilters(Rec);
 
                         if AuditRoll.Find('-') then
-                          repeat
-                            Sum += AuditRoll."Amount Including VAT";
-                          until AuditRoll.Next = 0;
+                            repeat
+                                Sum += AuditRoll."Amount Including VAT";
+                            until AuditRoll.Next = 0;
 
                         Message(Format(Sum));
 
@@ -966,13 +1002,13 @@ page 6014432 "Audit Roll"
                         AuditRollGlobal.Reset;
                         AuditRollGlobal.FilterGroup := 2;
 
-                        AuditRollGlobal.SetRange("Register No.","Register No.");
-                        AuditRollGlobal.SetRange("Sales Ticket No.","Sales Ticket No.");
-                        AuditRollGlobal.SetRange("Sale Type","Sale Type"::Sale);
-                        AuditRollGlobal.SetRange("Sale Date","Sale Date");
+                        AuditRollGlobal.SetRange("Register No.", "Register No.");
+                        AuditRollGlobal.SetRange("Sales Ticket No.", "Sales Ticket No.");
+                        AuditRollGlobal.SetRange("Sale Type", "Sale Type"::Sale);
+                        AuditRollGlobal.SetRange("Sale Date", "Sale Date");
                         AuditRollGlobal.FilterGroup := 0;
                         //FORM.RUNMODAL(FORM::"Revisionsrulle Statistik",Revisionsrulle);
-                        PAGE.RunModal(PAGE::"Audit Roll Statistics",AuditRollGlobal);
+                        PAGE.RunModal(PAGE::"Audit Roll Statistics", AuditRollGlobal);
                     end;
                 }
                 action("Advanced Sales Statistics")
@@ -990,14 +1026,14 @@ page 6014432 "Audit Roll"
                     begin
                         AuditRollGlobal.Reset;
                         AuditRollGlobal.FilterGroup := 2;
-                        AuditRollGlobal.SetCurrentKey("Sale Date","Sale Type");
+                        AuditRollGlobal.SetCurrentKey("Sale Date", "Sale Type");
                         AuditRollGlobal.SetRange("Register No.");
                         AuditRollGlobal.SetRange("Sales Ticket No.");
-                        AuditRollGlobal.SetRange("Sale Type","Sale Type"::Sale);
-                        AuditRollGlobal.SetRange("Sale Date",Today);
+                        AuditRollGlobal.SetRange("Sale Type", "Sale Type"::Sale);
+                        AuditRollGlobal.SetRange("Sale Date", Today);
                         AuditRollGlobal.FilterGroup := 0;
                         //FORM.RUNMODAL(FORM::"Revisionsrulle Statistik",Revisionsrulle);
-                        PAGE.RunModal(PAGE::"Audit Roll Statistics",AuditRollGlobal);
+                        PAGE.RunModal(PAGE::"Audit Roll Statistics", AuditRollGlobal);
                     end;
                 }
             }
@@ -1029,7 +1065,7 @@ page 6014432 "Audit Roll"
         DoUpdate := true;
 
         if TempAuditRollArray[1]."Sales Ticket No." <> TempAuditRollArray[2]."Sales Ticket No." then
-          CurrPage.PingPong.Ping(1);
+            CurrPage.PingPong.Ping(1);
     end;
 
     trigger OnAfterGetRecord()
@@ -1045,18 +1081,18 @@ page 6014432 "Audit Roll"
     begin
         //-NPR5.48 [318531]
         if GetFilter(Type) = '' then
-        //+NPR5.48 [318531]
-        //-NPR5.22
-        SetFilter(Type,'<>%1',Type::Cancelled);
+            //+NPR5.48 [318531]
+            //-NPR5.22
+            SetFilter(Type, '<>%1', Type::Cancelled);
         //+NPR5.22
-        
+
         //-NPR5.23 [242105]
         //IF FIND('+') THEN;
         if FindFirst then;
         //+NPR5.23 [242105]
-        
+
         SelectedTicketNo := "Sales Ticket No.";
-        
+
         /*IF NOT extFilters THEN BEGIN
           CASE Filter[2] OF
             Filter::Hængende : BEGIN
@@ -1076,10 +1112,10 @@ page 6014432 "Audit Roll"
             END;
           END;
         END;*/
-        
+
         //-NPR5.38 [301600]
         if NPRetailSetup.Get then
-          AdvancedPosting := NPRetailSetup."Advanced Posting Activated";
+            AdvancedPosting := NPRetailSetup."Advanced Posting Activated";
         //+NPR5.38 [301600]
 
     end;
@@ -1087,16 +1123,16 @@ page 6014432 "Audit Roll"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if Filter[2] = Filter::Payment then begin
-          Filter[1] := PaymentEntries();
-          CurrPage.Update(false);
-          //CurrForm.UPDATE(FALSE);
-          exit(false);
+            Filter[1] := PaymentEntries();
+            CurrPage.Update(false);
+            //CurrForm.UPDATE(FALSE);
+            exit(false);
         end;
         if Filter[2] = Filter::Deposit then begin
-          Filter[1] := DepositEntries();
-          //CurrForm.UPDATE(FALSE);
-          CurrPage.Update(true);
-          exit(false);
+            Filter[1] := DepositEntries();
+            //CurrForm.UPDATE(FALSE);
+            CurrPage.Update(true);
+            exit(false);
         end;
     end;
 
@@ -1106,12 +1142,12 @@ page 6014432 "Audit Roll"
         SalesShipmentHeader: Record "Sales Shipment Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         CreditCardTransaction: Record "EFT Receipt";
-        TempAuditRollArray: array [2] of Record "Audit Roll" temporary;
+        TempAuditRollArray: array[2] of Record "Audit Roll" temporary;
         RetailContractMgt: Codeunit "Retail Contract Mgt.";
         CounterNoFilter: Code[10];
         SalespersonCodeFilter: Code[10];
         CustomerNoFilter: Code[20];
-        "Filter": array [2] of Option " ",Payment,Deposit;
+        "Filter": array[2] of Option " ",Payment,Deposit;
         TypeFilter: Option " ","G/L",Item,Payment,"Open/Close",Customer,"Debit Sale",Cancelled,Comment;
         PostedFilter: Option " ",No,Yes;
         FindLast: Option " ",No,Yes;
@@ -1141,32 +1177,32 @@ page 6014432 "Audit Roll"
         PostDocNo: Code[20];
     begin
         //PostReceipt
-        
+
         AuditRoll4 := Rec;
-        AuditRoll4.SetCurrentKey("Register No.","Sales Ticket No.");
-        AuditRoll4.SetRange("Register No.","Register No.");
-        AuditRoll4.SetRange("Sales Ticket No.","Sales Ticket No.");
-        if Confirm(TX001,true,AuditRoll4.GetFilters) then begin
-          /* FINANCES */
-          AuditRollPosting.DeleteAll;
-          AuditRollPosting.TransferFromRevSilent(AuditRoll4,AuditRollPosting);
-          //-NPR5.51 [343685]
-          //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
-          PostDocNo := PostTempAuditRoll.GetNewPostingNo(true);
-          PostTempAuditRoll.SetPostingNo(PostDocNo);
-          //+NPR5.51 [343685]
-          PostTempAuditRoll.RunPost(AuditRollPosting);
-          AuditRollPosting.UpdateChangesSilent;
-        
-          /* ITEM LEDGER ENTRIES */
-          AuditRollPosting.DeleteAll;
-          AuditRollPosting.TransferFromRevSilentItemLedg(AuditRoll4,AuditRollPosting);
-          //-NPR5.51 [343685]
-          //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
-          PostTempAuditRoll.SetPostingNo(PostDocNo);
-          //+NPR5.51 [343685]
-          PostTempAuditRoll.RunPostItemLedger(AuditRollPosting);
-          AuditRollPosting.UpdateChangesSilent;
+        AuditRoll4.SetCurrentKey("Register No.", "Sales Ticket No.");
+        AuditRoll4.SetRange("Register No.", "Register No.");
+        AuditRoll4.SetRange("Sales Ticket No.", "Sales Ticket No.");
+        if Confirm(TX001, true, AuditRoll4.GetFilters) then begin
+            /* FINANCES */
+            AuditRollPosting.DeleteAll;
+            AuditRollPosting.TransferFromRevSilent(AuditRoll4, AuditRollPosting);
+            //-NPR5.51 [343685]
+            //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
+            PostDocNo := PostTempAuditRoll.GetNewPostingNo(true);
+            PostTempAuditRoll.SetPostingNo(PostDocNo);
+            //+NPR5.51 [343685]
+            PostTempAuditRoll.RunPost(AuditRollPosting);
+            AuditRollPosting.UpdateChangesSilent;
+
+            /* ITEM LEDGER ENTRIES */
+            AuditRollPosting.DeleteAll;
+            AuditRollPosting.TransferFromRevSilentItemLedg(AuditRoll4, AuditRollPosting);
+            //-NPR5.51 [343685]
+            //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
+            PostTempAuditRoll.SetPostingNo(PostDocNo);
+            //+NPR5.51 [343685]
+            PostTempAuditRoll.RunPostItemLedger(AuditRollPosting);
+            AuditRollPosting.UpdateChangesSilent;
         end;
 
     end;
@@ -1195,30 +1231,30 @@ page 6014432 "Audit Roll"
         //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
 
         case Filter[2] of
-          Filter::Payment:
-            begin
-              Filter[2] := Filter::" ";
-              Rec.CopyFilters(TempAuditRollArray[1]);
-              //CurrForm."Register No.".ACTIVATE;
-              //CurrForm.UPDATE(TRUE);
-              exit(Filter[2]);
-            end;
-          Filter::" ":
-            begin
-              Filter[2] := Filter::Payment;
-              NPRetail.Get;
-              FilterGroup(2);
-              TempAuditRollArray[1].CopyFilters(Rec);
-              Reset;
-              SetRange(Type,Type::"G/L");
-              SetRange("Sale Type","Sale Type"::"Out payment");
-              SetRange(Posted,false);
-              SetRange("No.",'*');
-              FilterGroup(0);
-              //CurrForm.UPDATE(TRUE);
-              //CurrForm."No.".ACTIVATE;
-              exit(Filter[2]);
-            end;
+            Filter::Payment:
+                begin
+                    Filter[2] := Filter::" ";
+                    Rec.CopyFilters(TempAuditRollArray[1]);
+                    //CurrForm."Register No.".ACTIVATE;
+                    //CurrForm.UPDATE(TRUE);
+                    exit(Filter[2]);
+                end;
+            Filter::" ":
+                begin
+                    Filter[2] := Filter::Payment;
+                    NPRetail.Get;
+                    FilterGroup(2);
+                    TempAuditRollArray[1].CopyFilters(Rec);
+                    Reset;
+                    SetRange(Type, Type::"G/L");
+                    SetRange("Sale Type", "Sale Type"::"Out payment");
+                    SetRange(Posted, false);
+                    SetRange("No.", '*');
+                    FilterGroup(0);
+                    //CurrForm.UPDATE(TRUE);
+                    //CurrForm."No.".ACTIVATE;
+                    exit(Filter[2]);
+                end;
         end;
     end;
 
@@ -1232,31 +1268,31 @@ page 6014432 "Audit Roll"
         //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
 
         case Filter[2] of
-          Filter::Deposit:
-            begin
-              Filter[2] := Filter::" ";
-              Rec.CopyFilters(TempAuditRollArray[1]);
-              //CurrForm."Register No.".ACTIVATE;
-              //CurrForm.UPDATE(TRUE);
-              exit(Filter[2]);
-            end;
-          Filter::" ":
-            begin
-              Filter[2] := Filter::Deposit;
-              NPRetail.Get;
-              FilterGroup(2);
-              TempAuditRollArray[1].CopyFilters(Rec);
-              Reset;
-              SetRange(Type,Type::Customer);
-              SetRange("Sale Type","Sale Type"::Deposit);
-              SetRange(Posted,false);
-              SetRange("No.",'*');
-              FilterGroup(0);
-              //CurrForm.UPDATE(TRUE);
-              CurrPage.Update(true);
-              //CurrForm."No.".ACTIVATE;
-              exit(Filter[2]);
-            end;
+            Filter::Deposit:
+                begin
+                    Filter[2] := Filter::" ";
+                    Rec.CopyFilters(TempAuditRollArray[1]);
+                    //CurrForm."Register No.".ACTIVATE;
+                    //CurrForm.UPDATE(TRUE);
+                    exit(Filter[2]);
+                end;
+            Filter::" ":
+                begin
+                    Filter[2] := Filter::Deposit;
+                    NPRetail.Get;
+                    FilterGroup(2);
+                    TempAuditRollArray[1].CopyFilters(Rec);
+                    Reset;
+                    SetRange(Type, Type::Customer);
+                    SetRange("Sale Type", "Sale Type"::Deposit);
+                    SetRange(Posted, false);
+                    SetRange("No.", '*');
+                    FilterGroup(0);
+                    //CurrForm.UPDATE(TRUE);
+                    CurrPage.Update(true);
+                    //CurrForm."No.".ACTIVATE;
+                    exit(Filter[2]);
+                end;
         end;
     end;
 
@@ -1269,11 +1305,12 @@ page 6014432 "Audit Roll"
     procedure SetStyleExpression()
     begin
         if Type = Type::"Open/Close" then
-          StyleExpr := 'Strong'
-        else if ("Sales Ticket No." = SelectedTicketNo) then
-          StyleExpr := 'StrongAccent'
+            StyleExpr := 'Strong'
         else
-          StyleExpr := 'None'
+            if ("Sales Ticket No." = SelectedTicketNo) then
+                StyleExpr := 'StrongAccent'
+            else
+                StyleExpr := 'None'
     end;
 }
 

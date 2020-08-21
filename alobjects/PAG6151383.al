@@ -17,69 +17,87 @@ page 6151383 "CS Stock-Take Rfid Card"
             group(General)
             {
                 Caption = 'General';
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Function";"Request Function")
+                field("Request Function"; "Request Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch Id";"Batch Id")
+                field("Batch Id"; "Batch Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch No.";"Batch No.")
+                field("Batch No."; "Batch No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Device Id";"Device Id")
+                field("Device Id"; "Device Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Tags;Tags)
+                field(Tags; Tags)
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch Posting";"Batch Posting")
+                field("Batch Posting"; "Batch Posting")
                 {
+                    ApplicationArea = All;
                 }
-                field(Handled;Handled)
+                field(Handled; Handled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Posting)
             {
                 Caption = 'Posting';
-                field("Posting Started";"Posting Started")
+                field("Posting Started"; "Posting Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Ended";"Posting Ended")
+                field("Posting Ended"; "Posting Ended")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Error";"Posting Error")
+                field("Posting Error"; "Posting Error")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Error Detail";"Posting Error Detail")
+                field("Posting Error Detail"; "Posting Error Detail")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Data)
             {
                 Caption = 'Data';
-                field(RequestData;RequestData)
+                field(RequestData; RequestData)
                 {
+                    ApplicationArea = All;
                     MultiLine = true;
                     ShowCaption = false;
                 }
-                field(ResponseData;ResponseData)
+                field(ResponseData; ResponseData)
                 {
+                    ApplicationArea = All;
                     MultiLine = true;
                     ShowCaption = false;
                 }
@@ -111,20 +129,20 @@ page 6151383 "CS Stock-Take Rfid Card"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Request Data","Response Data");
+        CalcFields("Request Data", "Response Data");
 
         if not "Request Data".HasValue then
-          RequestData := ''
+            RequestData := ''
         else begin
-          "Request Data".CreateInStream(IStream);
-          IStream.Read(RequestData,MaxStrLen(RequestData));
+            "Request Data".CreateInStream(IStream);
+            IStream.Read(RequestData, MaxStrLen(RequestData));
         end;
 
         if not "Response Data".HasValue then
-          ResponseData := ''
+            ResponseData := ''
         else begin
-          "Response Data".CreateInStream(IStream);
-          IStream.Read(ResponseData,MaxStrLen(RequestData));
+            "Response Data".CreateInStream(IStream);
+            IStream.Read(ResponseData, MaxStrLen(RequestData));
         end;
     end;
 

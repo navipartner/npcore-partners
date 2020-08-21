@@ -18,41 +18,53 @@ page 6151426 "Magento Custom Option List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field(Required;Required)
+                field(Required; Required)
                 {
+                    ApplicationArea = All;
                 }
-                field("Max Length";"Max Length")
+                field("Max Length"; "Max Length")
                 {
+                    ApplicationArea = All;
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                 }
-                field(Price;Price)
+                field(Price; Price)
                 {
+                    ApplicationArea = All;
                 }
-                field("Price Type";"Price Type")
+                field("Price Type"; "Price Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Type";"Sales Type")
+                field("Sales Type"; "Sales Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales No.";"Sales No.")
+                field("Sales No."; "Sales No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Count";"Item Count")
+                field("Item Count"; "Item Count")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

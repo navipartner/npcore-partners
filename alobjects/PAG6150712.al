@@ -11,51 +11,64 @@ page 6150712 "POS Default Views"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Filter";"Salesperson Filter")
+                field("Salesperson Filter"; "Salesperson Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register Filter";"Register Filter")
+                field("Register Filter"; "Register Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Monday;Monday)
+                field(Monday; Monday)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Tuesday;Tuesday)
+                field(Tuesday; Tuesday)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Wednesday;Wednesday)
+                field(Wednesday; Wednesday)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Thursday;Thursday)
+                field(Thursday; Thursday)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Friday;Friday)
+                field(Friday; Friday)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Saturday;Saturday)
+                field(Saturday; Saturday)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Sunday;Sunday)
+                field(Sunday; Sunday)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("POS View Code";"POS View Code")
+                field("POS View Code"; "POS View Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -13,50 +13,65 @@ page 6060054 "Item Worksheet Field Setup"
         {
             repeater(Group)
             {
-                field("Worksheet Template Name";"Worksheet Template Name")
+                field("Worksheet Template Name"; "Worksheet Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Number";"Field Number")
+                field("Field Number"; "Field Number")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Field Number Create";"Target Field Number Create")
+                field("Target Field Number Create"; "Target Field Number Create")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Field Name Create";"Target Field Name Create")
+                field("Target Field Name Create"; "Target Field Name Create")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Field Caption Create";"Target Field Caption Create")
+                field("Target Field Caption Create"; "Target Field Caption Create")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Field Number Update";"Target Field Number Update")
+                field("Target Field Number Update"; "Target Field Number Update")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Field Name Update";"Target Field Name Update")
+                field("Target Field Name Update"; "Target Field Name Update")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Field Caption Update";"Target Field Caption Update")
+                field("Target Field Caption Update"; "Target Field Caption Update")
                 {
+                    ApplicationArea = All;
                 }
-                field("Process Create";"Process Create")
+                field("Process Create"; "Process Create")
                 {
+                    ApplicationArea = All;
                 }
-                field("Process Update";"Process Update")
+                field("Process Update"; "Process Update")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Value for Create";"Default Value for Create")
+                field("Default Value for Create"; "Default Value for Create")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mapped Values";"Mapped Values")
+                field("Mapped Values"; "Mapped Values")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -71,11 +86,11 @@ page 6060054 "Item Worksheet Field Setup"
                 Caption = 'Field Value Map';
                 Image = MapDimensions;
                 RunObject = Page "Item Worksheet Field Mapping";
-                RunPageLink = "Worksheet Template Name"=FIELD("Worksheet Template Name"),
-                              "Worksheet Name"=FIELD("Worksheet Name"),
-                              "Table No."=FIELD("Table No."),
-                              "Field Number"=FIELD("Field Number");
-                RunPageView = SORTING("Worksheet Template Name","Worksheet Name","Table No.","Field Number","Source Value")
+                RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
+                              "Worksheet Name" = FIELD("Worksheet Name"),
+                              "Table No." = FIELD("Table No."),
+                              "Field Number" = FIELD("Field Number");
+                RunPageView = SORTING("Worksheet Template Name", "Worksheet Name", "Table No.", "Field Number", "Source Value")
                               ORDER(Ascending);
             }
         }

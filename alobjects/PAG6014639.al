@@ -20,31 +20,37 @@ page 6014639 "RP Template List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Printer Type";"Printer Type")
+                field("Printer Type"; "Printer Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Printer Device";"Printer Device")
+                field("Printer Device"; "Printer Device")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Modified At";"Last Modified At")
+                field("Last Modified At"; "Last Modified At")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            part(Control6014409;"RP Template Media Factbox")
+            part(Control6014409; "RP Template Media Factbox")
             {
-                SubPageLink = Template=FIELD(Code);
+                SubPageLink = Template = FIELD(Code);
             }
         }
     }

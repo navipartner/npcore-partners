@@ -15,70 +15,88 @@ page 6014675 "Endpoint Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
-                field("Max. Requests per Batch";"Max. Requests per Batch")
+                field("Max. Requests per Batch"; "Max. Requests per Batch")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wait to Send";"Wait to Send")
+                field("Wait to Send"; "Wait to Send")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Obsolete Requests";"Delete Obsolete Requests")
+                field("Delete Obsolete Requests"; "Delete Obsolete Requests")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Sent Requests After";"Delete Sent Requests After")
+                field("Delete Sent Requests After"; "Delete Sent Requests After")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Changes)
             {
-                field("Trigger on Modify";"Trigger on Modify")
+                field("Trigger on Modify"; "Trigger on Modify")
                 {
+                    ApplicationArea = All;
                 }
-                field("Trigger on Insert";"Trigger on Insert")
+                field("Trigger on Insert"; "Trigger on Insert")
                 {
+                    ApplicationArea = All;
                 }
-                field("Trigger on Delete";"Trigger on Delete")
+                field("Trigger on Delete"; "Trigger on Delete")
                 {
+                    ApplicationArea = All;
                 }
-                field("Trigger on Rename";"Trigger on Rename")
+                field("Trigger on Rename"; "Trigger on Rename")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Queries)
             {
-                field("Query Name";"Query Name")
+                field("Query Name"; "Query Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max. Requests per Query";"Max. Requests per Query")
+                field("Max. Requests per Query"; "Max. Requests per Query")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Query from Database";"Allow Query from Database")
+                field("Allow Query from Database"; "Allow Query from Database")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Query from Company Name";"Allow Query from Company Name")
+                field("Allow Query from Company Name"; "Allow Query from Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Query from User ID";"Allow Query from User ID")
+                field("Allow Query from User ID"; "Allow Query from User ID")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6150625;"Endpoint Filters")
+            part(Control6150625; "Endpoint Filters")
             {
-                SubPageLink = "Endpoint Code"=FIELD(Code);
+                SubPageLink = "Endpoint Code" = FIELD(Code);
             }
         }
     }
@@ -92,22 +110,22 @@ page 6014675 "Endpoint Card"
                 Caption = 'Requests';
                 Image = XMLFile;
                 RunObject = Page "Endpoint Request List";
-                RunPageLink = "Endpoint Code"=FIELD(Code);
+                RunPageLink = "Endpoint Code" = FIELD(Code);
             }
             action("Request Batches")
             {
                 Caption = 'Request Batches';
                 Image = XMLFileGroup;
                 RunObject = Page "Endpoint Request Batch List";
-                RunPageLink = "Endpoint Code"=FIELD(Code);
+                RunPageLink = "Endpoint Code" = FIELD(Code);
             }
             action("Query")
             {
                 Caption = 'Query';
                 Image = Questionnaire;
                 RunObject = Page "Endpoint Query List";
-                RunPageLink = "Endpoint Code"=FIELD(Code);
-                RunPageView = SORTING("Endpoint Code","No.")
+                RunPageLink = "Endpoint Code" = FIELD(Code);
+                RunPageView = SORTING("Endpoint Code", "No.")
                               ORDER(Ascending);
             }
         }

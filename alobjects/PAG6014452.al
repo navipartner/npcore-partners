@@ -12,8 +12,8 @@ page 6014452 "Mixed Discount List"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Mixed Discount";
-    SourceTableView = SORTING("Starting date","Starting time","Ending date","Ending time")
-                      WHERE("Mix Type"=FILTER(Standard|Combination));
+    SourceTableView = SORTING("Starting date", "Starting time", "Ending date", "Ending time")
+                      WHERE("Mix Type" = FILTER(Standard | Combination));
     UsageCategory = Lists;
 
     layout
@@ -23,81 +23,98 @@ page 6014452 "Mixed Discount List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Caption = 'Mix No.';
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Mix Type";"Mix Type")
+                field("Mix Type"; "Mix Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Min. Quantity";"Min. Quantity")
+                field("Min. Quantity"; "Min. Quantity")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                 }
-                field("Discount Type";"Discount Type")
+                field("Discount Type"; "Discount Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Total Amount";"Total Amount")
+                field("Total Amount"; "Total Amount")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                 }
-                field("Total Discount %";"Total Discount %")
+                field("Total Discount %"; "Total Discount %")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                 }
-                field("Total Discount Amount";"Total Discount Amount")
+                field("Total Discount Amount"; "Total Discount Amount")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                 }
-                field("Starting date";"Starting date")
+                field("Starting date"; "Starting date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Starting time";"Starting time")
+                field("Starting time"; "Starting time")
                 {
-                    Editable = false;
-                    Visible = false;
-                }
-                field("Ending date";"Ending date")
-                {
-                    Editable = false;
-                }
-                field("Ending time";"Ending time")
-                {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Created the";"Created the")
+                field("Ending date"; "Ending date")
                 {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field("Ending time"; "Ending time")
+                {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Created the"; "Created the")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field(Lot;Lot)
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Visible = false;
+                }
+                field(Lot; Lot)
+                {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Unit price incl VAT";"Unit price incl VAT")
+                field("Unit price incl VAT"; "Unit price incl VAT")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
@@ -114,8 +131,8 @@ page 6014452 "Mixed Discount List"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6014411),
-                              "No."=FIELD(Code);
+                RunPageLink = "Table ID" = CONST(6014411),
+                              "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
 
                 trigger OnAction()

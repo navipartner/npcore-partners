@@ -15,33 +15,39 @@ page 6150687 "NPRE Kitchen Station Selection"
         {
             repeater(Group)
             {
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Seating Location";"Seating Location")
+                field("Seating Location"; "Seating Location")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serving Step";"Serving Step")
+                field("Serving Step"; "Serving Step")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Category Code";"Print Category Code")
+                field("Print Category Code"; "Print Category Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Production Restaurant Code";"Production Restaurant Code")
+                field("Production Restaurant Code"; "Production Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Kitchen Station";"Kitchen Station")
+                field("Kitchen Station"; "Kitchen Station")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014409;Notes)
+            systempart(Control6014409; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014410;Links)
+            systempart(Control6014410; Links)
             {
                 Visible = false;
             }

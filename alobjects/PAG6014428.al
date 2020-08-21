@@ -24,71 +24,90 @@ page 6014428 "Salesperson Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Job Title";"Job Title")
+                field("Job Title"; "Job Title")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail";"E-Mail")
+                field("E-Mail"; "E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Commission %";"Commission %")
+                field("Commission %"; "Commission %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Maximum Cash Returnsale";"Maximum Cash Returnsale")
+                field("Maximum Cash Returnsale"; "Maximum Cash Returnsale")
                 {
+                    ApplicationArea = All;
                 }
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Security)
             {
                 Caption = 'Security';
-                field("Register Password";"Register Password")
+                field("Register Password"; "Register Password")
                 {
+                    ApplicationArea = All;
                     ExtendedDatatype = Masked;
                 }
-                field("Reverse Sales Ticket";"Reverse Sales Ticket")
+                field("Reverse Sales Ticket"; "Reverse Sales Ticket")
                 {
+                    ApplicationArea = All;
                 }
-                field("Locked-to Register No.";"Locked-to Register No.")
+                field("Locked-to Register No."; "Locked-to Register No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Retail)
             {
                 Caption = 'Retail';
-                field("Hide Register Imbalance";"Hide Register Imbalance")
+                field("Hide Register Imbalance"; "Hide Register Imbalance")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales (Qty.)";"Sales (Qty.)")
+                field("Sales (Qty.)"; "Sales (Qty.)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Sales (LCY)";"Item Group Sales (LCY)")
+                field("Item Group Sales (LCY)"; "Item Group Sales (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales (LCY)";"Sales (LCY)")
+                field("Sales (LCY)"; "Sales (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("COGS (LCY)";"COGS (LCY)")
+                field("COGS (LCY)"; "COGS (LCY)")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -110,7 +129,7 @@ page 6014428 "Salesperson Card"
                 Caption = '&Statistics';
                 Image = Statistics;
                 RunObject = Page "Salesperson Statistics";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'F9';
             }
             action("Sales Person report")
@@ -124,9 +143,9 @@ page 6014428 "Salesperson Card"
                 Caption = 'Cash Codes';
                 Image = "Action";
                 RunObject = Page "Alternative Number";
-                RunPageLink = Code=FIELD(Code),
-                              Type=CONST(SalesPerson);
-                RunPageView = SORTING(Type,Code,"Alt. No.");
+                RunPageLink = Code = FIELD(Code),
+                              Type = CONST(SalesPerson);
+                RunPageView = SORTING(Type, Code, "Alt. No.");
                 ShortCutKey = 'Ctrl+A';
             }
             action("Remove from staff Sale")

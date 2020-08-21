@@ -23,39 +23,49 @@ page 6014514 "Warranty Catalog"
                     group(Control6150616)
                     {
                         ShowCaption = false;
-                        field("No.";"No.")
+                        field("No."; "No.")
                         {
+                            ApplicationArea = All;
                         }
-                        field(Description;Description)
+                        field(Description; Description)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Name;Name)
+                        field(Name; Name)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Salesperson Code";"Salesperson Code")
+                        field("Salesperson Code"; "Salesperson Code")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                        field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                        field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                         {
+                            ApplicationArea = All;
                         }
                     }
                     group(Control6150623)
                     {
                         ShowCaption = false;
-                        field(Bonnummer;Bonnummer)
+                        field(Bonnummer; Bonnummer)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Kassenummer;Kassenummer)
+                        field(Kassenummer; Kassenummer)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Debitortype;Debitortype)
+                        field(Debitortype; Debitortype)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Customer No.";"Customer No.")
+                        field("Customer No."; "Customer No.")
                         {
+                            ApplicationArea = All;
                         }
                         grid(Control6150629)
                         {
@@ -63,54 +73,66 @@ page 6014514 "Warranty Catalog"
                             group("Police No.")
                             {
                                 Caption = 'Police No.';
-                                field("Police 1";"Police 1")
+                                field("Police 1"; "Police 1")
                                 {
+                                    ApplicationArea = All;
                                 }
-                                field("Police 2";"Police 2")
+                                field("Police 2"; "Police 2")
                                 {
+                                    ApplicationArea = All;
                                 }
-                                field("Police 3";"Police 3")
+                                field("Police 3"; "Police 3")
                                 {
+                                    ApplicationArea = All;
                                 }
-                                field("Police udstedt";"Police udstedt")
+                                field("Police udstedt"; "Police udstedt")
                                 {
+                                    ApplicationArea = All;
                                 }
-                                field("Insurance Sent";"Insurance Sent")
+                                field("Insurance Sent"; "Insurance Sent")
                                 {
+                                    ApplicationArea = All;
                                 }
-                                field("Delivery Date";"Delivery Date")
+                                field("Delivery Date"; "Delivery Date")
                                 {
+                                    ApplicationArea = All;
                                 }
                             }
                             group("Expiry Date")
                             {
                                 Caption = 'Expiry Date';
-                                field("Police 1 End Date";"Police 1 End Date")
+                                field("Police 1 End Date"; "Police 1 End Date")
                                 {
+                                    ApplicationArea = All;
                                     ShowCaption = false;
                                 }
-                                field("Police 2 udstedt";"Police 2 udstedt")
+                                field("Police 2 udstedt"; "Police 2 udstedt")
                                 {
+                                    ApplicationArea = All;
                                     ShowCaption = false;
                                 }
-                                field("Police 3 udstedt";"Police 3 udstedt")
+                                field("Police 3 udstedt"; "Police 3 udstedt")
                                 {
+                                    ApplicationArea = All;
                                     ShowCaption = false;
                                 }
                             }
                             group(Amount)
                             {
                                 Caption = 'Amount';
-                                field("Premium 1";"Premium 1")
+                                field("Premium 1"; "Premium 1")
                                 {
+                                    ApplicationArea = All;
                                     ShowCaption = false;
                                 }
-                                field("Premium 2";"Premium 2")
+                                field("Premium 2"; "Premium 2")
                                 {
+                                    ApplicationArea = All;
                                     ShowCaption = false;
                                 }
-                                field("Premium 3";"Premium 3")
+                                field("Premium 3"; "Premium 3")
                                 {
+                                    ApplicationArea = All;
                                     ShowCaption = false;
                                 }
                             }
@@ -127,60 +149,77 @@ page 6014514 "Warranty Catalog"
                     group(Control6150657)
                     {
                         ShowCaption = false;
-                        field(Name1;Name)
+                        field(Name1; Name)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Name 2";"Name 2")
+                        field("Name 2"; "Name 2")
                         {
+                            ApplicationArea = All;
                         }
-                        field(Address;Address)
+                        field(Address; Address)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Address 2";"Address 2")
+                        field("Address 2"; "Address 2")
                         {
+                            ApplicationArea = All;
                         }
-                        field(City;City)
+                        field(City; City)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Post Code";"Post Code")
+                        field("Post Code"; "Post Code")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Phone No.";"Phone No.")
+                        field("Phone No."; "Phone No.")
                         {
+                            ApplicationArea = All;
                         }
-                        field("E-Mail";"E-Mail")
+                        field("E-Mail"; "E-Mail")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Phone No. 2";"Phone No. 2")
+                        field("Phone No. 2"; "Phone No. 2")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Fax No.";"Fax No.")
+                        field("Fax No."; "Fax No.")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Your Reference";"Your Reference")
+                        field("Your Reference"; "Your Reference")
                         {
+                            ApplicationArea = All;
                         }
                     }
                     group(Control6150658)
                     {
                         ShowCaption = false;
-                        field("Bill-to Customer No.";"Bill-to Customer No.")
+                        field("Bill-to Customer No."; "Bill-to Customer No.")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Bill-to Name";"Bill-to Name")
+                        field("Bill-to Name"; "Bill-to Name")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Bill-to Address";"Bill-to Address")
+                        field("Bill-to Address"; "Bill-to Address")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Bill-to Address 2";"Bill-to Address 2")
+                        field("Bill-to Address 2"; "Bill-to Address 2")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Bill-to City";"Bill-to City")
+                        field("Bill-to City"; "Bill-to City")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Bill-to Contact";"Bill-to Contact")
+                        field("Bill-to Contact"; "Bill-to Contact")
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }
@@ -194,46 +233,56 @@ page 6014514 "Warranty Catalog"
                     group(Control6150673)
                     {
                         ShowCaption = false;
-                        field("1. Service Incoming";"1. Service Incoming")
+                        field("1. Service Incoming"; "1. Service Incoming")
                         {
+                            ApplicationArea = All;
                         }
-                        field("2. Service Incoming";"2. Service Incoming")
+                        field("2. Service Incoming"; "2. Service Incoming")
                         {
+                            ApplicationArea = All;
                         }
-                        field("3. Service Incoming";"3. Service Incoming")
+                        field("3. Service Incoming"; "3. Service Incoming")
                         {
+                            ApplicationArea = All;
                         }
-                        field("4. Service Incoming";"4. Service Incoming")
+                        field("4. Service Incoming"; "4. Service Incoming")
                         {
+                            ApplicationArea = All;
                         }
-                        field("5. Service Incoming";"5. Service Incoming")
+                        field("5. Service Incoming"; "5. Service Incoming")
                         {
+                            ApplicationArea = All;
                         }
                     }
                     group(Control6150674)
                     {
                         ShowCaption = false;
-                        field("1. Service Done";"1. Service Done")
+                        field("1. Service Done"; "1. Service Done")
                         {
+                            ApplicationArea = All;
                         }
-                        field("2. Service Done";"2. Service Done")
+                        field("2. Service Done"; "2. Service Done")
                         {
+                            ApplicationArea = All;
                         }
-                        field("3. Service Done";"3. Service Done")
+                        field("3. Service Done"; "3. Service Done")
                         {
+                            ApplicationArea = All;
                         }
-                        field("4. Service Done";"4. Service Done")
+                        field("4. Service Done"; "4. Service Done")
                         {
+                            ApplicationArea = All;
                         }
-                        field("5. Service Done";"5. Service Done")
+                        field("5. Service Done"; "5. Service Done")
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }
             }
-            part(Control6150680;"Warranty Cat. Lines")
+            part(Control6150680; "Warranty Cat. Lines")
             {
-                SubPageLink = "Warranty No."=FIELD("No.");
+                SubPageLink = "Warranty No." = FIELD("No.");
             }
         }
     }
@@ -276,8 +325,8 @@ page 6014514 "Warranty Catalog"
                         GarantiHoved: Record "Warranty Directory";
                     begin
 
-                        CurrPage.SetSelectionFilter( GarantiHoved );
-                        GarantiHoved.PrintRec( false );
+                        CurrPage.SetSelectionFilter(GarantiHoved);
+                        GarantiHoved.PrintRec(false);
                     end;
                 }
                 action(Policy)
@@ -290,7 +339,7 @@ page 6014514 "Warranty Catalog"
                         GarantiHoved: Record "Warranty Directory";
                     begin
 
-                        CurrPage.SetSelectionFilter( GarantiHoved );
+                        CurrPage.SetSelectionFilter(GarantiHoved);
                         GarantiHoved.PrintPolicy;
                     end;
                 }
@@ -304,7 +353,7 @@ page 6014514 "Warranty Catalog"
                         FotoCode: Codeunit "Retail Contract Mgt.";
                     begin
 
-                        FotoCode.PrintInsurance( Kassenummer, Bonnummer, true );
+                        FotoCode.PrintInsurance(Kassenummer, Bonnummer, true);
                     end;
                 }
             }
@@ -327,15 +376,15 @@ page 6014514 "Warranty Catalog"
 
 
         if ("Insurance Sent" <> 0D) then
-           CurrPage.Editable(false)
+            CurrPage.Editable(false)
         else
-           CurrPage.Editable(true);
+            CurrPage.Editable(true);
     end;
 
     trigger OnOpenPage()
     begin
 
-        if Rec.Find('+') then ;
+        if Rec.Find('+') then;
     end;
 }
 

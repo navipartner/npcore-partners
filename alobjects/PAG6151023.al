@@ -16,53 +16,69 @@ page 6151023 "NpRv Arch. Voucher Entries"
         {
             repeater(Group)
             {
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Amount";"Remaining Amount")
+                field("Remaining Amount"; "Remaining Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field(Positive;Positive)
+                field(Positive; Positive)
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Document No.";"External Document No.")
+                field("External Document No."; "External Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Partner Code";"Partner Code")
+                field("Partner Code"; "Partner Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closed by Entry No.";"Closed by Entry No.")
+                field("Closed by Entry No."; "Closed by Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closed by Partner Code";"Closed by Partner Code")
+                field("Closed by Partner Code"; "Closed by Partner Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Partner Clearing";"Partner Clearing")
+                field("Partner Clearing"; "Partner Clearing")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -84,7 +100,7 @@ page 6151023 "NpRv Arch. Voucher Entries"
                     Navigate: Page Navigate;
                 begin
                     //-NPR5.55 [404116]
-                    Navigate.SetDoc("Posting Date","Document No.");
+                    Navigate.SetDoc("Posting Date", "Document No.");
                     Navigate.Run;
                     //+NPR5.55 [404116]
                 end;

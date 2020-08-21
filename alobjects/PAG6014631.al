@@ -13,23 +13,29 @@ page 6014631 "RP Template Archive List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field("Archived at";"Archived at")
+                field("Archived at"; "Archived at")
                 {
+                    ApplicationArea = All;
                 }
-                field("Archived by";"Archived by")
+                field("Archived by"; "Archived by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Version Comments";"Version Comments")
+                field("Version Comments"; "Version Comments")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template.HASVALUE";Template.HasValue)
+                field("Template.HASVALUE"; Template.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Archived Data';
                 }
             }

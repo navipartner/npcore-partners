@@ -13,12 +13,14 @@ page 6059983 "Store Manager Activities"
         {
             cuegroup("Open Documents")
             {
-                field("Open Sales Orders";"Open Sales Orders")
+                field("Open Sales Orders"; "Open Sales Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Orders";
                 }
-                field("Open Purchase Orders";"Open Purchase Orders")
+                field("Open Purchase Orders"; "Open Purchase Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Purchase Orders";
                 }
 
@@ -40,12 +42,14 @@ page 6059983 "Store Manager Activities"
             }
             cuegroup("Posted Documents")
             {
-                field("Posted Sales Invoices";"Posted Sales Invoices")
+                field("Posted Sales Invoices"; "Posted Sales Invoices")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Posted Sales Invoices";
                 }
-                field("Posted Purchase Orders";"Posted Purchase Orders")
+                field("Posted Purchase Orders"; "Posted Purchase Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Posted Purchase Invoices";
                 }
             }

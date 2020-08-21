@@ -12,14 +12,17 @@ page 6151395 "CS Counting Supervisor"
         {
             repeater(Group)
             {
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Full Name";"Full Name")
+                field("Full Name"; "Full Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Pin;Pin)
+                field(Pin; Pin)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

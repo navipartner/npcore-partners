@@ -8,7 +8,7 @@ page 6059979 "Variety Fields Lookup"
     PageType = List;
     SourceTable = "Variety Field Setup";
     SourceTableView = SORTING("Sort Order")
-                      WHERE(Disabled=CONST(false));
+                      WHERE(Disabled = CONST(false));
 
     layout
     {
@@ -16,31 +16,38 @@ page 6059979 "Variety Fields Lookup"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Secondary Type";"Secondary Type")
+                field("Secondary Type"; "Secondary Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Secondary Field No.";"Secondary Field No.")
+                field("Secondary Field No."; "Secondary Field No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Secondary Description";"Secondary Description")
+                field("Secondary Description"; "Secondary Description")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

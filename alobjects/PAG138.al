@@ -1,4 +1,4 @@
-pageextension 6014411 pageextension6014411 extends "Posted Purchase Invoice" 
+pageextension 6014411 pageextension6014411 extends "Posted Purchase Invoice"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // 
@@ -19,11 +19,13 @@ pageextension 6014411 pageextension6014411 extends "Posted Purchase Invoice"
     {
         addafter("Pay-to")
         {
-            field("Pay-to E-mail";"Pay-to E-mail")
+            field("Pay-to E-mail"; "Pay-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
         }

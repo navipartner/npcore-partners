@@ -39,42 +39,49 @@ page 6059932 "Doc. Exchange Activities"
                 cuegroup(Control4)
                 {
                     ShowCaption = false;
-                    field("Incoming Documents";"Incoming Documents")
+                    field("Incoming Documents"; "Incoming Documents")
                     {
+                        ApplicationArea = All;
                         Caption = 'Total';
                     }
-                    field("Incoming Documents Created";"Incoming Documents Created")
+                    field("Incoming Documents Created"; "Incoming Documents Created")
                     {
+                        ApplicationArea = All;
                         Caption = 'Created';
                     }
                 }
                 cuegroup("In Process")
                 {
                     Caption = 'In Process';
-                    field("Incoming Documents New";"Incoming Documents New")
+                    field("Incoming Documents New"; "Incoming Documents New")
                     {
+                        ApplicationArea = All;
                         Caption = 'New';
                     }
-                    field("Incoming Documents Released";"Incoming Documents Released")
+                    field("Incoming Documents Released"; "Incoming Documents Released")
                     {
+                        ApplicationArea = All;
                         Caption = 'Released';
                     }
-                    field("Incoming Documents Pending Ap.";"Incoming Documents Pending Ap.")
+                    field("Incoming Documents Pending Ap."; "Incoming Documents Pending Ap.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Pending Approval';
                     }
                 }
                 cuegroup(Attention)
                 {
                     Caption = 'Attention';
-                    field("Incoming Documents Failed";"Incoming Documents Failed")
+                    field("Incoming Documents Failed"; "Incoming Documents Failed")
                     {
+                        ApplicationArea = All;
                         Caption = 'Failed';
                         Style = Unfavorable;
                         StyleExpr = HasFailedIncoming;
                     }
-                    field("Incoming Documents Rejected";"Incoming Documents Rejected")
+                    field("Incoming Documents Rejected"; "Incoming Documents Rejected")
                     {
+                        ApplicationArea = All;
                         Caption = 'Rejected';
                         Style = Unfavorable;
                         StyleExpr = HasRejectedIncoming;
@@ -87,17 +94,20 @@ page 6059932 "Doc. Exchange Activities"
                 cuegroup(Control6150618)
                 {
                     ShowCaption = false;
-                    field("Ongoing Purchase Invoices";"Ongoing Purchase Invoices")
+                    field("Ongoing Purchase Invoices"; "Ongoing Purchase Invoices")
                     {
+                        ApplicationArea = All;
                         Caption = 'Purchase Invoices';
                     }
-                    field("Ongoing Sales Invoices";"Ongoing Sales Invoices")
+                    field("Ongoing Sales Invoices"; "Ongoing Sales Invoices")
                     {
+                        ApplicationArea = All;
                         Caption = 'Sales Invoices';
                         DrillDownPageID = "Sales Invoice List";
                     }
-                    field("Requests to Approve";"Requests to Approve")
+                    field("Requests to Approve"; "Requests to Approve")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -118,15 +128,15 @@ page 6059932 "Doc. Exchange Activities"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
 
-        SetRange("User ID Filter",UserId);
+        SetRange("User ID Filter", UserId);
 
         HasCamera := CameraProvider.IsAvailable;
         if HasCamera then
-          CameraProvider := CameraProvider.Create;
+            CameraProvider := CameraProvider.Create;
     end;
 
     var
@@ -137,11 +147,11 @@ page 6059932 "Doc. Exchange Activities"
         HasFailedIncoming: Boolean;
         HasRejectedIncoming: Boolean;
 
-    trigger CameraProvider::PictureAvailable(PictureName: Text;PictureFilePath: Text)
+    trigger CameraProvider::PictureAvailable(PictureName: Text; PictureFilePath: Text)
     var
         IncomingDocument: Record "Incoming Document";
     begin
-        IncomingDocument.CreateIncomingDocumentFromServerFile(PictureName,PictureFilePath);
+        IncomingDocument.CreateIncomingDocumentFromServerFile(PictureName, PictureFilePath);
         CurrPage.Update;
     end;
 }

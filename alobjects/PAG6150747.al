@@ -16,70 +16,87 @@ page 6150747 "Unfinished POS Sale Transact."
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Date;Date)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Customer Name";"Customer Name")
+                field("Customer Name"; "Customer Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Amount";"Payment Amount")
+                field("Payment Amount"; "Payment Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Sale ID";"POS Sale ID")
+                field("POS Sale ID"; "POS Sale ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Retail ID";"Retail ID")
+                field("Retail ID"; "Retail ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Host Name";"Host Name")
+                field("Host Name"; "Host Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Device ID";"Device ID")
+                field("Device ID"; "Device ID")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(SaleLines;"POS Sale Lines Subpage")
+            part(SaleLines; "POS Sale Lines Subpage")
             {
                 Caption = 'POS Sale Lines';
-                SubPageLink = "Register No."=FIELD("Register No."),
-                              "Sales Ticket No."=FIELD("Sales Ticket No.");
+                SubPageLink = "Register No." = FIELD("Register No."),
+                              "Sales Ticket No." = FIELD("Sales Ticket No.");
             }
         }
         area(factboxes)
         {
-            systempart(Control6014414;Notes)
+            systempart(Control6014414; Notes)
             {
                 Visible = false;
             }
@@ -122,7 +139,7 @@ page 6150747 "Unfinished POS Sale Transact."
                     trigger OnAction()
                     begin
                         Error('Not Supported');
-                        POSResumeSale.DoCancelSale(Rec,POSSession);
+                        POSResumeSale.DoCancelSale(Rec, POSSession);
                         CurrPage.Update(false);
                     end;
                 }
@@ -145,7 +162,7 @@ page 6150747 "Unfinished POS Sale Transact."
                     begin
                         SalePOS.Copy(Rec);
                         Reset;
-                        SalePOS.CopyFilter("Register No.","Register No.");
+                        SalePOS.CopyFilter("Register No.", "Register No.");
                         Ascending(false);
                         if FindFirst then;
                     end;

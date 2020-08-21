@@ -15,6 +15,7 @@ page 6014615 "RapidStart Base Data Import"
 
             field("Package Name"; package)
             {
+                ApplicationArea = All;
                 Lookup = true;
                 trigger OnLookup(var value: Text): Boolean
                 var

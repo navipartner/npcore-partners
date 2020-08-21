@@ -17,18 +17,22 @@ page 6151421 "Magento Product Relations"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Relation Type";"Relation Type")
+                field("Relation Type"; "Relation Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Item No.";"To Item No.")
+                field("To Item No."; "To Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Item Description";"To Item Description")
+                field("To Item Description"; "To Item Description")
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

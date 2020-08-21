@@ -13,17 +13,21 @@ page 6151057 "Distribution Header"
         {
             repeater(Group)
             {
-                field("Distribution Group";"Distribution Group")
+                field("Distribution Group"; "Distribution Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Hiearachy";"Item Hiearachy")
+                field("Item Hiearachy"; "Item Hiearachy")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Type";"Distribution Type")
+                field("Distribution Type"; "Distribution Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -39,7 +43,7 @@ page 6151057 "Distribution Header"
                 Image = List;
                 Promoted = true;
                 RunObject = Page "Distribution Lines";
-                RunPageLink = "Distribution Id"=FIELD("Distribution Id");
+                RunPageLink = "Distribution Id" = FIELD("Distribution Id");
             }
         }
     }

@@ -27,89 +27,114 @@ page 6150702 "POS Menu Buttons"
             {
                 IndentationColumn = Level;
                 IndentationControls = Caption;
-                field(Caption;Caption)
+                field(Caption; Caption)
                 {
+                    ApplicationArea = All;
                 }
-                field(Tooltip;Tooltip)
+                field(Tooltip; Tooltip)
                 {
+                    ApplicationArea = All;
                 }
-                field("Action Type";"Action Type")
+                field("Action Type"; "Action Type")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         SetActionCodeEditable();
                     end;
                 }
-                field("Action Code";"Action Code")
+                field("Action Code"; "Action Code")
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = NeedParameterRefresh;
                 }
-                field("Data Source Name";"Data Source Name")
+                field("Data Source Name"; "Data Source Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Show Plus/Minus Buttons";"Show Plus/Minus Buttons")
+                field("Show Plus/Minus Buttons"; "Show Plus/Minus Buttons")
                 {
+                    ApplicationArea = All;
                 }
-                field("Background Color";"Background Color")
+                field("Background Color"; "Background Color")
                 {
+                    ApplicationArea = All;
                 }
-                field("Foreground Color";"Foreground Color")
+                field("Foreground Color"; "Foreground Color")
                 {
+                    ApplicationArea = All;
                 }
-                field("Icon Class";"Icon Class")
+                field("Icon Class"; "Icon Class")
                 {
+                    ApplicationArea = All;
                 }
-                field("Background Image Url";"Background Image Url")
+                field("Background Image Url"; "Background Image Url")
                 {
+                    ApplicationArea = All;
                 }
-                field("Caption Position";"Caption Position")
+                field("Caption Position"; "Caption Position")
                 {
+                    ApplicationArea = All;
                 }
-                field("Custom Class Attribute";"Custom Class Attribute")
+                field("Custom Class Attribute"; "Custom Class Attribute")
                 {
+                    ApplicationArea = All;
                 }
-                field(Bold;Bold)
+                field(Bold; Bold)
                 {
+                    ApplicationArea = All;
                 }
-                field("Font Size";"Font Size")
+                field("Font Size"; "Font Size")
                 {
+                    ApplicationArea = All;
                 }
-                field("Position X";"Position X")
+                field("Position X"; "Position X")
                 {
+                    ApplicationArea = All;
                 }
-                field("Position Y";"Position Y")
+                field("Position Y"; "Position Y")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocking UI";"Blocking UI")
+                field("Blocking UI"; "Blocking UI")
                 {
+                    ApplicationArea = All;
                     Editable = IsBlockingUIEnabled;
                 }
-                field("Secure Method Code";"Secure Method Code")
+                field("Secure Method Code"; "Secure Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register Type";"Register Type")
+                field("Register Type"; "Register Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Available on Desktop";"Available on Desktop")
+                field("Available on Desktop"; "Available on Desktop")
                 {
+                    ApplicationArea = All;
                 }
-                field("Available in App";"Available in App")
+                field("Available in App"; "Available in App")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -292,7 +317,7 @@ page 6150702 "POS Menu Buttons"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         if not BelowxRec then
-          Rec.InsertRow();
+            Rec.InsertRow();
     end;
 
     trigger OnOpenPage()
@@ -300,7 +325,7 @@ page 6150702 "POS Menu Buttons"
         POSAction: Record "POS Action";
     begin
         SetColumnVisibleAttributes();
-        CurrPage.Caption := StrSubstNo(Text001,"Menu Code");
+        CurrPage.Caption := StrSubstNo(Text001, "Menu Code");
         //-NPR5.40 [306347]
         POSAction.DiscoverActions();
         //+NPR5.40 [306347]
@@ -354,19 +379,19 @@ page 6150702 "POS Menu Buttons"
     begin
         //-NPR5.32.11 [282223]
         MenuButton.Copy(Rec);
-        MenuButton.SetRange("Action Type",MenuButton."Action Type"::Action);
-        MenuButton.SetRange(Tooltip,'');
+        MenuButton.SetRange("Action Type", MenuButton."Action Type"::Action);
+        MenuButton.SetRange(Tooltip, '');
         if MenuButton.FindSet(true) then
-          repeat
-            if POSAction.Get(MenuButton."Action Code") then begin
-              MenuButton.Tooltip := POSAction.Tooltip;
-              MenuButton.Modify(false);
-              Modified := true;
-            end;
-          until MenuButton.Next = 0;
+            repeat
+                if POSAction.Get(MenuButton."Action Code") then begin
+                    MenuButton.Tooltip := POSAction.Tooltip;
+                    MenuButton.Modify(false);
+                    Modified := true;
+                end;
+            until MenuButton.Next = 0;
 
         if Modified then
-          CurrPage.Update(false);
+            CurrPage.Update(false);
         //+NPR5.32.11 [282223]
     end;
 
@@ -374,16 +399,16 @@ page 6150702 "POS Menu Buttons"
     var
         PopupMenuButton: Record "POS Menu Button";
     begin
-        TestField("Action Type","Action Type"::PopupMenu);
-        PopupMenuButton.SetRange("Menu Code","Action Code");
-        PAGE.Run(0,PopupMenuButton);
+        TestField("Action Type", "Action Type"::PopupMenu);
+        PopupMenuButton.SetRange("Menu Code", "Action Code");
+        PAGE.Run(0, PopupMenuButton);
     end;
 
     local procedure GetRowStyle()
     begin
         RowStyle := '';
         if HasSubMenus then
-          RowStyle := 'Strong';
+            RowStyle := 'Strong';
 
         //-NPR5.40 [306347]
         NeedParameterRefresh := Rec.RefreshParametersRequired();
@@ -405,8 +430,8 @@ page 6150702 "POS Menu Buttons"
         IndentEnabled := Rec.IndentAllowed();
         ActionTypeEnabled := Rec.ActionIsEditable();
 
-        MenuButton.SetRange("Menu Code","Menu Code");
-        MenuButton.SetRange("Parent ID",ID);
+        MenuButton.SetRange("Menu Code", "Menu Code");
+        MenuButton.SetRange("Parent ID", ID);
         HasSubMenus := not MenuButton.IsEmpty();
 
         IsParametersEnabled := "Action Type" = "Action Type"::Action;
@@ -419,7 +444,7 @@ page 6150702 "POS Menu Buttons"
         ActionCodeEnabled := ActionTypeEnabled and ("Action Type" <> "Action Type"::Submenu);
         //-NPR5.39 [303968]
         //IsParametersEnabled := "Action Type" IN ["Action Type"::Action,"Action Type"::Item,"Action Type"::PopupMenu];
-        IsParametersEnabled := "Action Type" in ["Action Type"::Action,"Action Type"::Item,"Action Type"::PopupMenu,"Action Type"::PaymentType];
+        IsParametersEnabled := "Action Type" in ["Action Type"::Action, "Action Type"::Item, "Action Type"::PopupMenu, "Action Type"::PaymentType];
         //+NPR5.39 [303968]
         IsPopupEnabled := "Action Type" = "Action Type"::PopupMenu;
         //-NPR5.32.11 [281618]
@@ -433,14 +458,14 @@ page 6150702 "POS Menu Buttons"
     begin
 
         //-NPR5.37 [292656]
-        CurrPage.SetSelectionFilter (POSMenuButton);
-        if (POSMenuButton.FindSet ()) then begin
-          repeat
-            //-NPR5.40 [306347]
-            //POSMenuButton.RefreshActionCode ();
-            POSMenuButton.RefreshParameters ();
+        CurrPage.SetSelectionFilter(POSMenuButton);
+        if (POSMenuButton.FindSet()) then begin
+            repeat
+                //-NPR5.40 [306347]
+                //POSMenuButton.RefreshActionCode ();
+                POSMenuButton.RefreshParameters();
             //+NPR5.40 [306347]
-          until (POSMenuButton.Next () = 0);
+            until (POSMenuButton.Next() = 0);
         end;
         //+NPR5.37 [292656]
     end;

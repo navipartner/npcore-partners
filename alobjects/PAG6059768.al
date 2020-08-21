@@ -13,23 +13,29 @@ page 6059768 "NaviDocs Handling Profiles"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Handle by NAS";"Handle by NAS")
+                field("Handle by NAS"; "Handle by NAS")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default for Print";"Default for Print")
+                field("Default for Print"; "Default for Print")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default for E-Mail";"Default for E-Mail")
+                field("Default for E-Mail"; "Default for E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Electronic Document";"Default Electronic Document")
+                field("Default Electronic Document"; "Default Electronic Document")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

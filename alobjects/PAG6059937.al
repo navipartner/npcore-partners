@@ -12,17 +12,21 @@ page 6059937 "RSS Feed Channel Subscriptions"
         {
             repeater(Group)
             {
-                field("Feed Code";"Feed Code")
+                field("Feed Code"; "Feed Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Url;Url)
+                field(Url; Url)
                 {
+                    ApplicationArea = All;
                 }
-                field("Show as New Within";"Show as New Within")
+                field("Show as New Within"; "Show as New Within")
                 {
+                    ApplicationArea = All;
                 }
-                field(Default;Default)
+                field(Default; Default)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

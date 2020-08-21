@@ -39,156 +39,205 @@ page 6060124 "MM Membership Setup"
             repeater(Group)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Type";"Membership Type")
+                field("Membership Type"; "Membership Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Loyalty Card";"Loyalty Card")
+                field("Loyalty Card"; "Loyalty Card")
                 {
+                    ApplicationArea = All;
                 }
-                field("Loyalty Code";"Loyalty Code")
+                field("Loyalty Code"; "Loyalty Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Customer Config. Template Code";"Customer Config. Template Code")
+                field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Contact Config. Template Code";"Contact Config. Template Code")
+                field("Contact Config. Template Code"; "Contact Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Customer No.";"Membership Customer No.")
+                field("Membership Customer No."; "Membership Customer No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Member Information";"Member Information")
+                field("Member Information"; "Member Information")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
-                field(Perpetual;Perpetual)
+                field(Perpetual; Perpetual)
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Role Assignment";"Member Role Assignment")
+                field("Member Role Assignment"; "Member Role Assignment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Welcome Notification";"Create Welcome Notification")
+                field("Create Welcome Notification"; "Create Welcome Notification")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Renewal Notifications";"Create Renewal Notifications")
+                field("Create Renewal Notifications"; "Create Renewal Notifications")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Member Cardinality";"Membership Member Cardinality")
+                field("Membership Member Cardinality"; "Membership Member Cardinality")
                 {
+                    ApplicationArea = All;
                 }
-                field("Anonymous Member Cardinality";"Anonymous Member Cardinality")
+                field("Anonymous Member Cardinality"; "Anonymous Member Cardinality")
                 {
+                    ApplicationArea = All;
                 }
-                field("Community Code";"Community Code")
+                field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Membership Delete";"Allow Membership Delete")
+                field("Allow Membership Delete"; "Allow Membership Delete")
                 {
+                    ApplicationArea = All;
                 }
-                field("Confirm Member On Card Scan";"Confirm Member On Card Scan")
+                field("Confirm Member On Card Scan"; "Confirm Member On Card Scan")
                 {
+                    ApplicationArea = All;
                 }
-                field("Web Service Print Action";"Web Service Print Action")
+                field("Web Service Print Action"; "Web Service Print Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Print Action";"POS Print Action")
+                field("POS Print Action"; "POS Print Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account Print Object Type";"Account Print Object Type")
+                field("Account Print Object Type"; "Account Print Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account Print Template Code";"Account Print Template Code")
+                field("Account Print Template Code"; "Account Print Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account Print Object ID";"Account Print Object ID")
+                field("Account Print Object ID"; "Account Print Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Print Object Type";"Receipt Print Object Type")
+                field("Receipt Print Object Type"; "Receipt Print Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Print Template Code";"Receipt Print Template Code")
+                field("Receipt Print Template Code"; "Receipt Print Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Print Object ID";"Receipt Print Object ID")
+                field("Receipt Print Object ID"; "Receipt Print Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Scheme";"Card Number Scheme")
+                field("Card Number Scheme"; "Card Number Scheme")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Prefix";"Card Number Prefix")
+                field("Card Number Prefix"; "Card Number Prefix")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Length";"Card Number Length")
+                field("Card Number Length"; "Card Number Length")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Validation";"Card Number Validation")
+                field("Card Number Validation"; "Card Number Validation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number No. Series";"Card Number No. Series")
+                field("Card Number No. Series"; "Card Number No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Valid Until";"Card Number Valid Until")
+                field("Card Number Valid Until"; "Card Number Valid Until")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Pattern";"Card Number Pattern")
+                field("Card Number Pattern"; "Card Number Pattern")
                 {
+                    ApplicationArea = All;
                     ToolTip = '<any text><[MA|MS|NS|N*x|A*x|X*x]><[...]><...>';
                 }
-                field("Card Print Object Type";"Card Print Object Type")
+                field("Card Print Object Type"; "Card Print Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Print Template Code";"Card Print Template Code")
+                field("Card Print Template Code"; "Card Print Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Print Object ID";"Card Print Object ID")
+                field("Card Print Object ID"; "Card Print Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Expire Date Calculation";"Card Expire Date Calculation")
+                field("Card Expire Date Calculation"; "Card Expire Date Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Item Barcode";"Ticket Item Barcode")
+                field("Ticket Item Barcode"; "Ticket Item Barcode")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Print Model";"Ticket Print Model")
+                field("Ticket Print Model"; "Ticket Print Model")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Print Object Type";"Ticket Print Object Type")
+                field("Ticket Print Object Type"; "Ticket Print Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Print Object ID";"Ticket Print Object ID")
+                field("Ticket Print Object ID"; "Ticket Print Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Print Template Code";"Ticket Print Template Code")
+                field("Ticket Print Template Code"; "Ticket Print Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("GDPR Mode";"GDPR Mode")
+                field("GDPR Mode"; "GDPR Mode")
                 {
+                    ApplicationArea = All;
                 }
-                field("GDPR Agreement No.";"GDPR Agreement No.")
+                field("GDPR Agreement No."; "GDPR Agreement No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Enable NP Pass Integration";"Enable NP Pass Integration")
+                field("Enable NP Pass Integration"; "Enable NP Pass Integration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Enable Age Verification";"Enable Age Verification")
+                field("Enable Age Verification"; "Enable Age Verification")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Validate Age Against";"Validate Age Against")
+                field("Validate Age Against"; "Validate Age Against")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -211,7 +260,7 @@ page 6060124 "MM Membership Setup"
                 Image = SetupList;
                 Promoted = true;
                 RunObject = Page "MM Membership Sales Setup";
-                RunPageLink = "Membership Code"=FIELD(Code);
+                RunPageLink = "Membership Code" = FIELD(Code);
             }
             action("Membership Alteration")
             {
@@ -219,7 +268,7 @@ page 6060124 "MM Membership Setup"
                 Image = SetupList;
                 Promoted = true;
                 RunObject = Page "MM Membership Alteration";
-                RunPageLink = "From Membership Code"=FIELD(Code);
+                RunPageLink = "From Membership Code" = FIELD(Code);
             }
             action("Member Communication Setup")
             {
@@ -229,7 +278,7 @@ page 6060124 "MM Membership Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Communication Setup";
-                RunPageLink = "Membership Code"=FIELD(Code);
+                RunPageLink = "Membership Code" = FIELD(Code);
             }
             separator(Separator6014404)
             {
@@ -239,7 +288,7 @@ page 6060124 "MM Membership Setup"
                 Caption = 'Membership Admission Setup';
                 Image = SetupLines;
                 RunObject = Page "MM Membership Admission Setup";
-                RunPageLink = "Membership  Code"=FIELD(Code);
+                RunPageLink = "Membership  Code" = FIELD(Code);
             }
             action("Membership Limitation Setup")
             {
@@ -250,7 +299,7 @@ page 6060124 "MM Membership Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Membership Limitation Setup";
-                RunPageLink = "Membership  Code"=FIELD(Code);
+                RunPageLink = "Membership  Code" = FIELD(Code);
             }
             action("Sponsorship Ticket Setup")
             {
@@ -260,7 +309,7 @@ page 6060124 "MM Membership Setup"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "MM Sponsorship Ticket Setup";
-                RunPageLink = "Membership Code"=FIELD(Code);
+                RunPageLink = "Membership Code" = FIELD(Code);
             }
             separator(Separator6014405)
             {
@@ -270,7 +319,7 @@ page 6060124 "MM Membership Setup"
                 Caption = 'Memberships';
                 Image = List;
                 RunObject = Page "MM Memberships";
-                RunPageLink = "Membership Code"=FIELD(Code);
+                RunPageLink = "Membership Code" = FIELD(Code);
             }
             action("Item List")
             {
@@ -298,7 +347,7 @@ page 6060124 "MM Membership Setup"
     begin
 
         //-+MM1.18 [266769]
-        Rec.SetFilter (Blocked, '=%1', false);
+        Rec.SetFilter(Blocked, '=%1', false);
     end;
 }
 

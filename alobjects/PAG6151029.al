@@ -13,40 +13,50 @@ page 6151029 "NpRv Sending Log"
         {
             repeater(Group)
             {
-                field("Log Date";"Log Date")
+                field("Log Date"; "Log Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Message";"Log Message")
+                field("Log Message"; "Log Message")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sending Type";"Sending Type")
+                field("Sending Type"; "Sending Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sent to";"Sent to")
+                field("Sent to"; "Sent to")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Error during Send";"Error during Send")
+                field("Error during Send"; "Error during Send")
                 {
+                    ApplicationArea = All;
                 }
-                field(ErrorMessage;GetErrorMessage())
+                field(ErrorMessage; GetErrorMessage())
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         Message(GetErrorMessage());
                     end;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voucher No.";"Voucher No.")
+                field("Voucher No."; "Voucher No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

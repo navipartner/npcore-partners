@@ -17,26 +17,33 @@ page 6151372 "CS Communication Log List"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Start";"Request Start")
+                field("Request Start"; "Request Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request End";"Request End")
+                field("Request End"; "Request End")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Function";"Request Function")
+                field("Request Function"; "Request Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Request";"Internal Request")
+                field("Internal Request"; "Internal Request")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Log No.";"Internal Log No.")
+                field("Internal Log No."; "Internal Log No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(User;User)
+                field(User; User)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

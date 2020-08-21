@@ -1,4 +1,4 @@
-pageextension 6014435 pageextension6014435 extends "Extended Text" 
+pageextension 6014435 pageextension6014435 extends "Extended Text"
 {
     // NPR5.49/TJ  /20190218 CASE 345047 New group Jobs and field Event
     layout
@@ -8,8 +8,9 @@ pageextension 6014435 pageextension6014435 extends "Extended Text"
             group(Jobs)
             {
                 Caption = 'Jobs';
-                field("Event";"Event")
+                field("Event"; "Event")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

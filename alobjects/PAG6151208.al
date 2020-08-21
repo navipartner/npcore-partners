@@ -22,8 +22,9 @@ page 6151208 "NpCs Stores by Distance"
                 group(Control6014413)
                 {
                     ShowCaption = false;
-                    field(FromStoreCode;FromStoreCode)
+                    field(FromStoreCode; FromStoreCode)
                     {
+                        ApplicationArea = All;
                         Caption = 'From Store Code';
                         TableRelation = "NpCs Store";
                         Visible = (NOT ShowInventory);
@@ -32,10 +33,10 @@ page 6151208 "NpCs Stores by Distance"
                         var
                             NpCsStore: Record "NpCs Store";
                         begin
-                            if PAGE.RunModal(0,NpCsStore) = ACTION::LookupOK then begin
-                              FromStoreCode := NpCsStore.Code;
-                              InitSourceTable();
-                              CurrPage.Update(false);
+                            if PAGE.RunModal(0, NpCsStore) = ACTION::LookupOK then begin
+                                FromStoreCode := NpCsStore.Code;
+                                InitSourceTable();
+                                CurrPage.Update(false);
                             end;
                         end;
 
@@ -45,8 +46,9 @@ page 6151208 "NpCs Stores by Distance"
                             CurrPage.Update(false);
                         end;
                     }
-                    field("Show In Stock only";InStockOnly)
+                    field("Show In Stock only"; InStockOnly)
                     {
+                        ApplicationArea = All;
                         Caption = 'Show In Stock only';
                         Visible = ShowInventory;
 
@@ -55,7 +57,7 @@ page 6151208 "NpCs Stores by Distance"
                             FilterGroup(2);
                             SetRange("In Stock");
                             if InStockOnly then
-                              SetRange("In Stock",true);
+                                SetRange("In Stock", true);
                             FilterGroup(0);
 
                             CurrPage.Update(false);
@@ -65,8 +67,9 @@ page 6151208 "NpCs Stores by Distance"
                 group(Control6014420)
                 {
                     ShowCaption = false;
-                    field("''";'')
+                    field("''"; '')
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                         Visible = ShowInventory;
                     }
@@ -74,91 +77,106 @@ page 6151208 "NpCs Stores by Distance"
             }
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                     Visible = false;
                 }
-                field("In Stock";"In Stock")
+                field("In Stock"; "In Stock")
                 {
+                    ApplicationArea = All;
                     Visible = ShowInventory;
                 }
-                field("Requested Qty.";"Requested Qty.")
+                field("Requested Qty."; "Requested Qty.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fullfilled Qty.";"Fullfilled Qty.")
+                field("Fullfilled Qty."; "Fullfilled Qty.")
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Distance (km)";"Distance (km)")
+                field("Distance (km)"; "Distance (km)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = TRUE;
                 }
-                field("Contact Address";"Contact Address")
+                field("Contact Address"; "Contact Address")
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Contact Post Code";"Contact Post Code")
+                field("Contact Post Code"; "Contact Post Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Contact City";"Contact City")
+                field("Contact City"; "Contact City")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Contact Country/Region Code";"Contact Country/Region Code")
+                field("Contact Country/Region Code"; "Contact Country/Region Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Contact Phone No.";"Contact Phone No.")
+                field("Contact Phone No."; "Contact Phone No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Contact E-mail";"Contact E-mail")
+                field("Contact E-mail"; "Contact E-mail")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Geolocation Latitude";"Geolocation Latitude")
+                field("Geolocation Latitude"; "Geolocation Latitude")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = (NOT ShowInventory);
                 }
-                field("Geolocation Longitude";"Geolocation Longitude")
+                field("Geolocation Longitude"; "Geolocation Longitude")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = (NOT ShowInventory);
                 }
             }
-            part(Lines;"NpCs Store Inventory Buffer")
+            part(Lines; "NpCs Store Inventory Buffer")
             {
                 Caption = 'Inventory';
-                SubPageLink = "Store Code"=FIELD(Code);
+                SubPageLink = "Store Code" = FIELD(Code);
                 Visible = ShowInventory;
             }
         }
@@ -173,7 +191,7 @@ page 6151208 "NpCs Stores by Distance"
                 Caption = 'Card';
                 Image = Card;
                 RunObject = Page "NpCs Store Card";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F7';
             }
         }
@@ -184,8 +202,8 @@ page 6151208 "NpCs Stores by Distance"
         NpCsStore: Record "NpCs Store";
     begin
         if not NpCsStore.Get(FromStoreCode) then begin
-          NpCsStoreMgt.FindLocalStore(NpCsStore);
-          FromStoreCode := NpCsStore.Code;
+            NpCsStoreMgt.FindLocalStore(NpCsStore);
+            FromStoreCode := NpCsStore.Code;
         end;
 
         //-NPR5.52 [369476]
@@ -211,27 +229,27 @@ page 6151208 "NpCs Stores by Distance"
         NpCsStore: Record "NpCs Store";
     begin
         if not IsTemporary then
-          exit;
+            exit;
 
         //-NPR5.52 [369476]
         if TempNpCsStore.FindFirst then begin
-          Copy(TempNpCsStore,true);
-          exit;
+            Copy(TempNpCsStore, true);
+            exit;
         end;
         //+NPR5.52 [369476]
 
         DeleteAll;
 
         if not NpCsStore.Get(FromStoreCode) then
-          exit;
+            exit;
 
-        NpCsStoreMgt.InitStoresWithDistance(NpCsStore,Rec);
+        NpCsStoreMgt.InitStoresWithDistance(NpCsStore, Rec);
     end;
 
-    procedure SetSourceTables(var TempNpCsStore2: Record "NpCs Store" temporary;var NpCsStoreInventoryBuffer: Record "NpCs Store Inventory Buffer" temporary)
+    procedure SetSourceTables(var TempNpCsStore2: Record "NpCs Store" temporary; var NpCsStoreInventoryBuffer: Record "NpCs Store Inventory Buffer" temporary)
     begin
         //-NPR5.52 [369476]
-        TempNpCsStore.Copy(TempNpCsStore2,true);
+        TempNpCsStore.Copy(TempNpCsStore2, true);
         //+NPR5.52 [369476]
         CurrPage.Lines.PAGE.SetSourceTable(NpCsStoreInventoryBuffer);
     end;

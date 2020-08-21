@@ -13,37 +13,46 @@ page 6150906 "POS HC Endpoint Setup"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Endpoint)
             {
-                field("Endpoint URI";"Endpoint URI")
+                field("Endpoint URI"; "Endpoint URI")
                 {
+                    ApplicationArea = All;
                 }
-                field("Connection Timeout (ms)";"Connection Timeout (ms)")
+                field("Connection Timeout (ms)"; "Connection Timeout (ms)")
                 {
+                    ApplicationArea = All;
                 }
                 group(Credentials)
                 {
-                    field("Credentials Type";"Credentials Type")
+                    field("Credentials Type"; "Credentials Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("User Domain";"User Domain")
+                    field("User Domain"; "User Domain")
                     {
+                        ApplicationArea = All;
                     }
-                    field("User Account";"User Account")
+                    field("User Account"; "User Account")
                     {
+                        ApplicationArea = All;
                     }
-                    field("User Password";"User Password")
+                    field("User Password"; "User Password")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

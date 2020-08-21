@@ -14,41 +14,52 @@ page 6151525 "Nc Endpoint E-mail Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
             }
             group("E-Mail")
             {
-                field("Recipient E-Mail Address";"Recipient E-Mail Address")
+                field("Recipient E-Mail Address"; "Recipient E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("CC E-Mail Address";"CC E-Mail Address")
+                field("CC E-Mail Address"; "CC E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("BCC E-Mail Address";"BCC E-Mail Address")
+                field("BCC E-Mail Address"; "BCC E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Subject Text";"Subject Text")
+                field("Subject Text"; "Subject Text")
                 {
+                    ApplicationArea = All;
                 }
-                field("Body Text";"Body Text")
+                field("Body Text"; "Body Text")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filename Attachment";"Filename Attachment")
+                field("Filename Attachment"; "Filename Attachment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sender Name";"Sender Name")
+                field("Sender Name"; "Sender Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sender E-Mail Address";"Sender E-Mail Address")
+                field("Sender E-Mail Address"; "Sender E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

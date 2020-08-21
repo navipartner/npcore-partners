@@ -16,14 +16,17 @@ page 6151503 "Nc Task Fields"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Previous Value";"Previous Value")
+                field("Previous Value"; "Previous Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Value";"New Value")
+                field("New Value"; "New Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -15,18 +15,22 @@ page 6151195 "NpCs Stores"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Local Store";"Local Store")
+                field("Local Store"; "Local Store")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

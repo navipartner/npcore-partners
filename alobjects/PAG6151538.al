@@ -12,11 +12,13 @@ page 6151538 "Nc Endpoint Trigger Links"
         {
             repeater(Group)
             {
-                field("Endpoint Code";"Endpoint Code")
+                field("Endpoint Code"; "Endpoint Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Trigger Code";"Trigger Code")
+                field("Trigger Code"; "Trigger Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

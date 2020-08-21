@@ -15,21 +15,26 @@ page 6150741 "POS Admin. Template List"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Persist on Client";"Persist on Client")
+                field("Persist on Client"; "Persist on Client")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -47,7 +52,7 @@ page 6150741 "POS Admin. Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Admin. Template Scopes";
-                RunPageLink = "POS Admin. Template Id"=FIELD(Id);
+                RunPageLink = "POS Admin. Template Id" = FIELD(Id);
             }
         }
     }

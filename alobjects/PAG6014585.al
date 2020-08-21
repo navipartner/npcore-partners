@@ -32,8 +32,9 @@ page 6014585 "Advanced Sales Statistics"
         {
             group(Period)
             {
-                field(PeriodType;PeriodType)
+                field(PeriodType; PeriodType)
                 {
+                    ApplicationArea = All;
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Quarter,Year,Period';
 
@@ -41,36 +42,39 @@ page 6014585 "Advanced Sales Statistics"
                     begin
 
                         if PeriodType = PeriodType::Period then
-                          PeriodPeriodTypeOnValidate;
+                            PeriodPeriodTypeOnValidate;
 
                         if PeriodType = PeriodType::Year then
-                          YearPeriodTypeOnValidate;
+                            YearPeriodTypeOnValidate;
 
                         if PeriodType = PeriodType::Quarter then
-                          QuarterPeriodTypeOnValidate;
+                            QuarterPeriodTypeOnValidate;
 
                         if PeriodType = PeriodType::Month then
-                          MonthPeriodTypeOnValidate;
+                            MonthPeriodTypeOnValidate;
 
                         if PeriodType = PeriodType::Week then
-                          WeekPeriodTypeOnValidate;
+                            WeekPeriodTypeOnValidate;
 
                         if PeriodType = PeriodType::Day then
-                          DayPeriodTypeOnValidate;
+                            DayPeriodTypeOnValidate;
 
                         CurrPage.Update;
                     end;
                 }
-                field(DateFilter;DateFilter)
+                field(DateFilter; DateFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Period';
                 }
-                field(DateFilterLastYear;DateFilterLastYear)
+                field(DateFilterLastYear; DateFilterLastYear)
                 {
+                    ApplicationArea = All;
                     Caption = 'Period (Last Year)';
                 }
-                field(HideItemGroup;HideItemGroup)
+                field(HideItemGroup; HideItemGroup)
                 {
+                    ApplicationArea = All;
                     Caption = 'Hide Empty Lines';
                     Visible = false;
 
@@ -91,8 +95,9 @@ page 6014585 "Advanced Sales Statistics"
                         CurrPage.Update(false);
                     end;
                 }
-                field(ItemNoFilter;ItemNoFilter)
+                field(ItemNoFilter; ItemNoFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item No. Filter';
                     TableRelation = Item."No.";
 
@@ -100,7 +105,7 @@ page 6014585 "Advanced Sales Statistics"
                     begin
                         //-NPR4.21
                         //CurrForm.SubSalesperson.FORM.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,
-                                                                //ItemNoFilter);
+                        //ItemNoFilter);
                         //CurrPage.SalespersonStatisticsSubpage.PAGE.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,ItemNoFilter);
                         //+NPR4.21
                         //-NPR5.31
@@ -108,13 +113,15 @@ page 6014585 "Advanced Sales Statistics"
                         //+NPR5.31
                     end;
                 }
-                field(ItemGroupFilter;ItemGroupFilter)
+                field(ItemGroupFilter; ItemGroupFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Group Filter';
-                    TableRelation = "Item Group" WHERE (Blocked=CONST(false));
+                    TableRelation = "Item Group" WHERE(Blocked = CONST(false));
                 }
-                field(ItemCategoryCodeFilter;ItemCategoryCodeFilter)
+                field(ItemCategoryCodeFilter; ItemCategoryCodeFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Category Code';
                     TableRelation = "Item Category";
                 }
@@ -122,10 +129,11 @@ page 6014585 "Advanced Sales Statistics"
             group(Control6150631)
             {
                 ShowCaption = false;
-                field(Dim1Filter;Dim1Filter)
+                field(Dim1Filter; Dim1Filter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Dept. Code';
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
                     trigger OnValidate()
                     begin
@@ -137,10 +145,11 @@ page 6014585 "Advanced Sales Statistics"
                         //CurrForm.UPDATE;
                     end;
                 }
-                field(Dim2Filter;Dim2Filter)
+                field(Dim2Filter; Dim2Filter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Project Code';
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
                     trigger OnValidate()
                     begin
@@ -152,8 +161,9 @@ page 6014585 "Advanced Sales Statistics"
                         CurrPage.Update;
                     end;
                 }
-                field(ShowLastYear;ShowLastYear)
+                field(ShowLastYear; ShowLastYear)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show last year';
 
                     trigger OnValidate()
@@ -188,8 +198,9 @@ page 6014585 "Advanced Sales Statistics"
                         //+NPR4.21
                     end;
                 }
-                field(ShowSameWeekday;ShowSameWeekday)
+                field(ShowSameWeekday; ShowSameWeekday)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show same weekday last year';
 
                     trigger OnValidate()
@@ -201,19 +212,22 @@ page 6014585 "Advanced Sales Statistics"
             repeater(UpdateControls)
             {
                 Editable = false;
-                field("Period Name";"Period Name")
+                field("Period Name"; "Period Name")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         ViewPosition := ViewPosition::Period;
                     end;
                 }
-                field("Period Start";"Period Start")
+                field("Period Start"; "Period Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("-""Sale (QTY)""";-"Sale (QTY)")
+                field("-""Sale (QTY)"""; -"Sale (QTY)")
                 {
+                    ApplicationArea = All;
                     Caption = 'Sale (QTY)';
 
                     trigger OnDrillDown()
@@ -222,19 +236,21 @@ page 6014585 "Advanced Sales Statistics"
                         ItemLedgerEntryForm: Page "Item Ledger Entries";
                     begin
 
-                        SetItemLedgerEntryFilter( ItemLedgerEntry );
-                        ItemLedgerEntryForm.SetTableView( ItemLedgerEntry );
-                        ItemLedgerEntryForm.Editable( false );
+                        SetItemLedgerEntryFilter(ItemLedgerEntry);
+                        ItemLedgerEntryForm.SetTableView(ItemLedgerEntry);
+                        ItemLedgerEntryForm.Editable(false);
                         ItemLedgerEntryForm.RunModal;
                     end;
                 }
-                field("-""LastYear Sale (QTY)""";-"LastYear Sale (QTY)")
+                field("-""LastYear Sale (QTY)"""; -"LastYear Sale (QTY)")
                 {
+                    ApplicationArea = All;
                     Caption = '-> Last Year';
                     Visible = PLYSaleQty;
                 }
-                field("Sale (LCY)";"Sale (LCY)")
+                field("Sale (LCY)"; "Sale (LCY)")
                 {
+                    ApplicationArea = All;
                     Caption = 'Sale(LCY)';
 
                     trigger OnDrillDown()
@@ -243,32 +259,37 @@ page 6014585 "Advanced Sales Statistics"
                         ValueEntryForm: Page "Value Entries";
                     begin
 
-                        SetValueEntryFilter( ValueEntry );
-                        ValueEntryForm.SetTableView( ValueEntry );
-                        ValueEntryForm.Editable( false );
+                        SetValueEntryFilter(ValueEntry);
+                        ValueEntryForm.SetTableView(ValueEntry);
+                        ValueEntryForm.Editable(false);
                         ValueEntryForm.RunModal;
                     end;
                 }
-                field("LastYear Sale (LCY)";"LastYear Sale (LCY)")
+                field("LastYear Sale (LCY)"; "LastYear Sale (LCY)")
                 {
+                    ApplicationArea = All;
                     Caption = 'LastYear Sale (LCY)';
                     Visible = PLYSale;
                 }
-                field("Profit (LCY)";"Profit (LCY)")
+                field("Profit (LCY)"; "Profit (LCY)")
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit (LCY)';
                 }
-                field("LastYear Profit (LCY)";"LastYear Profit (LCY)")
+                field("LastYear Profit (LCY)"; "LastYear Profit (LCY)")
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Year Profit(LCY)';
                     Visible = PLYProfit;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit %';
                 }
-                field("LastYear Profit %";"LastYear Profit %")
+                field("LastYear Profit %"; "LastYear Profit %")
                 {
+                    ApplicationArea = All;
                     Caption = 'LastYear Profit %';
                     Visible = "PLYProfit%";
                 }
@@ -293,13 +314,13 @@ page 6014585 "Advanced Sales Statistics"
                     begin
                         //-NPR4.13
 
-                        SalesStatisticsReport.setFilter( ViewPosition, Day, Dim1Filter, Dim2Filter, "Period Start",
+                        SalesStatisticsReport.setFilter(ViewPosition, Day, Dim1Filter, Dim2Filter, "Period Start",
                                            "Period End", ItemGroupFilter, LastYearCalc,
-                                           ( ((ViewPosition=ViewPosition::ItemGroup) and HideItemGroup) or
-                                             ((ViewPosition=ViewPosition::Item) and HideItem) or
-                                             ((ViewPosition=ViewPosition::Customer) and HideCustomer) or
-                                             ((ViewPosition=ViewPosition::Vendor) and HideVendor) or
-                                             ((ViewPosition=ViewPosition::Projectcode) and false) ) );
+                                           (((ViewPosition = ViewPosition::ItemGroup) and HideItemGroup) or
+                                             ((ViewPosition = ViewPosition::Item) and HideItem) or
+                                             ((ViewPosition = ViewPosition::Customer) and HideCustomer) or
+                                             ((ViewPosition = ViewPosition::Vendor) and HideVendor) or
+                                             ((ViewPosition = ViewPosition::Projectcode) and false)));
                         SalesStatisticsReport.RunModal;
 
                         //+NPR4.13
@@ -323,9 +344,9 @@ page 6014585 "Advanced Sales Statistics"
                     begin
                         //-NPR4.21
                         SalespersonStatistics.InitForm;
-                        SalespersonStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,
+                        SalespersonStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,
                                                                              ItemNoFilter);
-                        SalespersonStatistics.ShowLastYear( ShowLastYear );
+                        SalespersonStatistics.ShowLastYear(ShowLastYear);
                         SalespersonStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         SalespersonStatistics.RunModal;
@@ -344,7 +365,7 @@ page 6014585 "Advanced Sales Statistics"
                     begin
                         //-NPR4.21
                         ItemGroupStatistic.InitForm;
-                        ItemGroupStatistic.SetFilter  ( Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc);
+                        ItemGroupStatistic.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc);
                         //ItemGroupFilter :=
 
                         //-NPR5.51 [358271]
@@ -372,9 +393,9 @@ page 6014585 "Advanced Sales Statistics"
                         ItemStatistics.InitForm;
                         //-NPR5.51 [365732]
                         //ItemStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc);
-                        ItemStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,ItemCategoryCodeFilter);
+                        ItemStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc, ItemCategoryCodeFilter);
                         //+NPR5.51 [365732]
-                        ItemStatistics.ShowLastYear( ShowLastYear );
+                        ItemStatistics.ShowLastYear(ShowLastYear);
                         ItemStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         ItemStatistics.RunModal;
@@ -393,9 +414,9 @@ page 6014585 "Advanced Sales Statistics"
                     begin
                         //-NPR4.21
                         CustomerStatistics.InitForm;
-                        CustomerStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc );
+                        CustomerStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc);
 
-                        CustomerStatistics.ShowLastYear( ShowLastYear );
+                        CustomerStatistics.ShowLastYear(ShowLastYear);
                         CustomerStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         CustomerStatistics.RunModal;
@@ -414,9 +435,9 @@ page 6014585 "Advanced Sales Statistics"
                     begin
                         //-NPR4.21
                         VendorStatistics.InitForm;
-                        VendorStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc );
+                        VendorStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc);
 
-                        VendorStatistics.ShowLastYear( ShowLastYear );
+                        VendorStatistics.ShowLastYear(ShowLastYear);
                         VendorStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         VendorStatistics.RunModal;
@@ -436,7 +457,7 @@ page 6014585 "Advanced Sales Statistics"
 
                         //-NPR5.31
                         ItemCategoryStatsSubpage.InitForm;
-                        ItemCategoryStatsSubpage.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc,ItemCategoryCodeFilter,ItemNoFilter);
+                        ItemCategoryStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc, ItemCategoryCodeFilter, ItemNoFilter);
                         ItemCategoryStatsSubpage.ShowLastYear(ShowLastYear);
                         ItemCategoryStatsSubpage.ChangeEmptyFilter;
                         Sleep(10);
@@ -457,7 +478,7 @@ page 6014585 "Advanced Sales Statistics"
 
                         //-NPR5.31
                         ProdGroupCodeStatsSubpage.InitForm;
-                        ProdGroupCodeStatsSubpage.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc,ProductGroupCodeFilter,ItemNoFilter,ItemCategoryCodeFilter);
+                        ProdGroupCodeStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc, ProductGroupCodeFilter, ItemNoFilter, ItemCategoryCodeFilter);
                         ProdGroupCodeStatsSubpage.ShowLastYear(ShowLastYear);
                         ProdGroupCodeStatsSubpage.ChangeEmptyFilter;
                         Sleep(10);
@@ -472,10 +493,10 @@ page 6014585 "Advanced Sales Statistics"
     trigger OnAfterGetCurrRecord()
     begin
 
-        if not( UsingPeriod ) then begin
-          DateFilter := CopyStr( StrSubstNo( '%1..%2', "Period Start", "Period End" ), 1, 50 );
-          DateFilterLastYear := CopyStr( StrSubstNo( '%1..%2', CalcDate(LastYearCalc,"Period Start"),
-          CalcDate(LastYearCalc,"Period End")  ), 1, 50 );
+        if not (UsingPeriod) then begin
+            DateFilter := CopyStr(StrSubstNo('%1..%2', "Period Start", "Period End"), 1, 50);
+            DateFilterLastYear := CopyStr(StrSubstNo('%1..%2', CalcDate(LastYearCalc, "Period Start"),
+            CalcDate(LastYearCalc, "Period End")), 1, 50);
         end;
         //-NPR5.31
         //  UpdateSubformFilters;
@@ -491,18 +512,18 @@ page 6014585 "Advanced Sales Statistics"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(PeriodFormMan.FindDate(Which,Rec,Day));
+        exit(PeriodFormMan.FindDate(Which, Rec, Day));
     end;
 
     trigger OnInit()
     begin
-         ShowSameWeekday := true;
+        ShowSameWeekday := true;
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
 
-        exit(PeriodFormMan.NextDate(Steps,Rec,Day));
+        exit(PeriodFormMan.NextDate(Steps, Rec, Day));
     end;
 
     trigger OnOpenPage()
@@ -608,43 +629,43 @@ page 6014585 "Advanced Sales Statistics"
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         //Calc()
-        SetValueEntryFilter( ValueEntry );
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        SetValueEntryFilter(ValueEntry);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcSums( Quantity );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcSums(Quantity);
 
         "Sale (QTY)" := ItemLedgerEntry.Quantity;
         "Sale (LCY)" := ValueEntry."Sales Amount (Actual)";
         "Profit (LCY)" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
         if "Sale (LCY)" <> 0 then
-          "Profit %" := "Profit (LCY)" / "Sale (LCY)" * 100
+            "Profit %" := "Profit (LCY)" / "Sale (LCY)" * 100
         else
-          "Profit %" := 0;
+            "Profit %" := 0;
 
         // Calc last year
         LastYear := true;
-        if ( (Day = Day::Day) and ShowSameWeekday ) or (Day = Day::Week) then
-          LastYearCalc := '<-52W>'
+        if ((Day = Day::Day) and ShowSameWeekday) or (Day = Day::Week) then
+            LastYearCalc := '<-52W>'
         else
-          LastYearCalc := '<-1Y>';
+            LastYearCalc := '<-1Y>';
 
-        if (Date2DMY("Period Start", 3) < 1) or ( Date2DMY("Period Start", 3) > 9998 ) then
-          LastYearCalc := '';
+        if (Date2DMY("Period Start", 3) < 1) or (Date2DMY("Period Start", 3) > 9998) then
+            LastYearCalc := '';
 
-        SetValueEntryFilter( ValueEntry );
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        SetValueEntryFilter(ValueEntry);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcSums( Quantity );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcSums(Quantity);
 
         "LastYear Sale (QTY)" := ItemLedgerEntry.Quantity;
         "LastYear Sale (LCY)" := ValueEntry."Sales Amount (Actual)";
         "LastYear Profit (LCY)" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
         if "LastYear Sale (LCY)" <> 0 then
-          "LastYear Profit %" := "LastYear Profit (LCY)" / "LastYear Sale (LCY)" * 100
+            "LastYear Profit %" := "LastYear Profit (LCY)" / "LastYear Sale (LCY)" * 100
         else
-          "LastYear Profit %" := 0;
+            "LastYear Profit %" := 0;
 
         LastYear := false;
         //-NPR5.31
@@ -655,43 +676,43 @@ page 6014585 "Advanced Sales Statistics"
     procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
         //SetItemLedgerEntryFilter
-        ItemLedgerEntry.SetCurrentKey( "Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        ItemLedgerEntry.SetRange( "Entry Type", ItemLedgerEntry."Entry Type"::Sale );
+        ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
         if not LastYear then
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', "Period Start", "Period End" )
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', "Period Start", "Period End")
         else
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', CalcDate(LastYearCalc,"Period Start"), CalcDate(LastYearCalc,"Period End")
-        );
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, "Period Start"), CalcDate(LastYearCalc, "Period End")
+          );
 
 
         if ItemGroupFilter <> '' then
-          ItemLedgerEntry.SetRange( "Item Group No.", ItemGroupFilter )
+            ItemLedgerEntry.SetRange("Item Group No.", ItemGroupFilter)
         else
-          ItemLedgerEntry.SetRange( "Item Group No." );
+            ItemLedgerEntry.SetRange("Item Group No.");
 
         if Dim1Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code" );
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code" );
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code");
         //-NPR5.31
-        if ItemNoFilter <> ''  then
-          ItemLedgerEntry.SetFilter("Item No.",ItemNoFilter)
+        if ItemNoFilter <> '' then
+            ItemLedgerEntry.SetFilter("Item No.", ItemNoFilter)
         else
-          ItemLedgerEntry.SetRange("Item No.");
+            ItemLedgerEntry.SetRange("Item No.");
         //+NPR5.31
 
 
 
         //-NPR5.44 [312575]
-        if ItemCategoryCodeFilter <> ''  then
-          ItemLedgerEntry.SetFilter("Item Category Code",ItemCategoryCodeFilter)
+        if ItemCategoryCodeFilter <> '' then
+            ItemLedgerEntry.SetFilter("Item Category Code", ItemCategoryCodeFilter)
         else
-          ItemLedgerEntry.SetRange("Item Category Code");
+            ItemLedgerEntry.SetRange("Item Category Code");
         //+NPR5.44 [312575]
     end;
 
@@ -701,33 +722,33 @@ page 6014585 "Advanced Sales Statistics"
         //-NPR5.55 [361515]
         //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
         //+NPR5.55 [361515]
-        ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
+        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
         if not LastYear then
-          ValueEntry.SetFilter( "Posting Date", '%1..%2', "Period Start", "Period End" )
+            ValueEntry.SetFilter("Posting Date", '%1..%2', "Period Start", "Period End")
         else
-          ValueEntry.SetFilter( "Posting Date", '%1..%2',CalcDate(LastYearCalc,"Period Start"), CalcDate(LastYearCalc,"Period End") );
+            ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, "Period Start"), CalcDate(LastYearCalc, "Period End"));
 
         if ItemGroupFilter <> '' then
-          ValueEntry.SetRange( "Item Group No.", ItemGroupFilter )
+            ValueEntry.SetRange("Item Group No.", ItemGroupFilter)
         else
-          ValueEntry.SetRange( "Item Group No." );
+            ValueEntry.SetRange("Item Group No.");
 
         if Dim1Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 1 Code" );
+            ValueEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 2 Code" );
+            ValueEntry.SetRange("Global Dimension 2 Code");
 
 
         //-NPR5.44 [312575]
-        if ItemCategoryCodeFilter <> ''  then
-          ValueEntry.SetFilter("Item Category Code",ItemCategoryCodeFilter)
+        if ItemCategoryCodeFilter <> '' then
+            ValueEntry.SetFilter("Item Category Code", ItemCategoryCodeFilter)
         else
-          ValueEntry.SetRange("Item Category Code");
+            ValueEntry.SetRange("Item Category Code");
         //+NPR5.44 [312575]
     end;
 
@@ -735,58 +756,64 @@ page 6014585 "Advanced Sales Statistics"
     begin
         //GetCheckValue()
         case ViewPosition of
-          ViewPosition::ItemGroup : begin
-            exit( StrSubstNo( '%1%2%3', Dim1Filter, Dim2Filter, DateFilter ));
-          end;
-          ViewPosition::Item,
-          ViewPosition::Customer,
-          ViewPosition::Vendor : begin
-            exit( StrSubstNo( '%1%2%3%4', Dim1Filter, Dim2Filter, ItemGroupFilter, DateFilter ));
-          end;
+            ViewPosition::ItemGroup:
+                begin
+                    exit(StrSubstNo('%1%2%3', Dim1Filter, Dim2Filter, DateFilter));
+                end;
+            ViewPosition::Item,
+            ViewPosition::Customer,
+            ViewPosition::Vendor:
+                begin
+                    exit(StrSubstNo('%1%2%3%4', Dim1Filter, Dim2Filter, ItemGroupFilter, DateFilter));
+                end;
         end;
     end;
 
-    procedure UpdateHiddenLines(ViewPos: Integer;bForce: Boolean)
+    procedure UpdateHiddenLines(ViewPos: Integer; bForce: Boolean)
     begin
         //UpdateHiddenLines()
 
         case ViewPos of
-          ViewPosition::ItemGroup : begin
-            if ( ItemGroupCheck <> GetCheckValue ) or bForce then begin
-             // CurrForm.SubItemGroup.FORM.UpdateHidden;
-               //-NPR4.21
-               //CurrPage.ItemGroupStatisticsSubpage.PAGE.UpdateHidden;
-               //+NPR4.21
-              ItemGroupCheck := GetCheckValue;
-            end;
-          end;
-          ViewPosition::Item : begin
-            if ( ItemCheck <> GetCheckValue ) or bForce then begin
-              //CurrForm.SubItem.FORM.UpdateHidden;
-               //-NPR4.21
-               //CurrPage.ItemStatisticsSubpage.PAGE.UpdateHidden;
-               //+NPR4.21
-              ItemCheck := GetCheckValue;
-            end;
-          end;
-          ViewPosition::Customer : begin
-            if ( CustomerCheck <> GetCheckValue ) or bForce then begin
-              //CurrForm.SubCustomer.FORM.UpdateHidden;
-              //-NPR4.21
-              //CurrPage."CustomerStatistics Subpage".PAGE.UpdateHidden;
-              //+NPR4.21
-              CustomerCheck := GetCheckValue;
-            end;
-          end;
-          ViewPosition::Vendor : begin
-            if ( VendorCheck <> GetCheckValue ) or bForce then begin
-              //CurrForm.SubVendor.FORM.UpdateHidden;
-              //-NPR4.21
-              //CurrPage.VendorStatisticsSubpage.PAGE.UpdateHidden;
-              //+NPR4.21
-              VendorCheck := GetCheckValue;
-            end;
-          end;
+            ViewPosition::ItemGroup:
+                begin
+                    if (ItemGroupCheck <> GetCheckValue) or bForce then begin
+                        // CurrForm.SubItemGroup.FORM.UpdateHidden;
+                        //-NPR4.21
+                        //CurrPage.ItemGroupStatisticsSubpage.PAGE.UpdateHidden;
+                        //+NPR4.21
+                        ItemGroupCheck := GetCheckValue;
+                    end;
+                end;
+            ViewPosition::Item:
+                begin
+                    if (ItemCheck <> GetCheckValue) or bForce then begin
+                        //CurrForm.SubItem.FORM.UpdateHidden;
+                        //-NPR4.21
+                        //CurrPage.ItemStatisticsSubpage.PAGE.UpdateHidden;
+                        //+NPR4.21
+                        ItemCheck := GetCheckValue;
+                    end;
+                end;
+            ViewPosition::Customer:
+                begin
+                    if (CustomerCheck <> GetCheckValue) or bForce then begin
+                        //CurrForm.SubCustomer.FORM.UpdateHidden;
+                        //-NPR4.21
+                        //CurrPage."CustomerStatistics Subpage".PAGE.UpdateHidden;
+                        //+NPR4.21
+                        CustomerCheck := GetCheckValue;
+                    end;
+                end;
+            ViewPosition::Vendor:
+                begin
+                    if (VendorCheck <> GetCheckValue) or bForce then begin
+                        //CurrForm.SubVendor.FORM.UpdateHidden;
+                        //-NPR4.21
+                        //CurrPage.VendorStatisticsSubpage.PAGE.UpdateHidden;
+                        //+NPR4.21
+                        VendorCheck := GetCheckValue;
+                    end;
+                end;
         end;
     end;
 
@@ -839,22 +866,22 @@ page 6014585 "Advanced Sales Statistics"
     begin
         //Day:=PeriodType;
         if not UsingPeriod then
-          UsingPeriod := true
+            UsingPeriod := true
         else
-          UsingPeriod := false;
+            UsingPeriod := false;
 
         if UsingPeriod then begin
-          //IF FORM.RUNMODAL(6060102,tblPeriode) = ACTION::LookupOK THEN BEGIN
-          if PAGE.RunModal(6060102,tblPeriode) = ACTION::LookupOK then begin
-            "Period Start" := tblPeriode."Start Date";
-            "Period End" := tblPeriode."End Date";
-            DateFilter := StrSubstNo('%1..%2',"Period Start","Period End");
-            SetFilter("Period Start",DateFilter);
-            DateFilterLastYear := StrSubstNo('%1..%2',tblPeriode."Start Date Last Year",tblPeriode."End Date Last Year");
-            Day := Day::Day;
-          end;
+            //IF FORM.RUNMODAL(6060102,tblPeriode) = ACTION::LookupOK THEN BEGIN
+            if PAGE.RunModal(6060102, tblPeriode) = ACTION::LookupOK then begin
+                "Period Start" := tblPeriode."Start Date";
+                "Period End" := tblPeriode."End Date";
+                DateFilter := StrSubstNo('%1..%2', "Period Start", "Period End");
+                SetFilter("Period Start", DateFilter);
+                DateFilterLastYear := StrSubstNo('%1..%2', tblPeriode."Start Date Last Year", tblPeriode."End Date Last Year");
+                Day := Day::Day;
+            end;
         end else
-          SetFilter("Period Start",'');
+            SetFilter("Period Start", '');
         //-NPR5.31
         //UpdateSubformFilters;
         //+NPR5.31

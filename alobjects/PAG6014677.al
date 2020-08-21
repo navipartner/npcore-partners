@@ -14,23 +14,29 @@ page 6014677 "Endpoint Request Batch List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Endpoint Code";"Endpoint Code")
+                field("Endpoint Code"; "Endpoint Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Creation Date";"Creation Date")
+                field("Creation Date"; "Creation Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Requests";"No. of Requests")
+                field("No. of Requests"; "No. of Requests")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -45,7 +51,7 @@ page 6014677 "Endpoint Request Batch List"
                 Caption = 'Requests';
                 Image = XMLFile;
                 RunObject = Page "Endpoint Request List";
-                RunPageLink = "Request Batch No."=FIELD("No.");
+                RunPageLink = "Request Batch No." = FIELD("No.");
             }
         }
         area(processing)
@@ -60,7 +66,7 @@ page 6014677 "Endpoint Request Batch List"
 
                     trigger OnAction()
                     begin
-                        EndpointManagement.SetBatchStatus(Rec,0);
+                        EndpointManagement.SetBatchStatus(Rec, 0);
                         CurrPage.Update;
                     end;
                 }
@@ -71,7 +77,7 @@ page 6014677 "Endpoint Request Batch List"
 
                     trigger OnAction()
                     begin
-                        EndpointManagement.SetBatchStatus(Rec,1);
+                        EndpointManagement.SetBatchStatus(Rec, 1);
                         CurrPage.Update;
                     end;
                 }
@@ -82,7 +88,7 @@ page 6014677 "Endpoint Request Batch List"
 
                     trigger OnAction()
                     begin
-                        EndpointManagement.SetBatchStatus(Rec,2);
+                        EndpointManagement.SetBatchStatus(Rec, 2);
                         CurrPage.Update;
                     end;
                 }

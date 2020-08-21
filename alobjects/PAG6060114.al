@@ -15,19 +15,23 @@ page 6060114 "TM Ticket Access Facts"
         {
             repeater(Group)
             {
-                field("Fact Name";"Fact Name")
+                field("Fact Name"; "Fact Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Fact Code";"Fact Code")
+                field("Fact Code"; "Fact Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Block;Block)
+                field(Block; Block)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -48,48 +52,48 @@ page 6060114 "TM Ticket Access Facts"
     begin
         // EXIT (GETFILTER ("Fact Code"));
 
-        CurrPage.SetSelectionFilter (Fact);
+        CurrPage.SetSelectionFilter(Fact);
         FactCount := Fact.Count;
 
         if (FactCount > 0) then begin
-          Fact.Find('-');
+            Fact.Find('-');
 
-          while (FactCount > 0) do begin
-            FactCount := FactCount - 1;
-            Fact.MarkedOnly(false);
-            FirstFact := Fact."Fact Code";
-            LastFact := FirstFact;
-            More := (FactCount > 0);
-            while More do begin
-              if Fact.Next = 0 then begin
-                More := false;
-              end else begin
-                if not Fact.Mark then begin
-                  More := false;
-                end else begin
-                  LastFact := Fact."Fact Code";
-                  FactCount := FactCount - 1;
-                  if FactCount = 0 then
-                    More := false;
+            while (FactCount > 0) do begin
+                FactCount := FactCount - 1;
+                Fact.MarkedOnly(false);
+                FirstFact := Fact."Fact Code";
+                LastFact := FirstFact;
+                More := (FactCount > 0);
+                while More do begin
+                    if Fact.Next = 0 then begin
+                        More := false;
+                    end else begin
+                        if not Fact.Mark then begin
+                            More := false;
+                        end else begin
+                            LastFact := Fact."Fact Code";
+                            FactCount := FactCount - 1;
+                            if FactCount = 0 then
+                                More := false;
+                        end;
+                    end;
                 end;
-              end;
-            end;
 
-            if SelectionFilter <> '' then
-              SelectionFilter := SelectionFilter + '|';
-            if FirstFact = LastFact then
-              SelectionFilter := SelectionFilter + FirstFact
-            else
-              SelectionFilter := SelectionFilter + FirstFact + '..' + LastFact;
-            if FactCount > 0 then begin
-              Fact.MarkedOnly(true);
-              Fact.Next;
+                if SelectionFilter <> '' then
+                    SelectionFilter := SelectionFilter + '|';
+                if FirstFact = LastFact then
+                    SelectionFilter := SelectionFilter + FirstFact
+                else
+                    SelectionFilter := SelectionFilter + FirstFact + '..' + LastFact;
+                if FactCount > 0 then begin
+                    Fact.MarkedOnly(true);
+                    Fact.Next;
+                end;
             end;
-          end;
 
         end;
 
-        exit (SelectionFilter);
+        exit(SelectionFilter);
     end;
 
     procedure SetSelection(var TicketFact: Record "TM Ticket Access Fact")

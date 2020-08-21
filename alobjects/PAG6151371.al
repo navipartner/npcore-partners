@@ -41,24 +41,31 @@ page 6151371 "CS Setup"
             {
                 field("Enable Capture Service"; "Enable Capture Service")
                 {
+                    ApplicationArea = All;
                 }
                 field("Log Communication"; "Log Communication")
                 {
+                    ApplicationArea = All;
                 }
                 field("Web Service Is Published"; "Web Service Is Published")
                 {
+                    ApplicationArea = All;
                 }
                 field("Warehouse Type"; "Warehouse Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Media Library"; "Media Library")
                 {
+                    ApplicationArea = All;
                 }
                 field("Zero Def. Qty. to Handle"; "Zero Def. Qty. to Handle")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sum Qty. to Handle"; "Sum Qty. to Handle")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Stock-Take")
@@ -66,15 +73,19 @@ page 6151371 "CS Setup"
                 Caption = 'Stock-Take';
                 field("Filter Worksheets by Location"; "Filter Worksheets by Location")
                 {
+                    ApplicationArea = All;
                 }
                 field("Error On Invalid Barcode"; "Error On Invalid Barcode")
                 {
+                    ApplicationArea = All;
                 }
                 field("Aggregate Stock-Take Summarize"; "Aggregate Stock-Take Summarize")
                 {
+                    ApplicationArea = All;
                 }
                 field("Create Worksheet after Trans."; "Create Worksheet after Trans.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(RFID)
@@ -82,15 +93,19 @@ page 6151371 "CS Setup"
                 Caption = 'RFID';
                 field("Stock-Take Template"; "Stock-Take Template")
                 {
+                    ApplicationArea = All;
                 }
                 field("Earliest Start Date/Time"; "Earliest Start Date/Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Batch Size"; "Batch Size")
                 {
+                    ApplicationArea = All;
                 }
                 field("Disregard Unknown RFID Tags"; "Disregard Unknown RFID Tags")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Ship & Receive")
@@ -98,9 +113,11 @@ page 6151371 "CS Setup"
                 Caption = 'Ship & Receive';
                 field("Import Tags to Shipping Doc."; "Import Tags to Shipping Doc.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Use Whse. Receipt"; "Use Whse. Receipt")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Price Calculation")
@@ -108,6 +125,7 @@ page 6151371 "CS Setup"
                 Caption = 'Price Calculation';
                 field("Price Calc. Customer No."; "Price Calc. Customer No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Search)
@@ -115,6 +133,7 @@ page 6151371 "CS Setup"
                 Caption = 'Search';
                 field("Max Records In Search Result"; "Max Records In Search Result")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Worksheets)
@@ -122,9 +141,11 @@ page 6151371 "CS Setup"
                 Caption = 'Worksheets';
                 field("Item Reclass. Jour Temp Name"; "Item Reclass. Jour Temp Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Item Reclass. Jour Batch Name"; "Item Reclass. Jour Batch Name")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Physical Inventory Counting")
@@ -132,9 +153,11 @@ page 6151371 "CS Setup"
                 Caption = 'Physical Inventory Counting';
                 field("Phys. Inv Jour Temp Name"; "Phys. Inv Jour Temp Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Phys. Inv Jour No. Series"; "Phys. Inv Jour No. Series")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Job Queue")
@@ -142,15 +165,19 @@ page 6151371 "CS Setup"
                 Caption = 'Job Queue';
                 field("Post with Job Queue"; "Post with Job Queue")
                 {
+                    ApplicationArea = All;
                 }
                 field("Job Queue Category Code"; "Job Queue Category Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Notify On Success"; "Notify On Success")
                 {
+                    ApplicationArea = All;
                 }
                 field("Run in User Session"; "Run in User Session")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

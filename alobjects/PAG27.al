@@ -1,4 +1,4 @@
-pageextension 6014428 pageextension6014428 extends "Vendor List" 
+pageextension 6014428 pageextension6014428 extends "Vendor List"
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // NPR9   /LS/20151022  CASE 225607  Merged to 2016
@@ -10,114 +10,124 @@ pageextension 6014428 pageextension6014428 extends "Vendor List"
     {
         addafter("Base Calendar Code")
         {
-            field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+            field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 1, "No.", NPRAttrTextArray[1]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 1, "No.", NPRAttrTextArray[1]);
                 end;
             }
-            field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+            field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 2, "No.", NPRAttrTextArray[2]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 2, "No.", NPRAttrTextArray[2]);
                 end;
             }
-            field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+            field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 3, "No.", NPRAttrTextArray[3]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 3, "No.", NPRAttrTextArray[3]);
                 end;
             }
-            field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+            field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 4, "No.", NPRAttrTextArray[4]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 4, "No.", NPRAttrTextArray[4]);
                 end;
             }
-            field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+            field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 5, "No.", NPRAttrTextArray[5]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 5, "No.", NPRAttrTextArray[5]);
                 end;
             }
-            field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+            field(NPRAttrTextArray_06; NPRAttrTextArray[6])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,6,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible06;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 6, "No.", NPRAttrTextArray[6]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 6, "No.", NPRAttrTextArray[6]);
                 end;
             }
-            field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+            field(NPRAttrTextArray_07; NPRAttrTextArray[7])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,7,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible07;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 7, "No.", NPRAttrTextArray[7]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 7, "No.", NPRAttrTextArray[7]);
                 end;
             }
-            field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+            field(NPRAttrTextArray_08; NPRAttrTextArray[8])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,8,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible08;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 8, "No.", NPRAttrTextArray[8]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 8, "No.", NPRAttrTextArray[8]);
                 end;
             }
-            field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+            field(NPRAttrTextArray_09; NPRAttrTextArray[9])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,9,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible09;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 9, "No.", NPRAttrTextArray[9]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 9, "No.", NPRAttrTextArray[9]);
                 end;
             }
-            field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+            field(NPRAttrTextArray_10; NPRAttrTextArray[10])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,23,10,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible10;
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Vendor, 10, "No.", NPRAttrTextArray[10]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Vendor, 10, "No.", NPRAttrTextArray[10]);
                 end;
             }
         }
@@ -135,10 +145,10 @@ pageextension 6014428 pageextension6014428 extends "Vendor List"
     }
 
     var
-        NPRAttrTextArray: array [40] of Text[100];
+        NPRAttrTextArray: array[40] of Text[100];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -155,12 +165,12 @@ pageextension 6014428 pageextension6014428 extends "Vendor List"
 
     //trigger OnAfterGetRecord()
     //begin
-        /*
-        //-NPR4.11
-        NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Vendor, "No.");
-        NPRAttrEditable := CurrPage.Editable();
-        //+NPR4.11
-        */
+    /*
+    //-NPR4.11
+    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Vendor, "No.");
+    NPRAttrEditable := CurrPage.Editable();
+    //+NPR4.11
+    */
     //end;
 
 
@@ -169,32 +179,32 @@ pageextension 6014428 pageextension6014428 extends "Vendor List"
     //trigger OnOpenPage()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        SetFilter("Date Filter",'..%1',WorkDate);
-        with SocialListeningSetup do
-          SocialListeningSetupVisible := Get and "Show on Customers" and "Accept License Agreement" and ("Solution ID" <> '');
-        ResyncVisible := ReadSoftOCRMasterDataSync.IsSyncEnabled;
-        */
+    /*
+    SetFilter("Date Filter",'..%1',WorkDate);
+    with SocialListeningSetup do
+      SocialListeningSetupVisible := Get and "Show on Customers" and "Accept License Agreement" and ("Solution ID" <> '');
+    ResyncVisible := ReadSoftOCRMasterDataSync.IsSyncEnabled;
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        //-NPR4.11
-        NPRAttrManagement.GetAttributeVisibility (DATABASE::Vendor, NPRAttrVisibleArray);
-        NPRAttrVisible01 := NPRAttrVisibleArray[1];
-        NPRAttrVisible02 := NPRAttrVisibleArray[2];
-        NPRAttrVisible03 := NPRAttrVisibleArray[3];
-        NPRAttrVisible04 := NPRAttrVisibleArray[4];
-        NPRAttrVisible05 := NPRAttrVisibleArray[5];
-        NPRAttrVisible06 := NPRAttrVisibleArray[6];
-        NPRAttrVisible07 := NPRAttrVisibleArray[7];
-        NPRAttrVisible08 := NPRAttrVisibleArray[8];
-        NPRAttrVisible09 := NPRAttrVisibleArray[9];
-        NPRAttrVisible10 := NPRAttrVisibleArray[10];
-        //+NPR4.11
+    /*
+    //-NPR4.11
+    NPRAttrManagement.GetAttributeVisibility (DATABASE::Vendor, NPRAttrVisibleArray);
+    NPRAttrVisible01 := NPRAttrVisibleArray[1];
+    NPRAttrVisible02 := NPRAttrVisibleArray[2];
+    NPRAttrVisible03 := NPRAttrVisibleArray[3];
+    NPRAttrVisible04 := NPRAttrVisibleArray[4];
+    NPRAttrVisible05 := NPRAttrVisibleArray[5];
+    NPRAttrVisible06 := NPRAttrVisibleArray[6];
+    NPRAttrVisible07 := NPRAttrVisibleArray[7];
+    NPRAttrVisible08 := NPRAttrVisibleArray[8];
+    NPRAttrVisible09 := NPRAttrVisibleArray[9];
+    NPRAttrVisible10 := NPRAttrVisibleArray[10];
+    //+NPR4.11
 
-        #1..4
-        */
+    #1..4
+    */
     //end;
 }
 

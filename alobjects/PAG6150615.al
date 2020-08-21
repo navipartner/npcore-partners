@@ -22,129 +22,165 @@ page 6150615 "POS Store Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Name 2";"Name 2")
+                field("Name 2"; "Name 2")
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("Address 2";"Address 2")
+                field("Address 2"; "Address 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field(Contact;Contact)
+                field(Contact; Contact)
                 {
+                    ApplicationArea = All;
                 }
-                field(County;County)
+                field(County; County)
                 {
+                    ApplicationArea = All;
                 }
-                field("Country/Region Code";"Country/Region Code")
+                field("Country/Region Code"; "Country/Region Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Language Code";"Language Code")
+                field("Language Code"; "Language Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Registration No.";"VAT Registration No.")
+                field("VAT Registration No."; "VAT Registration No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Registration No.";"Registration No.")
+                field("Registration No."; "Registration No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Communication)
             {
                 Caption = 'Communication';
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fax No.";"Fax No.")
+                field("Fax No."; "Fax No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail";"E-Mail")
+                field("E-Mail"; "E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Home Page";"Home Page")
+                field("Home Page"; "Home Page")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Posting)
             {
                 Caption = 'Posting';
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Bus. Posting Group";"VAT Bus. Posting Group")
+                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Customer No.";"VAT Customer No.")
+                field("VAT Customer No."; "VAT Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default POS Posting Setup";"Default POS Posting Setup")
+                field("Default POS Posting Setup"; "Default POS Posting Setup")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Area Code";"Tax Area Code")
+                field("Tax Area Code"; "Tax Area Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Liable";"Tax Liable")
+                field("Tax Liable"; "Tax Liable")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Compression";"Posting Compression")
+                field("Posting Compression"; "Posting Compression")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Period Register No. Series";"POS Period Register No. Series")
+                field("POS Period Register No. Series"; "POS Period Register No. Series")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Profiles)
             {
                 Caption = 'Profiles';
-                field("POS Restaurant Profile";"POS Restaurant Profile")
+                field("POS Restaurant Profile"; "POS Restaurant Profile")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Reporting)
             {
                 Caption = 'Reporting';
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Group Code";"Store Group Code")
+                field("Store Group Code"; "Store Group Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Category Code";"Store Category Code")
+                field("Store Category Code"; "Store Category Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Locality Code";"Store Locality Code")
+                field("Store Locality Code"; "Store Locality Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Size";"Store Size")
+                field("Store Size"; "Store Size")
                 {
+                    ApplicationArea = All;
                 }
-                field("Opening Date";"Opening Date")
+                field("Opening Date"; "Opening Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Geolocation Latitude";"Geolocation Latitude")
+                field("Geolocation Latitude"; "Geolocation Latitude")
                 {
+                    ApplicationArea = All;
                 }
-                field("Geolocation Longitude";"Geolocation Longitude")
+                field("Geolocation Longitude"; "Geolocation Longitude")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -159,8 +195,8 @@ page 6150615 "POS Store Card"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6150614),
-                              "No."=FIELD(Code);
+                RunPageLink = "Table ID" = CONST(6150614),
+                              "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
             }
             action("POS Unit List")
@@ -183,7 +219,7 @@ page 6150615 "POS Store Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Posting Setup";
-                RunPageLink = "POS Store Code"=FIELD(Code);
+                RunPageLink = "POS Store Code" = FIELD(Code);
             }
             action("POS Period Registers")
             {
@@ -193,7 +229,7 @@ page 6150615 "POS Store Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Period Register List";
-                RunPageLink = "POS Store Code"=FIELD(Code);
+                RunPageLink = "POS Store Code" = FIELD(Code);
             }
             action("POS Entries")
             {
@@ -203,7 +239,7 @@ page 6150615 "POS Store Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Entry List";
-                RunPageLink = "POS Store Code"=FIELD(Code);
+                RunPageLink = "POS Store Code" = FIELD(Code);
             }
         }
     }

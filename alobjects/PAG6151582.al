@@ -17,31 +17,38 @@ page 6151582 "Event Events by Attributes"
             group(Control6014408)
             {
                 ShowCaption = false;
-                field(FilterDescription;FilterDescription)
+                field(FilterDescription; FilterDescription)
                 {
+                    ApplicationArea = All;
                     Caption = 'Attributes Filter';
                     Editable = false;
                 }
             }
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Bill-to Customer No.";"Bill-to Customer No.")
+                field("Bill-to Customer No."; "Bill-to Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Status";"Event Status")
+                field("Event Status"; "Event Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount";"Total Amount")
+                field("Total Amount"; "Total Amount")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -56,7 +63,7 @@ page 6151582 "Event Events by Attributes"
                 Caption = 'View';
                 Image = View;
                 RunObject = Page "Event Card";
-                RunPageLink = "No."=FIELD("No.");
+                RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
             }
             action(SelectAttributeFilter)
@@ -73,16 +80,16 @@ page 6151582 "Event Events by Attributes"
                 begin
                     EventAttributeTempFilters.LookupMode := true;
                     if EventAttributeTempFilters.RunModal = ACTION::LookupOK then begin
-                      Reset;
-                      EventAttributeTempFilters.GetRecord(EventAttributeTempFilter);
-                      FilterDescription := EventAttributeTempFilter.Description;
-                      if not EventAttrMgt.FindEventsInAttributesFilter(EventAttributeTempFilter."Template Name",EventAttributeTempFilter."Filter Name",Job) then
-                        SetDefaultFilter()
-                      else begin
-                        Copy(Job);
-                        MarkedOnly(true);
-                      end;
-                      CurrPage.Update(false);
+                        Reset;
+                        EventAttributeTempFilters.GetRecord(EventAttributeTempFilter);
+                        FilterDescription := EventAttributeTempFilter.Description;
+                        if not EventAttrMgt.FindEventsInAttributesFilter(EventAttributeTempFilter."Template Name", EventAttributeTempFilter."Filter Name", Job) then
+                            SetDefaultFilter()
+                        else begin
+                            Copy(Job);
+                            MarkedOnly(true);
+                        end;
+                        CurrPage.Update(false);
                     end;
                 end;
             }
@@ -109,7 +116,7 @@ page 6151582 "Event Events by Attributes"
 
     local procedure SetDefaultFilter()
     begin
-        SetRange("No.",'%$');
+        SetRange("No.", '%$');
     end;
 }
 

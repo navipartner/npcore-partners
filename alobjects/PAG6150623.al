@@ -14,55 +14,61 @@ page 6150623 "POS Payment Bin Set Float"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Processing Type";"Processing Type")
+                field("Processing Type"; "Processing Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Include In Counting";"Include In Counting")
+                field("Include In Counting"; "Include In Counting")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                     Caption = 'Amount';
-                    DecimalPlaces = 2:2;
+                    DecimalPlaces = 2 : 2;
 
                     trigger OnValidate()
                     var
                         POSPaymentBinCheckpoint: Record "POS Payment Bin Checkpoint";
                     begin
                         case true of
-                          Amount > 0:
-                            begin
-                              POSPaymentBinCheckpoint.SetRange("Payment Method No.",Code);
-                              POSPaymentBinCheckpoint.SetRange("Payment Bin No.",POSPaymentBin."No.");
-                              if POSPaymentBinCheckpoint.FindLast then
-                                if POSPaymentBinCheckpoint."Float Amount" <> 0 then
-                                  Error(FloatAlreadySetErr,POSPaymentBinCheckpoint.FieldCaption("Payment Bin No."),POSPaymentBinCheckpoint."Payment Bin No.",
-                                                           FieldCaption(Code),Code);
-                              if not POSPaymentMethodTemp.Get(Code) then begin
-                                POSPaymentMethodTemp.Init;
-                                POSPaymentMethodTemp.Code := Code;
-                                POSPaymentMethodTemp."Rounding Precision" := Amount;
-                                POSPaymentMethodTemp.Insert;
-                              end else if Amount <> POSPaymentMethodTemp."Rounding Precision" then begin
-                                POSPaymentMethodTemp."Rounding Precision" := Amount;
-                                POSPaymentMethodTemp.Modify;
-                              end;
-                            end;
-                          Amount = 0:
-                            if POSPaymentMethodTemp.Get(Code) then
-                              POSPaymentMethodTemp.Delete;
-                          Amount < 0:
-                            Error(NegAmountErr);
+                            Amount > 0:
+                                begin
+                                    POSPaymentBinCheckpoint.SetRange("Payment Method No.", Code);
+                                    POSPaymentBinCheckpoint.SetRange("Payment Bin No.", POSPaymentBin."No.");
+                                    if POSPaymentBinCheckpoint.FindLast then
+                                        if POSPaymentBinCheckpoint."Float Amount" <> 0 then
+                                            Error(FloatAlreadySetErr, POSPaymentBinCheckpoint.FieldCaption("Payment Bin No."), POSPaymentBinCheckpoint."Payment Bin No.",
+                                                                     FieldCaption(Code), Code);
+                                    if not POSPaymentMethodTemp.Get(Code) then begin
+                                        POSPaymentMethodTemp.Init;
+                                        POSPaymentMethodTemp.Code := Code;
+                                        POSPaymentMethodTemp."Rounding Precision" := Amount;
+                                        POSPaymentMethodTemp.Insert;
+                                    end else
+                                        if Amount <> POSPaymentMethodTemp."Rounding Precision" then begin
+                                            POSPaymentMethodTemp."Rounding Precision" := Amount;
+                                            POSPaymentMethodTemp.Modify;
+                                        end;
+                                end;
+                            Amount = 0:
+                                if POSPaymentMethodTemp.Get(Code) then
+                                    POSPaymentMethodTemp.Delete;
+                            Amount < 0:
+                                Error(NegAmountErr);
                         end;
                     end;
                 }
@@ -78,7 +84,7 @@ page 6150623 "POS Payment Bin Set Float"
     begin
         Amount := 0;
         if POSPaymentMethodTemp.Get(Code) then
-          Amount := POSPaymentMethodTemp."Rounding Precision";
+            Amount := POSPaymentMethodTemp."Rounding Precision";
     end;
 
     var
@@ -96,10 +102,10 @@ page 6150623 "POS Payment Bin Set Float"
     procedure GetAmounts(var POSPaymentMethodHere: Record "POS Payment Method")
     begin
         if POSPaymentMethodTemp.FindSet then
-          repeat
-            POSPaymentMethodHere := POSPaymentMethodTemp;
-            POSPaymentMethodHere.Insert;
-          until POSPaymentMethodTemp.Next = 0;
+            repeat
+                POSPaymentMethodHere := POSPaymentMethodTemp;
+                POSPaymentMethodHere.Insert;
+            until POSPaymentMethodTemp.Next = 0;
     end;
 }
 

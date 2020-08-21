@@ -19,91 +19,114 @@ page 6014486 "Pacsoft Shipment Document"
         {
             group(General)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Receiver ID";"Receiver ID")
+                field("Receiver ID"; "Receiver ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("Address 2";"Address 2")
+                field("Address 2"; "Address 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field(County;County)
+                field(County; County)
                 {
+                    ApplicationArea = All;
                 }
-                field("Country/Region Code";"Country/Region Code")
+                field("Country/Region Code"; "Country/Region Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Contact;Contact)
+                field(Contact; Contact)
                 {
+                    ApplicationArea = All;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fax No.";"Fax No.")
+                field("Fax No."; "Fax No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Registration No.";"VAT Registration No.")
+                field("VAT Registration No."; "VAT Registration No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail";"E-Mail")
+                field("E-Mail"; "E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("SMS No.";"SMS No.")
+                field("SMS No."; "SMS No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Reference;Reference)
+                field(Reference; Reference)
                 {
+                    ApplicationArea = All;
                 }
-                field("Free Text";"Free Text")
+                field("Free Text"; "Free Text")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipment Date";"Shipment Date")
+                field("Shipment Date"; "Shipment Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Agent Code";"Shipping Agent Code")
+                field("Shipping Agent Code"; "Shipping Agent Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Package Code";"Package Code")
+                field("Package Code"; "Package Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Parcel Qty.";"Parcel Qty.")
+                field("Parcel Qty."; "Parcel Qty.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         ValidateWeights(true);
                     end;
                 }
-                field("Parcel Weight";"Parcel Weight")
+                field("Parcel Weight"; "Parcel Weight")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         ValidateWeights(true);
                     end;
                 }
-                field(TotalWeight;"Total Weight")
+                field(TotalWeight; "Total Weight")
                 {
+                    ApplicationArea = All;
                     Editable = TotalWeightEditable;
 
                     trigger OnValidate()
@@ -111,91 +134,113 @@ page 6014486 "Pacsoft Shipment Document"
                         ValidateWeights(true);
                     end;
                 }
-                field("Print Return Label";"Print Return Label")
+                field("Print Return Label"; "Print Return Label")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Shipping Agent Code";"Return Shipping Agent Code")
+                field("Return Shipping Agent Code"; "Return Shipping Agent Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Undeliverable;Undeliverable)
+                field(Undeliverable; Undeliverable)
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Link To Print";"Send Link To Print")
+                field("Send Link To Print"; "Send Link To Print")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request XML";"Request XML")
+                field("Request XML"; "Request XML")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Request XML Name";"Request XML Name")
+                field("Request XML Name"; "Request XML Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Delivery Location";"Delivery Location")
+                field("Delivery Location"; "Delivery Location")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ship-to Name";"Ship-to Name")
+                field("Ship-to Name"; "Ship-to Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ship-to Address";"Ship-to Address")
+                field("Ship-to Address"; "Ship-to Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ship-to Address 2";"Ship-to Address 2")
+                field("Ship-to Address 2"; "Ship-to Address 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ship-to Post Code";"Ship-to Post Code")
+                field("Ship-to Post Code"; "Ship-to Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ship-to City";"Ship-to City")
+                field("Ship-to City"; "Ship-to City")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ship-to County";"Ship-to County")
+                field("Ship-to County"; "Ship-to County")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ship-to Country/Region Code";"Ship-to Country/Region Code")
+                field("Ship-to Country/Region Code"; "Ship-to Country/Region Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Marking;Marking)
+                field(Marking; Marking)
                 {
+                    ApplicationArea = All;
                 }
-                field(Volume;Volume)
+                field(Volume; Volume)
                 {
+                    ApplicationArea = All;
                 }
-                field(Contents;Contents)
+                field(Contents; Contents)
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Label Both";"Return Label Both")
+                field("Return Label Both"; "Return Label Both")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Label";"Return Label")
+                field("Return Label"; "Return Label")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Customs Documentation")
             {
-                field("Customs Document";"Customs Document")
+                field("Customs Document"; "Customs Document")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customs Currency";"Customs Currency")
+                field("Customs Currency"; "Customs Currency")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sender VAT Reg. No";"Sender VAT Reg. No")
+                field("Sender VAT Reg. No"; "Sender VAT Reg. No")
                 {
+                    ApplicationArea = All;
                 }
-                part(Control6150661;"Pacsoft Customs Item Rows")
+                part(Control6150661; "Pacsoft Customs Item Rows")
                 {
-                    SubPageLink = "Shipment Document Entry No."=FIELD("Entry No.");
-                    SubPageView = SORTING("Shipment Document Entry No.","Entry No.");
+                    SubPageLink = "Shipment Document Entry No." = FIELD("Entry No.");
+                    SubPageView = SORTING("Shipment Document Entry No.", "Entry No.");
                 }
             }
             group(Control6150659)
             {
                 ShowCaption = false;
-                part(Control6150660;"Pacsoft Shipment Doc. Services")
+                part(Control6150660; "Pacsoft Shipment Doc. Services")
                 {
-                    SubPageLink = "Entry No."=FIELD("Entry No."),
-                                  "Shipping Agent Code"=FIELD("Shipping Agent Code");
-                    SubPageView = SORTING("Entry No.","Shipping Agent Code","Shipping Agent Service Code");
+                    SubPageLink = "Entry No." = FIELD("Entry No."),
+                                  "Shipping Agent Code" = FIELD("Shipping Agent Code");
+                    SubPageView = SORTING("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
                 }
             }
         }
@@ -215,8 +260,8 @@ page 6014486 "Pacsoft Shipment Document"
                     PacsoftMgt: Codeunit "Pacsoft Management";
                 begin
                     if PacsoftMgt.CheckDocument(Rec) then begin
-                      OKButtonPressed := true;
-                      CurrPage.Close;
+                        OKButtonPressed := true;
+                        CurrPage.Close;
                     end;
                 end;
             }
@@ -247,7 +292,7 @@ page 6014486 "Pacsoft Shipment Document"
     begin
         TotalWeightEditable := ("Parcel Qty." > 1);
         if Update then
-          CurrPage.Update(true);
+            CurrPage.Update(true);
     end;
 }
 

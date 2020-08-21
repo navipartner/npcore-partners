@@ -26,21 +26,27 @@ page 6014421 "Item Group Page"
                 Caption = 'General';
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field("Webshop Picture"; "Webshop Picture")
                 {
+                    ApplicationArea = All;
                 }
                 field("Search Description"; "Search Description")
                 {
+                    ApplicationArea = All;
                 }
                 field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -53,6 +59,7 @@ page 6014421 "Item Group Page"
                 Caption = 'Settings';
                 field("Parent Item Group No."; "Parent Item Group No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -61,15 +68,19 @@ page 6014421 "Item Group Page"
                 }
                 field("Used Goods Group"; "Used Goods Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
                 field("Item Discount Group"; "Item Discount Group")
                 {
+                    ApplicationArea = All;
                 }
                 field(Warranty; Warranty)
                 {
+                    ApplicationArea = All;
                     Caption = 'Warranty certificate';
 
                     trigger OnValidate()
@@ -79,6 +90,7 @@ page 6014421 "Item Group Page"
                 }
                 field("Warranty File"; "Warranty File")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -87,6 +99,7 @@ page 6014421 "Item Group Page"
                 }
                 field("Insurance Category"; "Insurance Category")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -95,36 +108,46 @@ page 6014421 "Item Group Page"
                 }
                 field("Tarif No."; "Tarif No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Level; Level)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Belongs In Main Item Group"; "Belongs In Main Item Group")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Base Unit of Measure"; "Base Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
                 field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
                 field(Internet; Internet)
                 {
+                    ApplicationArea = All;
                 }
                 field("Variety Group"; "Variety Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Config. Template Header"; "Config. Template Header")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Posting)
@@ -135,42 +158,50 @@ page 6014421 "Item Group Page"
                     Caption = 'VAT Setup';
                     field("VATPostingSetup.""VAT %"""; VATPostingSetup."VAT %")
                     {
+                        ApplicationArea = All;
                         Caption = 'VAT %';
                         Editable = false;
                     }
                     field("GLAccountSale.""No."""; GLAccountSale."No.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Account Sales VAT';
                         Editable = false;
                     }
                     field("GLAccountSale.Name"; GLAccountSale.Name)
                     {
+                        ApplicationArea = All;
                         Caption = 'Account Name';
                         Editable = false;
                     }
                     field("GLAccountPurch.""No."""; GLAccountPurch."No.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Account Purchase VAT';
                         Editable = false;
                     }
                     field("GLAccountPurch.Name"; GLAccountPurch.Name)
                     {
+                        ApplicationArea = All;
                         Caption = 'Account Name';
                         Editable = false;
                     }
                     field("GLAccountReverse.""No."""; GLAccountReverse."No.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Account Recipient';
                         Editable = false;
                     }
                     field("GLAccountReverse.Name"; GLAccountReverse.Name)
                     {
+                        ApplicationArea = All;
                         Caption = 'Account Name';
                         Editable = false;
                     }
                 }
                 field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -182,6 +213,7 @@ page 6014421 "Item Group Page"
                 }
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -196,18 +228,23 @@ page 6014421 "Item Group Page"
                 }
                 field("Inventory Posting Group"; "Inventory Posting Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Tax Group Code"; "Tax Group Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Costing Method"; "Costing Method")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Pictures)
@@ -215,6 +252,7 @@ page 6014421 "Item Group Page"
                 Caption = 'Pictures';
                 field(Control1160330017; Picture)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }

@@ -15,20 +15,25 @@ page 6060080 "MCS Recommendations Setup"
         {
             group(General)
             {
-                field("Max. History Records per Call";"Max. History Records per Call")
+                field("Max. History Records per Call"; "Max. History Records per Call")
                 {
+                    ApplicationArea = All;
                 }
-                field("Online Recommendations Model";"Online Recommendations Model")
+                field("Online Recommendations Model"; "Online Recommendations Model")
                 {
+                    ApplicationArea = All;
                 }
-                field("Background Send POS Lines";"Background Send POS Lines")
+                field("Background Send POS Lines"; "Background Send POS Lines")
                 {
+                    ApplicationArea = All;
                 }
-                field("Background Send Sales Lines";"Background Send Sales Lines")
+                field("Background Send Sales Lines"; "Background Send Sales Lines")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max. Rec. per Sales Document";"Max. Rec. per Sales Document")
+                field("Max. Rec. per Sales Document"; "Max. Rec. per Sales Document")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -42,8 +47,8 @@ page 6060080 "MCS Recommendations Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

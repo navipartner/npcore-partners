@@ -12,8 +12,9 @@ page 6184515 "EFT NETS Cloud POS Unit Setup"
         {
             group(General)
             {
-                field("Terminal ID";"Terminal ID")
+                field("Terminal ID"; "Terminal ID")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -21,7 +22,7 @@ page 6184515 "EFT NETS Cloud POS Unit Setup"
                         TerminalIDOut: Text;
                     begin
                         if EFTNETSCloudIntegration.LookupTerminal(GlobalEFTSetup, TerminalIDOut) then
-                          Validate("Terminal ID", TerminalIDOut);
+                            Validate("Terminal ID", TerminalIDOut);
                     end;
                 }
             }

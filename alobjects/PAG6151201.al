@@ -11,7 +11,7 @@ page 6151201 "NpCs Document Log Entries"
     {
         area(content)
         {
-            usercontrol(PingPong;"Microsoft.Dynamics.Nav.Client.PingPong")
+            usercontrol(PingPong; "Microsoft.Dynamics.Nav.Client.PingPong")
             {
 
                 trigger AddInReady()
@@ -31,33 +31,42 @@ page 6151201 "NpCs Document Log Entries"
             }
             repeater(Group)
             {
-                field("Log Date";"Log Date")
+                field("Log Date"; "Log Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Workflow Type";"Workflow Type")
+                field("Workflow Type"; "Workflow Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Workflow Module";"Workflow Module")
+                field("Workflow Module"; "Workflow Module")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Code";"Store Code")
+                field("Store Code"; "Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Message";"Log Message")
+                field("Log Message"; "Log Message")
                 {
+                    ApplicationArea = All;
                 }
-                field("Error Entry";"Error Entry")
+                field("Error Entry"; "Error Entry")
                 {
+                    ApplicationArea = All;
                 }
-                field("GetErrorMessage()";GetErrorMessage())
+                field("GetErrorMessage()"; GetErrorMessage())
                 {
+                    ApplicationArea = All;
                     Caption = 'Error Message';
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -90,9 +99,9 @@ page 6151201 "NpCs Document Log Entries"
     local procedure Ping()
     begin
         if not AutoUpdate then
-          exit;
+            exit;
         if not PingPongReady then
-          exit;
+            exit;
 
         CurrPage.PingPong.Ping(1000);
     end;

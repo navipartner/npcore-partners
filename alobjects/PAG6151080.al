@@ -14,45 +14,55 @@ page 6151080 "ExRv Voucher Types"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account No.";"Account No.")
+                field("Account No."; "Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Type";"Source Type")
+                field("Source Type"; "Source Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Posting";"Direct Posting")
+                field("Direct Posting"; "Direct Posting")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Amount";"Remaining Amount")
+                field("Remaining Amount"; "Remaining Amount")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -85,12 +95,12 @@ page 6151080 "ExRv Voucher Types"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "ExRv Vouchers";
-                RunPageLink = "Voucher Type"=FIELD(Code);
+                RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
             }
             action(Dimensions)
             {
-                AccessByPermission = TableData Dimension=R;
+                AccessByPermission = TableData Dimension = R;
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 ShortCutKey = 'Shift+Ctrl+D';

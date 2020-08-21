@@ -13,36 +13,45 @@ page 6014445 "Create Credit Voucher"
                 group(Control6150615)
                 {
                     ShowCaption = false;
-                    field(Amount;Amount)
+                    field(Amount; Amount)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Address;Address)
+                    field(Address; Address)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Post Code";"Post Code")
+                    field("Post Code"; "Post Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field(City;City)
+                    field(City; City)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150621)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sales Ticket No.";"Sales Ticket No.")
+                    field("Sales Ticket No."; "Sales Ticket No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Issue Date";"Issue Date")
+                    field("Issue Date"; "Issue Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Salesperson;Salesperson)
+                    field(Salesperson; Salesperson)
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

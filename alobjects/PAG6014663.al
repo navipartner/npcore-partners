@@ -22,97 +22,111 @@ page 6014663 "Stock-Take Worksheet"
             group(Control6150614)
             {
                 ShowCaption = false;
-                field(ConfigurationCode;ConfigurationCode)
+                field(ConfigurationCode; ConfigurationCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Stock-Take Code';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
 
                         CurrPage.SaveRecord;
-                        StockTakeMgr.LookupConfigurationCode (ConfigurationCode, Rec);
+                        StockTakeMgr.LookupConfigurationCode(ConfigurationCode, Rec);
                         WorksheetName := '';
-                        StockTakeMgr.SetWorksheetName (WorksheetName, Rec);
+                        StockTakeMgr.SetWorksheetName(WorksheetName, Rec);
 
-                        CurrPage.Update (false);
+                        CurrPage.Update(false);
                     end;
 
                     trigger OnValidate()
                     begin
 
-                        StockTakeMgr.CheckConfigurationCode (ConfigurationCode, Rec);
+                        StockTakeMgr.CheckConfigurationCode(ConfigurationCode, Rec);
                         WorksheetName := '';
-                        StockTakeMgr.SetWorksheetName (WorksheetName, Rec);
+                        StockTakeMgr.SetWorksheetName(WorksheetName, Rec);
 
                         ConfigurationCodeOnAfterValidate();
                     end;
                 }
-                field("Conf Item Group Filter";"Conf Item Group Filter")
+                field("Conf Item Group Filter"; "Conf Item Group Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Conf Vendor Code Filter";"Conf Vendor Code Filter")
+                field("Conf Vendor Code Filter"; "Conf Vendor Code Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Conf Calc. Date";"Conf Calc. Date")
+                field("Conf Calc. Date"; "Conf Calc. Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Conf Location Code";"Conf Location Code")
+                field("Conf Location Code"; "Conf Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Conf Stock Take Method";"Conf Stock Take Method")
+                field("Conf Stock Take Method"; "Conf Stock Take Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Conf Adjustment Method";"Conf Adjustment Method")
+                field("Conf Adjustment Method"; "Conf Adjustment Method")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Control6150649)
             {
                 ShowCaption = false;
-                field(WorksheetName;WorksheetName)
+                field(WorksheetName; WorksheetName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Worksheet Name';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         CurrPage.SaveRecord;
                         "Stock-Take Config Code" := ConfigurationCode;
-                        StockTakeMgr.LookupWorksheetName (WorksheetName, Rec);
+                        StockTakeMgr.LookupWorksheetName(WorksheetName, Rec);
                         CurrPage.Update(false);
-                        CurrPage.SubPage.PAGE.Update (false);
+                        CurrPage.SubPage.PAGE.Update(false);
                     end;
 
                     trigger OnValidate()
                     begin
-                        StockTakeMgr.SetConfigurationCode (ConfigurationCode, Rec);
-                        StockTakeMgr.CheckWorksheetName (WorksheetName, Rec);
+                        StockTakeMgr.SetConfigurationCode(ConfigurationCode, Rec);
+                        StockTakeMgr.CheckWorksheetName(WorksheetName, Rec);
 
                         WorkSheetNameOnAfterValidate()
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Filter";"Item Group Filter")
+                field("Item Group Filter"; "Item Group Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Code Filter";"Vendor Code Filter")
+                field("Vendor Code Filter"; "Vendor Code Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Topup Worksheet";"Topup Worksheet")
+                field("Topup Worksheet"; "Topup Worksheet")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(SubPage;"Stock-Take Worksheet Line")
+            part(SubPage; "Stock-Take Worksheet Line")
             {
-                SubPageLink = "Stock-Take Config Code"=FIELD("Stock-Take Config Code"),
-                              "Worksheet Name"=FIELD(Name);
+                SubPageLink = "Stock-Take Config Code" = FIELD("Stock-Take Config Code"),
+                              "Worksheet Name" = FIELD(Name);
             }
-            field(LineTypeCountText;LineTypeCountText)
+            field(LineTypeCountText; LineTypeCountText)
             {
+                ApplicationArea = All;
                 Editable = false;
                 ShowCaption = false;
                 Style = Favorable;
@@ -141,15 +155,15 @@ page 6014663 "Stock-Take Worksheet"
                         //-NPR4.16
                         //ERROR('Need to Convert Dataport');
 
-                        StockTakeMgr.ImportPreHandler (Rec);
+                        StockTakeMgr.ImportPreHandler(Rec);
                         StockTakeWorkSheetName := Rec;
                         StockTakeWorkSheetName.SetRecFilter;
-                        StockTakeWorkSheetLine.SetRange ("Stock-Take Config Code", StockTakeWorkSheetName."Stock-Take Config Code");
-                        StockTakeWorkSheetLine.SetRange ("Worksheet Name", StockTakeWorkSheetName.Name);
-                        if (StockTakeWorkSheetLine.IsEmpty ()) then ;
+                        StockTakeWorkSheetLine.SetRange("Stock-Take Config Code", StockTakeWorkSheetName."Stock-Take Config Code");
+                        StockTakeWorkSheetLine.SetRange("Worksheet Name", StockTakeWorkSheetName.Name);
+                        if (StockTakeWorkSheetLine.IsEmpty()) then;
                         //DATAPORT.RUNMODAL(DATAPORT::"Indlæsning af Status tal fra", TRUE, StockTakeWorkSheetLine);
-                        XMLPORT.Run(XMLPORT::"Import StockTake Wrksht. Line",false,true, StockTakeWorkSheetLine);
-                        StockTakeMgr.ImportPostHandler (Rec);
+                        XMLPORT.Run(XMLPORT::"Import StockTake Wrksht. Line", false, true, StockTakeWorkSheetLine);
+                        StockTakeMgr.ImportPostHandler(Rec);
 
                         //+NPR4.16
                     end;
@@ -161,9 +175,9 @@ page 6014663 "Stock-Take Worksheet"
 
                     trigger OnAction()
                     begin
-                        StockTakeMgr.ImportPreHandler (Rec);
-                        ScannerFunctions.initStockTake (Rec);
-                        StockTakeMgr.ImportPostHandler (Rec);
+                        StockTakeMgr.ImportPreHandler(Rec);
+                        ScannerFunctions.initStockTake(Rec);
+                        StockTakeMgr.ImportPostHandler(Rec);
                     end;
                 }
                 action("Import Worksheets & Lines")
@@ -178,21 +192,21 @@ page 6014663 "Stock-Take Worksheet"
                         StockTakeConfigCode: Code[20];
                     begin
                         //-NPR4.16
-                        StockTakeMgr.ImportPreHandler (Rec);
+                        StockTakeMgr.ImportPreHandler(Rec);
                         StockTakeWorkSheet := Rec;
                         StockTakeWorkSheet.SetRecFilter;
-                        StockTakeWorkSheetLine.SetRange ("Stock-Take Config Code", StockTakeWorkSheet."Stock-Take Config Code");
-                        StockTakeWorkSheetLine.SetRange ("Worksheet Name", StockTakeWorkSheet.Name);
-                        if (StockTakeWorkSheetLine.IsEmpty ()) then ;
-                        XMLPORT.Run(XMLPORT::"Import Multi-StockTake Wrksht.",false,true, StockTakeWorkSheetLine);
+                        StockTakeWorkSheetLine.SetRange("Stock-Take Config Code", StockTakeWorkSheet."Stock-Take Config Code");
+                        StockTakeWorkSheetLine.SetRange("Worksheet Name", StockTakeWorkSheet.Name);
+                        if (StockTakeWorkSheetLine.IsEmpty()) then;
+                        XMLPORT.Run(XMLPORT::"Import Multi-StockTake Wrksht.", false, true, StockTakeWorkSheetLine);
 
                         StockTakeConfigCode := "Stock-Take Config Code";
-                        StockTakeWorkSheet.Reset ();
-                        StockTakeWorkSheet.SetFilter ("Stock-Take Config Code", '=%1', StockTakeConfigCode);
-                        if (StockTakeWorkSheet.FindSet ()) then begin
-                          repeat
-                            StockTakeMgr.ImportPostHandler (StockTakeWorkSheet);
-                          until (StockTakeWorkSheet.Next () = 0);
+                        StockTakeWorkSheet.Reset();
+                        StockTakeWorkSheet.SetFilter("Stock-Take Config Code", '=%1', StockTakeConfigCode);
+                        if (StockTakeWorkSheet.FindSet()) then begin
+                            repeat
+                                StockTakeMgr.ImportPostHandler(StockTakeWorkSheet);
+                            until (StockTakeWorkSheet.Next() = 0);
                         end;
 
                         //+NPR4.16
@@ -205,7 +219,7 @@ page 6014663 "Stock-Take Worksheet"
 
                     trigger OnAction()
                     begin
-                        StockTakeMgr.ImportPostHandler (Rec);
+                        StockTakeMgr.ImportPostHandler(Rec);
                     end;
                 }
             }
@@ -223,16 +237,16 @@ page 6014663 "Stock-Take Worksheet"
                         StockTakeWorkSheet: Record "Stock-Take Worksheet";
                         Frm: Page "Stock-Take Calc. Inv. Transfer";
                     begin
-                        StockTakeWorkSheet.Get ("Stock-Take Config Code", Name);
-                        StockTakeWorkSheet.FilterGroup (2);
-                        StockTakeWorkSheet.SetFilter ("Stock-Take Config Code", '=%1', Rec."Stock-Take Config Code");
-                        StockTakeWorkSheet.SetFilter (Name, '=%1', Rec.Name);
-                        StockTakeWorkSheet.FilterGroup (0);
-                        Frm.SetRecord (StockTakeWorkSheet);
-                        Frm.SetTableView (StockTakeWorkSheet);
-                        Frm.LookupMode (true);
+                        StockTakeWorkSheet.Get("Stock-Take Config Code", Name);
+                        StockTakeWorkSheet.FilterGroup(2);
+                        StockTakeWorkSheet.SetFilter("Stock-Take Config Code", '=%1', Rec."Stock-Take Config Code");
+                        StockTakeWorkSheet.SetFilter(Name, '=%1', Rec.Name);
+                        StockTakeWorkSheet.FilterGroup(0);
+                        Frm.SetRecord(StockTakeWorkSheet);
+                        Frm.SetTableView(StockTakeWorkSheet);
+                        Frm.LookupMode(true);
                         if (Frm.RunModal = ACTION::LookupOK) then
-                          StockTakeMgr.TransferToItemInvJnl (Rec, Frm.GetUserTransferAction(), Frm.GetPostingDate());
+                            StockTakeMgr.TransferToItemInvJnl(Rec, Frm.GetUserTransferAction(), Frm.GetPostingDate());
                     end;
                 }
                 action("Top-Up Area")
@@ -244,7 +258,7 @@ page 6014663 "Stock-Take Worksheet"
                     begin
 
                         //-NPR5.48 [332846]
-                        StockTakeMgr.AreaTopUp (Rec);
+                        StockTakeMgr.AreaTopUp(Rec);
                         //+NPR5.48 [332846]
                     end;
                 }
@@ -257,7 +271,7 @@ page 6014663 "Stock-Take Worksheet"
                 Caption = 'Configuration Card';
                 Image = Setup;
                 RunObject = Page "Stock-Take Configuration Card";
-                RunPageLink = Code=FIELD("Stock-Take Config Code");
+                RunPageLink = Code = FIELD("Stock-Take Config Code");
             }
         }
     }
@@ -274,7 +288,7 @@ page 6014663 "Stock-Take Worksheet"
         WorksheetName := Name;
 
         //-NPR5.49 [348372]
-        CountWorksheetLines ();
+        CountWorksheetLines();
         //+NPR5.49 [348372]
     end;
 
@@ -297,24 +311,24 @@ page 6014663 "Stock-Take Worksheet"
     procedure ConfigurationCodeOnAfterValidate()
     begin
         CurrPage.SaveRecord;
-        StockTakeMgr.LookupConfigurationCode (ConfigurationCode, Rec);
+        StockTakeMgr.LookupConfigurationCode(ConfigurationCode, Rec);
         WorksheetName := '';
-        StockTakeMgr.SetWorksheetName (WorksheetName, Rec);
+        StockTakeMgr.SetWorksheetName(WorksheetName, Rec);
 
-        CurrPage.Update (false);
+        CurrPage.Update(false);
 
         //-NPR5.49 [348372]
-        CountWorksheetLines ();
+        CountWorksheetLines();
         //+NPR5.49 [348372]
     end;
 
     procedure WorkSheetNameOnAfterValidate()
     begin
-        StockTakeMgr.SetWorksheetName (WorksheetName, Rec);
-        CurrPage.Update (false);
+        StockTakeMgr.SetWorksheetName(WorksheetName, Rec);
+        CurrPage.Update(false);
 
         //-NPR5.49 [348372]
-        CountWorksheetLines ();
+        CountWorksheetLines();
         //+NPR5.49 [348372]
     end;
 
@@ -330,23 +344,23 @@ page 6014663 "Stock-Take Worksheet"
     begin
 
         //-NPR5.49 [348372]
-        StockTakeWorksheet.SetFilter ("Stock-Take Config Code", '=%1', ConfigurationCode);
-        WorksheetsCount := StockTakeWorksheet.Count ();
+        StockTakeWorksheet.SetFilter("Stock-Take Config Code", '=%1', ConfigurationCode);
+        WorksheetsCount := StockTakeWorksheet.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Stock-Take Config Code", '=%1', ConfigurationCode);
-        StockTakeWorksheetLine.SetFilter ("Worksheet Name", '=%1', WorksheetName);
-        WorksheetLinesCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Stock-Take Config Code", '=%1', ConfigurationCode);
+        StockTakeWorksheetLine.SetFilter("Worksheet Name", '=%1', WorksheetName);
+        WorksheetLinesCount := StockTakeWorksheetLine.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::READY);
-        ReadyCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::READY);
+        ReadyCount := StockTakeWorksheetLine.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::IGNORE);
-        IgnoreCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::IGNORE);
+        IgnoreCount := StockTakeWorksheetLine.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::TRANSFERRED);
-        TransferCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::TRANSFERRED);
+        TransferCount := StockTakeWorksheetLine.Count();
 
-        LineTypeCountText := StrSubstNo ('%1: %2, %3: %4 [%5/%6/%7]', ConfigurationCode, WorksheetsCount, WorksheetName, WorksheetLinesCount, ReadyCount, IgnoreCount, TransferCount);
+        LineTypeCountText := StrSubstNo('%1: %2, %3: %4 [%5/%6/%7]', ConfigurationCode, WorksheetsCount, WorksheetName, WorksheetLinesCount, ReadyCount, IgnoreCount, TransferCount);
         //+NPR5.49 [348372]
     end;
 }

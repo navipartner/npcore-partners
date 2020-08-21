@@ -20,29 +20,35 @@ page 6059833 "Event Resource Avail. Overview"
         {
             group(General)
             {
-                field(ResourceNoFilter;ResourceNoFilter)
+                field(ResourceNoFilter; ResourceNoFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Resource No. Filter';
                     TableRelation = Resource;
                 }
-                field(StartingDate;StartingDate)
+                field(StartingDate; StartingDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Starting Date';
                 }
-                field(EndingDate;EndingDate)
+                field(EndingDate; EndingDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Ending Date';
                 }
-                field(StartingTime;StartingTime)
+                field(StartingTime; StartingTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'Starting Time';
                 }
-                field(EndingTime;EndingTime)
+                field(EndingTime; EndingTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'Ending Time';
                 }
-                field(TimeInterval;TimeInterval)
+                field(TimeInterval; TimeInterval)
                 {
+                    ApplicationArea = All;
                     Caption = 'Time Interval';
                     ToolTip = 'Duration in which time intervals should be shown in, for example, 1h=1 hour, 30m=30 minutes';
                 }
@@ -55,85 +61,100 @@ page 6059833 "Event Resource Avail. Overview"
                 IndentationControls = ResNoAndDesc;
                 ShowAsTree = true;
                 ShowCaption = false;
-                field(ResNoAndDesc;ResNoAndDesc)
+                field(ResNoAndDesc; ResNoAndDesc)
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("MatrixDataHolder[1]";MatrixDataHolder[1])
+                field("MatrixDataHolder[1]"; MatrixDataHolder[1])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[1];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[1];
                     ShowCaption = false;
                     StyleExpr = StyleExpr1;
                 }
-                field("MatrixDataHolder[2]";MatrixDataHolder[2])
+                field("MatrixDataHolder[2]"; MatrixDataHolder[2])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[2];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[2];
                     ShowCaption = false;
                     StyleExpr = StyleExpr2;
                 }
-                field("MatrixDataHolder[3]";MatrixDataHolder[3])
+                field("MatrixDataHolder[3]"; MatrixDataHolder[3])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[3];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[3];
                     ShowCaption = false;
                     StyleExpr = StyleExpr3;
                 }
-                field("MatrixDataHolder[4]";MatrixDataHolder[4])
+                field("MatrixDataHolder[4]"; MatrixDataHolder[4])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[4];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[4];
                     ShowCaption = false;
                     StyleExpr = StyleExpr4;
                 }
-                field("MatrixDataHolder[5]";MatrixDataHolder[5])
+                field("MatrixDataHolder[5]"; MatrixDataHolder[5])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[5];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[5];
                     ShowCaption = false;
                     StyleExpr = StyleExpr5;
                 }
-                field("MatrixDataHolder[6]";MatrixDataHolder[6])
+                field("MatrixDataHolder[6]"; MatrixDataHolder[6])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[6];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[6];
                     ShowCaption = false;
                     StyleExpr = StyleExpr6;
                 }
-                field("MatrixDataHolder[7]";MatrixDataHolder[7])
+                field("MatrixDataHolder[7]"; MatrixDataHolder[7])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[7];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[7];
                     ShowCaption = false;
                     StyleExpr = StyleExpr7;
                 }
-                field("MatrixDataHolder[8]";MatrixDataHolder[8])
+                field("MatrixDataHolder[8]"; MatrixDataHolder[8])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[8];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[8];
                     ShowCaption = false;
                     StyleExpr = StyleExpr8;
                 }
-                field("MatrixDataHolder[9]";MatrixDataHolder[9])
+                field("MatrixDataHolder[9]"; MatrixDataHolder[9])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[9];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[9];
                     ShowCaption = false;
                     StyleExpr = StyleExpr9;
                 }
-                field("MatrixDataHolder[10]";MatrixDataHolder[10])
+                field("MatrixDataHolder[10]"; MatrixDataHolder[10])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[10];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[10];
                     ShowCaption = false;
                     StyleExpr = StyleExpr10;
                 }
-                field("MatrixDataHolder[11]";MatrixDataHolder[11])
+                field("MatrixDataHolder[11]"; MatrixDataHolder[11])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[11];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[11];
                     ShowCaption = false;
                     StyleExpr = StyleExpr11;
                 }
-                field("MatrixDataHolder[12]";MatrixDataHolder[12])
+                field("MatrixDataHolder[12]"; MatrixDataHolder[12])
                 {
-                    CaptionClass = '3,'+DateColumnCaption[12];
+                    ApplicationArea = All;
+                    CaptionClass = '3,' + DateColumnCaption[12];
                     ShowCaption = false;
                     StyleExpr = StyleExpr12;
                 }
@@ -209,9 +230,9 @@ page 6059833 "Event Resource Avail. Overview"
         DateTimeError: Label '%1 must be before %2.';
         DateTimeNotBlankErr: Label '%1 must not be blank.';
         TimeIntervalErr: Label 'Time Interval needs to be set.';
-        DateColumnCaption: array [12] of Text;
-        MatrixDataHolder: array [12] of Text;
-        DateArray: array [12] of Date;
+        DateColumnCaption: array[12] of Text;
+        MatrixDataHolder: array[12] of Text;
+        DateArray: array[12] of Date;
         EventPlanLineGroupingMgt: Codeunit "Event Plan. Line Grouping Mgt.";
         StyleExpr1: Text;
         StyleExpr2: Text;
@@ -242,17 +263,17 @@ page 6059833 "Event Resource Avail. Overview"
         CheckTime();
         DeleteAll;
         if ResourceNoFilter <> '' then
-          Resource.SetFilter("No.",ResourceNoFilter);
+            Resource.SetFilter("No.", ResourceNoFilter);
         if Resource.FindSet then
-          repeat
-            FromTime := StartingTime;
-            ResourceCounter += 10000;
-            InsertRec(Resource,ResourceCounter,0,StartingTime,EndingTime);
-            for i := 1 to MaxNoOfIntervals() do begin
-              InsertRec(Resource,ResourceCounter + i,ResourceCounter,FromTime,FromTime + TimeInterval);
-              FromTime := FromTime + TimeInterval;
-            end;
-          until Resource.Next = 0;
+            repeat
+                FromTime := StartingTime;
+                ResourceCounter += 10000;
+                InsertRec(Resource, ResourceCounter, 0, StartingTime, EndingTime);
+                for i := 1 to MaxNoOfIntervals() do begin
+                    InsertRec(Resource, ResourceCounter + i, ResourceCounter, FromTime, FromTime + TimeInterval);
+                    FromTime := FromTime + TimeInterval;
+                end;
+            until Resource.Next = 0;
         LoadDateArrays(StartingDate);
     end;
 
@@ -269,16 +290,16 @@ page 6059833 "Event Resource Avail. Overview"
         UpperBound := ArrayLen(DateColumnCaption);
         RemDays := EndingDate - FromDate + 1;
         if RemDays < UpperBound then
-          UpperBound := RemDays;
+            UpperBound := RemDays;
         for i := 1 to UpperBound do begin
-          if i = 1 then
-            DateArray[i] := FromDate
-          else
-            DateArray[i] := CalcDate(StrSubstNo('%1D',i - 1),FromDate);
-          Date.SetRange("Period Type",Date."Period Type"::Date);
-          Date.SetRange("Period Start",DateArray[i]);
-          Date.FindFirst;
-          DateColumnCaption[i] := Format(DateArray[i]) + ' ' + Date."Period Name";
+            if i = 1 then
+                DateArray[i] := FromDate
+            else
+                DateArray[i] := CalcDate(StrSubstNo('%1D', i - 1), FromDate);
+            Date.SetRange("Period Type", Date."Period Type"::Date);
+            Date.SetRange("Period Start", DateArray[i]);
+            Date.FindFirst;
+            DateColumnCaption[i] := Format(DateArray[i]) + ' ' + Date."Period Name";
         end;
         NextSetEnabled := DateArray[UpperBound] <> EndingDate;
     end;
@@ -289,17 +310,17 @@ page 6059833 "Event Resource Avail. Overview"
     begin
         Clear(MatrixDataHolder);
         for i := 1 to ArrayLen(DateColumnCaption) do begin
-          if ("Line No." = 0) or (DateArray[i] = 0D) then
-            MatrixDataHolder[i] := ''
-          else begin
-            "Planning Date" := DateArray[i];
-            "Status Text" := '';
-            EventPlanLineGroupingMgt.CheckCapAndTimeAvailabilityOnDemand(Rec,false);
-            if "Status Text" = '' then
-              MatrixDataHolder[i] := FreeText
-            else
-              MatrixDataHolder[i] := NotFreeText;
-          end;
+            if ("Line No." = 0) or (DateArray[i] = 0D) then
+                MatrixDataHolder[i] := ''
+            else begin
+                "Planning Date" := DateArray[i];
+                "Status Text" := '';
+                EventPlanLineGroupingMgt.CheckCapAndTimeAvailabilityOnDemand(Rec, false);
+                if "Status Text" = '' then
+                    MatrixDataHolder[i] := FreeText
+                else
+                    MatrixDataHolder[i] := NotFreeText;
+            end;
         end;
     end;
 
@@ -308,11 +329,11 @@ page 6059833 "Event Resource Avail. Overview"
         Job: Record Job;
     begin
         if StartingDate = 0D then
-          Error(DateTimeNotBlankErr,Job.FieldCaption("Starting Date"));
+            Error(DateTimeNotBlankErr, Job.FieldCaption("Starting Date"));
         if EndingDate = 0D then
-          Error(DateTimeNotBlankErr,Job.FieldCaption("Ending Date"));
+            Error(DateTimeNotBlankErr, Job.FieldCaption("Ending Date"));
         if StartingDate > EndingDate then
-          Error(DateTimeError,Job.FieldCaption("Starting Date"),Job.FieldCaption("Ending Date"));
+            Error(DateTimeError, Job.FieldCaption("Starting Date"), Job.FieldCaption("Ending Date"));
     end;
 
     local procedure CheckTime()
@@ -320,13 +341,13 @@ page 6059833 "Event Resource Avail. Overview"
         Job: Record Job;
     begin
         if Format(TimeInterval) = '' then
-          Error(TimeIntervalErr);
+            Error(TimeIntervalErr);
         if StartingTime = 0T then
-          Error(DateTimeNotBlankErr,Job.FieldCaption("Starting Time"));
+            Error(DateTimeNotBlankErr, Job.FieldCaption("Starting Time"));
         if EndingTime = 0T then
-          Error(DateTimeNotBlankErr,Job.FieldCaption("Ending Time"));
+            Error(DateTimeNotBlankErr, Job.FieldCaption("Ending Time"));
         if StartingTime >= EndingTime then
-          Error(DateTimeError,Job.FieldCaption("Starting Time"),Job.FieldCaption("Ending Time"));
+            Error(DateTimeError, Job.FieldCaption("Starting Time"), Job.FieldCaption("Ending Time"));
     end;
 
     local procedure MaxNoOfIntervals() Counter: Integer
@@ -335,13 +356,13 @@ page 6059833 "Event Resource Avail. Overview"
     begin
         FromTime := StartingTime;
         while FromTime < EndingTime do begin
-          FromTime := FromTime + TimeInterval;
-          Counter += 1;
+            FromTime := FromTime + TimeInterval;
+            Counter += 1;
         end;
         exit(Counter);
     end;
 
-    local procedure InsertRec(Resource: Record Resource;LineNo: Integer;MainLineNo: Integer;FromTime: Time;ToTime: Time)
+    local procedure InsertRec(Resource: Record Resource; LineNo: Integer; MainLineNo: Integer; FromTime: Time; ToTime: Time)
     begin
         Init;
         "No." := Resource."No.";
@@ -358,28 +379,40 @@ page 6059833 "Event Resource Avail. Overview"
         StyleExpr: Text;
     begin
         for i := 1 to ArrayLen(MatrixDataHolder) do begin
-          case MatrixDataHolder[i] of
-            '':
-              StyleExpr := 'Standard';
-            FreeText:
-              StyleExpr := 'Favorable';
-            NotFreeText:
-              StyleExpr := 'Unfavorable';
-          end;
-          case i of
-            1: StyleExpr1 := StyleExpr;
-            2: StyleExpr2 := StyleExpr;
-            3: StyleExpr3 := StyleExpr;
-            4: StyleExpr4 := StyleExpr;
-            5: StyleExpr5 := StyleExpr;
-            6: StyleExpr6 := StyleExpr;
-            7: StyleExpr7 := StyleExpr;
-            8: StyleExpr8 := StyleExpr;
-            9: StyleExpr9 := StyleExpr;
-            10: StyleExpr10 := StyleExpr;
-            11: StyleExpr11 := StyleExpr;
-            12: StyleExpr12 := StyleExpr;
-          end;
+            case MatrixDataHolder[i] of
+                '':
+                    StyleExpr := 'Standard';
+                FreeText:
+                    StyleExpr := 'Favorable';
+                NotFreeText:
+                    StyleExpr := 'Unfavorable';
+            end;
+            case i of
+                1:
+                    StyleExpr1 := StyleExpr;
+                2:
+                    StyleExpr2 := StyleExpr;
+                3:
+                    StyleExpr3 := StyleExpr;
+                4:
+                    StyleExpr4 := StyleExpr;
+                5:
+                    StyleExpr5 := StyleExpr;
+                6:
+                    StyleExpr6 := StyleExpr;
+                7:
+                    StyleExpr7 := StyleExpr;
+                8:
+                    StyleExpr8 := StyleExpr;
+                9:
+                    StyleExpr9 := StyleExpr;
+                10:
+                    StyleExpr10 := StyleExpr;
+                11:
+                    StyleExpr11 := StyleExpr;
+                12:
+                    StyleExpr12 := StyleExpr;
+            end;
         end;
     end;
 
@@ -388,14 +421,14 @@ page 6059833 "Event Resource Avail. Overview"
         FirstDate: Date;
     begin
         case Direction of
-          Direction::Next:
-            FirstDate := CalcDate('1D',DateArray[ArrayLen(DateArray)]);
-          Direction::Previous:
-            begin
-              FirstDate := CalcDate(StrSubstNo('-%1D',ArrayLen(DateArray)),DateArray[1]);
-              if FirstDate < StartingDate then
-                FirstDate := StartingDate;
-            end;
+            Direction::Next:
+                FirstDate := CalcDate('1D', DateArray[ArrayLen(DateArray)]);
+            Direction::Previous:
+                begin
+                    FirstDate := CalcDate(StrSubstNo('-%1D', ArrayLen(DateArray)), DateArray[1]);
+                    if FirstDate < StartingDate then
+                        FirstDate := StartingDate;
+                end;
         end;
         LoadDateArrays(FirstDate);
     end;

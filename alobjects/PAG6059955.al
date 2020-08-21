@@ -13,20 +13,25 @@ page 6059955 "MCS API Setup"
         {
             repeater(Group)
             {
-                field(API;API)
+                field(API; API)
                 {
+                    ApplicationArea = All;
                 }
-                field("Key 1";"Key 1")
+                field("Key 1"; "Key 1")
                 {
+                    ApplicationArea = All;
                 }
-                field("Key 2";"Key 2")
+                field("Key 2"; "Key 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Image Orientation";"Image Orientation")
+                field("Image Orientation"; "Image Orientation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Cognitive Services";"Use Cognitive Services")
+                field("Use Cognitive Services"; "Use Cognitive Services")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

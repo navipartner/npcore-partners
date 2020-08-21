@@ -16,15 +16,19 @@ page 6151510 "Nc Task Output List"
             {
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field("Last Modified at"; "Last Modified at")
                 {
+                    ApplicationArea = All;
                 }
                 field("Process Count"; "Process Count")
                 {
+                    ApplicationArea = All;
                 }
                 field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             grid(Control6151411)
@@ -35,6 +39,7 @@ page 6151510 "Nc Task Output List"
                     ShowCaption = false;
                     field(" "; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -42,6 +47,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151420; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -49,6 +55,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151419; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -56,6 +63,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151418; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -63,6 +71,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151417; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -70,6 +79,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151416; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -77,6 +87,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151415; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -84,6 +95,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151414; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -91,6 +103,7 @@ page 6151510 "Nc Task Output List"
                     }
                     field(Control6151413; '')
                     {
+                        ApplicationArea = All;
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -102,12 +115,14 @@ page 6151510 "Nc Task Output List"
                     ShowCaption = false;
                     field(Control6151409; '')
                     {
+                        ApplicationArea = All;
                         Caption = 'Response:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
                     }
                     field(ResponseText; ResponseText)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;

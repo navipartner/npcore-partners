@@ -12,41 +12,52 @@ page 6059969 "Description Control"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Setup Type";"Setup Type")
+                field("Setup Type"; "Setup Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Disable Item Translations";"Disable Item Translations")
+                field("Disable Item Translations"; "Disable Item Translations")
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 1 Var (Simple)";"Description 1 Var (Simple)")
+                field("Description 1 Var (Simple)"; "Description 1 Var (Simple)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2 Var (Simple)";"Description 2 Var (Simple)")
+                field("Description 2 Var (Simple)"; "Description 2 Var (Simple)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 1 Std (Simple)";"Description 1 Std (Simple)")
+                field("Description 1 Std (Simple)"; "Description 1 Std (Simple)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2 Std (Simple)";"Description 2 Std (Simple)")
+                field("Description 2 Std (Simple)"; "Description 2 Std (Simple)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 1 Var (Adv)";"Description 1 Var (Adv)")
+                field("Description 1 Var (Adv)"; "Description 1 Var (Adv)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Description 2 Var (Adv)";"Description 2 Var (Adv)")
+                field("Description 2 Var (Adv)"; "Description 2 Var (Adv)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Description 1 Std (Adv)";"Description 1 Std (Adv)")
+                field("Description 1 Std (Adv)"; "Description 1 Std (Adv)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Description 2 Std (Adv)";"Description 2 Std (Adv)")
+                field("Description 2 Std (Adv)"; "Description 2 Std (Adv)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

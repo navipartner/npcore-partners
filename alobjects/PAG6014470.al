@@ -19,7 +19,7 @@ page 6014470 "Retail Document Lines"
     PageType = ListPart;
     RefreshOnActivate = true;
     SourceTable = "Retail Document Lines";
-    SourceTableView = SORTING("Document Type","Document No.","Line No.");
+    SourceTableView = SORTING("Document Type", "Document No.", "Line No.");
 
     layout
     {
@@ -27,81 +27,105 @@ page 6014470 "Retail Document Lines"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Size;Size)
+                field(Size; Size)
                 {
+                    ApplicationArea = All;
                 }
-                field("Lock Code";"Lock Code")
+                field("Lock Code"; "Lock Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No. not Created";"Serial No. not Created")
+                field("Serial No. not Created"; "Serial No. not Created")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity in order";"Quantity in order")
+                field("Quantity in order"; "Quantity in order")
                 {
+                    ApplicationArea = All;
                     Visible = FieldQtyInOrder;
                 }
-                field("Quantity received";"Quantity received")
+                field("Quantity received"; "Quantity received")
                 {
+                    ApplicationArea = All;
                     Visible = FieldQuantityReceived;
                 }
-                field("Qty. to Ship";"Qty. to Ship")
+                field("Qty. to Ship"; "Qty. to Ship")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity Shipped";"Quantity Shipped")
+                field("Quantity Shipped"; "Quantity Shipped")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Received last";"Received last")
+                field("Received last"; "Received last")
                 {
+                    ApplicationArea = All;
                     Visible = FieldReceivedLast;
                 }
-                field("Letter printed";"Letter printed")
+                field("Letter printed"; "Letter printed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Reason Code";"Return Reason Code")
+                field("Return Reason Code"; "Return Reason Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reason Code";"Reason Code")
+                field("Reason Code"; "Reason Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rental Amount incl. VAT";"Rental Amount incl. VAT")
+                field("Rental Amount incl. VAT"; "Rental Amount incl. VAT")
                 {
+                    ApplicationArea = All;
                     Visible = FieldRentIncVat;
                 }
-                field("Unit price";"Unit price")
+                field("Unit price"; "Unit price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line discount %";"Line discount %")
+                field("Line discount %"; "Line discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line discount amount";"Line discount amount")
+                field("Line discount amount"; "Line discount amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Package quantity";"Package quantity")
+                field("Package quantity"; "Package quantity")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -115,29 +139,29 @@ page 6014470 "Retail Document Lines"
     begin
 
         case Type of
-          Type::Item :
-            begin
-              //Delete Accesories and BOM
-              RetailDocHandlingCU.UnfoldItemsDelete(Rec);
-            end;
+            Type::Item:
+                begin
+                    //Delete Accesories and BOM
+                    RetailDocHandlingCU.UnfoldItemsDelete(Rec);
+                end;
         end;
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        "Rental Header".Get( "Document Type", "Document No." );
+        "Rental Header".Get("Document Type", "Document No.");
 
         case Type of
-          Type::Item :
-            begin
-              //+Unfold Accessories
-              RetailDocHandlingCU.UnfoldAccessories(Rec);
-              //-Unfold Accessories
+            Type::Item:
+                begin
+                    //+Unfold Accessories
+                    RetailDocHandlingCU.UnfoldAccessories(Rec);
+                    //-Unfold Accessories
 
-              //+Unfold BOM
-              RetailDocHandlingCU.UnfoldBOM(Rec,'');
-              //-Unfold BOM
-            end;
+                    //+Unfold BOM
+                    RetailDocHandlingCU.UnfoldBOM(Rec, '');
+                    //-Unfold BOM
+                end;
         end;
     end;
 
@@ -145,11 +169,11 @@ page 6014470 "Retail Document Lines"
     begin
 
         case Type of
-          Type::Item :
-            begin
-              //Update Accesories and BOM
-              RetailDocHandlingCU.UnfoldItemsUpdate(Rec);
-            end;
+            Type::Item:
+                begin
+                    //Update Accesories and BOM
+                    RetailDocHandlingCU.UnfoldItemsUpdate(Rec);
+                end;
         end;
     end;
 
@@ -170,100 +194,101 @@ page 6014470 "Retail Document Lines"
     procedure setRetailDocType(int1: Integer)
     begin
         //setRetailDocType
-        
+
         case int1 of
-          "Rental Header"."Document Type"::" " :;
-        
-          /* SELECTION CONTRACT */
-        
-          "Rental Header"."Document Type"::"Selection Contract" :
-            begin
-                //-NPK TS
-                FieldRentIncVat:= true;
-                FieldQtyInOrder:= false;
-                FieldQuantityReceived:= false;
-                FieldReceivedLast:= false;
-                //+NPK TS
-            end;
-        
-          /* RETAIL ORDER */
-        
-          "Rental Header"."Document Type"::"Retail Order" :
-            begin
-                //-NPK TS
-                FieldRentIncVat:=false;
-                FieldQtyInOrder:=true;
-                FieldQuantityReceived:=true;
-                FieldReceivedLast:=true;
-                //+NPK TS
-            end;
-        
-          /* WISH */
-        
-          "Rental Header"."Document Type"::Wish :
-            begin
-                //-NPK TS
-                FieldRentIncVat:=false;
-                FieldQtyInOrder:=false;
-                FieldQuantityReceived:=false;
-                FieldReceivedLast:= false;
-                //+NPK TS
-            end;
-        
-          /* CUSTOMIZATION */
-        
-          "Rental Header"."Document Type"::Customization :
-            begin
-                //-NPK TS
-                FieldRentIncVat:=false;
-                FieldQtyInOrder:=false;
-                FieldQuantityReceived:=false;
-                FieldReceivedLast:= false;
-                //+NPK TS
-            end;
-        
-          "Rental Header"."Document Type"::Delivery :
-            begin
-                //-NPK TS
-                FieldRentIncVat:=false;
-                FieldQtyInOrder:=false;
-                FieldQuantityReceived:=false;
-                FieldReceivedLast:=false;
-                //+NPK TS
-            end;
-        
-          "Rental Header"."Document Type"::"Rental contract" :
-            begin
-                //-NPK TS
-                FieldRentIncVat:=true;
-                FieldQtyInOrder:=false;
-                FieldQuantityReceived:=false;
-                FieldReceivedLast:= false;
-                //+NPK TS
-            end;
-        
-          "Rental Header"."Document Type"::"Purchase contract" :
-            begin
-                //-NPK TS
-                FieldRentIncVat:=false;
-                FieldQtyInOrder:= false;
-                FieldQuantityReceived:=false;
-                FieldReceivedLast:=false;
-                //+NPK TS
-            end;
-        
-          "Rental Header"."Document Type"::Quote :
-            begin
-                //-NPK TS
-                FieldRentIncVat:= false;
-                FieldQtyInOrder:=  false;
-                FieldQuantityReceived:=false;
-                FieldReceivedLast:= false;
-                //+NPK TS
-            end;
-        
-        
-        
+            "Rental Header"."Document Type"::" ":
+                ;
+
+            /* SELECTION CONTRACT */
+
+            "Rental Header"."Document Type"::"Selection Contract":
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := true;
+                    FieldQtyInOrder := false;
+                    FieldQuantityReceived := false;
+                    FieldReceivedLast := false;
+                    //+NPK TS
+                end;
+
+            /* RETAIL ORDER */
+
+            "Rental Header"."Document Type"::"Retail Order":
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := false;
+                    FieldQtyInOrder := true;
+                    FieldQuantityReceived := true;
+                    FieldReceivedLast := true;
+                    //+NPK TS
+                end;
+
+            /* WISH */
+
+            "Rental Header"."Document Type"::Wish:
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := false;
+                    FieldQtyInOrder := false;
+                    FieldQuantityReceived := false;
+                    FieldReceivedLast := false;
+                    //+NPK TS
+                end;
+
+            /* CUSTOMIZATION */
+
+            "Rental Header"."Document Type"::Customization:
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := false;
+                    FieldQtyInOrder := false;
+                    FieldQuantityReceived := false;
+                    FieldReceivedLast := false;
+                    //+NPK TS
+                end;
+
+            "Rental Header"."Document Type"::Delivery:
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := false;
+                    FieldQtyInOrder := false;
+                    FieldQuantityReceived := false;
+                    FieldReceivedLast := false;
+                    //+NPK TS
+                end;
+
+            "Rental Header"."Document Type"::"Rental contract":
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := true;
+                    FieldQtyInOrder := false;
+                    FieldQuantityReceived := false;
+                    FieldReceivedLast := false;
+                    //+NPK TS
+                end;
+
+            "Rental Header"."Document Type"::"Purchase contract":
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := false;
+                    FieldQtyInOrder := false;
+                    FieldQuantityReceived := false;
+                    FieldReceivedLast := false;
+                    //+NPK TS
+                end;
+
+            "Rental Header"."Document Type"::Quote:
+                begin
+                    //-NPK TS
+                    FieldRentIncVat := false;
+                    FieldQtyInOrder := false;
+                    FieldQuantityReceived := false;
+                    FieldReceivedLast := false;
+                    //+NPK TS
+                end;
+
+
+
         end;
 
     end;

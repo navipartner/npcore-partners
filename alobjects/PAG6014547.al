@@ -12,12 +12,14 @@ page 6014547 "Field Lookup"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                     Caption = 'Field Caption';
                 }
             }

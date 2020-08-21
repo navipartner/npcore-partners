@@ -16,21 +16,26 @@ page 6184497 "Pepper Version Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Install Directory";"Install Directory")
+                field("Install Directory"; "Install Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Pepper DLL Version";"Pepper DLL Version")
+                field("Pepper DLL Version"; "Pepper DLL Version")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Zip File";HasZipFile)
+                field("Zip File"; HasZipFile)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -38,8 +43,9 @@ page 6184497 "Pepper Version Card"
             {
                 group(Configuration)
                 {
-                    field("XMLport Configuration";"XMLport Configuration")
+                    field("XMLport Configuration"; "XMLport Configuration")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
 
                         trigger OnValidate()
@@ -47,8 +53,9 @@ page 6184497 "Pepper Version Card"
                             CurrPage.Update;
                         end;
                     }
-                    field("XMLport Configuration Name";"XMLport Configuration Name")
+                    field("XMLport Configuration Name"; "XMLport Configuration Name")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
                 }
@@ -57,8 +64,9 @@ page 6184497 "Pepper Version Card"
             {
                 group("Begin Workshift")
                 {
-                    field("Codeunit Begin Workshift";"Codeunit Begin Workshift")
+                    field("Codeunit Begin Workshift"; "Codeunit Begin Workshift")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
 
                         trigger OnValidate()
@@ -66,15 +74,17 @@ page 6184497 "Pepper Version Card"
                             CurrPage.Update;
                         end;
                     }
-                    field("Codeunit Begin Workshift Name";"Codeunit Begin Workshift Name")
+                    field("Codeunit Begin Workshift Name"; "Codeunit Begin Workshift Name")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
                 }
                 group(Transaction)
                 {
-                    field("Codeunit Transaction";"Codeunit Transaction")
+                    field("Codeunit Transaction"; "Codeunit Transaction")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
 
                         trigger OnValidate()
@@ -82,15 +92,17 @@ page 6184497 "Pepper Version Card"
                             CurrPage.Update;
                         end;
                     }
-                    field("Codeunit Transaction Name";"Codeunit Transaction Name")
+                    field("Codeunit Transaction Name"; "Codeunit Transaction Name")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
                 }
                 group("End Workshift")
                 {
-                    field("Codeunit End Workshift";"Codeunit End Workshift")
+                    field("Codeunit End Workshift"; "Codeunit End Workshift")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
 
                         trigger OnValidate()
@@ -98,15 +110,17 @@ page 6184497 "Pepper Version Card"
                             CurrPage.Update;
                         end;
                     }
-                    field("Codeunit End Workshift Name";"Codeunit End Workshift Name")
+                    field("Codeunit End Workshift Name"; "Codeunit End Workshift Name")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
                 }
                 group(Auxiliary)
                 {
-                    field("Codeunit Auxiliary Functions";"Codeunit Auxiliary Functions")
+                    field("Codeunit Auxiliary Functions"; "Codeunit Auxiliary Functions")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
 
                         trigger OnValidate()
@@ -114,19 +128,22 @@ page 6184497 "Pepper Version Card"
                             CurrPage.Update;
                         end;
                     }
-                    field("Codeunit Auxiliary Name";"Codeunit Auxiliary Name")
+                    field("Codeunit Auxiliary Name"; "Codeunit Auxiliary Name")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
                 }
                 group(Install)
                 {
-                    field("Codeunit Install";"Codeunit Install")
+                    field("Codeunit Install"; "Codeunit Install")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
-                    field("Codeunit Install Name";"Codeunit Install Name")
+                    field("Codeunit Install Name"; "Codeunit Install Name")
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
                 }

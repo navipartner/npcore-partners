@@ -15,43 +15,51 @@ page 6014643 "RP Data Item Constraint Links"
         {
             repeater(Group)
             {
-                field("Data Item Name";"Data Item Name")
+                field("Data Item Name"; "Data Item Name")
                 {
+                    ApplicationArea = All;
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
                     Visible = false;
                 }
-                field("Data Item Field ID";"Data Item Field ID")
+                field("Data Item Field ID"; "Data Item Field ID")
                 {
+                    ApplicationArea = All;
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
                 }
-                field("Data Item Field Name";"Data Item Field Name")
+                field("Data Item Field Name"; "Data Item Field Name")
                 {
+                    ApplicationArea = All;
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
                 }
-                field("Filter Type";"Filter Type")
+                field("Filter Type"; "Filter Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field ID";"Field ID")
+                field("Field ID"; "Field ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Value";"Filter Value")
+                field("Filter Value"; "Filter Value")
                 {
-                    Enabled = "Filter Type"<>0;
+                    ApplicationArea = All;
+                    Enabled = "Filter Type" <> 0;
                 }
-                field("Link Type";"Link Type")
+                field("Link Type"; "Link Type")
                 {
-                    Enabled = "Filter Type"=0;
+                    ApplicationArea = All;
+                    Enabled = "Filter Type" = 0;
                     Style = Subordinate;
-                    StyleExpr = "Filter Type"<>0;
+                    StyleExpr = "Filter Type" <> 0;
                 }
             }
         }

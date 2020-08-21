@@ -13,38 +13,49 @@ page 6151389 "CS Refill Data"
         {
             repeater(Group)
             {
-                field("Item Group Code";"Item Group Code")
+                field("Item Group Code"; "Item Group Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Description";"Item Group Description")
+                field("Item Group Description"; "Item Group Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Description";"Item Description")
+                field("Item Description"; "Item Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description";"Variant Description")
+                field("Variant Description"; "Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. in Stock";"Qty. in Stock")
+                field("Qty. in Stock"; "Qty. in Stock")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. in Store";"Qty. in Store")
+                field("Qty. in Store"; "Qty. in Store")
                 {
+                    ApplicationArea = All;
                 }
-                field(Refilled;Refilled)
+                field(Refilled; Refilled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Refilled By";"Refilled By")
+                field("Refilled By"; "Refilled By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refilled Date";"Refilled Date")
+                field("Refilled Date"; "Refilled Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

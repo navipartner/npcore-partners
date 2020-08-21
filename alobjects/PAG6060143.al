@@ -15,55 +15,71 @@ page 6060143 "MM Membership Notification"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Membership Entry No.";"Membership Entry No.")
+                field("Membership Entry No."; "Membership Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Code";"Notification Code")
+                field("Notification Code"; "Notification Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date To Notify";"Date To Notify")
+                field("Date To Notify"; "Date To Notify")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Status";"Notification Status")
+                field("Notification Status"; "Notification Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Processed At";"Notification Processed At")
+                field("Notification Processed At"; "Notification Processed At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Processed By User";"Notification Processed By User")
+                field("Notification Processed By User"; "Notification Processed By User")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked By User";"Blocked By User")
+                field("Blocked By User"; "Blocked By User")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Trigger";"Notification Trigger")
+                field("Notification Trigger"; "Notification Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Filter Value";"Template Filter Value")
+                field("Template Filter Value"; "Template Filter Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Member Role";"Target Member Role")
+                field("Target Member Role"; "Target Member Role")
                 {
+                    ApplicationArea = All;
                 }
-                field("Include NP Pass";"Include NP Pass")
+                field("Include NP Pass"; "Include NP Pass")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Method";"Processing Method")
+                field("Processing Method"; "Processing Method")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -80,7 +96,7 @@ page 6060143 "MM Membership Notification"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Notification Entry";
-                RunPageLink = "Notification Entry No."=FIELD("Entry No.");
+                RunPageLink = "Notification Entry No." = FIELD("Entry No.");
             }
         }
         area(processing)
@@ -94,7 +110,7 @@ page 6060143 "MM Membership Notification"
                 trigger OnAction()
                 begin
 
-                    SendNotification (Rec);
+                    SendNotification(Rec);
                 end;
             }
         }
@@ -105,8 +121,8 @@ page 6060143 "MM Membership Notification"
         MemberNotification: Codeunit "MM Member Notification";
     begin
 
-        MemberNotification.HandleMembershipNotification (MembershipNotification);
-        CurrPage.Update (false);
+        MemberNotification.HandleMembershipNotification(MembershipNotification);
+        CurrPage.Update(false);
     end;
 }
 

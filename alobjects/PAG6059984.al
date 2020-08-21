@@ -13,32 +13,38 @@ page 6059984 "Web Manager Activities"
             cuegroup("Open Orders")
             {
                 Caption = 'Open Orders';
-                field("Open Web Sales Orders";"Open Web Sales Orders")
+                field("Open Web Sales Orders"; "Open Web Sales Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                 }
-                field("Open Credit Memos";"Open Credit Memos")
+                field("Open Credit Memos"; "Open Credit Memos")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Credit Memo Lines Subform";
                 }
-                field("Open Purchase Orders";"Open Purchase Orders")
+                field("Open Purchase Orders"; "Open Purchase Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Purchase Order List";
                 }
             }
             cuegroup("Processed Orders")
             {
                 Caption = 'Processed Orders';
-                field("Posted Web Sales Orders";"Posted Web Sales Orders")
+                field("Posted Web Sales Orders"; "Posted Web Sales Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Invoice List";
                 }
-                field("Posted Credit Memos";"Posted Credit Memos")
+                field("Posted Credit Memos"; "Posted Credit Memos")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Posted Sales Credit Memos";
                 }
-                field("Posted Purchase Orders";"Posted Purchase Orders")
+                field("Posted Purchase Orders"; "Posted Purchase Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Posted Purchase Invoices";
                 }
             }
@@ -67,8 +73,8 @@ page 6059984 "Web Manager Activities"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

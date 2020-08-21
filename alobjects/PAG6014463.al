@@ -12,26 +12,33 @@ page 6014463 "Touch Screen - Meta Triggers"
             repeater(Control6150621)
             {
                 ShowCaption = false;
-                field(When;When)
+                field(When; When)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sequence;Sequence)
+                field(Sequence; Sequence)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Type";"Line Type")
+                field("Line Type"; "Line Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(ID;ID)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                 }
-                field("Var Parameter";"Var Parameter")
+                field("Var Parameter"; "Var Parameter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Var Record Param";"Var Record Param")
+                field("Var Record Param"; "Var Record Param")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

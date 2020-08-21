@@ -37,28 +37,32 @@ page 6014433 "Payment Type - Card"
                 group(Control6150671)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Register No.";"Register No.")
+                    field("Register No."; "Register No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Account Type";"Account Type")
+                    field("Account Type"; "Account Type")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
 
                         trigger OnValidate()
                         begin
                             if "Account Type" = "Account Type"::Customer then begin
-                              "G/L Account No." := '';
-                              "Bank Acc. No." := '';
-                            end else if "Account Type" = "Account Type"::"G/L Account" then begin
-                              "Customer No." := '';
-                              "Bank Acc. No." := '';
-                            end else begin
-                              "Customer No." := '';
-                              "G/L Account No." := '';
-                            end;
+                                "G/L Account No." := '';
+                                "Bank Acc. No." := '';
+                            end else
+                                if "Account Type" = "Account Type"::"G/L Account" then begin
+                                    "Customer No." := '';
+                                    "Bank Acc. No." := '';
+                                end else begin
+                                    "Customer No." := '';
+                                    "G/L Account No." := '';
+                                end;
                             //CurrForm.Customer.EDITABLE := "Account Type" = "Account Type"::Customer;
                             //CurrForm."G/L Account".EDITABLE := "Account Type" = "Account Type"::"G/L Account";
                             //CurrForm.Bank.EDITABLE := "Account Type" = "Account Type"::Bank;
@@ -67,44 +71,54 @@ page 6014433 "Payment Type - Card"
                             BankEditable := "Account Type" = "Account Type"::Bank;
                         end;
                     }
-                    field("G/L Account No.";"G/L Account No.")
+                    field("G/L Account No."; "G/L Account No.")
                     {
+                        ApplicationArea = All;
                         Editable = GlAccountEditable;
                         Importance = Promoted;
                     }
-                    field("Customer No.";"Customer No.")
+                    field("Customer No."; "Customer No.")
                     {
+                        ApplicationArea = All;
                         Editable = CustomerEditable;
                     }
-                    field("Bank Acc. No.";"Bank Acc. No.")
+                    field("Bank Acc. No."; "Bank Acc. No.")
                     {
+                        ApplicationArea = All;
                         Editable = BankEditable;
                     }
-                    field(Status;Status)
+                    field(Status; Status)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sales Line Text";"Sales Line Text")
+                    field("Sales Line Text"; "Sales Line Text")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Zero as Default on Popup";"Zero as Default on Popup")
+                    field("Zero as Default on Popup"; "Zero as Default on Popup")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150684)
                 {
                     ShowCaption = false;
-                    field("Search Description";"Search Description")
+                    field("Search Description"; "Search Description")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Prefix;Prefix)
+                    field(Prefix; Prefix)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Processing Type";"Processing Type")
+                    field("Processing Type"; "Processing Type")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -116,90 +130,116 @@ page 6014433 "Payment Type - Card"
                             MinSalesAmountEditable := ("Processing Type" = "Processing Type"::"Gift Voucher");
                         end;
                     }
-                    field("Payment Method Code";"Payment Method Code")
+                    field("Payment Method Code"; "Payment Method Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Posting;Posting)
+                    field(Posting; Posting)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Immediate Posting";"Immediate Posting")
+                    field("Immediate Posting"; "Immediate Posting")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Day Clearing Account";"Day Clearing Account")
+                    field("Day Clearing Account"; "Day Clearing Account")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Euro;Euro)
+                    field(Euro; Euro)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Is Check";"Is Check")
+                    field("Is Check"; "Is Check")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Common Company Clearing";"Common Company Clearing")
+                    field("Common Company Clearing"; "Common Company Clearing")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Auto End Sale";"Auto End Sale")
+                    field("Auto End Sale"; "Auto End Sale")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Forced Amount";"Forced Amount")
+                    field("Forced Amount"; "Forced Amount")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Match Sales Amount";"Match Sales Amount")
+                    field("Match Sales Amount"; "Match Sales Amount")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Reverse Unrealized VAT";"Reverse Unrealized VAT")
+                    field("Reverse Unrealized VAT"; "Reverse Unrealized VAT")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Control6150645;'')
+                    field(Control6150645; '')
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
-                    field("Open Drawer";"Open Drawer")
+                    field("Open Drawer"; "Open Drawer")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(Options)
             {
                 Caption = 'Option';
-                field("Via Terminal";"Via Terminal")
+                field("Via Terminal"; "Via Terminal")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Reference Incoming";"Reference Incoming")
+                field("Reference Incoming"; "Reference Incoming")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fixed Rate";"Fixed Rate")
+                field("Fixed Rate"; "Fixed Rate")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rounding Precision";"Rounding Precision")
+                field("Rounding Precision"; "Rounding Precision")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt - Post it Now";"Receipt - Post it Now")
+                field("Receipt - Post it Now"; "Receipt - Post it Now")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Maximum Amount";"Maximum Amount")
+                field("Maximum Amount"; "Maximum Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Minimum Amount";"Minimum Amount")
+                field("Minimum Amount"; "Minimum Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Refund";"Allow Refund")
+                field("Allow Refund"; "Allow Refund")
                 {
+                    ApplicationArea = All;
                 }
-                field("EFT Surcharge Service Item No.";"EFT Surcharge Service Item No.")
+                field("EFT Surcharge Service Item No."; "EFT Surcharge Service Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("EFT Tip Service Item No.";"EFT Tip Service Item No.")
+                field("EFT Tip Service Item No."; "EFT Tip Service Item No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Integration)
@@ -208,25 +248,30 @@ page 6014433 "Payment Type - Card"
                 group(Specialization)
                 {
                     Caption = 'Specialization';
-                    field("Validation Codeunit";"Validation Codeunit")
+                    field("Validation Codeunit"; "Validation Codeunit")
                     {
+                        ApplicationArea = All;
                     }
-                    field("On Sale End Codeunit";"On Sale End Codeunit")
+                    field("On Sale End Codeunit"; "On Sale End Codeunit")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Post Processing Codeunit";"Post Processing Codeunit")
+                    field("Post Processing Codeunit"; "Post Processing Codeunit")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(Balancing)
             {
-                field("To be Balanced";"To be Balanced")
+                field("To be Balanced"; "To be Balanced")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Balancing Type";"Balancing Type")
+                field("Balancing Type"; "Balancing Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -252,9 +297,9 @@ page 6014433 "Payment Type - Card"
                         CreditCardPrefix: Page "Credit Card Prefix";
                     begin
                         PaymentTypePrefix.Reset;
-                        PaymentTypePrefix.SetRange("Payment Type","No.");
-                        PaymentTypePrefix.SetRange("Register No.","Register No.");
-                        PaymentTypePrefix.SetRange("Global Dimension 1 Code","Global Dimension 1 Code");
+                        PaymentTypePrefix.SetRange("Payment Type", "No.");
+                        PaymentTypePrefix.SetRange("Register No.", "Register No.");
+                        PaymentTypePrefix.SetRange("Global Dimension 1 Code", "Global Dimension 1 Code");
                         CreditCardPrefix.SetTableView(PaymentTypePrefix);
                         CreditCardPrefix.LookupMode := true;
                         //PræfixForm.Prefix;
@@ -274,8 +319,8 @@ page 6014433 "Payment Type - Card"
                         CreditCardPrefix: Page "Credit Card Prefix";
                     begin
                         PaymentTypePrefix.Reset;
-                        PaymentTypePrefix.SetRange("Payment Type","No.");
-                        PaymentTypePrefix.SetRange("Register No.","Register No.");
+                        PaymentTypePrefix.SetRange("Payment Type", "No.");
+                        PaymentTypePrefix.SetRange("Register No.", "Register No.");
                         CreditCardPrefix.SetTableView(PaymentTypePrefix);
                         CreditCardPrefix.LookupMode := true;
                         CreditCardPrefix.weights;
@@ -293,7 +338,7 @@ page 6014433 "Payment Type - Card"
                         TestField("G/L Account No.");
                         GLAccount.Get("G/L Account No.");
                         //FORM.RUNMODAL(FORM::"G/L Account Card",Finanskontorec);
-                        PAGE.RunModal(PAGE::"G/L Account Card",GLAccount);
+                        PAGE.RunModal(PAGE::"G/L Account Card", GLAccount);
                     end;
                 }
             }

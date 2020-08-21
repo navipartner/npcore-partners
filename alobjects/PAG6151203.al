@@ -14,29 +14,37 @@ page 6151203 "NpCs Document Mapping"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("From Store Code";"From Store Code")
+                field("From Store Code"; "From Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("From No.";"From No.")
+                field("From No."; "From No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Description";"From Description")
+                field("From Description"; "From Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Description 2";"From Description 2")
+                field("From Description 2"; "From Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("To No.";"To No.")
+                field("To No."; "To No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Description";"To Description")
+                field("To Description"; "To Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Description 2";"To Description 2")
+                field("To Description 2"; "To Description 2")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

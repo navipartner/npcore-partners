@@ -14,27 +14,34 @@ page 6014662 "Stock-Take Worksheets"
         {
             repeater(Group)
             {
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Filter";"Item Group Filter")
+                field("Item Group Filter"; "Item Group Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Code Filter";"Vendor Code Filter")
+                field("Vendor Code Filter"; "Vendor Code Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field(Metrics;LineTypeCountText)
+                field(Metrics; LineTypeCountText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Metrics';
                     Editable = false;
                     Style = Favorable;
@@ -51,7 +58,7 @@ page 6014662 "Stock-Take Worksheets"
     trigger OnAfterGetRecord()
     begin
         //-NPR5.49 [348372]
-        CountWorksheetLines ();
+        CountWorksheetLines();
         //+NPR5.49 [348372]
     end;
 
@@ -70,23 +77,23 @@ page 6014662 "Stock-Take Worksheets"
     begin
 
         //-NPR5.49 [348372]
-        StockTakeWorksheet.SetFilter ("Stock-Take Config Code", '=%1', Rec."Stock-Take Config Code");
-        WorksheetsCount := StockTakeWorksheet.Count ();
+        StockTakeWorksheet.SetFilter("Stock-Take Config Code", '=%1', Rec."Stock-Take Config Code");
+        WorksheetsCount := StockTakeWorksheet.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Stock-Take Config Code", '=%1', Rec."Stock-Take Config Code");
-        StockTakeWorksheetLine.SetFilter ("Worksheet Name", '=%1', Rec.Name);
-        WorksheetLinesCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Stock-Take Config Code", '=%1', Rec."Stock-Take Config Code");
+        StockTakeWorksheetLine.SetFilter("Worksheet Name", '=%1', Rec.Name);
+        WorksheetLinesCount := StockTakeWorksheetLine.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::READY);
-        ReadyCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::READY);
+        ReadyCount := StockTakeWorksheetLine.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::IGNORE);
-        IgnoreCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::IGNORE);
+        IgnoreCount := StockTakeWorksheetLine.Count();
 
-        StockTakeWorksheetLine.SetFilter ("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::TRANSFERRED);
-        TransferCount := StockTakeWorksheetLine.Count ();
+        StockTakeWorksheetLine.SetFilter("Transfer State", '=%1', StockTakeWorksheetLine."Transfer State"::TRANSFERRED);
+        TransferCount := StockTakeWorksheetLine.Count();
 
-        LineTypeCountText := StrSubstNo ('%2 [%3/%4/%5]', WorksheetsCount, WorksheetLinesCount, ReadyCount, IgnoreCount, TransferCount);
+        LineTypeCountText := StrSubstNo('%2 [%3/%4/%5]', WorksheetsCount, WorksheetLinesCount, ReadyCount, IgnoreCount, TransferCount);
         //+NPR5.49 [348372]
     end;
 }

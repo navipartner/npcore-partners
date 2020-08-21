@@ -13,37 +13,43 @@ page 6150726 "POS Action Sequences"
         {
             repeater(Group)
             {
-                field("Reference Type";"Reference Type")
+                field("Reference Type"; "Reference Type")
                 {
+                    ApplicationArea = All;
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
                 }
-                field("Reference POS Action Code";"Reference POS Action Code")
+                field("Reference POS Action Code"; "Reference POS Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
                 }
-                field("POS Action Code";"POS Action Code")
+                field("POS Action Code"; "POS Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
                 }
-                field("Source Type";"Source Type")
+                field("Source Type"; "Source Type")
                 {
+                    ApplicationArea = All;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
                 }
-                field("Sequence No.";"Sequence No.")
+                field("Sequence No."; "Sequence No.")
                 {
+                    ApplicationArea = All;
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
@@ -85,11 +91,11 @@ page 6150726 "POS Action Sequences"
         MsgText: Text;
     begin
         if not CODEUNIT.Run(CODEUNIT::"Discover POS Action Sequences") then begin
-          MsgText := StrSubstNo(Text001,GetLastErrorText);
-          if Fail then
-            Error(MsgText)
-          else
-            Message(MsgText);
+            MsgText := StrSubstNo(Text001, GetLastErrorText);
+            if Fail then
+                Error(MsgText)
+            else
+                Message(MsgText);
         end;
     end;
 }

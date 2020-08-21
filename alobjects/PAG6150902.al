@@ -16,47 +16,61 @@ page 6150902 "HC Retail Setup"
         {
             group(General)
             {
-                field("Amount Rounding Precision";"Amount Rounding Precision")
+                field("Amount Rounding Precision"; "Amount Rounding Precision")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Source Code";"Posting Source Code")
+                field("Posting Source Code"; "Posting Source Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting No. Management";"Posting No. Management")
+                field("Posting No. Management"; "Posting No. Management")
                 {
+                    ApplicationArea = All;
                 }
-                field("Selection No. Series";"Selection No. Series")
+                field("Selection No. Series"; "Selection No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balancing Posting Type";"Balancing Posting Type")
+                field("Balancing Posting Type"; "Balancing Posting Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vat Bus. Posting Group";"Vat Bus. Posting Group")
+                field("Vat Bus. Posting Group"; "Vat Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post registers compressed";"Post registers compressed")
+                field("Post registers compressed"; "Post registers compressed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Appendix no. eq Sales Ticket";"Appendix no. eq Sales Ticket")
+                field("Appendix no. eq Sales Ticket"; "Appendix no. eq Sales Ticket")
                 {
+                    ApplicationArea = All;
                 }
-                field("Compress G/L Entries";"Compress G/L Entries")
+                field("Compress G/L Entries"; "Compress G/L Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gen. Journal Template";"Gen. Journal Template")
+                field("Gen. Journal Template"; "Gen. Journal Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gen. Journal Batch";"Gen. Journal Batch")
+                field("Gen. Journal Batch"; "Gen. Journal Batch")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Journal Template";"Item Journal Template")
+                field("Item Journal Template"; "Item Journal Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Journal Batch";"Item Journal Batch")
+                field("Item Journal Batch"; "Item Journal Batch")
                 {
+                    ApplicationArea = All;
                 }
-                field("Dimensions Posting Type";"Dimensions Posting Type")
+                field("Dimensions Posting Type"; "Dimensions Posting Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -70,8 +84,8 @@ page 6150902 "HC Retail Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

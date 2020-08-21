@@ -15,20 +15,25 @@ page 6151528 "Nc Collector List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -43,14 +48,14 @@ page 6151528 "Nc Collector List"
                 Caption = 'Collection Lines';
                 Image = XMLFile;
                 RunObject = Page "Nc Collection Lines";
-                RunPageLink = "Collector Code"=FIELD(Code);
+                RunPageLink = "Collector Code" = FIELD(Code);
             }
             action(Collections)
             {
                 Caption = 'Collections';
                 Image = XMLFileGroup;
                 RunObject = Page "Nc Collection List";
-                RunPageLink = "Collector Code"=FIELD(Code);
+                RunPageLink = "Collector Code" = FIELD(Code);
             }
         }
     }

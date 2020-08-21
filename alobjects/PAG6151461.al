@@ -16,26 +16,33 @@ page 6151461 "Magento Customer Mapping"
             repeater(Group)
             {
                 FreezeColumn = City;
-                field("Country/Region Code";"Country/Region Code")
+                field("Country/Region Code"; "Country/Region Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Country/Region Name";"Country/Region Name")
+                field("Country/Region Name"; "Country/Region Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Template Code";"Customer Template Code")
+                field("Customer Template Code"; "Customer Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Config. Template Code";"Config. Template Code")
+                field("Config. Template Code"; "Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fixed Customer No.";"Fixed Customer No.")
+                field("Fixed Customer No."; "Fixed Customer No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

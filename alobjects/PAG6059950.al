@@ -20,53 +20,69 @@ page 6059950 "Display Setup"
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Display Content Code";"Display Content Code")
+                field("Display Content Code"; "Display Content Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Screen No.";"Screen No.")
+                field("Screen No."; "Screen No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Duration";"Receipt Duration")
+                field("Receipt Duration"; "Receipt Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Width Pct.";"Receipt Width Pct.")
+                field("Receipt Width Pct."; "Receipt Width Pct.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Placement";"Receipt Placement")
+                field("Receipt Placement"; "Receipt Placement")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Description Padding";"Receipt Description Padding")
+                field("Receipt Description Padding"; "Receipt Description Padding")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Discount Padding";"Receipt Discount Padding")
+                field("Receipt Discount Padding"; "Receipt Discount Padding")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Total Padding";"Receipt Total Padding")
+                field("Receipt Total Padding"; "Receipt Total Padding")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt GrandTotal Padding";"Receipt GrandTotal Padding")
+                field("Receipt GrandTotal Padding"; "Receipt GrandTotal Padding")
                 {
+                    ApplicationArea = All;
                 }
-                field("Image Rotation Interval";"Image Rotation Interval")
+                field("Image Rotation Interval"; "Image Rotation Interval")
                 {
+                    ApplicationArea = All;
                 }
-                field("Media Downloaded";"Media Downloaded")
+                field("Media Downloaded"; "Media Downloaded")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prices ex. VAT";"Prices ex. VAT")
+                field("Prices ex. VAT"; "Prices ex. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Custom Display Codeunit";"Custom Display Codeunit")
+                field("Custom Display Codeunit"; "Custom Display Codeunit")
                 {
+                    ApplicationArea = All;
                 }
-                field(Activate;Activate)
+                field(Activate; Activate)
                 {
+                    ApplicationArea = All;
                 }
-                field("Hide receipt";"Hide receipt")
+                field("Hide receipt"; "Hide receipt")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -92,7 +108,7 @@ page 6059950 "Display Setup"
     begin
         //-NPR5.46 [328581]
         if DisplayContent.FindSet then
-          exit;
+            exit;
 
         DisplayContent.Init;
         DisplayContent.Code := 'HTML';

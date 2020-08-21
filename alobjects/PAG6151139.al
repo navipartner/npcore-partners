@@ -17,18 +17,22 @@ page 6151139 "TM Admission Forecast Lines"
                 FreezeColumn = StartTime;
                 field("Code"; LINE_Code)
                 {
+                    ApplicationArea = All;
                     Caption = 'Code';
                 }
                 field(Description; LINE_Description)
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                 }
                 field(StartTime; LINE_StartTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'Start Time';
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     StyleExpr = 'Strong';
 
@@ -39,6 +43,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field2; MATRIX_CellData[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
 
@@ -49,6 +54,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field3; MATRIX_CellData[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
 
@@ -59,6 +65,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field4; MATRIX_CellData[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
 
@@ -69,6 +76,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field5; MATRIX_CellData[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
 
@@ -79,6 +87,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field6; MATRIX_CellData[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
 
@@ -89,6 +98,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field7; MATRIX_CellData[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
 
@@ -99,6 +109,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field8; MATRIX_CellData[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
 
@@ -109,6 +120,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field9; MATRIX_CellData[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
 
@@ -119,6 +131,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field10; MATRIX_CellData[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
 
@@ -129,6 +142,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field11; MATRIX_CellData[11])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
 
@@ -139,6 +153,7 @@ page 6151139 "TM Admission Forecast Lines"
                 }
                 field(Field12; MATRIX_CellData[12])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
 

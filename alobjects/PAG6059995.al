@@ -13,30 +13,35 @@ page 6059995 "RSS Reader Activities"
     {
         area(content)
         {
-            field("RssFeedChannelSub.""Feed Code""";RssFeedChannelSub."Feed Code")
+            field("RssFeedChannelSub.""Feed Code"""; RssFeedChannelSub."Feed Code")
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
             repeater(Group)
             {
-                field(Title;Title)
+                field(Title; Title)
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = Highlight;
                 }
-                field(Link;Link)
+                field(Link; Link)
                 {
+                    ApplicationArea = All;
                     ExtendedDatatype = URL;
                     Style = Attention;
                     StyleExpr = Highlight;
                 }
-                field("Published At";"Published At")
+                field("Published At"; "Published At")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = Highlight;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = Highlight;
                 }
@@ -70,7 +75,7 @@ page 6059995 "RSS Reader Activities"
     trigger OnOpenPage()
     begin
         if LoadDefault then
-          ImportRss(RssFeedChannelSub);
+            ImportRss(RssFeedChannelSub);
     end;
 
     var
@@ -82,14 +87,14 @@ page 6059995 "RSS Reader Activities"
 
     local procedure LoadDefault(): Boolean
     begin
-        RssFeedChannelSub.SetRange(Default,true);
+        RssFeedChannelSub.SetRange(Default, true);
         exit(RssFeedChannelSub.FindFirst);
     end;
 
     local procedure ImportRss(RssFeedChSub: Record "RSS Feed Channel Subscription")
     begin
         if RssFeedChSub.Url <> '' then
-          RSSFeedChannelHandling.ImportRss(RssFeedChSub,Rec);
+            RSSFeedChannelHandling.ImportRss(RssFeedChSub, Rec);
         CurrPage.Update(false);
     end;
 
@@ -97,12 +102,12 @@ page 6059995 "RSS Reader Activities"
     begin
         Highlight := false;
         if not RssFeedChannelSub.IsEmpty then
-          if Format(RssFeedChannelSub."Show as New Within") <> '' then begin
-            Status := '';
-            Highlight := CreateDateTime(CalcDate('-'+Format(RssFeedChannelSub."Show as New Within"),Today),Time) < "Published At";
-            if Highlight then
-              Status := StatusText;
-          end;
+            if Format(RssFeedChannelSub."Show as New Within") <> '' then begin
+                Status := '';
+                Highlight := CreateDateTime(CalcDate('-' + Format(RssFeedChannelSub."Show as New Within"), Today), Time) < "Published At";
+                if Highlight then
+                    Status := StatusText;
+            end;
     end;
 
     local procedure ChangeChannelLookup()
@@ -113,8 +118,8 @@ page 6059995 "RSS Reader Activities"
         RssFeedChannelSubscriptions.LookupMode(true);
         RssFeedChannelSubscriptions.SetTableView(RssFeedChannelSub);
         if RssFeedChannelSubscriptions.RunModal = ACTION::LookupOK then begin
-          RssFeedChannelSubscriptions.GetRecord(RssFeedChannelSub);
-          ImportRss(RssFeedChannelSub);
+            RssFeedChannelSubscriptions.GetRecord(RssFeedChannelSub);
+            ImportRss(RssFeedChannelSub);
         end;
     end;
 }

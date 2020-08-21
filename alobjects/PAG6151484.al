@@ -23,23 +23,26 @@ page 6151484 "Magento Top 10 Items by Qty"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         //-MAG1.22
                         //PAGE.RUN(PAGE::"Retail Item Card",Rec);
                         Item.Get("No.");
-                        PAGE.Run(PAGE::"Retail Item Card",Item);
+                        PAGE.Run(PAGE::"Retail Item Card", Item);
                         //+MAG1.22
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales (Qty.)";"Sales (Qty.)")
+                field("Sales (Qty.)"; "Sales (Qty.)")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Sales (Qty.)';
                 }
@@ -72,7 +75,7 @@ page 6151484 "Magento Top 10 Items by Qty"
 
                     trigger OnAction()
                     begin
-                        PeriodType := PeriodType::Week ;
+                        PeriodType := PeriodType::Week;
                         UpdateList;
                     end;
                 }
@@ -137,26 +140,26 @@ page 6151484 "Magento Top 10 Items by Qty"
     begin
         DeleteAll;
         Setdate;
-        Query1.SetFilter(Posting_Date,'%1..%2',StartDate,Enddate);
-        Query1.SetFilter(Item_Ledger_Entry_Type,'Sale');
+        Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
+        Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
         Query1.Open;
         while Query1.Read do begin
-           if Item.Get(Query1.Item_No) then begin
-            TransferFields(Item);
-            if Insert then
-        //-MAG1.20
-            SetFilter("Date Filter",'%1..%2',StartDate,Enddate);
-        //+MAG1.20
-            //-MAG1.17
-        //-MAG1.20
-            //Item.CALCFIELDS("Sales (Qty.)");
-            //"Low-Level Code" := ROUND(Item."Sales (Qty.)",0.01) * 100;
-            CalcFields("Sales (Qty.)");
-           "Low-Level Code" := Round("Sales (Qty.)",0.01) * 100;
-        //+MAG1.20
-            //+MAG1.17
-           Modify;
-          end;
+            if Item.Get(Query1.Item_No) then begin
+                TransferFields(Item);
+                if Insert then
+                    //-MAG1.20
+                    SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+                //+MAG1.20
+                //-MAG1.17
+                //-MAG1.20
+                //Item.CALCFIELDS("Sales (Qty.)");
+                //"Low-Level Code" := ROUND(Item."Sales (Qty.)",0.01) * 100;
+                CalcFields("Sales (Qty.)");
+                "Low-Level Code" := Round("Sales (Qty.)", 0.01) * 100;
+                //+MAG1.20
+                //+MAG1.17
+                Modify;
+            end;
 
         end;
         Query1.Close;
@@ -167,31 +170,31 @@ page 6151484 "Magento Top 10 Items by Qty"
         DatePeriod: Record Date;
     begin
         case PeriodType of
-          PeriodType::Day :
-            begin
-              StartDate := CurrDate;
-              Enddate := CurrDate;
-            end;
-          PeriodType::Week :
-            begin
-              StartDate := CalcDate('<-CW>',CurrDate);
-              Enddate := CalcDate('<CW>',CurrDate);
-            end;
-          PeriodType::Month :
-            begin
-              StartDate := CalcDate('<-CM>',CurrDate);
-              Enddate := CalcDate('<CM>',CurrDate);
-            end;
-          PeriodType::Quarter :
-            begin
-              StartDate := CalcDate('<-CQ>',CurrDate);
-              Enddate := CalcDate('<CQ>',CurrDate);
-            end;
-          PeriodType::Year :
-            begin
-              StartDate := CalcDate('<-CY>',CurrDate);
-              Enddate := CalcDate('<CY>',CurrDate);
-             end;
+            PeriodType::Day:
+                begin
+                    StartDate := CurrDate;
+                    Enddate := CurrDate;
+                end;
+            PeriodType::Week:
+                begin
+                    StartDate := CalcDate('<-CW>', CurrDate);
+                    Enddate := CalcDate('<CW>', CurrDate);
+                end;
+            PeriodType::Month:
+                begin
+                    StartDate := CalcDate('<-CM>', CurrDate);
+                    Enddate := CalcDate('<CM>', CurrDate);
+                end;
+            PeriodType::Quarter:
+                begin
+                    StartDate := CalcDate('<-CQ>', CurrDate);
+                    Enddate := CalcDate('<CQ>', CurrDate);
+                end;
+            PeriodType::Year:
+                begin
+                    StartDate := CalcDate('<-CY>', CurrDate);
+                    Enddate := CalcDate('<CY>', CurrDate);
+                end;
         end;
     end;
 }

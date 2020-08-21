@@ -34,49 +34,56 @@ page 6150628 "POS Payment Bin Checkpoint"
                     Editable = ViewMode = FALSE;
                     ShowCaption = false;
                     Visible = ShowCountingSection;
-                    field(PaymentTypeNo;"Payment Type No.")
+                    field(PaymentTypeNo; "Payment Type No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field(PaymentBinNo;"Payment Bin No.")
+                    field(PaymentBinNo; "Payment Bin No.")
                     {
-                        Editable = false;
-                        Visible = false;
-                    }
-                    field(PaymentMethodNo;"Payment Method No.")
-                    {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = false;
                     }
-                    field(CountedAmountInclFloat;"Counted Amount Incl. Float")
+                    field(PaymentMethodNo; "Payment Method No.")
                     {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                    }
+                    field(CountedAmountInclFloat; "Counted Amount Incl. Float")
+                    {
+                        ApplicationArea = All;
                         MinValue = 0;
 
                         trigger OnAssistEdit()
                         begin
 
-                            OnAssistEditCounting ();
+                            OnAssistEditCounting();
                         end;
 
                         trigger OnValidate()
                         begin
 
-                            CountingDifference := CalculatedDifference ();
-                            CalculateNewFloatAmount ();
-                            CurrPage.Update (true);
+                            CountingDifference := CalculatedDifference();
+                            CalculateNewFloatAmount();
+                            CurrPage.Update(true);
                         end;
                     }
-                    field(CalculatedAmountInclFloat;"Calculated Amount Incl. Float")
+                    field(CalculatedAmountInclFloat; "Calculated Amount Incl. Float")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = NOT IsBlindCount;
                     }
-                    field(CountingDifference;CountingDifference)
+                    field(CountingDifference; CountingDifference)
                     {
+                        ApplicationArea = All;
                         Caption = 'Difference';
                         Style = Unfavorable;
                         StyleExpr = CountingDifference <> 0;
@@ -86,13 +93,14 @@ page 6150628 "POS Payment Bin Checkpoint"
                         begin
 
                             "Counted Amount Incl. Float" := "Calculated Amount Incl. Float" - CountingDifference;
-                            CountingDifference := CalculatedDifference ();
-                            CalculateNewFloatAmount ();
-                            CurrPage.Update (true);
+                            CountingDifference := CalculatedDifference();
+                            CalculateNewFloatAmount();
+                            CurrPage.Update(true);
                         end;
                     }
-                    field(Comment1;Comment)
+                    field(Comment1; Comment)
                     {
+                        ApplicationArea = All;
                         Visible = NOT IsBlindCount;
                     }
                 }
@@ -104,64 +112,74 @@ page 6150628 "POS Payment Bin Checkpoint"
                     Editable = ViewMode = FALSE;
                     ShowCaption = false;
                     Visible = ShowClosingSection;
-                    field("Payment Type No.";"Payment Type No.")
+                    field("Payment Type No."; "Payment Type No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Payment Method No.";"Payment Method No.")
+                    field("Payment Method No."; "Payment Method No.")
                     {
-                        Editable = false;
-                        Visible = false;
-                    }
-                    field("Payment Bin No.";"Payment Bin No.")
-                    {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = false;
                     }
-                    field("Float Amount";"Float Amount")
+                    field("Payment Bin No."; "Payment Bin No.")
                     {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                    }
+                    field("Float Amount"; "Float Amount")
+                    {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Counted Amount Incl. Float";"Counted Amount Incl. Float")
+                    field("Counted Amount Incl. Float"; "Counted Amount Incl. Float")
                     {
+                        ApplicationArea = All;
                         MinValue = 0;
                         Visible = false;
 
                         trigger OnAssistEdit()
                         begin
 
-                            OnAssistEditCounting ();
+                            OnAssistEditCounting();
                         end;
 
                         trigger OnValidate()
                         begin
 
-                            CalculateNewFloatAmount ();
-                            CurrPage.Update (true);
+                            CalculateNewFloatAmount();
+                            CurrPage.Update(true);
                         end;
                     }
-                    field("Transfer In Amount";"Transfer In Amount")
+                    field("Transfer In Amount"; "Transfer In Amount")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = false;
                     }
-                    field("Transfer Out Amount";"Transfer Out Amount")
+                    field("Transfer Out Amount"; "Transfer Out Amount")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = false;
                     }
-                    field(NetTransfer;NetTransfer)
+                    field(NetTransfer; NetTransfer)
                     {
+                        ApplicationArea = All;
                         Caption = 'Transfered Amount';
                         Editable = false;
                     }
-                    field("Calculated Amount Incl. Float";"Calculated Amount Incl. Float")
+                    field("Calculated Amount Incl. Float"; "Calculated Amount Incl. Float")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = NOT IsBlindCount;
                     }
-                    field("New Float Amount";"New Float Amount")
+                    field("New Float Amount"; "New Float Amount")
                     {
+                        ApplicationArea = All;
                         Editable = PageMode = PageMode::FINAL_COUNT;
                         MinValue = 0;
                         Style = Strong;
@@ -173,77 +191,87 @@ page 6150628 "POS Payment Bin Checkpoint"
                             "Bank Deposit Amount" := "Counted Amount Incl. Float" - "Move to Bin Amount" - "New Float Amount";
 
                             if ("Bank Deposit Amount" < 0) then
-                              Error (INVALID_AMOUNT, "New Float Amount");
+                                Error(INVALID_AMOUNT, "New Float Amount");
 
-                            SelectBankBin ();
-                            SelectSafeBin ();
-                            CurrPage.Update (true);
-                        end;
-                    }
-                    field("Bank Deposit Amount";"Bank Deposit Amount")
-                    {
-                        Style = Unfavorable;
-                        StyleExpr = InvalidDistribution;
-
-                        trigger OnValidate()
-                        begin
-
-                            CalculateNewFloatAmount ();
                             SelectBankBin();
-                            CurrPage.Update (true);
+                            SelectSafeBin();
+                            CurrPage.Update(true);
                         end;
                     }
-                    field("Bank Deposit Bin Code";"Bank Deposit Bin Code")
+                    field("Bank Deposit Amount"; "Bank Deposit Amount")
                     {
-                        ShowMandatory = "Bank Deposit Amount" <> 0;
-                    }
-                    field("Bank Deposit Reference";"Bank Deposit Reference")
-                    {
-                        ShowMandatory = "Bank Deposit Amount" <> 0;
-                    }
-                    field("Move to Bin Amount";"Move to Bin Amount")
-                    {
+                        ApplicationArea = All;
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
 
                         trigger OnValidate()
                         begin
 
-                            CalculateNewFloatAmount ();
+                            CalculateNewFloatAmount();
+                            SelectBankBin();
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field("Bank Deposit Bin Code"; "Bank Deposit Bin Code")
+                    {
+                        ApplicationArea = All;
+                        ShowMandatory = "Bank Deposit Amount" <> 0;
+                    }
+                    field("Bank Deposit Reference"; "Bank Deposit Reference")
+                    {
+                        ApplicationArea = All;
+                        ShowMandatory = "Bank Deposit Amount" <> 0;
+                    }
+                    field("Move to Bin Amount"; "Move to Bin Amount")
+                    {
+                        ApplicationArea = All;
+                        Style = Unfavorable;
+                        StyleExpr = InvalidDistribution;
+
+                        trigger OnValidate()
+                        begin
+
+                            CalculateNewFloatAmount();
                             SelectSafeBin();
 
                             //-NPR5.45 [322769]
-                            if (PageMode  = PageMode::TRANSFER) then
-                              if (("Move to Bin Amount" <> 0) and ("Include In Counting" = "Include In Counting"::NO)) then
-                                "Include In Counting" := "Include In Counting"::YES;
+                            if (PageMode = PageMode::TRANSFER) then
+                                if (("Move to Bin Amount" <> 0) and ("Include In Counting" = "Include In Counting"::NO)) then
+                                    "Include In Counting" := "Include In Counting"::YES;
                             //-NPR5.45 [322769]
 
-                            CurrPage.Update (true);
+                            CurrPage.Update(true);
                         end;
                     }
-                    field("Move to Bin Code";"Move to Bin Code")
+                    field("Move to Bin Code"; "Move to Bin Code")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = "Move to bin amount" <> 0;
                     }
-                    field("Move to Bin Reference";"Move to Bin Reference")
+                    field("Move to Bin Reference"; "Move to Bin Reference")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = "Move to bin amount" <> 0;
                     }
-                    field(Status;Status)
+                    field(Status; Status)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Checkpoint Bin Entry No.";"Checkpoint Bin Entry No.")
+                    field("Checkpoint Bin Entry No."; "Checkpoint Bin Entry No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = false;
                     }
-                    field("Payment Bin Entry Amount";"Payment Bin Entry Amount")
+                    field("Payment Bin Entry Amount"; "Payment Bin Entry Amount")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = false;
                     }
-                    field("Payment Bin Entry Amount (LCY)";"Payment Bin Entry Amount (LCY)")
+                    field("Payment Bin Entry Amount (LCY)"; "Payment Bin Entry Amount (LCY)")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         Visible = false;
                     }
@@ -270,7 +298,7 @@ page 6150628 "POS Payment Bin Checkpoint"
 
     trigger OnAfterGetRecord()
     begin
-        CountingDifference := CalculatedDifference ();
+        CountingDifference := CalculatedDifference();
         InvalidDistribution := "Counted Amount Incl. Float" <> ("Bank Deposit Amount" + "Move to Bin Amount" + "New Float Amount");
 
         NetTransfer := "Transfer In Amount" + "Transfer Out Amount";
@@ -283,43 +311,43 @@ page 6150628 "POS Payment Bin Checkpoint"
 
         //-+NPR5.42 [307267]
         if (PageMode = PageMode::PRELIMINARY_COUNT) then begin
-          ModifyAll (Status, Status::READY);
-          exit;
+            ModifyAll(Status, Status::READY);
+            exit;
         end;
 
         HaveError := false;
-        if (FindSet ()) then begin
-          repeat
-            HaveError := HaveError or
-             ("Counted Amount Incl. Float" - "Bank Deposit Amount" - "Move to Bin Amount" <> "New Float Amount");
-          until (Next () = 0);
+        if (FindSet()) then begin
+            repeat
+                HaveError := HaveError or
+                 ("Counted Amount Incl. Float" - "Bank Deposit Amount" - "Move to Bin Amount" <> "New Float Amount");
+            until (Next() = 0);
         end;
 
         if (not HaveError) then begin
-          SetFilter (Status, '=%1', Status::WIP);
+            SetFilter(Status, '=%1', Status::WIP);
 
-          //-NPR5.43 [311964]
-          //  IF (NOT ISEMPTY ()) THEN
-          //    IF (CONFIRM (TextFinishCountingandPost, TRUE)) THEN
-          //      MODIFYALL (Status, Status::READY);
-          if (not IsEmpty ()) then begin
-            if (PageMode = PageMode::TRANSFER) then
-              if (Confirm (TextFinishTransfer, true)) then
-                ModifyAll (Status, Status::READY);
+            //-NPR5.43 [311964]
+            //  IF (NOT ISEMPTY ()) THEN
+            //    IF (CONFIRM (TextFinishCountingandPost, TRUE)) THEN
+            //      MODIFYALL (Status, Status::READY);
+            if (not IsEmpty()) then begin
+                if (PageMode = PageMode::TRANSFER) then
+                    if (Confirm(TextFinishTransfer, true)) then
+                        ModifyAll(Status, Status::READY);
 
-            //-NPR5.46 [322769]
-            // IF (PageMode = PageMode::FINAL_COUNT) THEN
-            //   IF (CONFIRM (TextFinishCountingandPost, TRUE)) THEN
-            //    MODIFYALL (Status, Status::READY);
-            if (PageMode = PageMode::FINAL_COUNT) then begin
-              SetFilter ("Include In Counting", '<>%1', "Include In Counting"::NO);
-              if (Confirm (TextFinishCountingandPost, true)) then
-                ModifyAll (Status, Status::READY);
+                //-NPR5.46 [322769]
+                // IF (PageMode = PageMode::FINAL_COUNT) THEN
+                //   IF (CONFIRM (TextFinishCountingandPost, TRUE)) THEN
+                //    MODIFYALL (Status, Status::READY);
+                if (PageMode = PageMode::FINAL_COUNT) then begin
+                    SetFilter("Include In Counting", '<>%1', "Include In Counting"::NO);
+                    if (Confirm(TextFinishCountingandPost, true)) then
+                        ModifyAll(Status, Status::READY);
+                end;
+                //+NPR5.46 [322769]
+
             end;
-            //+NPR5.46 [322769]
-
-          end;
-          //+NPR5.43 [311964]
+            //+NPR5.43 [311964]
 
         end;
     end;
@@ -329,7 +357,7 @@ page 6150628 "POS Payment Bin Checkpoint"
 
 
         if ("Calculated Amount Incl. Float" > 0) then //-+NPR5.49 [348458]
-          TestField (Status, Status::WIP);
+            TestField(Status, Status::WIP);
     end;
 
     trigger OnOpenPage()
@@ -344,85 +372,88 @@ page 6150628 "POS Payment Bin Checkpoint"
         //-NPR5.43 [311964]
 
         //-NPR5.45 [311964]
-         case PageMode of
-          PageMode::TRANSFER : ModifyAll (Type, POSPaymentBinCheckpoint.Type::TRANSFER);
-          PageMode::FINAL_COUNT : ModifyAll (Type, POSPaymentBinCheckpoint.Type::ZREPORT);
-          PageMode::PRELIMINARY_COUNT : ModifyAll (Type, POSPaymentBinCheckpoint.Type::XREPORT);
-         end;
+        case PageMode of
+            PageMode::TRANSFER:
+                ModifyAll(Type, POSPaymentBinCheckpoint.Type::TRANSFER);
+            PageMode::FINAL_COUNT:
+                ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
+            PageMode::PRELIMINARY_COUNT:
+                ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
+        end;
         //+NPR5.45 [311964]
 
 
         //-NPR5.46 [322769]
         if (PageMode = PageMode::FINAL_COUNT) then begin
 
-          POSPaymentBinCheckpoint.CopyFilters (Rec);
-          POSPaymentBinCheckpoint.SetFilter ("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
-          if (POSPaymentBinCheckpoint.FindSet ()) then begin
-            repeat
-              POSPaymentMethod.Get (POSPaymentBinCheckpoint."Payment Method No.");
-              if (POSPaymentMethod."Bin for Virtual-Count" = '') then
-                Error (AutoCountBin, POSPaymentMethod.TableCaption, POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption ("Bin for Virtual-Count"));
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                repeat
+                    POSPaymentMethod.Get(POSPaymentBinCheckpoint."Payment Method No.");
+                    if (POSPaymentMethod."Bin for Virtual-Count" = '') then
+                        Error(AutoCountBin, POSPaymentMethod.TableCaption, POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption("Bin for Virtual-Count"));
 
-              POSPaymentBin.Get (POSPaymentMethod."Bin for Virtual-Count");
+                    POSPaymentBin.Get(POSPaymentMethod."Bin for Virtual-Count");
 
-              POSPaymentBinCheckpoint."Counted Amount Incl. Float" := POSPaymentBinCheckpoint."Calculated Amount Incl. Float";
+                    POSPaymentBinCheckpoint."Counted Amount Incl. Float" := POSPaymentBinCheckpoint."Calculated Amount Incl. Float";
 
-              //-NPR5.47 [322769]
-              //  IF (POSPaymentBin."Bin Type" = POSPaymentBin."Bin Type"::BANK) THEN BEGIN
-              //    POSPaymentBinCheckpoint.VALIDATE ("Bank Deposit Bin Code", POSPaymentMethod."Bin for Virtual-Count");
-              //    POSPaymentBinCheckpoint.VALIDATE ("Bank Deposit Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
-              //    POSPaymentBinCheckpoint."Bank Deposit Reference" := STRSUBSTNO ('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", COPYSTR (UPPERCASE(DELCHR(FORMAT(CREATEGUID),'=','{}-')), 1, 7));
-              //  END ELSE BEGIN
-              //    POSPaymentBinCheckpoint.VALIDATE ("Move to Bin Code", POSPaymentMethod."Bin for Virtual-Count");
-              //    POSPaymentBinCheckpoint.VALIDATE ("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
-              //    POSPaymentBinCheckpoint."Move to Bin Reference" := STRSUBSTNO ('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", COPYSTR (UPPERCASE(DELCHR(FORMAT(CREATEGUID),'=','{}-')), 1, 7));
-              //  END;
-              POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
-              POSPaymentBinCheckpoint.Validate ("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
-              POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo ('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", CopyStr (UpperCase(DelChr(Format(CreateGuid),'=','{}-')), 1, 7));
-              //+NPR5.47 [322769]
+                    //-NPR5.47 [322769]
+                    //  IF (POSPaymentBin."Bin Type" = POSPaymentBin."Bin Type"::BANK) THEN BEGIN
+                    //    POSPaymentBinCheckpoint.VALIDATE ("Bank Deposit Bin Code", POSPaymentMethod."Bin for Virtual-Count");
+                    //    POSPaymentBinCheckpoint.VALIDATE ("Bank Deposit Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
+                    //    POSPaymentBinCheckpoint."Bank Deposit Reference" := STRSUBSTNO ('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", COPYSTR (UPPERCASE(DELCHR(FORMAT(CREATEGUID),'=','{}-')), 1, 7));
+                    //  END ELSE BEGIN
+                    //    POSPaymentBinCheckpoint.VALIDATE ("Move to Bin Code", POSPaymentMethod."Bin for Virtual-Count");
+                    //    POSPaymentBinCheckpoint.VALIDATE ("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
+                    //    POSPaymentBinCheckpoint."Move to Bin Reference" := STRSUBSTNO ('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", COPYSTR (UPPERCASE(DELCHR(FORMAT(CREATEGUID),'=','{}-')), 1, 7));
+                    //  END;
+                    POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
+                    POSPaymentBinCheckpoint.Validate("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
+                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
+                    //+NPR5.47 [322769]
 
-              POSPaymentBinCheckpoint."New Float Amount" := 0;
-              POSPaymentBinCheckpoint.Comment := AutoCount;
+                    POSPaymentBinCheckpoint."New Float Amount" := 0;
+                    POSPaymentBinCheckpoint.Comment := AutoCount;
 
-              //-NPR5.50 [353293]
-              POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
-              //+NPR5.50 [353293]
+                    //-NPR5.50 [353293]
+                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
+                    //+NPR5.50 [353293]
 
-              POSPaymentBinCheckpoint.Modify ();
+                    POSPaymentBinCheckpoint.Modify();
 
-            until (POSPaymentBinCheckpoint.Next () = 0);
-          end;
+                until (POSPaymentBinCheckpoint.Next() = 0);
+            end;
 
-          //-NPR5.49 [348458]
-          POSPaymentBinCheckpoint.Reset ();
-          POSPaymentBinCheckpoint.CopyFilters (Rec);
-          POSPaymentBinCheckpoint.SetFilter ("Calculated Amount Incl. Float", '<%1', 0);
-          POSPaymentBinCheckpoint.SetFilter ("Include In Counting", '<>%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL); //-+NPR5.54 [389250]
-          if (POSPaymentBinCheckpoint.FindSet ()) then begin
-            repeat
-              POSPaymentBinCheckpoint.Validate ("Counted Amount Incl. Float", 0);
-              POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
-              POSPaymentBinCheckpoint."New Float Amount" := 0;
-              POSPaymentBinCheckpoint.Comment := AutoCount;
-              POSPaymentBinCheckpoint.Modify ();
-            until (POSPaymentBinCheckpoint.Next () = 0);
-          end;
-          //+NPR5.49 [348458]
+            //-NPR5.49 [348458]
+            POSPaymentBinCheckpoint.Reset();
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            POSPaymentBinCheckpoint.SetFilter("Calculated Amount Incl. Float", '<%1', 0);
+            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '<>%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL); //-+NPR5.54 [389250]
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                repeat
+                    POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", 0);
+                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
+                    POSPaymentBinCheckpoint."New Float Amount" := 0;
+                    POSPaymentBinCheckpoint.Comment := AutoCount;
+                    POSPaymentBinCheckpoint.Modify();
+                until (POSPaymentBinCheckpoint.Next() = 0);
+            end;
+            //+NPR5.49 [348458]
 
         end;
 
         //-NPR5.49 [348458]
         if (IsBlindCount) then begin
-          POSPaymentBinCheckpoint.Reset ();
-          POSPaymentBinCheckpoint.CopyFilters (Rec);
-          POSPaymentBinCheckpoint.SetFilter ("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::YES);
-          if (POSPaymentBinCheckpoint.FindSet ()) then begin
-            repeat
-              POSPaymentBinCheckpoint."New Float Amount" := 0;
-              POSPaymentBinCheckpoint.Modify ();
-            until (POSPaymentBinCheckpoint.Next () = 0);
-          end;
+            POSPaymentBinCheckpoint.Reset();
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::YES);
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                repeat
+                    POSPaymentBinCheckpoint."New Float Amount" := 0;
+                    POSPaymentBinCheckpoint.Modify();
+                until (POSPaymentBinCheckpoint.Next() = 0);
+            end;
         end;
         //+NPR5.49 [348458]
 
@@ -432,23 +463,27 @@ page 6150628 "POS Payment Bin Checkpoint"
         //   SETFILTER ("Include In Counting", '<>%1', "Include In Counting"::NO);
         // //+NPR5.45 [322769]
         case PageMode of
-          PageMode::FINAL_COUNT : SetFilter ("Include In Counting", '<>%1&<>%2', "Include In Counting"::NO, "Include In Counting"::VIRTUAL);
-          PageMode::PRELIMINARY_COUNT : SetFilter ("Include In Counting", '<>%1', "Include In Counting"::NO);
-          PageMode::TRANSFER : ;
-          PageMode::VIEW : SetFilter ("Include In Counting", '<>%1', "Include In Counting"::NO);
+            PageMode::FINAL_COUNT:
+                SetFilter("Include In Counting", '<>%1&<>%2', "Include In Counting"::NO, "Include In Counting"::VIRTUAL);
+            PageMode::PRELIMINARY_COUNT:
+                SetFilter("Include In Counting", '<>%1', "Include In Counting"::NO);
+            PageMode::TRANSFER:
+                ;
+            PageMode::VIEW:
+                SetFilter("Include In Counting", '<>%1', "Include In Counting"::NO);
         end;
         //+NPR5.46 [322769]
 
 
         if (PageMode = PageMode::TRANSFER) then begin
-          POSPaymentBinCheckpoint.CopyFilters (Rec);
-          if (POSPaymentBinCheckpoint.FindSet ()) then begin
-            repeat
-              POSPaymentBinCheckpoint.Validate ("Counted Amount Incl. Float", POSPaymentBinCheckpoint."Calculated Amount Incl. Float");
-              POSPaymentBinCheckpoint.Modify ();
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                repeat
+                    POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", POSPaymentBinCheckpoint."Calculated Amount Incl. Float");
+                    POSPaymentBinCheckpoint.Modify();
 
-            until (POSPaymentBinCheckpoint.Next () = 0);
-          end;
+                until (POSPaymentBinCheckpoint.Next() = 0);
+            end;
         end;
     end;
 
@@ -477,49 +512,49 @@ page 6150628 "POS Payment Bin Checkpoint"
         PaymentTypePrefix: Record "Payment Type - Prefix";
     begin
 
-        PaymentTypeDetailed.SetFilter ("Payment No.", '=%1', "Payment Type No.");
-        PaymentTypeDetailed.SetFilter ("Register No.", '=%1', GetRegisterNo ());
-        if (PaymentTypeDetailed.IsEmpty ()) then begin
+        PaymentTypeDetailed.SetFilter("Payment No.", '=%1', "Payment Type No.");
+        PaymentTypeDetailed.SetFilter("Register No.", '=%1', GetRegisterNo());
+        if (PaymentTypeDetailed.IsEmpty()) then begin
 
-          // PaymentPrefix.SETFILTER("Register No.", Rec.GETFILTER("Register No."));
+            // PaymentPrefix.SETFILTER("Register No.", Rec.GETFILTER("Register No."));
 
-          PaymentTypePrefix.SetFilter ("Payment Type", '=%1', "Payment Type No.");
-          if PaymentTypePrefix.FindSet() then begin
-            repeat
-              PaymentTypeDetailed.Init;
-              PaymentTypeDetailed."Payment No." := "Payment Type No.";
-              PaymentTypeDetailed."Register No." := GetRegisterNo ();
-              PaymentTypeDetailed.Weight := PaymentTypePrefix.Weight;
-              PaymentTypeDetailed.Insert ();
+            PaymentTypePrefix.SetFilter("Payment Type", '=%1', "Payment Type No.");
+            if PaymentTypePrefix.FindSet() then begin
+                repeat
+                    PaymentTypeDetailed.Init;
+                    PaymentTypeDetailed."Payment No." := "Payment Type No.";
+                    PaymentTypeDetailed."Register No." := GetRegisterNo();
+                    PaymentTypeDetailed.Weight := PaymentTypePrefix.Weight;
+                    PaymentTypeDetailed.Insert();
 
-            until (PaymentTypePrefix.Next() = 0);
-            Commit;
-          end;
+                until (PaymentTypePrefix.Next() = 0);
+                Commit;
+            end;
         end;
 
-        if (PaymentTypeDetailed.IsEmpty ()) then
-          Error (TextSetupPaymentTypeMissing, "Payment Type No.");
+        if (PaymentTypeDetailed.IsEmpty()) then
+            Error(TextSetupPaymentTypeMissing, "Payment Type No.");
 
-        TouchScreenBalancingLine.SetTableView (PaymentTypeDetailed);
-        TouchScreenBalancingLine.LookupMode (true);
-        TouchScreenBalancingLine.Editable (true);
+        TouchScreenBalancingLine.SetTableView(PaymentTypeDetailed);
+        TouchScreenBalancingLine.LookupMode(true);
+        TouchScreenBalancingLine.Editable(true);
         //-NPR5.55 [405110]
         //IF (TouchScreenBalancingLine.RUNMODAL() = ACTION::LookupOK) THEN BEGIN
         TouchScreenBalancingLine.Run();
         //+NPR5.55 [405110]
         "Counted Amount Incl. Float" := 0;
         if (PaymentTypeDetailed.FindSet()) then begin
-          repeat
-            "Counted Amount Incl. Float" += PaymentTypeDetailed.Amount;
+            repeat
+                "Counted Amount Incl. Float" += PaymentTypeDetailed.Amount;
 
-          until (PaymentTypeDetailed.Next() = 0);
+            until (PaymentTypeDetailed.Next() = 0);
         end;
         //-NPR5.55 [405110]
         //END;
         //+NPR5.55 [405110]
-        CountingDifference := CalculatedDifference ();
-        CalculateNewFloatAmount ();
-        CurrPage.Update (true);
+        CountingDifference := CalculatedDifference();
+        CalculateNewFloatAmount();
+        CurrPage.Update(true);
     end;
 
     local procedure GetRegisterNo() RegisterNo: Code[10]
@@ -530,13 +565,13 @@ page 6150628 "POS Payment Bin Checkpoint"
     begin
 
         //-NPR5.42 [306858]
-        if (POSSession.IsActiveSession (POSFrontEndManagement)) then begin
-          POSFrontEndManagement.GetSession (POSSession);
-          POSSession.GetSetup (POSSetup);
-          exit (POSSetup.Register());
+        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            exit(POSSetup.Register());
         end;
 
-        exit ('NOREGISTER');
+        exit('NOREGISTER');
         //EXIT ('1');
         //+NPR5.42 [306858]
     end;
@@ -550,14 +585,14 @@ page 6150628 "POS Payment Bin Checkpoint"
     begin
 
         //-NPR5.42 [306858]
-        if (POSSession.IsActiveSession (POSFrontEndManagement)) then begin
-          POSFrontEndManagement.GetSession (POSSession);
-          POSSession.GetSetup (POSSetup);
-          POSSetup.GetPOSUnit (POSUnit);
-          exit (POSUnit."No.");
+        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSUnit(POSUnit);
+            exit(POSUnit."No.");
         end;
 
-        exit ('NOUNIT');
+        exit('NOUNIT');
         //+NPR5.42 [306858]
     end;
 
@@ -569,14 +604,14 @@ page 6150628 "POS Payment Bin Checkpoint"
         POSStore: Record "POS Store";
     begin
         //-NPR5.42 [306858]
-        if (POSSession.IsActiveSession (POSFrontEndManagement)) then begin
-          POSFrontEndManagement.GetSession (POSSession);
-          POSSession.GetSetup (POSSetup);
-          POSSetup.GetPOSStore (POSStore);
-          exit (POSStore.Code);
+        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+            exit(POSStore.Code);
         end;
 
-        exit ('NOSTORE');
+        exit('NOSTORE');
         //+NPR5.42 [306858]
     end;
 
@@ -586,7 +621,7 @@ page 6150628 "POS Payment Bin Checkpoint"
         Difference := "Calculated Amount Incl. Float" - "Counted Amount Incl. Float";
         Comment := COMMENT_DIFFERENCE;
         if (Difference = 0) then
-          Comment := COMMENT_NO_DIFFERENCE;
+            Comment := COMMENT_NO_DIFFERENCE;
     end;
 
     local procedure CalculateNewFloatAmount()
@@ -595,7 +630,7 @@ page 6150628 "POS Payment Bin Checkpoint"
         "New Float Amount" := "Counted Amount Incl. Float" - "Bank Deposit Amount" - "Move to Bin Amount";
 
         if ("New Float Amount" < 0) then
-          "New Float Amount" := 0;
+            "New Float Amount" := 0;
     end;
 
     procedure SetTransferMode()
@@ -617,28 +652,28 @@ page 6150628 "POS Payment Bin Checkpoint"
         //  PageMode := PageMode::FINAL_COUNT;
 
         case Mode of
-          Mode::PRELIMINARY :
-            begin
-              ShowCountingSection := true;
-              ShowClosingSection := false;
-              ViewMode := false;
-              PageMode := PageMode::PRELIMINARY_COUNT;
-            end;
+            Mode::PRELIMINARY:
+                begin
+                    ShowCountingSection := true;
+                    ShowClosingSection := false;
+                    ViewMode := false;
+                    PageMode := PageMode::PRELIMINARY_COUNT;
+                end;
 
-          Mode::FINAL :
-            begin
-              ShowCountingSection := true;
-              ShowClosingSection := true;
-              ViewMode := false;
-              PageMode := PageMode::FINAL_COUNT;
-            end;
+            Mode::FINAL:
+                begin
+                    ShowCountingSection := true;
+                    ShowClosingSection := true;
+                    ViewMode := false;
+                    PageMode := PageMode::FINAL_COUNT;
+                end;
 
-          else begin
-            ShowCountingSection := true;
-            ShowClosingSection := true;
-            ViewMode := true;
-            PageMode := PageMode::VIEW;
-          end;
+            else begin
+                    ShowCountingSection := true;
+                    ShowClosingSection := true;
+                    ViewMode := true;
+                    PageMode := PageMode::VIEW;
+                end;
         end;
         //+NPR5.46 [328326]
     end;
@@ -648,44 +683,44 @@ page 6150628 "POS Payment Bin Checkpoint"
         POSPaymentBin: Record "POS Payment Bin";
     begin
         if ("Bank Deposit Amount" = 0) then begin
-          "Bank Deposit Bin Code" := '';
-          exit;
+            "Bank Deposit Bin Code" := '';
+            exit;
         end;
 
         //-NPR5.42 [306858]
-        "Bank Deposit Reference" := StrSubstNo ('%1 %2', "Payment Method No.", CopyStr (UpperCase(DelChr(Format(CreateGuid),'=','{}-')), 1, 7));
+        "Bank Deposit Reference" := StrSubstNo('%1 %2', "Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
 
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
         //IF (POSPaymentBin.COUNT() <> 1) THEN
         //  EXIT;
 
-        if POSPaymentBin.IsEmpty () then
-          exit;
+        if POSPaymentBin.IsEmpty() then
+            exit;
 
         POSPaymentBin.Reset;
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
-        POSPaymentBin.SetFilter ("POS Store Code", '=%1', GetStoreCode ());
-        if (POSPaymentBin.Count () = 1) then begin
-          POSPaymentBin.FindFirst ();
-          Validate ("Bank Deposit Bin Code", POSPaymentBin."No.");
-          exit;
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
+        POSPaymentBin.SetFilter("POS Store Code", '=%1', GetStoreCode());
+        if (POSPaymentBin.Count() = 1) then begin
+            POSPaymentBin.FindFirst();
+            Validate("Bank Deposit Bin Code", POSPaymentBin."No.");
+            exit;
         end;
 
         POSPaymentBin.Reset;
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
-        POSPaymentBin.SetFilter ("Attached to POS Unit No.", '=%1', GetPosUnitNo ());
-        if (POSPaymentBin.Count () = 1) then begin
-          POSPaymentBin.FindFirst ();
-          Validate ("Bank Deposit Bin Code", POSPaymentBin."No.");
-          exit;
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
+        POSPaymentBin.SetFilter("Attached to POS Unit No.", '=%1', GetPosUnitNo());
+        if (POSPaymentBin.Count() = 1) then begin
+            POSPaymentBin.FindFirst();
+            Validate("Bank Deposit Bin Code", POSPaymentBin."No.");
+            exit;
         end;
 
         POSPaymentBin.Reset;
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
-        if (POSPaymentBin.Count () = 1) then begin
-          POSPaymentBin.FindFirst ();
-          Validate ("Bank Deposit Bin Code", POSPaymentBin."No.");
-          exit;
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
+        if (POSPaymentBin.Count() = 1) then begin
+            POSPaymentBin.FindFirst();
+            Validate("Bank Deposit Bin Code", POSPaymentBin."No.");
+            exit;
         end;
 
         // POSPaymentBin.FINDFIRST ();
@@ -698,44 +733,44 @@ page 6150628 "POS Payment Bin Checkpoint"
         POSPaymentBin: Record "POS Payment Bin";
     begin
         if ("Move to Bin Amount" = 0) then begin
-          "Move to Bin Code" := '';
-          exit;
+            "Move to Bin Code" := '';
+            exit;
         end;
 
         //-NPR5.42 [306858]
-        "Move to Bin Reference" := StrSubstNo ('%1 %2', "Payment Method No.", CopyStr (UpperCase(DelChr(Format(CreateGuid),'=','{}-')), 1, 7));
+        "Move to Bin Reference" := StrSubstNo('%1 %2', "Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
 
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
         // IF (POSPaymentBin.COUNT() <> 1) THEN
         //  EXIT;
 
-        if POSPaymentBin.IsEmpty () then
-          exit;
+        if POSPaymentBin.IsEmpty() then
+            exit;
 
         POSPaymentBin.Reset;
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
-        POSPaymentBin.SetFilter ("POS Store Code", '=%1', GetStoreCode ());
-        if (POSPaymentBin.Count () = 1) then begin
-          POSPaymentBin.FindFirst ();
-          Validate ("Move to Bin Code", POSPaymentBin."No.");
-          exit;
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
+        POSPaymentBin.SetFilter("POS Store Code", '=%1', GetStoreCode());
+        if (POSPaymentBin.Count() = 1) then begin
+            POSPaymentBin.FindFirst();
+            Validate("Move to Bin Code", POSPaymentBin."No.");
+            exit;
         end;
 
         POSPaymentBin.Reset;
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
-        POSPaymentBin.SetFilter ("Attached to POS Unit No.", '=%1', GetPosUnitNo ());
-        if (POSPaymentBin.Count () = 1) then begin
-          POSPaymentBin.FindFirst ();
-          Validate ("Move to Bin Code", POSPaymentBin."No.");
-          exit;
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
+        POSPaymentBin.SetFilter("Attached to POS Unit No.", '=%1', GetPosUnitNo());
+        if (POSPaymentBin.Count() = 1) then begin
+            POSPaymentBin.FindFirst();
+            Validate("Move to Bin Code", POSPaymentBin."No.");
+            exit;
         end;
 
         POSPaymentBin.Reset;
-        POSPaymentBin.SetFilter ("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
-        if (POSPaymentBin.Count () = 1) then begin
-          POSPaymentBin.FindFirst ();
-          Validate ("Move to Bin Code", POSPaymentBin."No.");
-          exit;
+        POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
+        if (POSPaymentBin.Count() = 1) then begin
+            POSPaymentBin.FindFirst();
+            Validate("Move to Bin Code", POSPaymentBin."No.");
+            exit;
         end;
 
         // POSPaymentBin.FINDFIRST ();

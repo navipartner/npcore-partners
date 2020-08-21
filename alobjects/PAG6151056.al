@@ -12,25 +12,30 @@ page 6151056 "Distribution Group"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Warehouse Location";"Warehouse Location")
+                field("Warehouse Location"; "Warehouse Location")
                 {
+                    ApplicationArea = All;
                 }
-                field("Warehouse Overhead Pct.";"Warehouse Overhead Pct.")
+                field("Warehouse Overhead Pct."; "Warehouse Overhead Pct.")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control10;"Distribution Grp Memb Listpart")
+            part(Control10; "Distribution Grp Memb Listpart")
             {
-                SubPageLink = "Distribution Group"=FIELD(Code);
+                SubPageLink = "Distribution Group" = FIELD(Code);
             }
         }
     }
@@ -45,7 +50,7 @@ page 6151056 "Distribution Group"
                 Image = Setup;
                 Promoted = true;
                 RunObject = Page "Distribution Setup";
-                RunPageLink = "Distribution Group"=FIELD(Code);
+                RunPageLink = "Distribution Group" = FIELD(Code);
             }
         }
     }

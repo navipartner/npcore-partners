@@ -12,21 +12,24 @@ page 6014642 "RP Data Item Constraints"
         {
             repeater(Group)
             {
-                field("Constraint Type";"Constraint Type")
+                field("Constraint Type"; "Constraint Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
-            part(Control6014405;"RP Data Item Constraint Links")
+            part(Control6014405; "RP Data Item Constraint Links")
             {
-                SubPageLink = "Data Item Code"=FIELD("Data Item Code"),
-                              "Constraint Line No."=FIELD("Line No.");
+                SubPageLink = "Data Item Code" = FIELD("Data Item Code"),
+                              "Constraint Line No." = FIELD("Line No.");
             }
         }
     }

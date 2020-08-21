@@ -12,23 +12,29 @@ page 6184486 "Pepper Card Type Fees"
         {
             repeater(Group)
             {
-                field("Card Type Code";"Card Type Code")
+                field("Card Type Code"; "Card Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Minimum Amount";"Minimum Amount")
+                field("Minimum Amount"; "Minimum Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Merchant Fee %";"Merchant Fee %")
+                field("Merchant Fee %"; "Merchant Fee %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Merchant Fee Amount";"Merchant Fee Amount")
+                field("Merchant Fee Amount"; "Merchant Fee Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Surcharge %";"Customer Surcharge %")
+                field("Customer Surcharge %"; "Customer Surcharge %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Surcharge Amount";"Customer Surcharge Amount")
+                field("Customer Surcharge Amount"; "Customer Surcharge Amount")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

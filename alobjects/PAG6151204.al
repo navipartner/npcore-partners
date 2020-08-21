@@ -9,8 +9,8 @@ page 6151204 "NpCs Send to Store Orders"
     PageType = List;
     SourceTable = "NpCs Document";
     SourceTableView = SORTING("Entry No.")
-                      WHERE(Type=CONST("Send to Store"),
-                            "Document Type"=CONST(Order));
+                      WHERE(Type = CONST("Send to Store"),
+                            "Document Type" = CONST(Order));
     UsageCategory = Lists;
 
     layout
@@ -19,93 +19,121 @@ page 6151204 "NpCs Send to Store Orders"
         {
             repeater(Group)
             {
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sell-to Customer Name";"Sell-to Customer Name")
+                field("Sell-to Customer Name"; "Sell-to Customer Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Workflow Code";"Workflow Code")
+                field("Workflow Code"; "Workflow Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Next Workflow Step";"Next Workflow Step")
+                field("Next Workflow Step"; "Next Workflow Step")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Store Code";"From Store Code")
+                field("From Store Code"; "From Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Document Type";"To Document Type")
+                field("To Document Type"; "To Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Document No.";"To Document No.")
+                field("To Document No."; "To Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Store Code";"To Store Code")
+                field("To Store Code"; "To Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Stock";"Store Stock")
+                field("Store Stock"; "Store Stock")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prepaid Amount";"Prepaid Amount")
+                field("Prepaid Amount"; "Prepaid Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prepayment Account No.";"Prepayment Account No.")
+                field("Prepayment Account No."; "Prepayment Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(LastLogMessage;GetLastLogMessage())
+                field(LastLogMessage; GetLastLogMessage())
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Log Message';
                 }
-                field(LastLogErrorMessage;GetLastLogErrorMessage())
+                field(LastLogErrorMessage; GetLastLogErrorMessage())
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Log Error Message';
                     Style = Attention;
                     StyleExpr = TRUE;
                 }
-                field("Processing Status";"Processing Status")
+                field("Processing Status"; "Processing Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing updated at";"Processing updated at")
+                field("Processing updated at"; "Processing updated at")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing updated by";"Processing updated by")
+                field("Processing updated by"; "Processing updated by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer E-mail";"Customer E-mail")
+                field("Customer E-mail"; "Customer E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Phone No.";"Customer Phone No.")
+                field("Customer Phone No."; "Customer Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Notification from Store";"Send Notification from Store")
+                field("Send Notification from Store"; "Send Notification from Store")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify Customer via E-mail";"Notify Customer via E-mail")
+                field("Notify Customer via E-mail"; "Notify Customer via E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify Customer via Sms";"Notify Customer via Sms")
+                field("Notify Customer via Sms"; "Notify Customer via Sms")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery Status";"Delivery Status")
+                field("Delivery Status"; "Delivery Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery updated at";"Delivery updated at")
+                field("Delivery updated at"; "Delivery updated at")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delivery updated by";"Delivery updated by")
+                field("Delivery updated by"; "Delivery updated by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Order Module";"Send Order Module")
+                field("Send Order Module"; "Send Order Module")
                 {
+                    ApplicationArea = All;
                 }
-                field("Order Status Module";"Order Status Module")
+                field("Order Status Module"; "Order Status Module")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Processing Module";"Post Processing Module")
+                field("Post Processing Module"; "Post Processing Module")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -144,7 +172,7 @@ page 6151204 "NpCs Send to Store Orders"
                 begin
                     NpCsWorkflowMgt.ScheduleRunWorkflow(Rec);
 
-                    NpCsCollectMgt.RunLog(Rec,true);
+                    NpCsCollectMgt.RunLog(Rec, true);
                 end;
             }
             group("Send Order")
@@ -229,16 +257,16 @@ page 6151204 "NpCs Send to Store Orders"
                         NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
                     begin
                         //-NPR5.55 [406591]
-                        if ("Processing Status" in ["Processing Status"::" ","Processing Status"::Pending,"Processing Status"::Confirmed]) and
-                          ("Delivery Status" in ["Delivery Status"::" ","Delivery Status"::Ready])
+                        if ("Processing Status" in ["Processing Status"::" ", "Processing Status"::Pending, "Processing Status"::Confirmed]) and
+                          ("Delivery Status" in ["Delivery Status"::" ", "Delivery Status"::Ready])
                         then begin
-                          if not Confirm(Text002,false,"Document Type","Document No.") then
-                            exit;
+                            if not Confirm(Text002, false, "Document Type", "Document No.") then
+                                exit;
                         end;
                         if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
-                          Message(Text003,"Document Type","Reference No.")
+                            Message(Text003, "Document Type", "Reference No.")
                         else
-                          Message(Text004,"Document Type","Reference No.",GetLastErrorText);
+                            Message(Text004, "Document Type", "Reference No.", GetLastErrorText);
 
                         CurrPage.Update(false);
                         //+NPR5.55 [406591]
@@ -271,7 +299,7 @@ page 6151204 "NpCs Send to Store Orders"
                 var
                     NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
                 begin
-                    NpCsCollectMgt.RunLog(Rec,false);
+                    NpCsCollectMgt.RunLog(Rec, false);
                 end;
             }
         }

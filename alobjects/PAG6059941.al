@@ -16,17 +16,21 @@ page 6059941 "SMS Template Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Alt. Sender";"Alt. Sender")
+                field("Alt. Sender"; "Alt. Sender")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     var
@@ -38,21 +42,25 @@ page 6059941 "SMS Template Card"
                         //+NPR5.40 [304312]
                     end;
                 }
-                field("Table Caption";"Table Caption")
+                field("Table Caption"; "Table Caption")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Recipient;Recipient)
+                field(Recipient; Recipient)
                 {
+                    ApplicationArea = All;
                     Lookup = true;
                 }
-                field("""Table Filters"".HASVALUE";"Table Filters".HasValue)
+                field("""Table Filters"".HASVALUE"; "Table Filters".HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Filters on Table';
                     Editable = false;
                 }
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
 
                     trigger OnValidate()
@@ -63,22 +71,22 @@ page 6059941 "SMS Template Card"
                     end;
                 }
             }
-            part(SMSTemplateSubform;"SMS Template Subform")
+            part(SMSTemplateSubform; "SMS Template Subform")
             {
                 Caption = 'SMS Content';
                 ShowFilter = false;
-                SubPageLink = "Template Code"=FIELD(Code);
-                SubPageView = SORTING("Template Code","Line No.");
+                SubPageLink = "Template Code" = FIELD(Code);
+                SubPageView = SORTING("Template Code", "Line No.");
                 UpdatePropagation = Both;
             }
         }
         area(factboxes)
         {
-            part("Fields";"SMS Field List")
+            part("Fields"; "SMS Field List")
             {
                 Caption = 'Fields';
-                SubPageLink = TableNo=FIELD("Table No.");
-                SubPageView = SORTING(TableNo,"No.");
+                SubPageLink = TableNo = FIELD("Table No.");
+                SubPageView = SORTING(TableNo, "No.");
                 UpdatePropagation = Both;
             }
         }

@@ -26,58 +26,75 @@ page 6060119 "TM Admission Schedule Lines"
             {
                 field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Schedule Code"; "Schedule Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Visibility On Web"; "Visibility On Web")
                 {
+                    ApplicationArea = All;
                 }
                 field("Process Order"; "Process Order")
                 {
+                    ApplicationArea = All;
                 }
                 field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
                 field("Prebook Is Required"; "Prebook Is Required")
                 {
+                    ApplicationArea = All;
                 }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
+                    ApplicationArea = All;
                 }
                 field("Reserved For Web"; "Reserved For Web")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Reserved For Members"; "Reserved For Members")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Unbookable Before Start (Secs)"; "Unbookable Before Start (Secs)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Bookable Passed Start (Secs)"; "Bookable Passed Start (Secs)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Capacity Control"; "Capacity Control")
                 {
+                    ApplicationArea = All;
                 }
                 field("Concurrency Code"; "Concurrency Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Prebook From"; "Prebook From")
                 {
+                    ApplicationArea = All;
                 }
                 field("Schedule Generated Until"; "Schedule Generated Until")
                 {
+                    ApplicationArea = All;
                 }
                 field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
                 {
+                    ApplicationArea = All;
                     Caption = 'Customized Calendar';
                     Editable = false;
 
@@ -90,42 +107,55 @@ page 6060119 "TM Admission Schedule Lines"
                 }
                 field("Scheduled Start Time"; "Scheduled Start Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Scheduled Stop Time"; "Scheduled Stop Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Event Arrival From Time"; "Event Arrival From Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Event Arrival Until Time"; "Event Arrival Until Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales From Date (Rel.)"; "Sales From Date (Rel.)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales From Time"; "Sales From Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Until Date (Rel.)"; "Sales Until Date (Rel.)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Until Time"; "Sales Until Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Pricing Option"; "Pricing Option")
                 {
+                    ApplicationArea = All;
                 }
                 field("Price Scope"; "Price Scope")
                 {
+                    ApplicationArea = All;
                 }
                 field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
                 field(Percentage; Percentage)
                 {
+                    ApplicationArea = All;
                 }
                 field("Amount Includes VAT"; "Amount Includes VAT")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

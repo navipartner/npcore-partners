@@ -21,50 +21,59 @@ page 6151590 "NpDc Coupon Type Card"
                 group(Control6014442)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Discount Type";"Discount Type")
+                    field("Discount Type"; "Discount Type")
                     {
+                        ApplicationArea = All;
                     }
                     group(Control6014439)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type"=0);
-                        field("Discount Amount";"Discount Amount")
+                        Visible = ("Discount Type" = 0);
+                        field("Discount Amount"; "Discount Amount")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                         }
                     }
                     group(Control6014440)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type"=1);
-                        field("Discount %";"Discount %")
+                        Visible = ("Discount Type" = 1);
+                        field("Discount %"; "Discount %")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                         }
-                        field("Max. Discount Amount";"Max. Discount Amount")
+                        field("Max. Discount Amount"; "Max. Discount Amount")
                         {
+                            ApplicationArea = All;
                             ToolTip = 'Max. Discount Amount per Sale';
                         }
                     }
-                    field(Enabled;Enabled)
+                    field(Enabled; Enabled)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014443)
                 {
                     ShowCaption = false;
-                    field("Coupon Qty. (Open)";"Coupon Qty. (Open)")
+                    field("Coupon Qty. (Open)"; "Coupon Qty. (Open)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Arch. Coupon Qty.";"Arch. Coupon Qty.")
+                    field("Arch. Coupon Qty."; "Arch. Coupon Qty.")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -74,8 +83,9 @@ page 6151590 "NpDc Coupon Type Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("Issue Coupon Module";"Issue Coupon Module")
+                    field("Issue Coupon Module"; "Issue Coupon Module")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -86,20 +96,24 @@ page 6151590 "NpDc Coupon Type Card"
                 group(Control6014427)
                 {
                     ShowCaption = false;
-                    field("Reference No. Pattern";"Reference No. Pattern")
+                    field("Reference No. Pattern"; "Reference No. Pattern")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = '[S] ~ Coupon No. [AN] ~ Random Char [AN*3] ~ 3 Random Chars';
                     }
-                    field("Customer No.";"Customer No.")
+                    field("Customer No."; "Customer No.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Customer No.';
                     }
-                    field("Print Template Code";"Print Template Code")
+                    field("Print Template Code"; "Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Print on Issue";"Print on Issue")
+                    field("Print on Issue"; "Print on Issue")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -109,8 +123,9 @@ page 6151590 "NpDc Coupon Type Card"
                 group(Control6014430)
                 {
                     ShowCaption = false;
-                    field("Validate Coupon Module";"Validate Coupon Module")
+                    field("Validate Coupon Module"; "Validate Coupon Module")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -121,11 +136,13 @@ page 6151590 "NpDc Coupon Type Card"
                 group(Control6014431)
                 {
                     ShowCaption = false;
-                    field("Starting Date";"Starting Date")
+                    field("Starting Date"; "Starting Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ending Date";"Ending Date")
+                    field("Ending Date"; "Ending Date")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -135,29 +152,34 @@ page 6151590 "NpDc Coupon Type Card"
                 group(Control6014432)
                 {
                     ShowCaption = false;
-                    field("Apply Discount Module";"Apply Discount Module")
+                    field("Apply Discount Module"; "Apply Discount Module")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
                             CurrPage.Update(true);
                         end;
                     }
-                    field("Application Sequence No.";"Application Sequence No.")
+                    field("Application Sequence No."; "Application Sequence No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014433)
                 {
                     ShowCaption = false;
-                    field("Max Use per Sale";"Max Use per Sale")
+                    field("Max Use per Sale"; "Max Use per Sale")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Multi-Use Coupon";"Multi-Use Coupon")
+                    field("Multi-Use Coupon"; "Multi-Use Coupon")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Multi-Use Qty.";"Multi-Use Qty.")
+                    field("Multi-Use Qty."; "Multi-Use Qty.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Multi-Use Qty.';
                     }
                 }
@@ -246,7 +268,7 @@ page 6151590 "NpDc Coupon Type Card"
                 Caption = 'Coupons';
                 Image = Voucher;
                 RunObject = Page "NpDc Coupons";
-                RunPageLink = "Coupon Type"=FIELD(Code);
+                RunPageLink = "Coupon Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
             }
             action(Comments)
@@ -254,13 +276,13 @@ page 6151590 "NpDc Coupon Type Card"
                 Caption = 'Co&mments';
                 Image = ViewComments;
                 RunObject = Page "Retail Comments";
-                RunPageLink = "Table ID"=CONST(6151590),
-                              "No."=FIELD(Code),
-                              "No. 2"=FILTER(''),
-                              Option=CONST("0"),
-                              "Option 2"=CONST("0"),
-                              Integer=CONST(0),
-                              "Integer 2"=CONST(0);
+                RunPageLink = "Table ID" = CONST(6151590),
+                              "No." = FIELD(Code),
+                              "No. 2" = FILTER(''),
+                              Option = CONST("0"),
+                              "Option 2" = CONST("0"),
+                              Integer = CONST(0),
+                              "Integer 2" = CONST(0);
             }
         }
     }
@@ -289,13 +311,13 @@ page 6151590 "NpDc Coupon Type Card"
         NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
     begin
         HasIssueCouponSetup := false;
-        NpDcCouponModuleMgt.OnHasIssueCouponSetup(Rec,HasIssueCouponSetup);
+        NpDcCouponModuleMgt.OnHasIssueCouponSetup(Rec, HasIssueCouponSetup);
 
         HasValidateCouponSetup := false;
-        NpDcCouponModuleMgt.OnHasValidateCouponSetup(Rec,HasValidateCouponSetup);
+        NpDcCouponModuleMgt.OnHasValidateCouponSetup(Rec, HasValidateCouponSetup);
 
         HasApplyDiscountSetup := false;
-        NpDcCouponModuleMgt.OnHasApplyDiscountSetup(Rec,HasApplyDiscountSetup);
+        NpDcCouponModuleMgt.OnHasApplyDiscountSetup(Rec, HasApplyDiscountSetup);
 
         CurrPage.Update(false);
     end;

@@ -12,41 +12,53 @@ page 6151071 "Retail Replenishment SKU List"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Reordering Policy";"Reordering Policy")
+                field("Reordering Policy"; "Reordering Policy")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reorder Point";"Reorder Point")
+                field("Reorder Point"; "Reorder Point")
                 {
+                    ApplicationArea = All;
                 }
-                field("Replenishment System";"Replenishment System")
+                field("Replenishment System"; "Replenishment System")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reorder Quantity";"Reorder Quantity")
+                field("Reorder Quantity"; "Reorder Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Maximum Inventory";"Maximum Inventory")
+                field("Maximum Inventory"; "Maximum Inventory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Minimum Order Quantity";"Minimum Order Quantity")
+                field("Minimum Order Quantity"; "Minimum Order Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Maximum Order Quantity";"Maximum Order Quantity")
+                field("Maximum Order Quantity"; "Maximum Order Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Safety Stock Quantity";"Safety Stock Quantity")
+                field("Safety Stock Quantity"; "Safety Stock Quantity")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -21,28 +21,34 @@ page 6014535 "Scanner - Setup"
                     group(Control6150616)
                     {
                         ShowCaption = false;
-                        field(ID;ID)
+                        field(ID; ID)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Description;Description)
+                        field(Description; Description)
                         {
+                            ApplicationArea = All;
                             Importance = Promoted;
                         }
                     }
                     group(Control6150619)
                     {
                         ShowCaption = false;
-                        field(Type;Type)
+                        field(Type; Type)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Port;Port)
+                        field(Port; Port)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Clear Scanner Option";"Clear Scanner Option")
+                        field("Clear Scanner Option"; "Clear Scanner Option")
                         {
+                            ApplicationArea = All;
                         }
-                        field(Debug;Debug)
+                        field(Debug; Debug)
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }
@@ -56,44 +62,57 @@ page 6014535 "Scanner - Setup"
                     group(Control6150627)
                     {
                         ShowCaption = false;
-                        field("Path - EXE / DLL Directory";"Path - EXE / DLL Directory")
+                        field("Path - EXE / DLL Directory"; "Path - EXE / DLL Directory")
                         {
+                            ApplicationArea = All;
                         }
-                        field("EXE - In";"EXE - In")
+                        field("EXE - In"; "EXE - In")
                         {
+                            ApplicationArea = All;
                         }
-                        field("EXE - Out";"EXE - Out")
+                        field("EXE - Out"; "EXE - Out")
                         {
+                            ApplicationArea = All;
                         }
-                        field("EXE - Update Scanner";"EXE - Update Scanner")
+                        field("EXE - Update Scanner"; "EXE - Update Scanner")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Path - Drop Directory";"Path - Drop Directory")
+                        field("Path - Drop Directory"; "Path - Drop Directory")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Path - Pickup Directory";"Path - Pickup Directory")
+                        field("Path - Pickup Directory"; "Path - Pickup Directory")
                         {
+                            ApplicationArea = All;
                         }
-                        field("File - Name Type";"File - Name Type")
+                        field("File - Name Type"; "File - Name Type")
                         {
+                            ApplicationArea = All;
                         }
-                        field("File - Name/Prefix";"File - Name/Prefix")
+                        field("File - Name/Prefix"; "File - Name/Prefix")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Import to Server Folder First";"Import to Server Folder First")
+                        field("Import to Server Folder First"; "Import to Server Folder First")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Local Client Scanner Folder";"Local Client Scanner Folder")
+                        field("Local Client Scanner Folder"; "Local Client Scanner Folder")
                         {
+                            ApplicationArea = All;
                         }
-                        field("File - After";"File - After")
+                        field("File - After"; "File - After")
                         {
+                            ApplicationArea = All;
                         }
-                        field("File - Backup Directory";"File - Backup Directory")
+                        field("File - Backup Directory"; "File - Backup Directory")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Backup Filename";"Backup Filename")
+                        field("Backup Filename"; "Backup Filename")
                         {
+                            ApplicationArea = All;
                             ToolTip = '%1 = CurrentDatetime';
                         }
                     }
@@ -108,23 +127,28 @@ page 6014535 "Scanner - Setup"
                     group("Number Format")
                     {
                         Caption = 'Number Format';
-                        field("Decimal Point";"Decimal Point")
+                        field("Decimal Point"; "Decimal Point")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Leading Decimals";"Leading Decimals")
+                        field("Leading Decimals"; "Leading Decimals")
                         {
+                            ApplicationArea = All;
                         }
                         group("Before Communication")
                         {
                             Caption = 'Before Communication';
-                            field("File - Line Skip Pre";"File - Line Skip Pre")
+                            field("File - Line Skip Pre"; "File - Line Skip Pre")
                             {
+                                ApplicationArea = All;
                             }
-                            field("Placement Popup";"Placement Popup")
+                            field("Placement Popup"; "Placement Popup")
                             {
+                                ApplicationArea = All;
                             }
-                            field("Alt. Import Codeunit";"Alt. Import Codeunit")
+                            field("Alt. Import Codeunit"; "Alt. Import Codeunit")
                             {
+                                ApplicationArea = All;
                                 Caption = 'Alt. Import Codeunit';
                             }
                         }
@@ -132,26 +156,32 @@ page 6014535 "Scanner - Setup"
                     group("Field Format")
                     {
                         Caption = 'Field Format';
-                        field("Field Type";"Field Type")
+                        field("Field Type"; "Field Type")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Line Type";"Line Type")
+                        field("Line Type"; "Line Type")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Record Field Sep.";"Record Field Sep.")
+                        field("Record Field Sep."; "Record Field Sep.")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Prefix Length";"Prefix Length")
+                        field("Prefix Length"; "Prefix Length")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Scanning End String";"Scanning End String")
+                        field("Scanning End String"; "Scanning End String")
                         {
+                            ApplicationArea = All;
                         }
                         group("Weight Integration")
                         {
                             Caption = 'Weight Integration';
-                            field("Weight - No. of MA Samples";"Weight - No. of MA Samples")
+                            field("Weight - No. of MA Samples"; "Weight - No. of MA Samples")
                             {
+                                ApplicationArea = All;
                             }
                         }
                     }
@@ -165,20 +195,25 @@ page 6014535 "Scanner - Setup"
                     group(Control6014402)
                     {
                         ShowCaption = false;
-                        field("FTP Download to Server Folder";"FTP Download to Server Folder")
+                        field("FTP Download to Server Folder"; "FTP Download to Server Folder")
                         {
+                            ApplicationArea = All;
                         }
-                        field("FTP Site address";"FTP Site address")
+                        field("FTP Site address"; "FTP Site address")
                         {
+                            ApplicationArea = All;
                         }
-                        field("FTP Filename";"FTP Filename")
+                        field("FTP Filename"; "FTP Filename")
                         {
+                            ApplicationArea = All;
                         }
-                        field("FTP Username";"FTP Username")
+                        field("FTP Username"; "FTP Username")
                         {
+                            ApplicationArea = All;
                         }
-                        field("FTP Password";"FTP Password")
+                        field("FTP Password"; "FTP Password")
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }
@@ -186,20 +221,20 @@ page 6014535 "Scanner - Setup"
             group("Input Format")
             {
                 Caption = 'Input Format';
-                part(Control6150662;"Scanner - Field Setup")
+                part(Control6150662; "Scanner - Field Setup")
                 {
-                    SubPageLink = ID=FIELD(ID),
-                                  "Where To"=CONST(Input);
+                    SubPageLink = ID = FIELD(ID),
+                                  "Where To" = CONST(Input);
                     SubPageView = SORTING(Order);
                 }
             }
             group("Output Format")
             {
                 Caption = 'Output Format';
-                part(Control6150664;"Scanner - Field Setup")
+                part(Control6150664; "Scanner - Field Setup")
                 {
-                    SubPageLink = ID=FIELD(ID),
-                                  "Where To"=CONST(Output);
+                    SubPageLink = ID = FIELD(ID),
+                                  "Where To" = CONST(Output);
                     SubPageView = SORTING(Order);
                 }
             }

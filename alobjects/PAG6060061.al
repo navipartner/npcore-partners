@@ -14,17 +14,21 @@ page 6060061 "Catalog Suppliers"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Sales Statistics";"Send Sales Statistics")
+                field("Send Sales Statistics"; "Send Sales Statistics")
                 {
+                    ApplicationArea = All;
                 }
-                field("Trade Number";"Trade Number")
+                field("Trade Number"; "Trade Number")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

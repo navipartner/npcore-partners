@@ -12,19 +12,22 @@ page 6060154 "Event Standard Dialog"
     {
         area(content)
         {
-            field(MessageText;MessageText)
+            field(MessageText; MessageText)
             {
+                ApplicationArea = All;
                 Caption = 'Message';
                 Visible = ShowMessage;
             }
-            field(Password;Password)
+            field(Password; Password)
             {
+                ApplicationArea = All;
                 Caption = 'Password';
                 ExtendedDatatype = Masked;
                 Visible = ShowPassword;
             }
-            field(ConfirmPassword;ConfirmPassword)
+            field(ConfirmPassword; ConfirmPassword)
             {
+                ApplicationArea = All;
                 Caption = 'Confirm Password';
                 ExtendedDatatype = Masked;
                 Visible = ShowPassword;
@@ -39,8 +42,8 @@ page 6060154 "Event Standard Dialog"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if ShowPassword then
-          if Password <> ConfirmPassword then
-            Error(PasswordsMatchErr);
+            if Password <> ConfirmPassword then
+                Error(PasswordsMatchErr);
     end;
 
     var

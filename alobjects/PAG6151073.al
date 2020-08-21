@@ -14,12 +14,14 @@ page 6151073 "Retail Replenisment Setup"
         {
             repeater(Group)
             {
-                field("Item Demand Calc. Codeunit";"Item Demand Calc. Codeunit")
+                field("Item Demand Calc. Codeunit"; "Item Demand Calc. Codeunit")
                 {
-                    TableRelation = AllObj."Object ID" WHERE ("Object Type"=FILTER(Codeunit));
+                    ApplicationArea = All;
+                    TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
                 }
-                field("Default Transit Location";"Default Transit Location")
+                field("Default Transit Location"; "Default Transit Location")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

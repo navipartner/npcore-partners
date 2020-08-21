@@ -18,29 +18,37 @@ page 6151430 "Magento Attribute List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                 }
-                field(Filterable;Filterable)
+                field(Filterable; Filterable)
                 {
+                    ApplicationArea = All;
                 }
-                field("Use in Product Listing";"Use in Product Listing")
+                field("Use in Product Listing"; "Use in Product Listing")
                 {
+                    ApplicationArea = All;
                 }
-                field("Show Option Images Is Frontend";"Show Option Images Is Frontend")
+                field("Show Option Images Is Frontend"; "Show Option Images Is Frontend")
                 {
+                    ApplicationArea = All;
                 }
-                field("Used by Items";"Used by Items")
+                field("Used by Items"; "Used by Items")
                 {
+                    ApplicationArea = All;
                 }
-                field("Used by Attribute Set";"Used by Attribute Set")
+                field("Used by Attribute Set"; "Used by Attribute Set")
                 {
+                    ApplicationArea = All;
                 }
-                field(Visible;Visible)
+                field(Visible; Visible)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

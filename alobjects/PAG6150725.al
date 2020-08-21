@@ -10,8 +10,9 @@ page 6150725 "POS Select Language Dialog"
     {
         area(content)
         {
-            field(LanguageCode;LanguageCode)
+            field(LanguageCode; LanguageCode)
             {
+                ApplicationArea = All;
                 Caption = 'Select Language';
                 TableRelation = Language;
 

@@ -18,41 +18,53 @@ page 6059939 "Sales Price Maintenance Setup"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Type";"Sales Type")
+                field("Sales Type"; "Sales Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Code";"Sales Code")
+                field("Sales Code"; "Sales Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prices Including VAT";"Prices Including VAT")
+                field("Prices Including VAT"; "Prices Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Bus. Posting Gr. (Price)";"VAT Bus. Posting Gr. (Price)")
+                field("VAT Bus. Posting Gr. (Price)"; "VAT Bus. Posting Gr. (Price)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Invoice Disc.";"Allow Invoice Disc.")
+                field("Allow Invoice Disc."; "Allow Invoice Disc.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Line Disc.";"Allow Line Disc.")
+                field("Allow Line Disc."; "Allow Line Disc.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Unit Price";"Internal Unit Price")
+                field("Internal Unit Price"; "Internal Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field(Factor;Factor)
+                field(Factor; Factor)
                 {
+                    ApplicationArea = All;
                 }
-                field("Exclude Item Groups";"Exclude Item Groups")
+                field("Exclude Item Groups"; "Exclude Item Groups")
                 {
+                    ApplicationArea = All;
                 }
-                field("Exclude All Item Groups";"Exclude All Item Groups")
+                field("Exclude All Item Groups"; "Exclude All Item Groups")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -107,29 +119,33 @@ page 6059939 "Sales Price Maintenance Setup"
         Item: Record Item;
     begin
         //-NPR5.43 [318039]
-        if not Confirm(Text00001,true) then
-          exit;
+        if not Confirm(Text00001, true) then
+            exit;
         if Item.FindSet then
-          repeat
-            if FindSalesPrices(Item) then
-              SalesPrice.DeleteAll;
-            SalesPrice.Init;
-            SalesPrice.Validate("Item No.",Item."No.");
-            SalesPrice."Sales Type" := "Sales Type";
-            SalesPrice.Validate("Sales Code","Sales Code");
-            SalesPrice."Starting Date" := Item."Special Price From";
-            SalesPrice."Minimum Quantity" := 0;
-            case "Internal Unit Price" of
-              "Internal Unit Price"::"Unit Cost": SalesPrice."Unit Price" := Item."Unit Cost" * Factor;
-              "Internal Unit Price"::"Unit Price": SalesPrice."Unit Price" := Item."Unit Price" * Factor;
-              "Internal Unit Price"::"Last Direct Cost": SalesPrice."Unit Price" := Item."Last Direct Cost" * Factor;
-              "Internal Unit Price"::"Standard Cost": SalesPrice."Unit Price" := Item."Standard Cost" * Factor;
-            end;
-            SalesPrice."Ending Date" := Item."Special Price To";
-            SalesPrice."VAT Bus. Posting Gr. (Price)" := Item."VAT Bus. Posting Gr. (Price)" ;
-            SalesPrice."Price Includes VAT" := SalesPrice."Price Includes VAT";
-            SalesPrice.Insert(true);
-          until Item.Next =0;
+            repeat
+                if FindSalesPrices(Item) then
+                    SalesPrice.DeleteAll;
+                SalesPrice.Init;
+                SalesPrice.Validate("Item No.", Item."No.");
+                SalesPrice."Sales Type" := "Sales Type";
+                SalesPrice.Validate("Sales Code", "Sales Code");
+                SalesPrice."Starting Date" := Item."Special Price From";
+                SalesPrice."Minimum Quantity" := 0;
+                case "Internal Unit Price" of
+                    "Internal Unit Price"::"Unit Cost":
+                        SalesPrice."Unit Price" := Item."Unit Cost" * Factor;
+                    "Internal Unit Price"::"Unit Price":
+                        SalesPrice."Unit Price" := Item."Unit Price" * Factor;
+                    "Internal Unit Price"::"Last Direct Cost":
+                        SalesPrice."Unit Price" := Item."Last Direct Cost" * Factor;
+                    "Internal Unit Price"::"Standard Cost":
+                        SalesPrice."Unit Price" := Item."Standard Cost" * Factor;
+                end;
+                SalesPrice."Ending Date" := Item."Special Price To";
+                SalesPrice."VAT Bus. Posting Gr. (Price)" := Item."VAT Bus. Posting Gr. (Price)";
+                SalesPrice."Price Includes VAT" := SalesPrice."Price Includes VAT";
+                SalesPrice.Insert(true);
+            until Item.Next = 0;
         Message(Text00002);
         //+NPR5.43 [318039]
     end;
@@ -159,12 +175,12 @@ page 6059939 "Sales Price Maintenance Setup"
           UNTIL SalesPrice.NEXT = 0;
         */
         if Item.FindSet then
-          repeat
-            //-NPR5.51 [360328]
-            //IF FindSalesPrices(Item) THEN
-              SalesPriceMaintenance.UpdateSalesPricesForStaff(Item);
+            repeat
+                //-NPR5.51 [360328]
+                //IF FindSalesPrices(Item) THEN
+                SalesPriceMaintenance.UpdateSalesPricesForStaff(Item);
             //+NPR5.51 [360328]
-          until Item.Next = 0;
+            until Item.Next = 0;
         //+NPR5.52 [345782]
         Message(Text00003);
         //+NPR5.43 [318039]
@@ -176,10 +192,10 @@ page 6059939 "Sales Price Maintenance Setup"
         SalesPrice: Record "Sales Price";
     begin
         //-NPR5.43 [318039]
-        SalesPrice.SetRange("Item No.",Item."No.");
-        SalesPrice.SetRange("Sales Type","Sales Type");
-        SalesPrice.SetRange("Sales Code","Sales Code");
-        SalesPrice.SetRange("Variant Code",'');
+        SalesPrice.SetRange("Item No.", Item."No.");
+        SalesPrice.SetRange("Sales Type", "Sales Type");
+        SalesPrice.SetRange("Sales Code", "Sales Code");
+        SalesPrice.SetRange("Variant Code", '');
         exit(not SalesPrice.IsEmpty);
         //+NPR5.43 [318039]
     end;

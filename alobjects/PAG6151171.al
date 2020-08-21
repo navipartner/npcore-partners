@@ -15,17 +15,21 @@ page 6151171 "NpGp Global POS Sales Setups"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Service Url";"Service Url")
+                field("Service Url"; "Service Url")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sync POS Sales Immediately";"Sync POS Sales Immediately")
+                field("Sync POS Sales Immediately"; "Sync POS Sales Immediately")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

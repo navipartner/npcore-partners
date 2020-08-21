@@ -19,24 +19,28 @@ page 6150705 "POS Parameter Values"
         {
             repeater(Group)
             {
-                field(ParameterName;ParameterName)
+                field(ParameterName; ParameterName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Name';
                     Editable = false;
                 }
-                field(ParameterDescription;ParameterDescription)
+                field(ParameterDescription; ParameterDescription)
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
                 }
-                field(ParameterValue;ParameterValue)
+                field(ParameterValue; ParameterValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Value';
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
@@ -110,8 +114,8 @@ page 6150705 "POS Parameter Values"
         POSActionParameter: Record "POS Action Parameter";
     begin
         //-NPR5.34 [282915]
-        if POSActionParameter.Get("Action Code",Name) then
-          exit(POSActionParameter."Default Value" = Value);
+        if POSActionParameter.Get("Action Code", Name) then
+            exit(POSActionParameter."Default Value" = Value);
         exit(false);
         //+NPR5.34 [282915]
     end;
@@ -122,7 +126,7 @@ page 6150705 "POS Parameter Values"
         Clear(ParameterName);
         OnGetParameterNameCaption(Rec, ParameterName);
         if (ParameterName = '') then
-          ParameterName := Name;
+            ParameterName := Name;
         //+NPR5.40 [308050]
     end;
 
@@ -144,13 +148,13 @@ page 6150705 "POS Parameter Values"
         OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
         //-NPR5.54 [335834]
         if "Data Type" = "Data Type"::Boolean then
-          ParameterValue := GetBooleanStringCaption()
+            ParameterValue := GetBooleanStringCaption()
         else
-        //+NPR5.54 [335834]
-        if (ParameterOptionString = '') or ("Data Type" <> "Data Type"::Option) then
-          ParameterValue := Value
-        else
-          ParameterValue := GetOptionStringCaption(ParameterOptionString)
+            //+NPR5.54 [335834]
+            if (ParameterOptionString = '') or ("Data Type" <> "Data Type"::Option) then
+                ParameterValue := Value
+            else
+                ParameterValue := GetOptionStringCaption(ParameterOptionString)
         //+NPR5.40 [308050]
     end;
 }

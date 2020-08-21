@@ -17,80 +17,92 @@ page 6150718 "POS Menu Filter"
             group(General)
             {
                 Caption = 'General';
-                field("Filter Code";"Filter Code")
+                field("Filter Code"; "Filter Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
             group("Run object")
             {
                 Caption = 'Run object';
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Object Id";"Object Id")
+                field("Object Id"; "Object Id")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Object Name";"Object Name")
+                field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Run Modal";"Run Modal")
+                field("Run Modal"; "Run Modal")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Filter record")
             {
                 Caption = 'Filter record';
-                field("Send Sale POS";"Send Sale POS")
+                field("Send Sale POS"; "Send Sale POS")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Send Sale Line POS";"Send Sale Line POS")
+                field("Send Sale Line POS"; "Send Sale Line POS")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 group("Implied Filters")
                 {
                     Caption = 'Implied Filters';
-                    field("Current POS Register / Unit";"Current POS Register / Unit")
+                    field("Current POS Register / Unit"; "Current POS Register / Unit")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

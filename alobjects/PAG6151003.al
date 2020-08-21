@@ -19,62 +19,76 @@ page 6151003 "POS Quote Card"
                 group(Control6014411)
                 {
                     ShowCaption = false;
-                    field("Sales Ticket No.";"Sales Ticket No.")
+                    field("Sales Ticket No."; "Sales Ticket No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Register No.";"Register No.")
+                    field("Register No."; "Register No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Entry No.";"Entry No.")
+                    field("Entry No."; "Entry No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Created at";"Created at")
+                    field("Created at"; "Created at")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Salesperson Code";"Salesperson Code")
+                    field("Salesperson Code"; "Salesperson Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Amount;Amount)
+                    field(Amount; Amount)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Amount Including VAT";"Amount Including VAT")
+                    field("Amount Including VAT"; "Amount Including VAT")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Contains EFT Approval";"Contains EFT Approval")
+                    field("Contains EFT Approval"; "Contains EFT Approval")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014409)
                 {
                     ShowCaption = false;
-                    field("Customer Type";"Customer Type")
+                    field("Customer Type"; "Customer Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Customer No.";"Customer No.")
+                    field("Customer No."; "Customer No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Customer Price Group";"Customer Price Group")
+                    field("Customer Price Group"; "Customer Price Group")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Customer Disc. Group";"Customer Disc. Group")
+                    field("Customer Disc. Group"; "Customer Disc. Group")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Attention;Attention)
+                    field(Attention; Attention)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Reference;Reference)
+                    field(Reference; Reference)
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
-            part(Lines;"POS Quote Subpage")
+            part(Lines; "POS Quote Subpage")
             {
                 Caption = 'Lines';
-                SubPageLink = "Quote Entry No."=FIELD("Entry No.");
+                SubPageLink = "Quote Entry No." = FIELD("Entry No.");
             }
         }
     }

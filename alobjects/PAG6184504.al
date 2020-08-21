@@ -22,41 +22,53 @@ page 6184504 "EFT Adyen Payment Type Setup"
         {
             group(General)
             {
-                field("Merchant Account";"Merchant Account")
+                field("Merchant Account"; "Merchant Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("API Key";"API Key")
+                field("API Key"; "API Key")
                 {
+                    ApplicationArea = All;
                 }
-                field(Environment;Environment)
+                field(Environment; Environment)
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Condition";"Transaction Condition")
+                field("Transaction Condition"; "Transaction Condition")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Recurring Contract";"Create Recurring Contract")
+                field("Create Recurring Contract"; "Create Recurring Contract")
                 {
+                    ApplicationArea = All;
                 }
-                field("Acquire Card First";"Acquire Card First")
+                field("Acquire Card First"; "Acquire Card First")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Level";"Log Level")
+                field("Log Level"; "Log Level")
                 {
+                    ApplicationArea = All;
                 }
-                field("Silent Discount Allowed";"Silent Discount Allowed")
+                field("Silent Discount Allowed"; "Silent Discount Allowed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Capture Delay Hours";"Capture Delay Hours")
+                field("Capture Delay Hours"; "Capture Delay Hours")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashback Allowed";"Cashback Allowed")
+                field("Cashback Allowed"; "Cashback Allowed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Recurring API URL Prefix";"Recurring API URL Prefix")
+                field("Recurring API URL Prefix"; "Recurring API URL Prefix")
                 {
+                    ApplicationArea = All;
                 }
-                field(Unattended;Unattended)
+                field(Unattended; Unattended)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

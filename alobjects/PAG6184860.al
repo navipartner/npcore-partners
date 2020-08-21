@@ -14,12 +14,15 @@ page 6184860 "Azure Storage Setup"
             {
                 field("Account Name"; "Account Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Account Description"; "Account Description")
                 {
+                    ApplicationArea = All;
                 }
                 field(AccessKey; AccessKey)
                 {
+                    ApplicationArea = All;
                     Caption = 'Shared Access Key';
                     ExtendedDatatype = Masked;
                     ToolTip = 'Storage account -> Settings section -> Access keys -> key1 or key2';
@@ -31,6 +34,7 @@ page 6184860 "Azure Storage Setup"
                 }
                 field(AdminKey; AdminKey)
                 {
+                    ApplicationArea = All;
                     Caption = 'Search App Admin Key';
                     ExtendedDatatype = Masked;
                     ToolTip = 'Search Service -> Settings section -> Keys -> "Primary admin key" or "Secondary admin key"';
@@ -42,10 +46,12 @@ page 6184860 "Azure Storage Setup"
                 }
                 field(Timeout; Timeout)
                 {
+                    ApplicationArea = All;
                     ToolTip = 'Miliseconds';
                 }
                 field("Storage On Server"; "Storage On Server")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -15,9 +15,11 @@ page 6150645 "POS Info Lookup Field Setup"
                 Caption = 'Group';
                 field("Map To"; "Map To")
                 {
+                    ApplicationArea = All;
                 }
                 field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     DrillDown = false;
                     Lookup = false;
@@ -29,6 +31,7 @@ page 6150645 "POS Info Lookup Field Setup"
                 }
                 field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

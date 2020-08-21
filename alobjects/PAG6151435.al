@@ -17,17 +17,21 @@ page 6151435 "Magento Attribute Set Values"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Attribute ID";"Attribute ID")
+                field("Attribute ID"; "Attribute ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute Group ID";"Attribute Group ID")
+                field("Attribute Group ID"; "Attribute Group ID")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

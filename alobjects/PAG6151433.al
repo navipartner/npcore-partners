@@ -17,11 +17,13 @@ page 6151433 "Magento Attribute Set List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Used by Items";"Used by Items")
+                field("Used by Items"; "Used by Items")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

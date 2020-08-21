@@ -24,34 +24,42 @@ page 6059789 "E-mail Setup"
         {
             group(General)
             {
-                field("Mail Server";"Mail Server")
+                field("Mail Server"; "Mail Server")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("Mail Server Port";"Mail Server Port")
+                field("Mail Server Port"; "Mail Server Port")
                 {
+                    ApplicationArea = All;
                 }
-                field("Enable Ssl";"Enable Ssl")
+                field("Enable Ssl"; "Enable Ssl")
                 {
+                    ApplicationArea = All;
                 }
-                field(Username;Username)
+                field(Username; Username)
                 {
+                    ApplicationArea = All;
                 }
-                field(Password;Password)
+                field(Password; Password)
                 {
+                    ApplicationArea = All;
                 }
-                field("From E-mail Address";"From E-mail Address")
+                field("From E-mail Address"; "From E-mail Address")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("From Name";"From Name")
+                field("From Name"; "From Name")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(NAS)
             {
-                field("NAS Folder";"NAS Folder")
+                field("NAS Folder"; "NAS Folder")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -76,7 +84,7 @@ page 6059789 "E-mail Setup"
                     EmailTemplateCount := EmailDocumentMgt.CreateEmailTemplates();
                     //+PN1.08
                     if EmailTemplateCount > 0 then
-                      Message(StrSubstNo(Text001,EmailTemplateCount));
+                        Message(StrSubstNo(Text001, EmailTemplateCount));
                 end;
             }
             group(CreateEmailTemplateGroup)
@@ -96,7 +104,7 @@ page 6059789 "E-mail Setup"
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesQuote");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesQuote");
                         //+PN1.08
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                     end;
                 }
                 action(CreateSalesOrderEmailTemplate)
@@ -112,7 +120,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesOrder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesOrder");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -129,7 +137,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesShpt");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesShpt");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -146,7 +154,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesInv");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesInv");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -163,7 +171,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesCrMemo");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesCrMemo");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -180,7 +188,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchQuote");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchQuote");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -197,7 +205,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchOrder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchOrder");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -214,7 +222,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchRcpt");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchRcpt");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -231,7 +239,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchInv");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchInv");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -248,7 +256,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchCrMemo");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchCrMemo");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -265,7 +273,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.Reminder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.Reminder");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -282,7 +290,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ChargeMemo");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ChargeMemo");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -299,7 +307,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.Statement");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.Statement");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -316,7 +324,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServQuote");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServQuote");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -333,7 +341,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServOrder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServOrder");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -350,7 +358,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServShpt");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServShpt");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -367,7 +375,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServInv");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServInv");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -385,7 +393,7 @@ page 6059789 "E-mail Setup"
                         //-PN1.08
                         //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.AuditRoll");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.AuditRoll");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -402,7 +410,7 @@ page 6059789 "E-mail Setup"
                     begin
                         //-PN1.08
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.CreditVoucher");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -419,7 +427,7 @@ page 6059789 "E-mail Setup"
                     begin
                         //-PN1.08
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.GiftVoucher");
-                        Message(StrSubstNo(Text002,EmailTemplateCode));
+                        Message(StrSubstNo(Text002, EmailTemplateCode));
                         //+PN1.08
                     end;
                 }
@@ -431,7 +439,7 @@ page 6059789 "E-mail Setup"
     begin
         Reset;
         if not Get then
-          Insert;
+            Insert;
 
         //-PN1.08
         SetVisible();

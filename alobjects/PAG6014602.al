@@ -15,27 +15,33 @@ page 6014602 "NPR Item Variants"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                     Visible = true;
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                     Caption = 'Inventory';
                     Editable = false;
                 }
-                field(NetChange;NetChange)
+                field(NetChange; NetChange)
                 {
+                    ApplicationArea = All;
                     Caption = 'Net Change';
                     Editable = false;
                 }
@@ -43,11 +49,11 @@ page 6014602 "NPR Item Variants"
         }
         area(factboxes)
         {
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = false;
             }
@@ -67,8 +73,8 @@ page 6014602 "NPR Item Variants"
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Translations";
-                    RunPageLink = "Item No."=FIELD("Item No."),
-                                  "Variant Code"=FIELD(Code);
+                    RunPageLink = "Item No." = FIELD("Item No."),
+                                  "Variant Code" = FIELD(Code);
                 }
             }
         }
@@ -78,14 +84,14 @@ page 6014602 "NPR Item Variants"
     var
         Item: Record Item;
     begin
-        Item.Reset ();
-        Item.Get (Rec."Item No.");
-        Item.SetFilter ("No.", '=%1', Rec."Item No.");
-        Item.SetFilter ("Variant Filter", '=%1', Rec.Code);
-        Item.SetFilter ("Date Filter", '..%1', Today);
+        Item.Reset();
+        Item.Get(Rec."Item No.");
+        Item.SetFilter("No.", '=%1', Rec."Item No.");
+        Item.SetFilter("Variant Filter", '=%1', Rec.Code);
+        Item.SetFilter("Date Filter", '..%1', Today);
         if (LocationCodeFilter <> '') then
-          Item.SetFilter ("Location Filter", '=%1', LocationCodeFilter);
-        Item.CalcFields (Inventory, "Net Change");
+            Item.SetFilter("Location Filter", '=%1', LocationCodeFilter);
+        Item.CalcFields(Inventory, "Net Change");
         Inventory := Item.Inventory;
         NetChange := Item."Net Change";
     end;

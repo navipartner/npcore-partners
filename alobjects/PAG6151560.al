@@ -17,8 +17,9 @@ page 6151560 "NpXml Template Trigger Links"
         {
             repeater(Group)
             {
-                field("Link Type";"Link Type")
+                field("Link Type"; "Link Type")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -27,38 +28,45 @@ page 6151560 "NpXml Template Trigger Links"
                         //+NC1.08
                     end;
                 }
-                field("Parent Field No.";"Parent Field No.")
+                field("Parent Field No."; "Parent Field No.")
                 {
+                    ApplicationArea = All;
                     Enabled = XmlTemplateFieldNoEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT XmlTemplateFieldNoEnabled;
                 }
-                field("Parent Field Name";"Parent Field Name")
+                field("Parent Field Name"; "Parent Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Parent Filter Value";"Parent Filter Value")
+                field("Parent Filter Value"; "Parent Filter Value")
                 {
+                    ApplicationArea = All;
                     Enabled = XmlTemplateFilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT XmlTemplateFilterValueEnabled;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                     Enabled = FieldNoEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT FieldNoEnabled;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Value";"Filter Value")
+                field("Filter Value"; "Filter Value")
                 {
+                    ApplicationArea = All;
                     Enabled = FilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT FilterValueEnabled;
                 }
-                field("Previous Filter Value";"Previous Filter Value")
+                field("Previous Filter Value"; "Previous Filter Value")
                 {
+                    ApplicationArea = All;
                     Enabled = PreviousFilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT PreviousFilterValueEnabled;
@@ -103,10 +111,10 @@ page 6151560 "NpXml Template Trigger Links"
     local procedure SetEnabled()
     begin
         //-NC1.08
-        XmlTemplateFilterValueEnabled := "Link Type" in ["Link Type"::ParentConstant,"Link Type"::ParentFilter];
-        XmlTemplateFieldNoEnabled := XmlTemplateFilterValueEnabled or ("Link Type" in ["Link Type"::TableLink,"Link Type"::PreviousTableLink]);
+        XmlTemplateFilterValueEnabled := "Link Type" in ["Link Type"::ParentConstant, "Link Type"::ParentFilter];
+        XmlTemplateFieldNoEnabled := XmlTemplateFilterValueEnabled or ("Link Type" in ["Link Type"::TableLink, "Link Type"::PreviousTableLink]);
         FieldNoEnabled := not XmlTemplateFilterValueEnabled;
-        FilterValueEnabled := "Link Type" in ["Link Type"::Constant,"Link Type"::Filter];
+        FilterValueEnabled := "Link Type" in ["Link Type"::Constant, "Link Type"::Filter];
         PreviousFilterValueEnabled := "Link Type" = "Link Type"::PreviousConstant;
         //+NC1.08
     end;
@@ -114,8 +122,8 @@ page 6151560 "NpXml Template Trigger Links"
     procedure SetTemplateTriggerView(NpXmlTemplateTrigger: Record "NpXml Template Trigger")
     begin
         FilterGroup(2);
-        SetRange("Xml Template Code",NpXmlTemplateTrigger."Xml Template Code");
-        SetRange("Xml Template Trigger Line No.",NpXmlTemplateTrigger."Line No.");
+        SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
+        SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
         FilterGroup(2);
 
         XmlTemplateTableNo := NpXmlTemplateTrigger."Parent Table No.";

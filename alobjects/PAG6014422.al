@@ -6,7 +6,7 @@ page 6014422 "Pacsoft Customs Item Rows"
     DelayedInsert = true;
     PageType = ListPart;
     SourceTable = "Pacsoft Customs Item Rows";
-    SourceTableView = SORTING("Shipment Document Entry No.","Entry No.");
+    SourceTableView = SORTING("Shipment Document Entry No.", "Entry No.");
 
     layout
     {
@@ -14,26 +14,33 @@ page 6014422 "Pacsoft Customs Item Rows"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Code";"Item Code")
+                field("Item Code"; "Item Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Information";"Line Information")
+                field("Line Information"; "Line Information")
                 {
+                    ApplicationArea = All;
                 }
-                field(Copies;Copies)
+                field(Copies; Copies)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customs Value";"Customs Value")
+                field("Customs Value"; "Customs Value")
                 {
+                    ApplicationArea = All;
                 }
-                field(Content;Content)
+                field(Content; Content)
                 {
+                    ApplicationArea = All;
                 }
-                field("Country of Origin";"Country of Origin")
+                field("Country of Origin"; "Country of Origin")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
