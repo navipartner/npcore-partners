@@ -19,11 +19,13 @@ page 6184474 "EFT Auxiliary Operations"
         {
             repeater(Group)
             {
-                field("Auxiliary ID";"Auxiliary ID")
+                field("Auxiliary ID"; "Auxiliary ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

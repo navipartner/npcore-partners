@@ -13,8 +13,9 @@ page 6014412 "Phone No lookup"
         {
             group(General)
             {
-                field(PhoneNo;PhoneNo)
+                field(PhoneNo; PhoneNo)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
 
                     trigger OnValidate()
@@ -23,35 +24,43 @@ page 6014412 "Phone No lookup"
                         CheckifExist;
                     end;
                 }
-                field(ID;ID)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail";"E-Mail")
+                field("E-Mail"; "E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Home Page";"Home Page")
+                field("Home Page"; "Home Page")
                 {
+                    ApplicationArea = All;
                 }
-                field(NewContact;NewContact)
+                field(NewContact; NewContact)
                 {
+                    ApplicationArea = All;
                     Caption = 'Create Contact';
 
                     trigger OnDrillDown()
                     begin
                         if Contact.Get(PhoneNo) then
-                         PAGE.RunModal(PAGE::"Contact Card", Contact);
+                            PAGE.RunModal(PAGE::"Contact Card", Contact);
                     end;
 
                     trigger OnValidate()
@@ -59,14 +68,15 @@ page 6014412 "Phone No lookup"
                         CheckifExist;
                     end;
                 }
-                field(NewCust;NewCust)
+                field(NewCust; NewCust)
                 {
+                    ApplicationArea = All;
                     Caption = 'Create Customer';
 
                     trigger OnDrillDown()
                     begin
                         if Customer.Get(PhoneNo) then
-                         PAGE.RunModal(PAGE::"Customer Card", Customer);
+                            PAGE.RunModal(PAGE::"Customer Card", Customer);
                     end;
 
                     trigger OnValidate()
@@ -74,14 +84,15 @@ page 6014412 "Phone No lookup"
                         CheckifExist;
                     end;
                 }
-                field(NewVendor;NewVendor)
+                field(NewVendor; NewVendor)
                 {
+                    ApplicationArea = All;
                     Caption = 'Create Vendor';
 
                     trigger OnDrillDown()
                     begin
                         if Vendor.Get(PhoneNo) then
-                         PAGE.RunModal(PAGE::"Vendor Card", Vendor);
+                            PAGE.RunModal(PAGE::"Vendor Card", Vendor);
                     end;
 
                     trigger OnValidate()
@@ -122,7 +133,7 @@ page 6014412 "Phone No lookup"
 
                 trigger OnAction()
                 begin
-                    CreateDetails ;
+                    CreateDetails;
                 end;
             }
         }
@@ -158,7 +169,7 @@ page 6014412 "Phone No lookup"
     begin
         "Create Contact" := NewContact;
         "Create Customer" := NewCust;
-        "Create Vendor" :=  NewVendor ;
+        "Create Vendor" := NewVendor;
         "No. Info Functions" := 'CREATE';
 
         NameandNumberslookup.Creation(Rec);
@@ -167,7 +178,7 @@ page 6014412 "Phone No lookup"
     local procedure RunCodeunit()
     begin
         Icomm.Get;
-        CODEUNIT.Run(Icomm."Number Info Codeunit ID",Rec);
+        CODEUNIT.Run(Icomm."Number Info Codeunit ID", Rec);
     end;
 
     local procedure CheckifExist()
@@ -177,24 +188,24 @@ page 6014412 "Phone No lookup"
         Text002: Label 'Customer already exists.';
     begin
         if NewContact then begin
-          if Contact.Get(PhoneNo) then begin
-            NewContact:= false;
-            Message(Text000);
-          end;
+            if Contact.Get(PhoneNo) then begin
+                NewContact := false;
+                Message(Text000);
+            end;
         end;
 
         if NewCust then begin
-         if Customer.Get(PhoneNo) then begin
-          NewCust := false;
-          Message(Text002);
-          end;
+            if Customer.Get(PhoneNo) then begin
+                NewCust := false;
+                Message(Text002);
+            end;
         end;
 
         if NewVendor then begin
-         if Vendor.Get(PhoneNo) then begin
-          NewVendor := false;
-          Message(Text001);
-          end;
+            if Vendor.Get(PhoneNo) then begin
+                NewVendor := false;
+                Message(Text001);
+            end;
         end;
         CurrPage.Update;
     end;
@@ -206,11 +217,11 @@ page 6014412 "Phone No lookup"
 
     procedure Setrec(var "TDC Names & Numbers Buffer": Record "Phone Lookup Buffer")
     begin
-        Rec := "TDC Names & Numbers Buffer" ;
+        Rec := "TDC Names & Numbers Buffer";
 
-        NewContact := "Create Contact" ;
+        NewContact := "Create Contact";
         NewCust := "Create Customer";
-        NewVendor :="Create Vendor" ;
+        NewVendor := "Create Vendor";
     end;
 }
 

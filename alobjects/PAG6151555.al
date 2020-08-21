@@ -17,27 +17,34 @@ page 6151555 "NpXml Attributes"
         {
             repeater(Group)
             {
-                field("Attribute Name";"Attribute Name")
+                field("Attribute Name"; "Attribute Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Namespace;Namespace)
+                field(Namespace; Namespace)
                 {
+                    ApplicationArea = All;
                     Visible = NamespacesEnabled;
                 }
-                field("Attribute Field No.";"Attribute Field No.")
+                field("Attribute Field No."; "Attribute Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute Field Name";"Attribute Field Name")
+                field("Attribute Field Name"; "Attribute Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Value";"Default Value")
+                field("Default Value"; "Default Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Only with Value";"Only with Value")
+                field("Only with Value"; "Only with Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Field Type";"Default Field Type")
+                field("Default Field Type"; "Default Field Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

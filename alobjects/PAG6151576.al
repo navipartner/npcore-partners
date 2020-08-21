@@ -15,31 +15,38 @@ page 6151576 "Event Resource Overview"
             group(Control6014417)
             {
                 ShowCaption = false;
-                field(StartingDate;StartingDate)
+                field(StartingDate; StartingDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Starting Date';
                 }
-                field(EndingDate;EndingDate)
+                field(EndingDate; EndingDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Ending Date';
                 }
             }
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail";"E-Mail")
+                field("E-Mail"; "E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field(Capacity;Capacity)
+                field(Capacity; Capacity)
                 {
+                    ApplicationArea = All;
                 }
-                field(QtyOnEvent;QtyOnEvent)
+                field(QtyOnEvent; QtyOnEvent)
                 {
+                    ApplicationArea = All;
                     Caption = 'Qty. on Event';
 
                     trigger OnDrillDown()
@@ -52,8 +59,9 @@ page 6151576 "Event Resource Overview"
                         EventPlanningLineList.Run;
                     end;
                 }
-                field(Available;Available)
+                field(Available; Available)
                 {
+                    ApplicationArea = All;
                     Caption = 'Available';
                 }
             }
@@ -69,7 +77,7 @@ page 6151576 "Event Resource Overview"
                 Caption = 'View';
                 Image = View;
                 RunObject = Page "Resource Card";
-                RunPageLink = "No."=FIELD("No.");
+                RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
             }
             group("Period Length")
@@ -83,7 +91,7 @@ page 6151576 "Event Resource Overview"
                     trigger OnAction()
                     begin
                         PeriodType := 0;
-                        PrepareDates(PeriodType,0D,StartingDate,EndingDate);
+                        PrepareDates(PeriodType, 0D, StartingDate, EndingDate);
                     end;
                 }
                 action(Week)
@@ -93,7 +101,7 @@ page 6151576 "Event Resource Overview"
                     trigger OnAction()
                     begin
                         PeriodType := 1;
-                        PrepareDates(PeriodType,0D,StartingDate,EndingDate);
+                        PrepareDates(PeriodType, 0D, StartingDate, EndingDate);
                     end;
                 }
                 action(Month)
@@ -103,7 +111,7 @@ page 6151576 "Event Resource Overview"
                     trigger OnAction()
                     begin
                         PeriodType := 2;
-                        PrepareDates(PeriodType,0D,StartingDate,EndingDate);
+                        PrepareDates(PeriodType, 0D, StartingDate, EndingDate);
                     end;
                 }
                 action(Quarter)
@@ -113,7 +121,7 @@ page 6151576 "Event Resource Overview"
                     trigger OnAction()
                     begin
                         PeriodType := 3;
-                        PrepareDates(PeriodType,0D,StartingDate,EndingDate);
+                        PrepareDates(PeriodType, 0D, StartingDate, EndingDate);
                     end;
                 }
                 action(Year)
@@ -123,7 +131,7 @@ page 6151576 "Event Resource Overview"
                     trigger OnAction()
                     begin
                         PeriodType := 4;
-                        PrepareDates(PeriodType,0D,StartingDate,EndingDate);
+                        PrepareDates(PeriodType, 0D, StartingDate, EndingDate);
                     end;
                 }
             }
@@ -134,7 +142,7 @@ page 6151576 "Event Resource Overview"
 
                 trigger OnAction()
                 begin
-                    PrepareDates(PeriodType,CalcDate('<-1D>',StartingDate),StartingDate,EndingDate);
+                    PrepareDates(PeriodType, CalcDate('<-1D>', StartingDate), StartingDate, EndingDate);
                 end;
             }
             action(Next)
@@ -144,7 +152,7 @@ page 6151576 "Event Resource Overview"
 
                 trigger OnAction()
                 begin
-                    PrepareDates(PeriodType,CalcDate('<1D>',EndingDate),StartingDate,EndingDate);
+                    PrepareDates(PeriodType, CalcDate('<1D>', EndingDate), StartingDate, EndingDate);
                 end;
             }
         }
@@ -153,7 +161,7 @@ page 6151576 "Event Resource Overview"
     trigger OnAfterGetRecord()
     begin
         QtyOnEvent := CalcQtyOnEvent();
-        SetFilter("Date Filter",'%1..%2',StartingDate,EndingDate);
+        SetFilter("Date Filter", '%1..%2', StartingDate, EndingDate);
         CalcFields(Capacity);
         Available := Capacity - QtyOnEvent;
     end;
@@ -161,7 +169,7 @@ page 6151576 "Event Resource Overview"
     trigger OnOpenPage()
     begin
         PeriodType := 2;
-        PrepareDates(PeriodType,0D,StartingDate,EndingDate);
+        PrepareDates(PeriodType, 0D, StartingDate, EndingDate);
     end;
 
     var
@@ -173,10 +181,10 @@ page 6151576 "Event Resource Overview"
 
     local procedure SetPlanningLineFilter(var JobPlanningLine: Record "Job Planning Line")
     begin
-        JobPlanningLine.SetFilter("Event Status",'<%1',JobPlanningLine."Event Status"::Completed);
-        JobPlanningLine.SetRange(Type,JobPlanningLine.Type::Resource);
-        JobPlanningLine.SetRange("No.",Rec."No.");
-        JobPlanningLine.SetRange("Planning Date",StartingDate,EndingDate);
+        JobPlanningLine.SetFilter("Event Status", '<%1', JobPlanningLine."Event Status"::Completed);
+        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
+        JobPlanningLine.SetRange("No.", Rec."No.");
+        JobPlanningLine.SetRange("Planning Date", StartingDate, EndingDate);
     end;
 
     local procedure CalcQtyOnEvent() TotalQty: Decimal
@@ -186,23 +194,23 @@ page 6151576 "Event Resource Overview"
     begin
         SetPlanningLineFilter(JobPlanningLine);
         if JobPlanningLine.FindSet then
-          repeat
-            Job.Get(JobPlanningLine."Job No.");
-            if Job."Event" then
-              TotalQty += JobPlanningLine."Quantity (Base)";
-          until JobPlanningLine.Next = 0;
+            repeat
+                Job.Get(JobPlanningLine."Job No.");
+                if Job."Event" then
+                    TotalQty += JobPlanningLine."Quantity (Base)";
+            until JobPlanningLine.Next = 0;
         exit(TotalQty);
     end;
 
-    local procedure PrepareDates(DateType: Option Day,Week,Month,Quarter,Year;ReferalDate: Date;var FromDate: Date;var ToDate: Date)
+    local procedure PrepareDates(DateType: Option Day,Week,Month,Quarter,Year; ReferalDate: Date; var FromDate: Date; var ToDate: Date)
     var
         BusinessChartBuffer: Record "Business Chart Buffer";
     begin
         BusinessChartBuffer."Period Length" := DateType;
         if ReferalDate = 0D then begin
-          ReferalDate := WorkDate;
-          Clear(FromDate);
-          Clear(ToDate);
+            ReferalDate := WorkDate;
+            Clear(FromDate);
+            Clear(ToDate);
         end;
         FromDate := BusinessChartBuffer.CalcFromDate(ReferalDate);
         ToDate := BusinessChartBuffer.CalcToDate(ReferalDate);

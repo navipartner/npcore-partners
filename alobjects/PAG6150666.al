@@ -19,47 +19,56 @@ page 6150666 "NPRE Tmp POS Waiter Pad Lines"
             repeater(Control6014408)
             {
                 ShowCaption = false;
-                field(Marked;Marked)
+                field(Marked; Marked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Waiter Pad No.";"Waiter Pad No.")
+                field("Waiter Pad No."; "Waiter Pad No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
                     Visible = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
                 }
-                field(Quanity;RemainingQtyToBill)
+                field(Quanity; RemainingQtyToBill)
                 {
+                    ApplicationArea = All;
                     Caption = 'Quantity';
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     StyleExpr = StyleTxt;
                 }
-                field("Marked Qty";"Marked Qty")
+                field("Marked Qty"; "Marked Qty")
                 {
+                    ApplicationArea = All;
                     StyleExpr = StyleTxt;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     StyleExpr = StyleTxt;
                     Visible = false;
                 }
@@ -97,30 +106,30 @@ page 6150666 "NPRE Tmp POS Waiter Pad Lines"
     begin
 
         if FirstOpen then begin
-          FirstOpen := false;
-          Marked := false;
+            FirstOpen := false;
+            Marked := false;
         end else begin
-          Marked := not Marked;
-          //-NPR5.55 [399170]-revoked
-          //IF ( (Quantity <> 1) AND (Quantity > 0) ) THEN BEGIN
-          //  IF NOT WaiterPadPOSManagement.GetQtyUI(Quantity, Description, ChosenQty) THEN BEGIN
-          //+NPR5.55 [399170]-revoked
-          //-NPR5.55 [399170]
-          if RemainingQtyToBill() > 1 then begin
-            if not WaiterPadPOSManagement.GetQtyUI(RemainingQtyToBill(), Description, ChosenQty) then begin
-          //+NPR5.55 [399170]
-              Marked := false;
-              StyleTxt := '';
-              exit;
+            Marked := not Marked;
+            //-NPR5.55 [399170]-revoked
+            //IF ( (Quantity <> 1) AND (Quantity > 0) ) THEN BEGIN
+            //  IF NOT WaiterPadPOSManagement.GetQtyUI(Quantity, Description, ChosenQty) THEN BEGIN
+            //+NPR5.55 [399170]-revoked
+            //-NPR5.55 [399170]
+            if RemainingQtyToBill() > 1 then begin
+                if not WaiterPadPOSManagement.GetQtyUI(RemainingQtyToBill(), Description, ChosenQty) then begin
+                    //+NPR5.55 [399170]
+                    Marked := false;
+                    StyleTxt := '';
+                    exit;
+                end;
+                if ChosenQty = 0 then Error(ERRQTYZERO);
+                //IF ChosenQty > Quantity THEN ERROR(ERRQTYTOHIGH, Quantity);  //NPR5.55 [399170]-revoked
+                if ChosenQty > RemainingQtyToBill() then Error(ERRQTYTOHIGH, RemainingQtyToBill());  //NPR5.55 [399170]
+                "Marked Qty" := ChosenQty;
+            end else begin
+                //"Marked Qty" := Quantity;  //NPR5.55 [399170]-revoked
+                "Marked Qty" := RemainingQtyToBill();  //NPR5.55 [399170]
             end;
-            if ChosenQty = 0 then Error(ERRQTYZERO);
-            //IF ChosenQty > Quantity THEN ERROR(ERRQTYTOHIGH, Quantity);  //NPR5.55 [399170]-revoked
-            if ChosenQty > RemainingQtyToBill() then Error(ERRQTYTOHIGH, RemainingQtyToBill());  //NPR5.55 [399170]
-            "Marked Qty" := ChosenQty;
-          end else begin
-            //"Marked Qty" := Quantity;  //NPR5.55 [399170]-revoked
-            "Marked Qty" := RemainingQtyToBill();  //NPR5.55 [399170]
-          end;
         end;
 
         if not Marked then "Marked Qty" := 0;
@@ -153,7 +162,7 @@ page 6150666 "NPRE Tmp POS Waiter Pad Lines"
 
     procedure fnSetLines(var TMPWaiterPadLine: Record "NPRE Waiter Pad Line" temporary)
     begin
-        Copy(TMPWaiterPadLine,true);
+        Copy(TMPWaiterPadLine, true);
         //-NPR5.55 [399170]-revoked
         /*
         Rec.DELETEALL;
@@ -176,9 +185,9 @@ page 6150666 "NPRE Tmp POS Waiter Pad Lines"
         Rec.FindFirst;
 
         repeat
-          TMPWaiterPadLine.Init;
-          TMPWaiterPadLine.TransferFields(Rec);
-          TMPWaiterPadLine.Insert;
+            TMPWaiterPadLine.Init;
+            TMPWaiterPadLine.TransferFields(Rec);
+            TMPWaiterPadLine.Insert;
         until (0 = Rec.Next);
     end;
 
@@ -190,9 +199,9 @@ page 6150666 "NPRE Tmp POS Waiter Pad Lines"
     local procedure GetStyle(): Text
     begin
         if Marked then begin
-          exit('Attention');
+            exit('Attention');
         end else begin
-          exit('');
+            exit('');
         end;
     end;
 }

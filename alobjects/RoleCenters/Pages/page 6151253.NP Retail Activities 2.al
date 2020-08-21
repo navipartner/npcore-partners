@@ -16,13 +16,16 @@ page 6151253 "NP Retail Activities 2"
 
                 field("Pending Inc. Documents"; "Pending Inc. Documents")
                 {
+                    ApplicationArea = All;
                 }
                 field("Processed Error Tasks"; "Processed Error Tasks")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Nc Task List";
                 }
                 field("Failed Webshop Payments"; "Failed Webshop Payments")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Magento Payment Line List";
                 }
 

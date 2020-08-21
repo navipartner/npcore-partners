@@ -12,11 +12,13 @@ page 6014575 "Register Types"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

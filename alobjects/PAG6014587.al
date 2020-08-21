@@ -62,14 +62,17 @@ page 6014587 "Item Group Statistics Subpage"
                 IndentationColumn = Level;
                 ShowAsTree = true;
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("-""Sale Quantity""";-"Sale Quantity")
+                field("-""Sale Quantity"""; -"Sale Quantity")
                 {
+                    ApplicationArea = All;
                     Caption = 'Sale (QTY)';
 
                     trigger OnAssistEdit()
@@ -78,19 +81,21 @@ page 6014587 "Item Group Statistics Subpage"
                         ItemledgerEntryForm: Page "Item Ledger Entries";
                     begin
 
-                        SetItemLedgerEntryFilter( ItemledgerEntry );
-                        ItemledgerEntryForm.SetTableView( ItemledgerEntry );
-                        ItemledgerEntryForm.Editable( false );
+                        SetItemLedgerEntryFilter(ItemledgerEntry);
+                        ItemledgerEntryForm.SetTableView(ItemledgerEntry);
+                        ItemledgerEntryForm.Editable(false);
                         ItemledgerEntryForm.RunModal;
                     end;
                 }
-                field("-""LastYear Sale Quantity""";-"LastYear Sale Quantity")
+                field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                     Visible = LSQTY;
                 }
-                field("Sale Amount";"Sale Amount")
+                field("Sale Amount"; "Sale Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'Sale (LCY)';
 
                     trigger OnDrillDown()
@@ -99,41 +104,48 @@ page 6014587 "Item Group Statistics Subpage"
                         ValueEntryForm: Page "Value Entries";
                     begin
 
-                        SetValueEntryFilter( ValueEntry );
-                        ValueEntryForm.SetTableView( ValueEntry );
-                        ValueEntryForm.Editable( false );
+                        SetValueEntryFilter(ValueEntry);
+                        ValueEntryForm.SetTableView(ValueEntry);
+                        ValueEntryForm.Editable(false);
                         ValueEntryForm.RunModal;
                     end;
                 }
-                field("LastYear Sale Amount";"LastYear Sale Amount")
+                field("LastYear Sale Amount"; "LastYear Sale Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                     Visible = LSAmount;
                 }
-                field("-CostAmt";-CostAmt)
+                field("-CostAmt"; -CostAmt)
                 {
+                    ApplicationArea = All;
                     Caption = 'Cost (LCY)';
                 }
-                field("-""Last Year CostAmt""";-"Last Year CostAmt")
+                field("-""Last Year CostAmt"""; -"Last Year CostAmt")
                 {
+                    ApplicationArea = All;
                     Caption = 'Last year Cost Amount';
                     Visible = LSAmount;
                 }
-                field("Profit Amount";"Profit Amount")
+                field("Profit Amount"; "Profit Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit (LCY)';
                 }
-                field("LastYear Profit Amount";"LastYear Profit Amount")
+                field("LastYear Profit Amount"; "LastYear Profit Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Year Proifit Amount';
                     Visible = LPA;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit %';
                 }
-                field("LastYear Profit %";"LastYear Profit %")
+                field("LastYear Profit %"; "LastYear Profit %")
                 {
+                    ApplicationArea = All;
                     Caption = '-> Last year';
                     Visible = "LP%";
                 }
@@ -162,12 +174,12 @@ page 6014587 "Item Group Statistics Subpage"
 
         //-NPR3.1
         if IsExpanded(Rec) then
-          Expanded := 1
+            Expanded := 1
         else
-          if HasChildren(Rec) then
-            Expanded := 0
-          else
-            Expanded := 2;
+            if HasChildren(Rec) then
+                Expanded := 0
+            else
+                Expanded := 2;
         //+NPR3.1
     end;
 
@@ -202,8 +214,8 @@ page 6014587 "Item Group Statistics Subpage"
         "retail config": Record "Retail Setup";
     begin
 
-        if ( Periodestart = 0D ) then Periodestart := Today;
-        if ( Periodeslut = 0D ) then Periodeslut := Today;
+        if (Periodestart = 0D) then Periodestart := Today;
+        if (Periodeslut = 0D) then Periodeslut := Today;
         //-NPR4.21
         ////-NPR3.1
         //InitTempTable;
@@ -249,11 +261,11 @@ page 6014587 "Item Group Statistics Subpage"
         "Last Year CostAmt": Decimal;
         ItemGroupFilter: Code[20];
 
-    procedure SetFilter(GlobalDim1: Code[20];GlobalDim2: Code[20];DatoStart: Date;DatoEnd: Date;LastYearCalc: Text[50])
+    procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; LastYearCalc: Text[50])
     begin
         //SetFilter()
-        if ( Dim1Filter <> GlobalDim1 ) or ( Dim2Filter <> GlobalDim2 ) or ( Periodestart <> DatoStart ) or ( Periodeslut <> DatoEnd ) then
-          ReleaseLock;
+        if (Dim1Filter <> GlobalDim1) or (Dim2Filter <> GlobalDim2) or (Periodestart <> DatoStart) or (Periodeslut <> DatoEnd) then
+            ReleaseLock;
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
         Periodestart := DatoStart;
@@ -269,44 +281,44 @@ page 6014587 "Item Group Statistics Subpage"
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         //Calc()
-        SetValueEntryFilter( ValueEntry );
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        SetValueEntryFilter(ValueEntry);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcSums( Quantity );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcSums(Quantity);
 
         "Sale Quantity" := ItemLedgerEntry.Quantity;
         "Sale Amount" := ValueEntry."Sales Amount (Actual)";
         "Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
         //-NPR4.12
-        CostAmt:= ValueEntry."Cost Amount (Actual)";
+        CostAmt := ValueEntry."Cost Amount (Actual)";
         //+NPR4.12
 
         if "Sale Amount" <> 0 then
-          "Profit %" := "Profit Amount" / "Sale Amount" * 100
+            "Profit %" := "Profit Amount" / "Sale Amount" * 100
         else
-          "Profit %" := 0;
+            "Profit %" := 0;
 
         // Calc last year
         LastYear := true;
 
-        SetValueEntryFilter( ValueEntry );
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        SetValueEntryFilter(ValueEntry);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcSums( Quantity );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcSums(Quantity);
 
         "LastYear Sale Quantity" := ItemLedgerEntry.Quantity;
         "LastYear Sale Amount" := ValueEntry."Sales Amount (Actual)";
         "LastYear Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
         //-NPR4.12
-        "Last Year CostAmt":= ValueEntry."Cost Amount (Actual)";
+        "Last Year CostAmt" := ValueEntry."Cost Amount (Actual)";
         //+NPR4.12
 
         if "LastYear Sale Amount" <> 0 then
-          "LastYear Profit %" := "LastYear Profit Amount" / "LastYear Sale Amount" * 100
+            "LastYear Profit %" := "LastYear Profit Amount" / "LastYear Sale Amount" * 100
         else
-          "LastYear Profit %" := 0;
+            "LastYear Profit %" := 0;
 
         LastYear := false;
     end;
@@ -314,24 +326,24 @@ page 6014587 "Item Group Statistics Subpage"
     procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
         //SetItemLedgerEntryFilter
-        ItemLedgerEntry.SetCurrentKey( "Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        ItemLedgerEntry.SetRange( "Entry Type", ItemLedgerEntry."Entry Type"::Sale );
-        ItemLedgerEntry.SetRange( "Item Group No.", "No." );
+        ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+        ItemLedgerEntry.SetRange("Item Group No.", "No.");
         if not LastYear then
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', Periodestart, Periodeslut )
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', CalcDate(CalcLastYear,Periodestart), CalcDate(CalcLastYear,Periodeslut) );
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
 
         if Dim1Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code" );
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code" );
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
@@ -340,23 +352,23 @@ page 6014587 "Item Group Statistics Subpage"
         //-NPR5.55 [361515]
         //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
         //+NPR5.55 [361515]
-        ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
-        ValueEntry.SetRange( "Item Group No.", "No." );
+        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+        ValueEntry.SetRange("Item Group No.", "No.");
         if not LastYear then
-          ValueEntry.SetFilter( "Posting Date", '%1..%2', Periodestart, Periodeslut )
+            ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-          ValueEntry.SetFilter( "Posting Date", '%1..%2',CalcDate(CalcLastYear,Periodestart), CalcDate(CalcLastYear,Periodeslut) );
+            ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
 
         if Dim1Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 1 Code" );
+            ValueEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 2 Code" );
+            ValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
     procedure ChangeEmptyFilter(): Boolean
@@ -373,61 +385,62 @@ page 6014587 "Item Group Statistics Subpage"
         //HideEmpty :=  NOT HideEmpty;
         HideEmpty := true;
         if HideEmpty then begin
-          TempItemGroup.DeleteAll;
-          Current := Rec;
-          Dlg.Open( txtDlg );
-          ItemGroup.SetCurrentKey("Entry No.","Primary Key Length");
-          //-NPR5.51 [358271]
-          ItemGroup.SetFilter("No.",ItemGroupFilter);
-          //+NPR5.51 [358271]
-          if ItemGroup.Find('-') then repeat
-            Count += 1;
-            Dlg.Update( 1, ItemGroup."No." );
-            Dlg.Update( 2, Round( Count / ItemGroup.Count * 10000, 1, '=' ));
-            Clear(ItemLedgerEntry);
-            SetItemLedgerEntryFilter( ItemLedgerEntry );
-            ItemLedgerEntry.SetRange( "Item Group No.", ItemGroup."No." );
-            if ItemLedgerEntry.Count > 0 then
-              ItemLedgerEntry.CalcSums( Quantity );
+            TempItemGroup.DeleteAll;
+            Current := Rec;
+            Dlg.Open(txtDlg);
+            ItemGroup.SetCurrentKey("Entry No.", "Primary Key Length");
             //-NPR5.51 [358271]
-            Clear(ValueEntry);
-            SetValueEntryFilter(ValueEntry);
-            ValueEntry.SetRange( "Item Group No.", ItemGroup."No." );
-            if ValueEntry.Count > 0 then
-              ValueEntry.CalcSums("Sales Amount (Actual)");
+            ItemGroup.SetFilter("No.", ItemGroupFilter);
+            //+NPR5.51 [358271]
+            if ItemGroup.Find('-') then
+                repeat
+                    Count += 1;
+                    Dlg.Update(1, ItemGroup."No.");
+                    Dlg.Update(2, Round(Count / ItemGroup.Count * 10000, 1, '='));
+                    Clear(ItemLedgerEntry);
+                    SetItemLedgerEntryFilter(ItemLedgerEntry);
+                    ItemLedgerEntry.SetRange("Item Group No.", ItemGroup."No.");
+                    if ItemLedgerEntry.Count > 0 then
+                        ItemLedgerEntry.CalcSums(Quantity);
+                    //-NPR5.51 [358271]
+                    Clear(ValueEntry);
+                    SetValueEntryFilter(ValueEntry);
+                    ValueEntry.SetRange("Item Group No.", ItemGroup."No.");
+                    if ValueEntry.Count > 0 then
+                        ValueEntry.CalcSums("Sales Amount (Actual)");
 
 
-            //IF ItemLedgerEntry.Quantity <> 0 THEN BEGIN
-            if not ((ItemLedgerEntry.Quantity = 0) and (ValueEntry."Sales Amount (Actual)" = 0)) then begin
-            //-NPR5.51 [358271]
+                    //IF ItemLedgerEntry.Quantity <> 0 THEN BEGIN
+                    if not ((ItemLedgerEntry.Quantity = 0) and (ValueEntry."Sales Amount (Actual)" = 0)) then begin
+                        //-NPR5.51 [358271]
 
-              Get( ItemGroup."No." );
-              TempItemGroup :=  ItemGroup;
-              TempItemGroup.Insert;
-            end;
-          until ItemGroup.Next = 0;
-          Dlg.Close;
+                        Get(ItemGroup."No.");
+                        TempItemGroup := ItemGroup;
+                        TempItemGroup.Insert;
+                    end;
+                until ItemGroup.Next = 0;
+            Dlg.Close;
 
-          Rec := Current;
+            Rec := Current;
 
         end else begin
-          ExpandAll;
+            ExpandAll;
         end;
 
         //CurrForm.UPDATE;
         CurrPage.Update;
-        exit( HideEmpty );
+        exit(HideEmpty);
     end;
 
     procedure InitForm()
     begin
         //InitForm()
         Reset;
-        SetCurrentKey("Entry No.","Primary Key Length");
+        SetCurrentKey("Entry No.", "Primary Key Length");
         Dim1Filter := '';
         Dim2Filter := '';
         Periodestart := Today;
-        Periodeslut  := Today;
+        Periodeslut := Today;
         HideEmpty := true;
     end;
 
@@ -444,10 +457,10 @@ page 6014587 "Item Group Statistics Subpage"
     begin
         //UpdateHidden()
         if HideEmpty then begin
-          HideEmpty := false;
-          ChangeEmptyFilter;
-         //CurrForm.UPDATE;
-         CurrPage.Update;
+            HideEmpty := false;
+            ChangeEmptyFilter;
+            //CurrForm.UPDATE;
+            CurrPage.Update;
         end;
     end;
 
@@ -463,10 +476,10 @@ page 6014587 "Item Group Statistics Subpage"
         //CurrForm."LastYear Sale Amount".VISIBLE( Show );
         //CurrForm."LastYear Profit Amount".VISIBLE( Show );
         //CurrForm."LastYear Profit %".VISIBLE( Show );
-        LSQty :=Show;
-        LSAmount:=Show;
-        LPA :=Show;
-        "LP%":=Show;
+        LSQty := Show;
+        LSAmount := Show;
+        LPA := Show;
+        "LP%" := Show;
     end;
 
     local procedure ToggleExpandCollapse()
@@ -477,23 +490,23 @@ page 6014587 "Item Group Statistics Subpage"
         //-NPR3.1
 
         if Expanded = 0 then begin               // Has children, but not expanded
-          "Item Group 1".SetCurrentKey("Entry No.","Primary Key Length");
-          "Item Group 1".SetRange("Parent Item Group No.", "No.");
-          "Item Group 1" := Rec;
-          if "Item Group 1".Next <> 0 then begin
-            repeat
-              if "Item Group 1".Level > Level then begin
-                TempItemGroup := "Item Group 1";
-                if TempItemGroup.Insert then;
-              end;
-            until ("Item Group 1".Next = 0) or ("Item Group 1".Level = Level);
-          end;
+            "Item Group 1".SetCurrentKey("Entry No.", "Primary Key Length");
+            "Item Group 1".SetRange("Parent Item Group No.", "No.");
+            "Item Group 1" := Rec;
+            if "Item Group 1".Next <> 0 then begin
+                repeat
+                    if "Item Group 1".Level > Level then begin
+                        TempItemGroup := "Item Group 1";
+                        if TempItemGroup.Insert then;
+                    end;
+                until ("Item Group 1".Next = 0) or ("Item Group 1".Level = Level);
+            end;
         end else begin
-          if Expanded = 1 then begin            // Has children and is already expanded
-            TempItemGroup := Rec;
-            while (TempItemGroup.Next <> 0) and (TempItemGroup.Level > Level) do
-              TempItemGroup.Delete;
-          end;
+            if Expanded = 1 then begin            // Has children and is already expanded
+                TempItemGroup := Rec;
+                while (TempItemGroup.Next <> 0) and (TempItemGroup.Level > Level) do
+                    TempItemGroup.Delete;
+            end;
         end;
 
         //CurrForm.UPDATE;
@@ -508,9 +521,9 @@ page 6014587 "Item Group Statistics Subpage"
 
         TempItemGroup := ActualItemGroup;
         if TempItemGroup.Next = 0 then
-          exit(false)
+            exit(false)
         else
-          exit(TempItemGroup.Level > ActualItemGroup.Level);
+            exit(TempItemGroup.Level > ActualItemGroup.Level);
         //+NPR3.1
     end;
 
@@ -520,12 +533,12 @@ page 6014587 "Item Group Statistics Subpage"
     begin
         //-NPR3.1Tem
         TempItemGroup.DeleteAll;
-        IG.SetCurrentKey("Entry No.","Primary Key Length");
+        IG.SetCurrentKey("Entry No.", "Primary Key Length");
         if IG.Find('-') then
-          repeat
-            TempItemGroup := IG;
-            TempItemGroup.Insert;
-          until IG.Next = 0;
+            repeat
+                TempItemGroup := IG;
+                TempItemGroup.Insert;
+            until IG.Next = 0;
         //+NPR3.1
     end;
 
@@ -537,13 +550,13 @@ page 6014587 "Item Group Statistics Subpage"
         //-NPR3.1
 
         IG2 := ActualItemGroup;
-        IG2.SetCurrentKey("Entry No.","Primary Key Length");
+        IG2.SetCurrentKey("Entry No.", "Primary Key Length");
         IG2.SetCurrentKey("Entry No.");
         IG2.SetRange("Parent Item Group No.", ActualItemGroup."No.");
         if IG2.Next = 0 then
-          exit(false)
+            exit(false)
         else
-          exit(IG2.Level > ActualItemGroup.Level);
+            exit(IG2.Level > ActualItemGroup.Level);
         //+NPR3.1
     end;
 
@@ -555,14 +568,14 @@ page 6014587 "Item Group Statistics Subpage"
         //-NPR3.1
         TempItemGroup.DeleteAll;
 
-        TempItemGroup.SetCurrentKey("Entry No.","Primary Key Length");
+        TempItemGroup.SetCurrentKey("Entry No.", "Primary Key Length");
         //IG.SETRANGE("Parent item group",CurrentItemGroup);
-        IG.SetRange(Level,0,1);
+        IG.SetRange(Level, 0, 1);
         if IG.Find('-') then
-          repeat
-            TempItemGroup := IG;
-            TempItemGroup.Insert;
-          until IG.Next = 0;
+            repeat
+                TempItemGroup := IG;
+                TempItemGroup.Insert;
+            until IG.Next = 0;
         //+NPR3.1
     end;
 }

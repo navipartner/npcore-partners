@@ -16,46 +16,60 @@ page 6150744 "Archive POS Sale"
             {
                 field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
                 field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Customer Name"; "Customer Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
                 field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
                 field("Payment Amount"; "Payment Amount")
                 {
+                    ApplicationArea = All;
                 }
                 field("POS Sale ID"; "POS Sale ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Retail ID"; "Retail ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

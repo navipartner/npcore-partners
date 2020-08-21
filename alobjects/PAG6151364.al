@@ -13,24 +13,27 @@ page 6151364 "CS Warehouse Activity Setup"
         {
             repeater(Group)
             {
-                field("Source Document";"Source Document")
+                field("Source Document"; "Source Document")
                 {
+                    ApplicationArea = All;
                 }
-                field("Activity Type";"Activity Type")
+                field("Activity Type"; "Activity Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Show as Item No.";"Show as Item No.")
+                field("Show as Item No."; "Show as Item No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014406;Notes)
+            systempart(Control6014406; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014407;Links)
+            systempart(Control6014407; Links)
             {
                 Visible = false;
             }

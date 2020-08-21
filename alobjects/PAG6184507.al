@@ -12,44 +12,57 @@ page 6184507 "EFT Verifone Unit Parameters"
         {
             group(General)
             {
-                field("Terminal Serial Number";"Terminal Serial Number")
+                field("Terminal Serial Number"; "Terminal Serial Number")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal LAN Address";"Terminal LAN Address")
+                field("Terminal LAN Address"; "Terminal LAN Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal LAN Port";"Terminal LAN Port")
+                field("Terminal LAN Port"; "Terminal LAN Port")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Connection Mode";"Terminal Connection Mode")
+                field("Terminal Connection Mode"; "Terminal Connection Mode")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Log Location";"Terminal Log Location")
+                field("Terminal Log Location"; "Terminal Log Location")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Log Level";"Terminal Log Level")
+                field("Terminal Log Level"; "Terminal Log Level")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Listening Port";"Terminal Listening Port")
+                field("Terminal Listening Port"; "Terminal Listening Port")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Connection Type";"Terminal Connection Type")
+                field("Terminal Connection Type"; "Terminal Connection Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Default Language";"Terminal Default Language")
+                field("Terminal Default Language"; "Terminal Default Language")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Close Terminal on EOD";"Auto Close Terminal on EOD")
+                field("Auto Close Terminal on EOD"; "Auto Close Terminal on EOD")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Open on Transaction";"Auto Open on Transaction")
+                field("Auto Open on Transaction"; "Auto Open on Transaction")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Login After Reconnect";"Auto Login After Reconnect")
+                field("Auto Login After Reconnect"; "Auto Login After Reconnect")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Reconcile on Close";"Auto Reconcile on Close")
+                field("Auto Reconcile on Close"; "Auto Reconcile on Close")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

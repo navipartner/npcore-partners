@@ -29,24 +29,30 @@ page 6151431 "Magento Attributes"
                     repeater(Control6150613)
                     {
                         ShowCaption = false;
-                        field(Description;Description)
+                        field(Description; Description)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Type;Type)
+                        field(Type; Type)
                         {
+                            ApplicationArea = All;
                             Editable = TypeEditable;
                         }
-                        field(Position;Position)
+                        field(Position; Position)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Filterable;Filterable)
+                        field(Filterable; Filterable)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Use in Product Listing";"Use in Product Listing")
+                        field("Use in Product Listing"; "Use in Product Listing")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Used by Attribute Set";"Used by Attribute Set")
+                        field("Used by Attribute Set"; "Used by Attribute Set")
                         {
+                            ApplicationArea = All;
 
                             trigger OnDrillDown()
                             begin
@@ -55,8 +61,9 @@ page 6151431 "Magento Attributes"
                                 //+199932
                             end;
                         }
-                        field("Used by Items";"Used by Items")
+                        field("Used by Items"; "Used by Items")
                         {
+                            ApplicationArea = All;
 
                             trigger OnDrillDown()
                             begin
@@ -65,23 +72,25 @@ page 6151431 "Magento Attributes"
                                 //+MAG1.02
                             end;
                         }
-                        field(Visible;Visible)
+                        field(Visible; Visible)
                         {
+                            ApplicationArea = All;
                         }
                     }
-                    field(WidthControl;'')
+                    field(WidthControl; '')
                     {
+                        ApplicationArea = All;
                         Caption = '                                                                                                                                                             ';
                     }
                 }
                 group(Control6150623)
                 {
                     ShowCaption = false;
-                    part(AttributeLabels;"Magento Attribute Labels")
+                    part(AttributeLabels; "Magento Attribute Labels")
                     {
                         Caption = 'Labels';
                         ShowFilter = false;
-                        SubPageLink = "Attribute ID"=FIELD("Attribute ID");
+                        SubPageLink = "Attribute ID" = FIELD("Attribute ID");
                     }
                 }
             }
@@ -103,8 +112,8 @@ page 6151431 "Magento Attributes"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         TestField(Description);
-        if not Confirm(StrSubstNo(Text001,Format(Type)),false) then
-          exit(false);
+        if not Confirm(StrSubstNo(Text001, Format(Type)), false) then
+            exit(false);
     end;
 
     trigger OnOpenPage()
@@ -113,7 +122,7 @@ page 6151431 "Magento Attributes"
         //NaviConnectSetup.GET;
         //NaviConnectSetup.TESTFIELD("Attributes Enabled",TRUE);
         MagentoSetup.Get;
-        MagentoSetup.TestField("Attributes Enabled",true);
+        MagentoSetup.TestField("Attributes Enabled", true);
         //+MAG1.17
 
         SetVisible();
@@ -133,16 +142,16 @@ page 6151431 "Magento Attributes"
     begin
         //-MAG1.02
         TempAttributeSet.DeleteAll;
-        MagentoAttributeSetValue.SetRange("Attribute ID","Attribute ID");
+        MagentoAttributeSetValue.SetRange("Attribute ID", "Attribute ID");
         if MagentoAttributeSetValue.FindSet then
-          repeat
-            if AttributeSet.Get(MagentoAttributeSetValue."Attribute Set ID") then begin
-              TempAttributeSet.Init;
-              TempAttributeSet := AttributeSet;
-              TempAttributeSet.Insert;
-            end;
-          until MagentoAttributeSetValue.Next = 0;
-        PAGE.Run(PAGE::"Magento Attribute Set List",TempAttributeSet);
+            repeat
+                if AttributeSet.Get(MagentoAttributeSetValue."Attribute Set ID") then begin
+                    TempAttributeSet.Init;
+                    TempAttributeSet := AttributeSet;
+                    TempAttributeSet.Insert;
+                end;
+            until MagentoAttributeSetValue.Next = 0;
+        PAGE.Run(PAGE::"Magento Attribute Set List", TempAttributeSet);
         //+MAG1.02
     end;
 
@@ -154,19 +163,19 @@ page 6151431 "Magento Attributes"
     begin
         //-MAG1.02
         TempItem.DeleteAll;
-        MagentoItemAttribute.SetRange("Attribute ID","Attribute ID");
-        MagentoItemAttribute.SetFilter("Variant Code",'=%1','');
+        MagentoItemAttribute.SetRange("Attribute ID", "Attribute ID");
+        MagentoItemAttribute.SetFilter("Variant Code", '=%1', '');
         if MagentoItemAttribute.FindSet then
-          repeat
-            if not TempItem.Get(MagentoItemAttribute."Item No.") then begin
-              if Item.Get(MagentoItemAttribute."Item No.") then begin
-                TempItem.Init;
-                TempItem := Item;
-                TempItem.Insert;
-              end;
-            end;
-          until MagentoItemAttribute.Next = 0;
-        PAGE.Run(PAGE::"Retail Item List",TempItem);
+            repeat
+                if not TempItem.Get(MagentoItemAttribute."Item No.") then begin
+                    if Item.Get(MagentoItemAttribute."Item No.") then begin
+                        TempItem.Init;
+                        TempItem := Item;
+                        TempItem.Insert;
+                    end;
+                end;
+            until MagentoItemAttribute.Next = 0;
+        PAGE.Run(PAGE::"Retail Item List", TempItem);
         //+MAG1.02
     end;
 

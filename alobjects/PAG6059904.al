@@ -18,59 +18,77 @@ page 6059904 "Task Log (Task)"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Template Name";"Journal Template Name")
+                field("Journal Template Name"; "Journal Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Batch Name";"Journal Batch Name")
+                field("Journal Batch Name"; "Journal Batch Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expected Ending Time";"Expected Ending Time")
+                field("Expected Ending Time"; "Expected Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Duration";"Task Duration")
+                field("Task Duration"; "Task Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Error Message";"Last Error Message")
+                field("Last Error Message"; "Last Error Message")
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Server Instance ID";"Server Instance ID")
+                field("Server Instance ID"; "Server Instance ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Session ID";"Session ID")
+                field("Session ID"; "Session ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Worker Group";"Task Worker Group")
+                field("Task Worker Group"; "Task Worker Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object No.";"Object No.")
+                field("Object No."; "Object No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Output Log Entries";"No. of Output Log Entries")
+                field("No. of Output Log Entries"; "No. of Output Log Entries")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

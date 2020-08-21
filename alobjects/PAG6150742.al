@@ -13,11 +13,13 @@ page 6150742 "POS Admin. Template Scopes"
         {
             repeater(Group)
             {
-                field("Applies To";"Applies To")
+                field("Applies To"; "Applies To")
                 {
+                    ApplicationArea = All;
                 }
-                field("Applies To Code";"Applies To Code")
+                field("Applies To Code"; "Applies To Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

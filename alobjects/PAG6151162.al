@@ -5,7 +5,7 @@ page 6151162 "MM Loyalty Store Setup Client"
     Caption = 'Loyalty Store Setup (Server)';
     PageType = List;
     SourceTable = "MM Loyalty Store Setup";
-    SourceTableView = WHERE(Setup=CONST(CLIENT));
+    SourceTableView = WHERE(Setup = CONST(CLIENT));
 
     layout
     {
@@ -13,29 +13,37 @@ page 6151162 "MM Loyalty Store Setup Client"
         {
             repeater(Group)
             {
-                field("Store Code";"Store Code")
+                field("Store Code"; "Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Code";"Unit Code")
+                field("Unit Code"; "Unit Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Setup;Setup)
+                field(Setup; Setup)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Authorization Code";"Authorization Code")
+                field("Authorization Code"; "Authorization Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Accept Client Transactions";"Accept Client Transactions")
+                field("Accept Client Transactions"; "Accept Client Transactions")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Method Code";"POS Payment Method Code")
+                field("POS Payment Method Code"; "POS Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Endpoint Code";"Store Endpoint Code")
+                field("Store Endpoint Code"; "Store Endpoint Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -54,7 +62,7 @@ page 6151162 "MM Loyalty Store Setup Client"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "MM Loyalty Server Trans. Log";
-                RunPageLink = "POS Store Code"=FIELD("Store Code");
+                RunPageLink = "POS Store Code" = FIELD("Store Code");
             }
         }
     }

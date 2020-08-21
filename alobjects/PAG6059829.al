@@ -19,20 +19,25 @@ page 6059829 "Transactional JSON Result"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field(ID;ID)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No";"Entry No")
+                field("Entry No"; "Entry No")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -47,21 +52,21 @@ page 6059829 "Transactional JSON Result"
         TransactionalEmailMgt: Codeunit "Transactional Email Mgt.";
     begin
         if IsEmpty then
-          //-NPR5.55 [343266]
-          TransactionalEmailMgt.GetSmartEmailList(Rec);
-          //+NPR5.55 [343266]
+            //-NPR5.55 [343266]
+            TransactionalEmailMgt.GetSmartEmailList(Rec);
+        //+NPR5.55 [343266]
     end;
 
     var
         NewCaption: Text;
 
-    procedure LoadRecords(var ResultsToShow: Record "Transactional JSON Result";UseCaption: Text)
+    procedure LoadRecords(var ResultsToShow: Record "Transactional JSON Result"; UseCaption: Text)
     begin
         if ResultsToShow.FindSet then
-          repeat
-            Rec := ResultsToShow;
-            Rec.Insert;
-          until ResultsToShow.Next = 0;
+            repeat
+                Rec := ResultsToShow;
+                Rec.Insert;
+            until ResultsToShow.Next = 0;
         NewCaption := UseCaption;
     end;
 }

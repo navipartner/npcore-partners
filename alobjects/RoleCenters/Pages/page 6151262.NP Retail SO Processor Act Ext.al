@@ -115,12 +115,14 @@ page 6151262 "NP Retail SO Processor Act Ext"
                  Caption = 'Returns';
                  field("Sales Return Orders - Open"; "Sales Return Orders - Open")
                  {
+ApplicationArea = All;
                      ApplicationArea = SalesReturnOrder;
                      DrillDownPageID = "Sales Return Order List";
                      ToolTip = 'Specifies the number of sales return orders documents that are displayed in the Sales Cue on the Role Center. The documents are filtered by today''s date.';
                  }
                  field("Sales Credit Memos - Open"; "Sales Credit Memos - Open")
                  {
+ApplicationArea = All;
                      ApplicationArea = Basic, Suite;
                      DrillDownPageID = "Sales Credit Memos";
                      ToolTip = 'Specifies the number of sales credit memos that are not yet posted.';
@@ -157,12 +159,14 @@ page 6151262 "NP Retail SO Processor Act Ext"
                  Visible = ShowDocumentsPendingDodExchService;
                  field("Sales Inv. - Pending Doc.Exch."; "Sales Inv. - Pending Doc.Exch.")
                  {
+ApplicationArea = All;
                      ApplicationArea = Suite;
                      ToolTip = 'Specifies sales invoices that await sending to the customer through the document exchange service.';
                      Visible = ShowDocumentsPendingDodExchService;
                  }
                  field("Sales CrM. - Pending Doc.Exch."; "Sales CrM. - Pending Doc.Exch.")
                  {
+ApplicationArea = All;
                      ApplicationArea = Suite;
                      ToolTip = 'Specifies sales credit memos that await sending to the customer through the document exchange service.';
                      Visible = ShowDocumentsPendingDodExchService;
@@ -174,6 +178,7 @@ page 6151262 "NP Retail SO Processor Act Ext"
                   Caption = 'My User Tasks';
                   field("UserTaskManagement.GetMyPendingUserTasksCount";UserTaskManagement.GetMyPendingUserTasksCount)
                   {
+ApplicationArea = All;
                       ApplicationArea = Basic,Suite;
                       Caption = 'Pending User Tasks';
                       Image = Checklist;

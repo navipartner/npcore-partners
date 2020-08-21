@@ -16,19 +16,21 @@ page 6059952 "Display Content Lines"
         {
             repeater(Group)
             {
-                field(Url;Url)
+                field(Url; Url)
                 {
+                    ApplicationArea = All;
                     Visible = UrlIsVisible;
                 }
-                field(Image;Image)
+                field(Image; Image)
                 {
+                    ApplicationArea = All;
                     Visible = ImageIsVisible;
                 }
             }
-            part(Control6014404;"Display Content Lines Image")
+            part(Control6014404; "Display Content Lines Image")
             {
-                SubPageLink = "Content Code"=FIELD("Content Code"),
-                              "Line No."=FIELD("Line No.");
+                SubPageLink = "Content Code" = FIELD("Content Code"),
+                              "Line No." = FIELD("Line No.");
             }
         }
     }
@@ -40,10 +42,10 @@ page 6059952 "Display Content Lines"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         if (DisplayContent.Type = DisplayContent.Type::Html) then begin
-          Clear(DisplayContentLines);
-          DisplayContentLines.SetRange("Content Code",DisplayContent.Code);
-          if DisplayContentLines.Count > 0 then
-            Error(Txt001);
+            Clear(DisplayContentLines);
+            DisplayContentLines.SetRange("Content Code", DisplayContent.Code);
+            if DisplayContentLines.Count > 0 then
+                Error(Txt001);
         end;
     end;
 
@@ -52,11 +54,11 @@ page 6059952 "Display Content Lines"
 
         DisplayContent.Get(GetFilter("Content Code"));
         if (DisplayContent.Type = DisplayContent.Type::Image) then begin
-         ImageIsVisible := true;
-         UrlIsVisible := false;
+            ImageIsVisible := true;
+            UrlIsVisible := false;
         end else begin
-         ImageIsVisible := false;
-         UrlIsVisible := true;
+            ImageIsVisible := false;
+            UrlIsVisible := true;
         end;
     end;
 

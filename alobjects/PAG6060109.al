@@ -3,7 +3,7 @@ page 6060109 "TM Ticket Participant Wks."
     // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
 
     Caption = 'Ticket Participant Wks.';
-    DataCaptionFields = "Admission Code","Notification Type","Notification Address";
+    DataCaptionFields = "Admission Code", "Notification Type", "Notification Address";
     PageType = List;
     SourceTable = "TM Ticket Participant Wks.";
 
@@ -13,110 +13,138 @@ page 6060109 "TM Ticket Participant Wks."
         {
             repeater(Group)
             {
-                field("Applies To Schedule Entry No.";"Applies To Schedule Entry No.")
+                field("Applies To Schedule Entry No."; "Applies To Schedule Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Type";"Notification Type")
+                field("Notification Type"; "Notification Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket No.";"Ticket No.")
+                field("Ticket No."; "Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Address";"Notification Address")
+                field("Notification Address"; "Notification Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notifcation Created At";"Notifcation Created At")
+                field("Notifcation Created At"; "Notifcation Created At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Notification Send Status";"Notification Send Status")
+                field("Notification Send Status"; "Notification Send Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Sent At";"Notification Sent At")
+                field("Notification Sent At"; "Notification Sent At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Notification Sent By User";"Notification Sent By User")
+                field("Notification Sent By User"; "Notification Sent By User")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Blocked By User";"Blocked By User")
+                field("Blocked By User"; "Blocked By User")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admission Description";"Admission Description")
+                field("Admission Description"; "Admission Description")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Det. Ticket Access Entry No.";"Det. Ticket Access Entry No.")
+                field("Det. Ticket Access Entry No."; "Det. Ticket Access Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Text 1";"Text 1")
+                field("Text 1"; "Text 1")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Text 2";"Text 2")
+                field("Text 2"; "Text 2")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Original Schedule Entry No.";"Original Schedule Entry No.")
+                field("Original Schedule Entry No."; "Original Schedule Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Original Start Date";"Original Start Date")
+                field("Original Start Date"; "Original Start Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Original Start Time";"Original Start Time")
+                field("Original Start Time"; "Original Start Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Original End Date";"Original End Date")
+                field("Original End Date"; "Original End Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Original End Time";"Original End Time")
+                field("Original End Time"; "Original End Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("New Schedule Entry No.";"New Schedule Entry No.")
+                field("New Schedule Entry No."; "New Schedule Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("New Start Date";"New Start Date")
+                field("New Start Date"; "New Start Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("New Start Time";"New Start Time")
+                field("New Start Time"; "New Start Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("New End Date";"New End Date")
+                field("New End Date"; "New End Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("New End Time";"New End Time")
+                field("New End Time"; "New End Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Notification Method";"Notification Method")
+                field("Notification Method"; "Notification Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Failed With Message";"Failed With Message")
+                field("Failed With Message"; "Failed With Message")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -149,8 +177,8 @@ page 6060109 "TM Ticket Participant Wks."
         TicketNotifyParticipant: Codeunit "TM Ticket Notify Participant";
     begin
 
-        CurrPage.SetSelectionFilter (TicketParticipantWks);
-        TicketNotifyParticipant.NotifyRecipients (TicketParticipantWks);
+        CurrPage.SetSelectionFilter(TicketParticipantWks);
+        TicketNotifyParticipant.NotifyRecipients(TicketParticipantWks);
     end;
 }
 

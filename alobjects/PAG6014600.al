@@ -17,8 +17,9 @@ page 6014600 "Health Check Service"
     {
         area(content)
         {
-            field(Number;Number)
+            field(Number; Number)
             {
+                ApplicationArea = All;
             }
         }
     }
@@ -34,11 +35,11 @@ page 6014600 "Health Check Service"
         String: Text;
     begin
         if GetFilter(Number) <> '' then begin
-          Evaluate(i, GetFilter(Number));
+            Evaluate(i, GetFilter(Number));
 
-          Init;
-          Number := i;
-          Insert;
+            Init;
+            Number := i;
+            Insert;
         end;
     end;
 }

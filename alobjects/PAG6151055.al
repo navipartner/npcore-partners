@@ -14,14 +14,17 @@ page 6151055 "Distribution Group List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -37,7 +40,7 @@ page 6151055 "Distribution Group List"
                 Image = SetupList;
                 Promoted = true;
                 RunObject = Page "Distribution Setup";
-                RunPageLink = "Distribution Group"=FIELD(Code);
+                RunPageLink = "Distribution Group" = FIELD(Code);
             }
             action("Distribution Group Members")
             {
@@ -45,7 +48,7 @@ page 6151055 "Distribution Group List"
                 Image = Group;
                 Promoted = true;
                 RunObject = Page "Distribution Group Member List";
-                RunPageLink = "Distribution Group"=FIELD(Code);
+                RunPageLink = "Distribution Group" = FIELD(Code);
             }
         }
     }

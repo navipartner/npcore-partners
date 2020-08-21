@@ -13,20 +13,25 @@ page 6059958 "MCS Person"
         {
             repeater(Group)
             {
-                field(PersonId;PersonId)
+                field(PersonId; PersonId)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(UserData;UserData)
+                field(UserData; UserData)
                 {
+                    ApplicationArea = All;
                 }
-                field(PersonGroupId;PersonGroupId)
+                field(PersonGroupId; PersonGroupId)
                 {
+                    ApplicationArea = All;
                 }
-                field(Faces;Faces)
+                field(Faces; Faces)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

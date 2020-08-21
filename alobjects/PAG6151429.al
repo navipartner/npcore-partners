@@ -17,26 +17,33 @@ page 6151429 "Magento Item Custom Opt. Value"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Custom Option No.";"Custom Option No.")
+                field("Custom Option No."; "Custom Option No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Custom Option Value Line No.";"Custom Option Value Line No.")
+                field("Custom Option Value Line No."; "Custom Option Value Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Price;Price)
+                field(Price; Price)
                 {
+                    ApplicationArea = All;
                 }
-                field("Price Type";"Price Type")
+                field("Price Type"; "Price Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -56,15 +63,15 @@ page 6151429 "Magento Item Custom Opt. Value"
         ItemCustomOptValue: Record "Magento Item Custom Opt. Value";
     begin
         if not Enabled then begin
-          if ItemCustomOptValue.Get("Item No.","Custom Option No.","Custom Option Value Line No.") then
-            ItemCustomOptValue.Delete(true);
-          exit;
+            if ItemCustomOptValue.Get("Item No.", "Custom Option No.", "Custom Option Value Line No.") then
+                ItemCustomOptValue.Delete(true);
+            exit;
         end;
 
-        if ItemCustomOptValue.Get("Item No.","Custom Option No.","Custom Option Value Line No.") then begin
-          ItemCustomOptValue.TransferFields(Rec);
-          ItemCustomOptValue.Modify(true);
-          exit;
+        if ItemCustomOptValue.Get("Item No.", "Custom Option No.", "Custom Option Value Line No.") then begin
+            ItemCustomOptValue.TransferFields(Rec);
+            ItemCustomOptValue.Modify(true);
+            exit;
         end;
 
         ItemCustomOptValue.Init;
@@ -72,7 +79,7 @@ page 6151429 "Magento Item Custom Opt. Value"
         ItemCustomOptValue.Insert(true);
     end;
 
-    procedure SetSourceTable(ItemNo: Code[20];CustomOptionNo: Code[20])
+    procedure SetSourceTable(ItemNo: Code[20]; CustomOptionNo: Code[20])
     var
         CustomOption: Record "Magento Custom Option";
         CustomOptionValue: Record "Magento Custom Option Value";
@@ -80,27 +87,27 @@ page 6151429 "Magento Item Custom Opt. Value"
     begin
         DeleteAll;
         if (not CustomOption.Get(CustomOptionNo)) or
-           not (CustomOption.Type in [CustomOption.Type::SelectDropDown,CustomOption.Type::SelectRadioButtons,
-                                            CustomOption.Type::SelectCheckbox,CustomOption.Type::SelectMultiple]) then begin
-          CurrPage.Update(false);
-          exit;
+           not (CustomOption.Type in [CustomOption.Type::SelectDropDown, CustomOption.Type::SelectRadioButtons,
+                                            CustomOption.Type::SelectCheckbox, CustomOption.Type::SelectMultiple]) then begin
+            CurrPage.Update(false);
+            exit;
         end;
 
-        CustomOptionValue.SetRange("Custom Option No.",CustomOptionNo);
+        CustomOptionValue.SetRange("Custom Option No.", CustomOptionNo);
         if CustomOptionValue.FindSet then
-          repeat
-            Init;
-            if ItemCustomOptValue.Get(ItemNo,CustomOptionValue."Custom Option No.",CustomOptionValue."Line No.") then
-              Rec := ItemCustomOptValue
-            else begin
-              Init;
-              "Item No." := ItemNo;
-              "Custom Option No." := CustomOptionValue."Custom Option No.";
-              "Custom Option Value Line No." := CustomOptionValue."Line No.";
-              Enabled := false;
-            end;
-            Insert;
-          until CustomOptionValue.Next = 0;
+            repeat
+                Init;
+                if ItemCustomOptValue.Get(ItemNo, CustomOptionValue."Custom Option No.", CustomOptionValue."Line No.") then
+                    Rec := ItemCustomOptValue
+                else begin
+                    Init;
+                    "Item No." := ItemNo;
+                    "Custom Option No." := CustomOptionValue."Custom Option No.";
+                    "Custom Option Value Line No." := CustomOptionValue."Line No.";
+                    Enabled := false;
+                end;
+                Insert;
+            until CustomOptionValue.Next = 0;
 
         CurrPage.Update(false);
     end;

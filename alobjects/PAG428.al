@@ -1,4 +1,4 @@
-pageextension 6014441 pageextension6014441 extends "Shipping Agents" 
+pageextension 6014441 pageextension6014441 extends "Shipping Agents"
 {
     // PS1.00/LS/20141201  CASE 200150 : Added fields "Shipping Agent Demand" & "Pacsoft Product"
     // NPR5.25/MMV /20160621 CASE 233533 Added field 6014442
@@ -9,29 +9,36 @@ pageextension 6014441 pageextension6014441 extends "Shipping Agents"
     {
         addafter(Name)
         {
-            field("Shipping Method";"Shipping Method")
+            field("Shipping Method"; "Shipping Method")
             {
+                ApplicationArea = All;
             }
-            field("Ship to Contact Mandatory";"Ship to Contact Mandatory")
+            field("Ship to Contact Mandatory"; "Ship to Contact Mandatory")
             {
+                ApplicationArea = All;
             }
-            field("Drop Point Service";"Drop Point Service")
+            field("Drop Point Service"; "Drop Point Service")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Account No.")
         {
-            field("Shipping Agent Demand";"Shipping Agent Demand")
+            field("Shipping Agent Demand"; "Shipping Agent Demand")
             {
+                ApplicationArea = All;
             }
-            field("Pacsoft Product";"Pacsoft Product")
+            field("Pacsoft Product"; "Pacsoft Product")
             {
+                ApplicationArea = All;
             }
-            field("Custom Print Layout";"Custom Print Layout")
+            field("Custom Print Layout"; "Custom Print Layout")
             {
+                ApplicationArea = All;
             }
-            field("Return Shipping agent";"Return Shipping agent")
+            field("Return Shipping agent"; "Return Shipping agent")
             {
+                ApplicationArea = All;
             }
         }
     }

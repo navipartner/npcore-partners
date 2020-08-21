@@ -9,115 +9,125 @@ page 6014501 "Dynamic Module Setting Dialog"
     {
         area(content)
         {
-            field(BooleanValue;BooleanValue)
+            field(BooleanValue; BooleanValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = BooleanVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,BooleanValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,BooleanValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, BooleanValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, BooleanValue);
                 end;
             }
-            field(TextValue;TextValue)
+            field(TextValue; TextValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = TextVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,TextValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,TextValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, TextValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, TextValue);
                 end;
             }
-            field(CodeValue;CodeValue)
+            field(CodeValue; CodeValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = CodeVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,CodeValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,UpperCase(CodeValue));
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, CodeValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, UpperCase(CodeValue));
                 end;
             }
-            field(DateValue;DateValue)
+            field(DateValue; DateValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = DateVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,DateValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,DateValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, DateValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, DateValue);
                 end;
             }
-            field(DateFormulaValue;DateFormulaValue)
+            field(DateFormulaValue; DateFormulaValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = DateFormulaVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,DateFormulaValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,DateFormulaValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, DateFormulaValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, DateFormulaValue);
                 end;
             }
-            field(DateTimeValue;DateTimeValue)
+            field(DateTimeValue; DateTimeValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = DateTimeVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,DateTimeValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,DateTimeValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, DateTimeValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, DateTimeValue);
                 end;
             }
-            field(DecimalValue;DecimalValue)
+            field(DecimalValue; DecimalValue)
             {
-                CaptionClass = '3,'+SettingName;
-                DecimalPlaces = 2:5;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
+                DecimalPlaces = 2 : 5;
                 Visible = DecimalVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,DecimalValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,DecimalValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, DecimalValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, DecimalValue);
                 end;
             }
-            field(DurationValue;DurationValue)
+            field(DurationValue; DurationValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = DurationVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,DurationValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,DurationValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, DurationValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, DurationValue);
                 end;
             }
-            field(IntegerValue;IntegerValue)
+            field(IntegerValue; IntegerValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = IntegerVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,IntegerValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,IntegerValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, IntegerValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, IntegerValue);
                 end;
             }
-            field(TimeValue;TimeValue)
+            field(TimeValue; TimeValue)
             {
-                CaptionClass = '3,'+SettingName;
+                ApplicationArea = All;
+                CaptionClass = '3,' + SettingName;
                 Visible = TimeVisible;
 
                 trigger OnValidate()
                 begin
-                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal,TimeValue);
-                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal,TimeValue);
+                    DynamicModuleHelper.CheckSetupValue(DynamicModuleSettingGlobal, TimeValue);
+                    DynamicModuleHelper.SetSetupValue(DynamicModuleSettingGlobal, TimeValue);
                 end;
             }
         }
@@ -157,60 +167,60 @@ page 6014501 "Dynamic Module Setting Dialog"
     begin
         DynamicModuleSettingGlobal := DynamicModuleSetting;
         SettingName := DynamicModuleSettingGlobal.Name;
-        DynamicModuleHelper.GetSetupValue(DynamicModuleSetting,VariantValue);
+        DynamicModuleHelper.GetSetupValue(DynamicModuleSetting, VariantValue);
         with DynamicModuleSetting do
-          case "Data Type" of
-            "Data Type"::Boolean:
-              begin
-                BooleanVisible := true;
-                BooleanValue := VariantValue;
-              end;
-            "Data Type"::Text:
-              begin
-                TextVisible := true;
-                TextValue := VariantValue;
-              end;
-            "Data Type"::Code:
-              begin
-                CodeVisible := true;
-                CodeValue := VariantValue;
-              end;
-            "Data Type"::Date:
-              begin
-                DateVisible := true;
-                DateValue := VariantValue;
-              end;
-            "Data Type"::DateFormula:
-              begin
-                DateFormulaVisible := true;
-                DateFormulaValue := VariantValue;
-              end;
-            "Data Type"::DateTime:
-              begin
-                DateTimeVisible := true;
-                DateTimeValue := VariantValue;
-              end;
-            "Data Type"::Decimal:
-              begin
-                DecimalVisible := true;
-                DecimalValue := VariantValue;
-              end;
-            "Data Type"::Duration:
-              begin
-                DurationVisible := true;
-                DurationValue := VariantValue;
-              end;
-            "Data Type"::Integer:
-              begin
-                IntegerVisible := true;
-                IntegerValue := VariantValue;
-              end;
-            "Data Type"::Time:
-              begin
-                TimeVisible := true;
-                TimeValue := VariantValue;
-              end;
-          end;
+            case "Data Type" of
+                "Data Type"::Boolean:
+                    begin
+                        BooleanVisible := true;
+                        BooleanValue := VariantValue;
+                    end;
+                "Data Type"::Text:
+                    begin
+                        TextVisible := true;
+                        TextValue := VariantValue;
+                    end;
+                "Data Type"::Code:
+                    begin
+                        CodeVisible := true;
+                        CodeValue := VariantValue;
+                    end;
+                "Data Type"::Date:
+                    begin
+                        DateVisible := true;
+                        DateValue := VariantValue;
+                    end;
+                "Data Type"::DateFormula:
+                    begin
+                        DateFormulaVisible := true;
+                        DateFormulaValue := VariantValue;
+                    end;
+                "Data Type"::DateTime:
+                    begin
+                        DateTimeVisible := true;
+                        DateTimeValue := VariantValue;
+                    end;
+                "Data Type"::Decimal:
+                    begin
+                        DecimalVisible := true;
+                        DecimalValue := VariantValue;
+                    end;
+                "Data Type"::Duration:
+                    begin
+                        DurationVisible := true;
+                        DurationValue := VariantValue;
+                    end;
+                "Data Type"::Integer:
+                    begin
+                        IntegerVisible := true;
+                        IntegerValue := VariantValue;
+                    end;
+                "Data Type"::Time:
+                    begin
+                        TimeVisible := true;
+                        TimeValue := VariantValue;
+                    end;
+            end;
     end;
 
     procedure GetModuleScopeSetting(var DynamicModuleSetting: Record "Dynamic Module Setting")

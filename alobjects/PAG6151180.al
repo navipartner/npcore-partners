@@ -13,17 +13,21 @@ page 6151180 "Retail Cross References"
         {
             repeater(Group)
             {
-                field("Retail ID";"Retail ID")
+                field("Retail ID"; "Retail ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Record Value";"Record Value")
+                field("Record Value"; "Record Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

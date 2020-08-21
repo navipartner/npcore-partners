@@ -17,59 +17,77 @@ page 6060070 "MM Membership Auto Renew List"
         {
             repeater(Group)
             {
-                field("Community Code";"Community Code")
+                field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid Until Date";"Valid Until Date")
+                field("Valid Until Date"; "Valid Until Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Date";"Document Date")
+                field("Document Date"; "Document Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Terms Code";"Payment Terms Code")
+                field("Payment Terms Code"; "Payment Terms Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Method Code";"Payment Method Code")
+                field("Payment Method Code"; "Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Invoice";"Post Invoice")
+                field("Post Invoice"; "Post Invoice")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Started At";"Started At")
+                field("Started At"; "Started At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Completed At";"Completed At")
+                field("Completed At"; "Completed At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Started By";"Started By")
+                field("Started By"; "Started By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Selected Membership Count";"Selected Membership Count")
+                field("Selected Membership Count"; "Selected Membership Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto-Renew Success Count";"Auto-Renew Success Count")
+                field("Auto-Renew Success Count"; "Auto-Renew Success Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto-Renew Fail Count";"Auto-Renew Fail Count")
+                field("Auto-Renew Fail Count"; "Auto-Renew Fail Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Invoice Create Fail Count";"Invoice Create Fail Count")
+                field("Invoice Create Fail Count"; "Invoice Create Fail Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Invoice Posting Fail Count";"Invoice Posting Fail Count")
+                field("Invoice Posting Fail Count"; "Invoice Posting Fail Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("First Invoice No.";"First Invoice No.")
+                field("First Invoice No."; "First Invoice No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Invoice No.";"Last Invoice No.")
+                field("Last Invoice No."; "Last Invoice No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -89,7 +107,7 @@ page 6060070 "MM Membership Auto Renew List"
 
                 trigger OnAction()
                 begin
-                    StartAutoRenew ();
+                    StartAutoRenew();
                 end;
             }
         }
@@ -103,7 +121,7 @@ page 6060070 "MM Membership Auto Renew List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Membership Auto-Renew Log";
-                RunPageLink = "Auto-Renew Entry No."=FIELD("Entry No.");
+                RunPageLink = "Auto-Renew Entry No." = FIELD("Entry No.");
             }
         }
     }
@@ -116,10 +134,10 @@ page 6060070 "MM Membership Auto Renew List"
         MembershipAutoRenew: Codeunit "MM Membership Auto Renew";
     begin
 
-        if "Completed At" <> CreateDateTime (0D, 0T) then
-          Error (COMPLETE);
+        if "Completed At" <> CreateDateTime(0D, 0T) then
+            Error(COMPLETE);
 
-        MembershipAutoRenew.AutoRenewBatch (Rec."Entry No.");
+        MembershipAutoRenew.AutoRenewBatch(Rec."Entry No.");
     end;
 }
 

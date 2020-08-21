@@ -1,4 +1,4 @@
-pageextension 6014442 pageextension6014442 extends "Sales Invoice" 
+pageextension 6014442 pageextension6014442 extends "Sales Invoice"
 {
     // NPR5.23/JDH /20160513 CASE 240916 Deleted old VariaX Matrix Action
     // NPR5.23/TS/20160603 CASE 2430085 Added field Posting Description
@@ -13,18 +13,21 @@ pageextension 6014442 pageextension6014442 extends "Sales Invoice"
     {
         addafter("Posting Date")
         {
-            field(NPPostingDescription1;"Posting Description")
+            field(NPPostingDescription1; "Posting Description")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
         addafter(Control174)
         {
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
         }
     }
@@ -117,23 +120,23 @@ pageextension 6014442 pageextension6014442 extends "Sales Invoice"
     //trigger OnAfterGetCurrRecord()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
-        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
-        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
+    /*
+    CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
+    CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
+    ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
 
-        UpdatePaymentService;
-        */
+    UpdatePaymentService;
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        #1..5
+    /*
+    #1..5
 
-        //-NPR5.55 [402013]
-        SetHasRetailVouchers();
-        //+NPR5.55 [402013]
-        */
+    //-NPR5.55 [402013]
+    SetHasRetailVouchers();
+    //+NPR5.55 [402013]
+    */
     //end;
 
     local procedure SetHasRetailVouchers()
@@ -142,10 +145,10 @@ pageextension 6014442 pageextension6014442 extends "Sales Invoice"
     begin
         //-NPR5.55 [402013]
         if "No." = '' then
-          exit;
+            exit;
 
-        NpRvSaleLinePOSVoucher.SetRange("Document Type","Document Type");
-        NpRvSaleLinePOSVoucher.SetRange("Document No.","No.");
+        NpRvSaleLinePOSVoucher.SetRange("Document Type", "Document Type");
+        NpRvSaleLinePOSVoucher.SetRange("Document No.", "No.");
         HasRetailVouchers := NpRvSaleLinePOSVoucher.FindFirst;
         //+NPR5.55 [402013]
     end;

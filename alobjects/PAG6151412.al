@@ -31,26 +31,32 @@ page 6151412 "Magento Picture Link Subform"
             repeater(Control6150624)
             {
                 ShowCaption = false;
-                field(MiniatureLine;TempMagentoPicture.Picture)
+                field(MiniatureLine; TempMagentoPicture.Picture)
                 {
+                    ApplicationArea = All;
                     Caption = 'Miniature';
                     Editable = false;
                     Visible = MiniatureLinePicture;
                 }
-                field("Picture Name";"Picture Name")
+                field("Picture Name"; "Picture Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Base Image";"Base Image")
+                field("Base Image"; "Base Image")
                 {
+                    ApplicationArea = All;
                 }
-                field("Small Image";"Small Image")
+                field("Small Image"; "Small Image")
                 {
+                    ApplicationArea = All;
                 }
-                field(Thumbnail;Thumbnail)
+                field(Thumbnail; Thumbnail)
                 {
+                    ApplicationArea = All;
                 }
-                field("Short Text";"Short Text")
+                field("Short Text"; "Short Text")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -59,12 +65,14 @@ page 6151412 "Magento Picture Link Subform"
                         //+MAG1.21
                     end;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
-            field(MiniatureSingle;TempMagentoPicture.Picture)
+            field(MiniatureSingle; TempMagentoPicture.Picture)
             {
+                ApplicationArea = All;
                 Caption = 'Miniature';
                 Editable = false;
                 Enabled = false;
@@ -81,7 +89,7 @@ page 6151412 "Magento Picture Link Subform"
     begin
         //-MAG1.21
         if MiniatureSinglePicture and not MiniatureLinePicture then
-          DownloadMiniature();
+            DownloadMiniature();
         //+MAG1.21
     end;
 
@@ -89,7 +97,7 @@ page 6151412 "Magento Picture Link Subform"
     begin
         //-MAG1.21
         if MiniatureLinePicture then
-          DownloadMiniature();
+            DownloadMiniature();
         //+MAG1.21
     end;
 
@@ -105,9 +113,9 @@ page 6151412 "Magento Picture Link Subform"
     begin
         //-MAG1.21
         if ItemNo <> '' then
-          "Item No." := ItemNo;
+            "Item No." := ItemNo;
         if VariantValueCode <> '' then
-          "Variant Value Code" := VariantValueCode;
+            "Variant Value Code" := VariantValueCode;
         //+MAG1.21
         //-MAG2.22 [359285]
         "Variety Type" := VarietyTypeCode;
@@ -143,12 +151,12 @@ page 6151412 "Magento Picture Link Subform"
         //-MAG1.21
         FilterGroup(2);
         if ItemNo <> '' then
-          SetRange("Item No.",ItemNo);
-        SetRange("Variant Value Code",VariantValueCode);
+            SetRange("Item No.", ItemNo);
+        SetRange("Variant Value Code", VariantValueCode);
         //-MAG2.22 [359285]
-        SetRange("Variety Type",VarietyTypeCode);
-        SetRange("Variety Table",VarietyTableCode);
-        SetRange("Variety Value",VarietyValueCode);
+        SetRange("Variety Type", VarietyTypeCode);
+        SetRange("Variety Table", VarietyTableCode);
+        SetRange("Variety Value", VarietyValueCode);
         //+MAG2.22 [359285]
         FilterGroup(0);
         CurrPage.Update(false);
@@ -163,7 +171,7 @@ page 6151412 "Magento Picture Link Subform"
         //+MAG1.21
     end;
 
-    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10];NewVarietyTableCode: Code[40];NewVarietyValueCode: Code[20])
+    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[20])
     begin
         //-MAG2.22 [359285]
         VarietyTypeCode := NewVarietyTypeCode;
@@ -182,22 +190,22 @@ page 6151412 "Magento Picture Link Subform"
         MagentoPicture: Record "Magento Picture";
     begin
         //-MAG2.22 [359285]
-        if TempMagentoPicture.Get(MagentoPicture.Type::Item,"Picture Name") then begin
-          TempMagentoPicture.DownloadPicture(TempMagentoPicture);   // NAV 2017+
-          exit;
+        if TempMagentoPicture.Get(MagentoPicture.Type::Item, "Picture Name") then begin
+            TempMagentoPicture.DownloadPicture(TempMagentoPicture);   // NAV 2017+
+            exit;
         end;
         //+MAG2.22 [359285]
 
         //-MAG2.20 [353499]
-        if MagentoPicture.Get(MagentoPicture.Type::Item,"Picture Name") then begin
-          TempMagentoPicture.Init;
-          TempMagentoPicture := MagentoPicture;
-          TempMagentoPicture.Insert;
+        if MagentoPicture.Get(MagentoPicture.Type::Item, "Picture Name") then begin
+            TempMagentoPicture.Init;
+            TempMagentoPicture := MagentoPicture;
+            TempMagentoPicture.Insert;
         end else begin
-          TempMagentoPicture.Init;
-          TempMagentoPicture.Type := MagentoPicture.Type::Item;
-          TempMagentoPicture.Name := "Picture Name";
-          TempMagentoPicture.Insert;
+            TempMagentoPicture.Init;
+            TempMagentoPicture.Type := MagentoPicture.Type::Item;
+            TempMagentoPicture.Name := "Picture Name";
+            TempMagentoPicture.Insert;
         end;
 
         TempMagentoPicture.DownloadPicture(TempMagentoPicture);   // NAV 2017+
@@ -209,9 +217,9 @@ page 6151412 "Magento Picture Link Subform"
     begin
         //-MAG1.21
         if not MagentoSetup.Get then
-          exit;
-        MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre,MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
-        MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture,MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
+            exit;
+        MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
+        MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
         //+MAG1.21
     end;
 }

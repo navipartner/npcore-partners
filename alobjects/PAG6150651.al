@@ -18,29 +18,37 @@ page 6150651 "POS Period Register List"
             repeater(Control6014401)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Opening Entry No.";"Opening Entry No.")
+                field("Opening Entry No."; "Opening Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Entry No.";"Closing Entry No.")
+                field("Closing Entry No."; "Closing Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Compression";"Posting Compression")
+                field("Posting Compression"; "Posting Compression")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -58,7 +66,7 @@ page 6150651 "POS Period Register List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Entry List";
-                RunPageLink = "POS Period Register No."=FIELD("No.");
+                RunPageLink = "POS Period Register No." = FIELD("No.");
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
             }
@@ -67,21 +75,21 @@ page 6150651 "POS Period Register List"
                 Caption = 'Sales Lines';
                 Image = Sales;
                 RunObject = Page "POS Sales Line List";
-                RunPageLink = "POS Period Register No."=FIELD("No.");
+                RunPageLink = "POS Period Register No." = FIELD("No.");
             }
             action("Payment Lines")
             {
                 Caption = 'Payment Lines';
                 Image = Payment;
                 RunObject = Page "POS Payment Line List";
-                RunPageLink = "POS Period Register No."=FIELD("No.");
+                RunPageLink = "POS Period Register No." = FIELD("No.");
             }
             action("Balancing Line")
             {
                 Caption = 'Balancing Line';
                 Image = Balance;
                 RunObject = Page "POS Balancing Line";
-                RunPageLink = "POS Period Register No."=FIELD("No.");
+                RunPageLink = "POS Period Register No." = FIELD("No.");
             }
         }
         area(processing)
@@ -99,7 +107,7 @@ page 6150651 "POS Period Register List"
                     POSPostEntries: Codeunit "POS Post Entries";
                     POSEntryToPost: Record "POS Entry";
                 begin
-                    POSEntryToPost.SetRange("POS Period Register No.","No.");
+                    POSEntryToPost.SetRange("POS Period Register No.", "No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
@@ -118,7 +126,7 @@ page 6150651 "POS Period Register List"
                     POSEntryToPost: Record "POS Entry";
                     POSPostEntries: Codeunit "POS Post Entries";
                 begin
-                    POSEntryToPost.SetRange("POS Period Register No.","No.");
+                    POSEntryToPost.SetRange("POS Period Register No.", "No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
@@ -137,7 +145,7 @@ page 6150651 "POS Period Register List"
                     POSEntryToPost: Record "POS Entry";
                     POSPostEntries: Codeunit "POS Post Entries";
                 begin
-                    POSEntryToPost.SetRange("POS Period Register No.","No.");
+                    POSEntryToPost.SetRange("POS Period Register No.", "No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
@@ -157,7 +165,7 @@ page 6150651 "POS Period Register List"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc(DT2Date("End of Day Date"),"Document No.");
+                    Navigate.SetDoc(DT2Date("End of Day Date"), "Document No.");
                     Navigate.Run;
                 end;
             }

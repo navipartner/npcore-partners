@@ -18,8 +18,9 @@ page 6060155 "Event Attribute Matrix"
             group(General)
             {
                 Caption = 'General';
-                field(TemplateName;TemplateName)
+                field(TemplateName; TemplateName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Template Name';
                     Editable = false;
                     TableRelation = "Event Attribute Template".Name;
@@ -29,35 +30,41 @@ page 6060155 "Event Attribute Matrix"
                         SetAttrTemplate(TemplateName);
                     end;
                 }
-                field(JobNo;JobNo)
+                field(JobNo; JobNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Event No.';
                     Editable = false;
-                    TableRelation = Job."No." WHERE (Event=CONST(true));
+                    TableRelation = Job."No." WHERE(Event = CONST(true));
                     Visible = JobNoVisible;
                 }
             }
             repeater(Group)
             {
                 FreezeColumn = Formula;
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Formula;Formula)
+                field(Formula; Formula)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(AttrColumnValue1;AttrColumnValue[1])
+                field(AttrColumnValue1; AttrColumnValue[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = AttrColumnCaption1;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible1;
@@ -67,8 +74,9 @@ page 6060155 "Event Attribute Matrix"
                         CheckAndUpdate(1);
                     end;
                 }
-                field(AttrColumnValue2;AttrColumnValue[2])
+                field(AttrColumnValue2; AttrColumnValue[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = AttrColumnCaption2;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible2;
@@ -78,8 +86,9 @@ page 6060155 "Event Attribute Matrix"
                         CheckAndUpdate(2);
                     end;
                 }
-                field(AttrColumnValue3;AttrColumnValue[3])
+                field(AttrColumnValue3; AttrColumnValue[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = AttrColumnCaption3;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible3;
@@ -89,8 +98,9 @@ page 6060155 "Event Attribute Matrix"
                         CheckAndUpdate(3);
                     end;
                 }
-                field(AttrColumnValue4;AttrColumnValue[4])
+                field(AttrColumnValue4; AttrColumnValue[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = AttrColumnCaption4;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible4;
@@ -100,8 +110,9 @@ page 6060155 "Event Attribute Matrix"
                         CheckAndUpdate(4);
                     end;
                 }
-                field(AttrColumnValue5;AttrColumnValue[5])
+                field(AttrColumnValue5; AttrColumnValue[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = AttrColumnCaption5;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible5;
@@ -153,8 +164,8 @@ page 6060155 "Event Attribute Matrix"
 
                     trigger OnAction()
                     begin
-                        if not EventAttrMgt.ShowEventsInAttributesFilter(TemplateName,FilterName) then
-                          Message(NoEventsInFilter);
+                        if not EventAttrMgt.ShowEventsInAttributesFilter(TemplateName, FilterName) then
+                            Message(NoEventsInFilter);
                     end;
                 }
             }
@@ -173,13 +184,13 @@ page 6060155 "Event Attribute Matrix"
     end;
 
     var
-        AttrColumnCaption: array [5] of Text;
+        AttrColumnCaption: array[5] of Text;
         AttrColumnCaption1: Text;
         AttrColumnCaption2: Text;
         AttrColumnCaption3: Text;
         AttrColumnCaption4: Text;
         AttrColumnCaption5: Text;
-        AttrColumnVisible: array [5] of Boolean;
+        AttrColumnVisible: array[5] of Boolean;
         [InDataSet]
         AttrColumnVisible1: Boolean;
         [InDataSet]
@@ -190,8 +201,8 @@ page 6060155 "Event Attribute Matrix"
         AttrColumnVisible4: Boolean;
         [InDataSet]
         AttrColumnVisible5: Boolean;
-        AttrColumnValue: array [5] of Text;
-        AttrColumnLineNo: array [5] of Integer;
+        AttrColumnValue: array[5] of Text;
+        AttrColumnLineNo: array[5] of Integer;
         AttrColumnEditable: Boolean;
         [InDataSet]
         JobNoVisible: Boolean;
@@ -219,7 +230,7 @@ page 6060155 "Event Attribute Matrix"
         EventAttrTemplate.TestField("Row Template Name");
         EventAttrTemplate.TestField("Column Template Name");
         FilterGroup := 2;
-        SetRange("Template Name",EventAttrTemplate."Row Template Name");
+        SetRange("Template Name", EventAttrTemplate."Row Template Name");
         FilterGroup := 0;
         //JobNoVisible := FALSE;
     end;
@@ -236,7 +247,7 @@ page 6060155 "Event Attribute Matrix"
           SetAttrTemplate(Job."Event Attribute Template Name");
         */
         //+NPR5.33 [277972]
-        
+
         //-NPR5.33 [277946]
         JobNoVisible := true;
         //+NPR5.33 [277946]
@@ -250,34 +261,34 @@ page 6060155 "Event Attribute Matrix"
     begin
         NextColumnSetExists := false;
         PreviousColumnSetExists := false;
-        EventAttrColValue.SetRange("Template Name",EventAttrTemplate."Column Template Name");
+        EventAttrColValue.SetRange("Template Name", EventAttrTemplate."Column Template Name");
         if EventAttrColValue.IsEmpty then
-          Error(NoColValuesSet,EventAttrTemplate."Column Template Name");
+            Error(NoColValuesSet, EventAttrTemplate."Column Template Name");
         if Forward then
-          EventAttrColValue.SetFilter("Line No.",'>%1',LastColumnLineNoFetched)
+            EventAttrColValue.SetFilter("Line No.", '>%1', LastColumnLineNoFetched)
         else
-          EventAttrColValue.SetFilter("Line No.",'<%1',FirstColumnLineNoFetched);
+            EventAttrColValue.SetFilter("Line No.", '<%1', FirstColumnLineNoFetched);
         if EventAttrColValue.IsEmpty then
-          exit;
+            exit;
         for i := 1 to ArrayLen(AttrColumnCaption) do begin
-          AttrColumnCaption[i] := '';
-          AttrColumnVisible[i] := false;
-          AttrColumnLineNo[i] := 0;
-          if i = 1 then begin
-            AttrColumnVisible[i] := EventAttrColValue.FindSet;
-            FirstColumnLineNoFetched := EventAttrColValue."Line No.";
-          end else
-            AttrColumnVisible[i] := EventAttrColValue.Next <> 0;
-          if AttrColumnVisible[i] then begin
-            AttrColumnCaption[i] := EventAttrColValue.Description;
-            AttrColumnLineNo[i] := EventAttrColValue."Line No.";
-          end;
+            AttrColumnCaption[i] := '';
+            AttrColumnVisible[i] := false;
+            AttrColumnLineNo[i] := 0;
+            if i = 1 then begin
+                AttrColumnVisible[i] := EventAttrColValue.FindSet;
+                FirstColumnLineNoFetched := EventAttrColValue."Line No.";
+            end else
+                AttrColumnVisible[i] := EventAttrColValue.Next <> 0;
+            if AttrColumnVisible[i] then begin
+                AttrColumnCaption[i] := EventAttrColValue.Description;
+                AttrColumnLineNo[i] := EventAttrColValue."Line No.";
+            end;
         end;
         LastColumnLineNoFetched := EventAttrColValue."Line No.";
 
-        EventAttrColValue.SetFilter("Line No.",'>%1',LastColumnLineNoFetched);
+        EventAttrColValue.SetFilter("Line No.", '>%1', LastColumnLineNoFetched);
         NextColumnSetExists := not EventAttrColValue.IsEmpty;
-        EventAttrColValue.SetFilter("Line No.",'<%1',FirstColumnLineNoFetched);
+        EventAttrColValue.SetFilter("Line No.", '<%1', FirstColumnLineNoFetched);
         PreviousColumnSetExists := not EventAttrColValue.IsEmpty;
         SetColumnCaption();
         SetColumnVisibility();
@@ -316,10 +327,10 @@ page 6060155 "Event Attribute Matrix"
         ColumnNo: Integer;
     begin
         for ColumnNo := 1 to ArrayLen(AttrColumnLineNo) do
-          //-NPR5.33 [277946]
-          //EventAttrMgt.EventAttributeEntryAction(2,TemplateName,JobNo,Rec."Line No.",AttrColumnLineNo[ColumnNo],AttrColumnCaption[ColumnNo],AttrColumnValue[ColumnNo]);
-          EventAttrMgt.EventAttributeEntryAction(2,TemplateName,JobNo,Rec."Line No.",AttrColumnLineNo[ColumnNo],AttrColumnCaption[ColumnNo],AttrColumnValue[ColumnNo],FilterMode,FilterName);
-          //+NPR5.33 [277946]
+            //-NPR5.33 [277946]
+            //EventAttrMgt.EventAttributeEntryAction(2,TemplateName,JobNo,Rec."Line No.",AttrColumnLineNo[ColumnNo],AttrColumnCaption[ColumnNo],AttrColumnValue[ColumnNo]);
+            EventAttrMgt.EventAttributeEntryAction(2, TemplateName, JobNo, Rec."Line No.", AttrColumnLineNo[ColumnNo], AttrColumnCaption[ColumnNo], AttrColumnValue[ColumnNo], FilterMode, FilterName);
+        //+NPR5.33 [277946]
     end;
 
     local procedure CheckAndUpdate(ColumnNo: Integer)
@@ -328,7 +339,7 @@ page 6060155 "Event Attribute Matrix"
     begin
         //-NPR5.33 [277946]
         //EventAttrMgt.CheckAndUpdate(TemplateName,JobNo,Rec."Line No.",AttrColumnLineNo[ColumnNo],AttrColumnCaption[ColumnNo],AttrColumnValue[ColumnNo]);
-        EventAttrMgt.CheckAndUpdate(TemplateName,JobNo,Rec."Line No.",AttrColumnLineNo[ColumnNo],AttrColumnCaption[ColumnNo],AttrColumnValue[ColumnNo],FilterMode,FilterName);
+        EventAttrMgt.CheckAndUpdate(TemplateName, JobNo, Rec."Line No.", AttrColumnLineNo[ColumnNo], AttrColumnCaption[ColumnNo], AttrColumnValue[ColumnNo], FilterMode, FilterName);
         //+NPR5.33 [277946]
         CurrPage.Update(false);
     end;

@@ -16,92 +16,121 @@ page 6151140 "Audit Roll - OData"
         {
             repeater(Group)
             {
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Type";"Sale Type")
+                field("Sale Type"; "Sale Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Date";"Sale Date")
+                field("Sale Date"; "Sale Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Time";"Closing Time")
+                field("Closing Time"; "Closing Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Posted;Posted)
+                field(Posted; Posted)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Entry Posted";"Item Entry Posted")
+                field("Item Entry Posted"; "Item Entry Posted")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount Amount";"Line Discount Amount")
+                field("Line Discount Amount"; "Line Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT %";"VAT %")
+                field("VAT %"; "VAT %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Offline;Offline)
+                field(Offline; Offline)
                 {
+                    ApplicationArea = All;
                 }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Authorised by";"Discount Authorised by")
+                field("Discount Authorised by"; "Discount Authorised by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reason Code";"Reason Code")
+                field("Reason Code"; "Reason Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posted Doc. No.";"Posted Doc. No.")
+                field("Posted Doc. No."; "Posted Doc. No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

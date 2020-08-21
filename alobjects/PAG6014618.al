@@ -15,8 +15,9 @@ page 6014618 "My Reports"
         {
             repeater(Group)
             {
-                field("Report No.";"Report No.")
+                field("Report No."; "Report No.")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
 
                     trigger OnAssistEdit()
@@ -29,8 +30,9 @@ page 6014618 "My Reports"
                         GetReport;
                     end;
                 }
-                field(ReportName;AllObjwithCap."Object Caption")
+                field(ReportName; AllObjwithCap."Object Caption")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Caption = 'Name';
 
@@ -72,7 +74,7 @@ page 6014618 "My Reports"
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID",UserId);
+        SetRange("User ID", UserId);
     end;
 
     var
@@ -106,7 +108,7 @@ page 6014618 "My Reports"
         AllObjwithCap.SetRange("Object Type", AllObjwithCap."Object Type"::Report);
         AllObjwithCap.SetRange("Object ID", "Report No.");
         if AllObjwithCap.FindFirst then
-          REPORT.Run("Report No.");
+            REPORT.Run("Report No.");
     end;
 }
 

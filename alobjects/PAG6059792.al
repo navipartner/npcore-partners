@@ -14,7 +14,7 @@ page 6059792 "E-mail Field List"
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Field";
-    SourceTableView = SORTING(TableNo,"No.");
+    SourceTableView = SORTING(TableNo, "No.");
 
     layout
     {
@@ -22,12 +22,14 @@ page 6059792 "E-mail Field List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                     Caption = 'Field Name';
                 }
             }

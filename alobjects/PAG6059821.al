@@ -16,24 +16,30 @@ page 6059821 "Smart Email List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Provider;Provider)
+                field(Provider; Provider)
                 {
+                    ApplicationArea = All;
                 }
-                field("Merge Table ID";"Merge Table ID")
+                field("Merge Table ID"; "Merge Table ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Table Caption";"Table Caption")
+                field("Table Caption"; "Table Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("Smart Email Name";"Smart Email Name")
+                field("Smart Email Name"; "Smart Email Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

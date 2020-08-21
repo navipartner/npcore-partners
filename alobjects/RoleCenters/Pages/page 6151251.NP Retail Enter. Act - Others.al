@@ -16,12 +16,15 @@ page 6151251 "NP Retail Enter. Act - Others"
                 Caption = 'Master Data';
                 field(Items; Items)
                 {
+                    ApplicationArea = All;
                 }
                 field(Contacts; Contacts)
                 {
+                    ApplicationArea = All;
                 }
                 field(Customers; Customers)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

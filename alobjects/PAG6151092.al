@@ -15,20 +15,25 @@ page 6151092 "Nc RapidConnect Subform"
         {
             repeater(Group)
             {
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Insert Trigger";"Insert Trigger")
+                field("Insert Trigger"; "Insert Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field("Modify Trigger";"Modify Trigger")
+                field("Modify Trigger"; "Modify Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field(Control6151408;"Trigger Fields")
+                field(Control6151408; "Trigger Fields")
                 {
+                    ApplicationArea = All;
                     HideValue = ("Modify Trigger" <> 2);
                     ShowCaption = false;
                 }
@@ -44,9 +49,9 @@ page 6151092 "Nc RapidConnect Subform"
             {
                 Image = List;
                 RunObject = Page "Nc RapidConnect Trigger Fields";
-                RunPageLink = "Setup Code"=FIELD("Setup Code"),
-                              "Table ID"=FIELD("Table ID");
-                Visible = ("Modify Trigger"=2);
+                RunPageLink = "Setup Code" = FIELD("Setup Code"),
+                              "Table ID" = FIELD("Table ID");
+                Visible = ("Modify Trigger" = 2);
             }
         }
     }

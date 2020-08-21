@@ -15,32 +15,41 @@ page 6151520 "Nc Triggers"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Split Trigger and Endpoint";"Split Trigger and Endpoint")
+                field("Split Trigger and Endpoint"; "Split Trigger and Endpoint")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Error on Empty Output";"Error on Empty Output")
+                field("Error on Empty Output"; "Error on Empty Output")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Processor";"Task Processor")
+                field("Task Processor"; "Task Processor")
                 {
+                    ApplicationArea = All;
                 }
-                field("Linked Endpoints";"Linked Endpoints")
+                field("Linked Endpoints"; "Linked Endpoints")
                 {
+                    ApplicationArea = All;
                 }
-                field("Subscriber Codeunit ID";"Subscriber Codeunit ID")
+                field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Subscriber Codeunit Name";"Subscriber Codeunit Name")
+                field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -65,7 +74,7 @@ page 6151520 "Nc Triggers"
                 Caption = 'Endpoint Links';
                 Image = Links;
                 RunObject = Page "Nc Endpoint Trigger Links";
-                RunPageLink = "Trigger Code"=FIELD(Code);
+                RunPageLink = "Trigger Code" = FIELD(Code);
                 RunPageView = SORTING("Trigger Code")
                               ORDER(Ascending);
             }
@@ -77,9 +86,9 @@ page 6151520 "Nc Triggers"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Nc Task List";
-                RunPageLink = "Record Value"=FIELD(Code);
-                RunPageView = WHERE(Type=CONST(Insert),
-                                    "Table No."=CONST(6151520));
+                RunPageLink = "Record Value" = FIELD(Code);
+                RunPageView = WHERE(Type = CONST(Insert),
+                                    "Table No." = CONST(6151520));
             }
         }
     }
@@ -99,10 +108,10 @@ page 6151520 "Nc Triggers"
         TaskCard: Page "TQ Task Card";
         NcTriggerScheduler: Codeunit "Nc Trigger Scheduler";
     begin
-        if NcTriggerScheduler.FindTaskLine(Rec,TaskLine,TaskLineParameters) then begin
-          TaskCard.SetRecord(TaskLine);
-          TaskCard.RunModal;
-          Clear(TaskCard);
+        if NcTriggerScheduler.FindTaskLine(Rec, TaskLine, TaskLineParameters) then begin
+            TaskCard.SetRecord(TaskLine);
+            TaskCard.RunModal;
+            Clear(TaskCard);
         end;
     end;
 }

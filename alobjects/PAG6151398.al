@@ -16,44 +16,57 @@ page 6151398 "CS RFID Header List"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Item Quantity";"Document Item Quantity")
+                field("Document Item Quantity"; "Document Item Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Closed";"Shipping Closed")
+                field("Shipping Closed"; "Shipping Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Closed By";"Shipping Closed By")
+                field("Shipping Closed By"; "Shipping Closed By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receiving Closed";"Receiving Closed")
+                field("Receiving Closed"; "Receiving Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receiving Closed By";"Receiving Closed By")
+                field("Receiving Closed By"; "Receiving Closed By")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Company";"From Company")
+                field("From Company"; "From Company")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Company";"To Company")
+                field("To Company"; "To Company")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Matched";"Document Matched")
+                field("Document Matched"; "Document Matched")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

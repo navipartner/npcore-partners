@@ -13,62 +13,81 @@ page 6060104 "MM Membership Point Entry"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Point Constraint";"Point Constraint")
+                field("Point Constraint"; "Point Constraint")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Value Entry No.";"Value Entry No.")
+                field("Value Entry No."; "Value Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Entry No.";"Membership Entry No.")
+                field("Membership Entry No."; "Membership Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Loyalty Code";"Loyalty Code")
+                field("Loyalty Code"; "Loyalty Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Loyalty Item Point Line No.";"Loyalty Item Point Line No.")
+                field("Loyalty Item Point Line No."; "Loyalty Item Point Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount (LCY)";"Amount (LCY)")
+                field("Amount (LCY)"; "Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Awarded Amount (LCY)";"Awarded Amount (LCY)")
+                field("Awarded Amount (LCY)"; "Awarded Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Awarded Points";"Awarded Points")
+                field("Awarded Points"; "Awarded Points")
                 {
+                    ApplicationArea = All;
                 }
-                field("Redeemed Points";"Redeemed Points")
+                field("Redeemed Points"; "Redeemed Points")
                 {
+                    ApplicationArea = All;
                 }
-                field(Points;Points)
+                field(Points; Points)
                 {
+                    ApplicationArea = All;
                 }
-                field("Period Start";"Period Start")
+                field("Period Start"; "Period Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("Period End";"Period End")
+                field("Period End"; "Period End")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -89,7 +108,7 @@ page 6060104 "MM Membership Point Entry"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date","Document No.");
+                    Navigate.SetDoc("Posting Date", "Document No.");
                     Navigate.Run;
                 end;
             }

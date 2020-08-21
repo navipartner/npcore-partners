@@ -18,66 +18,73 @@ page 6014611 "Retail Campaign"
                 group(Control6014409)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Magento Category Id";"Magento Category Id")
+                    field("Magento Category Id"; "Magento Category Id")
                     {
+                        ApplicationArea = All;
                         Visible = MagentoEnabled;
                     }
                 }
                 group(Control6014410)
                 {
                     ShowCaption = false;
-                    field("Sales Amount";RetailCampaignCalcMgt.CalcSalesAmount(Code,0))
+                    field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount(Code, 0))
                     {
+                        ApplicationArea = All;
                         Caption = 'Sales Amount';
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code,0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
                         end;
                     }
-                    field("Cost Amount";RetailCampaignCalcMgt.CalcCostAmount(Code,0))
+                    field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount(Code, 0))
                     {
+                        ApplicationArea = All;
                         Caption = 'Cost Amount';
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code,0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
                         end;
                     }
-                    field(Profit;RetailCampaignCalcMgt.CalcProfit(Code,0))
+                    field(Profit; RetailCampaignCalcMgt.CalcProfit(Code, 0))
                     {
+                        ApplicationArea = All;
                         Caption = 'Profit';
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code,0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
                         end;
                     }
-                    field("Profit %";RetailCampaignCalcMgt.CalcProfitPct(Code,0))
+                    field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct(Code, 0))
                     {
+                        ApplicationArea = All;
                         Caption = 'Profit %';
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code,0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
                         end;
                     }
                 }
             }
-            part(Control6014404;"Retail Campaign Subform")
+            part(Control6014404; "Retail Campaign Subform")
             {
-                SubPageLink = "Campaign Code"=FIELD(Code);
+                SubPageLink = "Campaign Code" = FIELD(Code);
                 UpdatePropagation = Both;
             }
-            part(RetailItems;"Retail Campaign Item Subform")
+            part(RetailItems; "Retail Campaign Item Subform")
             {
-                SubPageLink = "Retail Campaign Code"=FIELD(Code);
+                SubPageLink = "Retail Campaign Code" = FIELD(Code);
             }
         }
     }
@@ -100,7 +107,7 @@ page 6014611 "Retail Campaign"
                     //-NPR5.48 [299436]
                     ItemHierarchyMgmt.CreateItemHierachyFromRetailCampaign(Rec);
                     if ItemHierarchy.Get(Rec.Code) then
-                      PAGE.Run(6151051,ItemHierarchy);
+                        PAGE.Run(6151051, ItemHierarchy);
                     //+NPR5.48 [299436]
                 end;
             }
@@ -109,7 +116,7 @@ page 6014611 "Retail Campaign"
                 Caption = 'View Planning Items';
                 Image = ItemLines;
                 RunObject = Page "Item Hierarchy Card";
-                RunPageLink = "Hierarchy Code"=FIELD(Code);
+                RunPageLink = "Hierarchy Code" = FIELD(Code);
             }
             action("View Demand Lines")
             {
@@ -117,8 +124,8 @@ page 6014611 "Retail Campaign"
                 Image = ItemAvailability;
                 Promoted = false;
                 RunObject = Page "Retail Repl. Demand Lines";
-                RunPageLink = "Item Hierachy"=FIELD(Code),
-                              "Distribution Group"=FIELD("Distribution Group");
+                RunPageLink = "Item Hierachy" = FIELD(Code),
+                              "Distribution Group" = FIELD("Distribution Group");
             }
             action("View Distribution Lines")
             {
@@ -126,7 +133,7 @@ page 6014611 "Retail Campaign"
                 Image = ItemAvailbyLoc;
                 Promoted = false;
                 RunObject = Page "Distribution Lines";
-                RunPageLink = "Item Hiearachy"=FIELD(Code);
+                RunPageLink = "Item Hiearachy" = FIELD(Code);
             }
             action("Distribution Setup")
             {
@@ -134,7 +141,7 @@ page 6014611 "Retail Campaign"
                 Image = SetupList;
                 Promoted = true;
                 RunObject = Page "Distribution Setup";
-                RunPageLink = "Item Hiearachy"=FIELD(Code);
+                RunPageLink = "Item Hiearachy" = FIELD(Code);
             }
         }
         area(reporting)

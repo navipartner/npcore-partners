@@ -15,48 +15,61 @@ page 6014438 "Posted Documents"
         {
             repeater(Group)
             {
-                field("FORMAT(""Source Record ID"")";Format("Source Record ID"))
+                field("FORMAT(""Source Record ID"")"; Format("Source Record ID"))
                 {
+                    ApplicationArea = All;
                     Caption = 'Source Record ID';
                     Visible = false;
                 }
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Document No.";"External Document No.")
+                field("External Document No."; "External Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Date";"Document Date")
+                field("Document Date"; "Document Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sell-to/Buy-from No.";"Sell-to/Buy-from No.")
+                field("Sell-to/Buy-from No."; "Sell-to/Buy-from No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sell-to/Buy-from Name";"Sell-to/Buy-from Name")
+                field("Sell-to/Buy-from Name"; "Sell-to/Buy-from Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bill-to/Pay-to No.";"Bill-to/Pay-to No.")
+                field("Bill-to/Pay-to No."; "Bill-to/Pay-to No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Bill-to/Pay-to Name";"Bill-to/Pay-to Name")
+                field("Bill-to/Pay-to Name"; "Bill-to/Pay-to Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -101,8 +114,8 @@ page 6014438 "Posted Documents"
 
     local procedure GetCaptionText(): Text
     begin
-        if "Document Type" in ["Document Type"::"Prepayment Invoice","Document Type"::"Prepayment Credit Memo"] then
-          exit(StrSubstNo(PageCaptionTxt,Format("Source Record ID")));
+        if "Document Type" in ["Document Type"::"Prepayment Invoice", "Document Type"::"Prepayment Credit Memo"] then
+            exit(StrSubstNo(PageCaptionTxt, Format("Source Record ID")));
 
         exit('');
     end;

@@ -17,23 +17,29 @@ page 6151427 "Magento Custom Option Subform"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Price;Price)
+                field(Price; Price)
                 {
+                    ApplicationArea = All;
                 }
-                field("Price Type";"Price Type")
+                field("Price Type"; "Price Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Type";"Sales Type")
+                field("Sales Type"; "Sales Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales No.";"Sales No.")
+                field("Sales No."; "Sales No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Price Includes VAT";"Price Includes VAT")
+                field("Price Includes VAT"; "Price Includes VAT")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

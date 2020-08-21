@@ -17,29 +17,37 @@ page 6059961 "CashKeeper Overview"
         {
             repeater(Group)
             {
-                field("Transaction No.";"Transaction No.")
+                field("Transaction No."; "Transaction No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount";"Total Amount")
+                field("Total Amount"; "Total Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Value In Cents";"Value In Cents")
+                field("Value In Cents"; "Value In Cents")
                 {
+                    ApplicationArea = All;
                 }
-                field(Salesperson;Salesperson)
+                field(Salesperson; Salesperson)
                 {
+                    ApplicationArea = All;
                 }
-                field("User Id";"User Id")
+                field("User Id"; "User Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lookup Timestamp";"Lookup Timestamp")
+                field("Lookup Timestamp"; "Lookup Timestamp")
                 {
+                    ApplicationArea = All;
                 }
-                field("CashKeeper IP";"CashKeeper IP")
+                field("CashKeeper IP"; "CashKeeper IP")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -12,11 +12,13 @@ page 6150708 "POS Data Sources"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -30,12 +32,12 @@ page 6150708 "POS Data Sources"
     begin
         Rec.DiscoverDataSources();
         if DataSource <> '' then begin
-          Rec.Name := DataSource;
-          if not Rec.Find then
-            DataSource := '';
+            Rec.Name := DataSource;
+            if not Rec.Find then
+                DataSource := '';
         end;
         if DataSource = '' then
-          if Rec.FindFirst then;
+            if Rec.FindFirst then;
     end;
 
     var

@@ -16,29 +16,37 @@ page 6014492 "Retail Comments"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Date;Date)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Person Code";"Sales Person Code")
+                field("Sales Person Code"; "Sales Person Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                 }
-                field("Long Comment";"Long Comment")
+                field("Long Comment"; "Long Comment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Hide on printout";"Hide on printout")
+                field("Hide on printout"; "Hide on printout")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Date";"Start Date")
+                field("Start Date"; "Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Date";"End Date")
+                field("End Date"; "End Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -56,20 +64,18 @@ page 6014492 "Retail Comments"
     trigger OnOpenPage()
     begin
 
-        if "Table ID" = 6060001 then
-           begin
-              //CurrForm."Start Date".VISIBLE := TRUE;
-              StartdateVisible:=true;
-              //CurrForm."End Date".VISIBLE := TRUE;
-             EndateVisible:= true;
-           end
-        else
-           begin
-              //CurrForm."Start Date".VISIBLE := FALSE;
-             StartdateVisible:= false;
-              //CurrForm."End Date".VISIBLE := FALSE;
-             EndateVisible:= false;
-           end;
+        if "Table ID" = 6060001 then begin
+            //CurrForm."Start Date".VISIBLE := TRUE;
+            StartdateVisible := true;
+            //CurrForm."End Date".VISIBLE := TRUE;
+            EndateVisible := true;
+        end
+        else begin
+            //CurrForm."Start Date".VISIBLE := FALSE;
+            StartdateVisible := false;
+            //CurrForm."End Date".VISIBLE := FALSE;
+            EndateVisible := false;
+        end;
     end;
 
     var

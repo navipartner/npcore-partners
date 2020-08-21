@@ -18,14 +18,16 @@ page 6151181 "Retail Cross Reference Setup"
                 group(Control6014404)
                 {
                     ShowCaption = false;
-                    field(Control6014407;'')
+                    field(Control6014407; '')
                     {
+                        ApplicationArea = All;
                         Caption = 'Pattern Guide:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field("Pattern Guide";"Pattern Guide")
+                    field("Pattern Guide"; "Pattern Guide")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
@@ -34,11 +36,13 @@ page 6151181 "Retail Cross Reference Setup"
             }
             repeater(Group)
             {
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No. Pattern";"Reference No. Pattern")
+                field("Reference No. Pattern"; "Reference No. Pattern")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
             }

@@ -17,26 +17,33 @@ page 6059997 "Scanner Service Log List"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Start";"Request Start")
+                field("Request Start"; "Request Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request End";"Request End")
+                field("Request End"; "Request End")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Function";"Request Function")
+                field("Request Function"; "Request Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Request";"Internal Request")
+                field("Internal Request"; "Internal Request")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Log No.";"Internal Log No.")
+                field("Internal Log No."; "Internal Log No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current User";"Current User")
+                field("Current User"; "Current User")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -50,10 +57,10 @@ page 6059997 "Scanner Service Log List"
     begin
         CalcFields("Request Data");
         if not "Request Data".HasValue then
-          RequestData := ''
+            RequestData := ''
         else begin
-          "Request Data".CreateInStream(IStream);
-          IStream.Read(RequestData,MaxStrLen(RequestData));
+            "Request Data".CreateInStream(IStream);
+            IStream.Read(RequestData, MaxStrLen(RequestData));
         end;
     end;
 

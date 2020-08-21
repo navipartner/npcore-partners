@@ -17,16 +17,20 @@ page 6151336 "NP Retail Admin Act - Memb"
                 ShowCaption = false;
                 field("Membership Setup"; "Membership Setup")
                 {
+                    ApplicationArea = All;
                 }
                 field("Membership Sales Setup"; "Membership Sales Setup")
                 {
+                    ApplicationArea = All;
                 }
                 field("Member Alteration"; "Member Alteration")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "MM Membership Alteration";
                 }
                 field("Member Community"; "Member Community")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

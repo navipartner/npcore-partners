@@ -15,44 +15,56 @@ page 6151523 "Nc Endpoint FTP Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(FTP)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field(Server;Server)
+                field(Server; Server)
                 {
+                    ApplicationArea = All;
                 }
-                field(Username;Username)
+                field(Username; Username)
                 {
+                    ApplicationArea = All;
                 }
-                field(Password;Password)
+                field(Password; Password)
                 {
+                    ApplicationArea = All;
                 }
-                field(Port;Port)
+                field(Port; Port)
                 {
+                    ApplicationArea = All;
                 }
-                field(Passive;Passive)
+                field(Passive; Passive)
                 {
+                    ApplicationArea = All;
                 }
-                field(Directory;Directory)
+                field(Directory; Directory)
                 {
+                    ApplicationArea = All;
                 }
-                field(Filename;Filename)
+                field(Filename; Filename)
                 {
+                    ApplicationArea = All;
                 }
-                field("File Encoding";"File Encoding")
+                field("File Encoding"; "File Encoding")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

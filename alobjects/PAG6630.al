@@ -1,4 +1,4 @@
-pageextension 6014472 pageextension6014472 extends "Sales Return Order" 
+pageextension 6014472 pageextension6014472 extends "Sales Return Order"
 {
     // NPR4.10/TS/20150602 CASE 213397 Added field "Sell-to Customer Name 2" ,"Bill-to Name 2","Ship-to Name 2"
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
@@ -12,38 +12,44 @@ pageextension 6014472 pageextension6014472 extends "Sales Return Order"
     {
         addafter("Sell-to Customer Name")
         {
-            field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+            field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("VAT Bus. Posting Group")
         {
-            field("Magento Payment Amount";"Magento Payment Amount")
+            field("Magento Payment Amount"; "Magento Payment Amount")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Shipment Date")
         {
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Ship-to Name")
         {
-            field("Ship-to Name 2";"Ship-to Name 2")
+            field("Ship-to Name 2"; "Ship-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Ship-to Contact")
         {
-            field("Shipment Method Code";"Shipment Method Code")
+            field("Shipment Method Code"; "Shipment Method Code")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Bill-to Name")
         {
-            field("Bill-to Name 2";"Bill-to Name 2")
+            field("Bill-to Name 2"; "Bill-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
     }

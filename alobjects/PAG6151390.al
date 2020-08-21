@@ -15,24 +15,31 @@ page 6151390 "CS Whse. Receipt List"
             {
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Assigned User ID"; "Assigned User ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Assignment Date"; "Assignment Date")
                 {
+                    ApplicationArea = All;
                 }
                 field("Assignment Time"; "Assignment Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Document Status"; "Document Status")
                 {
+                    ApplicationArea = All;
                 }
                 field("Tags Scanned"; TagsScanned)
                 {
+                    ApplicationArea = All;
                     Caption = 'Scanned Tags';
                 }
             }

@@ -19,48 +19,60 @@ page 6150618 "POS Payment Method List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Type";"Processing Type")
+                field("Processing Type"; "Processing Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vouched By";"Vouched By")
+                field("Vouched By"; "Vouched By")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Is Finance Agreement";"Is Finance Agreement")
+                field("Is Finance Agreement"; "Is Finance Agreement")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Include In Counting";"Include In Counting")
+                field("Include In Counting"; "Include In Counting")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Condensed";"Post Condensed")
+                field("Post Condensed"; "Post Condensed")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Condensed Posting Description";"Condensed Posting Description")
+                field("Condensed Posting Description"; "Condensed Posting Description")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Rounding Precision";"Rounding Precision")
+                field("Rounding Precision"; "Rounding Precision")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Rounding Type";"Rounding Type")
+                field("Rounding Type"; "Rounding Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Rounding Gains Account";"Rounding Gains Account")
+                field("Rounding Gains Account"; "Rounding Gains Account")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Rounding Losses Account";"Rounding Losses Account")
+                field("Rounding Losses Account"; "Rounding Losses Account")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -79,7 +91,7 @@ page 6150618 "POS Payment Method List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Posting Setup";
-                RunPageLink = "POS Payment Method Code"=FIELD(Code);
+                RunPageLink = "POS Payment Method Code" = FIELD(Code);
             }
             group(History)
             {
@@ -92,7 +104,7 @@ page 6150618 "POS Payment Method List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Payment Line List";
-                    RunPageLink = "POS Payment Method Code"=FIELD(Code);
+                    RunPageLink = "POS Payment Method Code" = FIELD(Code);
                 }
             }
         }

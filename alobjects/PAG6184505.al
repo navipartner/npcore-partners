@@ -17,23 +17,29 @@ page 6184505 "EFT Shopper Recognition"
         {
             repeater(Group)
             {
-                field("Integration Type";"Integration Type")
+                field("Integration Type"; "Integration Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shopper Reference";"Shopper Reference")
+                field("Shopper Reference"; "Shopper Reference")
                 {
+                    ApplicationArea = All;
                 }
-                field("Contract ID";"Contract ID")
+                field("Contract ID"; "Contract ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Contract Type";"Contract Type")
+                field("Contract Type"; "Contract Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entity Type";"Entity Type")
+                field("Entity Type"; "Entity Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entity Key";"Entity Key")
+                field("Entity Key"; "Entity Key")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

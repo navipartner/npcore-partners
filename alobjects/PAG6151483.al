@@ -24,25 +24,29 @@ page 6151483 "Magento Top 10 Customers"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         //-MAG1.22
                         Cust.Get("No.");
-                        PAGE.Run(PAGE::"Customer Card",Cust);
+                        PAGE.Run(PAGE::"Customer Card", Cust);
                         //+MAG1.22
                     end;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales (LCY)";"Sales (LCY)")
+                field("Sales (LCY)"; "Sales (LCY)")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Sales Amount (Actual)';
                 }
@@ -75,7 +79,7 @@ page 6151483 "Magento Top 10 Customers"
 
                     trigger OnAction()
                     begin
-                        PeriodType := PeriodType::Week ;
+                        PeriodType := PeriodType::Week;
                         UpdateList;
                     end;
                 }
@@ -134,36 +138,36 @@ page 6151483 "Magento Top 10 Customers"
     begin
         DeleteAll;
         Setdate;
-        Query1.SetFilter(Posting_Date,'%1..%2',StartDate,Enddate);
+        Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.Open;
         while Query1.Read do begin
-         Cust.Get(Query1.Source_No);
-          TransferFields(Cust);
-          if not Insert then;
-        //-MAG1.20
-          SetFilter("Date Filter",'%1..%2',StartDate,Enddate);
-        //+MAG1.20
-          //-MAG1.17
-        //-MAG1.20
-        //  Cust.CALCFIELDS("Sales (LCY)");
-        //  "Search Name" := FORMAT(Cust."Sales (LCY)");
-        //  "Search Name" := PADSTR('',15 - STRLEN("Search Name"),'0') + "Search Name";
+            Cust.Get(Query1.Source_No);
+            TransferFields(Cust);
+            if not Insert then;
+            //-MAG1.20
+            SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+            //+MAG1.20
+            //-MAG1.17
+            //-MAG1.20
+            //  Cust.CALCFIELDS("Sales (LCY)");
+            //  "Search Name" := FORMAT(Cust."Sales (LCY)");
+            //  "Search Name" := PADSTR('',15 - STRLEN("Search Name"),'0') + "Search Name";
 
-          CalcFields("Sales (LCY)");
-        //-MAG1.22
-        //"Search Name" := FORMAT("Sales (LCY)");
-          "Search Name" := Format(-"Sales (LCY)"*100,20,1);
-        //+MAG1.22
-        //  "Search Name" := FORMAT("Sales (LCY)");
-          "Search Name" := PadStr('',15 - StrLen("Search Name"),'0') + "Search Name";
-          Modify;
-        //+MAG1.20
-          //+MAG1.17
+            CalcFields("Sales (LCY)");
+            //-MAG1.22
+            //"Search Name" := FORMAT("Sales (LCY)");
+            "Search Name" := Format(-"Sales (LCY)" * 100, 20, 1);
+            //+MAG1.22
+            //  "Search Name" := FORMAT("Sales (LCY)");
+            "Search Name" := PadStr('', 15 - StrLen("Search Name"), '0') + "Search Name";
+            Modify;
+            //+MAG1.20
+            //+MAG1.17
 
 
 
         end;
-         Query1.Close;
+        Query1.Close;
     end;
 
     local procedure Setdate()
@@ -171,31 +175,31 @@ page 6151483 "Magento Top 10 Customers"
         DatePeriod: Record Date;
     begin
         case PeriodType of
-          PeriodType::Day :
-           begin
-            StartDate := CurrDate;
-            Enddate := CurrDate;
-           end;
-          PeriodType::Week :
-           begin
-            StartDate := CalcDate('<-CW>',CurrDate);
-            Enddate := CalcDate('<CW>',CurrDate);
-           end;
-          PeriodType::Month :
-           begin
-            StartDate := CalcDate('<-CM>',CurrDate);
-            Enddate := CalcDate('<CM>',CurrDate);
-           end;
-          PeriodType::Quarter :
-          begin
-          StartDate := CalcDate('<-CQ>',CurrDate);
-          Enddate := CalcDate('<CQ>',CurrDate);
-          end;
-          PeriodType::Year :
-          begin
-            StartDate := CalcDate('<-CY>',CurrDate);
-            Enddate := CalcDate('<CY>',CurrDate);
-          end;
+            PeriodType::Day:
+                begin
+                    StartDate := CurrDate;
+                    Enddate := CurrDate;
+                end;
+            PeriodType::Week:
+                begin
+                    StartDate := CalcDate('<-CW>', CurrDate);
+                    Enddate := CalcDate('<CW>', CurrDate);
+                end;
+            PeriodType::Month:
+                begin
+                    StartDate := CalcDate('<-CM>', CurrDate);
+                    Enddate := CalcDate('<CM>', CurrDate);
+                end;
+            PeriodType::Quarter:
+                begin
+                    StartDate := CalcDate('<-CQ>', CurrDate);
+                    Enddate := CalcDate('<CQ>', CurrDate);
+                end;
+            PeriodType::Year:
+                begin
+                    StartDate := CalcDate('<-CY>', CurrDate);
+                    Enddate := CalcDate('<CY>', CurrDate);
+                end;
         end;
     end;
 }

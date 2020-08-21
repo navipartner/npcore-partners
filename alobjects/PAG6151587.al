@@ -18,35 +18,44 @@ page 6151587 "Event Invoices"
         {
             repeater(Group)
             {
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = ShowDetails;
                 }
-                field("Quantity Transferred";"Quantity Transferred")
+                field("Quantity Transferred"; "Quantity Transferred")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transferred Date";"Transferred Date")
+                field("Transferred Date"; "Transferred Date")
                 {
+                    ApplicationArea = All;
                     Visible = ShowDetails;
                 }
-                field("Invoiced Date";"Invoiced Date")
+                field("Invoiced Date"; "Invoiced Date")
                 {
+                    ApplicationArea = All;
                     Visible = ShowDetails;
                 }
-                field("Invoiced Amount (LCY)";"Invoiced Amount (LCY)")
+                field("Invoiced Amount (LCY)"; "Invoiced Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Invoiced Cost Amount (LCY)";"Invoiced Cost Amount (LCY)")
+                field("Invoiced Cost Amount (LCY)"; "Invoiced Cost Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Job Ledger Entry No.";"Job Ledger Entry No.")
+                field("Job Ledger Entry No."; "Job Ledger Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = ShowDetails;
                 }
             }
@@ -75,8 +84,8 @@ page 6151587 "Event Invoices"
                         JobCreateInvoice: Codeunit "Job Create-Invoice";
                     begin
                         EventMgt.OpenSalesDocument(Rec);
-                        JobCreateInvoice.FindInvoices(Rec,JobNo,JobTaskNo,JobPlanningLineNo,DetailLevel);
-                        if Get("Job No.","Job Task No.","Job Planning Line No.","Document Type","Document No.","Line No.") then;
+                        JobCreateInvoice.FindInvoices(Rec, JobNo, JobTaskNo, JobPlanningLineNo, DetailLevel);
+                        if Get("Job No.", "Job Task No.", "Job Planning Line No.", "Document Type", "Document No.", "Line No.") then;
                     end;
                 }
             }
@@ -92,7 +101,7 @@ page 6151587 "Event Invoices"
     var
         JobCreateInvoice: Codeunit "Job Create-Invoice";
     begin
-        EventMgt.FindInvoices(Rec,JobNo,JobTaskNo,JobPlanningLineNo,DetailLevel);
+        EventMgt.FindInvoices(Rec, JobNo, JobTaskNo, JobPlanningLineNo, DetailLevel);
     end;
 
     var

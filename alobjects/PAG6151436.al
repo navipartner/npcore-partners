@@ -19,19 +19,21 @@ page 6151436 "Magento Item Attributes"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Attribute Description";"Attribute Description")
+                field("Attribute Description"; "Attribute Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("GetValue()";GetValue())
+                field("GetValue()"; GetValue())
                 {
+                    ApplicationArea = All;
                     Caption = 'Value';
                 }
             }
-            part(Control6150617;"Magento Item Attribute Values")
+            part(Control6150617; "Magento Item Attribute Values")
             {
-                SubPageLink = "Attribute ID"=FIELD("Attribute ID"),
-                              "Item No."=FIELD("Item No."),
-                              "Variant Code"=FIELD("Variant Code");
+                SubPageLink = "Attribute ID" = FIELD("Attribute ID"),
+                              "Item No." = FIELD("Item No."),
+                              "Variant Code" = FIELD("Variant Code");
             }
         }
     }
@@ -45,17 +47,17 @@ page 6151436 "Magento Item Attributes"
         MagentoItemAttributeValue: Record "Magento Item Attribute Value";
     begin
         Value := '';
-        MagentoItemAttributeValue.SetRange("Attribute ID","Attribute ID");
-        MagentoItemAttributeValue.SetRange("Item No.","Item No.");
-        MagentoItemAttributeValue.SetRange("Variant Code","Variant Code");
-        MagentoItemAttributeValue.SetRange(Selected,true);
+        MagentoItemAttributeValue.SetRange("Attribute ID", "Attribute ID");
+        MagentoItemAttributeValue.SetRange("Item No.", "Item No.");
+        MagentoItemAttributeValue.SetRange("Variant Code", "Variant Code");
+        MagentoItemAttributeValue.SetRange(Selected, true);
         if MagentoItemAttributeValue.FindSet then
-          repeat
-            MagentoItemAttributeValue.CalcFields(Value);
-            if Value <> '' then
-              Value += ',';
-            Value += MagentoItemAttributeValue.Value;
-          until MagentoItemAttributeValue.Next = 0;
+            repeat
+                MagentoItemAttributeValue.CalcFields(Value);
+                if Value <> '' then
+                    Value += ',';
+                Value += MagentoItemAttributeValue.Value;
+            until MagentoItemAttributeValue.Next = 0;
 
         exit(Value);
     end;

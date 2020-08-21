@@ -17,33 +17,42 @@ page 6014671 "Lookup Templates"
         {
             repeater(Group)
             {
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Caption";"Table Caption")
+                field("Table Caption"; "Table Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field(Class;Class)
+                field(Class; Class)
                 {
+                    ApplicationArea = All;
                 }
-                field("Value Field No.";"Value Field No.")
+                field("Value Field No."; "Value Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Preemptive Push";"Preemptive Push")
+                field("Preemptive Push"; "Preemptive Push")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Value Field Name";"Value Field Name")
+                field("Value Field Name"; "Value Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sort By Field No.";"Sort By Field No.")
+                field("Sort By Field No."; "Sort By Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sorting Order";"Sorting Order")
+                field("Sorting Order"; "Sorting Order")
                 {
+                    ApplicationArea = All;
                 }
-                field("Has Lines";"Has Lines")
+                field("Has Lines"; "Has Lines")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -61,7 +70,7 @@ page 6014671 "Lookup Templates"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Lookup Template Lines";
-                RunPageLink = "Lookup Template Table No."=FIELD("Table No.");
+                RunPageLink = "Lookup Template Table No." = FIELD("Table No.");
             }
             action("Export Managed Dependency Manifest")
             {
@@ -110,11 +119,11 @@ page 6014671 "Lookup Templates"
         LookupTemplateLine: Record "Lookup Template Line";
     begin
         if LookupTemplate.Get(DATABASE::Customer) then
-          exit;
+            exit;
 
-        LookupTemplateLine.SetRange("Lookup Template Table No.",DATABASE::Customer);
+        LookupTemplateLine.SetRange("Lookup Template Table No.", DATABASE::Customer);
         if LookupTemplateLine.FindFirst then
-          exit;
+            exit;
 
         LookupTemplate.Init;
         LookupTemplate."Table No." := DATABASE::Customer;
@@ -227,11 +236,11 @@ page 6014671 "Lookup Templates"
         LookupTemplateLine: Record "Lookup Template Line";
     begin
         if LookupTemplate.Get(DATABASE::Item) then
-          exit;
+            exit;
 
-        LookupTemplateLine.SetRange("Lookup Template Table No.",DATABASE::Item);
+        LookupTemplateLine.SetRange("Lookup Template Table No.", DATABASE::Item);
         if LookupTemplateLine.FindFirst then
-          exit;
+            exit;
 
         LookupTemplate.Init;
         LookupTemplate."Table No." := DATABASE::Item;
@@ -348,11 +357,11 @@ page 6014671 "Lookup Templates"
         LookupTemplateLine: Record "Lookup Template Line";
     begin
         if LookupTemplate.Get(DATABASE::"Retail List") then
-          exit;
+            exit;
 
-        LookupTemplateLine.SetRange("Lookup Template Table No.",DATABASE::"Retail List");
+        LookupTemplateLine.SetRange("Lookup Template Table No.", DATABASE::"Retail List");
         if LookupTemplateLine.FindFirst then
-          exit;
+            exit;
 
         LookupTemplate.Init;
         LookupTemplate."Table No." := DATABASE::"Retail List";

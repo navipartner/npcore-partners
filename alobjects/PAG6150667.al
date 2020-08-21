@@ -18,29 +18,36 @@ page 6150667 "NPRE Seating Location"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Control6014404;Seatings)
+                field(Control6014404; Seatings)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     ShowCaption = false;
                 }
-                field(Seats;Seats)
+                field(Seats; Seats)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("POS Store";"POS Store")
+                field("POS Store"; "POS Store")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Send Kitchen Order";"Auto Send Kitchen Order")
+                field("Auto Send Kitchen Order"; "Auto Send Kitchen Order")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -61,7 +68,7 @@ page 6150667 "NPRE Seating Location"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPRE Seating List";
-                    RunPageLink = "Seating Location"=FIELD(Code);
+                    RunPageLink = "Seating Location" = FIELD(Code);
                 }
             }
         }

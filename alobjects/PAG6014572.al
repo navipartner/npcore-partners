@@ -17,12 +17,14 @@ page 6014572 "Tax Free Voucher Sale Links"
         {
             repeater(Group)
             {
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Voucher External No.";"Voucher External No.")
+                field("Voucher External No."; "Voucher External No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'Linked to Voucher';
                     Editable = false;
                     Enabled = false;

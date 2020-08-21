@@ -15,53 +15,69 @@ page 6150656 "POS Payment Line List"
         {
             repeater(Group)
             {
-                field("Entry Date";"Entry Date")
+                field("Entry Date"; "Entry Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Period Register No.";"POS Period Register No.")
+                field("POS Period Register No."; "POS Period Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Method Code";"POS Payment Method Code")
+                field("POS Payment Method Code"; "POS Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Bin Code";"POS Payment Bin Code")
+                field("POS Payment Bin Code"; "POS Payment Bin Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount (Sales Currency)";"Amount (Sales Currency)")
+                field("Amount (Sales Currency)"; "Amount (Sales Currency)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount (LCY)";"Amount (LCY)")
+                field("Amount (LCY)"; "Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -81,7 +97,7 @@ page 6150656 "POS Payment Line List"
                     Promoted = true;
                     PromotedCategory = Category4;
                     RunObject = Page "POS Entry Card";
-                    RunPageLink = "Entry No."=FIELD("POS Entry No.");
+                    RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
                 }
             }

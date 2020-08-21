@@ -16,35 +16,45 @@ page 6150654 "POS Payment Line Subpage"
         {
             repeater(Group)
             {
-                field("POS Payment Method Code";"POS Payment Method Code")
+                field("POS Payment Method Code"; "POS Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Bin Code";"POS Payment Bin Code")
+                field("POS Payment Bin Code"; "POS Payment Bin Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount (LCY)";"Amount (LCY)")
+                field("Amount (LCY)"; "Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount (Sales Currency)";"Amount (Sales Currency)")
+                field("Amount (Sales Currency)"; "Amount (Sales Currency)")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Document No.";"External Document No.")
+                field("External Document No."; "External Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Amount (LCY)";"VAT Amount (LCY)")
+                field("VAT Amount (LCY)"; "VAT Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Base Amount (LCY)";"VAT Base Amount (LCY)")
+                field("VAT Base Amount (LCY)"; "VAT Base Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

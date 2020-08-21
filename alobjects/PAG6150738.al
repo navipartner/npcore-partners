@@ -14,46 +14,57 @@ page 6150738 "POS Setup List"
         {
             repeater(Group)
             {
-                field("Primary Key";"Primary Key")
+                field("Primary Key"; "Primary Key")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Login Action Code";"Login Action Code")
+                field("Login Action Code"; "Login Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Text Enter Action Code";"Text Enter Action Code")
+                field("Text Enter Action Code"; "Text Enter Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Item Insert Action Code";"Item Insert Action Code")
+                field("Item Insert Action Code"; "Item Insert Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Payment Action Code";"Payment Action Code")
+                field("Payment Action Code"; "Payment Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Customer Action Code";"Customer Action Code")
+                field("Customer Action Code"; "Customer Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Lock POS Action Code";"Lock POS Action Code")
+                field("Lock POS Action Code"; "Lock POS Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Unlock POS Action Code";"Unlock POS Action Code")
+                field("Unlock POS Action Code"; "Unlock POS Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("OnBeforePaymentView Action";"OnBeforePaymentView Action")
+                field("OnBeforePaymentView Action"; "OnBeforePaymentView Action")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admin Menu Action Code";"Admin Menu Action Code")
+                field("Admin Menu Action Code"; "Admin Menu Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

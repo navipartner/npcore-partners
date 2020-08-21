@@ -16,18 +16,21 @@ page 6151606 "NpDc Extra Item Qty."
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Item No.";"Item No.")
+                    field("Item No."; "Item No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Discount Type";"Discount Type")
+                    field("Discount Type"; "Discount Type")
                     {
+                        ApplicationArea = All;
                     }
                     group(Control6014411)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type"=0);
-                        field("Discount Amount";"Discount Amount")
+                        Visible = ("Discount Type" = 0);
+                        field("Discount Amount"; "Discount Amount")
                         {
+                            ApplicationArea = All;
                             Caption = 'Discount Amount per Item';
                             ShowMandatory = true;
                         }
@@ -35,14 +38,16 @@ page 6151606 "NpDc Extra Item Qty."
                     group(Control6014409)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type"=1);
-                        field("Discount %";"Discount %")
+                        Visible = ("Discount Type" = 1);
+                        field("Discount %"; "Discount %")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                         }
                     }
-                    field(LotValidation;LotValidation)
+                    field(LotValidation; LotValidation)
                     {
+                        ApplicationArea = All;
                         Caption = 'Extra Item per Lot';
 
                         trigger OnValidate()
@@ -55,8 +60,9 @@ page 6151606 "NpDc Extra Item Qty."
                     {
                         ShowCaption = false;
                         Visible = (NOT LotValidation);
-                        field(TotalValidQty;ValidQty)
+                        field(TotalValidQty; ValidQty)
                         {
+                            ApplicationArea = All;
                             BlankZero = true;
                             Caption = 'Extra Item per Qty.';
 
@@ -66,11 +72,12 @@ page 6151606 "NpDc Extra Item Qty."
                             end;
                         }
                     }
-                    field(TotalMaxQty;MaxQty)
+                    field(TotalMaxQty; MaxQty)
                     {
+                        ApplicationArea = All;
                         BlankZero = true;
                         Caption = 'Max. Extra Item Qty. per Coupon';
-                        DecimalPlaces = 0:5;
+                        DecimalPlaces = 0 : 5;
                         Importance = Promoted;
 
                         trigger OnValidate()
@@ -82,20 +89,23 @@ page 6151606 "NpDc Extra Item Qty."
                 group(Control6014406)
                 {
                     ShowCaption = false;
-                    field("Item Description";"Item Description")
+                    field("Item Description"; "Item Description")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Unit Price";"Unit Price")
+                    field("Unit Price"; "Unit Price")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Profit %";"Profit %")
+                    field("Profit %"; "Profit %")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
-            part(NpDcExtraItemQtySubform;"NpDc Extra Item Qty. Subform")
+            part(NpDcExtraItemQtySubform; "NpDc Extra Item Qty. Subform")
             {
-                SubPageLink = "Coupon Type"=FIELD("Coupon Type");
+                SubPageLink = "Coupon Type" = FIELD("Coupon Type");
             }
         }
     }
@@ -124,28 +134,28 @@ page 6151606 "NpDc Extra Item Qty."
     begin
         CouponType := "Coupon Type";
         if CouponType = '' then begin
-          FilterGroup(2);
-          CouponType := GetRangeMax("Coupon Type");
-          FilterGroup(0);
+            FilterGroup(2);
+            CouponType := GetRangeMax("Coupon Type");
+            FilterGroup(0);
         end;
 
         if (MaxQty <= 0) and (ValidQty <= 0) and (not LotValidation) then begin
-          if NpDcCouponListItem.Get(CouponType,-1) then
-            NpDcCouponListItem.Delete(true);
+            if NpDcCouponListItem.Get(CouponType, -1) then
+                NpDcCouponListItem.Delete(true);
 
-          CurrPage.Update(false);
-          exit;
+            CurrPage.Update(false);
+            exit;
         end;
 
-        if not NpDcCouponListItem.Get(CouponType,-1) then begin
-          NpDcCouponListItem.Init;
-          NpDcCouponListItem."Coupon Type" := CouponType;
-          NpDcCouponListItem."Line No." := -1;
-          NpDcCouponListItem."Max. Discount Amount" := MaxDiscountAmt;
-          NpDcCouponListItem."Max. Quantity" := MaxQty;
-          NpDcCouponListItem."Validation Quantity" := ValidQty;
-          NpDcCouponListItem."Lot Validation" := LotValidation;
-          NpDcCouponListItem.Insert(true);
+        if not NpDcCouponListItem.Get(CouponType, -1) then begin
+            NpDcCouponListItem.Init;
+            NpDcCouponListItem."Coupon Type" := CouponType;
+            NpDcCouponListItem."Line No." := -1;
+            NpDcCouponListItem."Max. Discount Amount" := MaxDiscountAmt;
+            NpDcCouponListItem."Max. Quantity" := MaxQty;
+            NpDcCouponListItem."Validation Quantity" := ValidQty;
+            NpDcCouponListItem."Lot Validation" := LotValidation;
+            NpDcCouponListItem.Insert(true);
         end;
 
         PrevRec := Format(NpDcCouponListItem);
@@ -155,7 +165,7 @@ page 6151606 "NpDc Extra Item Qty."
         NpDcCouponListItem."Lot Validation" := LotValidation;
 
         if PrevRec <> Format(NpDcCouponListItem) then
-          NpDcCouponListItem.Modify(true);
+            NpDcCouponListItem.Modify(true);
 
         CurrPage.Update(false);
     end;
@@ -167,20 +177,20 @@ page 6151606 "NpDc Extra Item Qty."
     begin
         CouponType := "Coupon Type";
         if CouponType = '' then begin
-          if GetFilter("Coupon Type") = '' then
-            exit;
+            if GetFilter("Coupon Type") = '' then
+                exit;
 
-          FilterGroup(2);
-          CouponType := GetRangeMax("Coupon Type");
-          FilterGroup(0);
+            FilterGroup(2);
+            CouponType := GetRangeMax("Coupon Type");
+            FilterGroup(0);
         end;
         MaxDiscountAmt := 0;
         MaxQty := 0;
         ValidQty := 0;
         LotValidation := false;
 
-        if not NpDcCouponListItem.Get(CouponType,-1) then
-          exit;
+        if not NpDcCouponListItem.Get(CouponType, -1) then
+            exit;
 
         MaxQty := NpDcCouponListItem."Max. Quantity";
         ValidQty := NpDcCouponListItem."Validation Quantity";

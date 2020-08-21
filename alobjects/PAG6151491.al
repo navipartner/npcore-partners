@@ -6,7 +6,7 @@ page 6151491 "Raptor Setup"
     // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
     // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor
 
-    AccessByPermission = TableData "Raptor Setup"=M;
+    AccessByPermission = TableData "Raptor Setup" = M;
     Caption = 'Raptor Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -21,37 +21,46 @@ page 6151491 "Raptor Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Enable Raptor Functions";"Enable Raptor Functions")
+                field("Enable Raptor Functions"; "Enable Raptor Functions")
                 {
+                    ApplicationArea = All;
                 }
-                field("Base Url";"Base Url")
+                field("Base Url"; "Base Url")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer ID";"Customer ID")
+                field("Customer ID"; "Customer ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("API Key";"API Key")
+                field("API Key"; "API Key")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Tracking)
             {
                 Caption = 'Tracking';
-                field("Send Data to Raptor";"Send Data to Raptor")
+                field("Send Data to Raptor"; "Send Data to Raptor")
                 {
+                    ApplicationArea = All;
                     Enabled = "Enable Raptor Functions";
                 }
-                field("Tracking Service Url";"Tracking Service Url")
+                field("Tracking Service Url"; "Tracking Service Url")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tracking Service Type";"Tracking Service Type")
+                field("Tracking Service Type"; "Tracking Service Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Exclude Webshop Sales";"Exclude Webshop Sales")
+                field("Exclude Webshop Sales"; "Exclude Webshop Sales")
                 {
+                    ApplicationArea = All;
                 }
-                field("Webshop Salesperson Filter";"Webshop Salesperson Filter")
+                field("Webshop Salesperson Filter"; "Webshop Salesperson Filter")
                 {
+                    ApplicationArea = All;
                     Enabled = "Exclude Webshop Sales";
 
                     trigger OnAssistEdit()
@@ -113,9 +122,9 @@ page 6151491 "Raptor Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert(true);
-          RaptorManagement.InitializeDefaultActions(false,false);
+            Init;
+            Insert(true);
+            RaptorManagement.InitializeDefaultActions(false, false);
         end;
     end;
 }

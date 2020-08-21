@@ -16,44 +16,55 @@ page 6150640 "POS Info Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Message;Message)
+                field(Message; Message)
                 {
+                    ApplicationArea = All;
                 }
-                field("Once per Transaction";"Once per Transaction")
+                field("Once per Transaction"; "Once per Transaction")
                 {
+                    ApplicationArea = All;
                 }
-                field("Copy from Header";"Copy from Header")
+                field("Copy from Header"; "Copy from Header")
                 {
+                    ApplicationArea = All;
                 }
-                field("Available in Front-End";"Available in Front-End")
+                field("Available in Front-End"; "Available in Front-End")
                 {
+                    ApplicationArea = All;
                 }
-                field("Set POS Sale Line Color to Red";"Set POS Sale Line Color to Red")
+                field("Set POS Sale Line Color to Red"; "Set POS Sale Line Color to Red")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Input Mandatory";"Input Mandatory")
+                field("Input Mandatory"; "Input Mandatory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Input Type";"Input Type")
+                field("Input Type"; "Input Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part("POS Info Subform";"POS Info Subform")
+            part("POS Info Subform"; "POS Info Subform")
             {
                 Caption = 'POS Info Subform';
-                SubPageLink = Code=FIELD(Code);
+                SubPageLink = Code = FIELD(Code);
             }
         }
     }
@@ -72,7 +83,7 @@ page 6150640 "POS Info Card"
                     POSInfoLookupFieldSetup: Page "POS Info Lookup Field Setup";
                 begin
                     if ("Input Type" <> "Input Type"::Table) or ("Table No." = 0) then
-                      Error(ErrorText001,Format("Input Type"::Table),FieldCaption("Table No."));
+                        Error(ErrorText001, Format("Input Type"::Table), FieldCaption("Table No."));
 
                     POSInfoLookupFieldSetup.SetPOSInfo(Rec);
                     POSInfoLookupFieldSetup.RunModal;

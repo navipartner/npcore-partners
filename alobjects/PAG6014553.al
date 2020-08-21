@@ -13,21 +13,26 @@ page 6014553 "Mixed Discount Levels"
         {
             repeater(Group)
             {
-                field("Mixed Discount Code";"Mixed Discount Code")
+                field("Mixed Discount Code"; "Mixed Discount Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Multiple Of";"Multiple Of")
+                field("Multiple Of"; "Multiple Of")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount %";"Discount %")
+                field("Discount %"; "Discount %")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

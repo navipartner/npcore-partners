@@ -23,65 +23,85 @@ page 6014440 "Pacsoft Shipment Documents"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(RecordID;RecordID)
+                field(RecordID; RecordID)
                 {
+                    ApplicationArea = All;
                 }
-                field("Creation Time";"Creation Time")
+                field("Creation Time"; "Creation Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Export Time";"Export Time")
+                field("Export Time"; "Export Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Message";"Return Message")
+                field("Return Message"; "Return Message")
                 {
+                    ApplicationArea = All;
                 }
-                field(Session;Session)
+                field(Session; Session)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Agent Code";"Shipping Agent Code")
+                field("Shipping Agent Code"; "Shipping Agent Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Package Code";"Package Code")
+                field("Package Code"; "Package Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Reference;Reference)
+                field(Reference; Reference)
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipment Date";"Shipment Date")
+                field("Shipment Date"; "Shipment Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Method Code";"Shipping Method Code")
+                field("Shipping Method Code"; "Shipping Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Agent Service Code";"Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response Shipment ID";"Response Shipment ID")
+                field("Response Shipment ID"; "Response Shipment ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response Package No.";"Response Package No.")
+                field("Response Package No."; "Response Package No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Return Label";"Print Return Label")
+                field("Print Return Label"; "Print Return Label")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Response Shipment ID";"Return Response Shipment ID")
+                field("Return Response Shipment ID"; "Return Response Shipment ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Response Package No.";"Return Response Package No.")
+                field("Return Response Package No."; "Return Response Package No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Shipping Agent Code";"Return Shipping Agent Code")
+                field("Return Shipping Agent Code"; "Return Shipping Agent Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -135,14 +155,14 @@ page 6014440 "Pacsoft Shipment Documents"
                     //-NPR5.26 [248912]
                     //  PacsoftMgt.SendDocument(Rec, TRUE);
                     begin
-                      PacsoftSetup.Get;
-                      if PacsoftSetup."Use Pacsoft integration" then begin
-                        PacsoftMgt.SendDocument(Rec, true);
-                        Clear(Rec);
-                        CurrPage.Update(false);
+                        PacsoftSetup.Get;
+                        if PacsoftSetup."Use Pacsoft integration" then begin
+                            PacsoftMgt.SendDocument(Rec, true);
+                            Clear(Rec);
+                            CurrPage.Update(false);
                         end;
-                    //  ELSE IF PacsoftSetup."Use Pakkelabels" THEN
-                    //  PakkelabelsMgnt.CreateShipmentOwnCustomerNo(Rec);
+                        //  ELSE IF PacsoftSetup."Use Pakkelabels" THEN
+                        //  PakkelabelsMgnt.CreateShipmentOwnCustomerNo(Rec);
                     end;
                     //-NPR5.26 [248912]
                 end;

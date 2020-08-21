@@ -14,26 +14,32 @@ page 6150631 "POS Payment Checkpoint Subpage"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Payment Method No.";"Payment Method No.")
+                field("Payment Method No."; "Payment Method No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Bin No.";"Payment Bin No.")
+                field("Payment Bin No."; "Payment Bin No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Calculated Amount Incl. Float";"Calculated Amount Incl. Float")
+                field("Calculated Amount Incl. Float"; "Calculated Amount Incl. Float")
                 {
+                    ApplicationArea = All;
                     Visible = IsBlindCount = FALSE;
                 }
-                field("Counted Amount Incl. Float";"Counted Amount Incl. Float")
+                field("Counted Amount Incl. Float"; "Counted Amount Incl. Float")
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -57,7 +63,7 @@ page 6150631 "POS Payment Checkpoint Subpage"
     trigger OnOpenPage()
     begin
 
-        SetFilter ("Calculated Amount Incl. Float", '<>%1', 0);
+        SetFilter("Calculated Amount Incl. Float", '<>%1', 0);
     end;
 
     var

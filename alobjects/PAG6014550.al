@@ -17,29 +17,37 @@ page 6014550 "RFID Print Log"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("RFID Tag Value";"RFID Tag Value")
+                field("RFID Tag Value"; "RFID Tag Value")
                 {
+                    ApplicationArea = All;
                 }
-                field(Barcode;Barcode)
+                field(Barcode; Barcode)
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch ID";"Batch ID")
+                field("Batch ID"; "Batch ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Printed At";"Printed At")
+                field("Printed At"; "Printed At")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

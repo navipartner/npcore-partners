@@ -14,11 +14,13 @@ page 6151441 "Magento Contact Pmt. Methods"
         {
             repeater(Group)
             {
-                field("External Payment Method Code";"External Payment Method Code")
+                field("External Payment Method Code"; "External Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Method Code";"Payment Method Code")
+                field("Payment Method Code"; "Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

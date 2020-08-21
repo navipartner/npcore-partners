@@ -12,14 +12,17 @@ page 6060050 "Item Worksheet Setup Subpage"
         {
             repeater(Group)
             {
-                field("Related Field Name";"Related Field Name")
+                field("Related Field Name"; "Related Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                 }
-                field("Create New";"Create New")
+                field("Create New"; "Create New")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

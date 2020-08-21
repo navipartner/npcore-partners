@@ -11,11 +11,13 @@ page 6060147 "RC Membership Burndown Setup"
         {
             group(General)
             {
-                field("Use Work Date as Base";"Use Work Date as Base")
+                field("Use Work Date as Base"; "Use Work Date as Base")
                 {
+                    ApplicationArea = All;
                 }
-                field("StartDate Offset";"StartDate Offset")
+                field("StartDate Offset"; "StartDate Offset")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

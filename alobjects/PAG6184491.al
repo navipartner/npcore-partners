@@ -15,17 +15,21 @@ page 6184491 "Pepper Configuration List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field(Mode;Mode)
+                field(Mode; Mode)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -40,7 +44,7 @@ page 6184491 "Pepper Configuration List"
                 Caption = 'Instances';
                 Image = Server;
                 RunObject = Page "Pepper Instances";
-                RunPageLink = "Configuration Code"=FIELD(Code);
+                RunPageLink = "Configuration Code" = FIELD(Code);
                 RunPageView = SORTING(ID)
                               ORDER(Ascending);
             }

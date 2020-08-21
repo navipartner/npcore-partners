@@ -17,11 +17,13 @@ page 6014571 "Tax Free Consolidation"
             repeater(Group)
             {
                 InstructionalText = 'Use add/remove actions to specify which sales receipts should be consolidated.';
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Date";"Sale Date")
+                field("Sale Date"; "Sale Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -50,27 +52,27 @@ page 6014571 "Tax Free Consolidation"
                     AuditRollPage.LookupMode(true);
                     AuditRollPage.SetTableView(AuditRoll);
                     if AuditRollPage.RunModal = ACTION::LookupOK then begin
-                      AuditRollPage.GetRecord(AuditRoll);
+                        AuditRollPage.GetRecord(AuditRoll);
 
-                      SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-                      if FindFirst then
-                        Error(Error_AlreadySelected, AuditRoll."Sales Ticket No.");
-                      SetRange("Sales Ticket No.");
+                        SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
+                        if FindFirst then
+                            Error(Error_AlreadySelected, AuditRoll."Sales Ticket No.");
+                        SetRange("Sales Ticket No.");
 
-                      if TaxFreeMgt.TryGetActiveVoucherFromReceiptNo(AuditRoll."Sales Ticket No.", TaxFreeVoucher) then begin
-                        if not Confirm(Caption_VoidExisting) then
-                          exit;
+                        if TaxFreeMgt.TryGetActiveVoucherFromReceiptNo(AuditRoll."Sales Ticket No.", TaxFreeVoucher) then begin
+                            if not Confirm(Caption_VoidExisting) then
+                                exit;
 
-                        TaxFreeMgt.VoucherVoid(TaxFreeVoucher);
+                            TaxFreeMgt.VoucherVoid(TaxFreeVoucher);
 
-                        if not TaxFreeVoucher.Void then //Void attempt failed, don't add to consolidation list.
-                          exit;
-                      end;
+                            if not TaxFreeVoucher.Void then //Void attempt failed, don't add to consolidation list.
+                                exit;
+                        end;
 
-                      "Entry No." := "Entry No."+1;
-                      "Sales Ticket No." := AuditRoll."Sales Ticket No.";
-                      "Sale Date" := AuditRoll."Sale Date";
-                      Insert;
+                        "Entry No." := "Entry No." + 1;
+                        "Sales Ticket No." := AuditRoll."Sales Ticket No.";
+                        "Sale Date" := AuditRoll."Sale Date";
+                        Insert;
                     end;
                 end;
             }
@@ -85,7 +87,7 @@ page 6014571 "Tax Free Consolidation"
                 trigger OnAction()
                 begin
                     if Confirm(Caption_DeleteSelected) then
-                      Delete;
+                        Delete;
                 end;
             }
             action("Consolidate Receipts")
@@ -101,8 +103,8 @@ page 6014571 "Tax Free Consolidation"
                     TaxFreeMgt: Codeunit "Tax Free Handler Mgt.";
                 begin
                     if FindSet then begin
-                      TaxFreeMgt.VoucherConsolidate(TaxFreeUnit, Rec);
-                      CurrPage.Close;
+                        TaxFreeMgt.VoucherConsolidate(TaxFreeUnit, Rec);
+                        CurrPage.Close;
                     end;
                 end;
             }
@@ -118,7 +120,7 @@ page 6014571 "Tax Free Consolidation"
     procedure SetRec(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary)
     begin
         if not tmpTaxFreeConsolidation.IsTemporary then
-          exit;
+            exit;
 
         Rec.Copy(tmpTaxFreeConsolidation, true);
     end;
@@ -126,7 +128,7 @@ page 6014571 "Tax Free Consolidation"
     procedure GetRec(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary)
     begin
         if not tmpTaxFreeConsolidation.IsTemporary then
-          exit;
+            exit;
 
         tmpTaxFreeConsolidation.Copy(Rec, true);
     end;

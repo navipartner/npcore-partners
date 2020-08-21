@@ -16,34 +16,40 @@ page 6060101 "TM Ticket Request Mini"
         {
             repeater(General)
             {
-                field("External Item Code";"External Item Code")
+                field("External Item Code"; "External Item Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
 
                         //-#337112 [337112]
-                        CurrPage.Update (true);
+                        CurrPage.Update(true);
                         //+#337112 [337112]
                     end;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admission Description";"Admission Description")
+                field("Admission Description"; "Admission Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Notification Method";"Notification Method")
+                field("Notification Method"; "Notification Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Address";"Notification Address")
+                field("Notification Address"; "Notification Address")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -56,11 +62,11 @@ page 6060101 "TM Ticket Request Mini"
     procedure FillRequestTable(var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary)
     begin
 
-        if (TmpTicketReservationRequest.FindSet ()) then begin
-          repeat
-            TransferFields (TmpTicketReservationRequest, true);
-            Insert ();
-          until (TmpTicketReservationRequest.Next () = 0);
+        if (TmpTicketReservationRequest.FindSet()) then begin
+            repeat
+                TransferFields(TmpTicketReservationRequest, true);
+                Insert();
+            until (TmpTicketReservationRequest.Next() = 0);
         end;
     end;
 
@@ -68,11 +74,11 @@ page 6060101 "TM Ticket Request Mini"
     begin
 
         Reset;
-        if (FindSet ()) then begin
-          repeat
-            TmpTicketReservationRequest.TransferFields (Rec, true);
-            TmpTicketReservationRequest.Insert ();
-          until (Next () = 0);
+        if (FindSet()) then begin
+            repeat
+                TmpTicketReservationRequest.TransferFields(Rec, true);
+                TmpTicketReservationRequest.Insert();
+            until (Next() = 0);
         end;
     end;
 }

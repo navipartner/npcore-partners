@@ -12,68 +12,89 @@ page 6184509 "EFT NETS BAXI Payment Setup"
         {
             group(General)
             {
-                field("Log File Path";"Log File Path")
+                field("Log File Path"; "Log File Path")
                 {
+                    ApplicationArea = All;
                 }
-                field("Trace Level";"Trace Level")
+                field("Trace Level"; "Trace Level")
                 {
+                    ApplicationArea = All;
                 }
-                field("Baud Rate";"Baud Rate")
+                field("Baud Rate"; "Baud Rate")
                 {
+                    ApplicationArea = All;
                 }
-                field("COM Port";"COM Port")
+                field("COM Port"; "COM Port")
                 {
+                    ApplicationArea = All;
                 }
-                field("Host Environment";"Host Environment")
+                field("Host Environment"; "Host Environment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cutter Support";"Cutter Support")
+                field("Cutter Support"; "Cutter Support")
                 {
+                    ApplicationArea = All;
                 }
-                field("Printer Width";"Printer Width")
+                field("Printer Width"; "Printer Width")
                 {
+                    ApplicationArea = All;
                 }
-                field("Display Width";"Display Width")
+                field("Display Width"; "Display Width")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Auto Delete Days";"Log Auto Delete Days")
+                field("Log Auto Delete Days"; "Log Auto Delete Days")
                 {
+                    ApplicationArea = All;
                 }
-                field("Socket Listener";"Socket Listener")
+                field("Socket Listener"; "Socket Listener")
                 {
+                    ApplicationArea = All;
                 }
-                field("Socket Listener Port";"Socket Listener Port")
+                field("Socket Listener Port"; "Socket Listener Port")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bluetooth Tunnel";"Bluetooth Tunnel")
+                field("Bluetooth Tunnel"; "Bluetooth Tunnel")
                 {
+                    ApplicationArea = All;
                 }
-                field("Link Control Timeout Seconds";"Link Control Timeout Seconds")
+                field("Link Control Timeout Seconds"; "Link Control Timeout Seconds")
                 {
+                    ApplicationArea = All;
                 }
-                field(DCC;DCC)
+                field(DCC; DCC)
                 {
+                    ApplicationArea = All;
                 }
-                field("Force Offline";"Force Offline")
+                field("Force Offline"; "Force Offline")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Reconcile On EOD";"Auto Reconcile On EOD")
+                field("Auto Reconcile On EOD"; "Auto Reconcile On EOD")
                 {
+                    ApplicationArea = All;
                 }
-                field("Force Abort Minimum Seconds";"Force Abort Minimum Seconds")
+                field("Force Abort Minimum Seconds"; "Force Abort Minimum Seconds")
                 {
+                    ApplicationArea = All;
                 }
-                field("Administration Timeout Seconds";"Administration Timeout Seconds")
+                field("Administration Timeout Seconds"; "Administration Timeout Seconds")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lookup Timeout Seconds";"Lookup Timeout Seconds")
+                field("Lookup Timeout Seconds"; "Lookup Timeout Seconds")
                 {
+                    ApplicationArea = All;
                 }
-                field("Open Timeout Seconds";"Open Timeout Seconds")
+                field("Open Timeout Seconds"; "Open Timeout Seconds")
                 {
+                    ApplicationArea = All;
                 }
-                field("Close Timeout Seconds";"Close Timeout Seconds")
+                field("Close Timeout Seconds"; "Close Timeout Seconds")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -19,53 +19,69 @@ page 6014565 "Tax Free Voucher"
         {
             repeater(Group)
             {
-                field("External Voucher No.";"External Voucher No.")
+                field("External Voucher No."; "External Voucher No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Voucher Barcode";"External Voucher Barcode")
+                field("External Voucher Barcode"; "External Voucher Barcode")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issued Date";"Issued Date")
+                field("Issued Date"; "Issued Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issued Time";"Issued Time")
+                field("Issued Time"; "Issued Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issued By User";"Issued By User")
+                field("Issued By User"; "Issued By User")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount Incl. VAT";"Total Amount Incl. VAT")
+                field("Total Amount Incl. VAT"; "Total Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refund Amount";"Refund Amount")
+                field("Refund Amount"; "Refund Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Handler ID";"Handler ID")
+                field("Handler ID"; "Handler ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Service ID";"Service ID")
+                field("Service ID"; "Service ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Mode;Mode)
+                field(Mode; Mode)
                 {
+                    ApplicationArea = All;
                 }
-                field(Void;Void)
+                field(Void; Void)
                 {
+                    ApplicationArea = All;
                 }
-                field("Voided By User";"Voided By User")
+                field("Voided By User"; "Voided By User")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voided Date";"Voided Date")
+                field("Voided Date"; "Voided Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voided Time";"Voided Time")
+                field("Voided Time"; "Voided Time")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -143,7 +159,7 @@ page 6014565 "Tax Free Voucher"
                     TaxFreeVoucherSaleLinks: Page "Tax Free Voucher Sale Links";
                 begin
                     if PAGE.RunModal(PAGE::"Tax Free Voucher Sale Links", TaxFreeVoucherSaleLink) = ACTION::LookupOK then begin
-                      Get(TaxFreeVoucherSaleLink."Voucher Entry No.");
+                        Get(TaxFreeVoucherSaleLink."Voucher Entry No.");
                     end;
                 end;
             }

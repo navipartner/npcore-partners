@@ -13,11 +13,13 @@ page 6151094 "Nc RapidConnect Trigger Fields"
         {
             repeater(Group)
             {
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -12,14 +12,17 @@ page 6151187 "MM Member Communication Setup"
         {
             repeater(Group)
             {
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Message Type";"Message Type")
+                field("Message Type"; "Message Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Preferred Method";"Preferred Method")
+                field("Preferred Method"; "Preferred Method")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

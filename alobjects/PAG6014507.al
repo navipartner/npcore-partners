@@ -17,39 +17,50 @@ page 6014507 "Used Goods Reg. List"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Date";"Purchase Date")
+                field("Purchase Date"; "Purchase Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Subject;Subject)
+                field(Subject; Subject)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchased By Customer No.";"Purchased By Customer No.")
+                field("Purchased By Customer No."; "Purchased By Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Identification Number";"Identification Number")
+                field("Identification Number"; "Identification Number")
                 {
+                    ApplicationArea = All;
                 }
-                field("Subject Sold Date";"Subject Sold Date")
+                field("Subject Sold Date"; "Subject Sold Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item No. Created";"Item No. Created")
+                field("Item No. Created"; "Item No. Created")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field(Serienummer;Serienummer)
+                field(Serienummer; Serienummer)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

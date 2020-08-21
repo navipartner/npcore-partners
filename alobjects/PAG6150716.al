@@ -12,44 +12,53 @@ page 6150716 "POS Unit Identity Card"
         {
             group(General)
             {
-                field("Device ID";"Device ID")
+                field("Device ID"; "Device ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Host Name";"Host Name")
+                field("Host Name"; "Host Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Session Type";"Session Type")
+                field("Session Type"; "Session Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Select POS Using";"Select POS Using")
+                field("Select POS Using"; "Select POS Using")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(User)
             {
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
             group("POS Unit")
             {
-                field("Default POS Unit No.";"Default POS Unit No.")
+                field("Default POS Unit No."; "Default POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Device)
             {
-                field("Created At";"Created At")
+                field("Created At"; "Created At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Last Session At";"Last Session At")
+                field("Last Session At"; "Last Session At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

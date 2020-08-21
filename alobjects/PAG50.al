@@ -1,4 +1,4 @@
-pageextension 6014451 pageextension6014451 extends "Purchase Order" 
+pageextension 6014451 pageextension6014451 extends "Purchase Order"
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -27,63 +27,73 @@ pageextension 6014451 pageextension6014451 extends "Purchase Order"
     {
         addafter("Job Queue Status")
         {
-            field(PostingDescription;"Posting Description")
+            field(PostingDescription; "Posting Description")
             {
+                ApplicationArea = All;
             }
         }
         addafter(Control71)
         {
-            field("Pay-to E-mail";"Pay-to E-mail")
+            field("Pay-to E-mail"; "Pay-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
-            field("Sell-to Customer Name";"Sell-to Customer Name")
+            field("Sell-to Customer Name"; "Sell-to Customer Name")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
-            field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+            field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
-            field("Sell-to Address";"Sell-to Address")
+            field("Sell-to Address"; "Sell-to Address")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
-            field("Sell-to Address 2";"Sell-to Address 2")
+            field("Sell-to Address 2"; "Sell-to Address 2")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
-            field("Sell-to City";"Sell-to City")
+            field("Sell-to City"; "Sell-to City")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
-            field("Sell-to Post Code";"Sell-to Post Code")
+            field("Sell-to Post Code"; "Sell-to Post Code")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
-            field("Sell-to Phone No.";"Sell-to Phone No.")
+            field("Sell-to Phone No."; "Sell-to Phone No.")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
         }
         addafter(Control3)
         {
-            part(Control6150621;"NP Attributes FactBox")
+            part(Control6150621; "NP Attributes FactBox")
             {
                 Provider = PurchLines;
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
                 Visible = true;
             }
         }
         addafter(Control1905767507)
         {
-            part("Item Availability FactBox";"NPR Item Availability FactBox")
+            part("Item Availability FactBox"; "NPR Item Availability FactBox")
             {
                 Caption = 'Item Availability FactBox';
                 Provider = PurchLines;
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
             }
         }
     }
@@ -122,7 +132,7 @@ pageextension 6014451 pageextension6014451 extends "Purchase Order"
                 var
                     CSRfidHeader: Record "CS Rfid Header";
                 begin
-                    CSRfidHeader.OpenRfidSalesDoc(1,"Vendor Order No.","Sell-to Customer No.","No.");
+                    CSRfidHeader.OpenRfidSalesDoc(1, "Vendor Order No.", "Sell-to Customer No.", "No.");
                 end;
             }
         }
@@ -172,25 +182,25 @@ pageextension 6014451 pageextension6014451 extends "Purchase Order"
     //trigger OnOpenPage()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        SetDocNoVisible;
-        IsSaaS := PermissionManager.SoftwareAsAService;
+    /*
+    SetDocNoVisible;
+    IsSaaS := PermissionManager.SoftwareAsAService;
 
-        #4..9
-          DocumentIsPosted := (not Get("Document Type","No."));
+    #4..9
+      DocumentIsPosted := (not Get("Document Type","No."));
 
-        ActivateFields;
-        */
+    ActivateFields;
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        #1..12
+    /*
+    #1..12
 
-        //-NPR5.55 [379709]
-        ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
-        //+NPR5.55 [379709]
-        */
+    //-NPR5.55 [379709]
+    ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
+    //+NPR5.55 [379709]
+    */
     //end;
 }
 

@@ -14,23 +14,29 @@ page 6184851 "FR Audit No. Series"
         {
             repeater(Group)
             {
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reprint No. Series";"Reprint No. Series")
+                field("Reprint No. Series"; "Reprint No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("JET No. Series";"JET No. Series")
+                field("JET No. Series"; "JET No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Period No. Series";"Period No. Series")
+                field("Period No. Series"; "Period No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Grand Period No. Series";"Grand Period No. Series")
+                field("Grand Period No. Series"; "Grand Period No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Yearly Period No. Series";"Yearly Period No. Series")
+                field("Yearly Period No. Series"; "Yearly Period No. Series")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

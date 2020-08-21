@@ -15,8 +15,9 @@ page 6014457 "Table Export Wizard Fields"
             repeater(Control6150619)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -25,36 +26,40 @@ page 6014457 "Table Export Wizard Fields"
                         TableNo: Integer;
                     begin
                         TableNo := GetRangeMin(TableNo);
-                        Field.SetRange(TableNo,TableNo);
+                        Field.SetRange(TableNo, TableNo);
 
                         if "No." > 0 then
-                          if Field.Get(TableNo,"No.") then;
+                            if Field.Get(TableNo, "No.") then;
 
                         Fields.SetTableView(Field);
                         Fields.SetRecord(Field);
                         Fields.LookupMode(true);
 
                         if Fields.RunModal = ACTION::LookupOK then begin
-                          Fields.GetRecord(Field);
-                          TransferFields(Field);
-                          Insert;
+                            Fields.GetRecord(Field);
+                            TransferFields(Field);
+                            Insert;
                         end;
                     end;
                 }
-                field(FieldName;FieldName)
+                field(FieldName; FieldName)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Len;Len)
+                field(Len; Len)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Class;Class)
+                field(Class; Class)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -65,11 +70,11 @@ page 6014457 "Table Export Wizard Fields"
     {
     }
 
-    procedure AddField(TableNoIn: Integer;FieldNoIn: Integer)
+    procedure AddField(TableNoIn: Integer; FieldNoIn: Integer)
     var
         "Field": Record "Field";
     begin
-        Field.Get(TableNoIn,FieldNoIn);
+        Field.Get(TableNoIn, FieldNoIn);
         TransferFields(Field);
         if Insert then CurrPage.Update(false);
     end;
@@ -99,10 +104,11 @@ page 6014457 "Table Export Wizard Fields"
     begin
         Clear(Rec);
 
-        if FindSet then repeat
-          TempFields.TransferFields(Rec);
-          TempFields.Insert;
-        until Next = 0;
+        if FindSet then
+            repeat
+                TempFields.TransferFields(Rec);
+                TempFields.Insert;
+            until Next = 0;
         CurrPage.Update(false);
     end;
 }

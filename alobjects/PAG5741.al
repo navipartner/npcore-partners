@@ -1,4 +1,4 @@
-pageextension 6014463 pageextension6014463 extends "Transfer Order Subform" 
+pageextension 6014463 pageextension6014463 extends "Transfer Order Subform"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // NPR4.13/MMV/20150708 CASE 214173 Changed "Item No." to variable to handle barcode scanning OnValidate trigger.
@@ -16,21 +16,24 @@ pageextension 6014463 pageextension6014463 extends "Transfer Order Subform"
     {
         addafter("Item No.")
         {
-            field("Cross-Reference No.";"Cross-Reference No.")
+            field("Cross-Reference No."; "Cross-Reference No.")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Variant Code")
         {
-            field("Vendor Item No.";"Vendor Item No.")
+            field("Vendor Item No."; "Vendor Item No.")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
         addafter(Description)
         {
-            field("Description 2";"Description 2")
+            field("Description 2"; "Description 2")
             {
+                ApplicationArea = All;
             }
         }
     }

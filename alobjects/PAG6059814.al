@@ -26,8 +26,9 @@ page 6059814 "Retail Top 10 Customers"
             group(Control6014402)
             {
                 ShowCaption = false;
-                field(StartDate;StartDate)
+                field(StartDate; StartDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Start Date';
 
                     trigger OnValidate()
@@ -37,8 +38,9 @@ page 6059814 "Retail Top 10 Customers"
                         //+NPR5.29 [262956]
                     end;
                 }
-                field(Enddate;Enddate)
+                field(Enddate; Enddate)
                 {
+                    ApplicationArea = All;
                     Caption = 'End date';
 
                     trigger OnValidate()
@@ -54,28 +56,32 @@ page 6059814 "Retail Top 10 Customers"
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
 
                         trigger OnDrillDown()
                         begin
                             //-NC1.22
                             Cust.Get("No.");
-                            PAGE.Run(PAGE::"Customer Card",Cust);
+                            PAGE.Run(PAGE::"Customer Card", Cust);
                             //+NC1.22
                         end;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Phone No.";"Phone No.")
+                    field("Phone No."; "Phone No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Sales (LCY)";"Sales (LCY)")
+                    field("Sales (LCY)"; "Sales (LCY)")
                     {
+                        ApplicationArea = All;
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         Editable = false;
@@ -110,7 +116,7 @@ page 6059814 "Retail Top 10 Customers"
 
                     trigger OnAction()
                     begin
-                        PeriodType := PeriodType::Week ;
+                        PeriodType := PeriodType::Week;
                         UpdateList;
                     end;
                 }
@@ -180,35 +186,35 @@ page 6059814 "Retail Top 10 Customers"
     begin
         //-NPR5.29 [262956]
         DeleteAll;
-        Query1.SetFilter(Posting_Date,'%1..%2',StartDate,Enddate);
+        Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.Open;
         while Query1.Read do begin
-         if Cust.Get(Query1.Source_No) then begin
-             TransferFields(Cust);
-          if not Insert then;
-        //-NC1.20
-          SetFilter("Date Filter",'%1..%2',StartDate,Enddate);
-        //+NC1.20
-          //-NC1.17
-        //-NC1.20
-        //  Cust.CALCFIELDS("Sales (LCY)");
-        //  "Search Name" := FORMAT(Cust."Sales (LCY)");
-        //  "Search Name" := PADSTR('',15 - STRLEN("Search Name"),'0') + "Search Name";
+            if Cust.Get(Query1.Source_No) then begin
+                TransferFields(Cust);
+                if not Insert then;
+                //-NC1.20
+                SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+                //+NC1.20
+                //-NC1.17
+                //-NC1.20
+                //  Cust.CALCFIELDS("Sales (LCY)");
+                //  "Search Name" := FORMAT(Cust."Sales (LCY)");
+                //  "Search Name" := PADSTR('',15 - STRLEN("Search Name"),'0') + "Search Name";
 
-          CalcFields("Sales (LCY)");
-        //-NC1.22
-        //"Search Name" := FORMAT("Sales (LCY)");
-          "Search Name" := Format(-"Sales (LCY)"*100,20,1);
-        //+NC1.22
-        //  "Search Name" := FORMAT("Sales (LCY)");
-          "Search Name" := PadStr('',15 - StrLen("Search Name"),'0') + "Search Name";
-          Modify;
-        //+NC1.20
-          //+NC1.17
+                CalcFields("Sales (LCY)");
+                //-NC1.22
+                //"Search Name" := FORMAT("Sales (LCY)");
+                "Search Name" := Format(-"Sales (LCY)" * 100, 20, 1);
+                //+NC1.22
+                //  "Search Name" := FORMAT("Sales (LCY)");
+                "Search Name" := PadStr('', 15 - StrLen("Search Name"), '0') + "Search Name";
+                Modify;
+                //+NC1.20
+                //+NC1.17
 
+            end;
         end;
-        end;
-         Query1.Close;
+        Query1.Close;
         //-NPR5.29 [262956]
     end;
 
@@ -217,31 +223,31 @@ page 6059814 "Retail Top 10 Customers"
         DatePeriod: Record Date;
     begin
         case PeriodType of
-          PeriodType::Day :
-           begin
-            StartDate := CurrDate;
-            Enddate := CurrDate;
-           end;
-          PeriodType::Week :
-           begin
-            StartDate := CalcDate('<-CW>',CurrDate);
-            Enddate := CalcDate('<CW>',CurrDate);
-           end;
-          PeriodType::Month :
-           begin
-            StartDate := CalcDate('<-CM>',CurrDate);
-            Enddate := CalcDate('<CM>',CurrDate);
-           end;
-          PeriodType::Quarter :
-          begin
-          StartDate := CalcDate('<-CQ>',CurrDate);
-          Enddate := CalcDate('<CQ>',CurrDate);
-          end;
-          PeriodType::Year :
-          begin
-            StartDate := CalcDate('<-CY>',CurrDate);
-            Enddate := CalcDate('<CY>',CurrDate);
-          end;
+            PeriodType::Day:
+                begin
+                    StartDate := CurrDate;
+                    Enddate := CurrDate;
+                end;
+            PeriodType::Week:
+                begin
+                    StartDate := CalcDate('<-CW>', CurrDate);
+                    Enddate := CalcDate('<CW>', CurrDate);
+                end;
+            PeriodType::Month:
+                begin
+                    StartDate := CalcDate('<-CM>', CurrDate);
+                    Enddate := CalcDate('<CM>', CurrDate);
+                end;
+            PeriodType::Quarter:
+                begin
+                    StartDate := CalcDate('<-CQ>', CurrDate);
+                    Enddate := CalcDate('<CQ>', CurrDate);
+                end;
+            PeriodType::Year:
+                begin
+                    StartDate := CalcDate('<-CY>', CurrDate);
+                    Enddate := CalcDate('<CY>', CurrDate);
+                end;
         end;
     end;
 }

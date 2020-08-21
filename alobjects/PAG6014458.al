@@ -14,30 +14,37 @@ page 6014458 "Alternative Number"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = FieldCodeed;
                     Visible = FieldCode;
                 }
-                field("Alt. No.";"Alt. No.")
+                field("Alt. No."; "Alt. No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Editable = fieldvarianted;
                     Visible = FieldVariant;
                 }
-                field("Base Unit of Measure";"Base Unit of Measure")
+                field("Base Unit of Measure"; "Base Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Unit of Measure";"Sales Unit of Measure")
+                field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purch. Unit of Measure";"Purch. Unit of Measure")
+                field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created the";"Created the")
+                field("Created the"; "Created the")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -55,10 +62,10 @@ page 6014458 "Alternative Number"
     trigger OnOpenPage()
     begin
         setTypeView;
-        if Type=Type::Item then
-          FieldVariant:=true
+        if Type = Type::Item then
+            FieldVariant := true
         else
-          FieldVariant:=false;
+            FieldVariant := false;
     end;
 
     var
@@ -79,41 +86,41 @@ page 6014458 "Alternative Number"
     begin
 
         //CurrForm.Code.VISIBLE(FALSE);
-        FieldCode:=false;
+        FieldCode := false;
 
         case Type of
-          Type::Item :
-            begin
-              if GetFilter("Variant Code") <> '' then begin
-                //CurrForm."Alt. No.".ACTIVATE;
-                //CurrForm.Code.EDITABLE(FALSE);
-               // CurrForm."Variant Code".EDITABLE(FALSE);
-                FieldAlt:=true;
-                FieldCodeEd:=false;
-                FieldVariantEd:=false;
-                FieldVariant:=true;
-              end;
-            end;
-          Type::Customer :
-            begin
-              //CurrForm."Variant Code".VISIBLE(FALSE);
-              FieldVariant:=false;
-            end;
-          Type::"CRM Customer" :
-            begin
-              //CurrForm."Variant Code".VISIBLE(FALSE);
-              FieldVariant:=false;
-            end;
-          Type::Register :
-            begin
-              //CurrForm."Variant Code".VISIBLE(FALSE);
-              FieldVariant:=false;
-            end;
-          Type::SalesPerson :
-            begin
-             // CurrForm."Variant Code".VISIBLE(FALSE);
-              FieldVariant:=false;
-            end;
+            Type::Item:
+                begin
+                    if GetFilter("Variant Code") <> '' then begin
+                        //CurrForm."Alt. No.".ACTIVATE;
+                        //CurrForm.Code.EDITABLE(FALSE);
+                        // CurrForm."Variant Code".EDITABLE(FALSE);
+                        FieldAlt := true;
+                        FieldCodeEd := false;
+                        FieldVariantEd := false;
+                        FieldVariant := true;
+                    end;
+                end;
+            Type::Customer:
+                begin
+                    //CurrForm."Variant Code".VISIBLE(FALSE);
+                    FieldVariant := false;
+                end;
+            Type::"CRM Customer":
+                begin
+                    //CurrForm."Variant Code".VISIBLE(FALSE);
+                    FieldVariant := false;
+                end;
+            Type::Register:
+                begin
+                    //CurrForm."Variant Code".VISIBLE(FALSE);
+                    FieldVariant := false;
+                end;
+            Type::SalesPerson:
+                begin
+                    // CurrForm."Variant Code".VISIBLE(FALSE);
+                    FieldVariant := false;
+                end;
         end;
         CurrPage.Update(false);
     end;

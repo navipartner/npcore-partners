@@ -14,17 +14,21 @@ page 6184482 "Pepper EFT Transaction Subtype"
         {
             repeater(Group)
             {
-                field("Integration Type Code";"Integration Type Code")
+                field("Integration Type Code"; "Integration Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Type Code";"Transaction Type Code")
+                field("Transaction Type Code"; "Transaction Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

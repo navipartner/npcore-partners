@@ -13,29 +13,34 @@ page 6150695 "NPRE Service Flow Profile Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Close Waiter Pad On";"Close Waiter Pad On")
+                field("Close Waiter Pad On"; "Close Waiter Pad On")
                 {
+                    ApplicationArea = All;
                 }
-                field("Clear Seating On";"Clear Seating On")
+                field("Clear Seating On"; "Clear Seating On")
                 {
+                    ApplicationArea = All;
                 }
-                field("Seating Status after Clearing";"Seating Status after Clearing")
+                field("Seating Status after Clearing"; "Seating Status after Clearing")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014407;Notes)
+            systempart(Control6014407; Notes)
             {
             }
-            systempart(Control6014408;Links)
+            systempart(Control6014408; Links)
             {
                 Visible = false;
             }

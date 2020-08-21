@@ -41,45 +41,53 @@ page 6014490 "Retail Journal Header"
                 group(Control6150616)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
 
                         trigger OnAssistEdit()
                         begin
                             if AssistEdit(xRec) then
-                              CurrPage.Update;
+                                CurrPage.Update;
                         end;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                 }
                 group(Control6150619)
                 {
                     ShowCaption = false;
-                    field("Date of creation";"Date of creation")
+                    field("Date of creation"; "Date of creation")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Salesperson Code";"Salesperson Code")
+                    field("Salesperson Code"; "Salesperson Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Location Code";"Location Code")
+                    field("Location Code"; "Location Code")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
                             CurrPage.Update(true);
                         end;
                     }
-                    field("Register No.";"Register No.")
+                    field("Register No."; "Register No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Customer Price Group";"Customer Price Group")
+                    field("Customer Price Group"; "Customer Price Group")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Customer Disc. Group";"Customer Disc. Group")
+                    field("Customer Disc. Group"; "Customer Disc. Group")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -89,11 +97,13 @@ page 6014490 "Retail Journal Header"
                 group(Control6150625)
                 {
                     ShowCaption = false;
-                    field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                    field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                    field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -109,8 +119,9 @@ page 6014490 "Retail Journal Header"
                         Caption = 'Vendor No.';
                         //The GridLayout property is only supported on controls of type Grid
                         //GridLayout = Rows;
-                        field(VendorFilter;VendorFilter)
+                        field(VendorFilter; VendorFilter)
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                             TableRelation = Vendor;
 
@@ -126,8 +137,9 @@ page 6014490 "Retail Journal Header"
                     group("Item Group")
                     {
                         Caption = 'Item Group';
-                        field(ItemGroupFilter;ItemGroupFilter)
+                        field(ItemGroupFilter; ItemGroupFilter)
                         {
+                            ApplicationArea = All;
                             Caption = 'Item Group';
                             ShowCaption = false;
                             TableRelation = "Item Group";
@@ -144,8 +156,9 @@ page 6014490 "Retail Journal Header"
                     group("Unknown Item No.")
                     {
                         Caption = 'Unknown Item No.';
-                        field(ShowUnknown;ShowUnknown)
+                        field(ShowUnknown; ShowUnknown)
                         {
+                            ApplicationArea = All;
                             Caption = 'Unknown Item No.';
                             OptionCaption = 'All,Only existing items,Only unknown items';
                             ShowCaption = false;
@@ -161,8 +174,9 @@ page 6014490 "Retail Journal Header"
                     group("New Item")
                     {
                         Caption = 'New Item';
-                        field(ShowNew;ShowNew)
+                        field(ShowNew; ShowNew)
                         {
+                            ApplicationArea = All;
                             Caption = 'New Item';
                             OptionCaption = 'All,Only existing items,Only new items';
                             ShowCaption = false;
@@ -178,8 +192,9 @@ page 6014490 "Retail Journal Header"
                     group("Inventory Status")
                     {
                         Caption = 'Inventory Status';
-                        field(ShowInventory;ShowInventory)
+                        field(ShowInventory; ShowInventory)
                         {
+                            ApplicationArea = All;
                             Caption = 'Inventory Status';
                             OptionCaption = 'All,In stock,Not in stock';
                             ShowCaption = false;
@@ -194,24 +209,24 @@ page 6014490 "Retail Journal Header"
                     }
                 }
             }
-            part(SubLine;"Retail Journal Line")
+            part(SubLine; "Retail Journal Line")
             {
-                SubPageLink = "No."=FIELD("No."),
-                              "Location Filter"=FIELD("Location Code");
-                SubPageView = SORTING("No.","Line No.");
+                SubPageLink = "No." = FIELD("No."),
+                              "Location Filter" = FIELD("Location Code");
+                SubPageView = SORTING("No.", "Line No.");
             }
         }
         area(factboxes)
         {
-            part(Control6150641;"Item Invoicing FactBox")
+            part(Control6150641; "Item Invoicing FactBox")
             {
                 Provider = SubLine;
-                SubPageLink = "No."=FIELD("Item No.");
+                SubPageLink = "No." = FIELD("Item No.");
             }
-            part(Control6150645;"NP Attributes FactBox")
+            part(Control6150645; "NP Attributes FactBox")
             {
                 Provider = SubLine;
-                SubPageLink = "No."=FIELD("Item No.");
+                SubPageLink = "No." = FIELD("Item No.");
             }
         }
     }
@@ -325,13 +340,14 @@ page 6014490 "Retail Journal Header"
 
                         //CurrForm.SubLine.FORM.getSelectionFilter("Retail Journal Line");
                         CurrPage.SubLine.PAGE.GetSelectionFilter("Retail Journal Line");
-                        if "Retail Journal Line".Find('-') then repeat
-                          if item.Get("Retail Journal Line"."Item No.") then begin
-                            "Retail Journal Line".Validate(Description, item.Description);
-                            "Retail Journal Line".Validate("Description 2", item."Description 2");
-                            "Retail Journal Line".Modify(true);
-                          end;
-                        until "Retail Journal Line".Next = 0;
+                        if "Retail Journal Line".Find('-') then
+                            repeat
+                                if item.Get("Retail Journal Line"."Item No.") then begin
+                                    "Retail Journal Line".Validate(Description, item.Description);
+                                    "Retail Journal Line".Validate("Description 2", item."Description 2");
+                                    "Retail Journal Line".Modify(true);
+                                end;
+                            until "Retail Journal Line".Next = 0;
                     end;
                 }
             }
@@ -364,7 +380,7 @@ page 6014490 "Retail Journal Header"
                         //-NPR4.14
                         CurrPage.SubLine.PAGE.GetRecord(LabelPrintLine);
                         //+NPR4.14
-                        Scanner.initRetailJournal( Rec );
+                        Scanner.initRetailJournal(Rec);
                     end;
                 }
                 action(ImportFromPeriodDiscount)
@@ -598,10 +614,10 @@ page 6014490 "Retail Journal Header"
                     var
                         item1: Record Item;
                     begin
-                        if PAGE.RunModal(PAGE::"Item List",item1)=ACTION::LookupOK then
-                          CurrPage.SubLine.PAGE.SetItemFilter(item1."No.")
+                        if PAGE.RunModal(PAGE::"Item List", item1) = ACTION::LookupOK then
+                            CurrPage.SubLine.PAGE.SetItemFilter(item1."No.")
                         else
-                          CurrPage.SubLine.PAGE.SetItemFilter('');
+                            CurrPage.SubLine.PAGE.SetItemFilter('');
                     end;
                 }
                 action("Item Card")
@@ -643,21 +659,21 @@ page 6014490 "Retail Journal Header"
                     begin
 
                         //CurrForm.SubLine.FORM.getSelectionFilter(jnlLines);
-                          CurrPage.SubLine.PAGE.GetSelectionFilter(jnlLines);
+                        CurrPage.SubLine.PAGE.GetSelectionFilter(jnlLines);
                         d.Open(t001 + '\' + t002);
 
                         i := 0;
 
                         if jnlLines.Find('-') then begin
-                          n := jnlLines.Count;
-                          repeat
-                            d.Update(1, Round(i/n*10000,1, '>'));
-                            if jnlLines."Item No." = '' then
-                              jnlLines."Item No." := jnlLines.Barcode;
-                            jnlLines.Validate("Item No.");
-                            jnlLines.Modify(true);
-                            i += 1;
-                          until jnlLines.Next = 0;
+                            n := jnlLines.Count;
+                            repeat
+                                d.Update(1, Round(i / n * 10000, 1, '>'));
+                                if jnlLines."Item No." = '' then
+                                    jnlLines."Item No." := jnlLines.Barcode;
+                                jnlLines.Validate("Item No.");
+                                jnlLines.Modify(true);
+                                i += 1;
+                            until jnlLines.Next = 0;
                         end;
                         d.Close;
                     end;
@@ -726,42 +742,42 @@ page 6014490 "Retail Journal Header"
         //-NPR5.31 [262904]
         //IF RetailJournalLine.FINDFIRST THEN REPEAT
         if not RetailJournalLine.IsEmpty then begin
-          RetailJournalLine.FindSet;
-          repeat
-        //+NPR5.31 [262904]
-            PeriodDiscountLine.Reset;
-            PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '<=%1', RetailJournalHeader."Date of creation");
-            PeriodDiscountLine.SetFilter(PeriodDiscountLine."Ending Date", '>=%1', RetailJournalHeader."Date of creation");
-            PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.",RetailJournalLine."Item No.");
+            RetailJournalLine.FindSet;
+            repeat
+                //+NPR5.31 [262904]
+                PeriodDiscountLine.Reset;
+                PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '<=%1', RetailJournalHeader."Date of creation");
+                PeriodDiscountLine.SetFilter(PeriodDiscountLine."Ending Date", '>=%1', RetailJournalHeader."Date of creation");
+                PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", RetailJournalLine."Item No.");
 
-            if PeriodDiscountLine.FindFirst then begin
-              RetailJournalLine."Discount Code" := PeriodDiscountLine.Code;
-              RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Campaign;
-            end else begin
-              MixDiscountLine.Reset;
-              MixDiscountLine.SetFilter(MixDiscountLine."No.",RetailJournalLine."Item No.");
-              //-NPR5.31 [262904]
-              //IF MixDiscountLine.FINDFIRST THEN REPEAT
-              //  MixDiscount.RESET;
-              MixDiscountLine.SetRange("Disc. Grouping Type",MixDiscountLine."Disc. Grouping Type"::Item);
-              if MixDiscountLine.FindFirst then begin
-              //+NPR5.31 [262904]
-                if MixDiscount.Get(MixDiscountLine.Code) and
-                    ((MixDiscount."Starting date" <= RetailJournalHeader."Date of creation") and
-                    (MixDiscount."Ending date" >= RetailJournalHeader."Date of creation")) then begin
-                  RetailJournalLine."Discount Code" := MixDiscountLine.Code;
-                  RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Mix;
-              //-NPR5.31 [262904]
-              //    MixDiscountLine.FINDLAST;
-              //  END;
-              //UNTIL MixDiscountLine.NEXT = 0;
+                if PeriodDiscountLine.FindFirst then begin
+                    RetailJournalLine."Discount Code" := PeriodDiscountLine.Code;
+                    RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Campaign;
+                end else begin
+                    MixDiscountLine.Reset;
+                    MixDiscountLine.SetFilter(MixDiscountLine."No.", RetailJournalLine."Item No.");
+                    //-NPR5.31 [262904]
+                    //IF MixDiscountLine.FINDFIRST THEN REPEAT
+                    //  MixDiscount.RESET;
+                    MixDiscountLine.SetRange("Disc. Grouping Type", MixDiscountLine."Disc. Grouping Type"::Item);
+                    if MixDiscountLine.FindFirst then begin
+                        //+NPR5.31 [262904]
+                        if MixDiscount.Get(MixDiscountLine.Code) and
+                            ((MixDiscount."Starting date" <= RetailJournalHeader."Date of creation") and
+                            (MixDiscount."Ending date" >= RetailJournalHeader."Date of creation")) then begin
+                            RetailJournalLine."Discount Code" := MixDiscountLine.Code;
+                            RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Mix;
+                            //-NPR5.31 [262904]
+                            //    MixDiscountLine.FINDLAST;
+                            //  END;
+                            //UNTIL MixDiscountLine.NEXT = 0;
+                        end;
+                    end;
+                    //+NPR5.31 [262904]
                 end;
-              end;
-              //+NPR5.31 [262904]
-            end;
-            RetailJournalLine.Modify;
-          until RetailJournalLine.Next = 0;
-        //-NPR5.31 [262904]
+                RetailJournalLine.Modify;
+            until RetailJournalLine.Next = 0;
+            //-NPR5.31 [262904]
         end;
         //+NPR5.31 [262904]
         Message(Text001);
@@ -770,7 +786,7 @@ page 6014490 "Retail Journal Header"
     local procedure SetLineFilters()
     begin
         //-NPR5.53 [374290]
-        CurrPage.SubLine.PAGE.SetLineFilters(VendorFilter,ItemGroupFilter,ShowUnknown,ShowNew,ShowInventory);
+        CurrPage.SubLine.PAGE.SetLineFilters(VendorFilter, ItemGroupFilter, ShowUnknown, ShowNew, ShowInventory);
         //+NPR5.53 [374290]
     end;
 }

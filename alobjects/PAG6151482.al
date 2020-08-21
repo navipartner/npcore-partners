@@ -14,13 +14,14 @@ page 6151482 "Magento Sales Chart"
     {
         area(content)
         {
-            field("Date Range";StatusText)
+            field("Date Range"; StatusText)
             {
+                ApplicationArea = All;
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;
             }
-            usercontrol(chart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
+            usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
                 trigger AddInReady()
                 begin
@@ -131,17 +132,17 @@ page 6151482 "Magento Sales Chart"
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         Period: Option " ",Next,Previous;
-        SalesByPeriod: array [5] of Decimal;
-        OrderCount: array [5] of Decimal;
+        SalesByPeriod: array[5] of Decimal;
+        OrderCount: array[5] of Decimal;
 
     local procedure UpdateChart()
     begin
         if not ChartIsReady then
-          exit;
+            exit;
 
-        ChartMgt.TurnOver_Revenue(BusChartBuf,Period,PeriodType);
+        ChartMgt.TurnOver_Revenue(BusChartBuf, Period, PeriodType);
         BusChartBuf.Update(CurrPage.chart);
-        StatusText := StrSubstNo('%1 to %2',BusChartBuf."Period Filter Start Date",BusChartBuf."Period Filter End Date");
+        StatusText := StrSubstNo('%1 to %2', BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }
 

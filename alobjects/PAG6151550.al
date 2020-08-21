@@ -16,14 +16,17 @@ page 6151550 "NpXml Setup"
         {
             group(Generelt)
             {
-                field("NpXml Enabled";"NpXml Enabled")
+                field("NpXml Enabled"; "NpXml Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Version Prefix";"Template Version Prefix")
+                field("Template Version Prefix"; "Template Version Prefix")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Version No.";"Template Version No.")
+                field("Template Version No."; "Template Version No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -36,10 +39,10 @@ page 6151550 "NpXml Setup"
     trigger OnOpenPage()
     begin
         if not Get then
-          //-NC2.00
-          //NpXmlSetupMgt.SetupNpXml();
-          Insert;
-          //+NC2.00
+            //-NC2.00
+            //NpXmlSetupMgt.SetupNpXml();
+            Insert;
+        //+NC2.00
     end;
 }
 

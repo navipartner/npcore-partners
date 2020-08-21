@@ -17,14 +17,17 @@ page 6151396 "CS Approved Data"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty.";"Qty.")
+                field("Qty."; "Qty.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -38,17 +41,17 @@ page 6151396 "CS Approved Data"
     begin
         CSStockTakes.Get(localStockTakeId);
 
-        CSStockTakesData.SetRange(Stock_Take_Id,CSStockTakes."Stock-Take Id");
-        CSStockTakesData.SetRange(Stock_Take_Config_Code,CSStockTakes."Journal Template Name");
-        CSStockTakesData.SetRange(Worksheet_Name,CSStockTakes."Journal Batch Name");
+        CSStockTakesData.SetRange(Stock_Take_Id, CSStockTakes."Stock-Take Id");
+        CSStockTakesData.SetRange(Stock_Take_Config_Code, CSStockTakes."Journal Template Name");
+        CSStockTakesData.SetRange(Worksheet_Name, CSStockTakes."Journal Batch Name");
         CSStockTakesData.Open;
         while CSStockTakesData.Read do begin
-          NextRowNo := NextRowNo + 1;
-          "Entry No." := NextRowNo;
-          "Item No." := CSStockTakesData.ItemNo;
-          "Variant Code" := CSStockTakesData.Variant_Code;
-          "Qty." := CSStockTakesData.Count_;
-          Insert;
+            NextRowNo := NextRowNo + 1;
+            "Entry No." := NextRowNo;
+            "Item No." := CSStockTakesData.ItemNo;
+            "Variant Code" := CSStockTakesData.Variant_Code;
+            "Qty." := CSStockTakesData.Count_;
+            Insert;
         end;
         CSStockTakesData.Close;
 

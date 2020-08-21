@@ -22,6 +22,7 @@ page 6151597 "NpDc Coupon List Items"
                 Caption = 'Total';
                 field(TotalMaxQty; MaxQty)
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Max. Quantity per Coupon';
                     DecimalPlaces = 0 : 5;
@@ -37,6 +38,7 @@ page 6151597 "NpDc Coupon List Items"
                 }
                 field(LotValidation; LotValidation)
                 {
+                    ApplicationArea = All;
                     Caption = 'Lot Validation';
                     Visible = ValidationView;
 
@@ -53,6 +55,7 @@ page 6151597 "NpDc Coupon List Items"
                     Visible = (NOT LotValidation);
                     field(TotalValidQty; ValidQty)
                     {
+                        ApplicationArea = All;
                         BlankZero = true;
                         Caption = 'Validation Quantity';
                         Visible = (ValidationView);
@@ -70,36 +73,45 @@ page 6151597 "NpDc Coupon List Items"
             {
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Max. Discount Amount"; "Max. Discount Amount")
                 {
+                    ApplicationArea = All;
                     Visible = (NOT ValidationView);
                 }
                 field("Max. Quantity"; "Max. Quantity")
                 {
+                    ApplicationArea = All;
                     Visible = (NOT ValidationView);
                 }
                 field("Validation Quantity"; "Validation Quantity")
                 {
+                    ApplicationArea = All;
                     Visible = (LotValidation);
                 }
                 field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

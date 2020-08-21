@@ -14,32 +14,41 @@ page 6151598 "NpDc Sale Line POS Coupons"
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Date";"Sale Date")
+                field("Sale Date"; "Sale Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Line No.";"Sale Line No.")
+                field("Sale Line No."; "Sale Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Coupon Type";"Coupon Type")
+                field("Coupon Type"; "Coupon Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Coupon No.";"Coupon No.")
+                field("Coupon No."; "Coupon No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

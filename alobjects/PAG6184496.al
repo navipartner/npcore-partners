@@ -18,18 +18,22 @@ page 6184496 "Pepper Version List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Zip File";HasInstallFile)
+                field("Zip File"; HasInstallFile)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Pepper DLL Version";"Pepper DLL Version")
+                field("Pepper DLL Version"; "Pepper DLL Version")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

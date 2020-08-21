@@ -51,33 +51,41 @@ page 6151504 "Nc Import List"
                 ShowCaption = false;
                 field(Date; Date)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("<Filter Import Type>"; "Import Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Document ID"; "Document ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Sequence No."; "Sequence No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Document Name"; "Document Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field(Imported; Imported)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Runtime Error"; "Runtime Error")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Error Message";"Error Message")
+                field("Error Message"; "Error Message")
                 {
+                    ApplicationArea = All;
                     DrillDown = true;
                     Editable = false;
 
@@ -86,56 +94,68 @@ page 6151504 "Nc Import List"
                         NcImportMgt: Codeunit "Nc Import Mgt.";
                     begin
                         //-NPR5.55 [408100]
-                        Message(NcImportMgt.GetErrorMessage(Rec,false));
+                        Message(NcImportMgt.GetErrorMessage(Rec, false));
                         //+NPR5.55 [408100]
                     end;
                 }
                 field("Last Error E-mail Sent at"; "Last Error E-mail Sent at")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Last Error E-mail Sent to"; "Last Error E-mail Sent to")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Import Started at"; "Import Started at")
                 {
+                    ApplicationArea = All;
                 }
                 field("Import Completed at"; "Import Completed at")
                 {
+                    ApplicationArea = All;
                 }
                 field("Import Duration"; "Import Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Count";"Import Count")
+                field("Import Count"; "Import Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Started by";"Import Started by")
+                field("Import Started by"; "Import Started by")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Server Instance Id";"Server Instance Id")
+                field("Server Instance Id"; "Server Instance Id")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Session Id";"Session Id")
+                field("Session Id"; "Session Id")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Earliest Import Datetime";"Earliest Import Datetime")
+                field("Earliest Import Datetime"; "Earliest Import Datetime")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
             group(Control6014407)
             {
                 ShowCaption = false;
-                field("COUNT";Count)
+                field("COUNT"; Count)
                 {
+                    ApplicationArea = All;
                     Caption = 'Quantity';
                     Editable = false;
                 }
@@ -314,7 +334,7 @@ page 6151504 "Nc Import List"
     trigger OnOpenPage()
     begin
         //-NPR5.55 [408100]
-        SetRange(Imported,false);
+        SetRange(Imported, false);
         if FindFirst then;
         //+NPR5.55 [408100]
 
@@ -414,14 +434,14 @@ page 6151504 "Nc Import List"
         ImportedCount := 0;
         CurrPage.SetSelectionFilter(ImportEntry);
         //-NPR5.55 [408100]
-        ImportEntry.ModifyAll("Earliest Import Datetime",0DT);
+        ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
         Commit;
         //+NPR5.55 [408100]
         if ImportEntry.FindSet then
             repeat
-            //-NPR5.55 [408100]
-            CODEUNIT.Run(CODEUNIT::"Nc Import Processor",ImportEntry);
-            //+NPR5.55 [408100]
+                //-NPR5.55 [408100]
+                CODEUNIT.Run(CODEUNIT::"Nc Import Processor", ImportEntry);
+                //+NPR5.55 [408100]
                 ImportEntry.Get(ImportEntry."Entry No.");
                 ImportedCount += 1;
             until ImportEntry.Next = 0;
@@ -442,14 +462,14 @@ page 6151504 "Nc Import List"
             ImportEntry.ModifyAll(Imported, false, false);
             ImportEntry.ModifyAll("Runtime Error", false, false);
             //+NC2.16 [313184]
-          //-NPR5.55 [408100]
-          ImportEntry.ModifyAll("Earliest Import Datetime",0DT);
-          Commit;
-          if ImportEntry.FindSet then
-          repeat
-            NcImportProcessor.ScheduleImport(ImportEntry);
-          until ImportEntry.Next = 0;
-          //+NPR5.55 [408100]
+            //-NPR5.55 [408100]
+            ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
+            Commit;
+            if ImportEntry.FindSet then
+                repeat
+                    NcImportProcessor.ScheduleImport(ImportEntry);
+                until ImportEntry.Next = 0;
+            //+NPR5.55 [408100]
             CurrPage.Update(false);
         end;
     end;
@@ -516,9 +536,9 @@ page 6151504 "Nc Import List"
 
             NcImportType.CalcFields("XML Stylesheet");
             if not NcImportType."XML Stylesheet".HasValue then
-            //-NPR5.55 [366790]
-            //ERROR(Text006);
-            Error(Text006,"Import Type");
+                //-NPR5.55 [366790]
+                //ERROR(Text006);
+                Error(Text006, "Import Type");
             //+NPR5.55 [366790]
 
             TempBlob.FromRecord(NcImportType, NcImportType.FieldNo("XML Stylesheet"));
@@ -613,10 +633,10 @@ page 6151504 "Nc Import List"
 
             WinForm.Controls.Add(WebBrowser);
             WinForm.ShowDialog;
-          //-NPR5.55 [366790]
-          WinForm.Dispose();
-          Clear(WinForm);
-          //+NPR5.55 [366790]
+            //-NPR5.55 [366790]
+            WinForm.Dispose();
+            Clear(WinForm);
+            //+NPR5.55 [366790]
         end;
         //+NPR5.54 [366790]
     end;
@@ -628,19 +648,19 @@ page 6151504 "Nc Import List"
     begin
         //-NPR5.55 [366790]
         if DocNo = '' then
-          Error(Text001);
+            Error(Text001);
 
-        NcImportEntry.SetFilter("Document Name",'%1','*' + DocNo + '*');
+        NcImportEntry.SetFilter("Document Name", '%1', '*' + DocNo + '*');
         if NcImportEntry.FindSet then begin
-          if NcImportEntry.Count > 1 then begin
-            NcImportListPg.SetRecord(NcImportEntry);
-            NcImportListPg.RunModal();
-          end else begin
-           NcImportListPg.SetRecord(NcImportEntry);
-           NcImportListPg.ShowFormattedDocumentSource();
-          end;
+            if NcImportEntry.Count > 1 then begin
+                NcImportListPg.SetRecord(NcImportEntry);
+                NcImportListPg.RunModal();
+            end else begin
+                NcImportListPg.SetRecord(NcImportEntry);
+                NcImportListPg.ShowFormattedDocumentSource();
+            end;
         end else
-         Error(Text007,DocNo);
+            Error(Text007, DocNo);
         //+NPR5.55 [366790]
     end;
 }

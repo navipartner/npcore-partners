@@ -15,39 +15,45 @@ page 6151374 "CS Fields"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(TableNo;TableNo)
+                field(TableNo; TableNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'TableNo';
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                 }
-                field(TableName;TableName)
+                field(TableName; TableName)
                 {
+                    ApplicationArea = All;
                     Caption = 'TableName';
                 }
-                field(FieldName;FieldName)
+                field(FieldName; FieldName)
                 {
+                    ApplicationArea = All;
                     Caption = 'FieldName';
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Caption = 'Type';
                 }
-                field(Class;Class)
+                field(Class; Class)
                 {
+                    ApplicationArea = All;
                     Caption = 'Class';
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = false;
             }

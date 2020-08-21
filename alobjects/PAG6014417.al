@@ -12,11 +12,13 @@ page 6014417 "Print Tags"
         {
             repeater(Group)
             {
-                field("Print Tag";"Print Tag")
+                field("Print Tag"; "Print Tag")
                 {
+                    ApplicationArea = All;
                 }
-                field(Pick;Pick)
+                field(Pick; Pick)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
 
                     trigger OnValidate()
@@ -47,7 +49,7 @@ page 6014417 "Print Tags"
         PrintTags: Record "Print Tags";
     begin
         if TagText <> '' then
-          FromText(TagText+',');
+            FromText(TagText + ',');
     end;
 
     var
@@ -60,13 +62,14 @@ page 6014417 "Print Tags"
         TagString: Text;
         Tagged: Boolean;
     begin
-        if SelectedPrintTagsTmp.FindSet then repeat
-          TagString += SelectedPrintTagsTmp."Print Tag" + ',';
-          Tagged := true;
-        until SelectedPrintTagsTmp.Next = 0;
+        if SelectedPrintTagsTmp.FindSet then
+            repeat
+                TagString += SelectedPrintTagsTmp."Print Tag" + ',';
+                Tagged := true;
+            until SelectedPrintTagsTmp.Next = 0;
 
         if Tagged then
-          TagString := DelStr(TagString,StrLen(TagString));
+            TagString := DelStr(TagString, StrLen(TagString));
 
         exit(TagString);
     end;
@@ -81,10 +84,10 @@ page 6014417 "Print Tags"
         StringLibrary.Construct(TagString);
 
         repeat
-          i += 1;
-          PrevTag := CurrTag;
-          CurrTag := StringLibrary.SelectStringSep(i,',');
-          ToggleTag(CurrTag);
+            i += 1;
+            PrevTag := CurrTag;
+            CurrTag := StringLibrary.SelectStringSep(i, ',');
+            ToggleTag(CurrTag);
         until PrevTag = CurrTag;
 
         CurrPage.Update(false);
@@ -100,11 +103,11 @@ page 6014417 "Print Tags"
         if (StrLen(PrintTag) > 100) or (PrintTag = '') then exit;
 
         if SelectedPrintTagsTmp.Get(PrintTag) then
-          SelectedPrintTagsTmp.Delete
+            SelectedPrintTagsTmp.Delete
         else begin
-          SelectedPrintTagsTmp.Init;
-          SelectedPrintTagsTmp."Print Tag" := PrintTag;
-          SelectedPrintTagsTmp.Insert;
+            SelectedPrintTagsTmp.Init;
+            SelectedPrintTagsTmp."Print Tag" := PrintTag;
+            SelectedPrintTagsTmp.Insert;
         end;
     end;
 }

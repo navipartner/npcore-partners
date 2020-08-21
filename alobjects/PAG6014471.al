@@ -18,30 +18,33 @@ page 6014471 "Touch Screen - Meta Functions"
                 repeater(Control6150616)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                         NotBlank = true;
                     }
-                    field(NativeLangDesc;NativeLangDesc)
+                    field(NativeLangDesc; NativeLangDesc)
                     {
+                        ApplicationArea = All;
                         Caption = 'Description';
                     }
-                    field("Action";Action)
+                    field("Action"; Action)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150617)
                 {
                     ShowCaption = false;
-                    part(Control6150618;"Touch Screen - Meta F. Trans")
+                    part(Control6150618; "Touch Screen - Meta F. Trans")
                     {
-                        SubPageLink = "On function call"=FIELD(Code);
+                        SubPageLink = "On function call" = FIELD(Code);
                     }
-                    part(Control6150619;"Touch Screen - Meta Triggers")
+                    part(Control6150619; "Touch Screen - Meta Triggers")
                     {
                         Editable = NOT ("Action" = "Action"::NavEvent);
                         Enabled = NOT ("Action" = "Action"::NavEvent);
-                        SubPageLink = "On function call"=FIELD(Code);
+                        SubPageLink = "On function call" = FIELD(Code);
                     }
                 }
             }
@@ -55,15 +58,15 @@ page 6014471 "Touch Screen - Meta Functions"
     trigger OnAfterGetRecord()
     begin
         if MetaFunctionTrans.Get(Code, Language.Code) then
-          NativeLangDesc := MetaFunctionTrans.Description
+            NativeLangDesc := MetaFunctionTrans.Description
         else
-          NativeLangDesc := '';
+            NativeLangDesc := '';
     end;
 
     trigger OnOpenPage()
     begin
         Language.SetRange("Windows Language ID", GlobalLanguage);
-          if Language.Find('-') then;
+        if Language.Find('-') then;
     end;
 
     var

@@ -15,20 +15,25 @@ page 6014674 "Endpoint List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -43,14 +48,14 @@ page 6014674 "Endpoint List"
                 Caption = 'Requests';
                 Image = XMLFile;
                 RunObject = Page "Endpoint Request List";
-                RunPageLink = "Endpoint Code"=FIELD(Code);
+                RunPageLink = "Endpoint Code" = FIELD(Code);
             }
             action("Request Batches")
             {
                 Caption = 'Request Batches';
                 Image = XMLFileGroup;
                 RunObject = Page "Endpoint Request Batch List";
-                RunPageLink = "Endpoint Code"=FIELD(Code);
+                RunPageLink = "Endpoint Code" = FIELD(Code);
             }
         }
     }

@@ -18,125 +18,165 @@ page 6060065 "TM Ticket Notification Entry"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date To Notify";"Date To Notify")
+                field("Date To Notify"; "Date To Notify")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Send Status";"Notification Send Status")
+                field("Notification Send Status"; "Notification Send Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Sent At";"Notification Sent At")
+                field("Notification Sent At"; "Notification Sent At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Sent By User";"Notification Sent By User")
+                field("Notification Sent By User"; "Notification Sent By User")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Trigger";"Notification Trigger")
+                field("Notification Trigger"; "Notification Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Trigger Type";"Ticket Trigger Type")
+                field("Ticket Trigger Type"; "Ticket Trigger Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Type Code";"Ticket Type Code")
+                field("Ticket Type Code"; "Ticket Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket No.";"Ticket No.")
+                field("Ticket No."; "Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket List Price";"Ticket List Price")
+                field("Ticket List Price"; "Ticket List Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Method";"Notification Method")
+                field("Notification Method"; "Notification Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Address";"Notification Address")
+                field("Notification Address"; "Notification Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Relevant Date";"Relevant Date")
+                field("Relevant Date"; "Relevant Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Relevant Time";"Relevant Time")
+                field("Relevant Time"; "Relevant Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Relevant Datetime";"Relevant Datetime")
+                field("Relevant Datetime"; "Relevant Datetime")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expire Date";"Expire Date")
+                field("Expire Date"; "Expire Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expire Time";"Expire Time")
+                field("Expire Time"; "Expire Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expire Datetime";"Expire Datetime")
+                field("Expire Datetime"; "Expire Datetime")
                 {
+                    ApplicationArea = All;
                 }
-                field(Voided;Voided)
+                field(Voided; Voided)
                 {
+                    ApplicationArea = All;
                 }
-                field("External Ticket No.";"External Ticket No.")
+                field("External Ticket No."; "External Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket No. for Printing";"Ticket No. for Printing")
+                field("Ticket No. for Printing"; "Ticket No. for Printing")
                 {
+                    ApplicationArea = All;
                 }
-                field(Section;Section)
+                field(Section; Section)
                 {
+                    ApplicationArea = All;
                 }
-                field(Row;Row)
+                field(Row; Row)
                 {
+                    ApplicationArea = All;
                 }
-                field(Seat;Seat)
+                field(Seat; Seat)
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Holder E-Mail";"Ticket Holder E-Mail")
+                field("Ticket Holder E-Mail"; "Ticket Holder E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Holder Name";"Ticket Holder Name")
+                field("Ticket Holder Name"; "Ticket Holder Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket BOM Adm. Description";"Ticket BOM Adm. Description")
+                field("Ticket BOM Adm. Description"; "Ticket BOM Adm. Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Adm. Event Description";"Adm. Event Description")
+                field("Adm. Event Description"; "Adm. Event Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Adm. Location Description";"Adm. Location Description")
+                field("Adm. Location Description"; "Adm. Location Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket BOM Description";"Ticket BOM Description")
+                field("Ticket BOM Description"; "Ticket BOM Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Start Date";"Event Start Date")
+                field("Event Start Date"; "Event Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Start Time";"Event Start Time")
+                field("Event Start Time"; "Event Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity To Admit";"Quantity To Admit")
+                field("Quantity To Admit"; "Quantity To Admit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Waiting List Reference Code";"Waiting List Reference Code")
+                field("Waiting List Reference Code"; "Waiting List Reference Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Failed With Message";"Failed With Message")
+                field("Failed With Message"; "Failed With Message")
                 {
+                    ApplicationArea = All;
                 }
-                field("eTicket Type Code";"eTicket Type Code")
+                field("eTicket Type Code"; "eTicket Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("eTicket Pass Id";"eTicket Pass Id")
+                field("eTicket Pass Id"; "eTicket Pass Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("eTicket Pass Default URL";"eTicket Pass Default URL")
+                field("eTicket Pass Default URL"; "eTicket Pass Default URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("eTicket Pass Andriod URL";"eTicket Pass Andriod URL")
+                field("eTicket Pass Andriod URL"; "eTicket Pass Andriod URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("eTicket Pass Landing URL";"eTicket Pass Landing URL")
+                field("eTicket Pass Landing URL"; "eTicket Pass Landing URL")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -160,10 +200,10 @@ page 6060065 "TM Ticket Notification Entry"
                     ReasonText: Text;
                 begin
 
-                    if (not TicketRequestManager.CreateAndSendETicket (Rec."Ticket No.", ReasonText)) then
-                      Error (ReasonText);
+                    if (not TicketRequestManager.CreateAndSendETicket(Rec."Ticket No.", ReasonText)) then
+                        Error(ReasonText);
 
-                    CurrPage.Update (false);
+                    CurrPage.Update(false);
                 end;
             }
             action("Resend eTicket")
@@ -180,16 +220,16 @@ page 6060065 "TM Ticket Notification Entry"
                 begin
 
                     "Notification Send Status" := "Notification Send Status"::PENDING;
-                    Modify ();
+                    Modify();
 
                     //-TM1.39 [310057]
                     // IF (NOT TicketRequestManager.SendETicketNotification (Rec."Entry No.", ReasonText)) THEN
                     //   ERROR (ReasonText);
-                    if (not TicketRequestManager.SendETicketNotification (Rec."Entry No.", false, ReasonText)) then
-                      Error (ReasonText);
+                    if (not TicketRequestManager.SendETicketNotification(Rec."Entry No.", false, ReasonText)) then
+                        Error(ReasonText);
                     //+TM1.39 [310057]
 
-                    CurrPage.Update (false);
+                    CurrPage.Update(false);
                 end;
             }
             action("Show eTicket Template Data")
@@ -204,7 +244,7 @@ page 6060065 "TM Ticket Notification Entry"
                     TicketRequestManager: Codeunit "TM Ticket Request Manager";
                 begin
 
-                    Message ('%1', TicketRequestManager.GetETicketPassData (Rec));
+                    Message('%1', TicketRequestManager.GetETicketPassData(Rec));
                 end;
             }
             separator(Separator6014444)
@@ -226,13 +266,13 @@ page 6060065 "TM Ticket Notification Entry"
 
                     //-TM1.45 [374620]
                     "Notification Send Status" := "Notification Send Status"::PENDING;
-                    Modify ();
+                    Modify();
                     Commit(); //-+TM90.1.46 [374620]
 
-                    CurrPage.SetSelectionFilter (TicketNotificationEntry);
-                    TicketNotifyParticipant.SendGeneralNotification (TicketNotificationEntry);
+                    CurrPage.SetSelectionFilter(TicketNotificationEntry);
+                    TicketNotifyParticipant.SendGeneralNotification(TicketNotificationEntry);
 
-                    CurrPage.Update (false);
+                    CurrPage.Update(false);
                     //+TM1.45 [374620]
                 end;
             }

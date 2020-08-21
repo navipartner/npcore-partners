@@ -13,23 +13,29 @@ page 6059994 "MPOS Payment Gateway"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Provider;Provider)
+                field(Provider; Provider)
                 {
+                    ApplicationArea = All;
                 }
-                field(Decription;Decription)
+                field(Decription; Decription)
                 {
+                    ApplicationArea = All;
                 }
-                field("Merchant Id";"Merchant Id")
+                field("Merchant Id"; "Merchant Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(User;User)
+                field(User; User)
                 {
+                    ApplicationArea = All;
                 }
-                field(Password;Password)
+                field(Password; Password)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -50,8 +56,10 @@ page 6059994 "MPOS Payment Gateway"
                 trigger OnAction()
                 begin
                     case Provider of
-                        Provider::ADYEN : Error(NotImplimentedYetError);
-                        Provider::NETS : PAGE.Run(PAGE::"MPOS Nets Transactions List");
+                        Provider::ADYEN:
+                            Error(NotImplimentedYetError);
+                        Provider::NETS:
+                            PAGE.Run(PAGE::"MPOS Nets Transactions List");
                     end;
                 end;
             }

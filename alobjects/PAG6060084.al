@@ -14,35 +14,45 @@ page 6060084 "MCS Recommendations Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Date Time";"Start Date Time")
+                field("Start Date Time"; "Start Date Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Date Time";"End Date Time")
+                field("End Date Time"; "End Date Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Response;Response)
+                field(Response; Response)
                 {
+                    ApplicationArea = All;
                 }
-                field(Success;Success)
+                field(Success; Success)
                 {
+                    ApplicationArea = All;
                 }
-                field("Model No.";"Model No.")
+                field("Model No."; "Model No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Seed Item No.";"Seed Item No.")
+                field("Seed Item No."; "Seed Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Selected Item";"Selected Item")
+                field("Selected Item"; "Selected Item")
                 {
+                    ApplicationArea = All;
                 }
-                field("Selected Rating";"Selected Rating")
+                field("Selected Rating"; "Selected Rating")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -57,7 +67,7 @@ page 6060084 "MCS Recommendations Log"
                 Caption = 'Recommended Items';
                 Image = SuggestLines;
                 RunObject = Page "MCS Recommendations Lines";
-                RunPageLink = "Log Entry No."=FIELD("Entry No.");
+                RunPageLink = "Log Entry No." = FIELD("Entry No.");
             }
         }
     }

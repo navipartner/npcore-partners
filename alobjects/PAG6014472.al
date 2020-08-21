@@ -34,7 +34,7 @@ page 6014472 "Retail Journal Line"
     DelayedInsert = true;
     PageType = ListPart;
     SourceTable = "Retail Journal Line";
-    SourceTableView = SORTING ("No.", "Line No.");
+    SourceTableView = SORTING("No.", "Line No.");
 
     layout
     {
@@ -43,8 +43,9 @@ page 6014472 "Retail Journal Line"
             repeater(Control6014441)
             {
                 ShowCaption = false;
-                field(ItemNo;ItemNo)
+                field(ItemNo; ItemNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item No.';
                     Lookup = true;
                     TableRelation = Item;
@@ -52,20 +53,23 @@ page 6014472 "Retail Journal Line"
                     trigger OnValidate()
                     begin
                         //-NPR5.53 [374290]
-                        Validate("Item No.",ItemNo);
+                        Validate("Item No.", ItemNo);
                         Clear(Item);
                         if Item.Get(ItemNo) then;
                         //+NPR5.53 [374290]
                     end;
                 }
-                field("Calculation Date";"Calculation Date")
+                field("Calculation Date"; "Calculation Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity to Print";"Quantity to Print")
+                field("Quantity to Print"; "Quantity to Print")
                 {
+                    ApplicationArea = All;
                 }
-                field(Print;Print)
+                field(Print; Print)
                 {
+                    ApplicationArea = All;
                     Caption = 'Print';
 
                     trigger OnValidate()
@@ -78,130 +82,166 @@ page 6014472 "Retail Journal Line"
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("Vendor Item No."; "Vendor Item No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Barcode; Barcode)
                 {
+                    ApplicationArea = All;
                 }
                 field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
                 field("Item.""Unit Price"""; Item."Unit Price")
                 {
+                    ApplicationArea = All;
                     Caption = 'Unit price(Item Card)';
                     Editable = false;
                     Visible = true;
                 }
                 field("Last Direct Cost"; "Last Direct Cost")
                 {
+                    ApplicationArea = All;
                 }
                 field("Item.""Unit Cost"""; Item."Unit Cost")
                 {
+                    ApplicationArea = All;
                     Caption = 'Unit cost';
                     Editable = false;
                     Visible = false;
                 }
                 field("Profit % (new)"; "Profit % (new)")
                 {
+                    ApplicationArea = All;
                     Visible = true;
                 }
                 field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                 }
                 field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer Price Group"; "Customer Price Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer Disc. Group"; "Customer Disc. Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("New Item No."; "New Item No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Base Unit of measure"; "Base Unit of measure")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Purch. Unit of measure"; "Purch. Unit of measure")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Sales Unit of measure"; "Sales Unit of measure")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Quantity for Discount Calc"; "Quantity for Discount Calc")
                 {
+                    ApplicationArea = All;
                 }
                 field("Discount Type"; "Discount Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Discount Code"; "Discount Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Variant Code 2"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Discount Pct."; "Discount Pct.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Discount Price Incl. Vat"; "Discount Price Incl. Vat")
                 {
+                    ApplicationArea = All;
                 }
                 field("Discount Price Excl. VAT"; "Discount Price Excl. VAT")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Unit List Price"; "Unit List Price")
                 {
+                    ApplicationArea = All;
                 }
                 field("VAT %"; "VAT %")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Item group Field"; "Item group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Vendor Name"; "Vendor Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Net Change"; "Net Change")
                 {
+                    ApplicationArea = All;
                 }
                 field("Purchases (Qty.)"; "Purchases (Qty.)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales (Qty.)"; "Sales (Qty.)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Cannot edit unit price"; "Cannot edit unit price")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Exchange Label"; "Exchange Label")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -210,8 +250,9 @@ page 6014472 "Retail Journal Line"
                         //+NPR5.50 [350435]
                     end;
                 }
-                field("RFID Tag Value";"RFID Tag Value")
+                field("RFID Tag Value"; "RFID Tag Value")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -231,7 +272,7 @@ page 6014472 "Retail Journal Line"
         ItemNo := "Item No.";
         //+NPR5.53 [374290]
         if not Item.Get("Item No.") then
-          Item.Init;
+            Item.Init;
         calcProfit;
 
         RecRef.GetTable(Rec);
@@ -332,14 +373,14 @@ page 6014472 "Retail Journal Line"
     begin
         //-NPR5.53 [374290]
         if IsWebClient then begin
-          CurrPage.SetSelectionFilter(RetailJnlLine);
-          if RetailJnlLine.FindSet then
-            repeat
-              TempRetailJnlLine.Init;
-              TempRetailJnlLine := RetailJnlLine;
-              TempRetailJnlLine.Insert;
-            until RetailJnlLine.Next = 0;
-          LabelLibrary.SetSelectionBuffer(TempRetailJnlLine);
+            CurrPage.SetSelectionFilter(RetailJnlLine);
+            if RetailJnlLine.FindSet then
+                repeat
+                    TempRetailJnlLine.Init;
+                    TempRetailJnlLine := RetailJnlLine;
+                    TempRetailJnlLine.Insert;
+                until RetailJnlLine.Next = 0;
+            LabelLibrary.SetSelectionBuffer(TempRetailJnlLine);
         end;
         //+NPR5.53 [374290]
 
@@ -347,7 +388,7 @@ page 6014472 "Retail Journal Line"
 
         //-NPR5.53 [375557]
         if SkipConfirm then
-          exit;
+            exit;
         //+NPR5.53 [375557]
         //-NPR5.34 [282048]
         if Confirm(Caption_DeletePrintedLines) then begin
@@ -370,56 +411,56 @@ page 6014472 "Retail Journal Line"
         //+NPR5.53 [375557]
     end;
 
-    procedure SetLineFilters(VendorFilter: Text;ItemGroupFilter: Text;ShowUnknown: Option All,"Only existing items","Only unknown items";ShowNew: Option All,"Only existing items","Only new items";ShowInventory: Option All,"In stock","Not in stock")
+    procedure SetLineFilters(VendorFilter: Text; ItemGroupFilter: Text; ShowUnknown: Option All,"Only existing items","Only unknown items"; ShowNew: Option All,"Only existing items","Only new items"; ShowInventory: Option All,"In stock","Not in stock")
     begin
         //-NPR5.53 [374290]
         FilterGroup(40);
-        SetFilter("Vendor No.",VendorFilter);
-        SetFilter("Item group",ItemGroupFilter);
+        SetFilter("Vendor No.", VendorFilter);
+        SetFilter("Item group", ItemGroupFilter);
 
         case ShowUnknown of
-          ShowUnknown::All:
-            begin
-              SetRange("Item No.");
-            end;
-          ShowUnknown::"Only existing items":
-            begin
-              SetFilter("Item No.",'<>%1','');
-            end;
-          ShowUnknown::"Only unknown items":
-            begin
-              SetFilter("Item No.",'=%1','');
-            end;
+            ShowUnknown::All:
+                begin
+                    SetRange("Item No.");
+                end;
+            ShowUnknown::"Only existing items":
+                begin
+                    SetFilter("Item No.", '<>%1', '');
+                end;
+            ShowUnknown::"Only unknown items":
+                begin
+                    SetFilter("Item No.", '=%1', '');
+                end;
         end;
 
         case ShowNew of
-          ShowNew::All:
-            begin
-              SetRange("New Item");
-            end;
-          ShowNew::"Only existing items":
-            begin
-              SetRange("New Item",false);
-            end;
-          ShowNew::"Only new items":
-            begin
-              SetRange("New Item",true);
-            end;
+            ShowNew::All:
+                begin
+                    SetRange("New Item");
+                end;
+            ShowNew::"Only existing items":
+                begin
+                    SetRange("New Item", false);
+                end;
+            ShowNew::"Only new items":
+                begin
+                    SetRange("New Item", true);
+                end;
         end;
 
         case ShowInventory of
-          ShowInventory::All:
-            begin
-              SetRange(Inventory);
-            end;
-          ShowInventory::"In stock":
-            begin
-              SetFilter(Inventory,'>%1',0);
-            end;
-          ShowInventory::"Not in stock":
-            begin
-              SetFilter(Inventory,'<=%1',0);
-            end;
+            ShowInventory::All:
+                begin
+                    SetRange(Inventory);
+                end;
+            ShowInventory::"In stock":
+                begin
+                    SetFilter(Inventory, '>%1', 0);
+                end;
+            ShowInventory::"Not in stock":
+                begin
+                    SetFilter(Inventory, '<=%1', 0);
+                end;
         end;
 
         FilterGroup(0);

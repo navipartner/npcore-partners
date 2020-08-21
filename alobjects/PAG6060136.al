@@ -41,8 +41,9 @@ page 6060136 "MM Member Card"
         {
             group(General)
             {
-                field("External Member No.";"External Member No.")
+                field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
 
                     trigger OnValidate()
@@ -50,68 +51,86 @@ page 6060136 "MM Member Card"
 
                         //-MM1.45 [415293]
                         if ((Rec."External Member No." <> xRec."External Member No.") and (xRec."External Member No." <> '')) then
-                          if (not Confirm (EXT_NO_CHANGE, false)) then
-                            Error ('');
+                            if (not Confirm(EXT_NO_CHANGE, false)) then
+                                Error('');
                         //+MM1.45 [415293]
                     end;
                 }
-                field("Display Name";"Display Name")
+                field("Display Name"; "Display Name")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("First Name";"First Name")
+                field("First Name"; "First Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Middle Name";"Middle Name")
+                field("Middle Name"; "Middle Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Name";"Last Name")
+                field("Last Name"; "Last Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail Address";"E-Mail Address")
+                field("E-Mail Address"; "E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Social Security No.";"Social Security No.")
+                field("Social Security No."; "Social Security No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code Code";"Post Code Code")
+                field("Post Code Code"; "Post Code Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field(Country;Country)
+                field(Country; Country)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(CRM)
             {
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
-                field(Gender;Gender)
+                field(Gender; Gender)
                 {
+                    ApplicationArea = All;
                 }
-                field(Birthday;Birthday)
+                field(Birthday; Birthday)
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail News Letter";"E-Mail News Letter")
+                field("E-Mail News Letter"; "E-Mail News Letter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Method";"Notification Method")
+                field("Notification Method"; "Notification Method")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     var
@@ -119,28 +138,29 @@ page 6060136 "MM Member Card"
                         PageMemberCommunication: Page "MM Member Communication";
                     begin
 
-                        MemberCommunication.SetFilter ("Member Entry No.", '=%1', Rec."Entry No.");
-                        PageMemberCommunication.SetTableView (MemberCommunication);
-                        PageMemberCommunication.RunModal ();
+                        MemberCommunication.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
+                        PageMemberCommunication.SetTableView(MemberCommunication);
+                        PageMemberCommunication.RunModal();
                     end;
                 }
             }
-            part(MembershipListPart;"MM Member Membership ListPart")
+            part(MembershipListPart; "MM Member Membership ListPart")
             {
-                SubPageLink = "Member Entry No."=FIELD("Entry No.");
-                SubPageView = SORTING("Member Entry No.","Membership Entry No.");
+                SubPageLink = "Member Entry No." = FIELD("Entry No.");
+                SubPageView = SORTING("Member Entry No.", "Membership Entry No.");
             }
-            part(MemberCardsSubpage;"MM Member Cards ListPart")
+            part(MemberCardsSubpage; "MM Member Cards ListPart")
             {
-                SubPageLink = "Member Entry No."=FIELD("Entry No.");
+                SubPageLink = "Member Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Descending);
             }
             group(Attributes)
             {
                 Caption = 'Attributes';
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -148,19 +168,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (1);
+                        OnAttributeLookup(1);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (1);
+                        SetMasterDataAttributeValue(1);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -168,19 +189,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (2);
+                        SetMasterDataAttributeValue(2);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (2);
+                        SetMasterDataAttributeValue(2);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -188,19 +210,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (3);
+                        OnAttributeLookup(3);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (3);
+                        SetMasterDataAttributeValue(3);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -208,19 +231,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (4);
+                        OnAttributeLookup(4);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (4);
+                        SetMasterDataAttributeValue(4);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -228,19 +252,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (5);
+                        OnAttributeLookup(5);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (5);
+                        SetMasterDataAttributeValue(5);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -248,19 +273,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (6);
+                        OnAttributeLookup(6);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (6);
+                        SetMasterDataAttributeValue(6);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -268,19 +294,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (7);
+                        OnAttributeLookup(7);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (7);
+                        SetMasterDataAttributeValue(7);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -288,19 +315,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (8);
+                        OnAttributeLookup(8);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (8);
+                        SetMasterDataAttributeValue(8);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -308,19 +336,20 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (9);
+                        OnAttributeLookup(9);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (9);
+                        SetMasterDataAttributeValue(9);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -328,14 +357,14 @@ page 6060136 "MM Member Card"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-MM1.40 [360242]
-                        OnAttributeLookup (10);
+                        OnAttributeLookup(10);
                         //+MM1.40 [360242]
                     end;
 
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (10);
+                        SetMasterDataAttributeValue(10);
                         //+MM1.40 [360242]
                     end;
                 }
@@ -343,7 +372,7 @@ page 6060136 "MM Member Card"
         }
         area(factboxes)
         {
-            systempart(Control6150638;Notes)
+            systempart(Control6150638; Notes)
             {
             }
         }
@@ -364,8 +393,8 @@ page 6060136 "MM Member Card"
                 trigger OnAction()
                 begin
 
-                    if (Confirm (CONFIRM_PRINT, true, StrSubstNo (CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then
-                      MemberRetailIntegration.PrintMemberAccountCard ("External Member No.");
+                    if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then
+                        MemberRetailIntegration.PrintMemberAccountCard("External Member No.");
                 end;
             }
             action(PrintCard)
@@ -383,10 +412,10 @@ page 6060136 "MM Member Card"
                     MemberCardEntryNo: Integer;
                 begin
                     //-MM1.22 [289434]
-                    if (Confirm (CONFIRM_PRINT, true, StrSubstNo (CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
-                      //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
-                      MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo ();
-                      MemberRetailIntegration.PrintMemberCard ("Entry No.", MemberCardEntryNo);
+                    if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
+                        //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
+                        MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo();
+                        MemberRetailIntegration.PrintMemberCard("Entry No.", MemberCardEntryNo);
                     end;
                 end;
             }
@@ -414,36 +443,39 @@ page 6060136 "MM Member Card"
                     //-MM1.22 [278175]
                     //-#312939 [312939]
                     //MembershipEntryNo := MembershipManagement.GetMembershipFromExtMemberNo (Rec."External Member No.");
-                    MembershipEntryNo := CurrPage.MembershipListPart.PAGE.GetSelectedMembershipEntryNo ();
+                    MembershipEntryNo := CurrPage.MembershipListPart.PAGE.GetSelectedMembershipEntryNo();
                     //+#312939 [312939]
 
-                    if (MembershipManagement.MembershipNeedsActivation (MembershipEntryNo)) then
-                      if (Confirm (ACTIVATE_MEMBERSHIP, true)) then
-                        MembershipManagement.ActivateMembershipLedgerEntry (MembershipEntryNo, Today);
+                    if (MembershipManagement.MembershipNeedsActivation(MembershipEntryNo)) then
+                        if (Confirm(ACTIVATE_MEMBERSHIP, true)) then
+                            MembershipManagement.ActivateMembershipLedgerEntry(MembershipEntryNo, Today);
                     //+MM1.22 [278175]
 
                     //-#312939 [312939]
                     //MembershipManagement.IssueNewMemberCard (TRUE, "Entry No.", CardEntryNo, ResponseMessage);
                     MemberInfoCapture."Member Entry No" := Rec."Entry No.";
                     MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
-                    MembershipManagement.IssueMemberCard (true, MemberInfoCapture, CardEntryNo, ResponseMessage);
+                    MembershipManagement.IssueMemberCard(true, MemberInfoCapture, CardEntryNo, ResponseMessage);
                     //+#312939 [312939]
 
-                    MemberCard.Get (CardEntryNo);
+                    MemberCard.Get(CardEntryNo);
 
                     //-#310132 [310132]
-                    Membership.Get (MembershipEntryNo);
-                    MembershipSetup.Get (Membership."Membership Code");
+                    Membership.Get(MembershipEntryNo);
+                    MembershipSetup.Get(Membership."Membership Code");
 
                     case MembershipSetup."Card Expire Date Calculation" of
-                      MembershipSetup."Card Expire Date Calculation"::NA : MemberCard."Valid Until" := 0D;
-                      MembershipSetup."Card Expire Date Calculation"::DATEFORMULA : MemberCard."Valid Until"  := CalcDate (MembershipSetup."Card Number Valid Until", Today);
-                      MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED : MembershipManagement.GetMembershipMaxValidUntilDate (MembershipEntryNo, MemberCard."Valid Until");
+                        MembershipSetup."Card Expire Date Calculation"::NA:
+                            MemberCard."Valid Until" := 0D;
+                        MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
+                            MemberCard."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", Today);
+                        MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
+                            MembershipManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, MemberCard."Valid Until");
                     end;
-                    MemberCard.Modify ();
+                    MemberCard.Modify();
                     //+#310132 [310132]
 
-                    PAGE.Run (6060133, MemberCard);
+                    PAGE.Run(6060133, MemberCard);
                 end;
             }
             action("Take Picture")
@@ -458,7 +490,7 @@ page 6060136 "MM Member Card"
                 var
                     MCSWebcamAPI: Codeunit "MCS Webcam API";
                 begin
-                    MCSWebcamAPI.CallCaptureStartByMMMember(Rec,true);
+                    MCSWebcamAPI.CallCaptureStartByMMMember(Rec, true);
                 end;
             }
             action("Import Picture")
@@ -473,7 +505,7 @@ page 6060136 "MM Member Card"
                 var
                     MCSFaceServiceAPI: Codeunit "MCS Face Service API";
                 begin
-                    MCSFaceServiceAPI.ImportPersonPicture(Rec,true);
+                    MCSFaceServiceAPI.ImportPersonPicture(Rec, true);
                 end;
             }
             action("Member Anonymization")
@@ -489,11 +521,11 @@ page 6060136 "MM Member Card"
                     GDPRManagement: Codeunit "MM GDPR Management";
                     ReasonText: Text;
                 begin
-                    if (GDPRManagement.AnonymizeMember (Rec."Entry No.", false, ReasonText)) then
-                      if (not Confirm ('Member informtion will be lost! Do you want to continue?', false)) then
-                        Error ('');
+                    if (GDPRManagement.AnonymizeMember(Rec."Entry No.", false, ReasonText)) then
+                        if (not Confirm('Member informtion will be lost! Do you want to continue?', false)) then
+                            Error('');
 
-                    Message (ReasonText);
+                    Message(ReasonText);
                 end;
             }
             action("Create Welcome Notification")
@@ -512,16 +544,16 @@ page 6060136 "MM Member Card"
                 begin
 
                     //-MM1.42 [372557]
-                    MembershipRole.SetFilter ("Member Entry No.", '=%1', Rec."Entry No.");
-                    MembershipRole.SetFilter (Blocked, '=%1', false);
-                    if (MembershipRole.FindSet ()) then begin
-                      repeat
-                        EntryNo := MemberNotification.AddMemberWelcomeNotification (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
-                        if (MembershipNotification.Get (EntryNo)) then
-                          if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
-                            MemberNotification.HandleMembershipNotification (MembershipNotification);
+                    MembershipRole.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
+                    MembershipRole.SetFilter(Blocked, '=%1', false);
+                    if (MembershipRole.FindSet()) then begin
+                        repeat
+                            EntryNo := MemberNotification.AddMemberWelcomeNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
+                            if (MembershipNotification.Get(EntryNo)) then
+                                if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                                    MemberNotification.HandleMembershipNotification(MembershipNotification);
 
-                      until (MembershipRole.Next () = 0);
+                        until (MembershipRole.Next() = 0);
                     end;
                     //+MM1.42 [372557]
                 end;
@@ -542,15 +574,15 @@ page 6060136 "MM Member Card"
                 begin
 
                     //-MM1.42 [372557]
-                    MembershipRole.SetFilter ("Member Entry No.", '=%1', Rec."Entry No.");
-                    MembershipRole.SetFilter (Blocked, '=%1', false);
-                    if (MembershipRole.FindSet ()) then begin
-                      repeat
-                        EntryNo := MemberNotification.CreateWalletSendNotification (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0);
-                        if (MembershipNotification.Get (EntryNo)) then
-                          if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
-                            MemberNotification.HandleMembershipNotification (MembershipNotification);
-                      until (MembershipRole.Next () = 0);
+                    MembershipRole.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
+                    MembershipRole.SetFilter(Blocked, '=%1', false);
+                    if (MembershipRole.FindSet()) then begin
+                        repeat
+                            EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0);
+                            if (MembershipNotification.Get(EntryNo)) then
+                                if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                                    MemberNotification.HandleMembershipNotification(MembershipNotification);
+                        until (MembershipRole.Next() = 0);
                     end;
                     //+MM1.42 [372557]
                 end;
@@ -566,7 +598,7 @@ page 6060136 "MM Member Card"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "TM Ticket List";
-                RunPageLink = "External Member Card No."=FIELD("External Member No.");
+                RunPageLink = "External Member Card No." = FIELD("External Member No.");
             }
             action("Preferred Communication Methods")
             {
@@ -577,7 +609,7 @@ page 6060136 "MM Member Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Communication";
-                RunPageLink = "Member Entry No."=FIELD("Entry No.");
+                RunPageLink = "Member Entry No." = FIELD("Entry No.");
             }
             action("Member Notifications")
             {
@@ -586,7 +618,7 @@ page 6060136 "MM Member Card"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "MM Member Notification Entry";
-                RunPageLink = "Member Entry No."=FIELD("Entry No.");
+                RunPageLink = "Member Entry No." = FIELD("Entry No.");
             }
             action("Arrival Log")
             {
@@ -597,7 +629,7 @@ page 6060136 "MM Member Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Arrival Log";
-                RunPageLink = "External Member No."=FIELD("External Member No.");
+                RunPageLink = "External Member No." = FIELD("External Member No.");
             }
             group(History)
             {
@@ -618,10 +650,10 @@ page 6060136 "MM Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,Rec."External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
 
                         CustLedgerEntry.FilterGroup(2);
-                        CustLedgerEntry.SetRange("Customer No.",Membership."Customer No.");
+                        CustLedgerEntry.SetRange("Customer No.", Membership."Customer No.");
                         CustLedgerEntry.FilterGroup(0);
 
                         CustomerLedgerEntries.Editable(false);
@@ -643,16 +675,16 @@ page 6060136 "MM Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,Rec."External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
 
-                        ItemLedgerEntry.SetCurrentKey("Source Type","Source No.","Posting Date");
+                        ItemLedgerEntry.SetCurrentKey("Source Type", "Source No.", "Posting Date");
                         ItemLedgerEntry.FilterGroup(2);
-                        ItemLedgerEntry.SetRange("Source Type",ItemLedgerEntry."Source Type"::Customer);
-                        ItemLedgerEntry.SetRange("Source No.",Membership."Customer No.");
+                        ItemLedgerEntry.SetRange("Source Type", ItemLedgerEntry."Source Type"::Customer);
+                        ItemLedgerEntry.SetRange("Source No.", Membership."Customer No.");
                         ItemLedgerEntry.FilterGroup(0);
                         ItemLedgerEntry.Ascending(false);
                         if ItemLedgerEntry.FindFirst then;
-                        PAGE.RunModal(0,ItemLedgerEntry);
+                        PAGE.RunModal(0, ItemLedgerEntry);
                         //+MM1.42 [377727]
                     end;
                 }
@@ -671,7 +703,7 @@ page 6060136 "MM Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,Rec."External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
 
                         Customer.Get(Membership."Customer No.");
                         CustomerStatistics.SetRecord(Customer);
@@ -700,9 +732,9 @@ page 6060136 "MM Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,"External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                            Error(NO_ENTRIES, "External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
                         //+MM1.42 [377727]
                     end;
                 }
@@ -722,9 +754,9 @@ page 6060136 "MM Member Card"
                     begin
                         //-MM1.42 [377727]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,"External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                            Error(NO_ENTRIES, "External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
                         //+MM1.42 [377727]
                     end;
                 }
@@ -738,10 +770,10 @@ page 6060136 "MM Member Card"
     begin
         //-MM1.42 [377727]
         Clear(Membership);
-        MembershipRole.SetRange("Member Entry No.","Entry No.");
-        MembershipRole.SetRange(Blocked,false);
+        MembershipRole.SetRange("Member Entry No.", "Entry No.");
+        MembershipRole.SetRange(Blocked, false);
         if MembershipRole.FindFirst() then
-          Membership.Get(MembershipRole."Membership Entry No.");
+            Membership.Get(MembershipRole."Membership Entry No.");
         //+MM1.42 [377727]
     end;
 
@@ -749,7 +781,7 @@ page 6060136 "MM Member Card"
     begin
 
         //+MM1.40 [360242]
-        GetMasterDataAttributeValue ();
+        GetMasterDataAttributeValue();
         //-MM1.40 [360242]
     end;
 
@@ -759,7 +791,7 @@ page 6060136 "MM Member Card"
     begin
 
         //-MM1.40 [360242]
-        NPRAttrManagement.GetAttributeVisibility (GetAttributeTableId (), NPRAttrVisibleArray);
+        NPRAttrManagement.GetAttributeVisibility(GetAttributeTableId(), NPRAttrVisibleArray);
         // Because NAV is stupid!
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
@@ -771,7 +803,7 @@ page 6060136 "MM Member Card"
         NPRAttrVisible08 := NPRAttrVisibleArray[8];
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrEditable := CurrPage.Editable();
         //+MM1.40 [360242]
         //-MM1.42 [377727]
         RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
@@ -784,10 +816,10 @@ page 6060136 "MM Member Card"
         CONFIRM_PRINT: Label 'Do you want to print a member account card for %1?';
         CONFIRM_PRINT_FMT: Label '[%1] - %2';
         ACTIVATE_MEMBERSHIP: Label 'The membership has not been activated yet. Do you want to activate it now?';
-        NPRAttrTextArray: array [40] of Text[250];
+        NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -806,7 +838,7 @@ page 6060136 "MM Member Card"
     begin
 
         //-MM1.40 [360242]
-        NPRAttrManagement.SetEntryAttributeValue (GetAttributeTableId (), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
+        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
         //+MM1.40 [360242]
     end;
 
@@ -814,8 +846,8 @@ page 6060136 "MM Member Card"
     begin
 
         //-MM1.40 [360242]
-        NPRAttrManagement.GetEntryAttributeValue (NPRAttrTextArray, GetAttributeTableId, "Entry No.");
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, "Entry No.");
+        NPRAttrEditable := CurrPage.Editable();
         //+MM1.40 [360242]
     end;
 
@@ -823,7 +855,7 @@ page 6060136 "MM Member Card"
     begin
 
         //-MM1.40 [360242]
-        exit (NPRAttrVisibleArray [AttributeNumber]);
+        exit(NPRAttrVisibleArray[AttributeNumber]);
         //+MM1.40 [360242]
     end;
 
@@ -831,7 +863,7 @@ page 6060136 "MM Member Card"
     begin
 
         //-MM1.40 [360242]
-        exit (DATABASE::"MM Member");
+        exit(DATABASE::"MM Member");
         //+MM1.40 [360242]
     end;
 
@@ -839,7 +871,7 @@ page 6060136 "MM Member Card"
     begin
 
         //-MM1.40 [360242]
-        exit (StrSubstNo ('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
+        exit(StrSubstNo('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
         //+MM1.40 [360242]
     end;
 
@@ -849,7 +881,7 @@ page 6060136 "MM Member Card"
         //-MM1.44 [383842]
         //-MM1.40 [360242]
         //NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, FORMAT (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
-        NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, Format ("Entry No.",0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
+        NPRAttrManagement.OnPageLookUp(GetAttributeTableId, AttributeNumber, Format("Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
         //+MM1.40 [360242]
         //+MM1.44 [383842]
     end;

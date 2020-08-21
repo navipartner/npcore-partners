@@ -14,98 +14,112 @@ page 6060093 "TM Offline Ticket Validation"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ticket Reference Type";"Ticket Reference Type")
+                field("Ticket Reference Type"; "Ticket Reference Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ticket Reference No.";"Ticket Reference No.")
+                field("Ticket Reference No."; "Ticket Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Reference Type";"Member Reference Type")
+                field("Member Reference Type"; "Member Reference Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Member Reference No.";"Member Reference No.")
+                field("Member Reference No."; "Member Reference No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Event Type";"Event Type")
+                field("Event Type"; "Event Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Date";"Event Date")
+                field("Event Date"; "Event Date")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
 
                         //-TM90.1.46 [383196]
-                        OfflineTicketValidationRec.Reset ();
-                        OfflineTicketValidationRec.CopyFilters (Rec);
-                        OfflineTicketValidationRec.SetFilter ("Import Reference No.", '=%1', Rec."Import Reference No.");
-                        OfflineTicketValidationRec.SetFilter ("Process Status", '=%1', Rec."Process Status"::UNHANDLED);
+                        OfflineTicketValidationRec.Reset();
+                        OfflineTicketValidationRec.CopyFilters(Rec);
+                        OfflineTicketValidationRec.SetFilter("Import Reference No.", '=%1', Rec."Import Reference No.");
+                        OfflineTicketValidationRec.SetFilter("Process Status", '=%1', Rec."Process Status"::UNHANDLED);
                         if (Rec."Event Date" <> xRec."Event Date") then
-                          if (Confirm (APPLY_ON_ALL, true, Rec."Event Date", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
-                            OfflineTicketValidationRec.ModifyAll ("Event Date", Rec."Event Date");
-                            CurrPage.Update (false);
-                          end;
+                            if (Confirm(APPLY_ON_ALL, true, Rec."Event Date", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
+                                OfflineTicketValidationRec.ModifyAll("Event Date", Rec."Event Date");
+                                CurrPage.Update(false);
+                            end;
                         //+TM90.1.46 [383196]
                     end;
                 }
-                field("Event Time";"Event Time")
+                field("Event Time"; "Event Time")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
 
                         //-TM90.1.46 [383196]
-                        OfflineTicketValidationRec.Reset ();
-                        OfflineTicketValidationRec.CopyFilters (Rec);
-                        OfflineTicketValidationRec.SetFilter ("Import Reference No.", '=%1', Rec."Import Reference No.");
-                        OfflineTicketValidationRec.SetFilter ("Process Status", '=%1', Rec."Process Status"::UNHANDLED);
+                        OfflineTicketValidationRec.Reset();
+                        OfflineTicketValidationRec.CopyFilters(Rec);
+                        OfflineTicketValidationRec.SetFilter("Import Reference No.", '=%1', Rec."Import Reference No.");
+                        OfflineTicketValidationRec.SetFilter("Process Status", '=%1', Rec."Process Status"::UNHANDLED);
                         if (Rec."Event Time" <> xRec."Event Time") then
-                          if (Confirm (APPLY_ON_ALL, true, Rec."Event Time", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
-                            OfflineTicketValidationRec.ModifyAll ("Event Time", Rec."Event Time");
-                            CurrPage.Update (false);
-                          end;
+                            if (Confirm(APPLY_ON_ALL, true, Rec."Event Time", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
+                                OfflineTicketValidationRec.ModifyAll("Event Time", Rec."Event Time");
+                                CurrPage.Update(false);
+                            end;
                         //+TM90.1.46 [383196]
                     end;
                 }
-                field("Process Status";"Process Status")
+                field("Process Status"; "Process Status")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
 
                         //-TM90.1.46 [383196]
-                        OfflineTicketValidationRec.Reset ();
-                        OfflineTicketValidationRec.CopyFilters (Rec);
-                        OfflineTicketValidationRec.SetFilter ("Import Reference No.", '=%1', Rec."Import Reference No.");
+                        OfflineTicketValidationRec.Reset();
+                        OfflineTicketValidationRec.CopyFilters(Rec);
+                        OfflineTicketValidationRec.SetFilter("Import Reference No.", '=%1', Rec."Import Reference No.");
                         if (Rec."Process Status" <> xRec."Process Status") then
-                          if (Confirm (APPLY_ON_ALL, true, Rec."Process Status", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
-                            OfflineTicketValidationRec.ModifyAll ("Process Status", Rec."Process Status");
-                            CurrPage.Update (false);
-                          end;
+                            if (Confirm(APPLY_ON_ALL, true, Rec."Process Status", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
+                                OfflineTicketValidationRec.ModifyAll("Process Status", Rec."Process Status");
+                                CurrPage.Update(false);
+                            end;
                         //+TM90.1.46 [383196]
                     end;
                 }
-                field("Process Response Text";"Process Response Text")
+                field("Process Response Text"; "Process Response Text")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Reference No.";"Import Reference No.")
+                field("Import Reference No."; "Import Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Imported At";"Imported At")
+                field("Imported At"; "Imported At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Reference Name";"Import Reference Name")
+                field("Import Reference Name"; "Import Reference Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -125,8 +139,8 @@ page 6060093 "TM Offline Ticket Validation"
                 trigger OnAction()
                 begin
 
-                    OfflineTicketValidation.ProcessEntry ("Entry No.");
-                    CurrPage.Update (false);
+                    OfflineTicketValidation.ProcessEntry("Entry No.");
+                    CurrPage.Update(false);
                 end;
             }
             action("Process Batch")
@@ -139,8 +153,8 @@ page 6060093 "TM Offline Ticket Validation"
                 trigger OnAction()
                 begin
 
-                    OfflineTicketValidation.ProcessImportBatch ("Import Reference No.");
-                    CurrPage.Update (false);
+                    OfflineTicketValidation.ProcessImportBatch("Import Reference No.");
+                    CurrPage.Update(false);
                 end;
             }
         }
@@ -153,7 +167,7 @@ page 6060093 "TM Offline Ticket Validation"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "TM Ticket List";
-                RunPageLink = "External Ticket No."=FIELD("Ticket Reference No.");
+                RunPageLink = "External Ticket No." = FIELD("Ticket Reference No.");
             }
         }
     }
@@ -161,7 +175,7 @@ page 6060093 "TM Offline Ticket Validation"
     trigger OnOpenPage()
     begin
 
-        SetFilter ("Process Status", '<>%1', "Process Status"::VALID);
+        SetFilter("Process Status", '<>%1', "Process Status"::VALID);
     end;
 
     var

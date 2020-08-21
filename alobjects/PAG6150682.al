@@ -16,38 +16,48 @@ page 6150682 "NPRE W.Pad Line Pr.Log Entries"
         {
             repeater(Group)
             {
-                field("Waiter Pad No.";"Waiter Pad No.")
+                field("Waiter Pad No."; "Waiter Pad No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Waiter Pad Line No.";"Waiter Pad Line No.")
+                field("Waiter Pad Line No."; "Waiter Pad Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Print Type";"Print Type")
+                field("Print Type"; "Print Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Flow Status Object";"Flow Status Object")
+                field("Flow Status Object"; "Flow Status Object")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Flow Status Code";"Flow Status Code")
+                field("Flow Status Code"; "Flow Status Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Category Code";"Print Category Code")
+                field("Print Category Code"; "Print Category Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sent Date-Time";"Sent Date-Time")
+                field("Sent Date-Time"; "Sent Date-Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sent Quanity (Base)";"Sent Quanity (Base)")
+                field("Sent Quanity (Base)"; "Sent Quanity (Base)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Output Type";"Output Type")
+                field("Output Type"; "Output Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

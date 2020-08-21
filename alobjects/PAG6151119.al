@@ -12,8 +12,9 @@ page 6151119 "NpIa Item AddOn Sel. Variants"
     {
         area(content)
         {
-            field(Control6014406;'')
+            field(Control6014406; '')
             {
+                ApplicationArea = All;
                 CaptionClass = Format(GenerateInstructions());
                 Editable = false;
                 MultiLine = true;
@@ -21,22 +22,27 @@ page 6151119 "NpIa Item AddOn Sel. Variants"
             }
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -52,13 +58,13 @@ page 6151119 "NpIa Item AddOn Sel. Variants"
         Ok: Boolean;
     begin
         if CloseAction = ACTION::LookupOK then begin
-          SetRange("Variant Code",'');
-          Ok := IsEmpty;
-          SetRange("Variant Code",'');
-          if not Ok then
-            Message(VariantIsRequiredTxt);
+            SetRange("Variant Code", '');
+            Ok := IsEmpty;
+            SetRange("Variant Code", '');
+            if not Ok then
+                Message(VariantIsRequiredTxt);
         end else
-          Ok := true;
+            Ok := true;
         exit(Ok);
     end;
 

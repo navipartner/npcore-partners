@@ -35,54 +35,71 @@ page 6060126 "MM Members"
             {
                 field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("First Name"; "First Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Middle Name"; "Middle Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Last Name"; "Last Name")
                 {
+                    ApplicationArea = All;
                 }
                 field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
                 field(Gender; Gender)
                 {
+                    ApplicationArea = All;
                 }
                 field(Birthday; Birthday)
                 {
+                    ApplicationArea = All;
                 }
                 field("Contact No."; "Contact No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("E-Mail News Letter"; "E-Mail News Letter")
                 {
+                    ApplicationArea = All;
                 }
                 field("E-Mail Address"; "E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
                 field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
                 field("Post Code Code"; "Post Code Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(City; City)
                 {
+                    ApplicationArea = All;
                 }
                 field(Country; Country)
                 {
+                    ApplicationArea = All;
                 }
                 field("Display Name"; "Display Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -90,12 +107,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (1);
+                        SetMasterDataAttributeValue(1);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -103,12 +121,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (2);
+                        SetMasterDataAttributeValue(2);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -116,12 +135,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (3);
+                        SetMasterDataAttributeValue(3);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -129,12 +149,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (4);
+                        SetMasterDataAttributeValue(4);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -142,12 +163,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (5);
+                        SetMasterDataAttributeValue(5);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -155,12 +177,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (6);
+                        SetMasterDataAttributeValue(6);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -168,12 +191,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (7);
+                        SetMasterDataAttributeValue(7);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -181,12 +205,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (8);
+                        SetMasterDataAttributeValue(8);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -194,12 +219,13 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (9);
+                        SetMasterDataAttributeValue(9);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -207,7 +233,7 @@ page 6060126 "MM Members"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (10);
+                        SetMasterDataAttributeValue(10);
                         //+MM1.40 [360242]
                     end;
                 }
@@ -235,14 +261,14 @@ page 6060126 "MM Members"
                 begin
 
                     //-MM1.42 [385449]
-                    if (SelectMembershipSetup (MembershipSalesSetup)) then
-                      MembershipEntryNo := CreateMembership (MembershipSalesSetup);
+                    if (SelectMembershipSetup(MembershipSalesSetup)) then
+                        MembershipEntryNo := CreateMembership(MembershipSalesSetup);
 
                     if (MembershipEntryNo > 0) then begin
-                      MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
-                      MembershipRole.FindFirst ();
-                      Rec.SetFilter ("Entry No.", '=%1', MembershipRole."Member Entry No.");
-                      CurrPage.Update (false);
+                        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+                        MembershipRole.FindFirst();
+                        Rec.SetFilter("Entry No.", '=%1', MembershipRole."Member Entry No.");
+                        CurrPage.Update(false);
                     end;
                     //+MM1.42 [385449]
                 end;
@@ -278,7 +304,7 @@ page 6060126 "MM Members"
                 begin
 
                     //-MM1.41 [365970]
-                    SyncContact ();
+                    SyncContact();
                     //+MM1.41 [365970]
                 end;
             }
@@ -316,7 +342,7 @@ page 6060126 "MM Members"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Communication";
-                RunPageLink = "Member Entry No."=FIELD("Entry No.");
+                RunPageLink = "Member Entry No." = FIELD("Entry No.");
             }
             action("Arrival Log")
             {
@@ -348,9 +374,9 @@ page 6060126 "MM Members"
                     begin
                         //-MM1.43 [387750]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,"External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                            Error(NO_ENTRIES, "External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
                         //+MM1.43 [387750]
                     end;
                 }
@@ -370,9 +396,9 @@ page 6060126 "MM Members"
                     begin
                         //-MM1.43 [387750]
                         if (Membership."Customer No." = '') then
-                          Error(NO_ENTRIES,"External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                            Error(NO_ENTRIES, "External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
                         //+MM1.43 [387750]
                     end;
                 }
@@ -386,10 +412,10 @@ page 6060126 "MM Members"
     begin
         //-MM1.43 [387750]
         Clear(Membership);
-        MembershipRole.SetRange("Member Entry No.","Entry No.");
-        MembershipRole.SetRange(Blocked,false);
+        MembershipRole.SetRange("Member Entry No.", "Entry No.");
+        MembershipRole.SetRange(Blocked, false);
         if MembershipRole.FindFirst() then
-          Membership.Get(MembershipRole."Membership Entry No.");
+            Membership.Get(MembershipRole."Membership Entry No.");
         //+MM1.43 [387750]
     end;
 
@@ -492,14 +518,14 @@ page 6060126 "MM Members"
     begin
 
         //-MM1.41 [365970]
-        CurrPage.SetSelectionFilter (Member);
-        if (Member.FindSet ()) then begin
-          if (Member.Count() > 1) then
-            if (not Confirm (CONFIRM_SYNC, true, Member.Count())) then
-              Error ('');
-          repeat
-            Member.Modify (true);
-          until (Member.Next () = 0);
+        CurrPage.SetSelectionFilter(Member);
+        if (Member.FindSet()) then begin
+            if (Member.Count() > 1) then
+                if (not Confirm(CONFIRM_SYNC, true, Member.Count())) then
+                    Error('');
+            repeat
+                Member.Modify(true);
+            until (Member.Next() = 0);
         end;
         //+MM1.41 [365970]
     end;
@@ -510,20 +536,20 @@ page 6060126 "MM Members"
     begin
 
         //-MM1.42 [385449]
-        MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
-        if (MembershipSalesSetup.Count () = 1) then begin
-          exit (MembershipSalesSetup.FindFirst ());
+        MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+        if (MembershipSalesSetup.Count() = 1) then begin
+            exit(MembershipSalesSetup.FindFirst());
 
         end else begin
-          MembershipSalesSetupPage.SetTableView (MembershipSalesSetup);
-          MembershipSalesSetupPage.LookupMode (true);
-          if (ACTION::LookupOK = MembershipSalesSetupPage.RunModal ()) then begin
-            MembershipSalesSetupPage.GetRecord (MembershipSalesSetup);
-            exit (true);
-          end;
+            MembershipSalesSetupPage.SetTableView(MembershipSalesSetup);
+            MembershipSalesSetupPage.LookupMode(true);
+            if (ACTION::LookupOK = MembershipSalesSetupPage.RunModal()) then begin
+                MembershipSalesSetupPage.GetRecord(MembershipSalesSetup);
+                exit(true);
+            end;
         end;
 
-        exit (false);
+        exit(false);
         //+MM1.42 [385449]
     end;
 
@@ -539,32 +565,33 @@ page 6060126 "MM Members"
     begin
 
         //-MM1.42 [385449]
-        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
-        MemberCommunity.Get (MembershipSetup."Community Code");
-        MemberCommunity.CalcFields ("Foreign Membership");
-        MemberCommunity.TestField ("Foreign Membership", false);
+        MemberCommunity.Get(MembershipSetup."Community Code");
+        MemberCommunity.CalcFields("Foreign Membership");
+        MemberCommunity.TestField("Foreign Membership", false);
 
-        MemberInfoCapture.Init ();
+        MemberInfoCapture.Init();
         MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
-        MemberInfoCapture.Insert ();
+        MemberInfoCapture.Insert();
 
-        MemberInfoCapturePage.SetRecord (MemberInfoCapture);
-        MemberInfoCapture.SetFilter ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
-        MemberInfoCapturePage.SetTableView (MemberInfoCapture);
-        Commit ();
+        MemberInfoCapturePage.SetRecord(MemberInfoCapture);
+        MemberInfoCapture.SetFilter("Entry No.", '=%1', MemberInfoCapture."Entry No.");
+        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+        Commit();
 
-        MemberInfoCapturePage.LookupMode (true);
-        PageAction := MemberInfoCapturePage.RunModal ();
+        MemberInfoCapturePage.LookupMode(true);
+        PageAction := MemberInfoCapturePage.RunModal();
 
         if (PageAction = ACTION::LookupOK) then begin
-          MemberInfoCapturePage.GetRecord (MemberInfoCapture);
+            MemberInfoCapturePage.GetRecord(MemberInfoCapture);
 
-          case MembershipSalesSetup."Business Flow Type" of
-            MembershipSalesSetup."Business Flow Type"::MEMBERSHIP : MembershipEntryNo := MembershipManagement.CreateMembershipAll (MembershipSalesSetup, MemberInfoCapture, true);
-          else
-            Error ('Not implemented.');
-          end;
+            case MembershipSalesSetup."Business Flow Type" of
+                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
+                    MembershipEntryNo := MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
+                else
+                    Error('Not implemented.');
+            end;
 
         end;
         //+MM1.42 [385449]

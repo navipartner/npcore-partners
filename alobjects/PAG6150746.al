@@ -12,53 +12,64 @@ page 6150746 "Unfinished POS Sale"
     {
         area(content)
         {
-            field(Control6014409;'')
+            field(Control6014409; '')
             {
+                ApplicationArea = All;
                 CaptionClass = Format(GenerateInstructions());
                 MultiLine = true;
                 ShowCaption = false;
             }
             group(Details)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Date;Date)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Name";"Customer Name")
+                field("Customer Name"; "Customer Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         DrillDownDocument;
                     end;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         DrillDownDocument;
                     end;
                 }
-                field("Payment Amount";"Payment Amount")
+                field("Payment Amount"; "Payment Amount")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -81,9 +92,9 @@ page 6150746 "Unfinished POS Sale"
     local procedure GenerateInstructions(): Text
     begin
         if AllowToPostpone then
-          exit(LeaveAsIsAndNewText)
+            exit(LeaveAsIsAndNewText)
         else
-          exit(CancelAndNewText);
+            exit(CancelAndNewText);
     end;
 
     procedure SetAllowToPostpone(Set: Boolean)

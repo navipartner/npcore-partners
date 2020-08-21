@@ -13,14 +13,17 @@ page 6150735 "POS Themes"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -38,7 +41,7 @@ page 6150735 "POS Themes"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Theme Dependencies";
-                RunPageLink = "POS Theme Code"=FIELD(Code);
+                RunPageLink = "POS Theme Code" = FIELD(Code);
             }
         }
     }

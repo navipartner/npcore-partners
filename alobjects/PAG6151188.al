@@ -13,36 +13,45 @@ page 6151188 "MM Member Communication"
         {
             repeater(Group)
             {
-                field("Member Entry No.";"Member Entry No.")
+                field("Member Entry No."; "Member Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Membership Entry No.";"Membership Entry No.")
+                field("Membership Entry No."; "Membership Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Display Name";"Display Name")
+                field("Display Name"; "Display Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member No.";"External Member No.")
+                field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Message Type";"Message Type")
+                field("Message Type"; "Message Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Preferred Method";"Preferred Method")
+                field("Preferred Method"; "Preferred Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Accepted Communication";"Accepted Communication")
+                field("Accepted Communication"; "Accepted Communication")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -63,11 +72,11 @@ page 6151188 "MM Member Communication"
                 var
                     Member: Record "MM Member";
                 begin
-                    Member.SetFilter ("Entry No.", Rec.GetFilter ("Member Entry No."));
-                    if (Member.FindFirst ()) then
-                      CreateMemberDefaultSetup (Member."Entry No.");
+                    Member.SetFilter("Entry No.", Rec.GetFilter("Member Entry No."));
+                    if (Member.FindFirst()) then
+                        CreateMemberDefaultSetup(Member."Entry No.");
 
-                    CurrPage.Update (false);
+                    CurrPage.Update(false);
                 end;
             }
         }
@@ -78,7 +87,7 @@ page 6151188 "MM Member Communication"
         MembershipManagement: Codeunit "MM Membership Management";
     begin
 
-        MembershipManagement.CreateMemberCommunicationDefaultSetup (MemberEntryNo);
+        MembershipManagement.CreateMemberCommunicationDefaultSetup(MemberEntryNo);
     end;
 }
 

@@ -13,20 +13,25 @@ page 6060157 "Event Word Layouts"
         {
             repeater(Group)
             {
-                field(Usage;Usage)
+                field(Usage; Usage)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Basic Layout Code";"Basic Layout Code")
+                field("Basic Layout Code"; "Basic Layout Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Basic Layout Description";"Basic Layout Description")
+                field("Basic Layout Description"; "Basic Layout Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Layout.HASVALUE";Layout.HasValue)
+                field("Layout.HASVALUE"; Layout.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Has Layout';
                     Editable = false;
                 }
@@ -73,7 +78,7 @@ page 6060157 "Event Word Layouts"
 
                 trigger OnAction()
                 begin
-                    ExportLayout('',true);
+                    ExportLayout('', true);
                 end;
             }
             action(EditLayout)
@@ -96,10 +101,10 @@ page 6060157 "Event Word Layouts"
 
                 trigger OnAction()
                 begin
-                    if UpdateLayout(false,false) then
-                      Message(UpdateSuccesMsg)
+                    if UpdateLayout(false, false) then
+                        Message(UpdateSuccesMsg)
                     else
-                      Message(UpdateNotRequiredMsg);
+                        Message(UpdateNotRequiredMsg);
                 end;
             }
         }
@@ -133,7 +138,7 @@ page 6060157 "Event Word Layouts"
     trigger OnOpenPage()
     begin
         FilterGroup := 2;
-        SetRange("Source Record ID",Job.RecordId);
+        SetRange("Source Record ID", Job.RecordId);
         FilterGroup := 0;
         IsWindowsClient := false;
     end;
@@ -142,7 +147,7 @@ page 6060157 "Event Word Layouts"
         Job: Record Job;
         UpdateSuccesMsg: Label 'Layout has been updated to use the current report design.';
         UpdateNotRequiredMsg: Label 'Layout is up-to-date. No further updates are required.';
-        CaptionTxt: Label '%1 - %2 %3', Locked=true;
+        CaptionTxt: Label '%1 - %2 %3', Locked = true;
         PageCaption: Text;
         CanEdit: Boolean;
         IsWindowsClient: Boolean;

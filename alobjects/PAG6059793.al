@@ -18,8 +18,9 @@ page 6059793 "E-mail Template Subform"
         {
             repeater(Group)
             {
-                field("Mail Body Line";"Mail Body Line")
+                field("Mail Body Line"; "Mail Body Line")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

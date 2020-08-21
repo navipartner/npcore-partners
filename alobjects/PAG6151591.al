@@ -21,40 +21,51 @@ page 6151591 "NpDc Coupon Types"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Type";"Discount Type")
+                field("Discount Type"; "Discount Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount %";"Discount %")
+                field("Discount %"; "Discount %")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Application Sequence No.";"Application Sequence No.")
+                field("Application Sequence No."; "Application Sequence No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Coupon Qty. (Open)";"Coupon Qty. (Open)")
+                field("Coupon Qty. (Open)"; "Coupon Qty. (Open)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Arch. Coupon Qty.";"Arch. Coupon Qty.")
+                field("Arch. Coupon Qty."; "Arch. Coupon Qty.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -84,7 +95,7 @@ page 6151591 "NpDc Coupon Types"
                 Caption = 'Coupons';
                 Image = Voucher;
                 RunObject = Page "NpDc Coupons";
-                RunPageLink = "Coupon Type"=FIELD(Code);
+                RunPageLink = "Coupon Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
             }
             action(Comments)
@@ -92,13 +103,13 @@ page 6151591 "NpDc Coupon Types"
                 Caption = 'Co&mments';
                 Image = ViewComments;
                 RunObject = Page "Retail Comments";
-                RunPageLink = "Table ID"=CONST(6151590),
-                              "No."=FIELD(Code),
-                              "No. 2"=FILTER(''),
-                              Option=CONST("0"),
-                              "Option 2"=CONST("0"),
-                              Integer=CONST(0),
-                              "Integer 2"=CONST(0);
+                RunPageLink = "Table ID" = CONST(6151590),
+                              "No." = FIELD(Code),
+                              "No. 2" = FILTER(''),
+                              Option = CONST("0"),
+                              "Option 2" = CONST("0"),
+                              Integer = CONST(0),
+                              "Integer 2" = CONST(0);
             }
             action("How-to Videos")
             {

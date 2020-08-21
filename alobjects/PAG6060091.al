@@ -14,71 +14,93 @@ page 6060091 "MM Admission Service Entries"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created Date";"Created Date")
+                field("Created Date"; "Created Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Modify Date";"Modify Date")
+                field("Modify Date"; "Modify Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Token;Token)
+                field(Token; Token)
                 {
+                    ApplicationArea = All;
                 }
-                field("Key";Key)
+                field("Key"; Key)
                 {
+                    ApplicationArea = All;
                 }
-                field("Scanner Station Id";"Scanner Station Id")
+                field("Scanner Station Id"; "Scanner Station Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Arrived;Arrived)
+                field(Arrived; Arrived)
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Is Valid";"Admission Is Valid")
+                field("Admission Is Valid"; "Admission Is Valid")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Entry No.";"Card Entry No.")
+                field("Card Entry No."; "Card Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Entry No.";"Membership Entry No.")
+                field("Membership Entry No."; "Membership Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Entry No.";"Member Entry No.")
+                field("Member Entry No."; "Member Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Card No.";"External Card No.")
+                field("External Card No."; "External Card No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member No.";"External Member No.")
+                field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Entry No.";"Ticket Entry No.")
+                field("Ticket Entry No."; "Ticket Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Ticket No.";"External Ticket No.")
+                field("External Ticket No."; "External Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Message;Message)
+                field(Message; Message)
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Type Code";"Ticket Type Code")
+                field("Ticket Type Code"; "Ticket Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Type Description";"Ticket Type Description")
+                field("Ticket Type Description"; "Ticket Type Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Description";"Membership Description")
+                field("Membership Description"; "Membership Description")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -98,7 +120,7 @@ page 6060091 "MM Admission Service Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "MM Admission Service Log";
-                RunPageLink = "Entry No."=FIELD("Entry No.");
+                RunPageLink = "Entry No." = FIELD("Entry No.");
             }
         }
     }

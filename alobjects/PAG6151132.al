@@ -12,33 +12,39 @@ page 6151132 "TM Seating Wizard"
         {
             group(Sections)
             {
-                field(SelectedSectionCount;SelectedSectionCount)
+                field(SelectedSectionCount; SelectedSectionCount)
                 {
+                    ApplicationArea = All;
                     Caption = 'Selected Sections';
                     Editable = false;
                 }
-                field(SpanSections;SpanSections)
+                field(SpanSections; SpanSections)
                 {
+                    ApplicationArea = All;
                     Caption = 'Numbering Spans Sections';
                 }
             }
             group(Structure)
             {
                 Caption = 'Structure';
-                field(RowLabel;RowLabel)
+                field(RowLabel; RowLabel)
                 {
+                    ApplicationArea = All;
                     Caption = 'Row Label';
                 }
-                field(Rows;Rows)
+                field(Rows; Rows)
                 {
+                    ApplicationArea = All;
                     Caption = 'Rows to Create';
                 }
-                field(SeatLabel;SeatLabel)
+                field(SeatLabel; SeatLabel)
                 {
+                    ApplicationArea = All;
                     Caption = 'Seat Label';
                 }
-                field(SeatsPerRow;SeatsPerRow)
+                field(SeatsPerRow; SeatsPerRow)
                 {
+                    ApplicationArea = All;
                     Caption = 'Seats per Row';
                 }
             }
@@ -48,16 +54,19 @@ page 6151132 "TM Seating Wizard"
                 group(Row)
                 {
                     Caption = 'Row';
-                    field(RowStartNumber;RowStartNumber)
+                    field(RowStartNumber; RowStartNumber)
                     {
+                        ApplicationArea = All;
                         Caption = 'Start with Number (Row)';
                     }
-                    field("SeatingSetup.""Row Numbering""";SeatingSetup."Row Numbering")
+                    field("SeatingSetup.""Row Numbering"""; SeatingSetup."Row Numbering")
                     {
+                        ApplicationArea = All;
                         Caption = 'Numbering (Row)';
                     }
-                    field(RowNumberLayout;RowNumberLayout)
+                    field(RowNumberLayout; RowNumberLayout)
                     {
+                        ApplicationArea = All;
                         Caption = 'Section Numbering Layout';
                         OptionCaption = 'Across Sections,Section by Section';
                     }
@@ -65,33 +74,39 @@ page 6151132 "TM Seating Wizard"
                 group(Seat)
                 {
                     Caption = 'Seat';
-                    field(SeatStartNumber;SeatStartNumber)
+                    field(SeatStartNumber; SeatStartNumber)
                     {
+                        ApplicationArea = All;
                         Caption = 'Start with Number (Seat)';
                     }
-                    field("SeatingSetup.""Seat Numbering""";SeatingSetup."Seat Numbering")
+                    field("SeatingSetup.""Seat Numbering"""; SeatingSetup."Seat Numbering")
                     {
+                        ApplicationArea = All;
                         Caption = 'Numbering (Seat)';
                     }
-                    field(SeatingIncrement;SeatingIncrement)
+                    field(SeatingIncrement; SeatingIncrement)
                     {
+                        ApplicationArea = All;
                         Caption = 'Increment Style';
                         OptionCaption = 'Consecutive,Odd,Even';
                     }
-                    field(ContinuousNumbering;ContinuousNumbering)
+                    field(ContinuousNumbering; ContinuousNumbering)
                     {
+                        ApplicationArea = All;
                         Caption = 'Continuous Numbering';
                     }
                 }
             }
             group(Split)
             {
-                field(SplitOption;SplitOption)
+                field(SplitOption; SplitOption)
                 {
+                    ApplicationArea = All;
                     Caption = 'Horizontal,Vertical,Diagonal (Left to Right),Diagonal (Right to Left)';
                 }
-                field(SplitList;SplitList)
+                field(SplitList; SplitList)
                 {
+                    ApplicationArea = All;
                     Caption = 'Split On';
                 }
             }
@@ -120,7 +135,7 @@ page 6151132 "TM Seating Wizard"
         SplitList: Code[20];
         SplitOption: Option HORIZONTAL,VERTICAL,DIAGONAL_LR,DIAGONAL_RL;
 
-    procedure SetSectionTabValues(pSectionCount: Integer;pSectionNames: Text)
+    procedure SetSectionTabValues(pSectionCount: Integer; pSectionNames: Text)
     begin
 
         SelectedSectionCount := pSectionCount;
@@ -142,7 +157,7 @@ page 6151132 "TM Seating Wizard"
     begin
     end;
 
-    procedure GetStructureOptions(var vNumberOfRows: Integer;var vRowLabel: Text[80];var vNumberOfSeats: Integer;var vSeatLabel: Text[80])
+    procedure GetStructureOptions(var vNumberOfRows: Integer; var vRowLabel: Text[80]; var vNumberOfSeats: Integer; var vSeatLabel: Text[80])
     begin
 
         vNumberOfRows := Rows;
@@ -152,7 +167,7 @@ page 6151132 "TM Seating Wizard"
         vSeatLabel := SeatLabel;
     end;
 
-    procedure GetNumberingOptions(var vRowNumberingOrder: Option;var vRowStartNumber: Code[10];var vSeatNumberingOrder: Option;var vSeatStartNumber: Code[10];var vContinuousSeatNumbering: Boolean;var vSeatingIncrement: Option;var vSpanSections: Boolean)
+    procedure GetNumberingOptions(var vRowNumberingOrder: Option; var vRowStartNumber: Code[10]; var vSeatNumberingOrder: Option; var vSeatStartNumber: Code[10]; var vContinuousSeatNumbering: Boolean; var vSeatingIncrement: Option; var vSpanSections: Boolean)
     begin
 
         vRowNumberingOrder := SeatingSetup."Row Numbering";
@@ -167,7 +182,7 @@ page 6151132 "TM Seating Wizard"
         vSpanSections := SpanSections;
     end;
 
-    procedure GetSplitOptions(var vSplitOption: Option;var vSplitAtList: Code[20])
+    procedure GetSplitOptions(var vSplitOption: Option; var vSplitAtList: Code[20])
     begin
 
         vSplitAtList := SplitList;

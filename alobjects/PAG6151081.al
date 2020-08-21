@@ -13,54 +13,68 @@ page 6151081 "ExRv Vouchers"
         {
             repeater(Group)
             {
-                field("Voucher Type";"Voucher Type")
+                field("Voucher Type"; "Voucher Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issued at";"Issued at")
+                field("Issued at"; "Issued at")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Posted;Posted)
+                field(Posted; Posted)
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Amount";"Remaining Amount")
+                field("Remaining Amount"; "Remaining Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Type";"Source Type")
+                field("Source Type"; "Source Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Source No.";"Source No.")
+                field("Source No."; "Source No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Online Reference No.";"Online Reference No.")
+                field("Online Reference No."; "Online Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -89,9 +103,9 @@ page 6151081 "ExRv Vouchers"
                 begin
                     CurrPage.SetSelectionFilter(ExRvVoucher);
                     ExRvVoucher.FilterGroup(30);
-                    ExRvVoucher.SetRange(Posted,false);
-                    if not Confirm(Text000,true,ExRvVoucher.Count) then
-                      exit;
+                    ExRvVoucher.SetRange(Posted, false);
+                    if not Confirm(Text000, true, ExRvVoucher.Count) then
+                        exit;
 
                     ExRvMgt.PostVouchers(ExRvVoucher);
                     Message(Text001);
@@ -109,13 +123,13 @@ page 6151081 "ExRv Vouchers"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date","Source No.");
+                    Navigate.SetDoc("Posting Date", "Source No.");
                     Navigate.Run;
                 end;
             }
             action(Dimensions)
             {
-                AccessByPermission = TableData Dimension=R;
+                AccessByPermission = TableData Dimension = R;
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 ShortCutKey = 'Shift+Ctrl+D';

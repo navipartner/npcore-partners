@@ -14,23 +14,29 @@ page 6150634 "NPRE Print Templates Subpage"
         {
             repeater(Group)
             {
-                field("Print Type";"Print Type")
+                field("Print Type"; "Print Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Seating Location";"Seating Location")
+                field("Seating Location"; "Seating Location")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serving Step";"Serving Step")
+                field("Serving Step"; "Serving Step")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Category Code";"Print Category Code")
+                field("Print Category Code"; "Print Category Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Code";"Template Code")
+                field("Template Code"; "Template Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

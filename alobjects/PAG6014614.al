@@ -13,8 +13,9 @@ page 6014614 "Discount FactBox"
     {
         area(content)
         {
-            field("Mix Discount";MixDiscount)
+            field("Mix Discount"; MixDiscount)
             {
+                ApplicationArea = All;
                 Caption = 'Mix Discount';
 
                 trigger OnAssistEdit()
@@ -24,13 +25,14 @@ page 6014614 "Discount FactBox"
                 begin
                     MixedDiscountLines.Editable(false);
                     MixedDiscountLine.Reset;
-                    MixedDiscountLine.SetRange("No.","No.");
+                    MixedDiscountLine.SetRange("No.", "No.");
                     MixedDiscountLines.SetTableView(MixedDiscountLine);
                     MixedDiscountLines.RunModal;
                 end;
             }
-            field("Period Discount";PeriodDiscount)
+            field("Period Discount"; PeriodDiscount)
             {
+                ApplicationArea = All;
                 Caption = 'Period Discount';
 
                 trigger OnDrillDown()
@@ -40,13 +42,14 @@ page 6014614 "Discount FactBox"
                 begin
                     CampaignDiscountLines.Editable(false);
                     PeriodDiscountLine.Reset;
-                    PeriodDiscountLine.SetRange("Item No.","No.");
+                    PeriodDiscountLine.SetRange("Item No.", "No.");
                     CampaignDiscountLines.SetTableView(PeriodDiscountLine);
                     CampaignDiscountLines.RunModal;
                 end;
             }
-            field("Multiple Unit Price";MultipleUnitPrice)
+            field("Multiple Unit Price"; MultipleUnitPrice)
             {
+                ApplicationArea = All;
                 Caption = 'Multiple Unit Price';
 
                 trigger OnAssistEdit()
@@ -99,37 +102,37 @@ page 6014614 "Discount FactBox"
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Ending Date", '>=%1', Today);
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", "No.");
         if PeriodDiscountLine.FindFirst then
-          PeriodDiscount := true;
+            PeriodDiscount := true;
 
         PeriodDiscountLine.Reset;
         PeriodDiscountLine.SetRange(PeriodDiscountLine.Status, PeriodDiscountLine.Status::Active);
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '>%1', Today);
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", "No.");
         if PeriodDiscountLine.FindFirst then
-         PeriodDiscount := true;
+            PeriodDiscount := true;
 
         MixDiscountLine.Reset;
         MixDiscountLine.SetFilter(MixDiscountLine."No.", "No.");
         if MixDiscountLine.FindFirst then
-          repeat
-            MixDiscountHeader.Reset;
-            if MixDiscountHeader.Get(MixDiscountLine.Code)  and ((MixDiscountHeader."Starting date" <= Today) and
-              (MixDiscountHeader."Ending date" >=Today)) and (MixDiscountHeader.Status = MixDiscountHeader.Status::Active)then begin
-              MixDiscount := true;
-            end;
-          until MixDiscountLine.Next = 0;
+            repeat
+                MixDiscountHeader.Reset;
+                if MixDiscountHeader.Get(MixDiscountLine.Code) and ((MixDiscountHeader."Starting date" <= Today) and
+                  (MixDiscountHeader."Ending date" >= Today)) and (MixDiscountHeader.Status = MixDiscountHeader.Status::Active) then begin
+                    MixDiscount := true;
+                end;
+            until MixDiscountLine.Next = 0;
 
         if not MixDiscount then begin
-          MixDiscountLine.Reset;
-          MixDiscountLine.SetFilter(MixDiscountLine."No.", "No.");
-          if MixDiscountLine.FindFirst then
-            repeat
-            MixDiscountHeader.Reset;
-            if MixDiscountHeader.Get(MixDiscountLine.Code)  and (MixDiscountHeader."Starting date" > Today) and
-              (MixDiscountHeader.Status = MixDiscountHeader.Status::Active)then begin
-               MixDiscount := true;
-            end;
-            until MixDiscountLine.Next = 0;
+            MixDiscountLine.Reset;
+            MixDiscountLine.SetFilter(MixDiscountLine."No.", "No.");
+            if MixDiscountLine.FindFirst then
+                repeat
+                    MixDiscountHeader.Reset;
+                    if MixDiscountHeader.Get(MixDiscountLine.Code) and (MixDiscountHeader."Starting date" > Today) and
+                      (MixDiscountHeader.Status = MixDiscountHeader.Status::Active) then begin
+                        MixDiscount := true;
+                    end;
+                until MixDiscountLine.Next = 0;
         end;
     end;
 
@@ -143,10 +146,10 @@ page 6014614 "Discount FactBox"
         //QuantityDiscountHeader.SETFILTER("Main No.", "No.");
         //QuantityDiscountHeader.SETFILTER("Starting Date", '>%1', TODAY);
         QuantityDiscountHeader.SetFilter("Item No.", "No.");
-        QuantityDiscountHeader.SetRange(Status,QuantityDiscountHeader.Status::Active);
+        QuantityDiscountHeader.SetRange(Status, QuantityDiscountHeader.Status::Active);
         //+NPR5.48 [340047]
         if QuantityDiscountHeader.FindFirst then
-          MultipleUnitPrice := true;
+            MultipleUnitPrice := true;
         //+NPR5.45 [308196]
     end;
 }

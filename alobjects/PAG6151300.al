@@ -15,30 +15,38 @@ page 6151300 "NpEc Stores"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson/Purchaser Code";"Salesperson/Purchaser Code")
+                field("Salesperson/Purchaser Code"; "Salesperson/Purchaser Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Control6014408;"Customer Mapping")
+                field(Control6014408; "Customer Mapping")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("Customer Config. Template Code";"Customer Config. Template Code")
+                field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -53,7 +61,7 @@ page 6151300 "NpEc Stores"
                 Caption = 'Customer Mapping';
                 Image = List;
                 RunObject = Page "NpEc Customer Mapping";
-                RunPageLink = "Store Code"=FIELD(Code);
+                RunPageLink = "Store Code" = FIELD(Code);
             }
         }
     }

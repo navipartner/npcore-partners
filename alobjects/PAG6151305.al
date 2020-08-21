@@ -14,24 +14,30 @@ page 6151305 "NpEc Customer Mapping"
         {
             repeater(Group)
             {
-                field("Store Code";"Store Code")
+                field("Store Code"; "Store Code")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("Country/Region Code";"Country/Region Code")
+                field("Country/Region Code"; "Country/Region Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Config. Template Code";"Config. Template Code")
+                field("Config. Template Code"; "Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Country/Region Name";"Country/Region Name")
+                field("Country/Region Name"; "Country/Region Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -17,30 +17,37 @@ page 6014407 "Discount Priority List"
         {
             repeater(Group)
             {
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table ID";"Table ID")
+                field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Disabled;Disabled)
+                field(Disabled; Disabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Calc. Codeunit ID";"Discount Calc. Codeunit ID")
+                field("Discount Calc. Codeunit ID"; "Discount Calc. Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Discount Calc. Codeunit Name";"Discount Calc. Codeunit Name")
+                field("Discount Calc. Codeunit Name"; "Discount Calc. Codeunit Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Cross Line Calculation";"Cross Line Calculation")
+                field("Cross Line Calculation"; "Cross Line Calculation")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

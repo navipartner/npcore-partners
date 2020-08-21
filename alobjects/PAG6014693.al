@@ -16,9 +16,11 @@ page 6014693 "Retail Admin Activities - WFs"
                 Caption = 'POS Sales Workflow Steps';
                 field("Workflow Steps Enabled"; "Workflow Steps Enabled")
                 {
+                    ApplicationArea = All;
                 }
                 field("Workflow Steps Not Enabled"; "Workflow Steps Not Enabled")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

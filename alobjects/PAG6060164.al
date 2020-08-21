@@ -14,22 +14,27 @@ page 6060164 "Event Attribute Column Values"
         {
             repeater(Group)
             {
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Include in Formula";"Include in Formula")
+                field("Include in Formula"; "Include in Formula")
                 {
+                    ApplicationArea = All;
                 }
-                field(Promote;Promote)
+                field(Promote; Promote)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

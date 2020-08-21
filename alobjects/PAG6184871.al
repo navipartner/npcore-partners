@@ -13,14 +13,17 @@ page 6184871 "DropBox Overview"
         {
             repeater(Group)
             {
-                field("Account Code";"Account Code")
+                field("Account Code"; "Account Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("File Name";"File Name")
+                field("File Name"; "File Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

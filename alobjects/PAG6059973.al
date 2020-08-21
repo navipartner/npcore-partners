@@ -10,22 +10,27 @@ page 6059973 "Variety Value"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Table";Table)
+                field("Table"; Table)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sort Order";"Sort Order")
+                field("Sort Order"; "Sort Order")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

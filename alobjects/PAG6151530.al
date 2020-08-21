@@ -16,17 +16,21 @@ page 6151530 "Nc Collector Filters"
         {
             repeater(Group)
             {
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Text";"Filter Text")
+                field("Filter Text"; "Filter Text")
                 {
+                    ApplicationArea = All;
                 }
-                field("Collect When Modified";"Collect When Modified")
+                field("Collect When Modified"; "Collect When Modified")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -50,11 +54,11 @@ page 6151530 "Nc Collector Filters"
     var
         NcCollector: Record "Nc Collector";
     begin
-        if ("Collector Code" <> '') and ("Table No." = 0)  then begin
-          if NcCollector.Get("Collector Code") then begin
-            "Table No." := NcCollector."Table No.";
+        if ("Collector Code" <> '') and ("Table No." = 0) then begin
+            if NcCollector.Get("Collector Code") then begin
+                "Table No." := NcCollector."Table No.";
 
-          end;
+            end;
         end;
     end;
 }

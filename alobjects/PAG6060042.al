@@ -39,34 +39,36 @@ page 6060042 "Item Worksheet Page"
             group(General)
             {
                 Caption = 'General';
-                field(CurrentWorksheetName;CurrentWorksheetName)
+                field(CurrentWorksheetName; CurrentWorksheetName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Batch Name';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         CurrPage.SaveRecord;
-                        ItemWorksheetMgt.LookupName(CurrentWorksheetName,Rec);
+                        ItemWorksheetMgt.LookupName(CurrentWorksheetName, Rec);
                         CurrPage.Update(false);
                     end;
 
                     trigger OnValidate()
                     begin
-                        ItemWorksheetMgt.CheckName(CurrentWorksheetName,Rec);
+                        ItemWorksheetMgt.CheckName(CurrentWorksheetName, Rec);
                         CurrentJnlBatchNameOnAfterVali;
                     end;
                 }
-                field("Show Variety Level";ShowExpanded)
+                field("Show Variety Level"; ShowExpanded)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         if ItemWorksheet.Get("Worksheet Template Name", CurrentWorksheetName) then begin
-                          ItemWorksheet."Show Variety Level" := ShowExpanded;
-                          ItemWorksheet.Modify;
-                          ItemWorksheet.Validate("Show Variety Level");
-                          CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage;
-                          CurrPage.Update;
+                            ItemWorksheet."Show Variety Level" := ShowExpanded;
+                            ItemWorksheet.Modify;
+                            ItemWorksheet.Validate("Show Variety Level");
+                            CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage;
+                            CurrPage.Update;
                         end;
                     end;
                 }
@@ -74,237 +76,301 @@ page 6060042 "Item Worksheet Page"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Worksheet Template Name";"Worksheet Template Name")
+                field("Worksheet Template Name"; "Worksheet Template Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Action";Action)
+                field("Action"; Action)
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Item No.";"Vendor Item No.")
+                field("Vendor Item No."; "Vendor Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Bar Code";"Internal Bar Code")
+                field("Internal Bar Code"; "Internal Bar Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendors Bar Code";"Vendors Bar Code")
+                field("Vendors Bar Code"; "Vendors Bar Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field("Existing Item No.";"Existing Item No.")
+                field("Existing Item No."; "Existing Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group";"Item Group")
+                field("Item Group"; "Item Group")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Item";"Magento Item")
+                field("Magento Item"; "Magento Item")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Status Comment";"Status Comment")
+                field("Status Comment"; "Status Comment")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Changes";"No. of Changes")
+                field("No. of Changes"; "No. of Changes")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Warnings";"No. of Warnings")
+                field("No. of Warnings"; "No. of Warnings")
                 {
+                    ApplicationArea = All;
                 }
-                field("Recommended Retail Price";"Recommended Retail Price")
+                field("Recommended Retail Price"; "Recommended Retail Price")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = RRPDiff;
                 }
-                field("Sales Price";"Sales Price")
+                field("Sales Price"; "Sales Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Price Currency Code";"Sales Price Currency Code")
+                field("Sales Price Currency Code"; "Sales Price Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Price Start Date";"Sales Price Start Date")
+                field("Sales Price Start Date"; "Sales Price Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Unit Cost";"Direct Unit Cost")
+                field("Direct Unit Cost"; "Direct Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Price Currency Code";"Purchase Price Currency Code")
+                field("Purchase Price Currency Code"; "Purchase Price Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Price Start Date";"Purchase Price Start Date")
+                field("Purchase Price Start Date"; "Purchase Price Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Variant";"Use Variant")
+                field("Use Variant"; "Use Variant")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tariff No.";"Tariff No.")
+                field("Tariff No."; "Tariff No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Base Unit of Measure";"Base Unit of Measure")
+                field("Base Unit of Measure"; "Base Unit of Measure")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                     Visible = false;
                 }
-                field("Inventory Posting Group";"Inventory Posting Group")
+                field("Inventory Posting Group"; "Inventory Posting Group")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                     Visible = false;
                 }
-                field("Costing Method";"Costing Method")
+                field("Costing Method"; "Costing Method")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                     Visible = false;
                 }
-                field("VAT Bus. Posting Group";"VAT Bus. Posting Group")
+                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                     Visible = false;
                 }
-                field("VAT Bus. Posting Gr. (Price)";"VAT Bus. Posting Gr. (Price)")
+                field("VAT Bus. Posting Gr. (Price)"; "VAT Bus. Posting Gr. (Price)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field("Tax Group Code";"Tax Group Code")
+                field("Tax Group Code"; "Tax Group Code")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field("VAT Prod. Posting Group";"VAT Prod. Posting Group")
+                field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
-                    Editable = FieldsEditable;
-                    Visible = false;
-                }
-                field("<Global Dimension 2 Code>s";"Global Dimension 2 Code")
-                {
-                    Editable = FieldsEditable;
-                    Visible = false;
-                }
-                field("Sales Unit of Measure";"Sales Unit of Measure")
-                {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                     Visible = false;
                 }
-                field("Purch. Unit of Measure";"Purch. Unit of Measure")
+                field("<Global Dimension 2 Code>s"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                     Visible = false;
                 }
-                field("Manufacturer Code";"Manufacturer Code")
+                field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                     Visible = false;
                 }
-                field("Item Category Code";"Item Category Code")
+                field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                 {
+                    ApplicationArea = All;
+                    Editable = FieldsEditable;
+                    Visible = false;
+                }
+                field("Manufacturer Code"; "Manufacturer Code")
+                {
+                    ApplicationArea = All;
+                    Editable = FieldsEditable;
+                    Visible = false;
+                }
+                field("Item Category Code"; "Item Category Code")
+                {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field("Product Group Code";"Product Group Code")
+                field("Product Group Code"; "Product Group Code")
                 {
+                    ApplicationArea = All;
                     Editable = FieldsEditable;
                 }
-                field("Gross Weight";"Gross Weight")
+                field("Gross Weight"; "Gross Weight")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net Weight";"Net Weight")
+                field("Net Weight"; "Net Weight")
                 {
+                    ApplicationArea = All;
                 }
-                field("Units per Parcel";"Units per Parcel")
+                field("Units per Parcel"; "Units per Parcel")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Group";"Variety Group")
+                field("Variety Group"; "Variety Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1";"Variety 1")
+                field("Variety 1"; "Variety 1")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 1 Table (Base)";"Variety 1 Table (Base)")
+                field("Variety 1 Table (Base)"; "Variety 1 Table (Base)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Create Copy of Variety 1 Table";"Create Copy of Variety 1 Table")
+                field("Create Copy of Variety 1 Table"; "Create Copy of Variety 1 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2";"Variety 2")
+                field("Variety 2"; "Variety 2")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 2 Table (Base)";"Variety 2 Table (Base)")
+                field("Variety 2 Table (Base)"; "Variety 2 Table (Base)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Create Copy of Variety 2 Table";"Create Copy of Variety 2 Table")
+                field("Create Copy of Variety 2 Table"; "Create Copy of Variety 2 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 3";"Variety 3")
+                field("Variety 3"; "Variety 3")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 3 Table (Base)";"Variety 3 Table (Base)")
+                field("Variety 3 Table (Base)"; "Variety 3 Table (Base)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Create Copy of Variety 3 Table";"Create Copy of Variety 3 Table")
+                field("Create Copy of Variety 3 Table"; "Create Copy of Variety 3 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 4";"Variety 4")
+                field("Variety 4"; "Variety 4")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 4 Table (Base)";"Variety 4 Table (Base)")
+                field("Variety 4 Table (Base)"; "Variety 4 Table (Base)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Create Copy of Variety 4 Table";"Create Copy of Variety 4 Table")
+                field("Create Copy of Variety 4 Table"; "Create Copy of Variety 4 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Lines to Skip";"Variety Lines to Skip")
+                field("Variety Lines to Skip"; "Variety Lines to Skip")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Lines to Update";"Variety Lines to Update")
+                field("Variety Lines to Update"; "Variety Lines to Update")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Lines to Create";"Variety Lines to Create")
+                field("Variety Lines to Create"; "Variety Lines to Create")
                 {
+                    ApplicationArea = All;
                 }
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -312,12 +378,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 1, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 1, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[1]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -325,12 +392,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 2, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 2, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[2]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -338,12 +406,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 3, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 3, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[3]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -351,12 +420,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 4, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 4, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[4]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -364,12 +434,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 5, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 5, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[5]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -377,12 +448,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 6, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 6, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[6]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -390,12 +462,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 7, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 7, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[7]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -403,12 +476,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 8, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 8, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[8]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -416,12 +490,13 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 9, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 9, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[9]);
                         //+NPR4.19
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -429,37 +504,37 @@ page 6060042 "Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue (DATABASE::"Item Worksheet Line", 10, "Worksheet Template Name","Worksheet Name","Line No." , NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"Item Worksheet Line", 10, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[10]);
                         //+NPR4.19
                     end;
                 }
             }
-            part(ItemWorksheetVarSubpage;"Item Worksheet Variety Subpage")
+            part(ItemWorksheetVarSubpage; "Item Worksheet Variety Subpage")
             {
                 ShowFilter = false;
-                SubPageLink = "Worksheet Template Name"=FIELD("Worksheet Template Name"),
-                              "Worksheet Name"=FIELD("Worksheet Name"),
-                              "Worksheet Line No."=FIELD("Line No.");
-                SubPageView = SORTING("Worksheet Template Name","Worksheet Name","Worksheet Line No.","Variety 1 Value","Variety 2 Value","Variety 3 Value","Variety 4 Value")
+                SubPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
+                              "Worksheet Name" = FIELD("Worksheet Name"),
+                              "Worksheet Line No." = FIELD("Line No.");
+                SubPageView = SORTING("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                               ORDER(Ascending);
                 UpdatePropagation = SubPart;
             }
         }
         area(factboxes)
         {
-            part(ItemWorksheetFactBox;"Item Worksheet FactBox")
+            part(ItemWorksheetFactBox; "Item Worksheet FactBox")
             {
-                SubPageLink = "Worksheet Template Name"=FIELD("Worksheet Template Name"),
-                              "Worksheet Name"=FIELD("Worksheet Name"),
-                              "Line No."=FIELD("Line No.");
+                SubPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
+                              "Worksheet Name" = FIELD("Worksheet Name"),
+                              "Line No." = FIELD("Line No.");
                 Visible = true;
             }
-            part(NPAttribFactBox;"Item Worksheet Attr. FactBox")
+            part(NPAttribFactBox; "Item Worksheet Attr. FactBox")
             {
                 Caption = 'Attributes';
-                SubPageLink = "Worksheet Template Name"=FIELD("Worksheet Template Name"),
-                              "Worksheet Name"=FIELD("Worksheet Name"),
-                              "Line No."=FIELD("Line No.");
+                SubPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
+                              "Worksheet Name" = FIELD("Worksheet Name"),
+                              "Line No." = FIELD("Line No.");
                 SubPageView = SORTING("No. Series")
                               ORDER(Ascending);
                 Visible = true;
@@ -476,7 +551,7 @@ page 6060042 "Item Worksheet Page"
                 Caption = 'Existing Item';
                 Image = Item;
                 RunObject = Page "Retail Item Card";
-                RunPageLink = "No."=FIELD("Existing Item No.");
+                RunPageLink = "No." = FIELD("Existing Item No.");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
             }
@@ -529,8 +604,8 @@ page 6060042 "Item Worksheet Page"
                     begin
                         Clear(SuggestItemWorksheetLines);
                         ItemWorksheet.Reset;
-                        ItemWorksheet.SetRange("Item Template Name","Worksheet Template Name");
-                        ItemWorksheet.SetRange(Name,"Worksheet Name");
+                        ItemWorksheet.SetRange("Item Template Name", "Worksheet Template Name");
+                        ItemWorksheet.SetRange(Name, "Worksheet Name");
                         SuggestItemWorksheetLines.SetTableView(ItemWorksheet);
                         SuggestItemWorksheetLines.RunModal;
                         CurrPage.Update;
@@ -577,10 +652,10 @@ page 6060042 "Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        ItemWorksheetMgt.CombineLine(Rec,0);
+                        ItemWorksheetMgt.CombineLine(Rec, 0);
                         //-NPR4.19
                         Commit;
-                        RefreshVariants(0,true);
+                        RefreshVariants(0, true);
                         //-NPR4.19
                         CurrPage.Update;
                     end;
@@ -592,7 +667,7 @@ page 6060042 "Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(0,true);
+                        RefreshVariants(0, true);
                         CurrPage.Update;
                     end;
                 }
@@ -601,7 +676,7 @@ page 6060042 "Item Worksheet Page"
                     Caption = 'Vendor Variety Value Mapping';
                     Image = MapAccounts;
                     RunObject = Page "Item Worksheet Variety Mapping";
-                    RunPageLink = "Vendor No."=FIELD("Vendor No.");
+                    RunPageLink = "Vendor No." = FIELD("Vendor No.");
                 }
                 action("Suggest Existing Variants")
                 {
@@ -610,7 +685,7 @@ page 6060042 "Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(1,true);
+                        RefreshVariants(1, true);
                         CurrPage.Update;
                     end;
                 }
@@ -621,7 +696,7 @@ page 6060042 "Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(2,true);
+                        RefreshVariants(2, true);
                         CurrPage.Update;
                     end;
                 }
@@ -632,7 +707,7 @@ page 6060042 "Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(3,true);
+                        RefreshVariants(3, true);
                         CurrPage.Update;
                     end;
                 }
@@ -706,11 +781,12 @@ page 6060042 "Item Worksheet Page"
                         //-NPR4.19
                         Commit;
                         ItemWorksheetLine.Reset;
-                        ItemWorksheetLine.SetRange("Worksheet Template Name","Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name","Worksheet Name");
-                        if ItemWorksheetLine.FindSet then repeat
-                          ItemWorksheetLine.RefreshVariants(0,true);
-                        until ItemWorksheetLine.Next = 0;
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        if ItemWorksheetLine.FindSet then
+                            repeat
+                                ItemWorksheetLine.RefreshVariants(0, true);
+                            until ItemWorksheetLine.Next = 0;
                         //-NPR4.19
                         CurrPage.Update;
                     end;
@@ -723,11 +799,12 @@ page 6060042 "Item Worksheet Page"
                     trigger OnAction()
                     begin
                         ItemWorksheetLine.Reset;
-                        ItemWorksheetLine.SetRange("Worksheet Template Name","Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name","Worksheet Name");
-                        if ItemWorksheetLine.FindSet then repeat
-                          ItemWorksheetLine.RefreshVariants(0,true);
-                        until ItemWorksheetLine.Next = 0;
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        if ItemWorksheetLine.FindSet then
+                            repeat
+                                ItemWorksheetLine.RefreshVariants(0, true);
+                            until ItemWorksheetLine.Next = 0;
                         CurrPage.Update;
                     end;
                 }
@@ -740,11 +817,12 @@ page 6060042 "Item Worksheet Page"
                     begin
                         //-NPR5.22
                         ItemWorksheetLine.Reset;
-                        ItemWorksheetLine.SetRange("Worksheet Template Name","Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name","Worksheet Name");
-                        if ItemWorksheetLine.FindSet then repeat
-                         ItemWorksheetLine.RefreshVariants(1,true);
-                        until ItemWorksheetLine.Next = 0;
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        if ItemWorksheetLine.FindSet then
+                            repeat
+                                ItemWorksheetLine.RefreshVariants(1, true);
+                            until ItemWorksheetLine.Next = 0;
                         CurrPage.Update;
                         //+NPR5.22
                     end;
@@ -758,11 +836,12 @@ page 6060042 "Item Worksheet Page"
                     begin
                         //-NPR5.22
                         ItemWorksheetLine.Reset;
-                        ItemWorksheetLine.SetRange("Worksheet Template Name","Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name","Worksheet Name");
-                        if ItemWorksheetLine.FindSet then repeat
-                         ItemWorksheetLine.RefreshVariants(2,true);
-                        until ItemWorksheetLine.Next = 0;
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        if ItemWorksheetLine.FindSet then
+                            repeat
+                                ItemWorksheetLine.RefreshVariants(2, true);
+                            until ItemWorksheetLine.Next = 0;
                         CurrPage.Update;
                         //+NPR5.22
                     end;
@@ -776,11 +855,12 @@ page 6060042 "Item Worksheet Page"
                     begin
                         //-NPR5.22
                         ItemWorksheetLine.Reset;
-                        ItemWorksheetLine.SetRange("Worksheet Template Name","Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name","Worksheet Name");
-                        if ItemWorksheetLine.FindSet then repeat
-                         ItemWorksheetLine.RefreshVariants(3,true);
-                        until ItemWorksheetLine.Next = 0;
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        if ItemWorksheetLine.FindSet then
+                            repeat
+                                ItemWorksheetLine.RefreshVariants(3, true);
+                            until ItemWorksheetLine.Next = 0;
                         CurrPage.Update;
                         //+NPR5.22
                     end;
@@ -816,8 +896,8 @@ page 6060042 "Item Worksheet Page"
                         GetCurrentWorksheet;
                         ItemWorksheet.InsertDefaultFieldSetup;
                         ItemWorksheetFieldSetup.Reset;
-                        ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name",ItemWorksheet."Item Template Name");
-                        ItemWorksheetFieldSetup.SetFilter("Worksheet Name",ItemWorksheet.Name);
+                        ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", ItemWorksheet."Item Template Name");
+                        ItemWorksheetFieldSetup.SetFilter("Worksheet Name", ItemWorksheet.Name);
                         ItemWorksheetFieldSetupPage.SetTableView(ItemWorksheetFieldSetup);
                         ItemWorksheetFieldSetupPage.Run;
                         //+NPR5.25 [246088]
@@ -848,7 +928,7 @@ page 6060042 "Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        CODEUNIT.Run(CODEUNIT::"Item Wsht.-Register (Yes/No)",Rec);
+                        CODEUNIT.Run(CODEUNIT::"Item Wsht.-Register (Yes/No)", Rec);
                         CurrPage.Update(false);
                     end;
                 }
@@ -861,8 +941,8 @@ page 6060042 "Item Worksheet Page"
                     Caption = 'Map Excelsheet';
                     Image = MapAccounts;
                     RunObject = Page "Item Worksheet Excel Column";
-                    RunPageLink = "Worksheet Template Name"=FIELD("Worksheet Template Name"),
-                                  "Worksheet Name"=FIELD("Worksheet Name");
+                    RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
+                                  "Worksheet Name" = FIELD("Worksheet Name");
                 }
                 action("Export Excel")
                 {
@@ -874,7 +954,7 @@ page 6060042 "Item Worksheet Page"
                         ItemWorksheetLine: Record "Item Worksheet Line";
                     begin
                         //-NPR4.19
-                        REPORT.Run(REPORT::"Export Excel Item Worksheet",false,true,Rec);
+                        REPORT.Run(REPORT::"Export Excel Item Worksheet", false, true, Rec);
                         //+NPR4.19
                     end;
                 }
@@ -922,8 +1002,8 @@ page 6060042 "Item Worksheet Page"
     trigger OnAfterGetRecord()
     begin
         //-NPR4.19
-        NPRAttrManagement.GetWorksheetLineAttributeValue (NPRAttrTextArray, DATABASE::"Item Worksheet Line", "Worksheet Template Name","Worksheet Name","Line No.");
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrManagement.GetWorksheetLineAttributeValue(NPRAttrTextArray, DATABASE::"Item Worksheet Line", "Worksheet Template Name", "Worksheet Name", "Line No.");
+        NPRAttrEditable := CurrPage.Editable();
         //+NPR4.19
     end;
 
@@ -950,7 +1030,7 @@ page 6060042 "Item Worksheet Page"
     trigger OnOpenPage()
     begin
         //-NPR4.19
-        NPRAttrManagement.GetAttributeVisibility (DATABASE::"Item Worksheet Line", NPRAttrVisibleArray);
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::"Item Worksheet Line", NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
         NPRAttrVisible03 := NPRAttrVisibleArray[3];
@@ -962,26 +1042,26 @@ page 6060042 "Item Worksheet Page"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrEditable := CurrPage.Editable();
         //+NPR4.19
 
         //-NPR5.32 [274473]
         if OpenedFromFilteredView then begin
-          CopyFilters(ItemWorksheetLine);
-          exit;
+            CopyFilters(ItemWorksheetLine);
+            exit;
         end;
         //+NPR5.32 [274473]
 
         OpenedFromWorksheet := ("Worksheet Name" <> '') and ("Worksheet Template Name" = '');
         if OpenedFromWorksheet then begin
-          CurrentWorksheetName := "Worksheet Name";
-          ItemWorksheetMgt.OpenJnl(CurrentWorksheetName,Rec);
-          exit;
+            CurrentWorksheetName := "Worksheet Name";
+            ItemWorksheetMgt.OpenJnl(CurrentWorksheetName, Rec);
+            exit;
         end;
-        ItemWorksheetMgt.TemplateSelection(PAGE::"Item Worksheet Page",Rec,WorksheetSelected);
+        ItemWorksheetMgt.TemplateSelection(PAGE::"Item Worksheet Page", Rec, WorksheetSelected);
         if not WorksheetSelected then
-          Error('');
-        ItemWorksheetMgt.OpenJnl(CurrentWorksheetName,Rec);
+            Error('');
+        ItemWorksheetMgt.OpenJnl(CurrentWorksheetName, Rec);
         //GetCurrentWorksheet;
         //SetVisibleFields;
     end;
@@ -1005,11 +1085,11 @@ page 6060042 "Item Worksheet Page"
         ShowExpanded: Option "Variety 1","Variety 1+2","Variety 1+2+3","Variety 1+2+3+4";
         SuggestItemWorksheetLines: Report "Suggest Item Worksheet Lines";
         ItemWshtImpExpMgt: Codeunit "Item Wsht. Imp. Exp. Mgt.";
-        NPRAttrTextArray: array [40] of Text;
+        NPRAttrTextArray: array[40] of Text;
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         [InDataSet]
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         [InDataSet]
         NPRAttrVisible01: Boolean;
         [InDataSet]
@@ -1067,7 +1147,7 @@ page 6060042 "Item Worksheet Page"
     local procedure CurrentJnlBatchNameOnAfterVali()
     begin
         CurrPage.SaveRecord;
-        ItemWorksheetMgt.SetName(CurrentWorksheetName,Rec);
+        ItemWorksheetMgt.SetName(CurrentWorksheetName, Rec);
         CurrPage.Update(false);
     end;
 

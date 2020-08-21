@@ -16,25 +16,31 @@ page 6151586 "Event Exch. Int. E-Mails"
         {
             repeater(Group)
             {
-                field("E-Mail";"E-Mail")
+                field("E-Mail"; "E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Password.HASVALUE";Password.HasValue)
+                field("Password.HASVALUE"; Password.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Password Set';
                     Editable = false;
                 }
-                field("Default Organizer E-Mail";"Default Organizer E-Mail")
+                field("Default Organizer E-Mail"; "Default Organizer E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Time Zone No.";"Time Zone No.")
+                field("Time Zone No."; "Time Zone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Time Zone Display Name";"Time Zone Display Name")
+                field("Time Zone Display Name"; "Time Zone Display Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Time Zone Custom Offset (Min)";"Time Zone Custom Offset (Min)")
+                field("Time Zone Custom Offset (Min)"; "Time Zone Custom Offset (Min)")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

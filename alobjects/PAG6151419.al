@@ -23,23 +23,26 @@ page 6151419 "Magento Brand Card"
             group(Control6150613)
             {
                 ShowCaption = false;
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         if "Seo Link" <> '' then
-                          if not Confirm(Text001,false) then
-                            exit;
-                        Validate("Seo Link",Name);
+                            if not Confirm(Text001, false) then
+                                exit;
+                        Validate("Seo Link", Name);
                         CurrPage.Update(true);
                     end;
                 }
-                field("FORMAT(Description.HASVALUE)";Format(Description.HasValue))
+                field("FORMAT(Description.HASVALUE)"; Format(Description.HasValue))
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
 
@@ -51,13 +54,14 @@ page 6151419 "Magento Brand Card"
                         RecRef.GetTable(Rec);
                         FieldRef := RecRef.Field(FieldNo(Description));
                         if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                          RecRef.SetTable(Rec);
-                          Modify(true);
+                            RecRef.SetTable(Rec);
+                            Modify(true);
                         end;
                     end;
                 }
-                field("FORMAT(""Short Description"".HASVALUE)";Format("Short Description".HasValue))
+                field("FORMAT(""Short Description"".HASVALUE)"; Format("Short Description".HasValue))
                 {
+                    ApplicationArea = All;
                     Caption = 'Short Description';
                     Editable = false;
 
@@ -69,48 +73,54 @@ page 6151419 "Magento Brand Card"
                         RecRef.GetTable(Rec);
                         FieldRef := RecRef.Field(FieldNo("Short Description"));
                         if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                          RecRef.SetTable(Rec);
-                          Modify(true);
+                            RecRef.SetTable(Rec);
+                            Modify(true);
                         end;
                     end;
                 }
-                field("Seo Link";"Seo Link")
+                field("Seo Link"; "Seo Link")
                 {
+                    ApplicationArea = All;
                 }
-                field("Meta Title";"Meta Title")
+                field("Meta Title"; "Meta Title")
                 {
+                    ApplicationArea = All;
                 }
-                field("Meta Description";"Meta Description")
+                field("Meta Description"; "Meta Description")
                 {
+                    ApplicationArea = All;
                 }
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
-                field("Logo Picture";"Logo Picture")
+                field("Logo Picture"; "Logo Picture")
                 {
+                    ApplicationArea = All;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            part(PictureDragDropAddin;"Magento DragDropPic. Addin")
+            part(PictureDragDropAddin; "Magento DragDropPic. Addin")
             {
                 Caption = 'Picture';
                 Editable = false;
                 ShowFilter = false;
-                SubPageLink = Type=CONST(Brand),
-                              Name=FIELD(Picture);
+                SubPageLink = Type = CONST(Brand),
+                              Name = FIELD(Picture);
             }
-            part(LogoPictureDragDropAddin;"Magento DragDropPic. Addin")
+            part(LogoPictureDragDropAddin; "Magento DragDropPic. Addin")
             {
                 Caption = 'Logo';
                 Editable = false;
                 ShowFilter = false;
-                SubPageLink = Type=CONST(Brand),
-                              Name=FIELD("Logo Picture");
+                SubPageLink = Type = CONST(Brand),
+                              Name = FIELD("Logo Picture");
             }
         }
     }
@@ -138,8 +148,8 @@ page 6151419 "Magento Brand Card"
                     MagentoDisplayConfig: Record "Magento Display Config";
                 begin
                     //-MAG1.21
-                    MagentoDisplayConfig.SetRange("No.",Id);
-                    MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::Brand);
+                    MagentoDisplayConfig.SetRange("No.", Id);
+                    MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Brand);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                     MagentoDisplayConfigPage.Run;
                     //+MAG1.21
@@ -150,8 +160,8 @@ page 6151419 "Magento Brand Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.PictureDragDropAddin.PAGE.SetBrandCode(Id,false);
-        CurrPage.LogoPictureDragDropAddin.PAGE.SetBrandCode(Id,true);
+        CurrPage.PictureDragDropAddin.PAGE.SetBrandCode(Id, false);
+        CurrPage.LogoPictureDragDropAddin.PAGE.SetBrandCode(Id, true);
     end;
 
     trigger OnOpenPage()

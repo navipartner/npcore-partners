@@ -14,37 +14,45 @@ page 6150658 "POS Posting Log"
         {
             repeater(Group)
             {
-                field("Posting Timestamp";"Posting Timestamp")
+                field("Posting Timestamp"; "Posting Timestamp")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Duration";"Posting Duration")
+                field("Posting Duration"; "Posting Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("With Error";"With Error")
+                field("With Error"; "With Error")
                 {
+                    ApplicationArea = All;
                 }
-                field("Error Description";"Error Description")
+                field("Error Description"; "Error Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry View";"POS Entry View")
+                field("POS Entry View"; "POS Entry View")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last POS Entry No. at Posting";"Last POS Entry No. at Posting")
+                field("Last POS Entry No. at Posting"; "Last POS Entry No. at Posting")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of POS Entries";"No. of POS Entries")
+                field("No. of POS Entries"; "No. of POS Entries")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            part(Control6014412;"POS Posting Log Parameters")
+            part(Control6014412; "POS Posting Log Parameters")
             {
-                SubPageLink = "Entry No."=FIELD("Entry No.");
+                SubPageLink = "Entry No." = FIELD("Entry No.");
             }
         }
     }
@@ -79,7 +87,7 @@ page 6150658 "POS Posting Log"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Entry List";
-                RunPageLink = "POS Posting Log Entry No."=FIELD("Entry No.");
+                RunPageLink = "POS Posting Log Entry No." = FIELD("Entry No.");
             }
         }
     }

@@ -16,14 +16,17 @@ page 6059798 "E-mail Template Reports"
         {
             repeater(Group)
             {
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Filename;Filename)
+                field(Filename; Filename)
                 {
+                    ApplicationArea = All;
                 }
-                field("Report Name";"Report Name")
+                field("Report Name"; "Report Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

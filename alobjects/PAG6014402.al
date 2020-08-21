@@ -18,7 +18,7 @@ page 6014402 "Retail Item Journal"
     // NPR5.53/SARA/20191119 CASE 377622 Added Print Price Label function
     // NPR5.55/YAHA/20200623 CASE 408295 Caption Changed to Retail Item Journal
 
-    ApplicationArea = Basic,Suite;
+    ApplicationArea = Basic, Suite;
     AutoSplitKey = true;
     Caption = 'Retail Item Journal';
     DataCaptionFields = "Journal Batch Name";
@@ -33,229 +33,265 @@ page 6014402 "Retail Item Journal"
     {
         area(content)
         {
-            field(CurrentJnlBatchName;CurrentJnlBatchName)
+            field(CurrentJnlBatchName; CurrentJnlBatchName)
             {
+                ApplicationArea = All;
                 Caption = 'Batch Name';
                 Lookup = true;
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
                     CurrPage.SaveRecord;
-                    ItemJnlMgt.LookupName(CurrentJnlBatchName,Rec);
+                    ItemJnlMgt.LookupName(CurrentJnlBatchName, Rec);
                     CurrPage.Update(false);
                 end;
 
                 trigger OnValidate()
                 begin
-                    ItemJnlMgt.CheckName(CurrentJnlBatchName,Rec);
+                    ItemJnlMgt.CheckName(CurrentJnlBatchName, Rec);
                     CurrentJnlBatchNameOnAfterVali;
                 end;
             }
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Date";"Document Date")
+                field("Document Date"; "Document Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                     OptionCaption = 'Purchase,Sale,Positive Adjmt.,Negative Adjmt.';
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Document No.";"External Document No.")
+                field("External Document No."; "External Document No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         //-NPR5.30 [267424]
                         //ItemJnlMgt.GetItem("Item No.",ItemDescription);
-                        RetailItemJnlMgt.GetItem("Item No.",ItemDescription);
+                        RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
                         //+NPR5.30 [267424]
                         ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Cross-Reference No.";"Cross-Reference No.")
+                field("Cross-Reference No."; "Cross-Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("ShortcutDimCode[3]";ShortcutDimCode[3])
+                field("ShortcutDimCode[3]"; ShortcutDimCode[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,3';
                     ShowCaption = false;
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(3),
-                                                                  "Dimension Value Type"=CONST(Standard),
-                                                                  Blocked=CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
+                                                                  "Dimension Value Type" = CONST(Standard),
+                                                                  Blocked = CONST(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3,ShortcutDimCode[3]);
+                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
-                field("ShortcutDimCode[4]";ShortcutDimCode[4])
+                field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,4';
                     ShowCaption = false;
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(4),
-                                                                  "Dimension Value Type"=CONST(Standard),
-                                                                  Blocked=CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
+                                                                  "Dimension Value Type" = CONST(Standard),
+                                                                  Blocked = CONST(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4,ShortcutDimCode[4]);
+                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
-                field("ShortcutDimCode[5]";ShortcutDimCode[5])
+                field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,5';
                     ShowCaption = false;
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(5),
-                                                                  "Dimension Value Type"=CONST(Standard),
-                                                                  Blocked=CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
+                                                                  "Dimension Value Type" = CONST(Standard),
+                                                                  Blocked = CONST(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5,ShortcutDimCode[5]);
+                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
-                field("ShortcutDimCode[6]";ShortcutDimCode[6])
+                field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,6';
                     ShowCaption = false;
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(6),
-                                                                  "Dimension Value Type"=CONST(Standard),
-                                                                  Blocked=CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
+                                                                  "Dimension Value Type" = CONST(Standard),
+                                                                  Blocked = CONST(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6,ShortcutDimCode[6]);
+                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
-                field("ShortcutDimCode[7]";ShortcutDimCode[7])
+                field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,7';
                     ShowCaption = false;
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(7),
-                                                                  "Dimension Value Type"=CONST(Standard),
-                                                                  Blocked=CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
+                                                                  "Dimension Value Type" = CONST(Standard),
+                                                                  Blocked = CONST(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7,ShortcutDimCode[7]);
+                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
-                field("ShortcutDimCode[8]";ShortcutDimCode[8])
+                field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,8';
                     ShowCaption = false;
-                    TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(8),
-                                                                  "Dimension Value Type"=CONST(Standard),
-                                                                  Blocked=CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
+                                                                  "Dimension Value Type" = CONST(Standard),
+                                                                  Blocked = CONST(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8,ShortcutDimCode[8]);
+                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                     Visible = true;
 
                     trigger OnValidate()
                     var
                         WMSManagement: Codeunit "WMS Management";
                     begin
-                        WMSManagement.CheckItemJnlLineLocation(Rec,xRec);
+                        WMSManagement.CheckItemJnlLineLocation(Rec, xRec);
                     end;
                 }
-                field("Bin Code";"Bin Code")
+                field("Bin Code"; "Bin Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Salespers./Purch. Code";"Salespers./Purch. Code")
+                field("Salespers./Purch. Code"; "Salespers./Purch. Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Amount";"Unit Amount")
+                field("Unit Amount"; "Unit Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Indirect Cost %";"Indirect Cost %")
+                field("Indirect Cost %"; "Indirect Cost %")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Applies-to Entry";"Applies-to Entry")
+                field("Applies-to Entry"; "Applies-to Entry")
                 {
+                    ApplicationArea = All;
                 }
-                field("Applies-from Entry";"Applies-from Entry")
+                field("Applies-from Entry"; "Applies-from Entry")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Transaction Type";"Transaction Type")
+                field("Transaction Type"; "Transaction Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Transport Method";"Transport Method")
+                field("Transport Method"; "Transport Method")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Country/Region Code";"Country/Region Code")
+                field("Country/Region Code"; "Country/Region Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Reason Code";"Reason Code")
+                field("Reason Code"; "Reason Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -268,8 +304,9 @@ page 6014402 "Retail Item Journal"
                     group("Item Description")
                     {
                         Caption = 'Item Description';
-                        field(ItemDescription;ItemDescription)
+                        field(ItemDescription; ItemDescription)
                         {
+                            ApplicationArea = All;
                             Editable = false;
                             ShowCaption = false;
                         }
@@ -279,16 +316,16 @@ page 6014402 "Retail Item Journal"
         }
         area(factboxes)
         {
-            part(Control1903326807;"Item Replenishment FactBox")
+            part(Control1903326807; "Item Replenishment FactBox")
             {
-                SubPageLink = "No."=FIELD("Item No.");
+                SubPageLink = "No." = FIELD("Item No.");
                 Visible = false;
             }
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = false;
             }
@@ -305,7 +342,7 @@ page 6014402 "Retail Item Journal"
                 Image = Line;
                 action(Dimensions)
                 {
-                    AccessByPermission = TableData Dimension=R;
+                    AccessByPermission = TableData Dimension = R;
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     Promoted = true;
@@ -336,10 +373,10 @@ page 6014402 "Retail Item Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code"=FIELD("Location Code"),
-                                  "Item No."=FIELD("Item No."),
-                                  "Variant Code"=FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code","Item No.","Variant Code");
+                    RunPageLink = "Location Code" = FIELD("Location Code"),
+                                  "Item No." = FIELD("Item No."),
+                                  "Variant Code" = FIELD("Variant Code");
+                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
                 }
                 separator("-")
                 {
@@ -366,7 +403,7 @@ page 6014402 "Retail Item Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No."=FIELD("Item No.");
+                    RunPageLink = "No." = FIELD("Item No.");
                     ShortCutKey = 'Shift+F7';
                 }
                 action("Ledger E&ntries")
@@ -377,7 +414,7 @@ page 6014402 "Retail Item Journal"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No."=FIELD("Item No.");
+                    RunPageLink = "Item No." = FIELD("Item No.");
                     RunPageView = SORTING("Item No.");
                     ShortCutKey = 'Ctrl+F7';
                 }
@@ -392,7 +429,7 @@ page 6014402 "Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec,ItemAvailFormsMgt.ByEvent)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByEvent)
                         end;
                     }
                     action(Period)
@@ -402,7 +439,7 @@ page 6014402 "Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec,ItemAvailFormsMgt.ByPeriod)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByPeriod)
                         end;
                     }
                     action(Variant)
@@ -412,18 +449,18 @@ page 6014402 "Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec,ItemAvailFormsMgt.ByVariant)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByVariant)
                         end;
                     }
                     action(Location)
                     {
-                        AccessByPermission = TableData Location=R;
+                        AccessByPermission = TableData Location = R;
                         Caption = 'Location';
                         Image = Warehouse;
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec,ItemAvailFormsMgt.ByLocation)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByLocation)
                         end;
                     }
                     action("BOM Level")
@@ -433,7 +470,7 @@ page 6014402 "Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec,ItemAvailFormsMgt.ByBOM)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByBOM)
                         end;
                     }
                 }
@@ -483,11 +520,11 @@ page 6014402 "Retail Item Journal"
                         StdItemJnl: Record "Standard Item Journal";
                     begin
                         StdItemJnl.FilterGroup := 2;
-                        StdItemJnl.SetRange("Journal Template Name","Journal Template Name");
+                        StdItemJnl.SetRange("Journal Template Name", "Journal Template Name");
                         StdItemJnl.FilterGroup := 0;
-                        if PAGE.RunModal(PAGE::"Standard Item Journals",StdItemJnl) = ACTION::LookupOK then begin
-                          StdItemJnl.CreateItemJnlFromStdJnl(StdItemJnl,CurrentJnlBatchName);
-                          Message(Text001,StdItemJnl.Code);
+                        if PAGE.RunModal(PAGE::"Standard Item Journals", StdItemJnl) = ACTION::LookupOK then begin
+                            StdItemJnl.CreateItemJnlFromStdJnl(StdItemJnl, CurrentJnlBatchName);
+                            Message(Text001, StdItemJnl.Code);
                         end
                     end;
                 }
@@ -504,18 +541,18 @@ page 6014402 "Retail Item Journal"
                         StdItemJnl: Record "Standard Item Journal";
                         SaveAsStdItemJnl: Report "Save as Standard Item Journal";
                     begin
-                        ItemJnlLines.SetFilter("Journal Template Name","Journal Template Name");
-                        ItemJnlLines.SetFilter("Journal Batch Name",CurrentJnlBatchName);
+                        ItemJnlLines.SetFilter("Journal Template Name", "Journal Template Name");
+                        ItemJnlLines.SetFilter("Journal Batch Name", CurrentJnlBatchName);
                         CurrPage.SetSelectionFilter(ItemJnlLines);
                         ItemJnlLines.CopyFilters(Rec);
 
-                        ItemJnlBatch.Get("Journal Template Name",CurrentJnlBatchName);
-                        SaveAsStdItemJnl.Initialise(ItemJnlLines,ItemJnlBatch);
+                        ItemJnlBatch.Get("Journal Template Name", CurrentJnlBatchName);
+                        SaveAsStdItemJnl.Initialise(ItemJnlLines, ItemJnlBatch);
                         SaveAsStdItemJnl.RunModal;
                         if not SaveAsStdItemJnl.GetStdItemJournal(StdItemJnl) then
-                          exit;
+                            exit;
 
-                        Message(Text002,StdItemJnl.Code);
+                        Message(Text002, StdItemJnl.Code);
                     end;
                 }
                 action("Import from Scanner")
@@ -557,7 +594,7 @@ page 6014402 "Retail Item Journal"
 
                     trigger OnAction()
                     begin
-                        CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post",Rec);
+                        CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post", Rec);
                         CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
@@ -573,7 +610,7 @@ page 6014402 "Retail Item Journal"
 
                     trigger OnAction()
                     begin
-                        CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post+Print",Rec);
+                        CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post+Print", Rec);
                         CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
@@ -592,9 +629,9 @@ page 6014402 "Retail Item Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name","Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name","Journal Batch Name");
-                    REPORT.RunModal(REPORT::"Inventory Movement",true,true,ItemJnlLine);
+                    ItemJnlLine.SetRange("Journal Template Name", "Journal Template Name");
+                    ItemJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+                    REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
                 end;
             }
             action(PriceLabel)
@@ -617,7 +654,7 @@ page 6014402 "Retail Item Journal"
     begin
         //-NPR5.30 [267424]
         //ItemJnlMgt.GetItem("Item No.",ItemDescription);
-        RetailItemJnlMgt.GetItem("Item No.",ItemDescription);
+        RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
         //+NPR5.30 [267424]
     end;
 
@@ -632,14 +669,14 @@ page 6014402 "Retail Item Journal"
     begin
         Commit;
         if not ReserveItemJnlLine.DeleteLineConfirm(Rec) then
-          exit(false);
+            exit(false);
         ReserveItemJnlLine.DeleteLine(Rec);
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         if "Entry Type" > "Entry Type"::"Negative Adjmt." then
-          Error(Text000,"Entry Type");
+            Error(Text000, "Entry Type");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -653,18 +690,18 @@ page 6014402 "Retail Item Journal"
         JnlSelected: Boolean;
     begin
         if IsOpenedFromBatch then begin
-          CurrentJnlBatchName := "Journal Batch Name";
-          ItemJnlMgt.OpenJnl(CurrentJnlBatchName,Rec);
-          exit;
+            CurrentJnlBatchName := "Journal Batch Name";
+            ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
+            exit;
         end;
         //-NPR5.30 [266258]
         if not RetailItemJnlMgt.FindTemplate(PAGE::"Retail Item Journal") then
-          RetailItemJnlMgt.CreateTemplate(PAGE::"Retail Item Journal",0,false);
+            RetailItemJnlMgt.CreateTemplate(PAGE::"Retail Item Journal", 0, false);
         //+NPR5.30 [266258]
-        ItemJnlMgt.TemplateSelection(PAGE::"Retail Item Journal",0,false,Rec,JnlSelected);
+        ItemJnlMgt.TemplateSelection(PAGE::"Retail Item Journal", 0, false, Rec, JnlSelected);
         if not JnlSelected then
-          Error('');
-        ItemJnlMgt.OpenJnl(CurrentJnlBatchName,Rec);
+            Error('');
+        ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
     end;
 
     var
@@ -675,7 +712,7 @@ page 6014402 "Retail Item Journal"
         CalcWhseAdjmt: Report "Calculate Whse. Adjustment";
         CurrentJnlBatchName: Code[10];
         ItemDescription: Text[50];
-        ShortcutDimCode: array [8] of Code[20];
+        ShortcutDimCode: array[8] of Code[20];
         Text001: Label 'Item Journal lines have been successfully inserted from Standard Item Journal %1.';
         Text002: Label 'Standard Item Journal %1 has been successfully created.';
         RetailItemJnlMgt: Codeunit RetailItemJnlManagement;
@@ -683,7 +720,7 @@ page 6014402 "Retail Item Journal"
     local procedure CurrentJnlBatchNameOnAfterVali()
     begin
         CurrPage.SaveRecord;
-        ItemJnlMgt.SetName(CurrentJnlBatchName,Rec);
+        ItemJnlMgt.SetName(CurrentJnlBatchName, Rec);
         CurrPage.Update(false);
     end;
 }

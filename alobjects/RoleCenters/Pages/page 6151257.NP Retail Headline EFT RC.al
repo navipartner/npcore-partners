@@ -48,6 +48,7 @@ page 6151257 "NP Retail Headline EFT RC"
                 ShowCaption = false;
                 field(MyPickText; MyPickText)
                 {
+                    ApplicationArea = All;
                     Caption = 'My Pick Text';
                     Editable = false;
                 }
@@ -57,6 +58,7 @@ page 6151257 "NP Retail Headline EFT RC"
                 ShowCaption = false;
                 field(AwayPickText; AwayPickText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Away Pick Text';
                     Editable = false;
                 }

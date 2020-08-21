@@ -12,27 +12,34 @@ page 6151062 "Distribution Setup"
         {
             repeater(Group)
             {
-                field("Distribution Group";"Distribution Group")
+                field("Distribution Group"; "Distribution Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Hiearachy";"Item Hiearachy")
+                field("Item Hiearachy"; "Item Hiearachy")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Type";"Distribution Type")
+                field("Distribution Type"; "Distribution Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Required Delivery Date";"Required Delivery Date")
+                field("Required Delivery Date"; "Required Delivery Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Replenishment Grace Period";"Replenishment Grace Period")
+                field("Replenishment Grace Period"; "Replenishment Grace Period")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create SKU Per Location";"Create SKU Per Location")
+                field("Create SKU Per Location"; "Create SKU Per Location")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default SKU Repl. Setup";"Default SKU Repl. Setup")
+                field("Default SKU Repl. Setup"; "Default SKU Repl. Setup")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -58,7 +65,7 @@ page 6151062 "Distribution Setup"
                 var
                     ReplenishmentMgmt: Codeunit "Retail Replenishment Mgmt";
                 begin
-                    ReplenishmentMgmt.CreateDemandLines("Item Hiearachy","Distribution Group");
+                    ReplenishmentMgmt.CreateDemandLines("Item Hiearachy", "Distribution Group");
                     Message(TextCreated);
                 end;
             }
@@ -68,8 +75,8 @@ page 6151062 "Distribution Setup"
                 Image = Line;
                 Promoted = true;
                 RunObject = Page "Retail Repl. Demand Lines";
-                RunPageLink = "Item Hierachy"=FIELD("Item Hiearachy"),
-                              "Distribution Group"=FIELD("Distribution Group");
+                RunPageLink = "Item Hierachy" = FIELD("Item Hiearachy"),
+                              "Distribution Group" = FIELD("Distribution Group");
             }
         }
     }

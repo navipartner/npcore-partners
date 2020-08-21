@@ -16,26 +16,33 @@ page 6184488 "Pepper EFT Transaction Types"
         {
             repeater(Group)
             {
-                field("Integration Type";"Integration Type")
+                field("Integration Type"; "Integration Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Type";"Processing Type")
+                field("Processing Type"; "Processing Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Timeout (Seconds)";"POS Timeout (Seconds)")
+                field("POS Timeout (Seconds)"; "POS Timeout (Seconds)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Test Modes";"Allow Test Modes")
+                field("Allow Test Modes"; "Allow Test Modes")
                 {
+                    ApplicationArea = All;
                 }
-                field("Suppress Receipt Print";"Suppress Receipt Print")
+                field("Suppress Receipt Print"; "Suppress Receipt Print")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -50,7 +57,7 @@ page 6184488 "Pepper EFT Transaction Types"
                 Caption = 'Result Codes';
                 Image = ServiceCode;
                 RunObject = Page "Pepper EFT Result Codes";
-                RunPageLink = "Transaction Type Code"=FIELD(Code);
+                RunPageLink = "Transaction Type Code" = FIELD(Code);
                 RunPageView = SORTING("Transaction Type Code")
                               ORDER(Ascending);
             }

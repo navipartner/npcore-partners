@@ -13,26 +13,33 @@ page 6151043 "POS Payment View Log Entries"
         {
             repeater(Group)
             {
-                field("Log Date";"Log Date")
+                field("Log Date"; "Log Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store";"POS Store")
+                field("POS Store"; "POS Store")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit";"POS Unit")
+                field("POS Unit"; "POS Unit")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Sales No.";"POS Sales No.")
+                field("POS Sales No."; "POS Sales No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code Popup";"Post Code Popup")
+                field("Post Code Popup"; "Post Code Popup")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -21,13 +21,16 @@ page 6151247 "NP Retail Admin Act - WFs"
                 ShowCaption = false;
                 field("Workflow Steps Enabled"; "Workflow Steps Enabled")
                 {
+                    ApplicationArea = All;
                 }
                 field("Workflow Steps Not Enabled"; "Workflow Steps Not Enabled")
                 {
+                    ApplicationArea = All;
                 }
 
                 field("EAN SETUPr"; "EAN SETUP")
                 {
+                    ApplicationArea = All;
                     Caption = 'EAN BOX SETUP';
                     ShowCaption = true;
                 }

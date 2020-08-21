@@ -4,7 +4,7 @@ page 6014409 "Credit card transaction ticket"
     Editable = false;
     PageType = List;
     SourceTable = "EFT Receipt";
-    SourceTableView = WHERE(Type=FILTER(0|3));
+    SourceTableView = WHERE(Type = FILTER(0 | 3));
 
     layout
     {
@@ -12,11 +12,13 @@ page 6014409 "Credit card transaction ticket"
         {
             repeater(Group)
             {
-                field("Transaction Time";"Transaction Time")
+                field("Transaction Time"; "Transaction Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Text;Text)
+                field(Text; Text)
                 {
+                    ApplicationArea = All;
                     Width = 250;
                 }
             }

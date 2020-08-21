@@ -11,23 +11,27 @@ page 6150704 "POS Action Parameters"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         SetOptionsEditable();
                     end;
                 }
-                field(Options;Options)
+                field(Options; Options)
                 {
+                    ApplicationArea = All;
                     Editable = OptionsEditable;
                 }
-                field("Default Value";"Default Value")
+                field("Default Value"; "Default Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

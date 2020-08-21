@@ -11,11 +11,13 @@ page 6014640 "RP Template Setup"
             group(Settings)
             {
                 Caption = 'Settings';
-                field("Version Major Number";"Version Major Number")
+                field("Version Major Number"; "Version Major Number")
                 {
+                    ApplicationArea = All;
                 }
-                field("Version Prefix";"Version Prefix")
+                field("Version Prefix"; "Version Prefix")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -29,8 +31,8 @@ page 6014640 "RP Template Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert(true);
+            Init;
+            Insert(true);
         end;
     end;
 }

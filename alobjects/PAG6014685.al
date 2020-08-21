@@ -13,35 +13,45 @@ page 6014685 "Sales Price Maintenance Setupo"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Type";"Sales Type")
+                field("Sales Type"; "Sales Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Code";"Sales Code")
+                field("Sales Code"; "Sales Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prices Including VAT";"Prices Including VAT")
+                field("Prices Including VAT"; "Prices Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Bus. Posting Gr. (Price)";"VAT Bus. Posting Gr. (Price)")
+                field("VAT Bus. Posting Gr. (Price)"; "VAT Bus. Posting Gr. (Price)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Invoice Disc.";"Allow Invoice Disc.")
+                field("Allow Invoice Disc."; "Allow Invoice Disc.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Line Disc.";"Allow Line Disc.")
+                field("Allow Line Disc."; "Allow Line Disc.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Unit Price";"Internal Unit Price")
+                field("Internal Unit Price"; "Internal Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field(Factor;Factor)
+                field(Factor; Factor)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

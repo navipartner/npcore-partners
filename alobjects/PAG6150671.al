@@ -13,11 +13,13 @@ page 6150671 "POS Entry Factbox"
     {
         area(content)
         {
-            field("Currency Code";"Currency Code")
+            field("Currency Code"; "Currency Code")
             {
+                ApplicationArea = All;
             }
-            field("Item Sales (LCY)";"Item Sales (LCY)")
+            field("Item Sales (LCY)"; "Item Sales (LCY)")
             {
+                ApplicationArea = All;
 
                 trigger OnDrillDown()
                 begin
@@ -26,24 +28,30 @@ page 6150671 "POS Entry Factbox"
                     //+NPR5.53 [373672]
                 end;
             }
-            field("Customer Sales (LCY)";"Customer Sales (LCY)")
+            field("Customer Sales (LCY)"; "Customer Sales (LCY)")
             {
+                ApplicationArea = All;
             }
-            field("G/L Sales (LCY)";"G/L Sales (LCY)")
+            field("G/L Sales (LCY)"; "G/L Sales (LCY)")
             {
+                ApplicationArea = All;
             }
-            field("Discount Amount";"Discount Amount")
+            field("Discount Amount"; "Discount Amount")
             {
+                ApplicationArea = All;
                 Caption = 'Disc. Amt Excl. VAT';
             }
-            field("Amount Incl. Tax";"Amount Incl. Tax")
+            field("Amount Incl. Tax"; "Amount Incl. Tax")
             {
+                ApplicationArea = All;
             }
-            field("Amount Excl. Tax";"Amount Excl. Tax")
+            field("Amount Excl. Tax"; "Amount Excl. Tax")
             {
+                ApplicationArea = All;
             }
-            field("Tax Amount";"Tax Amount")
+            field("Tax Amount"; "Tax Amount")
             {
+                ApplicationArea = All;
 
                 trigger OnDrillDown()
                 begin
@@ -52,31 +60,39 @@ page 6150671 "POS Entry Factbox"
                     //+NPR5.53 [373672]
                 end;
             }
-            field("Rounding Amount (LCY)";"Rounding Amount (LCY)")
+            field("Rounding Amount (LCY)"; "Rounding Amount (LCY)")
             {
+                ApplicationArea = All;
             }
-            field("Payment Amount";"Payment Amount")
+            field("Payment Amount"; "Payment Amount")
             {
+                ApplicationArea = All;
             }
-            field("Sales Quantity";"Sales Quantity")
+            field("Sales Quantity"; "Sales Quantity")
             {
-                DecimalPlaces = 0:2;
+                ApplicationArea = All;
+                DecimalPlaces = 0 : 2;
             }
-            field("Return Sales Quantity";"Return Sales Quantity")
+            field("Return Sales Quantity"; "Return Sales Quantity")
             {
-                DecimalPlaces = 0:2;
+                ApplicationArea = All;
+                DecimalPlaces = 0 : 2;
             }
-            field("Sale Lines";"Sale Lines")
+            field("Sale Lines"; "Sale Lines")
             {
+                ApplicationArea = All;
             }
-            field("Payment Lines";"Payment Lines")
+            field("Payment Lines"; "Payment Lines")
             {
+                ApplicationArea = All;
             }
-            field("Tax Lines";"Tax Lines")
+            field("Tax Lines"; "Tax Lines")
             {
+                ApplicationArea = All;
             }
-            field("No. of Print Output Entries";"No. of Print Output Entries")
+            field("No. of Print Output Entries"; "No. of Print Output Entries")
             {
+                ApplicationArea = All;
             }
         }
     }
@@ -89,7 +105,7 @@ page 6150671 "POS Entry Factbox"
     begin
         //-NPR5.54 [393490]
         if "Discount Amount" = 0 then
-          UpdateDiscountAmt;
+            UpdateDiscountAmt;
         //+NPR5.54 [393490]
     end;
 
@@ -98,8 +114,8 @@ page 6150671 "POS Entry Factbox"
         TaxAmountLine: Record "POS Tax Amount Line";
     begin
         TaxAmountLine.Reset;
-        TaxAmountLine.SetRange("POS Entry No.","Entry No.");
-        PAGE.Run(0,TaxAmountLine);
+        TaxAmountLine.SetRange("POS Entry No.", "Entry No.");
+        PAGE.Run(0, TaxAmountLine);
     end;
 
     local procedure SaleDetail(Type: Integer)
@@ -107,11 +123,12 @@ page 6150671 "POS Entry Factbox"
         SalesLine: Record "POS Sales Line";
     begin
         SalesLine.Reset;
-        SalesLine.SetRange("POS Entry No.","Entry No.");
+        SalesLine.SetRange("POS Entry No.", "Entry No.");
         case Type of
-          1: SalesLine.SetRange(Type,SalesLine.Type::Item);
+            1:
+                SalesLine.SetRange(Type, SalesLine.Type::Item);
         end;
-        PAGE.Run(0,SalesLine);
+        PAGE.Run(0, SalesLine);
     end;
 
     local procedure UpdateDiscountAmt()
@@ -120,11 +137,11 @@ page 6150671 "POS Entry Factbox"
     begin
         //-NPR5.54 [393490]
         POSSalesLine.Reset;
-        POSSalesLine.SetRange("POS Entry No.","Entry No.");
+        POSSalesLine.SetRange("POS Entry No.", "Entry No.");
         if POSSalesLine.FindSet then begin
-          repeat
-            "Discount Amount" += POSSalesLine."Line Discount Amount Excl. VAT";
-          until POSSalesLine.Next = 0;
+            repeat
+                "Discount Amount" += POSSalesLine."Line Discount Amount Excl. VAT";
+            until POSSalesLine.Next = 0;
         end;
         //+NPR5.54 [393490]
     end;

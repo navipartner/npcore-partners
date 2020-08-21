@@ -12,23 +12,29 @@ page 6151042 "Notification Card"
         {
             group(General)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Title;Title)
+                field(Title; Title)
                 {
+                    ApplicationArea = All;
                 }
-                field(Body;Body)
+                field(Body; Body)
                 {
+                    ApplicationArea = All;
                 }
-                field(Handled;Handled)
+                field(Handled; Handled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Handled By";"Handled By")
+                field("Handled By"; "Handled By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Handled Register";"Handled Register")
+                field("Handled Register"; "Handled Register")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -48,7 +54,7 @@ page 6151042 "Notification Card"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCompletedFlag(UserId,"Temp Current Register",Format(Id));
+                    AFAPIWebService.SetNotificationCompletedFlag(UserId, "Temp Current Register", Format(Id));
                     CurrPage.Close;
                 end;
             }
@@ -62,7 +68,7 @@ page 6151042 "Notification Card"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCancelledFlag(UserId,"Temp Current Register",Format(Id));
+                    AFAPIWebService.SetNotificationCancelledFlag(UserId, "Temp Current Register", Format(Id));
                     CurrPage.Close;
                 end;
             }

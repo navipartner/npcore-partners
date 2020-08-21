@@ -12,26 +12,33 @@ page 6060135 "MM Membership Admission Setup"
         {
             repeater(Group)
             {
-                field("Membership  Code";"Membership  Code")
+                field("Membership  Code"; "Membership  Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket No. Type";"Ticket No. Type")
+                field("Ticket No. Type"; "Ticket No. Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket No.";"Ticket No.")
+                field("Ticket No."; "Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cardinality Type";"Cardinality Type")
+                field("Cardinality Type"; "Cardinality Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max Cardinality";"Max Cardinality")
+                field("Max Cardinality"; "Max Cardinality")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

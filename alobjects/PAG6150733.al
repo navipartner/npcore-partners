@@ -12,16 +12,18 @@ page 6150733 "POS Sales Workflow Set Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014404;"POS Sales Workflow Set Entries")
+            part(Control6014404; "POS Sales Workflow Set Entries")
             {
-                SubPageLink = "Set Code"=FIELD(Code);
+                SubPageLink = "Set Code" = FIELD(Code);
             }
         }
     }

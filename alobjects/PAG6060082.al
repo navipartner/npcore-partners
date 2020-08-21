@@ -12,65 +12,81 @@ page 6060082 "MCS Recommendations Model Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Build Status";"Build Status")
+                field("Build Status"; "Build Status")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(MCS)
             {
-                field("Model ID";"Model ID")
+                field("Model ID"; "Model ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Build ID";"Last Build ID")
+                field("Last Build ID"; "Last Build ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Build Date Time";"Last Build Date Time")
+                field("Last Build Date Time"; "Last Build Date Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Catalog Export Date Time";"Last Catalog Export Date Time")
+                field("Last Catalog Export Date Time"; "Last Catalog Export Date Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Item Ledger Entry No.";"Last Item Ledger Entry No.")
+                field("Last Item Ledger Entry No."; "Last Item Ledger Entry No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if Confirm(TextResetItemLedgerEntry) then
-                          "Last Item Ledger Entry No." := 0;
+                            "Last Item Ledger Entry No." := 0;
                     end;
                 }
             }
             group("Export Settings")
             {
-                field("Item View";"Item View")
+                field("Item View"; "Item View")
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute View";"Attribute View")
+                field("Attribute View"; "Attribute View")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer View";"Customer View")
+                field("Customer View"; "Customer View")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Ledger Entry View";"Item Ledger Entry View")
+                field("Item Ledger Entry View"; "Item Ledger Entry View")
                 {
+                    ApplicationArea = All;
                 }
-                field(Categories;Categories)
+                field(Categories; Categories)
                 {
+                    ApplicationArea = All;
                 }
-                field("Language Code";"Language Code")
+                field("Language Code"; "Language Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Recommendations per Seed";"Recommendations per Seed")
+                field("Recommendations per Seed"; "Recommendations per Seed")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -94,7 +110,7 @@ page 6060082 "MCS Recommendations Model Card"
                     var
                         MCRRecBuildModelData: Codeunit "MCS Rec. Build Model Data";
                     begin
-                        MCRRecBuildModelData.PreviewDataToSend(0,Rec);
+                        MCRRecBuildModelData.PreviewDataToSend(0, Rec);
                     end;
                 }
                 action(PreviewHistory)
@@ -109,7 +125,7 @@ page 6060082 "MCS Recommendations Model Card"
                     var
                         MCRRecBuildModelData: Codeunit "MCS Rec. Build Model Data";
                     begin
-                        MCRRecBuildModelData.PreviewDataToSend(1,Rec);
+                        MCRRecBuildModelData.PreviewDataToSend(1, Rec);
                     end;
                 }
             }
@@ -159,7 +175,7 @@ page 6060082 "MCS Recommendations Model Card"
                     var
                         MCRRecBuildModelData: Codeunit "MCS Rec. Build Model Data";
                     begin
-                        MCRRecBuildModelData.TestGetRecommendations(Rec,'40010');
+                        MCRRecBuildModelData.TestGetRecommendations(Rec, '40010');
                     end;
                 }
                 action(GetRecommendationsAllItems)
@@ -171,7 +187,7 @@ page 6060082 "MCS Recommendations Model Card"
                     var
                         MCSRecommendationsHandler: Codeunit "MCS Recommendations Handler";
                     begin
-                        MCSRecommendationsHandler.RefreshRecommendations(Rec,true);
+                        MCSRecommendationsHandler.RefreshRecommendations(Rec, true);
                     end;
                 }
                 action(DeleteAzureModel)
@@ -201,8 +217,8 @@ page 6060082 "MCS Recommendations Model Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "MCS Rec. Business Rules";
-                RunPageLink = "Model No."=FIELD(Code);
-                RunPageView = SORTING("Model No.","Rule No.")
+                RunPageLink = "Model No." = FIELD(Code);
+                RunPageView = SORTING("Model No.", "Rule No.")
                               ORDER(Ascending);
             }
             action(RecommendationsLines)
@@ -210,14 +226,14 @@ page 6060082 "MCS Recommendations Model Card"
                 Caption = 'RecommendationsLines';
                 Image = SuggestLines;
                 RunObject = Page "MCS Recommendations Lines";
-                RunPageLink = "Model No."=FIELD(Code);
+                RunPageLink = "Model No." = FIELD(Code);
             }
             action(Log)
             {
                 Caption = 'Log';
                 Image = InteractionLog;
                 RunObject = Page "MCS Recommendations Log";
-                RunPageLink = "Model No."=FIELD(Code);
+                RunPageLink = "Model No." = FIELD(Code);
             }
         }
     }

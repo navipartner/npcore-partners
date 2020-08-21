@@ -16,51 +16,65 @@ page 6151134 "TM Ticket Schedule Wizard"
             repeater(Control6014401)
             {
                 ShowCaption = false;
-                field("Schedule Code";"Schedule Code")
+                field("Schedule Code"; "Schedule Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("Stop Time";"Stop Time")
+                field("Stop Time"; "Stop Time")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field(Monday;Monday)
+                field(Monday; Monday)
                 {
+                    ApplicationArea = All;
                 }
-                field(Tuesday;Tuesday)
+                field(Tuesday; Tuesday)
                 {
+                    ApplicationArea = All;
                 }
-                field(Wednesday;Wednesday)
+                field(Wednesday; Wednesday)
                 {
+                    ApplicationArea = All;
                 }
-                field(Thursday;Thursday)
+                field(Thursday; Thursday)
                 {
+                    ApplicationArea = All;
                 }
-                field(Friday;Friday)
+                field(Friday; Friday)
                 {
+                    ApplicationArea = All;
                 }
-                field(Saturday;Saturday)
+                field(Saturday; Saturday)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sunday;Sunday)
+                field(Sunday; Sunday)
                 {
+                    ApplicationArea = All;
                 }
-                field("Capacity Control";"Capacity Control")
+                field("Capacity Control"; "Capacity Control")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max Capacity Per Sch. Entry";"Max Capacity Per Sch. Entry")
+                field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
+                    ApplicationArea = All;
                     Caption = 'Capacity';
                 }
-                field("Prebook From";"Prebook From")
+                field("Prebook From"; "Prebook From")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prebook Is Required";"Prebook Is Required")
+                field("Prebook Is Required"; "Prebook Is Required")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -79,10 +93,10 @@ page 6151134 "TM Ticket Schedule Wizard"
     begin
 
         if ("Start Time" = 0T) or ("Stop Time" = 0T) then
-          exit (false);
+            exit(false);
 
-        ScheduleCode := IncStr (ScheduleCode);
-        "Schedule Code" :=ScheduleCode;
+        ScheduleCode := IncStr(ScheduleCode);
+        "Schedule Code" := ScheduleCode;
     end;
 
     var
@@ -92,11 +106,11 @@ page 6151134 "TM Ticket Schedule Wizard"
     begin
 
         Rec.Reset;
-        if (Rec.FindSet ()) then begin
-          repeat
-            AdmissionSchedule.TransferFields (Rec, true);
-            AdmissionSchedule.Insert ();
-          until (Rec.Next () = 0);
+        if (Rec.FindSet()) then begin
+            repeat
+                AdmissionSchedule.TransferFields(Rec, true);
+                AdmissionSchedule.Insert();
+            until (Rec.Next() = 0);
         end;
     end;
 

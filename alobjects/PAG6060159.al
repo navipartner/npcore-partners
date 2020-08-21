@@ -12,11 +12,13 @@ page 6060159 "Event Attribute Row Templates"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -34,7 +36,7 @@ page 6060159 "Event Attribute Row Templates"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Event Attribute Row Values";
-                RunPageLink = "Template Name"=FIELD(Name);
+                RunPageLink = "Template Name" = FIELD(Name);
             }
         }
     }

@@ -25,59 +25,70 @@ page 6014466 "Quantity Discount Card"
         {
             group(General)
             {
-                field("Main No.";"Main No.")
+                field("Main No."; "Main No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                 }
-                field("Block Custom Discount";"Block Custom Discount")
+                field("Block Custom Discount"; "Block Custom Discount")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Conditions)
             {
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Date";"Closing Date")
+                field("Closing Date"; "Closing Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Time";"Closing Time")
+                field("Closing Time"; "Closing Time")
                 {
+                    ApplicationArea = All;
                 }
                 grid(Control6150629)
                 {
                     ShowCaption = false;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(QuantityDiscountLine1;"Quantity Discount Line")
+            part(QuantityDiscountLine1; "Quantity Discount Line")
             {
-                SubPageLink = "Item No."=FIELD("Item No."),
-                              "Main no."=FIELD("Main No.");
+                SubPageLink = "Item No." = FIELD("Item No."),
+                              "Main no." = FIELD("Main No.");
                 Visible = ActionVisible;
             }
         }
         area(factboxes)
         {
-            part(Control6150634;"Item Invoicing FactBox")
+            part(Control6150634; "Item Invoicing FactBox")
             {
-                SubPageLink = "No."=FIELD("Item No.");
+                SubPageLink = "No." = FIELD("Item No.");
             }
         }
     }
@@ -91,8 +102,8 @@ page 6014466 "Quantity Discount Card"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6014439),
-                              "No."=FIELD("Main No.");
+                RunPageLink = "Table ID" = CONST(6014439),
+                              "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
             }
         }
@@ -160,23 +171,23 @@ page 6014466 "Quantity Discount Card"
                     QuantityDiscountLine: Record "Quantity Discount Line";
                 begin
                     //-NPR5.30 [265244]
-                    if PAGE.RunModal(PAGE::"Quantity Discount List",QuantityDiscountHeader) <> ACTION::LookupOK then exit;
-                      QuantityDiscountLine1.Reset;
-                      QuantityDiscountLine1.SetRange("Main no.","Main No.");
-                      QuantityDiscountLine1.SetRange("Item No.","Item No.");
-                      QuantityDiscountLine1.DeleteAll;
+                    if PAGE.RunModal(PAGE::"Quantity Discount List", QuantityDiscountHeader) <> ACTION::LookupOK then exit;
+                    QuantityDiscountLine1.Reset;
+                    QuantityDiscountLine1.SetRange("Main no.", "Main No.");
+                    QuantityDiscountLine1.SetRange("Item No.", "Item No.");
+                    QuantityDiscountLine1.DeleteAll;
 
-                      QuantityDiscountLine1.Reset;
-                      QuantityDiscountLine1.SetRange("Main no.",QuantityDiscountHeader."Main No.");
-                      QuantityDiscountLine1.SetRange("Item No.",QuantityDiscountHeader."Item No.");
-                      if QuantityDiscountLine1.FindSet then
+                    QuantityDiscountLine1.Reset;
+                    QuantityDiscountLine1.SetRange("Main no.", QuantityDiscountHeader."Main No.");
+                    QuantityDiscountLine1.SetRange("Item No.", QuantityDiscountHeader."Item No.");
+                    if QuantityDiscountLine1.FindSet then
                         repeat
-                          QuantityDiscountLine.Init;
-                          QuantityDiscountLine.TransferFields(QuantityDiscountLine1);
-                          QuantityDiscountLine."Main no." := "Main No.";
-                          QuantityDiscountLine."Item No." := "Item No.";
-                          QuantityDiscountLine.Insert(true);
-                        until QuantityDiscountLine1.Next=0;
+                            QuantityDiscountLine.Init;
+                            QuantityDiscountLine.TransferFields(QuantityDiscountLine1);
+                            QuantityDiscountLine."Main no." := "Main No.";
+                            QuantityDiscountLine."Item No." := "Item No.";
+                            QuantityDiscountLine.Insert(true);
+                        until QuantityDiscountLine1.Next = 0;
 
                     //+NPR5.30 [265244]
                 end;
@@ -190,11 +201,11 @@ page 6014466 "Quantity Discount Card"
     begin
         UpdateStatus();
 
-        Flerstykhoved.SetRange( "Item No.", GetFilter( "Item No." ));
+        Flerstykhoved.SetRange("Item No.", GetFilter("Item No."));
         if not Flerstykhoved.Find('-') then begin
 
         end;
-        ActionVisible:=true;
+        ActionVisible := true;
     end;
 
     var
@@ -207,14 +218,15 @@ page 6014466 "Quantity Discount Card"
         "Quantity Discount Header 2": Record "Quantity Discount Header";
     begin
         //-NPK1.0
-        "Quantity Discount Header 2".SetFilter( Status, '<>%1', Status::Balanced );
-        if "Quantity Discount Header 2".FindFirst then repeat
-          if ("Quantity Discount Header 2"."Closing Date" < Today) or
-             ( ("Quantity Discount Header 2"."Closing Date" = Today) and ("Quantity Discount Header 2"."Closing Time" < Time) ) then begin
-            "Quantity Discount Header 2".Validate( Status, Status::Balanced );
-            "Quantity Discount Header 2".Modify( true );
-          end;
-        until "Quantity Discount Header 2".Next = 0;
+        "Quantity Discount Header 2".SetFilter(Status, '<>%1', Status::Balanced);
+        if "Quantity Discount Header 2".FindFirst then
+            repeat
+                if ("Quantity Discount Header 2"."Closing Date" < Today) or
+                   (("Quantity Discount Header 2"."Closing Date" = Today) and ("Quantity Discount Header 2"."Closing Time" < Time)) then begin
+                    "Quantity Discount Header 2".Validate(Status, Status::Balanced);
+                    "Quantity Discount Header 2".Modify(true);
+                end;
+            until "Quantity Discount Header 2".Next = 0;
         //+NPK1.0
     end;
 }

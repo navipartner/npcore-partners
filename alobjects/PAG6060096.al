@@ -16,14 +16,17 @@ page 6060096 "Ean Box Setups"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS View";"POS View")
+                field("POS View"; "POS View")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

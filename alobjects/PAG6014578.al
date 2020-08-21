@@ -17,8 +17,9 @@ page 6014578 "Tax Free GB Countries"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

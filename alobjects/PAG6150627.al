@@ -27,16 +27,19 @@ page 6150627 "POS Workshift Checkpoint Card"
             group(Balancing)
             {
                 Caption = 'Balancing';
-                field("Created At";"Created At")
+                field("Created At"; "Created At")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Direct Sales Count";"Direct Sales Count")
+                field("Direct Sales Count"; "Direct Sales Count")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Direct Item Returns Line Count";"Direct Item Returns Line Count")
+                field("Direct Item Returns Line Count"; "Direct Item Returns Line Count")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Overview)
@@ -45,151 +48,179 @@ page 6150627 "POS Workshift Checkpoint Card"
                 group(Sales)
                 {
                     Caption = 'Sales';
-                    field("Direct Item Sales (LCY)";"Direct Item Sales (LCY)")
+                    field("Direct Item Sales (LCY)"; "Direct Item Sales (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
-                    field("Direct Item Returns (LCY)";"Direct Item Returns (LCY)")
+                    field("Direct Item Returns (LCY)"; "Direct Item Returns (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                 }
                 group("Cash Movement")
                 {
                     Caption = 'Cash Movement';
-                    field("Local Currency (LCY)";"Local Currency (LCY)")
+                    field("Local Currency (LCY)"; "Local Currency (LCY)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Foreign Currency (LCY)";"Foreign Currency (LCY)")
+                    field("Foreign Currency (LCY)"; "Foreign Currency (LCY)")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Other Payments")
                 {
                     Caption = 'Other Payments';
-                    field("Debtor Payment (LCY)";"Debtor Payment (LCY)")
+                    field("Debtor Payment (LCY)"; "Debtor Payment (LCY)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("EFT (LCY)";"EFT (LCY)")
+                    field("EFT (LCY)"; "EFT (LCY)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("GL Payment (LCY)";"GL Payment (LCY)")
+                    field("GL Payment (LCY)"; "GL Payment (LCY)")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Voucher)
                 {
-                    field("Redeemed Vouchers (LCY)";"Redeemed Vouchers (LCY)")
+                    field("Redeemed Vouchers (LCY)"; "Redeemed Vouchers (LCY)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Issued Vouchers (LCY)";"Issued Vouchers (LCY)")
+                    field("Issued Vouchers (LCY)"; "Issued Vouchers (LCY)")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Other)
                 {
                     Caption = 'Other';
-                    field("Rounding (LCY)";"Rounding (LCY)")
+                    field("Rounding (LCY)"; "Rounding (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Bin Transfer Out Amount (LCY)";"Bin Transfer Out Amount (LCY)")
+                    field("Bin Transfer Out Amount (LCY)"; "Bin Transfer Out Amount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Bin Transfer In Amount (LCY)";"Bin Transfer In Amount (LCY)")
+                    field("Bin Transfer In Amount (LCY)"; "Bin Transfer In Amount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
                 }
                 group("Credit Sales")
                 {
                     Caption = 'Credit Sales';
-                    field("Credit Sales Count";"Credit Sales Count")
+                    field("Credit Sales Count"; "Credit Sales Count")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Credit Sales Amount (LCY)";"Credit Sales Amount (LCY)")
+                    field("Credit Sales Amount (LCY)"; "Credit Sales Amount (LCY)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Credit Net Sales Amount (LCY)";"Credit Net Sales Amount (LCY)")
+                    field("Credit Net Sales Amount (LCY)"; "Credit Net Sales Amount (LCY)")
                     {
+                        ApplicationArea = All;
                     }
                     group(Details)
                     {
                         Caption = 'Details';
-                        field("Credit Unreal. Sale Amt. (LCY)";"Credit Unreal. Sale Amt. (LCY)")
+                        field("Credit Unreal. Sale Amt. (LCY)"; "Credit Unreal. Sale Amt. (LCY)")
                         {
+                            ApplicationArea = All;
                             Importance = Additional;
                         }
-                        field("Credit Unreal. Ret. Amt. (LCY)";"Credit Unreal. Ret. Amt. (LCY)")
+                        field("Credit Unreal. Ret. Amt. (LCY)"; "Credit Unreal. Ret. Amt. (LCY)")
                         {
+                            ApplicationArea = All;
                             Importance = Additional;
                         }
-                        field("Credit Real. Sale Amt. (LCY)";"Credit Real. Sale Amt. (LCY)")
+                        field("Credit Real. Sale Amt. (LCY)"; "Credit Real. Sale Amt. (LCY)")
                         {
+                            ApplicationArea = All;
                             Importance = Additional;
                         }
-                        field("Credit Real. Return Amt. (LCY)";"Credit Real. Return Amt. (LCY)")
+                        field("Credit Real. Return Amt. (LCY)"; "Credit Real. Return Amt. (LCY)")
                         {
+                            ApplicationArea = All;
                             Importance = Additional;
                         }
                     }
                 }
             }
-            part("Payment Details";"POS Payment Checkpoint Subpage")
+            part("Payment Details"; "POS Payment Checkpoint Subpage")
             {
                 Caption = 'Payment Details';
                 Editable = false;
                 ShowFilter = false;
-                SubPageLink = "Workshift Checkpoint Entry No."=FIELD("Entry No.");
+                SubPageLink = "Workshift Checkpoint Entry No." = FIELD("Entry No.");
                 Visible = NOT IsBlindCount;
             }
             group(Turnover)
             {
                 Caption = 'Turnover';
-                field("Turnover (LCY)";"Turnover (LCY)")
+                field("Turnover (LCY)"; "Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Net Turnover (LCY)";"Net Turnover (LCY)")
+                field("Net Turnover (LCY)"; "Net Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net Cost (LCY)";"Net Cost (LCY)")
+                field("Net Cost (LCY)"; "Net Cost (LCY)")
                 {
+                    ApplicationArea = All;
                 }
                 group(Profit)
                 {
                     Caption = 'Profit';
-                    field("Profit Amount (LCY)";"Profit Amount (LCY)")
+                    field("Profit Amount (LCY)"; "Profit Amount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
-                    field("Profit %";"Profit %")
+                    field("Profit %"; "Profit %")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                 }
                 group(Direct)
                 {
                     Caption = 'Direct';
-                    field("Direct Turnover (LCY)";"Direct Turnover (LCY)")
+                    field("Direct Turnover (LCY)"; "Direct Turnover (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Direct Net Turnover (LCY)";"Direct Net Turnover (LCY)")
+                    field("Direct Net Turnover (LCY)"; "Direct Net Turnover (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
                 }
                 group(Credit)
                 {
                     Caption = 'Credit';
-                    field("Credit Turnover (LCY)";"Credit Turnover (LCY)")
+                    field("Credit Turnover (LCY)"; "Credit Turnover (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Credit Net Turnover (LCY)";"Credit Net Turnover (LCY)")
+                    field("Credit Net Turnover (LCY)"; "Credit Net Turnover (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
                 }
@@ -200,80 +231,96 @@ page 6150627 "POS Workshift Checkpoint Card"
                 group("Discount Amounts")
                 {
                     Caption = 'Discount Amounts';
-                    field("Campaign Discount (LCY)";"Campaign Discount (LCY)")
+                    field("Campaign Discount (LCY)"; "Campaign Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Mix Discount (LCY)";"Mix Discount (LCY)")
+                    field("Mix Discount (LCY)"; "Mix Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Quantity Discount (LCY)";"Quantity Discount (LCY)")
+                    field("Quantity Discount (LCY)"; "Quantity Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Custom Discount (LCY)";"Custom Discount (LCY)")
+                    field("Custom Discount (LCY)"; "Custom Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("BOM Discount (LCY)";"BOM Discount (LCY)")
+                    field("BOM Discount (LCY)"; "BOM Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Customer Discount (LCY)";"Customer Discount (LCY)")
+                    field("Customer Discount (LCY)"; "Customer Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Line Discount (LCY)";"Line Discount (LCY)")
+                    field("Line Discount (LCY)"; "Line Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
                 }
                 group("Dicount Percent")
                 {
                     Caption = 'Dicount Percent';
-                    field("Campaign Discount %";"Campaign Discount %")
+                    field("Campaign Discount %"; "Campaign Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Mix Discount %";"Mix Discount %")
+                    field("Mix Discount %"; "Mix Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Quantity Discount %";"Quantity Discount %")
+                    field("Quantity Discount %"; "Quantity Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Custom Discount %";"Custom Discount %")
+                    field("Custom Discount %"; "Custom Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("BOM Discount %";"BOM Discount %")
+                    field("BOM Discount %"; "BOM Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Customer Discount %";"Customer Discount %")
+                    field("Customer Discount %"; "Customer Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Line Discount %";"Line Discount %")
+                    field("Line Discount %"; "Line Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
                 }
                 group("Discount Total")
                 {
-                    field("Total Discount (LCY)";"Total Discount (LCY)")
+                    field("Total Discount (LCY)"; "Total Discount (LCY)")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
-                    field("Total Discount %";"Total Discount %")
+                    field("Total Discount %"; "Total Discount %")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                 }
             }
-            part(POSPaymentBins;"POS Unit to Bin Relation")
+            part(POSPaymentBins; "POS Unit to Bin Relation")
             {
                 Caption = 'Attached Payment Bins';
                 Editable = false;
@@ -298,7 +345,7 @@ page 6150627 "POS Workshift Checkpoint Card"
                 trigger OnAction()
                 begin
 
-                    CreateBinCheckpoint ("POS Unit No.");
+                    CreateBinCheckpoint("POS Unit No.");
                 end;
             }
             action("Create X-Report")
@@ -334,9 +381,9 @@ page 6150627 "POS Workshift Checkpoint Card"
                     POSWorkshiftTaxCheckpoint: Record "POS Workshift Tax Checkpoint";
                     POSTaxCheckpointPage: Page "POS Tax Checkpoint";
                 begin
-                    POSWorkshiftTaxCheckpoint.SetFilter ("Workshift Checkpoint Entry No.", '=%1', Rec."Entry No.");
-                    POSTaxCheckpointPage.SetTableView (POSWorkshiftTaxCheckpoint);
-                    POSTaxCheckpointPage.RunModal ();
+                    POSWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', Rec."Entry No.");
+                    POSTaxCheckpointPage.SetTableView(POSWorkshiftTaxCheckpoint);
+                    POSTaxCheckpointPage.RunModal();
                 end;
             }
         }
@@ -356,15 +403,15 @@ page 6150627 "POS Workshift Checkpoint Card"
                     ReportSelectionRetail: Record "Report Selection Retail";
                 begin
 
-                    POSWorkshiftCheckpoint.Get ("Entry No.");
-                    POSWorkshiftCheckpoint.SetRecFilter ();
+                    POSWorkshiftCheckpoint.Get("Entry No.");
+                    POSWorkshiftCheckpoint.SetRecFilter();
 
-                    ReportSelectionRetail.SetFilter ("Report Type", '=%1', ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
-                    if (ReportSelectionRetail.FindSet ()) then begin
-                      repeat
-                        ReportSelectionRetail.TestField ("Print Template");
-                        PrintTemplateMgt.PrintTemplate (ReportSelectionRetail."Print Template", POSWorkshiftCheckpoint, 0);
-                      until (ReportSelectionRetail.Next () = 0);
+                    ReportSelectionRetail.SetFilter("Report Type", '=%1', ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
+                    if (ReportSelectionRetail.FindSet()) then begin
+                        repeat
+                            ReportSelectionRetail.TestField("Print Template");
+                            PrintTemplateMgt.PrintTemplate(ReportSelectionRetail."Print Template", POSWorkshiftCheckpoint, 0);
+                        until (ReportSelectionRetail.Next() = 0);
                     end;
                 end;
             }
@@ -376,8 +423,8 @@ page 6150627 "POS Workshift Checkpoint Card"
         POSUnittoBinRelation: Record "POS Unit to Bin Relation";
     begin
 
-        POSUnittoBinRelation.SetFilter ("POS Unit No.", '=%1', Rec."POS Unit No.");
-        CurrPage.POSPaymentBins.PAGE.SetTableView (POSUnittoBinRelation);
+        POSUnittoBinRelation.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        CurrPage.POSPaymentBins.PAGE.SetTableView(POSUnittoBinRelation);
     end;
 
     trigger OnInit()
@@ -406,17 +453,17 @@ page 6150627 "POS Workshift Checkpoint Card"
     begin
 
         //-NPR5.45 [306157]
-        POSWorkshiftCheckpoint.CreateBinCheckpoint (Rec."Entry No.");
+        POSWorkshiftCheckpoint.CreateBinCheckpoint(Rec."Entry No.");
         //+NPR5.45 [306157]
         Commit;
 
-        POSPaymentBinCheckpoint.Reset ();
-        POSPaymentBinCheckpoint.SetFilter ("Workshift Checkpoint Entry No.", '=%1', Rec."Entry No.");
-        PaymentBinCheckpointPage.SetTableView (POSPaymentBinCheckpoint);
-        PaymentBinCheckpointPage.SetCheckpointMode (PageMode);
+        POSPaymentBinCheckpoint.Reset();
+        POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', Rec."Entry No.");
+        PaymentBinCheckpointPage.SetTableView(POSPaymentBinCheckpoint);
+        PaymentBinCheckpointPage.SetCheckpointMode(PageMode);
 
         //-NPR5.49 [348458]
-        PaymentBinCheckpointPage.SetBlindCount (IsBlindCount);
+        PaymentBinCheckpointPage.SetBlindCount(IsBlindCount);
         //+NPR5.49 [348458]
 
         PaymentBinCheckpointPage.RunModal();
@@ -427,11 +474,11 @@ page 6150627 "POS Workshift Checkpoint Card"
 
         PageMode := PageMode::PRELIMINARY;
         if (Mode = Mode::FINAL) then
-          PageMode := PageMode::FINAL;
+            PageMode := PageMode::FINAL;
 
         //-NPR5.46 [328326]
         if (Mode = Mode::VIEW) then
-          PageMode := PageMode::VIEW;
+            PageMode := PageMode::VIEW;
         //+NPR5.46 [328326]
     end;
 

@@ -15,14 +15,17 @@ page 6014676 "Endpoint Filters"
         {
             repeater(Group)
             {
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Text";"Filter Text")
+                field("Filter Text"; "Filter Text")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -46,11 +49,11 @@ page 6014676 "Endpoint Filters"
     var
         Endpoint: Record Endpoint;
     begin
-        if ("Endpoint Code" <> '') and ("Table No." = 0)  then begin
-          if Endpoint.Get("Endpoint Code") then begin
-            "Table No." := Endpoint."Table No.";
+        if ("Endpoint Code" <> '') and ("Table No." = 0) then begin
+            if Endpoint.Get("Endpoint Code") then begin
+                "Table No." := Endpoint."Table No.";
 
-          end;
+            end;
         end;
     end;
 }

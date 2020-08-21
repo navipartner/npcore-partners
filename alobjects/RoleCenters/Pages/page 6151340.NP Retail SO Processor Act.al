@@ -103,7 +103,7 @@ page 6151340 "NP Retail SO Processor Act"
 
 
 
-        procedure DrillDownSalesThisMonthLastYear()
+    procedure DrillDownSalesThisMonthLastYear()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -113,7 +113,7 @@ page 6151340 "NP Retail SO Processor Act"
     end;
 
 
-        procedure DrillDownSalesThisMonth()
+    procedure DrillDownSalesThisMonth()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin

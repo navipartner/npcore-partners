@@ -19,8 +19,8 @@ page 6014532 "Touch Screen - Saved sales"
     ModifyAllowed = false;
     PageType = StandardDialog;
     SourceTable = "Sale POS";
-    SourceTableView = SORTING ("Salesperson Code", "Saved Sale")
-                      WHERE ("Saved Sale" = CONST (true));
+    SourceTableView = SORTING("Salesperson Code", "Saved Sale")
+                      WHERE("Saved Sale" = CONST(true));
 
     layout
     {
@@ -32,25 +32,32 @@ page 6014532 "Touch Screen - Saved sales"
                 Visible = NOT ReturnSale;
                 field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
                 field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer Location No."; "Customer Location No.")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field("Customer Name"; "Customer Name")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Control6150620)
@@ -59,18 +66,18 @@ page 6014532 "Touch Screen - Saved sales"
                 part("Sales Lines"; "Sale POS - Saved Sale Line")
                 {
                     Caption = 'Sales Lines';
-                    SubPageLink = "Sales Ticket No." = FIELD ("Sales Ticket No.");
-                    SubPageView = SORTING ("Register No.", "Sales Ticket No.", "Sale Type", "Line No.")
+                    SubPageLink = "Sales Ticket No." = FIELD("Sales Ticket No.");
+                    SubPageView = SORTING("Register No.", "Sales Ticket No.", "Sale Type", "Line No.")
                                   ORDER(Ascending)
-                                  WHERE (Type = FILTER (<> Payment));
+                                  WHERE(Type = FILTER(<> Payment));
                 }
                 part("Payment Lines"; "Sale POS - Saved Sale Line")
                 {
                     Caption = 'Payment Lines';
-                    SubPageLink = "Sales Ticket No." = FIELD ("Sales Ticket No.");
-                    SubPageView = SORTING ("Register No.", "Sales Ticket No.", "Sale Type", "Line No.")
+                    SubPageLink = "Sales Ticket No." = FIELD("Sales Ticket No.");
+                    SubPageView = SORTING("Register No.", "Sales Ticket No.", "Sale Type", "Line No.")
                                   ORDER(Ascending)
-                                  WHERE (Type = CONST (Payment));
+                                  WHERE(Type = CONST(Payment));
                 }
             }
         }

@@ -18,34 +18,41 @@ page 6059968 "MPOS App Setup Card"
         {
             group(General)
             {
-                field(Enable;Enable)
+                field(Enable; Enable)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Web Service Is Published";"Web Service Is Published")
+                field("Web Service Is Published"; "Web Service Is Published")
                 {
+                    ApplicationArea = All;
                 }
-                field("Custom Web Service URL";"Custom Web Service URL")
+                field("Custom Web Service URL"; "Custom Web Service URL")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Payment)
             {
                 Caption = 'Payment';
-                field("Handle EFT Print in NAV";"Handle EFT Print in NAV")
+                field("Handle EFT Print in NAV"; "Handle EFT Print in NAV")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Gateway";"Payment Gateway")
+                field("Payment Gateway"; "Payment Gateway")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Admission)
             {
                 Caption = 'Admission';
-                field("Ticket Admission Web Url";"Ticket Admission Web Url")
+                field("Ticket Admission Web Url"; "Ticket Admission Web Url")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -66,8 +73,8 @@ page 6059968 "MPOS App Setup Card"
                 trigger OnAction()
                 begin
                     CODEUNIT.Run(6059965);
-                    if WebService.Get(WebService."Object Type"::Codeunit,'mpos_service') then begin
-                    "Receipt Web API" := GetUrl(CLIENTTYPE::SOAP);
+                    if WebService.Get(WebService."Object Type"::Codeunit, 'mpos_service') then begin
+                        "Receipt Web API" := GetUrl(CLIENTTYPE::SOAP);
                     end;
                 end;
             }
@@ -97,8 +104,10 @@ page 6059968 "MPOS App Setup Card"
                     MPOSPaymentGateway.Get("Payment Gateway");
 
                     case MPOSPaymentGateway.Provider of
-                        MPOSPaymentGateway.Provider::ADYEN : Error(NotImplimentedYetError);
-                        MPOSPaymentGateway.Provider::NETS : PAGE.Run(PAGE::"MPOS Nets Transactions List");
+                        MPOSPaymentGateway.Provider::ADYEN:
+                            Error(NotImplimentedYetError);
+                        MPOSPaymentGateway.Provider::NETS:
+                            PAGE.Run(PAGE::"MPOS Nets Transactions List");
                     end;
                 end;
             }

@@ -17,23 +17,26 @@ page 6014555 "Touch Screen - Cust Locations"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount";"Total Amount")
+                field("Total Amount"; "Total Amount")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Control6150617)
             {
                 ShowCaption = false;
-                part(Control6150618;"Sale POS - Saved Sale Line")
+                part(Control6150618; "Sale POS - Saved Sale Line")
                 {
-                    SubPageLink = "Customer Location No."=FIELD("No.");
-                    SubPageView = SORTING("Register No.","Sales Ticket No.","Line No.");
+                    SubPageLink = "Customer Location No." = FIELD("No.");
+                    SubPageView = SORTING("Register No.", "Sales Ticket No.", "Line No.");
                 }
             }
         }

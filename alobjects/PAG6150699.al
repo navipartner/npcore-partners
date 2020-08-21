@@ -16,22 +16,27 @@ page 6150699 "Retail Data Model Upgrade Log"
             {
                 IndentationColumn = Indent;
                 IndentationControls = Text;
-                field("Data Model Build";"Data Model Build")
+                field("Data Model Build"; "Data Model Build")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field(Text;Text)
+                field(Text; Text)
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = TextEmphasize;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date and Time";"Date and Time")
+                field("Date and Time"; "Date and Time")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

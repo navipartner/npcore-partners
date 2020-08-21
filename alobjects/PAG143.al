@@ -1,4 +1,4 @@
-pageextension 6014416 pageextension6014416 extends "Posted Sales Invoices" 
+pageextension 6014416 pageextension6014416 extends "Posted Sales Invoices"
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -16,12 +16,14 @@ pageextension 6014416 pageextension6014416 extends "Posted Sales Invoices"
 
         addafter("Shipment Date")
         {
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
                 Editable = false;
                 Visible = false;
             }
@@ -53,12 +55,12 @@ pageextension 6014416 pageextension6014416 extends "Posted Sales Invoices"
                         //-PN1.00
                         CurrPage.SetSelectionFilter(SalesInvHeader);
                         if SalesInvHeader.FindSet then
-                          repeat
-                            //-PN1.10
-                            //EmailDocMgt.SendReportSalesInvHdr(SalesInvHeader,TRUE);
-                            EmailDocMgt.SendReport(SalesInvHeader,true);
+                            repeat
+                                //-PN1.10
+                                //EmailDocMgt.SendReportSalesInvHdr(SalesInvHeader,TRUE);
+                                EmailDocMgt.SendReport(SalesInvHeader, true);
                             //+PN1.10
-                          until SalesInvHeader.Next = 0;
+                            until SalesInvHeader.Next = 0;
                         CurrPage.Update(false);
                         //+PN1.00
                     end;

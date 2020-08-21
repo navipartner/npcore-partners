@@ -15,27 +15,32 @@ page 6151027 "NpRv Partner Card"
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Service Url";"Service Url")
+                    field("Service Url"; "Service Url")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field("Service Username";"Service Username")
+                    field("Service Username"; "Service Username")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field("Service Password";"Service Password")
+                    field("Service Password"; "Service Password")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                 }
@@ -60,9 +65,9 @@ page 6151027 "NpRv Partner Card"
                     NpRvPartnerMgt: Codeunit "NpRv Partner Mgt.";
                 begin
                     if NpRvPartnerMgt.TryValidateGlobalVoucherService(Rec) then
-                      Message(Text001)
+                        Message(Text001)
                     else
-                      Error(GetLastErrorText);
+                        Error(GetLastErrorText);
                 end;
             }
         }
@@ -73,7 +78,7 @@ page 6151027 "NpRv Partner Card"
         NpRvPartnerMgt: Codeunit "NpRv Partner Mgt.";
     begin
         if not NpRvPartnerMgt.TryValidateGlobalVoucherService(Rec) then
-          exit(Confirm(Text000,false));
+            exit(Confirm(Text000, false));
     end;
 
     var

@@ -12,12 +12,14 @@ page 6014488 "Credit Card Prefix"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Prefix;Prefix)
+                field(Prefix; Prefix)
                 {
+                    ApplicationArea = All;
                     Visible = Prefixvi;
                 }
-                field(Weight;Weight)
+                field(Weight; Weight)
                 {
+                    ApplicationArea = All;
                     Visible = weightvi;
                 }
             }
@@ -30,8 +32,8 @@ page 6014488 "Credit Card Prefix"
 
     trigger OnOpenPage()
     begin
-        Prefixvi:=show_prefix;
-        Weightvi:=show_weight;
+        Prefixvi := show_prefix;
+        Weightvi := show_weight;
     end;
 
     var

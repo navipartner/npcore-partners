@@ -18,26 +18,33 @@ page 6014580 "Object Output Selection"
             repeater(Control6150620)
             {
                 ShowCaption = false;
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object ID";"Object ID")
+                field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Name";"Object Name")
+                field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Template";"Print Template")
+                field("Print Template"; "Print Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Output Type";"Output Type")
+                field("Output Type"; "Output Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Output Path";"Output Path")
+                field("Output Path"; "Output Path")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

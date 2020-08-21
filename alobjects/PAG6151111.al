@@ -14,20 +14,25 @@ page 6151111 "NpRi Sales Inv. Setup Subpage"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Invoice %";"Invoice %")
+                field("Invoice %"; "Invoice %")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

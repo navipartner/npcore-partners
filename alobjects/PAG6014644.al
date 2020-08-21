@@ -14,26 +14,33 @@ page 6014644 "Tax Free POS Units"
         {
             repeater(Group)
             {
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Handler ID";"Handler ID")
+                field("Handler ID"; "Handler ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Mode;Mode)
+                field(Mode; Mode)
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Level";"Log Level")
+                field("Log Level"; "Log Level")
                 {
+                    ApplicationArea = All;
                 }
-                field("Check POS Terminal IIN";"Check POS Terminal IIN")
+                field("Check POS Terminal IIN"; "Check POS Terminal IIN")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Timeout (ms)";"Request Timeout (ms)")
+                field("Request Timeout (ms)"; "Request Timeout (ms)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Voucher Prints";"Store Voucher Prints")
+                field("Store Voucher Prints"; "Store Voucher Prints")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -97,7 +104,7 @@ page 6014644 "Tax Free POS Units"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Tax Free Requests";
-                RunPageLink = "POS Unit No."=FIELD("POS Unit No.");
+                RunPageLink = "POS Unit No." = FIELD("POS Unit No.");
             }
         }
     }

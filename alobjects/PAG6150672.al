@@ -18,29 +18,37 @@ page 6150672 "POS Entry Output Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Output Timestamp";"Output Timestamp")
+                field("Output Timestamp"; "Output Timestamp")
                 {
+                    ApplicationArea = All;
                 }
-                field("Output Type";"Output Type")
+                field("Output Type"; "Output Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Output Method";"Output Method")
+                field("Output Method"; "Output Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Output Method Code";"Output Method Code")
+                field("Output Method Code"; "Output Method Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

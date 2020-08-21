@@ -16,72 +16,94 @@ page 6150655 "POS Sales Line List"
         {
             repeater(Group)
             {
-                field("Entry Date";"Entry Date")
+                field("Entry Date"; "Entry Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Period Register No.";"POS Period Register No.")
+                field("POS Period Register No."; "POS Period Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Excl. VAT";"Amount Excl. VAT")
+                field("Amount Excl. VAT"; "Amount Excl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Incl. VAT";"Amount Incl. VAT")
+                field("Amount Incl. VAT"; "Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Withhold Item";"Withhold Item")
+                field("Withhold Item"; "Withhold Item")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Authorised by";"Discount Authorised by")
+                field("Discount Authorised by"; "Discount Authorised by")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -101,7 +123,7 @@ page 6150655 "POS Sales Line List"
                     Promoted = true;
                     PromotedCategory = Category4;
                     RunObject = Page "POS Entry Card";
-                    RunPageLink = "Entry No."=FIELD("POS Entry No.");
+                    RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
                 }
             }

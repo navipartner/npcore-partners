@@ -16,18 +16,21 @@ page 6150727 "POS Parameter Values Temp."
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
                 }
@@ -68,28 +71,28 @@ page 6150727 "POS Parameter Values Temp."
     begin
         TempParam.DeleteAll();
         if Rec.FindSet then
-          repeat
-            TempParam := Rec;
-            TempParam.Insert();
-          until Rec.Next = 0;
+            repeat
+                TempParam := Rec;
+                TempParam.Insert();
+            until Rec.Next = 0;
     end;
 
     procedure SetDataToEdit(var TempParam: Record "POS Parameter Value" temporary)
     begin
         Rec.DeleteAll();
         if TempParam.FindSet then
-          repeat
-            Rec := TempParam;
-            Rec.Insert();
-          until TempParam.Next = 0;
+            repeat
+                Rec := TempParam;
+                Rec.Insert();
+            until TempParam.Next = 0;
     end;
 
     local procedure IsDefault(): Boolean
     var
         POSActionParameter: Record "POS Action Parameter";
     begin
-        if POSActionParameter.Get("Action Code",Name) then
-          exit(POSActionParameter."Default Value" = Value);
+        if POSActionParameter.Get("Action Code", Name) then
+            exit(POSActionParameter."Default Value" = Value);
         exit(false);
     end;
 }

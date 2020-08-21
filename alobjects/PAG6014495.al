@@ -7,7 +7,7 @@ page 6014495 "Audit Roll Backup List"
     Caption = 'Audit Roll Backup List';
     Editable = false;
     PageType = List;
-    Permissions = TableData "Audit Roll"=rimd;
+    Permissions = TableData "Audit Roll" = rimd;
     SourceTable = "Audit Roll Backup";
     UsageCategory = History;
 
@@ -17,65 +17,85 @@ page 6014495 "Audit Roll Backup List"
         {
             repeater(Group)
             {
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Type";"Sale Type")
+                field("Sale Type"; "Sale Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Date";"Sale Date")
+                field("Sale Date"; "Sale Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Time";"Closing Time")
+                field("Closing Time"; "Closing Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Posted;Posted)
+                field(Posted; Posted)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Entry Posted";"Item Entry Posted")
+                field("Item Entry Posted"; "Item Entry Posted")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount Amount";"Line Discount Amount")
+                field("Line Discount Amount"; "Line Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT %";"VAT %")
+                field("VAT %"; "VAT %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Offline;Offline)
+                field(Offline; Offline)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -98,13 +118,14 @@ page 6014495 "Audit Roll Backup List"
                     //-NPR5.27  [252997]
                     AuditRollBackup.Copy(Rec);
                     CurrPage.SetSelectionFilter(AuditRollBackup);
-                    if AuditRollBackup.FindSet then repeat
-                      if not AuditRoll.Get(AuditRollBackup."Register No.",AuditRollBackup."Sales Ticket No.",AuditRollBackup."Sale Type",AuditRollBackup."Line No.",
-                       AuditRollBackup."No.",AuditRollBackup."Sale Date") then begin
-                        AuditRoll.TransferFields(AuditRollBackup);
-                        AuditRoll.Insert;
-                      end;
-                    until AuditRollBackup.Next = 0;
+                    if AuditRollBackup.FindSet then
+                        repeat
+                            if not AuditRoll.Get(AuditRollBackup."Register No.", AuditRollBackup."Sales Ticket No.", AuditRollBackup."Sale Type", AuditRollBackup."Line No.",
+                             AuditRollBackup."No.", AuditRollBackup."Sale Date") then begin
+                                AuditRoll.TransferFields(AuditRollBackup);
+                                AuditRoll.Insert;
+                            end;
+                        until AuditRollBackup.Next = 0;
                     //+NPR5.27  [252997]
                 end;
             }

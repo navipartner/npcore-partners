@@ -35,10 +35,12 @@ page 6151254 "NP Retail Acc. Payables Act"
 
                 field("Pending Inc. Documents"; "Pending Inc. Documents")
                 {
+                    ApplicationArea = All;
                     DrillDownPageId = "Incoming Documents";
                 }
                 field("Posted Purchase order"; "Posted Purchase order")
                 {
+                    ApplicationArea = All;
                     Caption = 'Posted Purchase Invoices';
                     DrillDownPageId = "Posted Purchase Invoices";
                 }

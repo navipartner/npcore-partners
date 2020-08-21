@@ -13,17 +13,21 @@ page 6184861 "Azure Storage Overview"
         {
             repeater(Group)
             {
-                field("Account name";"Account name")
+                field("Account name"; "Account name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Container Name";"Container Name")
+                field("Container Name"; "Container Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("File Name";"File Name")
+                field("File Name"; "File Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

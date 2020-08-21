@@ -13,98 +13,129 @@ page 6151186 "MM Sponsorship Ticket Entry"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Entry No.";"Membership Entry No.")
+                field("Membership Entry No."; "Membership Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Token";"Ticket Token")
+                field("Ticket Token"; "Ticket Token")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket No.";"Ticket No.")
+                field("Ticket No."; "Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Type";"Event Type")
+                field("Event Type"; "Event Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created At";"Created At")
+                field("Created At"; "Created At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Send Status";"Notification Send Status")
+                field("Notification Send Status"; "Notification Send Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Sent At";"Notification Sent At")
+                field("Notification Sent At"; "Notification Sent At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Sent By User";"Notification Sent By User")
+                field("Notification Sent By User"; "Notification Sent By User")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Address";"Notification Address")
+                field("Notification Address"; "Notification Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Picked Up At";"Picked Up At")
+                field("Picked Up At"; "Picked Up At")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member No.";"External Member No.")
+                field("External Member No."; "External Member No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail Address";"E-Mail Address")
+                field("E-Mail Address"; "E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("First Name";"First Name")
+                field("First Name"; "First Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Middle Name";"Middle Name")
+                field("Middle Name"; "Middle Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Name";"Last Name")
+                field("Last Name"; "Last Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Display Name";"Display Name")
+                field("Display Name"; "Display Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code Code";"Post Code Code")
+                field("Post Code Code"; "Post Code Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field("Country Code";"Country Code")
+                field("Country Code"; "Country Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Country;Country)
+                field(Country; Country)
                 {
+                    ApplicationArea = All;
                 }
-                field(Birthday;Birthday)
+                field(Birthday; Birthday)
                 {
+                    ApplicationArea = All;
                 }
-                field("Community Code";"Community Code")
+                field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Valid From";"Membership Valid From")
+                field("Membership Valid From"; "Membership Valid From")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Valid Until";"Membership Valid Until")
+                field("Membership Valid Until"; "Membership Valid Until")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Failed With Message";"Failed With Message")
+                field("Failed With Message"; "Failed With Message")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket URL";"Ticket URL")
+                field("Ticket URL"; "Ticket URL")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -124,7 +155,7 @@ page 6151186 "MM Sponsorship Ticket Entry"
 
                 trigger OnAction()
                 begin
-                    ResendNotification (Rec);
+                    ResendNotification(Rec);
                 end;
             }
         }
@@ -138,7 +169,7 @@ page 6151186 "MM Sponsorship Ticket Entry"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "TM Ticket Request";
-                RunPageLink = "Session Token ID"=FIELD("Ticket Token");
+                RunPageLink = "Session Token ID" = FIELD("Ticket Token");
             }
         }
     }
@@ -148,8 +179,8 @@ page 6151186 "MM Sponsorship Ticket Entry"
         SponsorshipTicketMgmt: Codeunit "MM Sponsorship Ticket Mgmt.";
     begin
 
-        SponsorshipTicketEntry.TestField ("Notification Send Status", SponsorshipTicketEntry."Notification Send Status"::NOT_DELIVERED);
-        SponsorshipTicketMgmt.NotifyRecipient (SponsorshipTicketEntry."Entry No.");
+        SponsorshipTicketEntry.TestField("Notification Send Status", SponsorshipTicketEntry."Notification Send Status"::NOT_DELIVERED);
+        SponsorshipTicketMgmt.NotifyRecipient(SponsorshipTicketEntry."Entry No.");
     end;
 }
 

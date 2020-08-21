@@ -13,26 +13,30 @@ page 6150686 "NPRE Kitchen Station Card"
         {
             group(General)
             {
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014407;Notes)
+            systempart(Control6014407; Notes)
             {
             }
-            systempart(Control6014408;Links)
+            systempart(Control6014408; Links)
             {
                 Visible = false;
             }
@@ -51,8 +55,8 @@ page 6150686 "NPRE Kitchen Station Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPRE Kitchen Station Selection";
-                RunPageLink = "Restaurant Code"=FIELD("Restaurant Code"),
-                              "Kitchen Station"=FIELD(Code);
+                RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
+                              "Kitchen Station" = FIELD(Code);
             }
             action(ShowKitchenRequests)
             {

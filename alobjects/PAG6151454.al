@@ -21,61 +21,76 @@ page 6151454 "Magento Payment Line List"
         {
             repeater(Group)
             {
-                field("Document Table No.";"Document Table No.")
+                field("Document Table No."; "Document Table No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Type";"Payment Type")
+                field("Payment Type"; "Payment Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Account Type";"Account Type")
+                field("Account Type"; "Account Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account No.";"Account No.")
+                field("Account No."; "Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Adjust Amount";"Allow Adjust Amount")
+                field("Allow Adjust Amount"; "Allow Adjust Amount")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Posted;Posted)
+                field(Posted; Posted)
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Gateway Code";"Payment Gateway Code")
+                field("Payment Gateway Code"; "Payment Gateway Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("External Reference No.";"External Reference No.")
+                field("External Reference No."; "External Reference No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Date Captured";"Date Captured")
+                field("Date Captured"; "Date Captured")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Refunded";"Date Refunded")
+                field("Date Refunded"; "Date Refunded")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control50000;Notes)
+            systempart(Control50000; Notes)
             {
             }
         }
@@ -100,14 +115,14 @@ page 6151454 "Magento Payment Line List"
                     MagentoPmtMgt: Codeunit "Magento Pmt. Mgt.";
                 begin
                     if "Date Captured" <> 0D then begin
-                      //-MAG2.01 [242561]
-                      //MESSAGE(Text002);
-                      //EXIT;
-                      if not Confirm(Text002,false) then
-                        exit;
-                      Rec."Date Captured" := 0D;
-                      CurrPage.Update(true);
-                      //+MAG2.01 [242561]
+                        //-MAG2.01 [242561]
+                        //MESSAGE(Text002);
+                        //EXIT;
+                        if not Confirm(Text002, false) then
+                            exit;
+                        Rec."Date Captured" := 0D;
+                        CurrPage.Update(true);
+                        //+MAG2.01 [242561]
                     end;
 
                     MagentoPaymentGateway.Get("Payment Gateway Code");
@@ -117,7 +132,7 @@ page 6151454 "Magento Payment Line List"
                     //-MAG2.01 [242561]
                     //MESSAGE(Text001,"Payment Gateway Code","No.");
                     if "Date Captured" <> 0D then
-                      Message(Text001,"Payment Gateway Code","No.");
+                        Message(Text001, "Payment Gateway Code", "No.");
                     //+MAG2.01 [242561]
                 end;
             }
@@ -137,10 +152,10 @@ page 6151454 "Magento Payment Line List"
                 begin
                     //-MAG2.01 [242561]
                     if "Date Refunded" <> 0D then begin
-                      if not Confirm(Text003,false) then
-                        exit;
-                      Rec."Date Refunded" := 0D;
-                      CurrPage.Update(true);
+                        if not Confirm(Text003, false) then
+                            exit;
+                        Rec."Date Refunded" := 0D;
+                        CurrPage.Update(true);
                     end;
 
                     MagentoPaymentGateway.Get("Payment Gateway Code");
@@ -148,7 +163,7 @@ page 6151454 "Magento Payment Line List"
 
                     MagentoPmtMgt.RefundPaymentLine(Rec);
                     if "Date Refunded" <> 0D then
-                      Message(Text000,"Payment Gateway Code","No.");
+                        Message(Text000, "Payment Gateway Code", "No.");
                     //+MAG2.01 [242561]
                 end;
             }
@@ -167,7 +182,7 @@ page 6151454 "Magento Payment Line List"
                     MagentoPmtMgt: Codeunit "Magento Pmt. Mgt.";
                 begin
                     //-MAG2.01 [256733]
-                    MagentoPmtMgt.PostPaymentLine(Rec,GenJnlPostLine);
+                    MagentoPmtMgt.PostPaymentLine(Rec, GenJnlPostLine);
                     Message(Text004);
                     //+MAG2.01 [256733]
                 end;
@@ -188,7 +203,7 @@ page 6151454 "Magento Payment Line List"
                 var
                     NavigateForm: Page Navigate;
                 begin
-                    NavigateForm.SetDoc("Posting Date","Document No.");
+                    NavigateForm.SetDoc("Posting Date", "Document No.");
                     NavigateForm.Run;
                 end;
             }
@@ -236,9 +251,9 @@ page 6151454 "Magento Payment Line List"
         CaptureEnabled := false;
         RefundEnabled := false;
         if "Payment Gateway Code" = '' then
-          exit;
+            exit;
         if not PaymentGateway.Get("Payment Gateway Code") then
-          exit;
+            exit;
         CaptureEnabled := PaymentGateway."Capture Codeunit Id" <> 0;
         RefundEnabled := PaymentGateway."Refund Codeunit Id" <> 0;
         //+MAG2.01 [250694]

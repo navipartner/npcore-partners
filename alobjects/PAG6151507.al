@@ -14,14 +14,16 @@ page 6151507 "Nc Task Proces. Card"
         {
             group(Generelt)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6150618;"Nc Task Proces. Lines")
+            part(Control6150618; "Nc Task Proces. Lines")
             {
             }
         }

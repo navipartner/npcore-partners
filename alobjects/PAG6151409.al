@@ -18,14 +18,17 @@ page 6151409 "Magento VAT Business Groups"
         {
             repeater(Group)
             {
-                field("VAT Business Posting Group";"VAT Business Posting Group")
+                field("VAT Business Posting Group"; "VAT Business Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Tax Class";"Magento Tax Class")
+                field("Magento Tax Class"; "Magento Tax Class")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -10,24 +10,29 @@ page 6059788 "Ticket Access Reservation List"
         {
             repeater(Group)
             {
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(StartTime;StartTime)
+                field(StartTime; StartTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'From Time';
                     Editable = false;
                 }
-                field(EndTime;EndTime)
+                field(EndTime; EndTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'To Time';
                     Editable = false;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -76,15 +81,15 @@ page 6059788 "Ticket Access Reservation List"
 
         TicketAccessCapacitySlots.Get("Ticket Access Capacity Slot ID");
         StartTime := TicketAccessCapacitySlots."Access Start";
-        EndTime   := TicketAccessCapacitySlots."Access End";
+        EndTime := TicketAccessCapacitySlots."Access End";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
 
         if (GetFilter("Ticket Access Capacity Slot ID") <> '') and
-           (GetRangeMin("Ticket Access Capacity Slot ID")  = GetRangeMax("Ticket Access Capacity Slot ID")) then
-          Validate("Ticket Access Capacity Slot ID",GetRangeMin("Ticket Access Capacity Slot ID"));
+           (GetRangeMin("Ticket Access Capacity Slot ID") = GetRangeMax("Ticket Access Capacity Slot ID")) then
+            Validate("Ticket Access Capacity Slot ID", GetRangeMin("Ticket Access Capacity Slot ID"));
     end;
 
     var

@@ -13,21 +13,26 @@ page 6151494 "Raptor Action List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Type Description";"Data Type Description")
+                field("Data Type Description"; "Data Type Description")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Raptor Module Code";"Raptor Module Code")
+                field("Raptor Module Code"; "Raptor Module Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Raptor Module API Req. String";"Raptor Module API Req. String")
+                field("Raptor Module API Req. String"; "Raptor Module API Req. String")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

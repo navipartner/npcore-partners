@@ -24,44 +24,57 @@ page 6060132 "MM Member Community"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("External No. Search Order";"External No. Search Order")
+                field("External No. Search Order"; "External No. Search Order")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Membership No. Series";"External Membership No. Series")
+                field("External Membership No. Series"; "External Membership No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member No. Series";"External Member No. Series")
+                field("External Member No. Series"; "External Member No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No. Series";"Customer No. Series")
+                field("Customer No. Series"; "Customer No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Unique Identity";"Member Unique Identity")
+                field("Member Unique Identity"; "Member Unique Identity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Member UI Violation";"Create Member UI Violation")
+                field("Create Member UI Violation"; "Create Member UI Violation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Logon Credentials";"Member Logon Credentials")
+                field("Member Logon Credentials"; "Member Logon Credentials")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership to Cust. Rel.";"Membership to Cust. Rel.")
+                field("Membership to Cust. Rel."; "Membership to Cust. Rel.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Renewal Notifications";"Create Renewal Notifications")
+                field("Create Renewal Notifications"; "Create Renewal Notifications")
                 {
+                    ApplicationArea = All;
                 }
-                field("Activate Loyalty Program";"Activate Loyalty Program")
+                field("Activate Loyalty Program"; "Activate Loyalty Program")
                 {
+                    ApplicationArea = All;
                 }
-                field("Foreign Membership";"Foreign Membership")
+                field("Foreign Membership"; "Foreign Membership")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -77,7 +90,7 @@ page 6060132 "MM Member Community"
                 Caption = 'Membership Setup';
                 Image = SetupList;
                 RunObject = Page "MM Membership Setup";
-                RunPageLink = "Community Code"=FIELD(Code);
+                RunPageLink = "Community Code" = FIELD(Code);
             }
             action("Loyalty Setup")
             {
@@ -91,7 +104,7 @@ page 6060132 "MM Member Community"
                 Caption = 'Notification Setup';
                 Image = SetupList;
                 RunObject = Page "MM Member Notification Setup";
-                RunPageLink = "Community Code"=FIELD(Code);
+                RunPageLink = "Community Code" = FIELD(Code);
             }
             separator(Separator6150626)
             {
@@ -106,7 +119,7 @@ page 6060132 "MM Member Community"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "MM Membership Auto Renew List";
-                RunPageLink = "Community Code"=FIELD(Code);
+                RunPageLink = "Community Code" = FIELD(Code);
             }
             separator(Separator6014406)
             {
@@ -116,7 +129,7 @@ page 6060132 "MM Member Community"
                 Caption = 'Memberships';
                 Image = List;
                 RunObject = Page "MM Memberships";
-                RunPageLink = "Community Code"=FIELD(Code);
+                RunPageLink = "Community Code" = FIELD(Code);
             }
             separator(Separator6014405)
             {
@@ -137,7 +150,7 @@ page 6060132 "MM Member Community"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "MM Foreign Membership Setup";
-                RunPageLink = "Community Code"=FIELD(Code);
+                RunPageLink = "Community Code" = FIELD(Code);
             }
         }
         area(processing)

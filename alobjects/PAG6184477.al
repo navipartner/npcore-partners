@@ -16,17 +16,20 @@ page 6184477 "EFT Type POS Unit BLOB Param."
         {
             repeater(Group)
             {
-                field(ParameterName;ParameterName)
+                field(ParameterName; ParameterName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Name';
                     Editable = false;
                 }
-                field(ParameterDescription;ParameterDescription)
+                field(ParameterDescription; ParameterDescription)
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                 }
-                field("FORMAT(Value.HASVALUE)";Format(Value.HasValue))
+                field("FORMAT(Value.HASVALUE)"; Format(Value.HasValue))
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Caption = 'Value';
                     Editable = "User Configurable";
@@ -59,7 +62,7 @@ page 6184477 "EFT Type POS Unit BLOB Param."
         Clear(ParameterName);
         OnGetParameterNameCaption(Rec, ParameterName);
         if (ParameterName = '') then
-          ParameterName := Name;
+            ParameterName := Name;
     end;
 
     local procedure SetParameterDescription()

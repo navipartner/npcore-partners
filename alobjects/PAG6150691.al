@@ -16,54 +16,70 @@ page 6150691 "NPRE Kitchen Request List"
             repeater("Order Lines")
             {
                 Caption = 'Order Lines';
-                field("Request No.";"Request No.")
+                field("Request No."; "Request No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Order ID";"Order ID")
+                field("Order ID"; "Order ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serving Step";"Serving Step")
+                field("Serving Step"; "Serving Step")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created Date-Time";"Created Date-Time")
+                field("Created Date-Time"; "Created Date-Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serving Requested Date-Time";"Serving Requested Date-Time")
+                field("Serving Requested Date-Time"; "Serving Requested Date-Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Status";"Line Status")
+                field("Line Status"; "Line Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Production Status";"Production Status")
+                field("Production Status"; "Production Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Kitchen Stations";"No. of Kitchen Stations")
+                field("No. of Kitchen Stations"; "No. of Kitchen Stations")
                 {
+                    ApplicationArea = All;
                 }
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("SeatingCode()";SeatingCode())
+                field("SeatingCode()"; SeatingCode())
                 {
+                    ApplicationArea = All;
                     Caption = 'Seating Code';
                 }
             }

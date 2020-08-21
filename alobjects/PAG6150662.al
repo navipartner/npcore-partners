@@ -16,17 +16,21 @@ page 6150662 "NPRE Seating - Waiter Pad Link"
         {
             repeater(Group)
             {
-                field("Seating Code";"Seating Code")
+                field("Seating Code"; "Seating Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Waiter Pad No.";"Waiter Pad No.")
+                field("Waiter Pad No."; "Waiter Pad No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Of Waiter Pad For Seating";"No. Of Waiter Pad For Seating")
+                field("No. Of Waiter Pad For Seating"; "No. Of Waiter Pad For Seating")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Of Seating For Waiter Pad";"No. Of Seating For Waiter Pad")
+                field("No. Of Seating For Waiter Pad"; "No. Of Seating For Waiter Pad")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

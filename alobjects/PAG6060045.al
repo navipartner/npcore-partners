@@ -10,42 +10,50 @@ page 6060045 "Item Search Page"
         {
             group(General)
             {
-                field(ExternalItemNo;ExternalItemNo)
+                field(ExternalItemNo; ExternalItemNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'External Item No';
                 }
-                field(ExternalType;ExternalType)
+                field(ExternalType; ExternalType)
                 {
+                    ApplicationArea = All;
                     Caption = 'External Type';
                 }
-                field(VendorNo;VendorNo)
+                field(VendorNo; VendorNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Vendor No.';
                     TableRelation = Vendor."No.";
                 }
-                field(UnitOfMeasure;UnitOfMeasure)
+                field(UnitOfMeasure; UnitOfMeasure)
                 {
+                    ApplicationArea = All;
                     Caption = 'Unit Of Measure';
                     TableRelation = "Unit of Measure";
                 }
-                field(ItemNo;ItemNo)
+                field(ItemNo; ItemNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item No.';
                     Editable = false;
                     TableRelation = Item."No.";
                 }
-                field(VariantCode;VariantCode)
+                field(VariantCode; VariantCode)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variant Code';
                     Editable = false;
                 }
-                field(FoundItem;FoundItem)
+                field(FoundItem; FoundItem)
                 {
+                    ApplicationArea = All;
                     Caption = 'Found Item';
                     Editable = false;
                 }
-                field(SearchTime;Searchtime)
+                field(SearchTime; Searchtime)
                 {
+                    ApplicationArea = All;
                     Caption = 'Search time (seconds)';
                     Editable = false;
                 }
@@ -97,10 +105,10 @@ page 6060045 "Item Search Page"
                                ItemNo,
                                VariantCode);
         if not FoundItem then begin
-          ItemNo := '';
-          VariantCode := '';
+            ItemNo := '';
+            VariantCode := '';
         end;
-        Searchtime := Round((Time - StartSearch)/1000,0.01);
+        Searchtime := Round((Time - StartSearch) / 1000, 0.01);
     end;
 }
 

@@ -10,23 +10,29 @@ page 6060102 "Date Periodes"
         {
             repeater(Group)
             {
-                field("Period Code";"Period Code")
+                field("Period Code"; "Period Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Date";"Start Date")
+                field("Start Date"; "Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Date";"End Date")
+                field("End Date"; "End Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Date Last Year";"Start Date Last Year")
+                field("Start Date Last Year"; "Start Date Last Year")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Date Last Year";"End Date Last Year")
+                field("End Date Last Year"; "End Date Last Year")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

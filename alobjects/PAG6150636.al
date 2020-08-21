@@ -15,37 +15,47 @@ page 6150636 "POS View Profile Card"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Control6014403; Picture)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
                 field("POS Theme Code"; "POS Theme Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Line Order on Screen"; "Line Order on Screen")
                 {
+                    ApplicationArea = All;
                 }
-                field("Initial Sales View";"Initial Sales View")
+                field("Initial Sales View"; "Initial Sales View")
                 {
+                    ApplicationArea = All;
                 }
-                field("After End-of-Sale View";"After End-of-Sale View")
+                field("After End-of-Sale View"; "After End-of-Sale View")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Number and Date Formatting")
             {
                 field("Client Formatting Culture ID"; "Client Formatting Culture ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Client Decimal Separator"; "Client Decimal Separator")
                 {
+                    ApplicationArea = All;
                 }
                 field("Client Thousands Separator"; "Client Thousands Separator")
                 {
+                    ApplicationArea = All;
                 }
                 field("Client Date Separator"; "Client Date Separator")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

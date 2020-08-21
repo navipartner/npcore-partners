@@ -14,26 +14,33 @@ page 6151384 "CS Devices"
         {
             repeater(Group)
             {
-                field("Device Id";"Device Id")
+                field("Device Id"; "Device Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field(Heartbeat;Heartbeat)
+                field(Heartbeat; Heartbeat)
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Download Timestamp";"Last Download Timestamp")
+                field("Last Download Timestamp"; "Last Download Timestamp")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Download Timestamp";"Current Download Timestamp")
+                field("Current Download Timestamp"; "Current Download Timestamp")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Tag Count";"Current Tag Count")
+                field("Current Tag Count"; "Current Tag Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refresh Item Catalog";"Refresh Item Catalog")
+                field("Refresh Item Catalog"; "Refresh Item Catalog")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

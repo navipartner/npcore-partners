@@ -18,29 +18,37 @@ page 6151248 "NP Retail Admin Act - POS"
                 ShowCaption = false;
                 field("User Setups"; "User Setups")
                 {
+                    ApplicationArea = All;
                 }
                 field(Salespersons; Salespersons)
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Salespersons/Purchasers";
                 }
                 field("POS Stores"; "POS Stores")
                 {
+                    ApplicationArea = All;
                 }
                 field("POS Units"; "POS Units")
                 {
+                    ApplicationArea = All;
                 }
                 field("Cash Registers"; "Cash Registers")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Register List";
                 }
                 field("POS Payment Bins"; "POS Payment Bins")
                 {
+                    ApplicationArea = All;
                 }
                 field("POS Payment Methods"; "POS Payment Methods")
                 {
+                    ApplicationArea = All;
                 }
                 field("POS Posting Setups"; "POS Posting Setups")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "POS Posting Setup";
                 }
             }

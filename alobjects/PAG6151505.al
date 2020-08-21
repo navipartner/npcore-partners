@@ -22,42 +22,54 @@ page 6151505 "Nc Import Types"
             repeater(Control6150621)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Keep Import Entries for";"Keep Import Entries for")
+                field("Keep Import Entries for"; "Keep Import Entries for")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import Codeunit ID";"Import Codeunit ID")
+                field("Import Codeunit ID"; "Import Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lookup Codeunit ID";"Lookup Codeunit ID")
+                field("Lookup Codeunit ID"; "Lookup Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Webservice Enabled";"Webservice Enabled")
+                field("Webservice Enabled"; "Webservice Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Webservice Codeunit ID";"Webservice Codeunit ID")
+                field("Webservice Codeunit ID"; "Webservice Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ftp Enabled";"Ftp Enabled")
+                field("Ftp Enabled"; "Ftp Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field(Sftp;Sftp)
+                field(Sftp; Sftp)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ftp Host";"Ftp Host")
+                field("Ftp Host"; "Ftp Host")
                 {
+                    ApplicationArea = All;
                 }
-                field("Server File Enabled";"Server File Enabled")
+                field("Server File Enabled"; "Server File Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Server File Path";"Server File Path")
+                field("Server File Path"; "Server File Path")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

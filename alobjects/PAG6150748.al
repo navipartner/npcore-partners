@@ -13,32 +13,41 @@ page 6150748 "POS Sale Lines Subpage"
         {
             repeater(Group)
             {
-                field("Sale Type";"Sale Type")
+                field("Sale Type"; "Sale Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -60,8 +69,8 @@ page 6150748 "POS Sale Lines Subpage"
                 var
                     SalePOS: Record "Sale POS";
                 begin
-                    SalePOS.Get("Register No.","Sales Ticket No.");
-                    PAGE.Run(PAGE::"Unfinished POS Sale Transact.",SalePOS);
+                    SalePOS.Get("Register No.", "Sales Ticket No.");
+                    PAGE.Run(PAGE::"Unfinished POS Sale Transact.", SalePOS);
                 end;
             }
         }

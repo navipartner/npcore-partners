@@ -13,86 +13,113 @@ page 6151168 "NpGp POS Sales Entry Subpage"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cross-Reference No.";"Cross-Reference No.")
+                field("Cross-Reference No."; "Cross-Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("BOM Item No.";"BOM Item No.")
+                field("BOM Item No."; "BOM Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. per Unit of Measure";"Qty. per Unit of Measure")
+                field("Qty. per Unit of Measure"; "Qty. per Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity (Base)";"Quantity (Base)")
+                field("Quantity (Base)"; "Quantity (Base)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT %";"VAT %")
+                field("VAT %"; "VAT %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount Amount Excl. VAT";"Line Discount Amount Excl. VAT")
+                field("Line Discount Amount Excl. VAT"; "Line Discount Amount Excl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount Amount Incl. VAT";"Line Discount Amount Incl. VAT")
+                field("Line Discount Amount Incl. VAT"; "Line Discount Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Amount";"Line Amount")
+                field("Line Amount"; "Line Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Excl. VAT";"Amount Excl. VAT")
+                field("Amount Excl. VAT"; "Amount Excl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Incl. VAT";"Amount Incl. VAT")
+                field("Amount Incl. VAT"; "Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Dsc. Amt. Excl. VAT (LCY)";"Line Dsc. Amt. Excl. VAT (LCY)")
+                field("Line Dsc. Amt. Excl. VAT (LCY)"; "Line Dsc. Amt. Excl. VAT (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Dsc. Amt. Incl. VAT (LCY)";"Line Dsc. Amt. Incl. VAT (LCY)")
+                field("Line Dsc. Amt. Incl. VAT (LCY)"; "Line Dsc. Amt. Incl. VAT (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Excl. VAT (LCY)";"Amount Excl. VAT (LCY)")
+                field("Amount Excl. VAT (LCY)"; "Amount Excl. VAT (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Incl. VAT (LCY)";"Amount Incl. VAT (LCY)")
+                field("Amount Incl. VAT (LCY)"; "Amount Incl. VAT (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Retail ID";"Retail ID")
+                field("Retail ID"; "Retail ID")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -106,8 +133,8 @@ page 6151168 "NpGp POS Sales Entry Subpage"
             {
                 Image = List;
                 RunObject = Page "NpGp Detailed POS S. Entries";
-                RunPageLink = "POS Entry No."=FIELD("POS Entry No."),
-                              "POS Sales Line No."=FIELD("Line No.");
+                RunPageLink = "POS Entry No." = FIELD("POS Entry No."),
+                              "POS Sales Line No." = FIELD("Line No.");
                 ShortCutKey = 'Ctrl+F7';
             }
             action("POS Info")

@@ -14,49 +14,56 @@ page 6014612 "Retail Campaign Subform"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Amount";RetailCampaignCalcMgt.CalcSalesAmount("Campaign Code","Line No."))
+                field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount("Campaign Code", "Line No."))
                 {
+                    ApplicationArea = All;
                     Caption = 'Sales Amount';
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code","Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
                     end;
                 }
-                field("Cost Amount";RetailCampaignCalcMgt.CalcCostAmount("Campaign Code","Line No."))
+                field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount("Campaign Code", "Line No."))
                 {
+                    ApplicationArea = All;
                     Caption = 'Cost Amount';
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code","Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
                     end;
                 }
-                field(Profit;RetailCampaignCalcMgt.CalcProfit("Campaign Code","Line No."))
+                field(Profit; RetailCampaignCalcMgt.CalcProfit("Campaign Code", "Line No."))
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit';
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code","Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
                     end;
                 }
-                field("Profit %";RetailCampaignCalcMgt.CalcProfitPct("Campaign Code","Line No."))
+                field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct("Campaign Code", "Line No."))
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit %';
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code","Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
                     end;
                 }
             }

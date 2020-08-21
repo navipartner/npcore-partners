@@ -13,73 +13,80 @@ page 6014491 "Receipt Statistics"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Period Start";"Period Start")
+                field("Period Start"; "Period Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("Period Name";"Period Name")
+                field("Period Name"; "Period Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Kassedata.""All Normal Sales in Audit Roll""";Kassedata."All Normal Sales in Audit Roll")
+                field("Kassedata.""All Normal Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll")
                 {
+                    ApplicationArea = All;
                     Caption = 'Balance Due (LCY)';
                 }
-                field("Kassedata.""All Debit Sales in Audit Roll""";Kassedata."All Debit Sales in Audit Roll")
+                field("Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Debit Sales in Audit Roll")
                 {
+                    ApplicationArea = All;
                     Caption = 'Purchases (LCY)';
                 }
-                field("Kassedata.""Normal Sales in Audit Roll""+Kassedata.""Debit Sales in Audit Roll""";Kassedata."Normal Sales in Audit Roll"+Kassedata."Debit Sales in Audit Roll")
+                field("Kassedata.""Normal Sales in Audit Roll""+Kassedata.""Debit Sales in Audit Roll"""; Kassedata."Normal Sales in Audit Roll" + Kassedata."Debit Sales in Audit Roll")
                 {
+                    ApplicationArea = All;
                     Caption = 'Total';
                 }
-                field("Kassedata.""Attendance Count in Audit Roll""+Kassedata.""Item Count in Audit Roll Debit""";Kassedata."Attendance Count in Audit Roll"+Kassedata."Item Count in Audit Roll Debit")
+                field("Kassedata.""Attendance Count in Audit Roll""+Kassedata.""Item Count in Audit Roll Debit"""; Kassedata."Attendance Count in Audit Roll" + Kassedata."Item Count in Audit Roll Debit")
                 {
+                    ApplicationArea = All;
                     Caption = 'No. of servings';
                 }
             }
-            field(PeriodType;PeriodType)
+            field(PeriodType; PeriodType)
             {
+                ApplicationArea = All;
                 Caption = 'Select a Period';
 
                 trigger OnValidate()
                 begin
                     case PeriodType of
-                      PeriodType::Day:
-                        begin
+                        PeriodType::Day:
+                            begin
 
-                          PeriodType := PeriodType::Day;
-                          VendPeriodLength := PeriodType::Day;
-                          SetRange( "Period Type", "Period Type"::Date );
-                          CurrPage.Update(true);
-                        end;
-                      PeriodType ::Week:
-                        begin
-                          PeriodType := PeriodType::Week;
-                          VendPeriodLength := PeriodType::Week;
-                          SetRange( "Period Type", "Period Type"::Week );
-                          CurrPage.Update(true);
-                        end;
+                                PeriodType := PeriodType::Day;
+                                VendPeriodLength := PeriodType::Day;
+                                SetRange("Period Type", "Period Type"::Date);
+                                CurrPage.Update(true);
+                            end;
+                        PeriodType::Week:
+                            begin
+                                PeriodType := PeriodType::Week;
+                                VendPeriodLength := PeriodType::Week;
+                                SetRange("Period Type", "Period Type"::Week);
+                                CurrPage.Update(true);
+                            end;
 
-                      PeriodType ::Month:
-                        begin
-                          VendPeriodLength := PeriodType::Month;
-                          SetRange( "Period Type", "Period Type"::Month );
-                          CurrPage.Update(true);
-                        end;
-                      PeriodType::Quarter:
-                        begin
-                          PeriodType := PeriodType::Quarter;
-                          VendPeriodLength := PeriodType::Quarter;
-                          SetRange( "Period Type", "Period Type"::Quarter );
-                          CurrPage.Update(true);
-                        end;
+                        PeriodType::Month:
+                            begin
+                                VendPeriodLength := PeriodType::Month;
+                                SetRange("Period Type", "Period Type"::Month);
+                                CurrPage.Update(true);
+                            end;
+                        PeriodType::Quarter:
+                            begin
+                                PeriodType := PeriodType::Quarter;
+                                VendPeriodLength := PeriodType::Quarter;
+                                SetRange("Period Type", "Period Type"::Quarter);
+                                CurrPage.Update(true);
+                            end;
 
-                      PeriodType::Year:
-                        begin
-                          PeriodType := PeriodType::Year;
-                          VendPeriodLength := PeriodType;
-                          SetRange( "Period Type", "Period Type"::Year );
-                          CurrPage.Update(true);
-                        end;
+                        PeriodType::Year:
+                            begin
+                                PeriodType := PeriodType::Year;
+                                VendPeriodLength := PeriodType;
+                                SetRange("Period Type", "Period Type"::Year);
+                                CurrPage.Update(true);
+                            end;
                     end;
                 end;
             }
@@ -94,20 +101,20 @@ page 6014491 "Receipt Statistics"
     begin
 
         SetDateFilter;
-        Kassedata.CalcFields("All Normal Sales in Audit Roll","All Debit Sales in Audit Roll","Attendance Count in Audit Roll",
+        Kassedata.CalcFields("All Normal Sales in Audit Roll", "All Debit Sales in Audit Roll", "Attendance Count in Audit Roll",
           "Item Count in Audit Roll Debit");
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
 
-        exit(PeriodFormMgt.FindDate(Which,Rec,VendPeriodLength));
+        exit(PeriodFormMgt.FindDate(Which, Rec, VendPeriodLength));
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
 
-        exit(PeriodFormMgt.NextDate(Steps,Rec,VendPeriodLength));
+        exit(PeriodFormMgt.NextDate(Steps, Rec, VendPeriodLength));
     end;
 
     trigger OnOpenPage()
@@ -123,7 +130,7 @@ page 6014491 "Receipt Statistics"
         PeriodType: Option Day,Week,Month,Quarter,Year;
         Kassedata: Record Register;
 
-    procedure Set(var NewVend: Record Register;NewVendPeriodLength: Integer;NewAmountType: Option "Net Change","Balance at Date";var NewKassedata: Record Register)
+    procedure Set(var NewVend: Record Register; NewVendPeriodLength: Integer; NewAmountType: Option "Net Change","Balance at Date"; var NewKassedata: Record Register)
     begin
         Kassedata.Copy(NewKassedata);
         VendPeriodLength := NewVendPeriodLength;
@@ -163,9 +170,9 @@ page 6014491 "Receipt Statistics"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-          Kassedata.SetRange("Date Filter","Period Start","Period End")
+            Kassedata.SetRange("Date Filter", "Period Start", "Period End")
         else
-          Kassedata.SetRange("Date Filter",0D,"Period End");
+            Kassedata.SetRange("Date Filter", 0D, "Period End");
     end;
 }
 

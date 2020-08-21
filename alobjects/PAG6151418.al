@@ -20,8 +20,9 @@ page 6151418 "Magento Category Links"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Category Id";"Category Id")
+                field("Category Id"; "Category Id")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -31,24 +32,26 @@ page 6151418 "Magento Category Links"
                         MagentoCategory.FilterGroup(2);
                         //-MAG1.22
                         //MagentoCategory.SETRANGE("Root No.",RootNo);
-                        MagentoCategory.SetFilter("Root No.",RootNo);
+                        MagentoCategory.SetFilter("Root No.", RootNo);
                         //+MAG1.22
                         MagentoCategory.FilterGroup(0);
                         //-MAG2.26 [404580]
                         if MagentoCategory.Get("Category Id") then;
                         //+MAG2.26 [404580]
-                        if PAGE.RunModal(PAGE::"Magento Category List",MagentoCategory) <> ACTION::LookupOK then
-                          exit;
+                        if PAGE.RunModal(PAGE::"Magento Category List", MagentoCategory) <> ACTION::LookupOK then
+                            exit;
 
-                        Validate("Category Id",MagentoCategory.Id);
+                        Validate("Category Id", MagentoCategory.Id);
                         //+MAG1.21
                     end;
                 }
-                field("Category Name";"Category Name")
+                field("Category Name"; "Category Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -73,7 +76,7 @@ page 6151418 "Magento Category Links"
         //-MAG1.21
         RootNo := NewRootNo;
         FilterGroup(2);
-        SetFilter("Root No.",RootNo);
+        SetFilter("Root No.", RootNo);
         FilterGroup(0);
         CurrPage.Update(false);
         //+MAG1.21

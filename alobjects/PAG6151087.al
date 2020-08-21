@@ -14,36 +14,46 @@ page 6151087 "RIS Retail Inventory Set Sub."
         {
             repeater(Group)
             {
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Filter";"Location Filter")
+                field("Location Filter"; "Location Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Api Url";"Api Url")
+                field("Api Url"; "Api Url")
                 {
+                    ApplicationArea = All;
                 }
-                field("Api Username";"Api Username")
+                field("Api Username"; "Api Username")
                 {
+                    ApplicationArea = All;
                 }
-                field("Api Password";"Api Password")
+                field("Api Password"; "Api Password")
                 {
+                    ApplicationArea = All;
                 }
-                field("Api Domain";"Api Domain")
+                field("Api Domain"; "Api Domain")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Function";"Processing Function")
+                field("Processing Function"; "Processing Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Codeunit ID";"Processing Codeunit ID")
+                field("Processing Codeunit ID"; "Processing Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Processing Codeunit Name";"Processing Codeunit Name")
+                field("Processing Codeunit Name"; "Processing Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

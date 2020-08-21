@@ -14,23 +14,29 @@ page 6151539 "Nc Endpoints"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Endpoint Type";"Endpoint Type")
+                field("Endpoint Type"; "Endpoint Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Setup Summary";"Setup Summary")
+                field("Setup Summary"; "Setup Summary")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Linked Endpoints";"Linked Endpoints")
+                field("Linked Endpoints"; "Linked Endpoints")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -61,8 +67,8 @@ page 6151539 "Nc Endpoints"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Nc Endpoint Trigger Links";
-                RunPageLink = "Endpoint Code"=FIELD(Code);
-                RunPageView = SORTING("Endpoint Code","Trigger Code")
+                RunPageLink = "Endpoint Code" = FIELD(Code);
+                RunPageView = SORTING("Endpoint Code", "Trigger Code")
                               ORDER(Ascending);
             }
             action("Init Endpoint")

@@ -10,7 +10,7 @@ page 6014664 "Stock-Take Worksheet Line"
     Caption = 'Stock-Take Worksheet Line';
     PageType = ListPart;
     SourceTable = "Stock-Take Worksheet Line";
-    SourceTableView = SORTING("Stock-Take Config Code","Worksheet Name","Line No.")
+    SourceTableView = SORTING("Stock-Take Config Code", "Worksheet Name", "Line No.")
                       ORDER(Ascending);
 
     layout
@@ -19,101 +19,124 @@ page 6014664 "Stock-Take Worksheet Line"
         {
             repeater(Group)
             {
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Transfer State";"Transfer State")
+                field("Transfer State"; "Transfer State")
                 {
+                    ApplicationArea = All;
                 }
-                field(Barcode;Barcode)
+                field(Barcode; Barcode)
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = BarcodeFontBold;
 
                     trigger OnValidate()
                     begin
-                        EvaluateFontBold ();
+                        EvaluateFontBold();
                     end;
                 }
-                field("Item Translation Source";"Item Translation Source")
+                field("Item Translation Source"; "Item Translation Source")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Trans. Source Desc.";"Item Trans. Source Desc.")
+                field("Item Trans. Source Desc."; "Item Trans. Source Desc.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = ItemNoFontBold;
 
                     trigger OnValidate()
                     begin
-                        EvaluateFontBold ();
+                        EvaluateFontBold();
                     end;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
-                        EvaluateFontBold ();
+                        EvaluateFontBold();
                     end;
                 }
-                field("Item Description";"Item Description")
+                field("Item Description"; "Item Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description";"Variant Description")
+                field("Variant Description"; "Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. (Counted)";"Qty. (Counted)")
+                field("Qty. (Counted)"; "Qty. (Counted)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date of Inventory";"Date of Inventory")
+                field("Date of Inventory"; "Date of Inventory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shelf  No.";"Shelf  No.")
+                field("Shelf  No."; "Shelf  No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Session ID";"Session ID")
+                field("Session ID"; "Session ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Session Name";"Session Name")
+                field("Session Name"; "Session Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Session DateTime";"Session DateTime")
+                field("Session DateTime"; "Session DateTime")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Qty. (Total Counted)";"Qty. (Total Counted)")
+                field("Qty. (Total Counted)"; "Qty. (Total Counted)")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = BlockedItemFontBold;
                 }
-                field("Require Variant Code";"Require Variant Code")
+                field("Require Variant Code"; "Require Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Tracking Code";"Item Tracking Code")
+                field("Item Tracking Code"; "Item Tracking Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -148,7 +171,7 @@ page 6014664 "Stock-Take Worksheet Line"
 
                     trigger OnAction()
                     begin
-                        DisplayNonTranslatedItems ();
+                        DisplayNonTranslatedItems();
                     end;
                 }
                 action("Show &Blocked Items")
@@ -158,7 +181,7 @@ page 6014664 "Stock-Take Worksheet Line"
 
                     trigger OnAction()
                     begin
-                        DisplayBlockedItems ();
+                        DisplayBlockedItems();
                     end;
                 }
                 action("Show Missing &Variant Codes")
@@ -178,7 +201,7 @@ page 6014664 "Stock-Take Worksheet Line"
 
                     trigger OnAction()
                     begin
-                        DisplayAllItems ();
+                        DisplayAllItems();
                     end;
                 }
                 separator(Separator6150652)
@@ -190,7 +213,7 @@ page 6014664 "Stock-Take Worksheet Line"
 
                     trigger OnAction()
                     begin
-                        SetTransferOptionState ("Transfer State"::READY);
+                        SetTransferOptionState("Transfer State"::READY);
                     end;
                 }
                 action("Set Transfer Option to Ignore")
@@ -199,7 +222,7 @@ page 6014664 "Stock-Take Worksheet Line"
 
                     trigger OnAction()
                     begin
-                        SetTransferOptionState ("Transfer State"::IGNORE);
+                        SetTransferOptionState("Transfer State"::IGNORE);
                     end;
                 }
                 separator(Separator6150656)
@@ -215,12 +238,12 @@ page 6014664 "Stock-Take Worksheet Line"
                     var
                         Line: Record "Stock-Take Worksheet Line";
                     begin
-                        if Confirm(Text000,false) then
-                          if Confirm(Text001,false) then begin
-                            Line.SetRange ("Stock-Take Config Code", Rec."Stock-Take Config Code");
-                            Line.SetRange ("Worksheet Name", "Worksheet Name");
-                            Line.DeleteAll(true);
-                          end;
+                        if Confirm(Text000, false) then
+                            if Confirm(Text001, false) then begin
+                                Line.SetRange("Stock-Take Config Code", Rec."Stock-Take Config Code");
+                                Line.SetRange("Worksheet Name", "Worksheet Name");
+                                Line.DeleteAll(true);
+                            end;
                     end;
                 }
                 action("Delete lines with unknown item numbers")
@@ -233,11 +256,11 @@ page 6014664 "Stock-Take Worksheet Line"
                         Line: Record "Stock-Take Worksheet Line";
                         txtDeleteUnknown: Label 'Delete all unknown item numbers?';
                     begin
-                        if not Confirm( txtDeleteUnknown ) then
-                          exit;
-                        Line.SetRange ("Stock-Take Config Code", Rec."Stock-Take Config Code");
-                        Line.SetRange ("Worksheet Name", "Worksheet Name");
-                        Line.SetRange ("Item No.", '');
+                        if not Confirm(txtDeleteUnknown) then
+                            exit;
+                        Line.SetRange("Stock-Take Config Code", Rec."Stock-Take Config Code");
+                        Line.SetRange("Worksheet Name", "Worksheet Name");
+                        Line.SetRange("Item No.", '');
                         Line.DeleteAll;
                     end;
                 }
@@ -278,8 +301,8 @@ page 6014664 "Stock-Take Worksheet Line"
                     Caption = 'Phys. Inv. Entries';
                     Image = PhysicalInventoryLedger;
                     RunObject = Page "Phys. Inventory Ledger Entries";
-                    RunPageLink = "Item No."=FIELD("Item No."),
-                                  "Variant Code"=FIELD("Variant Code");
+                    RunPageLink = "Item No." = FIELD("Item No."),
+                                  "Variant Code" = FIELD("Variant Code");
                 }
                 action("Retail Print")
                 {
@@ -289,7 +312,7 @@ page 6014664 "Stock-Take Worksheet Line"
 
                     trigger OnAction()
                     begin
-                        RetailPrint ();
+                        RetailPrint();
                     end;
                 }
             }
@@ -298,7 +321,7 @@ page 6014664 "Stock-Take Worksheet Line"
 
     trigger OnAfterGetRecord()
     begin
-        EvaluateFontBold ();
+        EvaluateFontBold();
     end;
 
     var
@@ -315,49 +338,49 @@ page 6014664 "Stock-Take Worksheet Line"
     var
         Item: Record Item;
     begin
-        Item.Get ("Item No.");
-        PAGE.Run (0, Item);
+        Item.Get("Item No.");
+        PAGE.Run(0, Item);
     end;
 
     procedure ShowItemLedgerEntries()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        ItemLedgerEntry.SetCurrentKey ("Item No.");
-        ItemLedgerEntry.SetRange ("Item No.", "Item No.");
-        ItemLedgerEntry.SetRange ("Variant Code", "Variant Code");
-        PAGE.Run (0, ItemLedgerEntry);
+        ItemLedgerEntry.SetCurrentKey("Item No.");
+        ItemLedgerEntry.SetRange("Item No.", "Item No.");
+        ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
+        PAGE.Run(0, ItemLedgerEntry);
     end;
 
     procedure DisplayNonTranslatedItems()
     begin
-        SetFilter ("Item No.", '=%1', '');
+        SetFilter("Item No.", '=%1', '');
     end;
 
     procedure DisplayBlockedItems()
     begin
-        SetFilter (Blocked, '=%1', true);
+        SetFilter(Blocked, '=%1', true);
     end;
 
     procedure DisplayItemNoVariant()
     begin
-        SetFilter ("Variant Code", '=%1', '');
-        SetFilter ("Require Variant Code", '=%1', true);
+        SetFilter("Variant Code", '=%1', '');
+        SetFilter("Require Variant Code", '=%1', true);
     end;
 
     procedure DisplayAllItems()
     begin
-        SetRange ("Item No.");
-        SetRange (Blocked);
-        SetRange ("Variant Code");
-        SetRange ("Require Variant Code");
+        SetRange("Item No.");
+        SetRange(Blocked);
+        SetRange("Variant Code");
+        SetRange("Require Variant Code");
     end;
 
     procedure ShowDimensions()
     begin
         //-NPR4.16
-        ShowDimensions ();
-        CurrPage.Update (false);
+        ShowDimensions();
+        CurrPage.Update(false);
 
         // JournalLineDimension.FILTERGROUP (2);
         // JournalLineDimension.SETFILTER ("Table ID", '=%1', DATABASE::"Stock-Take Worksheet Line");
@@ -377,26 +400,26 @@ page 6014664 "Stock-Take Worksheet Line"
     begin
 
         case FieldNumber of
-          Rec.FieldNo (Barcode) :
-            SetBold := ("Item No." = '');
-          Rec.FieldNo ("Item No.") :
-            begin
-              SetBold := (Rec.Blocked);
-              itemVariant.SetFilter ("Item No.", '=%1', Rec."Item No.");
-              SetBold := SetBold or ((Rec."Variant Code" = '') and (itemVariant.FindFirst));
-            end;
-          Rec.FieldNo (Blocked) :
-            SetBold := (Rec.Blocked);
-          else
-            SetBold := false;
+            Rec.FieldNo(Barcode):
+                SetBold := ("Item No." = '');
+            Rec.FieldNo("Item No."):
+                begin
+                    SetBold := (Rec.Blocked);
+                    itemVariant.SetFilter("Item No.", '=%1', Rec."Item No.");
+                    SetBold := SetBold or ((Rec."Variant Code" = '') and (itemVariant.FindFirst));
+                end;
+            Rec.FieldNo(Blocked):
+                SetBold := (Rec.Blocked);
+            else
+                SetBold := false;
         end;
 
-        exit (SetBold);
+        exit(SetBold);
     end;
 
     procedure SelectionCount() rCount: Integer
     begin
-        exit (Count ());
+        exit(Count());
     end;
 
     local procedure SetTransferOptionState(TranferOptionState: Option)
@@ -405,16 +428,16 @@ page 6014664 "Stock-Take Worksheet Line"
     begin
 
         CurrPage.SetSelectionFilter(StockTakeWorksheetLine);
-        StockTakeWorksheetLine.ModifyAll ("Transfer State", TranferOptionState);
+        StockTakeWorksheetLine.ModifyAll("Transfer State", TranferOptionState);
         CurrPage.Update(false);
     end;
 
     local procedure EvaluateFontBold()
     begin
-        CalcFields (Blocked);
-        BarcodeFontBold := SetFontBold (Rec.FieldNo (Barcode));
-        ItemNoFontBold := SetFontBold (Rec.FieldNo ("Item No."));
-        BlockedItemFontBold := SetFontBold (Rec.FieldNo (Blocked));
+        CalcFields(Blocked);
+        BarcodeFontBold := SetFontBold(Rec.FieldNo(Barcode));
+        ItemNoFontBold := SetFontBold(Rec.FieldNo("Item No."));
+        BlockedItemFontBold := SetFontBold(Rec.FieldNo(Blocked));
     end;
 
     local procedure RetailPrint()
@@ -424,8 +447,8 @@ page 6014664 "Stock-Take Worksheet Line"
     begin
 
         //-NPR5.46 [329899]
-        CurrPage.SetSelectionFilter (StockTakeWorksheetLine);
-        StockTakeManager.RetailPrint (StockTakeWorksheetLine);
+        CurrPage.SetSelectionFilter(StockTakeWorksheetLine);
+        StockTakeManager.RetailPrint(StockTakeWorksheetLine);
         //+NPR5.46 [329899]
     end;
 }

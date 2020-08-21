@@ -17,17 +17,21 @@ page 6151524 "Nc Endpoint E-mail List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Recipient E-Mail Address";"Recipient E-Mail Address")
+                field("Recipient E-Mail Address"; "Recipient E-Mail Address")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

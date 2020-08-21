@@ -24,53 +24,67 @@ page 6014443 "Customer Repair List"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Handed In Date";"Handed In Date")
+                field("Handed In Date"; "Handed In Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Worranty;Worranty)
+                field(Worranty; Worranty)
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Brand;Brand)
+                field(Brand; Brand)
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prices Including VAT";"Prices Including VAT")
+                field("Prices Including VAT"; "Prices Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expected Completion Date";"Expected Completion Date")
+                field("Expected Completion Date"; "Expected Completion Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Price when Not Accepted";"Price when Not Accepted")
+                field("Price when Not Accepted"; "Price when Not Accepted")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014405;Notes)
+            systempart(Control6014405; Notes)
             {
             }
         }
@@ -82,7 +96,7 @@ page 6014443 "Customer Repair List"
 
     trigger OnInit()
     begin
-        
+
         //-NPR3.0a
         /*kasseNr := retailformcode.HentKassenummer;
         kasseRec.GET(kasseNr);
@@ -101,11 +115,11 @@ page 6014443 "Customer Repair List"
 
     local procedure SetFilterStatus(AllowFilter: Boolean)
     begin
-        if AllowFilter  then
-          SetFilter(Status,'%1|%2|%3|%4|%5|%6|%7',Status::"At Vendor",Status::"Awaits Approval",Status::Approved,Status::"Awaits Claiming",Status::"Return No Repair",Status::"Ready No Repair",Status::"To be sent")
+        if AllowFilter then
+            SetFilter(Status, '%1|%2|%3|%4|%5|%6|%7', Status::"At Vendor", Status::"Awaits Approval", Status::Approved, Status::"Awaits Claiming", Status::"Return No Repair", Status::"Ready No Repair", Status::"To be sent")
 
-         else
-          SetFilter(Status,'%1',Status::Claimed);
+        else
+            SetFilter(Status, '%1', Status::Claimed);
     end;
 }
 

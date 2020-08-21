@@ -1,4 +1,4 @@
-pageextension 6014401 pageextension6014401 extends "User Setup" 
+pageextension 6014401 pageextension6014401 extends "User Setup"
 {
     // NPR5.38/MHA /20180115  CASE 302240 Added fields 6014405 "Allow Register Switch" and 6014410 "Register Switch Filter"
     // NPR5.46/MMV /20180913  CASE 290734 Removed deprecated fields.
@@ -10,23 +10,28 @@ pageextension 6014401 pageextension6014401 extends "User Setup"
     {
         addafter("Time Sheet Admin.")
         {
-            field("Backoffice Register No.";"Backoffice Register No.")
+            field("Backoffice Register No."; "Backoffice Register No.")
             {
+                ApplicationArea = All;
             }
-            field("Allow Register Switch";"Allow Register Switch")
+            field("Allow Register Switch"; "Allow Register Switch")
             {
+                ApplicationArea = All;
             }
-            field("Register Switch Filter";"Register Switch Filter")
+            field("Register Switch Filter"; "Register Switch Filter")
             {
+                ApplicationArea = All;
             }
         }
         addafter(Email)
         {
-            field("Anonymize Customers";"Anonymize Customers")
+            field("Anonymize Customers"; "Anonymize Customers")
             {
+                ApplicationArea = All;
             }
-            field("Block Role Center";"Block Role Center")
+            field("Block Role Center"; "Block Role Center")
             {
+                ApplicationArea = All;
             }
         }
     }

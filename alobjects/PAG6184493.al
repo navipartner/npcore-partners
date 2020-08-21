@@ -16,112 +16,145 @@ page 6184493 "Pepper Terminal Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Instance ID";"Instance ID")
+                field("Instance ID"; "Instance ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Configuration Code";"Configuration Code")
+                field("Configuration Code"; "Configuration Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Language;Language)
+                field(Language; Language)
                 {
+                    ApplicationArea = All;
                 }
-                field("Pepper Receipt Encoding";"Pepper Receipt Encoding")
+                field("Pepper Receipt Encoding"; "Pepper Receipt Encoding")
                 {
+                    ApplicationArea = All;
                 }
-                field("NAV Receipt Encoding";"NAV Receipt Encoding")
+                field("NAV Receipt Encoding"; "NAV Receipt Encoding")
                 {
+                    ApplicationArea = All;
                 }
-                field("Com Port";"Com Port")
+                field("Com Port"; "Com Port")
                 {
+                    ApplicationArea = All;
                 }
-                field("IP Address";"IP Address")
+                field("IP Address"; "IP Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Type Code";"Terminal Type Code")
+                field("Terminal Type Code"; "Terminal Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Format";"Receipt Format")
+                field("Receipt Format"; "Receipt Format")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fixed Currency Code";"Fixed Currency Code")
+                field("Fixed Currency Code"; "Fixed Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Open Automatically";"Open Automatically")
+                field("Open Automatically"; "Open Automatically")
                 {
+                    ApplicationArea = All;
                 }
-                field("Close Automatically";"Close Automatically")
+                field("Close Automatically"; "Close Automatically")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cancel at Wrong Signature";"Cancel at Wrong Signature")
+                field("Cancel at Wrong Signature"; "Cancel at Wrong Signature")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer ID";"Customer ID")
+                field("Customer ID"; "Customer ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("License ID";"License ID")
+                field("License ID"; "License ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(License;HasLicense)
+                field(License; HasLicense)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Additional Parameters";HasAdditionalParameters)
+                field("Additional Parameters"; HasAdditionalParameters)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
             group(Matchbox)
             {
-                field("Matchbox Files";"Matchbox Files")
+                field("Matchbox Files"; "Matchbox Files")
                 {
+                    ApplicationArea = All;
                 }
-                field("Matchbox Company ID";"Matchbox Company ID")
+                field("Matchbox Company ID"; "Matchbox Company ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Matchbox Shop ID";"Matchbox Shop ID")
+                field("Matchbox Shop ID"; "Matchbox Shop ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Matchbox POS ID";"Matchbox POS ID")
+                field("Matchbox POS ID"; "Matchbox POS ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Matchbox File Name";"Matchbox File Name")
+                field("Matchbox File Name"; "Matchbox File Name")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Print Files")
             {
-                field("Print File Open";"Print File Open")
+                field("Print File Open"; "Print File Open")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print File Close";"Print File Close")
+                field("Print File Close"; "Print File Close")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print File Transaction";"Print File Transaction")
+                field("Print File Transaction"; "Print File Transaction")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print File CC Transaction";"Print File CC Transaction")
+                field("Print File CC Transaction"; "Print File CC Transaction")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print File Difference";"Print File Difference")
+                field("Print File Difference"; "Print File Difference")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print File End of Day";"Print File End of Day")
+                field("Print File End of Day"; "Print File End of Day")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print File Journal";"Print File Journal")
+                field("Print File Journal"; "Print File Journal")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print File Initialisation";"Print File Initialisation")
+                field("Print File Initialisation"; "Print File Initialisation")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -236,7 +269,7 @@ page 6184493 "Pepper Terminal Card"
                 Caption = 'Transaction Requests';
                 Image = Transactions;
                 RunObject = Page "EFT Transaction Requests";
-                RunPageLink = "Pepper Terminal Code"=FIELD(Code);
+                RunPageLink = "Pepper Terminal Code" = FIELD(Code);
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
             }
@@ -256,7 +289,7 @@ page 6184493 "Pepper Terminal Card"
     begin
         //-NPR5.25 [231481]
         //CALCFIELDS("Additional Parameters File");
-        CalcFields("Additional Parameters File","License File");
+        CalcFields("Additional Parameters File", "License File");
         HasLicense := "License File".HasValue;
         //+NPR5.25 [231481]
         HasAdditionalParameters := "Additional Parameters File".HasValue;

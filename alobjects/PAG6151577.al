@@ -18,15 +18,16 @@ page 6151577 "Event Copy"
             group("Copy from")
             {
                 Caption = 'Copy from';
-                field(SourceJobNo;SourceJobNo)
+                field(SourceJobNo; SourceJobNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Job No.';
                     TableRelation = Job;
 
                     trigger OnValidate()
                     begin
                         if (SourceJobNo <> '') and not SourceJob.Get(SourceJobNo) then
-                          Error(Text003,SourceJob.TableCaption,SourceJobNo);
+                            Error(Text003, SourceJob.TableCaption, SourceJobNo);
                         TargetJobDescription := SourceJob.Description;
                         TargetBillToCustomerNo := SourceJob."Bill-to Customer No.";
 
@@ -34,8 +35,9 @@ page 6151577 "Event Copy"
                         ToJobTaskNo := '';
                     end;
                 }
-                field(FromJobTaskNo;FromJobTaskNo)
+                field(FromJobTaskNo; FromJobTaskNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Job Task No. from';
                     Visible = false;
 
@@ -44,9 +46,9 @@ page 6151577 "Event Copy"
                         JobTask: Record "Job Task";
                     begin
                         if SourceJob."No." <> '' then begin
-                          JobTask.SetRange("Job No.",SourceJob."No.");
-                          if PAGE.RunModal(PAGE::"Job Task List",JobTask) = ACTION::LookupOK then
-                            FromJobTaskNo := JobTask."Job Task No.";
+                            JobTask.SetRange("Job No.", SourceJob."No.");
+                            if PAGE.RunModal(PAGE::"Job Task List", JobTask) = ACTION::LookupOK then
+                                FromJobTaskNo := JobTask."Job Task No.";
                         end;
                     end;
 
@@ -54,12 +56,13 @@ page 6151577 "Event Copy"
                     var
                         JobTask: Record "Job Task";
                     begin
-                        if (FromJobTaskNo <> '') and not JobTask.Get(SourceJob."No.",FromJobTaskNo) then
-                          Error(Text003,JobTask.TableCaption,FromJobTaskNo);
+                        if (FromJobTaskNo <> '') and not JobTask.Get(SourceJob."No.", FromJobTaskNo) then
+                            Error(Text003, JobTask.TableCaption, FromJobTaskNo);
                     end;
                 }
-                field(ToJobTaskNo;ToJobTaskNo)
+                field(ToJobTaskNo; ToJobTaskNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Job Task No. to';
                     Visible = false;
 
@@ -68,9 +71,9 @@ page 6151577 "Event Copy"
                         JobTask: Record "Job Task";
                     begin
                         if SourceJobNo <> '' then begin
-                          JobTask.SetRange("Job No.",SourceJobNo);
-                          if PAGE.RunModal(PAGE::"Job Task List",JobTask) = ACTION::LookupOK then
-                            ToJobTaskNo := JobTask."Job Task No.";
+                            JobTask.SetRange("Job No.", SourceJobNo);
+                            if PAGE.RunModal(PAGE::"Job Task List", JobTask) = ACTION::LookupOK then
+                                ToJobTaskNo := JobTask."Job Task No.";
                         end;
                     end;
 
@@ -78,12 +81,13 @@ page 6151577 "Event Copy"
                     var
                         JobTask: Record "Job Task";
                     begin
-                        if (ToJobTaskNo <> '') and not JobTask.Get(SourceJobNo,ToJobTaskNo) then
-                          Error(Text003,JobTask.TableCaption,ToJobTaskNo);
+                        if (ToJobTaskNo <> '') and not JobTask.Get(SourceJobNo, ToJobTaskNo) then
+                            Error(Text003, JobTask.TableCaption, ToJobTaskNo);
                     end;
                 }
-                field("From Source";Source)
+                field("From Source"; Source)
                 {
+                    ApplicationArea = All;
                     Caption = 'Source';
                     OptionCaption = 'Job Planning Lines,Job Ledger Entries,None';
                     Visible = false;
@@ -93,27 +97,31 @@ page 6151577 "Event Copy"
                         ValidateSource;
                     end;
                 }
-                field("Planning Line Type";PlanningLineType)
+                field("Planning Line Type"; PlanningLineType)
                 {
+                    ApplicationArea = All;
                     Caption = 'Incl. Planning Line Type';
                     Enabled = PlanningLineTypeEnable;
                     OptionCaption = 'Schedule+Contract,Schedule,Contract';
                     Visible = false;
                 }
-                field("Ledger Entry Line Type";LedgerEntryType)
+                field("Ledger Entry Line Type"; LedgerEntryType)
                 {
+                    ApplicationArea = All;
                     Caption = 'Incl. Ledger Entry Line Type';
                     Enabled = LedgerEntryLineTypeEnable;
                     OptionCaption = 'Usage+Sale,Usage,Sale';
                     Visible = false;
                 }
-                field(FromDate;FromDate)
+                field(FromDate; FromDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Starting Date';
                     Visible = false;
                 }
-                field(ToDate;ToDate)
+                field(ToDate; ToDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Ending Date';
                     Visible = false;
                 }
@@ -121,21 +129,25 @@ page 6151577 "Event Copy"
             group("Copy to")
             {
                 Caption = 'Copy to';
-                field(TargetJobNo;TargetJobNo)
+                field(TargetJobNo; TargetJobNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Job No.';
                 }
-                field(TargetJobDescription;TargetJobDescription)
+                field(TargetJobDescription; TargetJobDescription)
                 {
+                    ApplicationArea = All;
                     Caption = 'Job Description';
                 }
-                field(TargetBillToCustomerNo;TargetBillToCustomerNo)
+                field(TargetBillToCustomerNo; TargetBillToCustomerNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Bill-To Customer No.';
                     TableRelation = Customer;
                 }
-                field(NewStartingDate;NewStartingDate)
+                field(NewStartingDate; NewStartingDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Starting Date';
 
                     trigger OnValidate()
@@ -143,8 +155,9 @@ page 6151577 "Event Copy"
                         CheckDate;
                     end;
                 }
-                field(NewEndingDate;NewEndingDate)
+                field(NewEndingDate; NewEndingDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Ending Date';
 
                     trigger OnValidate()
@@ -156,16 +169,19 @@ page 6151577 "Event Copy"
             group(Apply)
             {
                 Caption = 'Apply';
-                field(CopyJobPrices;CopyJobPrices)
+                field(CopyJobPrices; CopyJobPrices)
                 {
+                    ApplicationArea = All;
                     Caption = 'Copy Job Prices';
                 }
-                field(CopyQuantity;CopyQuantity)
+                field(CopyQuantity; CopyQuantity)
                 {
+                    ApplicationArea = All;
                     Caption = 'Copy Quantity';
                 }
-                field(CopyDimensions;CopyDimensions)
+                field(CopyDimensions; CopyDimensions)
                 {
+                    ApplicationArea = All;
                     Caption = 'Copy Dimensions';
                 }
             }
@@ -188,29 +204,29 @@ page 6151577 "Event Copy"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if CloseAction in [ACTION::OK,ACTION::LookupOK] then begin
-          ValidateUserInput;
-          CopyJob.SetCopyOptions(CopyJobPrices,CopyQuantity,CopyDimensions,Source,PlanningLineType,LedgerEntryType);
-          CopyJob.SetJobTaskRange(FromJobTaskNo,ToJobTaskNo);
-          CopyJob.SetJobTaskDateRange(FromDate,ToDate);
-          CopyJob.CopyJob(SourceJob,TargetJobNo,TargetJobDescription,TargetBillToCustomerNo);
-          //-NPR5.32 [275963]
-          TargetJob.Get(TargetJobNo);
-          TargetJob."Starting Date" := 0D;
-          TargetJob."Ending Date" := 0D;
-          if NewStartingDate <> 0D then
-            TargetJob.Validate("Starting Date",NewStartingDate);
-          if NewEndingDate <> 0D then
-            TargetJob.Validate("Ending Date",NewEndingDate);
-          //-NPR5.38 [296166]
-          TargetJob."Event Status" := TargetJob.Status;
-          //+NPR5.38 [296166]
-          //-NPR5.40 [301375]
-          TargetJob.Validate("Event Status",SourceJob."Event Status");
-          //+NPR5.40 [301375]
-          TargetJob.Modify;
-          //+NPR5.32 [275963]
-          ConfirmAnswer := Confirm(Text001);
+        if CloseAction in [ACTION::OK, ACTION::LookupOK] then begin
+            ValidateUserInput;
+            CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
+            CopyJob.SetJobTaskRange(FromJobTaskNo, ToJobTaskNo);
+            CopyJob.SetJobTaskDateRange(FromDate, ToDate);
+            CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, TargetBillToCustomerNo);
+            //-NPR5.32 [275963]
+            TargetJob.Get(TargetJobNo);
+            TargetJob."Starting Date" := 0D;
+            TargetJob."Ending Date" := 0D;
+            if NewStartingDate <> 0D then
+                TargetJob.Validate("Starting Date", NewStartingDate);
+            if NewEndingDate <> 0D then
+                TargetJob.Validate("Ending Date", NewEndingDate);
+            //-NPR5.38 [296166]
+            TargetJob."Event Status" := TargetJob.Status;
+            //+NPR5.38 [296166]
+            //-NPR5.40 [301375]
+            TargetJob.Validate("Event Status", SourceJob."Event Status");
+            //+NPR5.40 [301375]
+            TargetJob.Modify;
+            //+NPR5.32 [275963]
+            ConfirmAnswer := Confirm(Text001);
         end
     end;
 
@@ -230,7 +246,7 @@ page 6151577 "Event Copy"
         LedgerEntryType: Option "Usage+Sale",Usage,Sale;
         Text001: Label 'The job was successfully copied. Do you want to open it now?';
         Text002: Label 'Job No. %1 will be assigned to the new Job. Do you want to continue?';
-        Text003: Label '%1 %2 does not exist.', Comment='Job Task 1000 does not exist.';
+        Text003: Label '%1 %2 does not exist.', Comment = 'Job Task 1000 does not exist.';
         CopyJobPrices: Boolean;
         CopyQuantity: Boolean;
         CopyDimensions: Boolean;
@@ -251,38 +267,38 @@ page 6151577 "Event Copy"
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
         if (SourceJobNo = '') or not SourceJob.Get(SourceJob."No.") then
-          Error(Text004,SourceJob.TableCaption);
+            Error(Text004, SourceJob.TableCaption);
 
         JobsSetup.Get;
         JobsSetup.TestField("Job Nos.");
         if TargetJobNo = '' then begin
-          TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.",0D,true);
-          if not Confirm(Text002,true,TargetJobNo) then begin
-            TargetJobNo := '';
-            Error('');
-          end;
+            TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, true);
+            if not Confirm(Text002, true, TargetJobNo) then begin
+                TargetJobNo := '';
+                Error('');
+            end;
         end else
-          NoSeriesManagement.TestManual(JobsSetup."Job Nos.");
+            NoSeriesManagement.TestManual(JobsSetup."Job Nos.");
     end;
 
     local procedure ValidateSource()
     begin
         case true of
-          Source = Source::"Job Planning Lines":
-            begin
-              PlanningLineTypeEnable := true;
-              LedgerEntryLineTypeEnable := false;
-            end;
-          Source = Source::"Job Ledger Entries":
-            begin
-              PlanningLineTypeEnable := false;
-              LedgerEntryLineTypeEnable := true;
-            end;
-          Source = Source::None:
-            begin
-              PlanningLineTypeEnable := false;
-              LedgerEntryLineTypeEnable := false;
-            end;
+            Source = Source::"Job Planning Lines":
+                begin
+                    PlanningLineTypeEnable := true;
+                    LedgerEntryLineTypeEnable := false;
+                end;
+            Source = Source::"Job Ledger Entries":
+                begin
+                    PlanningLineTypeEnable := false;
+                    LedgerEntryLineTypeEnable := true;
+                end;
+            Source = Source::None:
+                begin
+                    PlanningLineTypeEnable := false;
+                    LedgerEntryLineTypeEnable := false;
+                end;
         end;
     end;
 
@@ -308,7 +324,7 @@ page 6151577 "Event Copy"
     local procedure CheckDate()
     begin
         if (NewStartingDate > NewEndingDate) and (NewEndingDate <> 0D) then
-          Error(Text011,SourceJob.FieldCaption("Starting Date"),SourceJob.FieldCaption("Ending Date"));
+            Error(Text011, SourceJob.FieldCaption("Starting Date"), SourceJob.FieldCaption("Ending Date"));
     end;
 }
 

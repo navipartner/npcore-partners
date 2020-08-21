@@ -15,14 +15,17 @@ page 6151406 "Magento Stores"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Language Code";"Language Code")
+                field("Language Code"; "Language Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

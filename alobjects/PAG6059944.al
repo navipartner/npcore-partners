@@ -24,10 +24,12 @@ page 6059944 "SMS Send Message"
                     Visible = Mode < 2;
                     field(PhoneNo; PhoneNo)
                     {
+                        ApplicationArea = All;
                         Caption = 'Phone No';
                     }
                     field(SenderText; SenderText)
                     {
+                        ApplicationArea = All;
                         Caption = 'Sender';
                     }
                 }
@@ -37,6 +39,7 @@ page 6059944 "SMS Send Message"
                     Visible = ShowRecordSelection;
                     field(RecordInfo; RecordInfo)
                     {
+                        ApplicationArea = All;
                         Caption = 'Record';
                         Visible = ShowRecordSelection;
 
@@ -62,6 +65,7 @@ page 6059944 "SMS Send Message"
                     Visible = InfoText <> '';
                     field(InfoText; InfoText)
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                         Style = Strong;
                         StyleExpr = TRUE;
@@ -72,6 +76,7 @@ page 6059944 "SMS Send Message"
                     Caption = 'Message';
                     field(SMSMessageText; SMSMessageText)
                     {
+                        ApplicationArea = All;
                         MultiLine = true;
                         ShowCaption = false;
                     }
@@ -81,6 +86,7 @@ page 6059944 "SMS Send Message"
                     ShowCaption = false;
                     field(SendingOption; SendingOption)
                     {
+                        ApplicationArea = All;
                         Caption = 'Sending Option';
 
                         trigger OnValidate()
@@ -99,6 +105,7 @@ page 6059944 "SMS Send Message"
                         Visible = SendingOption = 1;
                         field(DelayUntil; DelayUntil)
                         {
+                            ApplicationArea = All;
                             Caption = 'Delay Until';
                         }
                     }

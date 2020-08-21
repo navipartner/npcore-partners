@@ -17,26 +17,33 @@ page 6150642 "POS Info List"
             repeater(Group)
             {
                 Caption = 'Group';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Message;Message)
+                field(Message; Message)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Input Type";"Input Type")
+                field("Input Type"; "Input Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Input Mandatory";"Input Mandatory")
+                field("Input Mandatory"; "Input Mandatory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Copy from Header";"Copy from Header")
+                field("Copy from Header"; "Copy from Header")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

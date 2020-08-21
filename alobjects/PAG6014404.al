@@ -16,161 +16,213 @@ page 6014404 Periods
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Balancing Time";"Balancing Time")
+                field("Balancing Time"; "Balancing Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Date Active";"Last Date Active")
+                field("Last Date Active"; "Last Date Active")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Opened";"Date Opened")
+                field("Date Opened"; "Date Opened")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Closed";"Date Closed")
+                field("Date Closed"; "Date Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Saved";"Date Saved")
+                field("Date Saved"; "Date Saved")
                 {
+                    ApplicationArea = All;
                 }
-                field("Opening Time";"Opening Time")
+                field("Opening Time"; "Opening Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Time";"Closing Time")
+                field("Closing Time"; "Closing Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Saving  Time";"Saving  Time")
+                field("Saving  Time"; "Saving  Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.2";"Sales Ticket No.")
+                field("Sales Ticket No.2"; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Opening Sales Ticket No.";"Opening Sales Ticket No.")
+                field("Opening Sales Ticket No."; "Opening Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Opening Cash";"Opening Cash")
+                field("Opening Cash"; "Opening Cash")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net. Cash Change";"Net. Cash Change")
+                field("Net. Cash Change"; "Net. Cash Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net. Credit Voucher Change";"Net. Credit Voucher Change")
+                field("Net. Credit Voucher Change"; "Net. Credit Voucher Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net. Gift Voucher Change";"Net. Gift Voucher Change")
+                field("Net. Gift Voucher Change"; "Net. Gift Voucher Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net. Terminal Change";"Net. Terminal Change")
+                field("Net. Terminal Change"; "Net. Terminal Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net. Dankort Change";"Net. Dankort Change")
+                field("Net. Dankort Change"; "Net. Dankort Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net. VisaCard Change";"Net. VisaCard Change")
+                field("Net. VisaCard Change"; "Net. VisaCard Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net. Change Other Cedit Cards";"Net. Change Other Cedit Cards")
+                field("Net. Change Other Cedit Cards"; "Net. Change Other Cedit Cards")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Sales";"Gift Voucher Sales")
+                field("Gift Voucher Sales"; "Gift Voucher Sales")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Voucher issuing";"Credit Voucher issuing")
+                field("Credit Voucher issuing"; "Credit Voucher issuing")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cash Received";"Cash Received")
+                field("Cash Received"; "Cash Received")
                 {
+                    ApplicationArea = All;
                 }
-                field("Pay Out";"Pay Out")
+                field("Pay Out"; "Pay Out")
                 {
+                    ApplicationArea = All;
                 }
-                field("Debit Sale";"Debit Sale")
+                field("Debit Sale"; "Debit Sale")
                 {
+                    ApplicationArea = All;
                 }
-                field("Order Amount";"Order Amount")
+                field("Order Amount"; "Order Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Invoice Amount";"Invoice Amount")
+                field("Invoice Amount"; "Invoice Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Amount";"Return Amount")
+                field("Return Amount"; "Return Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Memo Amount";"Credit Memo Amount")
+                field("Credit Memo Amount"; "Credit Memo Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Negative Sales Count";"Negative Sales Count")
+                field("Negative Sales Count"; "Negative Sales Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Negative Sales Amount";"Negative Sales Amount")
+                field("Negative Sales Amount"; "Negative Sales Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field(Cheque;Cheque)
+                field(Cheque; Cheque)
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Cash Amount";"Balanced Cash Amount")
+                field("Balanced Cash Amount"; "Balanced Cash Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Cash";"Closing Cash")
+                field("Closing Cash"; "Closing Cash")
                 {
+                    ApplicationArea = All;
                 }
-                field(Difference;Difference)
+                field(Difference; Difference)
                 {
+                    ApplicationArea = All;
                 }
-                field("Deposit in Bank";"Deposit in Bank")
+                field("Deposit in Bank"; "Deposit in Bank")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balance Per Denomination";"Balance Per Denomination")
+                field("Balance Per Denomination"; "Balance Per Denomination")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Sec. Currency";"Balanced Sec. Currency")
+                field("Balanced Sec. Currency"; "Balanced Sec. Currency")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Euro";"Balanced Euro")
+                field("Balanced Euro"; "Balanced Euro")
                 {
+                    ApplicationArea = All;
                 }
-                field("Change Register";"Change Register")
+                field("Change Register"; "Change Register")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Debit";"Gift Voucher Debit")
+                field("Gift Voucher Debit"; "Gift Voucher Debit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Euro Difference";"Euro Difference")
+                field("Euro Difference"; "Euro Difference")
                 {
+                    ApplicationArea = All;
                 }
-                field("LCY Count";"LCY Count")
+                field("LCY Count"; "LCY Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Euro Count";"Euro Count")
+                field("Euro Count"; "Euro Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Money bag no.";"Money bag no.")
+                field("Money bag no."; "Money bag no.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Alternative Register No.";"Alternative Register No.")
+                field("Alternative Register No."; "Alternative Register No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

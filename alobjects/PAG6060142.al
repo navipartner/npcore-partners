@@ -20,65 +20,85 @@ page 6060142 "MM Member Notification Setup"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field("Days Before"; "Days Before")
                 {
+                    ApplicationArea = All;
                 }
                 field("Days Past"; "Days Past")
                 {
+                    ApplicationArea = All;
                 }
                 field("Processing Method"; "Processing Method")
                 {
+                    ApplicationArea = All;
                 }
                 field("Template Filter Value"; "Template Filter Value")
                 {
+                    ApplicationArea = All;
                 }
                 field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Next Notification Code"; "Next Notification Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Target Member Role"; "Target Member Role")
                 {
+                    ApplicationArea = All;
                 }
                 field("Include NP Pass"; "Include NP Pass")
                 {
+                    ApplicationArea = All;
                 }
                 field("NP Pass Server Base URL"; "NP Pass Server Base URL")
                 {
+                    ApplicationArea = All;
                 }
                 field("Pass Notification Method"; "Pass Notification Method")
                 {
+                    ApplicationArea = All;
                 }
                 field("Passes API"; "Passes API")
                 {
+                    ApplicationArea = All;
                 }
                 field("""PUT Passes Template"".HASVALUE()"; "PUT Passes Template".HasValue())
                 {
+                    ApplicationArea = All;
                     Caption = 'Have Template';
                     Editable = false;
                 }
                 field("Pass Token"; "Pass Token")
                 {
+                    ApplicationArea = All;
                 }
                 field("Pass Type Code"; "Pass Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Generate Magento PW URL";"Generate Magento PW URL")
+                field("Generate Magento PW URL"; "Generate Magento PW URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fallback Magento PW URL";"Fallback Magento PW URL")
+                field("Fallback Magento PW URL"; "Fallback Magento PW URL")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

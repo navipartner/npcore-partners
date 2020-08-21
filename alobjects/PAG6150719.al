@@ -16,20 +16,25 @@ page 6150719 "POS Menu Filter List"
         {
             repeater(Group)
             {
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Id";"Object Id")
+                field("Object Id"; "Object Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Code";"Filter Code")
+                field("Filter Code"; "Filter Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Name";"Object Name")
+                field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

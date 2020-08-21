@@ -11,7 +11,7 @@ page 6059797 "E-mail Attachments"
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "E-mail Attachment";
-    SourceTableView = SORTING("Table No.","Primary Key","Line No.");
+    SourceTableView = SORTING("Table No.", "Primary Key", "Line No.");
 
     layout
     {
@@ -20,15 +20,18 @@ page 6059797 "E-mail Attachments"
             repeater(Group)
             {
                 Caption = 'Files';
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Attached File";"Attached File")
+                field("Attached File"; "Attached File")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

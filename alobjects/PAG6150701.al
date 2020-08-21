@@ -16,27 +16,35 @@ page 6150701 "POS Menus"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Caption; Caption)
                 {
+                    ApplicationArea = All;
                 }
                 field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
                 field("Register Type"; "Register Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Available on Desktop"; "Available on Desktop")
                 {
+                    ApplicationArea = All;
                 }
                 field("Available in App"; "Available in App")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -54,7 +62,7 @@ page 6150701 "POS Menus"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Menu Buttons";
-                RunPageLink = "Menu Code" = FIELD (Code);
+                RunPageLink = "Menu Code" = FIELD(Code);
             }
             action(ExportPackageSelected)
             {

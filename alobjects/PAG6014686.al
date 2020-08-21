@@ -18,14 +18,17 @@ page 6014686 "Create Outgoing Endpoint Query"
         {
             group(General)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table View";"Table View")
+                field("Table View"; "Table View")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -53,8 +56,8 @@ page 6014686 "Create Outgoing Endpoint Query"
         TextConfirmCreate: Label 'Would you like to create this Outgoing Endpoint Query?';
     begin
         if (Name <> '') and ("Table No." <> 0) then
-          if Confirm(TextConfirmCreate) then
-            CreateEndpointQuery;
+            if Confirm(TextConfirmCreate) then
+                CreateEndpointQuery;
     end;
 
     trigger OnOpenPage()
@@ -76,13 +79,13 @@ page 6014686 "Create Outgoing Endpoint Query"
         TestField("Table No.");
         EndpointQuery.Init;
         EndpointQuery.Insert(true);
-        EndpointQuery.Validate(Direction,EndpointQuery.Direction::Outgoing);
-        EndpointQuery.Validate(Name,Name);
-        EndpointQuery.Validate("Endpoint Code","Endpoint Code");
-        EndpointQuery.Validate("Table No.","Table No.");
-        EndpointQuery.Validate("Table View","Table View");
+        EndpointQuery.Validate(Direction, EndpointQuery.Direction::Outgoing);
+        EndpointQuery.Validate(Name, Name);
+        EndpointQuery.Validate("Endpoint Code", "Endpoint Code");
+        EndpointQuery.Validate("Table No.", "Table No.");
+        EndpointQuery.Validate("Table View", "Table View");
         EndpointQuery.Modify(true);
-        Message(TextCreated,EndpointQuery."No.");
+        Message(TextCreated, EndpointQuery."No.");
     end;
 }
 

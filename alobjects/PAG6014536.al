@@ -10,28 +10,35 @@ page 6014536 "Scanner - Field Setup"
         {
             repeater(Group)
             {
-                field("Order";Order)
+                field("Order"; Order)
                 {
+                    ApplicationArea = All;
                 }
-                field(Prefix;Prefix)
+                field(Prefix; Prefix)
                 {
+                    ApplicationArea = All;
                     Caption = 'Prefix';
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field(Postfix;Postfix)
+                field(Postfix; Postfix)
                 {
+                    ApplicationArea = All;
                 }
-                field(Padding;Padding)
+                field(Padding; Padding)
                 {
+                    ApplicationArea = All;
                     Caption = 'Padding';
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                 }
-                field(Length;Length)
+                field(Length; Length)
                 {
+                    ApplicationArea = All;
                     Caption = 'Length';
                 }
             }

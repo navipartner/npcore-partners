@@ -12,11 +12,13 @@ page 6151583 "Event Attributes"
         {
             repeater(Group)
             {
-                field("Template Name";"Template Name")
+                field("Template Name"; "Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Promote;Promote)
+                field(Promote; Promote)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -18,74 +18,97 @@ page 6014496 "Exchange Label"
         {
             repeater(Group)
             {
-                field("Store ID";"Store ID")
+                field("Store ID"; "Store ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Barcode;Barcode)
+                field(Barcode; Barcode)
                 {
+                    ApplicationArea = All;
                 }
-                field("Batch No.";"Batch No.")
+                field("Batch No."; "Batch No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Packaged Batch";"Packaged Batch")
+                field("Packaged Batch"; "Packaged Batch")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From";"Valid From")
+                field("Valid From"; "Valid From")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid To";"Valid To")
+                field("Valid To"; "Valid To")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Line No.";"Sales Line No.")
+                field("Sales Line No."; "Sales Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Price Incl. Vat";"Sales Price Incl. Vat")
+                field("Sales Price Incl. Vat"; "Sales Price Incl. Vat")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Header Type";"Sales Header Type")
+                field("Sales Header Type"; "Sales Header Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Header No.";"Sales Header No.")
+                field("Sales Header No."; "Sales Header No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit of Measure";"Unit of Measure")
+                field("Unit of Measure"; "Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Printed Date";"Printed Date")
+                field("Printed Date"; "Printed Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Retail Cross Reference No.";"Retail Cross Reference No.")
+                field("Retail Cross Reference No."; "Retail Cross Reference No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

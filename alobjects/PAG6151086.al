@@ -12,16 +12,18 @@ page 6151086 "RIS Retail Inventory Set Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014404;"RIS Retail Inventory Set Sub.")
+            part(Control6014404; "RIS Retail Inventory Set Sub.")
             {
-                SubPageLink = "Set Code"=FIELD(Code);
+                SubPageLink = "Set Code" = FIELD(Code);
             }
         }
     }

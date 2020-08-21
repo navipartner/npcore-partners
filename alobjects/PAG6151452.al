@@ -14,17 +14,21 @@ page 6151452 "Magento Order Status"
         {
             repeater(Group)
             {
-                field("Order No.";"Order No.")
+                field("Order No."; "Order No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Order No.";"External Order No.")
+                field("External Order No."; "External Order No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Modified Date";"Last Modified Date")
+                field("Last Modified Date"; "Last Modified Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -16,156 +16,201 @@ page 6014613 "Retail Campaign Item Subform"
         {
             repeater(Group)
             {
-                field("Disc. Type";"Disc. Type")
+                field("Disc. Type"; "Disc. Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Disc. Code";"Disc. Code")
+                field("Disc. Code"; "Disc. Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Campaign Unit Price";"Campaign Unit Price")
+                field("Campaign Unit Price"; "Campaign Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                     Caption = 'Unit Cost';
                 }
-                field("Campaign Unit Cost";"Campaign Unit Cost")
+                field("Campaign Unit Cost"; "Campaign Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Purchase Price";"Unit Purchase Price")
+                field("Unit Purchase Price"; "Unit Purchase Price")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount %";"Discount %")
+                field("Discount %"; "Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price Incl. VAT";"Unit Price Incl. VAT")
+                field("Unit Price Incl. VAT"; "Unit Price Incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mix Discount Type";"Mix Discount Type")
+                field("Mix Discount Type"; "Mix Discount Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mix Type";"Mix Type")
+                field("Mix Type"; "Mix Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Discount %";"Item Discount %")
+                field("Item Discount %"; "Item Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Discount Qty.";"Item Discount Qty.")
+                field("Item Discount Qty."; "Item Discount Qty.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Item";"Distribution Item")
+                field("Distribution Item"; "Distribution Item")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Item No.";"Vendor Item No.")
+                field("Vendor Item No."; "Vendor Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Units per Parcel";"Units per Parcel")
+                field("Units per Parcel"; "Units per Parcel")
                 {
+                    ApplicationArea = All;
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity On Purchase Order";"Quantity On Purchase Order")
+                field("Quantity On Purchase Order"; "Quantity On Purchase Order")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Page no. in advert";"Page no. in advert")
+                field("Page no. in advert"; "Page no. in advert")
                 {
+                    ApplicationArea = All;
                 }
-                field("Priority 2";"Priority 2")
+                field("Priority 2"; "Priority 2")
                 {
+                    ApplicationArea = All;
                 }
-                field(Photo;Photo)
+                field(Photo; Photo)
                 {
+                    ApplicationArea = All;
                 }
-                field("Cross-Reference No.";"Cross-Reference No.")
+                field("Cross-Reference No."; "Cross-Reference No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Disc. Grouping Type";"Disc. Grouping Type")
+                field("Disc. Grouping Type"; "Disc. Grouping Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Profit;Profit)
+                field(Profit; Profit)
                 {
+                    ApplicationArea = All;
                     Visible = true;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Group";"Item Group")
+                field("Item Group"; "Item Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Turnover;Turnover)
+                field(Turnover; Turnover)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Quantity Sold";"Quantity Sold")
+                field("Quantity Sold"; "Quantity Sold")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Internet Special Id";"Internet Special Id")
+                field("Internet Special Id"; "Internet Special Id")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Campaign Profit";"Campaign Profit")
+                field("Campaign Profit"; "Campaign Profit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Comment 2";"Comment 2")
+                field("Comment 2"; "Comment 2")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

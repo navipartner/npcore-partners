@@ -17,20 +17,25 @@ page 6014598 "Managed Package Lookup"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field(Tags;Tags)
+                field(Tags; Tags)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

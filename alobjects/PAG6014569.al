@@ -15,24 +15,25 @@ page 6014569 "Export Wizard Filters"
         {
             repeater(Group)
             {
-                field("Field Number";"Field Number")
+                field("Field Number"; "Field Number")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         "Field": Record "Field";
                         FieldsLookup: Page "Fields Lookup";
                     begin
-                        Field.SetRange(TableNo,"Table Number");
+                        Field.SetRange(TableNo, "Table Number");
                         FieldsLookup.SetTableView(Field);
                         FieldsLookup.LookupMode(true);
                         if FieldsLookup.RunModal = ACTION::LookupOK then begin
-                          FieldsLookup.GetRecord(Field);
-                          if Field."No." = "Field Number" then
-                            exit;
-                          CheckDuplicateField(Field);
-                          FillSourceRecord(Field);
-                          CurrPage.Update(true);
+                            FieldsLookup.GetRecord(Field);
+                            if Field."No." = "Field Number" then
+                                exit;
+                            CheckDuplicateField(Field);
+                            FillSourceRecord(Field);
+                            CurrPage.Update(true);
                         end;
                     end;
 
@@ -40,20 +41,23 @@ page 6014569 "Export Wizard Filters"
                     var
                         "Field": Record "Field";
                     begin
-                        if Field.Get("Table Number","Field Number") then
-                          FillSourceRecord(Field);
+                        if Field.Get("Table Number", "Field Number") then
+                            FillSourceRecord(Field);
                     end;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Field Filter";"Field Filter")
+                field("Field Filter"; "Field Filter")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -86,14 +90,14 @@ page 6014569 "Export Wizard Filters"
         "Field": Record "Field";
     begin
         if TempTableFilter.FindSet then
-          repeat
-            TransferFields(TempTableFilter);
-            if Field.Get("Table Number","Field Number") then begin
-              "Field Name" := Field.FieldName;
-              "Field Caption" := Field."Field Caption";
-            end;
-            if Insert then;
-          until TempTableFilter.Next = 0;
+            repeat
+                TransferFields(TempTableFilter);
+                if Field.Get("Table Number", "Field Number") then begin
+                    "Field Name" := Field.FieldName;
+                    "Field Caption" := Field."Field Caption";
+                end;
+                if Insert then;
+            until TempTableFilter.Next = 0;
     end;
 
     procedure GetData(var TempTableFilter: Record "Table Filter")
@@ -102,10 +106,11 @@ page 6014569 "Export Wizard Filters"
     begin
         Clear(Rec);
 
-        if FindSet then repeat
-          TempTableFilter.TransferFields(Rec);
-          TempTableFilter.Insert;
-        until Next = 0;
+        if FindSet then
+            repeat
+                TempTableFilter.TransferFields(Rec);
+                TempTableFilter.Insert;
+            until Next = 0;
         CurrPage.Update(false);
     end;
 

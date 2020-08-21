@@ -14,53 +14,66 @@ page 6014679 "Endpoint Query List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Direction;Direction)
+                field(Direction; Direction)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Endpoint Code";"Endpoint Code")
+                field("Endpoint Code"; "Endpoint Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Comment";"Processing Comment")
+                field("Processing Comment"; "Processing Comment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Creation Date";"Creation Date")
+                field("Creation Date"; "Creation Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processed Date";"Processed Date")
+                field("Processed Date"; "Processed Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Database Name";"Database Name")
+                field("Database Name"; "Database Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Only New and Modified Records";"Only New and Modified Records")
+                field("Only New and Modified Records"; "Only New and Modified Records")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table View";"Table View")
+                field("Table View"; "Table View")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            part(Control6150624;"Endpoint Query Filter Subform")
+            part(Control6150624; "Endpoint Query Filter Subform")
             {
-                SubPageLink = "Endpoint Query No."=FIELD("No.");
-                SubPageView = SORTING("Endpoint Query No.","Table No.","Field No.")
+                SubPageLink = "Endpoint Query No." = FIELD("No.");
+                SubPageView = SORTING("Endpoint Query No.", "Table No.", "Field No.")
                               ORDER(Ascending);
             }
         }
@@ -94,7 +107,7 @@ page 6014679 "Endpoint Query List"
                 Caption = 'Requests';
                 Image = XMLFile;
                 RunObject = Page "Endpoint Request List";
-                RunPageLink = "Query No."=FIELD("No.");
+                RunPageLink = "Query No." = FIELD("No.");
             }
         }
     }

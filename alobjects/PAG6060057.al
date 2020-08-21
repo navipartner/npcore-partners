@@ -14,17 +14,21 @@ page 6060057 "Item Worksheet Field Mapping"
         {
             repeater(Group)
             {
-                field(Matching;Matching)
+                field(Matching; Matching)
                 {
+                    ApplicationArea = All;
                 }
-                field("Case Sensitive";"Case Sensitive")
+                field("Case Sensitive"; "Case Sensitive")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Value";"Source Value")
+                field("Source Value"; "Source Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Target Value";"Target Value")
+                field("Target Value"; "Target Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

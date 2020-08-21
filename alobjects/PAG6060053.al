@@ -14,29 +14,36 @@ page 6060053 "Item Worksheet Excel Column"
         {
             repeater(Group)
             {
-                field("Excel Column";"Excel Column")
+                field("Excel Column"; "Excel Column")
                 {
+                    ApplicationArea = All;
                 }
-                field("Excel Header Text";"Excel Header Text")
+                field("Excel Header Text"; "Excel Header Text")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sample Data Row 1";"Sample Data Row 1")
+                field("Sample Data Row 1"; "Sample Data Row 1")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Sample Data Row 2";"Sample Data Row 2")
+                field("Sample Data Row 2"; "Sample Data Row 2")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Sample Data Row 3";"Sample Data Row 3")
+                field("Sample Data Row 3"; "Sample Data Row 3")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Process as";"Process as")
+                field("Process as"; "Process as")
                 {
+                    ApplicationArea = All;
                 }
-                field("Map to Caption";"Map to Caption")
+                field("Map to Caption"; "Map to Caption")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -70,7 +77,7 @@ page 6060053 "Item Worksheet Excel Column"
                     ItemWorksheetManagement: Codeunit "Item Worksheet Management";
                 begin
                     GetCurrentWorksheet;
-                    ItemWorksheetManagement.AddMappedFieldsToExcel(ItemWorksheet."Item Template Name",ItemWorksheet.Name);
+                    ItemWorksheetManagement.AddMappedFieldsToExcel(ItemWorksheet."Item Template Name", ItemWorksheet.Name);
                 end;
             }
         }

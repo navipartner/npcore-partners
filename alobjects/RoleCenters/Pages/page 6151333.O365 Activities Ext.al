@@ -202,7 +202,7 @@ page 6151333 "O365 Activities Ext"
     end;
 
 
-        procedure DrillDownSalesThisMonthLastYear()
+    procedure DrillDownSalesThisMonthLastYear()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -212,7 +212,7 @@ page 6151333 "O365 Activities Ext"
     end;
 
 
-        procedure DrillDownSalesThisMonth()
+    procedure DrillDownSalesThisMonth()
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin

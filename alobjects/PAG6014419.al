@@ -24,75 +24,91 @@ page 6014419 "Gift Voucher"
             group(General)
             {
                 Caption = 'General';
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("ZIP Code";"ZIP Code")
+                field("ZIP Code"; "ZIP Code")
                 {
+                    ApplicationArea = All;
                     Caption = 'Post Code/City';
                     Editable = false;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("No. Printed";"No. Printed")
+                field("No. Printed"; "No. Printed")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Salesperson;Salesperson)
+                field(Salesperson; Salesperson)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Issue Date";"Issue Date")
+                field("Issue Date"; "Issue Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         if Status <> xRec.Status then begin
-                          "Man. Change of Status Date" := Today;
-                          "Status Changed Man. by" := UserId;
+                            "Man. Change of Status Date" := Today;
+                            "Status Changed Man. by" := UserId;
                         end;
                     end;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("FORMAT(""Gift Voucher Message"".HASVALUE)";Format("Gift Voucher Message".HasValue))
+                field("FORMAT(""Gift Voucher Message"".HASVALUE)"; Format("Gift Voucher Message".HasValue))
                 {
+                    ApplicationArea = All;
                     Caption = 'Message';
 
                     trigger OnAssistEdit()
@@ -105,8 +121,8 @@ page 6014419 "Gift Voucher"
                         RecRef.GetTable(Rec);
                         FieldRef := RecRef.Field(FieldNo("Gift Voucher Message"));
                         if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                          RecRef.SetTable(Rec);
-                          Modify(true);
+                            RecRef.SetTable(Rec);
+                            Modify(true);
                         end;
                         //+MAG2.22 [353585]
                     end;
@@ -115,75 +131,93 @@ page 6014419 "Gift Voucher"
             group("Cashed In")
             {
                 Caption = 'Cashed In';
-                field("Cashed on Register No.";"Cashed on Register No.")
+                field("Cashed on Register No."; "Cashed on Register No.")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Cashed on Sales Ticket No.";"Cashed on Sales Ticket No.")
+                field("Cashed on Sales Ticket No."; "Cashed on Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Cashed Date";"Cashed Date")
+                field("Cashed Date"; "Cashed Date")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Cashed Salesperson";"Cashed Salesperson")
+                field("Cashed Salesperson"; "Cashed Salesperson")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed in Global Dim 1 Code";"Cashed in Global Dim 1 Code")
+                field("Cashed in Global Dim 1 Code"; "Cashed in Global Dim 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed in Global Dim 2 Code";"Cashed in Global Dim 2 Code")
+                field("Cashed in Global Dim 2 Code"; "Cashed in Global Dim 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed in Location Code";"Cashed in Location Code")
+                field("Cashed in Location Code"; "Cashed in Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Invoiced;Invoiced)
+                field(Invoiced; Invoiced)
                 {
+                    ApplicationArea = All;
                     Caption = 'Invoiced';
                 }
-                field("Invoiced by Document Type";"Invoiced by Document Type")
+                field("Invoiced by Document Type"; "Invoiced by Document Type")
                 {
+                    ApplicationArea = All;
                     Caption = 'Inv. on doc. type';
                 }
-                field("Invoiced by Document No.";"Invoiced by Document No.")
+                field("Invoiced by Document No."; "Invoiced by Document No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'Inv. on doc. no.';
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'Customer no.';
                     LookupPageID = "Customer List";
                 }
-                field(Reference;Reference)
+                field(Reference; Reference)
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed External";"Cashed External")
+                field("Cashed External"; "Cashed External")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Magento)
             {
                 Caption = 'Magento';
-                field("External Gift Voucher No.";"External Gift Voucher No.")
+                field("External Gift Voucher No."; "External Gift Voucher No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("External Reference No.";"External Reference No.")
+                field("External Reference No."; "External Reference No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Expire Date";"Expire Date")
+                field("Expire Date"; "Expire Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Sales Order No.";"Sales Order No.")
+                field("Sales Order No."; "Sales Order No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -255,11 +289,11 @@ page 6014419 "Gift Voucher"
                     var
                         GiftVoucher: Record "Gift Voucher";
                     begin
-                        TestField(Status,Status::Open);
+                        TestField(Status, Status::Open);
                         GiftVoucher.FilterGroup(2);
-                        GiftVoucher.SetRange("No.","No.");
+                        GiftVoucher.SetRange("No.", "No.");
                         GiftVoucher.FilterGroup(0);
-                        GiftVoucher.PrintGiftVoucher(false,true);
+                        GiftVoucher.PrintGiftVoucher(false, true);
                     end;
                 }
                 action(SendAsPDF)
@@ -276,12 +310,12 @@ page 6014419 "Gift Voucher"
                     begin
                         //-MAG2.01
                         if not Customer.Get("Customer No.") then
-                          exit;
+                            exit;
                         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-                          exit;
+                            exit;
 
                         RecRef.GetTable(Rec);
-                        EmailManagement.SendReport(MagentoSetup."Gift Voucher Report",RecRef,Customer."E-Mail",false);
+                        EmailManagement.SendReport(MagentoSetup."Gift Voucher Report", RecRef, Customer."E-Mail", false);
                         //+MAG2.01
                     end;
                 }

@@ -26,74 +26,94 @@ page 6150653 "POS Sale Line Subpage"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount Amount Excl. VAT";"Line Discount Amount Excl. VAT")
+                field("Line Discount Amount Excl. VAT"; "Line Discount Amount Excl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Excl. VAT";"Amount Excl. VAT")
+                field("Amount Excl. VAT"; "Amount Excl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Incl. VAT";"Amount Incl. VAT")
+                field("Amount Incl. VAT"; "Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
-                field("Discount Authorised by";"Discount Authorised by")
+                field("Discount Authorised by"; "Discount Authorised by")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Reason Code";"Reason Code")
+                field("Reason Code"; "Reason Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Bin Code";"Bin Code")
+                field("Bin Code"; "Bin Code")
                 {
+                    ApplicationArea = All;
                     Importance = Standard;
                     Visible = false;
                 }
-                field("Discount Type";"Discount Type")
+                field("Discount Type"; "Discount Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Discount Code";"Discount Code")
+                field("Discount Code"; "Discount Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Lot No.";"Lot No.")
+                field("Lot No."; "Lot No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Return Reason Code";"Return Reason Code")
+                field("Return Reason Code"; "Return Reason Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(LastPostedSalesDocNo;LastPostedSalesDocNo)
+                field(LastPostedSalesDocNo; LastPostedSalesDocNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Posted Sales Doc.';
 
                     trigger OnDrillDown()
@@ -103,14 +123,15 @@ page 6150653 "POS Sale Line Subpage"
                     begin
                         //-NPR5.50 [300557]
                         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then begin
-                          POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
-                          PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
+                            POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
+                            PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
                         end;
                         //+NPR5.50 [300557]
                     end;
                 }
-                field("Exclude from Posting";"Exclude from Posting")
+                field("Exclude from Posting"; "Exclude from Posting")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -159,7 +180,7 @@ page 6150653 "POS Sale Line Subpage"
         //-NPR5.50 [300557]
         LastPostedSalesDocNo := '';
         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then
-          LastPostedSalesDocNo := POSEntrySalesDocLink."Sales Document No";
+            LastPostedSalesDocNo := POSEntrySalesDocLink."Sales Document No";
         //+NPR5.50 [300557]
     end;
 

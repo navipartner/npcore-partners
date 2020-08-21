@@ -23,41 +23,53 @@ page 6150614 "POS Store List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Group Code";"Store Group Code")
+                field("Store Group Code"; "Store Group Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Category Code";"Store Category Code")
+                field("Store Category Code"; "Store Category Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Locality Code";"Store Locality Code")
+                field("Store Locality Code"; "Store Locality Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Bus. Posting Group";"VAT Bus. Posting Group")
+                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -79,13 +91,13 @@ page 6150614 "POS Store List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID"=CONST(6150614),
-                                      "No."=FIELD(Code);
+                        RunPageLink = "Table ID" = CONST(6150614),
+                                      "No." = FIELD(Code);
                         ShortCutKey = 'Shift+Ctrl+D';
                     }
                     action("Dimensions-&Multiple")
                     {
-                        AccessByPermission = TableData Dimension=R;
+                        AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
 
@@ -96,7 +108,7 @@ page 6150614 "POS Store List"
                         begin
                             //-NPR5.53 [371956]
                             CurrPage.SetSelectionFilter(POSStore);
-                            DefaultDimMultiple.SetMultiRecord(POSStore,FieldNo(Code));
+                            DefaultDimMultiple.SetMultiRecord(POSStore, FieldNo(Code));
                             DefaultDimMultiple.RunModal;
                             //-NPR5.53 [371956]
                         end;
@@ -122,7 +134,7 @@ page 6150614 "POS Store List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Posting Setup";
-                    RunPageLink = "POS Store Code"=FIELD(Code);
+                    RunPageLink = "POS Store Code" = FIELD(Code);
                 }
                 action("POS Period Registers")
                 {
@@ -132,7 +144,7 @@ page 6150614 "POS Store List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Period Register List";
-                    RunPageLink = "POS Store Code"=FIELD(Code);
+                    RunPageLink = "POS Store Code" = FIELD(Code);
                 }
                 action("POS Entries")
                 {
@@ -142,7 +154,7 @@ page 6150614 "POS Store List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Entry List";
-                    RunPageLink = "POS Store Code"=FIELD(Code);
+                    RunPageLink = "POS Store Code" = FIELD(Code);
                 }
             }
             group("Stock-Take")
@@ -159,7 +171,7 @@ page 6150614 "POS Store List"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = false;
                     RunObject = Page "CS Stock-Takes List";
-                    RunPageLink = Location=FIELD("Location Code");
+                    RunPageLink = Location = FIELD("Location Code");
                 }
             }
         }
@@ -169,7 +181,7 @@ page 6150614 "POS Store List"
     begin
         //-NPR5.50
         if CSSetup.Get then
-          StockTakeVisible := CSSetup."Enable Capture Service";
+            StockTakeVisible := CSSetup."Enable Capture Service";
         //+NPR5.50
     end;
 

@@ -26,65 +26,81 @@ page 6059769 "NaviDocs Document List"
             {
                 field("Document Description"; "Document Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Order No."; "Order No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("External Document No."; "External Document No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("No. (Recipient)"; "No. (Recipient)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Name (Recipient)"; "Name (Recipient)")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field(StatusText; StatusText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Status';
                     Editable = false;
                     OptionCaption = 'Unhandled,Error,Handled';
                 }
                 field("Document Handling Profile"; "Document Handling Profile")
                 {
+                    ApplicationArea = All;
                 }
                 field("Document Handling"; "Document Handling")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Report No."; "Report No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("E-mail (Recipient)"; "E-mail (Recipient)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Template Code"; "Template Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Printed Qty."; "Printed Qty.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Processed Qty."; "Processed Qty.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Delay sending until"; "Delay sending until")
                 {
+                    ApplicationArea = All;
                 }
             }
             part(NaviDocsCommentSubpage; "NaviDocs Comment Subpage")

@@ -10,29 +10,37 @@ page 6059776 "Member Card Types Subform"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Base Calculation On";"Base Calculation On")
+                field("Base Calculation On"; "Base Calculation On")
                 {
+                    ApplicationArea = All;
                 }
-                field("Units Per Point";"Units Per Point")
+                field("Units Per Point"; "Units Per Point")
                 {
+                    ApplicationArea = All;
                 }
-                field(Points;Points)
+                field(Points; Points)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Group";"Customer Group")
+                field("Customer Group"; "Customer Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

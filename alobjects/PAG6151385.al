@@ -24,65 +24,85 @@ page 6151385 "CS Stock-Takes List"
         {
             repeater(Group)
             {
-                field(Location;Location)
+                field(Location; Location)
                 {
+                    ApplicationArea = All;
                 }
-                field("Adjust Inventory";"Adjust Inventory")
+                field("Adjust Inventory"; "Adjust Inventory")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field(Closed;Closed)
+                field(Closed; Closed)
                 {
+                    ApplicationArea = All;
                 }
-                field(Approved;Approved)
+                field(Approved; Approved)
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Started";"Salesfloor Started")
+                field("Salesfloor Started"; "Salesfloor Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Duration";"Salesfloor Duration")
+                field("Salesfloor Duration"; "Salesfloor Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Entries";"Salesfloor Entries")
+                field("Salesfloor Entries"; "Salesfloor Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Started";"Stockroom Started")
+                field("Stockroom Started"; "Stockroom Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Duration";"Stockroom Duration")
+                field("Stockroom Duration"; "Stockroom Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Entries";"Stockroom Entries")
+                field("Stockroom Entries"; "Stockroom Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Started";"Refill Started")
+                field("Refill Started"; "Refill Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Duration";"Refill Duration")
+                field("Refill Duration"; "Refill Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Entries";"Refill Entries")
+                field("Refill Entries"; "Refill Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unknown Entries";"Unknown Entries")
+                field("Unknown Entries"; "Unknown Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Inventory Calculated";"Inventory Calculated")
+                field("Inventory Calculated"; "Inventory Calculated")
                 {
+                    ApplicationArea = All;
                 }
-                field("Predicted Qty.";"Predicted Qty.")
+                field("Predicted Qty."; "Predicted Qty.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Posted";"Journal Posted")
+                field("Journal Posted"; "Journal Posted")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock-Take Id";"Stock-Take Id")
+                field("Stock-Take Id"; "Stock-Take Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Note;Note)
+                field(Note; Note)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -103,7 +123,7 @@ page 6151385 "CS Stock-Takes List"
                 begin
                     //CreateNewCounting();
                     if not LocationRec.Get(GetFilter(Location)) then
-                      Error(Err_MissingLocation);
+                        Error(Err_MissingLocation);
 
                     CSHelperFunctions.CreateNewCountingV2(LocationRec);
                     CurrPage.Update();
@@ -127,7 +147,7 @@ page 6151385 "CS Stock-Takes List"
                 Caption = 'Tag Data';
                 Image = DataEntry;
                 RunObject = Page "CS Stock-Takes Data List";
-                RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
+                RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
             }
             group(Overview)
             {
@@ -137,22 +157,22 @@ page 6151385 "CS Stock-Takes List"
                     Caption = 'Devices';
                     Image = MiniForm;
                     RunObject = Page "CS Devices";
-                    RunPageLink = Location=FIELD(Location);
+                    RunPageLink = Location = FIELD(Location);
                 }
                 action("&Item Journal")
                 {
                     Caption = '&Item Journal';
                     Image = Worksheet2;
                     RunObject = Page "Phys. Inventory Journal";
-                    RunPageLink = "Journal Template Name"=FIELD("Journal Template Name"),
-                                  "Journal Batch Name"=FIELD("Journal Batch Name");
+                    RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
+                                  "Journal Batch Name" = FIELD("Journal Batch Name");
                 }
                 action("&Item Journal Batch")
                 {
                     Caption = '&Item Journal Batch';
                     Image = InventoryJournal;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST("Phys. Inventory"));
+                    RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"));
                 }
                 action("Approved Data")
                 {
@@ -172,7 +192,7 @@ page 6151385 "CS Stock-Takes List"
                     Caption = 'Batch Data';
                     Image = List;
                     RunObject = Page "CS Stock-Take Batch List";
-                    RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
+                    RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
                     RunPageView = SORTING(Created)
                                   ORDER(Ascending);
                 }
@@ -192,17 +212,17 @@ page 6151385 "CS Stock-Takes List"
                         CSPost: Codeunit "CS Post";
                     begin
                         if not "Adjust Inventory" then
-                          exit;
+                            exit;
 
                         if Approved = 0DT then
-                          exit;
+                            exit;
 
 
                         Clear(CSStockTakesData);
-                        CSStockTakesData.SetRange("Stock-Take Id",Rec."Stock-Take Id");
-                        CSStockTakesData.SetRange("Stock-Take Config Code",Rec."Journal Template Name");
-                        CSStockTakesData.SetRange("Worksheet Name",Rec."Journal Batch Name");
-                        CSStockTakesData.ModifyAll("Transferred To Worksheet",false);
+                        CSStockTakesData.SetRange("Stock-Take Id", Rec."Stock-Take Id");
+                        CSStockTakesData.SetRange("Stock-Take Config Code", Rec."Journal Template Name");
+                        CSStockTakesData.SetRange("Worksheet Name", Rec."Journal Batch Name");
+                        CSStockTakesData.ModifyAll("Transferred To Worksheet", false);
 
                         RecRef.Open(DATABASE::"CS Stock-Takes");
                         RecRef.Get(Rec.RecordId);
@@ -222,15 +242,15 @@ page 6151385 "CS Stock-Takes List"
                         ItemJournalBatch: Record "Item Journal Batch";
                     begin
                         if not "Adjust Inventory" then
-                          exit;
+                            exit;
 
                         if Approved = 0DT then
-                          exit;
+                            exit;
 
                         if "Journal Posted" then
-                          exit;
+                            exit;
 
-                        ItemJournalBatch.Get("Journal Template Name","Journal Batch Name");
+                        ItemJournalBatch.Get("Journal Template Name", "Journal Batch Name");
 
                         RecRef.Open(DATABASE::"Item Journal Batch");
                         RecRef.Get(ItemJournalBatch.RecordId);
@@ -255,26 +275,26 @@ page 6151385 "CS Stock-Takes List"
                     begin
                         CSSetup.Get;
                         if not CSSetup."Post with Job Queue" then
-                          exit;
+                            exit;
 
                         if not "Adjust Inventory" then
-                          exit;
+                            exit;
 
                         if Approved = 0DT then
-                          exit;
+                            exit;
 
                         if "Journal Posted" then
-                          exit;
+                            exit;
 
-                        ItemJournalBatch.Get("Journal Template Name","Journal Batch Name");
+                        ItemJournalBatch.Get("Journal Template Name", "Journal Batch Name");
 
                         RecRef.GetTable(ItemJournalBatch);
                         Clear(CSPostingBuffer);
-                        CSPostingBuffer.SetRange("Table No.",RecRef.Number);
-                        CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
-                        CSPostingBuffer.SetRange(Executed,false);
+                        CSPostingBuffer.SetRange("Table No.", RecRef.Number);
+                        CSPostingBuffer.SetRange("Record Id", RecRef.RecordId);
+                        CSPostingBuffer.SetRange(Executed, false);
                         if CSPostingBuffer.FindSet then
-                          Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+                            Error(Err_PostingIsScheduled, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
 
                         PostingRecRef.GetTable(ItemJournalBatch);
                         Clear(CSPostingBuffer);
@@ -284,7 +304,7 @@ page 6151385 "CS Stock-Takes List"
                         CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Store Counting";
                         CSPostingBuffer."Job Queue Priority for Post" := 2000;
                         if CSPostingBuffer.Insert(true) then
-                          CSPostEnqueue.Run(CSPostingBuffer);
+                            CSPostEnqueue.Run(CSPostingBuffer);
                     end;
                 }
                 action("Force Close w/o Posting")
@@ -312,10 +332,10 @@ page 6151385 "CS Stock-Takes List"
                         RecRef: RecordRef;
                         CSPost: Codeunit "CS Post";
                     begin
-                        TestField("Adjust Inventory",true);
+                        TestField("Adjust Inventory", true);
 
                         if Approved = 0DT then
-                          Error(Err_NotApproved);
+                            Error(Err_NotApproved);
 
                         RecRef.Open(DATABASE::"CS Stock-Takes");
                         RecRef.Get(Rec.RecordId);
@@ -334,12 +354,12 @@ page 6151385 "CS Stock-Takes List"
                         CSPost: Codeunit "CS Post";
                         ItemJournalBatch: Record "Item Journal Batch";
                     begin
-                        TestField("Journal Posted",false);
+                        TestField("Journal Posted", false);
 
                         if Approved = 0DT then
-                          Error(Err_NotApproved);
+                            Error(Err_NotApproved);
 
-                        ItemJournalBatch.Get("Journal Template Name","Journal Batch Name");
+                        ItemJournalBatch.Get("Journal Template Name", "Journal Batch Name");
                         RecRef.GetTable(ItemJournalBatch);
                         RecRef.FindFirst();
 

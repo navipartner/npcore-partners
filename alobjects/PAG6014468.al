@@ -21,12 +21,15 @@ page 6014468 "Sales Ticket Statistics"
                 ShowCaption = false;
                 field("Period Start"; "Period Start")
                 {
+                    ApplicationArea = All;
                 }
                 field("Period Name"; "Period Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Kassedata.""All Normal Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll")
                 {
+                    ApplicationArea = All;
                     Caption = 'Balance Due (LCY)';
 
                     trigger OnDrillDown()
@@ -45,6 +48,7 @@ page 6014468 "Sales Ticket Statistics"
                 }
                 field("Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Debit Sales in Audit Roll")
                 {
+                    ApplicationArea = All;
                     Caption = 'Purchases (LCY)';
 
                     trigger OnDrillDown()
@@ -65,14 +69,17 @@ page 6014468 "Sales Ticket Statistics"
                 }
                 field("Kassedata.""All Normal Sales in Audit Roll""+Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll" + Kassedata."All Debit Sales in Audit Roll")
                 {
+                    ApplicationArea = All;
                     Caption = 'Total';
                 }
                 field(totalCount; totalCount)
                 {
+                    ApplicationArea = All;
                     Caption = 'Number of Exp.';
                 }
                 field(CalculatedAverage; CalcAverage)
                 {
+                    ApplicationArea = All;
                     Caption = 'Stay Expedition';
                 }
             }
@@ -81,18 +88,21 @@ page 6014468 "Sales Ticket Statistics"
                 ShowCaption = false;
                 field(Dim1Filter; Dim1Filter)
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,1';
                     Caption = 'Dept. Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                 }
                 field(Dim2Filter; Dim2Filter)
                 {
+                    ApplicationArea = All;
                     CaptionClass = '1,2,2';
                     Caption = 'Project Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
                 }
                 field(PeriodType; PeriodType)
                 {
+                    ApplicationArea = All;
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Year';
 

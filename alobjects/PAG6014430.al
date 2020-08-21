@@ -26,72 +26,93 @@ page 6014430 "Credit Voucher List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issue Date";"Issue Date")
+                field("Issue Date"; "Issue Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issuing POS Entry No";"Issuing POS Entry No")
+                field("Issuing POS Entry No"; "Issuing POS Entry No")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issuing POS Sale Line No.";"Issuing POS Sale Line No.")
+                field("Issuing POS Sale Line No."; "Issuing POS Sale Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issuing POS Unit No.";"Issuing POS Unit No.")
+                field("Issuing POS Unit No."; "Issuing POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Salesperson;Salesperson)
+                field(Salesperson; Salesperson)
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed Date";"Cashed Date")
+                field("Cashed Date"; "Cashed Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed on Sales Ticket No.";"Cashed on Sales Ticket No.")
+                field("Cashed on Sales Ticket No."; "Cashed on Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed Salesperson";"Cashed Salesperson")
+                field("Cashed Salesperson"; "Cashed Salesperson")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed POS Entry No.";"Cashed POS Entry No.")
+                field("Cashed POS Entry No."; "Cashed POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed POS Payment Line No.";"Cashed POS Payment Line No.")
+                field("Cashed POS Payment Line No."; "Cashed POS Payment Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed POS Unit No.";"Cashed POS Unit No.")
+                field("Cashed POS Unit No."; "Cashed POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Reference;Reference)
+                field(Reference; Reference)
                 {
+                    ApplicationArea = All;
                 }
-                field("External Credit Voucher";"External Credit Voucher")
+                field("External Credit Voucher"; "External Credit Voucher")
                 {
+                    ApplicationArea = All;
                 }
             }
             grid(Control6150629)
             {
                 ShowCaption = false;
-                field(find;FindNo)
+                field(find; FindNo)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -132,11 +153,11 @@ page 6014430 "Credit Voucher List"
                         CreditVoucher: Record "Credit Voucher";
                     begin
                         //-NPR5.29
-                        TestField( Status, Status::Open );
+                        TestField(Status, Status::Open);
                         CreditVoucher.FilterGroup(2);
-                        CreditVoucher.SetRange("No.","No.");
+                        CreditVoucher.SetRange("No.", "No.");
                         CreditVoucher.FilterGroup(0);
-                        CreditVoucher.PrintCreditVoucher(false,true);
+                        CreditVoucher.PrintCreditVoucher(false, true);
                         //+NPR5.29
                     end;
                 }
@@ -193,11 +214,11 @@ page 6014430 "Credit Voucher List"
     begin
         //-NPR3.0b
         if FindNo <> '' then begin
-          SetFilter("No.", '=%1', FindNo);
-          if not Find('-') then begin
-            Error(TxtFind, FindNo);
-          end;
-          CurrPage.Update(false);
+            SetFilter("No.", '=%1', FindNo);
+            if not Find('-') then begin
+                Error(TxtFind, FindNo);
+            end;
+            CurrPage.Update(false);
         end;
         //+NPR3.0b
     end;

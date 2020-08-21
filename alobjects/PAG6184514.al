@@ -12,17 +12,21 @@ page 6184514 "EFT BIN Ranges"
         {
             repeater(Group)
             {
-                field("BIN from";"BIN from")
+                field("BIN from"; "BIN from")
                 {
+                    ApplicationArea = All;
                 }
-                field("BIN to";"BIN to")
+                field("BIN to"; "BIN to")
                 {
+                    ApplicationArea = All;
                 }
-                field("BIN Group Code";"BIN Group Code")
+                field("BIN Group Code"; "BIN Group Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("BIN Group Priority";"BIN Group Priority")
+                field("BIN Group Priority"; "BIN Group Priority")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

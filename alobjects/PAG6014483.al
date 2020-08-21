@@ -20,10 +20,11 @@ page 6014483 "Turnover Stats"
     {
         area(content)
         {
-            field(DepartmentFilter;DepartmentFilter)
+            field(DepartmentFilter; DepartmentFilter)
             {
+                ApplicationArea = All;
                 Caption = 'Depertment Filter';
-                TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+                TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
                 trigger OnValidate()
                 var
@@ -31,17 +32,18 @@ page 6014483 "Turnover Stats"
                 begin
                     RetailSetup.Get;
                     if RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::"PER REGISTER" then
-                      Filter := StrSubstNo('=%1',RegisterNo2);
+                        Filter := StrSubstNo('=%1', RegisterNo2);
                     //-NPR5.55 [414769]
                     //TurnoverStatistics(Filter);
-                    TurnoverStatistics(Filter,StartDate,EndDate);
+                    TurnoverStatistics(Filter, StartDate, EndDate);
                     //+NPR5.55 [414769]
                     CurrPage.sub1.PAGE.SetDeptFilter(DepartmentFilter);
                     CurrPage.Update(true);
                 end;
             }
-            field("Start Date";StartDate)
+            field("Start Date"; StartDate)
             {
+                ApplicationArea = All;
 
                 trigger OnValidate()
                 var
@@ -50,15 +52,16 @@ page 6014483 "Turnover Stats"
                     //-NPR5.55 [414769]
                     RetailSetup.Get;
                     if RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::"PER REGISTER" then
-                      Filter := StrSubstNo('=%1',RegisterNo2);
-                    TurnoverStatistics(Filter,StartDate,EndDate);
+                        Filter := StrSubstNo('=%1', RegisterNo2);
+                    TurnoverStatistics(Filter, StartDate, EndDate);
                     //CurrPage.sub1.PAGE.SetDateFilter(TRUE);
                     CurrPage.Update(true);
                     //+NPR5.55 [414769]
                 end;
             }
-            field("End Date";EndDate)
+            field("End Date"; EndDate)
             {
+                ApplicationArea = All;
 
                 trigger OnValidate()
                 var
@@ -67,8 +70,8 @@ page 6014483 "Turnover Stats"
                     //-NPR5.55 [414769]
                     RetailSetup.Get;
                     if RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::"PER REGISTER" then
-                      Filter := StrSubstNo('=%1',RegisterNo2);
-                    TurnoverStatistics(Filter,StartDate,EndDate);
+                        Filter := StrSubstNo('=%1', RegisterNo2);
+                    TurnoverStatistics(Filter, StartDate, EndDate);
                     //CurrPage.sub1.PAGE.SetDateFilter(TRUE);
                     CurrPage.Update(true);
                     //+NPR5.55 [414769]
@@ -83,56 +86,66 @@ page 6014483 "Turnover Stats"
                     group(Control6150636)
                     {
                         ShowCaption = false;
-                        field(RegisterNo;RegisterNo)
+                        field(RegisterNo; RegisterNo)
                         {
+                            ApplicationArea = All;
                             Caption = 'Register No.';
 
                             trigger OnValidate()
                             begin
                                 //+TS
-                                 /*
-                                IF Statistikmenu = Statistikmenu::Omsætning THEN
-                                  IF Opsætning.Balancing = Opsætning.Balancing::SAMLET THEN
-                                    Text := KasseText;
-                                */
+                                /*
+                               IF Statistikmenu = Statistikmenu::Omsætning THEN
+                                 IF Opsætning.Balancing = Opsætning.Balancing::SAMLET THEN
+                                   Text := KasseText;
+                               */
                                 //-TS
 
                             end;
                         }
-                        field(SaleAmount;SaleAmount)
+                        field(SaleAmount; SaleAmount)
                         {
+                            ApplicationArea = All;
                             Caption = 'Cash Sale';
                         }
-                        field(DebitSaleAmt;DebitSaleAmt)
+                        field(DebitSaleAmt; DebitSaleAmt)
                         {
+                            ApplicationArea = All;
                             Caption = 'Debit Sale';
                         }
-                        field(CreditedSaleAmount;CreditedSaleAmount)
+                        field(CreditedSaleAmount; CreditedSaleAmount)
                         {
+                            ApplicationArea = All;
                             Caption = 'Credited Sale';
                         }
-                        field(GiftVoucherAmount;GiftVoucherAmount)
+                        field(GiftVoucherAmount; GiftVoucherAmount)
                         {
+                            ApplicationArea = All;
                             Caption = 'Gift Voucher';
                         }
-                        field(CreditVoucherAmount;CreditVoucherAmount)
+                        field(CreditVoucherAmount; CreditVoucherAmount)
                         {
+                            ApplicationArea = All;
                             Caption = 'Credit Voucher';
                         }
-                        field(TotalAmount;TotalAmount)
+                        field(TotalAmount; TotalAmount)
                         {
+                            ApplicationArea = All;
                             Caption = 'Total';
                         }
-                        field("SaleAmount + CreditedSaleAmount + DebitSaleAmt";SaleAmount + CreditedSaleAmount + DebitSaleAmt)
+                        field("SaleAmount + CreditedSaleAmount + DebitSaleAmt"; SaleAmount + CreditedSaleAmount + DebitSaleAmt)
                         {
+                            ApplicationArea = All;
                             Caption = 'Revenue';
                         }
-                        field(AuditRollNoOfSales;AuditRollNoOfSales)
+                        field(AuditRollNoOfSales; AuditRollNoOfSales)
                         {
+                            ApplicationArea = All;
                             Caption = 'No. of Sales';
                         }
-                        field(AuditRollAverageSaleAmt;AuditRollAverageSaleAmt)
+                        field(AuditRollAverageSaleAmt; AuditRollAverageSaleAmt)
                         {
+                            ApplicationArea = All;
                             Caption = 'Average Sales';
                         }
                     }
@@ -140,33 +153,39 @@ page 6014483 "Turnover Stats"
                 group(Control6150627)
                 {
                     ShowCaption = false;
-                    field(DebitProfitAmount;DebitProfitAmount)
+                    field(DebitProfitAmount; DebitProfitAmount)
                     {
+                        ApplicationArea = All;
                         Caption = 'Debit Sale CM';
                     }
-                    field(DebitProfitPct;DebitProfitPct)
+                    field(DebitProfitPct; DebitProfitPct)
                     {
+                        ApplicationArea = All;
                         Caption = 'Debit CM %';
                     }
-                    field(PaymentAmount;PaymentAmount)
+                    field(PaymentAmount; PaymentAmount)
                     {
+                        ApplicationArea = All;
                         Caption = 'Payment';
                     }
-                    field(PayoutAmount;PayoutAmount)
+                    field(PayoutAmount; PayoutAmount)
                     {
+                        ApplicationArea = All;
                         Caption = 'Payout';
                     }
-                    field(ProfitAmount;ProfitAmount)
+                    field(ProfitAmount; ProfitAmount)
                     {
+                        ApplicationArea = All;
                         Caption = 'Profit (LCY)';
                     }
-                    field(ProfitPct;ProfitPct)
+                    field(ProfitPct; ProfitPct)
                     {
+                        ApplicationArea = All;
                         Caption = 'Profit (%)';
                     }
                 }
             }
-            part(sub1;"Turnover Statistics")
+            part(sub1; "Turnover Statistics")
             {
                 Caption = 'Turnover Statistics';
             }
@@ -191,10 +210,10 @@ page 6014483 "Turnover Stats"
                     var
                         "Filter": Text[250];
                     begin
-                        Filter := StrSubstNo('=%1',RegisterNo2);
+                        Filter := StrSubstNo('=%1', RegisterNo2);
                         //-NPR5.55 [414769]
                         //TurnoverStatistics(Filter);
-                        TurnoverStatistics(Filter,StartDate,EndDate);
+                        TurnoverStatistics(Filter, StartDate, EndDate);
                         //+NPR5.55 [414769]
                         CurrPage.Update(true);
                     end;
@@ -214,11 +233,11 @@ page 6014483 "Turnover Stats"
                     begin
                         RegisterList.LookupMode(true);
                         if not (RegisterList.RunModal = ACTION::LookupOK) then
-                          exit;
+                            exit;
                         RegisterList.GetRecord(Register);
                         //-NPR5.55 [414769]
                         //TurnoverStatistics(STRSUBSTNO('=%1',Register."Register No."));
-                        TurnoverStatistics(StrSubstNo('=%1',Register."Register No."),StartDate,EndDate);
+                        TurnoverStatistics(StrSubstNo('=%1', Register."Register No."), StartDate, EndDate);
                         //+NPR5.55 [414769]
                     end;
                 }
@@ -234,7 +253,7 @@ page 6014483 "Turnover Stats"
                     begin
                         //-NPR5.55 [414769]
                         //TurnoverStatistics('');
-                        TurnoverStatistics('',StartDate,EndDate);
+                        TurnoverStatistics('', StartDate, EndDate);
                         //+NPR5.55 [414769]
                     end;
                 }
@@ -293,11 +312,11 @@ page 6014483 "Turnover Stats"
 
         RetailSetup.Get;
         if RetailSetup."Internal Dept. Code" <> '' then
-          DepartmentFilter := StrSubstNo('<>%1',RetailSetup."Internal Dept. Code");
+            DepartmentFilter := StrSubstNo('<>%1', RetailSetup."Internal Dept. Code");
         //CurrForm.CAPTION("Oms. Caption");
     end;
 
-    procedure TurnoverStatistics(RegisterFilter: Text[250];StartDateFilter: Date;EndDateFilter: Date)
+    procedure TurnoverStatistics(RegisterFilter: Text[250]; StartDateFilter: Date; EndDateFilter: Date)
     var
         AuditRoll: Record "Audit Roll";
         TotalCost: Decimal;
@@ -314,7 +333,7 @@ page 6014483 "Turnover Stats"
         //  SaleDate := TODAY;
 
         if EndDateFilter = 0D then
-          EndDateFilter := Today;
+            EndDateFilter := Today;
         //+NPR5.55 [414769]
 
 
@@ -322,111 +341,111 @@ page 6014483 "Turnover Stats"
 
 
         if RegisterFilter = '' then
-          RegisterNo := Txt001
+            RegisterNo := Txt001
         else
-          RegisterNo := CopyStr(RegisterFilter,2,StrLen(RegisterFilter) - 1);
+            RegisterNo := CopyStr(RegisterFilter, 2, StrLen(RegisterFilter) - 1);
 
         RetailSetup.Get;
-        AuditRoll.SetCurrentKey("Register No.","Sale Date","Sale Type",Type,Quantity);
-        AuditRoll.SetFilter("Register No.",RegisterFilter);
+        AuditRoll.SetCurrentKey("Register No.", "Sale Date", "Sale Type", Type, Quantity);
+        AuditRoll.SetFilter("Register No.", RegisterFilter);
         //-NPR5.55 [414769]
         //AuditRoll.SETRANGE("Sale Date",SaleDate);
-        AuditRoll.SetFilter("Sale Date",'%1..%2',StartDateFilter,EndDateFilter);
+        AuditRoll.SetFilter("Sale Date", '%1..%2', StartDateFilter, EndDateFilter);
         //+NPR5.55 [414769]
 
         if DepartmentFilter <> '' then
-          AuditRoll.SetFilter("Shortcut Dimension 1 Code",DepartmentFilter)
+            AuditRoll.SetFilter("Shortcut Dimension 1 Code", DepartmentFilter)
         else
-          AuditRoll.SetRange("Shortcut Dimension 1 Code");
+            AuditRoll.SetRange("Shortcut Dimension 1 Code");
 
         TotalCost := 0;
         TotalNetAmt := 0;
 
         // Salg
-        AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type,AuditRoll.Type::Item);
-        AuditRoll.SetFilter(Quantity,'>0');
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+        AuditRoll.SetFilter(Quantity, '>0');
         AuditRoll.CalcSums("Amount Including VAT");
         SaleAmount := AuditRoll."Amount Including VAT";
-        AuditRoll.SetRange( Quantity );
+        AuditRoll.SetRange(Quantity);
 
-        AuditRoll.SetCurrentKey("Register No.","Sale Date","Sale Type",Type,Quantity,"Receipt Type");
-        AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type,AuditRoll.Type::Item);
-        AuditRoll.SetFilter(Quantity,'<0');
-        AuditRoll.SetRange("Receipt Type",AuditRoll."Receipt Type"::"Negative receipt");
+        AuditRoll.SetCurrentKey("Register No.", "Sale Date", "Sale Type", Type, Quantity, "Receipt Type");
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+        AuditRoll.SetFilter(Quantity, '<0');
+        AuditRoll.SetRange("Receipt Type", AuditRoll."Receipt Type"::"Negative receipt");
         AuditRoll.CalcSums("Amount Including VAT");
         CreditedSaleAmount := AuditRoll."Amount Including VAT";
-        AuditRoll.SetRange("Receipt Type",AuditRoll."Receipt Type"::"Return items");
+        AuditRoll.SetRange("Receipt Type", AuditRoll."Receipt Type"::"Return items");
         AuditRoll.CalcSums("Amount Including VAT");
         SaleAmount += AuditRoll."Amount Including VAT";
-        AuditRoll.SetCurrentKey("Register No.","Sale Date","Sale Type",Type,Quantity);
+        AuditRoll.SetCurrentKey("Register No.", "Sale Date", "Sale Type", Type, Quantity);
         AuditRoll.SetRange("Receipt Type");
         AuditRoll.SetRange(Quantity);
 
-        AuditRoll.SetCurrentKey("Register No.","Sale Date","Sale Type",Type);
+        AuditRoll.SetCurrentKey("Register No.", "Sale Date", "Sale Type", Type);
         AuditRoll.CalcSums(Amount);
         AuditRoll.CalcSums(Cost);
         TotalNetAmt += AuditRoll.Amount;
         TotalCost += AuditRoll.Cost;
 
         //Samlet debetsalg
-        AuditRoll.SetCurrentKey("Sale Date","Sale Type",Type,"Gift voucher ref.","Register No.");
+        AuditRoll.SetCurrentKey("Sale Date", "Sale Type", Type, "Gift voucher ref.", "Register No.");
         // Revisionsrulle.SETRANGE( "Sale Type", Revisionsrulle."Sale Type"::Bemærkning );
-        AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::"Debit Sale");
-        AuditRoll.SetRange("Gift voucher ref.",'');
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::"Debit Sale");
+        AuditRoll.SetRange("Gift voucher ref.", '');
         AuditRoll.CalcSums("Amount Including VAT");
         AuditRoll.CalcSums(Amount);
         AuditRoll.CalcSums(Cost);
         DebitSaleAmt := AuditRoll."Amount Including VAT";
         DebitProfitAmount := AuditRoll.Amount - AuditRoll.Cost;
         if AuditRoll.Amount <> 0 then
-          DebitProfitPct := DebitProfitAmount / AuditRoll.Amount * 100
+            DebitProfitPct := DebitProfitAmount / AuditRoll.Amount * 100
         else
-          DebitProfitPct := 0;
+            DebitProfitPct := 0;
 
         // Gavekort + tilgodebevis
         // Udbetaling
         // Indbetaling
 
-        AuditRoll.SetFilter("Gift voucher ref.",'<>%1','');
+        AuditRoll.SetFilter("Gift voucher ref.", '<>%1', '');
         AuditRoll.CalcSums("Amount Including VAT");
         GiftVoucherAmount := AuditRoll."Amount Including VAT";
         AuditRoll.SetRange("Gift voucher ref.");
 
         // Total
-        AuditRoll.SetCurrentKey("Register No.","Sale Type",Type,"No.","Sale Date");
+        AuditRoll.SetCurrentKey("Register No.", "Sale Type", Type, "No.", "Sale Date");
         if not Register.Get(RegisterNo2) then
-          Register.Find('-');
+            Register.Find('-');
         //-NPR5.53 [371955]
         POSUnit.Get(Register."Register No.");
         POSSetup.SetPOSUnit(POSUnit);
         //+NPR5.53 [371955]
 
-        AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Deposit);
-        AuditRoll.SetRange(Type,AuditRoll.Type::"G/L");
-        AuditRoll.SetRange("No.",Register."Gift Voucher Account");
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Deposit);
+        AuditRoll.SetRange(Type, AuditRoll.Type::"G/L");
+        AuditRoll.SetRange("No.", Register."Gift Voucher Account");
 
 
         AuditRoll.CalcSums(AuditRoll."Amount Including VAT");
         GiftVoucherAmount += AuditRoll."Amount Including VAT";
-        AuditRoll.SetRange("No.",Register."Credit Voucher Account");
+        AuditRoll.SetRange("No.", Register."Credit Voucher Account");
         AuditRoll.CalcSums(AuditRoll."Amount Including VAT");
         CreditVoucherAmount := AuditRoll."Amount Including VAT";
         AuditRoll.SetRange("No.");
 
         // Udbetaling
-        AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::"Out payment");
-        AuditRoll.SetRange(Type,AuditRoll.Type::"G/L");
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::"Out payment");
+        AuditRoll.SetRange(Type, AuditRoll.Type::"G/L");
         //AuditRoll.SETFILTER("No.",'<>%1&<>%2',Register.Rounding,Register."Gift Voucher Discount Account");  //NPR5.53 [371955]-revoked
-        AuditRoll.SetFilter("No.",'<>%1&<>%2',POSSetup.RoundingAccount(true),Register."Gift Voucher Discount Account");  //NPR5.53 [371955]
+        AuditRoll.SetFilter("No.", '<>%1&<>%2', POSSetup.RoundingAccount(true), Register."Gift Voucher Discount Account");  //NPR5.53 [371955]
         AuditRoll.CalcSums(AuditRoll."Amount Including VAT");
         PayoutAmount := AuditRoll."Amount Including VAT";
         AuditRoll.SetRange("No.");
 
         // Indbetaling
-        AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Deposit);
-        AuditRoll.SetRange(Type,AuditRoll.Type::Customer);
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Deposit);
+        AuditRoll.SetRange(Type, AuditRoll.Type::Customer);
         AuditRoll.CalcSums(AuditRoll."Amount Including VAT");
         PaymentAmount := AuditRoll."Amount Including VAT";
 
@@ -435,46 +454,46 @@ page 6014483 "Turnover Stats"
                                GiftVoucherAmount + CreditVoucherAmount +
                                DebitSaleAmt;
 
-        AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type,AuditRoll.Type::Item);
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
 
         ProfitAmount := TotalNetAmt - TotalCost;
         if TotalNetAmt <> 0 then
-          ProfitPct := ProfitAmount / TotalNetAmt * 100
+            ProfitPct := ProfitAmount / TotalNetAmt * 100
         else
-          ProfitPct := 0;
+            ProfitPct := 0;
         //-NPR5.55 [414769]
         //CalculateSaleLineNoAmount(RegisterFilter,SaleDate);
-        CalculateSaleLineNoAmount(RegisterFilter,StartDateFilter,EndDateFilter);
+        CalculateSaleLineNoAmount(RegisterFilter, StartDateFilter, EndDateFilter);
         //+NPR5.55 [414769]
     end;
 
-    procedure CalculateSaleLineNoAmount(RegisterFilter: Text[250];StartDate: Date;EndDate: Date)
+    procedure CalculateSaleLineNoAmount(RegisterFilter: Text[250]; StartDate: Date; EndDate: Date)
     var
         PaymentTypePOS: Record "Payment Type POS";
     begin
         //CalculateSaleLineNoAmount
         if RegisterFilter <> '' then
-          PaymentTypePOS.SetFilter("Register Filter",RegisterFilter)
+            PaymentTypePOS.SetFilter("Register Filter", RegisterFilter)
         else
-          PaymentTypePOS.SetRange("Register Filter");
+            PaymentTypePOS.SetRange("Register Filter");
         //-NPR5.55 [414769]
         //IF CalculationDate <> 0D THEN
-          //PaymentTypePOS.SETRANGE("Date Filter",CalculationDate)
+        //PaymentTypePOS.SETRANGE("Date Filter",CalculationDate)
         if (StartDate <> 0D) and (EndDate <> 0D) then
-          PaymentTypePOS.SetFilter("Date Filter",'%1..%2',StartDate,EndDate)
+            PaymentTypePOS.SetFilter("Date Filter", '%1..%2', StartDate, EndDate)
         //+NPR5.55 [414769]
         else
-          PaymentTypePOS.SetRange("Date Filter");
+            PaymentTypePOS.SetRange("Date Filter");
 
-        PaymentTypePOS.CalcFields("No. of Sales in Audit Roll","Normal Sale in Audit Roll","No. of Deb. Sales in Aud. Roll",
+        PaymentTypePOS.CalcFields("No. of Sales in Audit Roll", "Normal Sale in Audit Roll", "No. of Deb. Sales in Aud. Roll",
           "Debit Sale in Audit Roll");
         AuditRollNoOfSales := PaymentTypePOS."No. of Sales in Audit Roll";
         AuditRollNoOfSales += PaymentTypePOS."No. of Deb. Sales in Aud. Roll";
         if AuditRollNoOfSales <> 0 then
-          AuditRollAverageSaleAmt := (PaymentTypePOS."Normal Sale in Audit Roll" + PaymentTypePOS."Debit Sale in Audit Roll") / AuditRollNoOfSales
+            AuditRollAverageSaleAmt := (PaymentTypePOS."Normal Sale in Audit Roll" + PaymentTypePOS."Debit Sale in Audit Roll") / AuditRollNoOfSales
         else
-          AuditRollAverageSaleAmt := 0;
+            AuditRollAverageSaleAmt := 0;
     end;
 
     procedure OnInit1()
@@ -483,7 +502,7 @@ page 6014483 "Turnover Stats"
     begin
         //OnInit
         if RetailContractSetup.Get then
-          InsuranceCompanyCode := RetailContractSetup."Default Insurance Company";
+            InsuranceCompanyCode := RetailContractSetup."Default Insurance Company";
 
         RegisterNo2 := RetailFormCode.FetchRegisterNumber;
 
@@ -491,13 +510,13 @@ page 6014483 "Turnover Stats"
         SetType(1);
         RetailSetup.Get;
         case RetailSetup."F9 Statistics When Login" of
-          RetailSetup."F9 Statistics When Login"::"Show all registers":
-            Filter := '';
-          RetailSetup."F9 Statistics When Login"::"Show local register":
-            Filter := StrSubstNo('=%1',RegisterNo2);
+            RetailSetup."F9 Statistics When Login"::"Show all registers":
+                Filter := '';
+            RetailSetup."F9 Statistics When Login"::"Show local register":
+                Filter := StrSubstNo('=%1', RegisterNo2);
         end;
         //-NPR5.55 [414769]
-        TurnoverStatistics(Filter,SaleDate,EndDate);
+        TurnoverStatistics(Filter, SaleDate, EndDate);
         //+NPR5.55 [414769]
     end;
 
@@ -529,75 +548,75 @@ page 6014483 "Turnover Stats"
         NPRTempBuffer.Insert;
 
         for j := 1 to 15 do begin
-          i += 1;
-          NPRTempBuffer.Init;
-          NPRTempBuffer."Line No." := i;
-          NPRTempBuffer.Bold := true;
-          case j of
-            1:
-              begin
-                NPRTempBuffer.Description := Txt001;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(SaleAmount,2);
-              end;
-            2:
-              begin
-                NPRTempBuffer.Description := Txt002;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(CreditedSaleAmount,2);
-              end;
-            3:
-              begin
-                NPRTempBuffer.Description := Txt003;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(GiftVoucherAmount,2);
-              end;
-            4:
-              begin
-                NPRTempBuffer.Description := Txt004;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(CreditVoucherAmount,2);
-              end;
-            5:
-              begin
-                NPRTempBuffer.Description := Txt005;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(DebitSaleAmt,2);
-              end;
-            6:
-              begin
-                NPRTempBuffer.Description := Txt006;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(TotalAmount,2);
-                NPRTempBuffer.Bold := true;
-                NPRTempBuffer."Bold 2" := true;
-              end;
-            7:
-              begin
-                NPRTempBuffer.Description := Txt007;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(PaymentAmount,2);
-              end;
-            8:
-              begin
-                NPRTempBuffer.Description := Txt008;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(PayoutAmount,2);
-              end;
-            9:
-              begin
-                NPRTempBuffer.Description := Txt009;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(ProfitAmount,2);
-              end;
-            10:
-              begin
-                NPRTempBuffer.Description := Txt010;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(ProfitPct,3);
-              end;
-            11:
-              begin
-                NPRTempBuffer.Description := Txt011;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(AuditRollNoOfSales,0);
-              end;
-            12:
-              begin
-                NPRTempBuffer.Description := Txt012;
-                NPRTempBuffer."Description 2" := Utility.FormatDec2Text(AuditRollAverageSaleAmt,2);
-              end;
-          end;
-          NPRTempBuffer.Insert;
+            i += 1;
+            NPRTempBuffer.Init;
+            NPRTempBuffer."Line No." := i;
+            NPRTempBuffer.Bold := true;
+            case j of
+                1:
+                    begin
+                        NPRTempBuffer.Description := Txt001;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(SaleAmount, 2);
+                    end;
+                2:
+                    begin
+                        NPRTempBuffer.Description := Txt002;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(CreditedSaleAmount, 2);
+                    end;
+                3:
+                    begin
+                        NPRTempBuffer.Description := Txt003;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(GiftVoucherAmount, 2);
+                    end;
+                4:
+                    begin
+                        NPRTempBuffer.Description := Txt004;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(CreditVoucherAmount, 2);
+                    end;
+                5:
+                    begin
+                        NPRTempBuffer.Description := Txt005;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(DebitSaleAmt, 2);
+                    end;
+                6:
+                    begin
+                        NPRTempBuffer.Description := Txt006;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(TotalAmount, 2);
+                        NPRTempBuffer.Bold := true;
+                        NPRTempBuffer."Bold 2" := true;
+                    end;
+                7:
+                    begin
+                        NPRTempBuffer.Description := Txt007;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(PaymentAmount, 2);
+                    end;
+                8:
+                    begin
+                        NPRTempBuffer.Description := Txt008;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(PayoutAmount, 2);
+                    end;
+                9:
+                    begin
+                        NPRTempBuffer.Description := Txt009;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(ProfitAmount, 2);
+                    end;
+                10:
+                    begin
+                        NPRTempBuffer.Description := Txt010;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(ProfitPct, 3);
+                    end;
+                11:
+                    begin
+                        NPRTempBuffer.Description := Txt011;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(AuditRollNoOfSales, 0);
+                    end;
+                12:
+                    begin
+                        NPRTempBuffer.Description := Txt012;
+                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(AuditRollAverageSaleAmt, 2);
+                    end;
+            end;
+            NPRTempBuffer.Insert;
         end;
     end;
 

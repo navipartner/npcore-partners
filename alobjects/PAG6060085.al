@@ -13,58 +13,72 @@ page 6060085 "MCS Recommendations Lines"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Model No.";"Model No.")
+                field("Model No."; "Model No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Log Entry No.";"Log Entry No.")
+                field("Log Entry No."; "Log Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Seed Item No.";"Seed Item No.")
+                field("Seed Item No."; "Seed Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Document Line No.";"Document Line No.")
+                field("Document Line No."; "Document Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Rating;Rating)
+                field(Rating; Rating)
                 {
+                    ApplicationArea = All;
                     AutoFormatExpression = '<precision,0:2><Standard Format,0>%';
                     AutoFormatType = 10;
                 }
-                field("Date Time";"Date Time")
+                field("Date Time"; "Date Time")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

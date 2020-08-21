@@ -13,17 +13,21 @@ page 6151093 "Nc RapidConnect Endpoint Sub."
         {
             repeater(Group)
             {
-                field("Endpoint Code";"Endpoint Code")
+                field("Endpoint Code"; "Endpoint Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Endpoint Type";"Endpoint Type")
+                field("Endpoint Type"; "Endpoint Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Setup Summary";"Setup Summary")
+                field("Setup Summary"; "Setup Summary")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

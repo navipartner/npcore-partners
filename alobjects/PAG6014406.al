@@ -59,13 +59,16 @@ page 6014406 "Register Card"
                 Caption = 'Register';
                 field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Logon-User Name"; "Logon-User Name")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -74,30 +77,39 @@ page 6014406 "Register Card"
                 }
                 field("Register Type"; "Register Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Register Layout"; "Register Layout")
                 {
+                    ApplicationArea = All;
                 }
                 field("Shop id"; "Shop id")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Ticket Print Output"; "Sales Ticket Print Output")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Ticket Email Output"; "Sales Ticket Email Output")
                 {
+                    ApplicationArea = All;
                 }
                 field("Primary Payment Type"; "Primary Payment Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Return Payment Type"; "Return Payment Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Connected To Server"; "Connected To Server")
                 {
+                    ApplicationArea = All;
                 }
                 field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Accessories)
@@ -108,6 +120,7 @@ page 6014406 "Register Card"
                     ShowCaption = false;
                     field("Customer Display"; "Customer Display")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
 
                         trigger OnValidate()
@@ -125,10 +138,12 @@ page 6014406 "Register Card"
                     }
                     field("Display 1"; "Display 1")
                     {
+                        ApplicationArea = All;
                         Editable = FieldDisplay1;
                     }
                     field("Display 2"; "Display 2")
                     {
+                        ApplicationArea = All;
                         Editable = FieldDisplay2;
                     }
                 }
@@ -141,28 +156,36 @@ page 6014406 "Register Card"
                     ShowCaption = false;
                     field(Name; Name)
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Name 2"; "Name 2")
                     {
+                        ApplicationArea = All;
                     }
                     field(Address; Address)
                     {
+                        ApplicationArea = All;
                     }
                     field("Post Code"; "Post Code")
                     {
+                        ApplicationArea = All;
                     }
                     field(City; City)
                     {
+                        ApplicationArea = All;
                     }
                     field("Phone No."; "Phone No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("E-mail"; "E-mail")
                     {
+                        ApplicationArea = All;
                     }
                     field(Website; Website)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150669)
@@ -170,18 +193,23 @@ page 6014406 "Register Card"
                     ShowCaption = false;
                     field("Bank Name"; "Bank Name")
                     {
+                        ApplicationArea = All;
                     }
                     field("Bank Registration No."; "Bank Registration No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Bank Account No."; "Bank Account No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Automatic Payment No."; "Automatic Payment No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("VAT No."; "VAT No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -190,6 +218,7 @@ page 6014406 "Register Card"
                 Caption = 'Receipt';
                 field("Sales Ticket Line Text off"; "Sales Ticket Line Text off")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
 
                     trigger OnAssistEdit()
@@ -204,30 +233,38 @@ page 6014406 "Register Card"
                 }
                 field("Sales Ticket Line Text1"; "Sales Ticket Line Text1")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Sales Ticket Line Text2"; "Sales Ticket Line Text2")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Sales Ticket Line Text3"; "Sales Ticket Line Text3")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Sales Ticket Line Text4"; "Sales Ticket Line Text4")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Ticket Line Text5"; "Sales Ticket Line Text5")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Ticket Line Text6"; "Sales Ticket Line Text6")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Ticket Line Text7"; "Sales Ticket Line Text7")
                 {
+                    ApplicationArea = All;
                 }
                 field(BonText; BonText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Ticket Line Text';
                     Width = 2500;
                 }
@@ -240,18 +277,23 @@ page 6014406 "Register Card"
                     ShowCaption = false;
                     field("Touch Screen Login autopopup"; "Touch Screen Login autopopup")
                     {
+                        ApplicationArea = All;
                     }
                     field("Touch Screen Extended info"; "Touch Screen Extended info")
                     {
+                        ApplicationArea = All;
                     }
                     field("Touch Screen Customerclub"; "Touch Screen Customerclub")
                     {
+                        ApplicationArea = All;
                     }
                     field("Touch Screen Login Type"; "Touch Screen Login Type")
                     {
+                        ApplicationArea = All;
                     }
                     field("Skip Infobox Update in Sale"; "Skip Infobox Update in Sale")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -263,6 +305,7 @@ page 6014406 "Register Card"
                     ShowCaption = false;
                     field(Account; '')
                     {
+                        ApplicationArea = All;
                         Caption = 'Account';
                         ShowCaption = false;
                         Style = Strong;
@@ -270,37 +313,48 @@ page 6014406 "Register Card"
                     }
                     field(Control6150706; Account)
                     {
+                        ApplicationArea = All;
                         ShowCaption = false;
                     }
                     field("Gift Voucher Account"; "Gift Voucher Account")
                     {
+                        ApplicationArea = All;
                     }
                     field("Gift Voucher Discount Account"; "Gift Voucher Discount Account")
                     {
+                        ApplicationArea = All;
                     }
                     field("City Gift Voucher Account"; "City Gift Voucher Account")
                     {
+                        ApplicationArea = All;
                     }
                     field("City Gift Voucher Discount"; "City Gift Voucher Discount")
                     {
+                        ApplicationArea = All;
                     }
                     field("Credit Voucher Account"; "Credit Voucher Account")
                     {
+                        ApplicationArea = All;
                     }
                     field("Difference Account"; "Difference Account")
                     {
+                        ApplicationArea = All;
                     }
                     field("Difference Account - Neg."; "Difference Account - Neg.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Register Change Account"; "Register Change Account")
                     {
+                        ApplicationArea = All;
                     }
                     field("Location Code"; "Location Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("VAT Customer No."; "VAT Customer No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150716)
@@ -308,6 +362,7 @@ page 6014406 "Register Card"
                     ShowCaption = false;
                     field("End of Day Balancing"; '')
                     {
+                        ApplicationArea = All;
                         Caption = 'End of Day Balancing';
                         ShowCaption = false;
                         Style = Strong;
@@ -315,17 +370,21 @@ page 6014406 "Register Card"
                     }
                     field("Balancing every"; "Balancing every")
                     {
+                        ApplicationArea = All;
                     }
                     field("Balanced Type"; "Balanced Type")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Balance Account"; "Balance Account")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("End of day - Exchange Amount"; "End of day - Exchange Amount")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -334,25 +393,32 @@ page 6014406 "Register Card"
                 Caption = 'Sale';
                 field("Customer Price Group"; "Customer Price Group")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Customer Disc. Group"; "Customer Disc. Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer No. auto debit sale"; "Customer No. auto debit sale")
                 {
+                    ApplicationArea = All;
                 }
                 field("Exchange Label Exchange Period"; "Exchange Label Exchange Period")
                 {
+                    ApplicationArea = All;
                 }
                 field("Lock Register To Salesperson"; "Lock Register To Salesperson")
                 {
+                    ApplicationArea = All;
                 }
                 field("Use Sales Statistics"; "Use Sales Statistics")
                 {
+                    ApplicationArea = All;
                 }
                 field("Active Event No."; "Active Event No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Integration)
@@ -363,6 +429,7 @@ page 6014406 "Register Card"
                     Caption = 'mPos';
                     field("mPos Payment Type"; "mPos Payment Type")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

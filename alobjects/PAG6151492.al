@@ -16,25 +16,31 @@ page 6151492 "Raptor Data Buffer Entries"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Date-Time Created";"Date-Time Created")
+                field("Date-Time Created"; "Date-Time Created")
                 {
+                    ApplicationArea = All;
                     Visible = ShowCreatedDateTime;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Description";"Item Description")
+                field("Item Description"; "Item Description")
                 {
+                    ApplicationArea = All;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                     Visible = ShowPriority;
                 }
             }
@@ -52,7 +58,7 @@ page 6151492 "Raptor Data Buffer Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Retail Item Card";
-                RunPageLink = "No."=FIELD("Item No.");
+                RunPageLink = "No." = FIELD("Item No.");
             }
         }
     }
@@ -75,7 +81,7 @@ page 6151492 "Raptor Data Buffer Entries"
 
     procedure SetRecordSet(var RaptorDataBuffer: Record "Raptor Data Buffer")
     begin
-        Rec.Copy(RaptorDataBuffer,true);
+        Rec.Copy(RaptorDataBuffer, true);
     end;
 
     local procedure GetDataCaptionExpr(): Text

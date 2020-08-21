@@ -13,32 +13,39 @@ page 6151388 "CS Stock-Takes Approval"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("CSRefillItems.Item_Group_Code";CSRefillItems.Item_Group_Code)
+                field("CSRefillItems.Item_Group_Code"; CSRefillItems.Item_Group_Code)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("CSRefillItems.Item_No";CSRefillItems.Item_No)
+                field("CSRefillItems.Item_No"; CSRefillItems.Item_No)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("CSRefillItems.Item_Description";CSRefillItems.Item_Description)
+                field("CSRefillItems.Item_Description"; CSRefillItems.Item_Description)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("CSRefillItems.Variant_Code";CSRefillItems.Variant_Code)
+                field("CSRefillItems.Variant_Code"; CSRefillItems.Variant_Code)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("CSRefillItems.Variant_Description";CSRefillItems.Variant_Description)
+                field("CSRefillItems.Variant_Description"; CSRefillItems.Variant_Description)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("CSRefillItems.Qty_in_Stock";CSRefillItems.Qty_in_Stock)
+                field("CSRefillItems.Qty_in_Stock"; CSRefillItems.Qty_in_Stock)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
-                field("CSRefillItems.Qty_in_Store";CSRefillItems.Qty_in_Store)
+                field("CSRefillItems.Qty_in_Store"; CSRefillItems.Qty_in_Store)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -52,7 +59,7 @@ page 6151388 "CS Stock-Takes Approval"
     trigger OnAfterGetRecord()
     begin
         if not CSRefillItems.Read then
-          exit;
+            exit;
     end;
 
     trigger OnOpenPage()

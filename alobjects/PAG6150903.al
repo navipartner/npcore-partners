@@ -14,68 +14,89 @@ page 6150903 "HC Register List"
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Opening Cash";"Opening Cash")
+                field("Opening Cash"; "Opening Cash")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Account;Account)
+                field(Account; Account)
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Account";"Gift Voucher Account")
+                field("Gift Voucher Account"; "Gift Voucher Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Voucher Account";"Credit Voucher Account")
+                field("Credit Voucher Account"; "Credit Voucher Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("Difference Account";"Difference Account")
+                field("Difference Account"; "Difference Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Type";"Balanced Type")
+                field("Balanced Type"; "Balanced Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balance Account";"Balance Account")
+                field("Balance Account"; "Balance Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("Difference Account - Neg.";"Difference Account - Neg.")
+                field("Difference Account - Neg."; "Difference Account - Neg.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Discount Account";"Gift Voucher Discount Account")
+                field("Gift Voucher Discount Account"; "Gift Voucher Discount Account")
                 {
+                    ApplicationArea = All;
                 }
-                field(Rounding;Rounding)
+                field(Rounding; Rounding)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register Change Account";"Register Change Account")
+                field("Register Change Account"; "Register Change Account")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Filter";"Date Filter")
+                field("Date Filter"; "Date Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Filter";"Global Dimension 1 Filter")
+                field("Global Dimension 1 Filter"; "Global Dimension 1 Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Filter";"Global Dimension 2 Filter")
+                field("Global Dimension 2 Filter"; "Global Dimension 2 Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Filter";"Sales Ticket Filter")
+                field("Sales Ticket Filter"; "Sales Ticket Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Person Filter";"Sales Person Filter")
+                field("Sales Person Filter"; "Sales Person Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -90,8 +111,8 @@ page 6150903 "HC Register List"
                 Caption = 'Payment Posting Setup';
                 Image = GeneralPostingSetup;
                 RunObject = Page "HC Payment Types Posting Setup";
-                RunPageLink = "BC Register No."=FIELD("Register No.");
-                RunPageView = SORTING("BC Payment Type POS No.","BC Register No.")
+                RunPageLink = "BC Register No." = FIELD("Register No.");
+                RunPageView = SORTING("BC Payment Type POS No.", "BC Register No.")
                               ORDER(Ascending);
             }
             action("Default Dimension")
@@ -100,8 +121,8 @@ page 6150903 "HC Register List"
                 Image = DefaultDimension;
                 Promoted = true;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6150902),
-                              "No."=FIELD("Register No.");
+                RunPageLink = "Table ID" = CONST(6150902),
+                              "No." = FIELD("Register No.");
             }
         }
     }

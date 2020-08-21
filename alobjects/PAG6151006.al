@@ -22,18 +22,20 @@ page 6151006 "POS Entry Related Sales Doc."
         {
             repeater(Group)
             {
-                field("Sales Document Type";"Sales Document Type")
+                field("Sales Document Type"; "Sales Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Document No";"Sales Document No")
+                field("Sales Document No"; "Sales Document No")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     begin
 
                         //-NPR5.52 [372920]
-                        Rec.GetDocumentRecord (RecordVar);
-                        PAGE.Run (Rec.GetCardpageID(), RecordVar);
+                        Rec.GetDocumentRecord(RecordVar);
+                        PAGE.Run(Rec.GetCardpageID(), RecordVar);
                         //+NPR5.52 [372920]
                     end;
 
@@ -41,13 +43,14 @@ page 6151006 "POS Entry Related Sales Doc."
                     begin
 
                         //-NPR5.52 [372920]
-                        Rec.GetDocumentRecord (RecordVar);
-                        PAGE.Run (Rec.GetCardpageID(), RecordVar);
+                        Rec.GetDocumentRecord(RecordVar);
+                        PAGE.Run(Rec.GetCardpageID(), RecordVar);
                         //+NPR5.52 [372920]
                     end;
                 }
-                field("POS Entry Reference Type";"POS Entry Reference Type")
+                field("POS Entry Reference Type"; "POS Entry Reference Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

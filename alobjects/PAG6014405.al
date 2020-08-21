@@ -29,33 +29,43 @@ page 6014405 "Register List"
                 ShowCaption = false;
                 field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Opening Cash"; "Opening Cash")
                 {
+                    ApplicationArea = All;
                 }
                 field("Closing Cash"; "Closing Cash")
                 {
+                    ApplicationArea = All;
                 }
                 field(Balanced; Balanced)
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer Display"; "Customer Display")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

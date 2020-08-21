@@ -20,39 +20,48 @@ page 6151558 "NpXml Template Triggers"
         {
             repeater(Group)
             {
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                 }
-                field("Insert Trigger";"Insert Trigger")
+                field("Insert Trigger"; "Insert Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field("Modify Trigger";"Modify Trigger")
+                field("Modify Trigger"; "Modify Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Trigger";"Delete Trigger")
+                field("Delete Trigger"; "Delete Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                 }
-                field("Generic Parent Function";"Generic Parent Function")
+                field("Generic Parent Function"; "Generic Parent Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Generic Parent Codeunit ID";"Generic Parent Codeunit ID")
+                field("Generic Parent Codeunit ID"; "Generic Parent Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Generic Parent Codeunit Name";"Generic Parent Codeunit Name")
+                field("Generic Parent Codeunit Name"; "Generic Parent Codeunit Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -156,7 +165,7 @@ page 6151558 "NpXml Template Triggers"
     begin
         //-NC2.00
         if Level > 0 then
-          "Table Name" := PadStr('',Level * 3,' ') + "Table Name";
+            "Table Name" := PadStr('', Level * 3, ' ') + "Table Name";
         //+NC2.00
     end;
 
@@ -169,30 +178,30 @@ page 6151558 "NpXml Template Triggers"
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
         if not NpXmlTemplateTrigger.FindSet then
-          exit;
+            exit;
 
         if Next = 0 then
-          exit;
+            exit;
 
         TempNpXmlTemplateTrigger.DeleteAll;
         repeat
-          TempNpXmlTemplateTrigger.Init;
-          TempNpXmlTemplateTrigger := NpXmlTemplateTrigger;
-          TempNpXmlTemplateTrigger.Insert;
+            TempNpXmlTemplateTrigger.Init;
+            TempNpXmlTemplateTrigger := NpXmlTemplateTrigger;
+            TempNpXmlTemplateTrigger.Insert;
         until NpXmlTemplateTrigger.Next = 0;
 
         NpXmlTemplateTrigger.Reset;
-        NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code",TempNpXmlTemplateTrigger."Line No.");
-        NpXmlTemplateTrigger.SetRange("Xml Template Code",TempNpXmlTemplateTrigger."Xml Template Code");
+        NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
+        NpXmlTemplateTrigger.SetRange("Xml Template Code", TempNpXmlTemplateTrigger."Xml Template Code");
         if NpXmlTemplateTrigger.Next = 0 then
-          exit;
+            exit;
 
         repeat
-          //-NC1.13
-          //NpXmlMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
-          NpXmlTemplateMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
-          //+NC1.13
-          NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code",TempNpXmlTemplateTrigger."Line No.");
+            //-NC1.13
+            //NpXmlMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
+            NpXmlTemplateMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger, NpXmlTemplateTrigger);
+            //+NC1.13
+            NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
         until TempNpXmlTemplateTrigger.Next(-1) = 0;
         //+NC1.11
     end;
@@ -207,35 +216,35 @@ page 6151558 "NpXml Template Triggers"
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
         if not NpXmlTemplateTrigger.FindLast then
-          exit;
+            exit;
 
         if Next(-1) = 0 then
-          exit;
+            exit;
         LineNo := "Line No.";
 
         TempNpXmlTemplateTrigger.DeleteAll;
         repeat
-          TempNpXmlTemplateTrigger.Init;
-          TempNpXmlTemplateTrigger := NpXmlTemplateTrigger;
-          TempNpXmlTemplateTrigger.Insert;
+            TempNpXmlTemplateTrigger.Init;
+            TempNpXmlTemplateTrigger := NpXmlTemplateTrigger;
+            TempNpXmlTemplateTrigger.Insert;
         until NpXmlTemplateTrigger.Next(-1) = 0;
 
         NpXmlTemplateTrigger.Reset;
-        NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code",TempNpXmlTemplateTrigger."Line No.");
-        NpXmlTemplateTrigger.SetRange("Xml Template Code",TempNpXmlTemplateTrigger."Xml Template Code");
+        NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
+        NpXmlTemplateTrigger.SetRange("Xml Template Code", TempNpXmlTemplateTrigger."Xml Template Code");
         if NpXmlTemplateTrigger.Next(-1) = 0 then
-          exit;
+            exit;
 
         repeat
-          //-NC1.13
-          //NpXmlMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
-          NpXmlTemplateMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
-          //+NC1.13
-          NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code",TempNpXmlTemplateTrigger."Line No.");
+            //-NC1.13
+            //NpXmlMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
+            NpXmlTemplateMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger, NpXmlTemplateTrigger);
+            //+NC1.13
+            NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
         until TempNpXmlTemplateTrigger.Next = 0;
 
         FindFirst;
-        Get("Xml Template Code",LineNo);
+        Get("Xml Template Code", LineNo);
         //+NC1.11
     end;
 
@@ -247,20 +256,20 @@ page 6151558 "NpXml Template Triggers"
         NpXmlTemplateTrigger.Reset;
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
         if NpXmlTemplateTrigger.FindSet then
-          repeat
-            NpXmlTemplateTrigger.Level += Steps;
-            if NpXmlTemplateTrigger.Level < 0 then
-              NpXmlTemplateTrigger.Level := 0;
-            NpXmlTemplateTrigger.Modify(true);
-          until NpXmlTemplateTrigger.Next = 0;
+            repeat
+                NpXmlTemplateTrigger.Level += Steps;
+                if NpXmlTemplateTrigger.Level < 0 then
+                    NpXmlTemplateTrigger.Level := 0;
+                NpXmlTemplateTrigger.Modify(true);
+            until NpXmlTemplateTrigger.Next = 0;
 
         NpXmlTemplateTrigger.Reset;
-        NpXmlTemplateTrigger.SetRange("Xml Template Code","Xml Template Code");
+        NpXmlTemplateTrigger.SetRange("Xml Template Code", "Xml Template Code");
         if NpXmlTemplateTrigger.FindSet then
-          repeat
-            NpXmlTemplateTrigger.UpdateParentInfo();
-            NpXmlTemplateTrigger.Modify;
-          until NpXmlTemplateTrigger.Next = 0;
+            repeat
+                NpXmlTemplateTrigger.UpdateParentInfo();
+                NpXmlTemplateTrigger.Modify;
+            until NpXmlTemplateTrigger.Next = 0;
 
         CurrPage.Update(false);
         //+NC1.11
@@ -271,8 +280,8 @@ page 6151558 "NpXml Template Triggers"
         NpXmlTemplateTriggerLinks: Record "NpXml Template Trigger Link";
     begin
         //-NC1.21
-        NpXmlTemplateTriggerLinks.SetRange("Xml Template Code","Xml Template Code");
-        NpXmlTemplateTriggerLinks.SetRange("Xml Template Trigger Line No.","Line No.");
+        NpXmlTemplateTriggerLinks.SetRange("Xml Template Code", "Xml Template Code");
+        NpXmlTemplateTriggerLinks.SetRange("Xml Template Trigger Line No.", "Line No.");
         HasNoLinks := ("Parent Table No." <> "Table No.") and NpXmlTemplateTriggerLinks.IsEmpty;
         //+NC1.21
     end;

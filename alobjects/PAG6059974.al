@@ -19,7 +19,7 @@ page 6059974 "Variety Matrix"
     PageType = List;
     SourceTable = "Variety Buffer";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Variety 1 Sort Order","Variety 2 Sort Order","Variety 3 Sort Order","Variety 4 Sort Order");
+    SourceTableView = SORTING("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
 
     layout
     {
@@ -28,38 +28,41 @@ page 6059974 "Variety Matrix"
             group(Control6150615)
             {
                 ShowCaption = false;
-                field(ShowField;CurrVRTField.Description)
+                field(ShowField; CurrVRTField.Description)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Field';
                     Editable = false;
 
                     trigger OnDrillDown()
                     begin
                         if PAGE.RunModal(0, CurrVRTField) = ACTION::LookupOK then
-                          UpdateMatrix(false); //-NPR5.36 Parameter added;
+                            UpdateMatrix(false); //-NPR5.36 Parameter added;
                     end;
                 }
-                field(ShowAsCrossVRT;ShowAsCrossVRT)
+                field(ShowAsCrossVRT; ShowAsCrossVRT)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Horisontal';
 
                     trigger OnValidate()
                     begin
                         //-NPR5.31 [271133]
-                        MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                         //+NPR5.31 [271133]
 
                         UpdateMatrix(false); //-NPR5.36 Parameter added
                     end;
                 }
-                field(HideInactive;HideInactive)
+                field(HideInactive; HideInactive)
                 {
+                    ApplicationArea = All;
                     Caption = 'Hide Inactive Values';
 
                     trigger OnValidate()
                     begin
                         //-NPR5.31 [271133]
-                        MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                         //+NPR5.31 [271133]
 
                         UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -70,40 +73,46 @@ page 6059974 "Variety Matrix"
             {
                 FreezeColumn = "Variety 4 Value";
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = 'Strong';
                 }
-                field("Variety 1 Value";"Variety 1 Value")
+                field("Variety 1 Value"; "Variety 1 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 1";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety1;
                 }
-                field("Variety 2 Value";"Variety 2 Value")
+                field("Variety 2 Value"; "Variety 2 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 2";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety2;
                 }
-                field("Variety 3 Value";"Variety 3 Value")
+                field("Variety 3 Value"; "Variety 3 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 3";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety3;
                 }
-                field("Variety 4 Value";"Variety 4 Value")
+                field("Variety 4 Value"; "Variety 4 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 4";
                     Editable = false;
                     Visible = showvariety4;
                 }
-                field(Field1;MATRIX_CellData[1])
+                field(Field1; MATRIX_CellData[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     StyleExpr = 'Strong';
 
@@ -122,8 +131,9 @@ page 6059974 "Variety Matrix"
                         SetValue(1);
                     end;
                 }
-                field(Field2;MATRIX_CellData[2])
+                field(Field2; MATRIX_CellData[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
 
@@ -142,8 +152,9 @@ page 6059974 "Variety Matrix"
                         SetValue(2);
                     end;
                 }
-                field(Field3;MATRIX_CellData[3])
+                field(Field3; MATRIX_CellData[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
 
@@ -162,8 +173,9 @@ page 6059974 "Variety Matrix"
                         SetValue(3);
                     end;
                 }
-                field(Field4;MATRIX_CellData[4])
+                field(Field4; MATRIX_CellData[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
 
@@ -182,8 +194,9 @@ page 6059974 "Variety Matrix"
                         SetValue(4);
                     end;
                 }
-                field(Field5;MATRIX_CellData[5])
+                field(Field5; MATRIX_CellData[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
 
@@ -202,8 +215,9 @@ page 6059974 "Variety Matrix"
                         SetValue(5);
                     end;
                 }
-                field(Field6;MATRIX_CellData[6])
+                field(Field6; MATRIX_CellData[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
 
@@ -222,8 +236,9 @@ page 6059974 "Variety Matrix"
                         SetValue(6);
                     end;
                 }
-                field(Field7;MATRIX_CellData[7])
+                field(Field7; MATRIX_CellData[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
 
@@ -242,8 +257,9 @@ page 6059974 "Variety Matrix"
                         SetValue(7);
                     end;
                 }
-                field(Field8;MATRIX_CellData[8])
+                field(Field8; MATRIX_CellData[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
 
@@ -262,8 +278,9 @@ page 6059974 "Variety Matrix"
                         SetValue(8);
                     end;
                 }
-                field(Field9;MATRIX_CellData[9])
+                field(Field9; MATRIX_CellData[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
 
@@ -282,8 +299,9 @@ page 6059974 "Variety Matrix"
                         SetValue(9);
                     end;
                 }
-                field(Field10;MATRIX_CellData[10])
+                field(Field10; MATRIX_CellData[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
 
@@ -302,8 +320,9 @@ page 6059974 "Variety Matrix"
                         SetValue(10);
                     end;
                 }
-                field(Field11;MATRIX_CellData[11])
+                field(Field11; MATRIX_CellData[11])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
 
@@ -322,8 +341,9 @@ page 6059974 "Variety Matrix"
                         SetValue(11);
                     end;
                 }
-                field(Field12;MATRIX_CellData[12])
+                field(Field12; MATRIX_CellData[12])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
 
@@ -342,8 +362,9 @@ page 6059974 "Variety Matrix"
                         SetValue(12);
                     end;
                 }
-                field(Field13;MATRIX_CellData[13])
+                field(Field13; MATRIX_CellData[13])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[13];
                     StyleExpr = 'Strong';
 
@@ -362,8 +383,9 @@ page 6059974 "Variety Matrix"
                         SetValue(13);
                     end;
                 }
-                field(Field14;MATRIX_CellData[14])
+                field(Field14; MATRIX_CellData[14])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[14];
                     StyleExpr = 'Strong';
 
@@ -382,8 +404,9 @@ page 6059974 "Variety Matrix"
                         SetValue(14);
                     end;
                 }
-                field(Field15;MATRIX_CellData[15])
+                field(Field15; MATRIX_CellData[15])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[15];
                     StyleExpr = 'Strong';
 
@@ -402,8 +425,9 @@ page 6059974 "Variety Matrix"
                         SetValue(15);
                     end;
                 }
-                field(Field16;MATRIX_CellData[16])
+                field(Field16; MATRIX_CellData[16])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[16];
                     StyleExpr = 'Strong';
 
@@ -422,8 +446,9 @@ page 6059974 "Variety Matrix"
                         SetValue(16);
                     end;
                 }
-                field(Field17;MATRIX_CellData[17])
+                field(Field17; MATRIX_CellData[17])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[17];
                     StyleExpr = 'Strong';
 
@@ -442,8 +467,9 @@ page 6059974 "Variety Matrix"
                         SetValue(17);
                     end;
                 }
-                field(Field18;MATRIX_CellData[18])
+                field(Field18; MATRIX_CellData[18])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[18];
                     StyleExpr = 'Strong';
 
@@ -462,8 +488,9 @@ page 6059974 "Variety Matrix"
                         SetValue(18);
                     end;
                 }
-                field(Field19;MATRIX_CellData[19])
+                field(Field19; MATRIX_CellData[19])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[19];
                     StyleExpr = 'Strong';
 
@@ -482,8 +509,9 @@ page 6059974 "Variety Matrix"
                         SetValue(19);
                     end;
                 }
-                field(Field20;MATRIX_CellData[20])
+                field(Field20; MATRIX_CellData[20])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[20];
                     StyleExpr = 'Strong';
 
@@ -502,8 +530,9 @@ page 6059974 "Variety Matrix"
                         SetValue(20);
                     end;
                 }
-                field(Field21;MATRIX_CellData[21])
+                field(Field21; MATRIX_CellData[21])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[21];
                     StyleExpr = 'Strong';
 
@@ -522,8 +551,9 @@ page 6059974 "Variety Matrix"
                         SetValue(21);
                     end;
                 }
-                field(Field22;MATRIX_CellData[22])
+                field(Field22; MATRIX_CellData[22])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[22];
                     StyleExpr = 'Strong';
 
@@ -542,8 +572,9 @@ page 6059974 "Variety Matrix"
                         SetValue(22);
                     end;
                 }
-                field(Field23;MATRIX_CellData[23])
+                field(Field23; MATRIX_CellData[23])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[23];
                     StyleExpr = 'Strong';
 
@@ -562,8 +593,9 @@ page 6059974 "Variety Matrix"
                         SetValue(23);
                     end;
                 }
-                field(Field24;MATRIX_CellData[24])
+                field(Field24; MATRIX_CellData[24])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[24];
                     StyleExpr = 'Strong';
 
@@ -582,8 +614,9 @@ page 6059974 "Variety Matrix"
                         SetValue(24);
                     end;
                 }
-                field(Field25;MATRIX_CellData[25])
+                field(Field25; MATRIX_CellData[25])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[25];
                     StyleExpr = 'Strong';
 
@@ -602,8 +635,9 @@ page 6059974 "Variety Matrix"
                         SetValue(25);
                     end;
                 }
-                field(Field26;MATRIX_CellData[26])
+                field(Field26; MATRIX_CellData[26])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[26];
                     StyleExpr = 'Strong';
 
@@ -622,8 +656,9 @@ page 6059974 "Variety Matrix"
                         SetValue(26);
                     end;
                 }
-                field(Field27;MATRIX_CellData[27])
+                field(Field27; MATRIX_CellData[27])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[27];
                     StyleExpr = 'Strong';
 
@@ -642,8 +677,9 @@ page 6059974 "Variety Matrix"
                         SetValue(27);
                     end;
                 }
-                field(Field28;MATRIX_CellData[28])
+                field(Field28; MATRIX_CellData[28])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[28];
                     StyleExpr = 'Strong';
 
@@ -662,8 +698,9 @@ page 6059974 "Variety Matrix"
                         SetValue(28);
                     end;
                 }
-                field(Field29;MATRIX_CellData[29])
+                field(Field29; MATRIX_CellData[29])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[29];
                     StyleExpr = 'Strong';
 
@@ -682,8 +719,9 @@ page 6059974 "Variety Matrix"
                         SetValue(29);
                     end;
                 }
-                field(Field30;MATRIX_CellData[30])
+                field(Field30; MATRIX_CellData[30])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + MATRIX_CaptionSet[30];
                     StyleExpr = 'Strong';
 
@@ -713,16 +751,19 @@ page 6059974 "Variety Matrix"
                     group(Info)
                     {
                         Caption = 'Info';
-                        field("CurrVRTField.Description";CurrVRTField.Description)
+                        field("CurrVRTField.Description"; CurrVRTField.Description)
                         {
+                            ApplicationArea = All;
                             Caption = 'Currently Showing';
                         }
-                        field("CurrVRTField.""Secondary Description""";CurrVRTField."Secondary Description")
+                        field("CurrVRTField.""Secondary Description"""; CurrVRTField."Secondary Description")
                         {
+                            ApplicationArea = All;
                             Caption = 'Show in ()';
                         }
-                        field(Total;Total)
+                        field(Total; Total)
                         {
+                            ApplicationArea = All;
                             //BlankZero = true;
                             Caption = 'Total';
                             //DecimalPlaces = 0:5;
@@ -732,26 +773,28 @@ page 6059974 "Variety Matrix"
                     group("Variety 1")
                     {
                         Caption = 'Variety 1';
-                        field("Item.""Variety 1""";Item."Variety 1")
+                        field("Item.""Variety 1"""; Item."Variety 1")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 1 Table""";Item."Variety 1 Table")
+                        field("Item.""Variety 1 Table"""; Item."Variety 1 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item,0);
+                                VRTLookupFunc.LookupVarietyValues(Item, 0);
 
                                 //-NPR5.36 [285733]
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");//Is this one needed?
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");//Is this one needed?
                                 //+NPR5.36 [285733]
 
                                 //-NPR5.31 [271133]
-                                MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                                 //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -761,22 +804,24 @@ page 6059974 "Variety Matrix"
                     group("Variety 2")
                     {
                         Caption = 'Variety 2';
-                        field("Item.""Variety 2""";Item."Variety 2")
+                        field("Item.""Variety 2"""; Item."Variety 2")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 2 Table""";Item."Variety 2 Table")
+                        field("Item.""Variety 2 Table"""; Item."Variety 2 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item,1);
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");
+                                VRTLookupFunc.LookupVarietyValues(Item, 1);
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
                                 //-NPR5.31 [271133]
-                                MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                                 //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -786,22 +831,24 @@ page 6059974 "Variety Matrix"
                     group("Variety 3")
                     {
                         Caption = 'Variety 3';
-                        field("Item.""Variety 3""";Item."Variety 3")
+                        field("Item.""Variety 3"""; Item."Variety 3")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 3 Table""";Item."Variety 3 Table")
+                        field("Item.""Variety 3 Table"""; Item."Variety 3 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item,2);
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");
+                                VRTLookupFunc.LookupVarietyValues(Item, 2);
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
                                 //-NPR5.31 [271133]
-                                MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                                 //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -811,22 +858,24 @@ page 6059974 "Variety Matrix"
                     group("Variety 4")
                     {
                         Caption = 'Variety 4';
-                        field("Item.""Variety 4""";Item."Variety 4")
+                        field("Item.""Variety 4"""; Item."Variety 4")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 4 Table""";Item."Variety 4 Table")
+                        field("Item.""Variety 4 Table"""; Item."Variety 4 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item,3);
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");
+                                VRTLookupFunc.LookupVarietyValues(Item, 3);
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
                                 //-NPR5.31 [271133]
-                                MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                                 //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -854,7 +903,7 @@ page 6059974 "Variety Matrix"
                     VRTCloneData: Codeunit "Variety Clone Data";
                 begin
                     //-VRT1.10
-                    VRTCloneData.CreateTableCopy(Item,0,false);
+                    VRTCloneData.CreateTableCopy(Item, 0, false);
                     CurrPage.Update(false);
                     //+VRT1.10
                 end;
@@ -902,8 +951,8 @@ page 6059974 "Variety Matrix"
     begin
         MATRIX_CurrentColumnOrdinal := 0;
         while MATRIX_CurrentColumnOrdinal < MATRIX_CurrentNoOfMatrixColumn do begin
-          MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
-          MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
+            MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
+            MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
         end;
     end;
 
@@ -912,7 +961,7 @@ page 6059974 "Variety Matrix"
         Initialize();
         ShowAsCrossVRT := Item."Cross Variety No.";
         //-NPR5.31 [271133]
-        MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
         //+NPR5.31 [271133]
 
         UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -920,9 +969,9 @@ page 6059974 "Variety Matrix"
 
     var
         VarietySetup: Record "Variety Setup";
-        MatrixRecords: array [30] of Record "Variety Buffer" temporary;
+        MatrixRecords: array[30] of Record "Variety Buffer" temporary;
         MATRIX_CurrentNoOfMatrixColumn: Integer;
-        MATRIX_CellData: array [30] of Text[1024];
+        MATRIX_CellData: array[30] of Text[1024];
         Item: Record Item;
         ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4;
         RecRef: RecordRef;
@@ -932,8 +981,8 @@ page 6059974 "Variety Matrix"
         ShowVariety2: Boolean;
         ShowVariety3: Boolean;
         ShowVariety4: Boolean;
-        MATRIX_MatrixRecords: array [30] of Record "Variety Buffer" temporary;
-        MATRIX_CaptionSet: array [30] of Text[1024];
+        MATRIX_MatrixRecords: array[30] of Record "Variety Buffer" temporary;
+        MATRIX_CaptionSet: array[30] of Text[1024];
         MATRIX_CaptionRange: Text[1024];
         MATRIX_PrimKeyFirstCaptionInCu: Text[1024];
         MATRIX_CurrentNoOfColumns: Integer;
@@ -946,22 +995,22 @@ page 6059974 "Variety Matrix"
     local procedure Initialize()
     begin
         if Initialized then
-          exit;
+            exit;
 
         VarietySetup.Get;
-        VarietySetup.TestField("Variety Enabled",true);
+        VarietySetup.TestField("Variety Enabled", true);
 
         HideInactive := VarietySetup."Hide Inactive Values";
         Initialized := true;
     end;
 
-    procedure Load(MatrixColumns1: array [100] of Text[1024];var MatrixRecords1: array [100] of Record "Variety Buffer";CurrentNoOfMatrixColumns: Integer)
+    procedure Load(MatrixColumns1: array[100] of Text[1024]; var MatrixRecords1: array[100] of Record "Variety Buffer"; CurrentNoOfMatrixColumns: Integer)
     var
         i: Integer;
     begin
-        CopyArray(MATRIX_CaptionSet,MatrixColumns1,1);
+        CopyArray(MATRIX_CaptionSet, MatrixColumns1, 1);
         for i := 1 to ArrayLen(MatrixRecords) do
-          MatrixRecords[i].Copy(MatrixRecords1[i]);
+            MatrixRecords[i].Copy(MatrixRecords1[i]);
 
         MATRIX_CurrentNoOfMatrixColumn := CurrentNoOfMatrixColumns;
     end;
@@ -977,10 +1026,14 @@ page 6059974 "Variety Matrix"
 
         VRTBuffer := Rec;
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety2: VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety3: VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety4: VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety1:
+                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety2:
+                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety3:
+                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety4:
+                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
 
         //-NPR5.36 [288696]
@@ -988,7 +1041,7 @@ page 6059974 "Variety Matrix"
         FieldValue := MATRIX_CellData[MATRIX_ColumnOrdinal];
         VRTMatrixMgt.OnDrillDown(VRTBuffer, CurrVRTField, FieldValue, ItemFilters); //-NPR5.47 [327541] Added itemFilters
         if FieldValue = MATRIX_CellData[MATRIX_ColumnOrdinal] then
-          exit;
+            exit;
         MATRIX_CellData[MATRIX_ColumnOrdinal] := FieldValue;
         SetValue(MATRIX_ColumnOrdinal);
         //+NPR5.36 [288696]
@@ -1002,10 +1055,14 @@ page 6059974 "Variety Matrix"
         //-NPR5.47 [324997]
         VRTBuffer := Rec;
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety2: VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety3: VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety4: VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety1:
+                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety2:
+                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety3:
+                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety4:
+                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
 
         FieldValue := MATRIX_CellData[MATRIX_ColumnOrdinal];
@@ -1013,7 +1070,7 @@ page 6059974 "Variety Matrix"
         VRTMatrixMgt.OnLookup(VRTBuffer, CurrVRTField, FieldValue, ItemFilters);
 
         if FieldValue = MATRIX_CellData[MATRIX_ColumnOrdinal] then
-          exit;
+            exit;
         MATRIX_CellData[MATRIX_ColumnOrdinal] := FieldValue;
         SetValue(MATRIX_ColumnOrdinal);
         //+NPR5.47 [324997]
@@ -1030,10 +1087,14 @@ page 6059974 "Variety Matrix"
 
         VRTBuffer := Rec;
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety2: VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety3: VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety4: VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety1:
+                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety2:
+                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety3:
+                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety4:
+                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
 
         MATRIX_CellData[MATRIX_ColumnOrdinal] := VRTMatrixMgt.GetValue(VRTBuffer."Variety 1 Value", VRTBuffer."Variety 2 Value",
@@ -1041,7 +1102,7 @@ page 6059974 "Variety Matrix"
                                                  //-NPR5.47 [327541]
                                                  //CurrVRTField, LocationFilter, GD1, GD2);
                                                  CurrVRTField, ItemFilters);
-                                                 //+NPR5.47 [327541]
+        //+NPR5.47 [327541]
     end;
 
     procedure UpdateMatrix(ReloadMatrixData: Boolean)
@@ -1061,15 +1122,19 @@ page 6059974 "Variety Matrix"
         //LoadMatrixRecords(Rec, Item."No.", ShowAsCrossVRT);
         LoadMatrixRows(Rec, Item, ShowAsCrossVRT, HideInactive);
         if ReloadMatrixData then
-          VRTMatrixMgt.LoadMatrixData(Item."No.", HideInactive);
+            VRTMatrixMgt.LoadMatrixData(Item."No.", HideInactive);
         //+NPR5.36 [285733]
 
         //Are the sorting order 100% correct with 3 or 4 Variety in use?
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: Rec.SetCurrentKey("Variety 2 Sort Order","Variety 3 Sort Order","Variety 4 Sort Order","Variety 1 Sort Order");
-          ShowAsCrossVRT::Variety2: Rec.SetCurrentKey("Variety 3 Sort Order","Variety 4 Sort Order","Variety 1 Sort Order","Variety 2 Sort Order");
-          ShowAsCrossVRT::Variety3: Rec.SetCurrentKey("Variety 4 Sort Order","Variety 1 Sort Order","Variety 2 Sort Order","Variety 3 Sort Order");
-          ShowAsCrossVRT::Variety4: Rec.SetCurrentKey("Variety 1 Sort Order","Variety 2 Sort Order","Variety 3 Sort Order","Variety 4 Sort Order");
+            ShowAsCrossVRT::Variety1:
+                Rec.SetCurrentKey("Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order", "Variety 1 Sort Order");
+            ShowAsCrossVRT::Variety2:
+                Rec.SetCurrentKey("Variety 3 Sort Order", "Variety 4 Sort Order", "Variety 1 Sort Order", "Variety 2 Sort Order");
+            ShowAsCrossVRT::Variety3:
+                Rec.SetCurrentKey("Variety 4 Sort Order", "Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order");
+            ShowAsCrossVRT::Variety4:
+                Rec.SetCurrentKey("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
         end;
 
         ShowVariety1 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety1) and (Item."Variety 1" <> ''));
@@ -1110,14 +1175,14 @@ page 6059974 "Variety Matrix"
 
         ShowTotal := CurrVRTField."Field No." = 15;
         if ShowTotal then
-          Total := Format(VRTMatrixMgt.GetTotal(RecRef, CurrVRTField."Field No."))
+            Total := Format(VRTMatrixMgt.GetTotal(RecRef, CurrVRTField."Field No."))
         else
-          Total := '';
+            Total := '';
 
         CurrPage.Update(false);
     end;
 
-    procedure SetRecordRef(RecRef2: RecordRef;var Item2: Record Item;ShowFieldNo: Integer)
+    procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
     begin
         RecRef := RecRef2;
         Item := Item2;
@@ -1126,21 +1191,21 @@ page 6059974 "Variety Matrix"
         //LocationFilter := Item2.GETFILTER("Location Filter");
         ItemFilters.Copy(Item2);
         if Item2.GetFilter("Date Filter") = '' then
-          ItemFilters.SetFilter("Date Filter", '%1', WorkDate);
+            ItemFilters.SetFilter("Date Filter", '%1', WorkDate);
         //+NPR5.47 [327541]
 
-        VRTMatrixMgt.SetRecord(RecRef2,Item."No.");
+        VRTMatrixMgt.SetRecord(RecRef2, Item."No.");
         //CurrVRTField.SETRANGE(Type, CurrVRTField.Type::Field);
         CurrVRTField.SetRange("Table No.", RecRef.Number);
         if ShowFieldNo <> 0 then
-          CurrVRTField.SetRange("Field No.", ShowFieldNo)
+            CurrVRTField.SetRange("Field No.", ShowFieldNo)
         else
-          CurrVRTField.SetRange("Is Table Default", true);
+            CurrVRTField.SetRange("Is Table Default", true);
 
         if not CurrVRTField.FindFirst then begin
-          CurrVRTField.SetRange("Field No.");
-          CurrVRTField.SetRange("Is Table Default");
-          CurrVRTField.FindFirst;
+            CurrVRTField.SetRange("Field No.");
+            CurrVRTField.SetRange("Is Table Default");
+            CurrVRTField.FindFirst;
         end;
         CurrVRTField.SetRange("Field No.");
         CurrVRTField.SetRange("Is Table Default");
@@ -1158,10 +1223,14 @@ page 6059974 "Variety Matrix"
         VRT3Value := "Variety 3 Value";
         VRT4Value := "Variety 4 Value";
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: VRT1Value := MATRIX_CaptionSet[FieldNumber];
-          ShowAsCrossVRT::Variety2: VRT2Value := MATRIX_CaptionSet[FieldNumber];
-          ShowAsCrossVRT::Variety3: VRT3Value := MATRIX_CaptionSet[FieldNumber];
-          ShowAsCrossVRT::Variety4: VRT4Value := MATRIX_CaptionSet[FieldNumber];
+            ShowAsCrossVRT::Variety1:
+                VRT1Value := MATRIX_CaptionSet[FieldNumber];
+            ShowAsCrossVRT::Variety2:
+                VRT2Value := MATRIX_CaptionSet[FieldNumber];
+            ShowAsCrossVRT::Variety3:
+                VRT3Value := MATRIX_CaptionSet[FieldNumber];
+            ShowAsCrossVRT::Variety4:
+                VRT4Value := MATRIX_CaptionSet[FieldNumber];
         end;
 
         VRTMatrixMgt.SetValue(VRT1Value, VRT2Value, VRT3Value, VRT4Value, CurrVRTField, MATRIX_CellData[FieldNumber]);
@@ -1171,11 +1240,11 @@ page 6059974 "Variety Matrix"
         //+NPR5.47 [327541]
 
         if ShowTotal then
-          Total := Format(VRTMatrixMgt.GetTotal(RecRef, CurrVRTField."Field No."));
+            Total := Format(VRTMatrixMgt.GetTotal(RecRef, CurrVRTField."Field No."));
         CurrPage.Update(false);
     end;
 
-    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn;Item: Record Item;ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
+    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     begin
         //-NPR5.31 [271133]
         Clear(MATRIX_MatrixRecords);
@@ -1183,8 +1252,8 @@ page 6059974 "Variety Matrix"
         //+NPR5.31 [271133]
 
         if MATRIX_CurrentNoOfMatrixColumn > MATRIX_CurrentNoOfColumns then begin
-          //The cross variants is decreased. Data that are outside new arraylength must be cleared;
-          Clear(MATRIX_CellData);
+            //The cross variants is decreased. Data that are outside new arraylength must be cleared;
+            Clear(MATRIX_CellData);
         end;
     end;
 }

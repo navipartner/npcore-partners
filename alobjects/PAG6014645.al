@@ -19,49 +19,64 @@ page 6014645 "Tax Free Requests"
             {
                 field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Handler ID"; "Handler ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Date Start"; "Date Start")
                 {
+                    ApplicationArea = All;
                 }
                 field("Time Start"; "Time Start")
                 {
+                    ApplicationArea = All;
                 }
                 field("Date End"; "Date End")
                 {
+                    ApplicationArea = All;
                 }
                 field("Time End"; "Time End")
                 {
+                    ApplicationArea = All;
                 }
                 field(Mode; Mode)
                 {
+                    ApplicationArea = All;
                 }
                 field("Request Type"; "Request Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Error Code"; "Error Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Error Message"; "Error Message")
                 {
+                    ApplicationArea = All;
                 }
                 field(Success; Success)
                 {
+                    ApplicationArea = All;
                 }
                 field("Request.HASVALUE"; Request.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Request Stored';
                 }
                 field("Response.HASVALUE"; Response.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Response Stored';
                 }
             }

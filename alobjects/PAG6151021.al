@@ -21,54 +21,68 @@ page 6151021 "NpRv Arch. Voucher Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field("Voucher Type";"Voucher Type")
+                    field("Voucher Type"; "Voucher Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Account No.";"Account No.")
+                    field("Account No."; "Account No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field("Issue Register No.";"Issue Register No.")
+                    field("Issue Register No."; "Issue Register No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Issue Document Type";"Issue Document Type")
+                    field("Issue Document Type"; "Issue Document Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Issue Document No.";"Issue Document No.")
+                    field("Issue Document No."; "Issue Document No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Issue External Document No.";"Issue External Document No.")
+                    field("Issue External Document No."; "Issue External Document No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Issue Partner Code";"Issue Partner Code")
+                    field("Issue Partner Code"; "Issue Partner Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Partner Clearing";"Partner Clearing")
+                    field("Partner Clearing"; "Partner Clearing")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Allow Top-up";"Allow Top-up")
+                    field("Allow Top-up"; "Allow Top-up")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014422)
                 {
                     ShowCaption = false;
-                    field("Issue Date";"Issue Date")
+                    field("Issue Date"; "Issue Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Initial Amount";"Initial Amount")
+                    field("Initial Amount"; "Initial Amount")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field(Amount;Amount)
+                    field(Amount; Amount)
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -78,83 +92,106 @@ page 6151021 "NpRv Arch. Voucher Card"
                 group(Control6014417)
                 {
                     ShowCaption = false;
-                    field("Send Voucher Module";"Send Voucher Module")
+                    field("Send Voucher Module"; "Send Voucher Module")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014415)
                 {
                     ShowCaption = false;
-                    field("Reference No.";"Reference No.")
+                    field("Reference No."; "Reference No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Send via Print";"Send via Print")
+                    field("Send via Print"; "Send via Print")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Print Template Code";"Print Template Code")
+                    field("Print Template Code"; "Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Send via E-mail";"Send via E-mail")
+                    field("Send via E-mail"; "Send via E-mail")
                     {
+                        ApplicationArea = All;
                     }
-                    field("E-mail Template Code";"E-mail Template Code")
+                    field("E-mail Template Code"; "E-mail Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Send via SMS";"Send via SMS")
+                    field("Send via SMS"; "Send via SMS")
                     {
+                        ApplicationArea = All;
                     }
-                    field("SMS Template Code";"SMS Template Code")
+                    field("SMS Template Code"; "SMS Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("No. Send";"No. Send")
+                    field("No. Send"; "No. Send")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Contact)
                 {
                     Caption = 'Contact';
-                    field("Customer No.";"Customer No.")
+                    field("Customer No."; "Customer No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Contact No.";"Contact No.")
+                    field("Contact No."; "Contact No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Name 2";"Name 2")
+                    field("Name 2"; "Name 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Address;Address)
+                    field(Address; Address)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Address 2";"Address 2")
+                    field("Address 2"; "Address 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Post Code";"Post Code")
+                    field("Post Code"; "Post Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field(City;City)
+                    field(City; City)
                     {
+                        ApplicationArea = All;
                     }
-                    field(County;County)
+                    field(County; County)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Country/Region Code";"Country/Region Code")
+                    field("Country/Region Code"; "Country/Region Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("E-mail";"E-mail")
+                    field("E-mail"; "E-mail")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Phone No.";"Phone No.")
+                    field("Phone No."; "Phone No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Language Code";"Language Code")
+                    field("Language Code"; "Language Code")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Voucher Message";"Voucher Message")
+                    field("Voucher Message"; "Voucher Message")
                     {
+                        ApplicationArea = All;
                         MultiLine = true;
                     }
                 }
@@ -165,26 +202,30 @@ page 6151021 "NpRv Arch. Voucher Card"
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Validate Voucher Module";"Validate Voucher Module")
+                    field("Validate Voucher Module"; "Validate Voucher Module")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014409)
                 {
                     ShowCaption = false;
-                    field("Starting Date";"Starting Date")
+                    field("Starting Date"; "Starting Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ending Date";"Ending Date")
+                    field("Ending Date"; "Ending Date")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group("Apply Payment")
             {
                 Caption = 'Apply Payment';
-                field("Apply Payment Module";"Apply Payment Module")
+                field("Apply Payment Module"; "Apply Payment Module")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -199,7 +240,7 @@ page 6151021 "NpRv Arch. Voucher Card"
                 Caption = 'Archived Voucher Entries';
                 Image = Entries;
                 RunObject = Page "NpRv Arch. Voucher Entries";
-                RunPageLink = "Arch. Voucher No."=FIELD("No.");
+                RunPageLink = "Arch. Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
             }
             action("Arch. Sending Log")
@@ -207,7 +248,7 @@ page 6151021 "NpRv Arch. Voucher Card"
                 Caption = 'Archived Sending Log';
                 Image = Log;
                 RunObject = Page "NpRv Arch. Sending Log";
-                RunPageLink = "Arch. Voucher No."=FIELD("No.");
+                RunPageLink = "Arch. Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
             }
         }

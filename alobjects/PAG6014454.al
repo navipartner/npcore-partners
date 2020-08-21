@@ -26,11 +26,13 @@ page 6014454 "Campaign Discount Lines"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Cross-Reference No.";"Cross-Reference No.")
+                field("Cross-Reference No."; "Cross-Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -43,78 +45,96 @@ page 6014454 "Campaign Discount Lines"
                         ItemList.LookupMode(true);
                         ItemList.SetTableView(Item);
                         if Item2.Get(Text) then
-                          ItemList.SetRecord(Item2);
+                            ItemList.SetRecord(Item2);
                         if ItemList.RunModal = ACTION::LookupOK then begin
-                          ItemList.GetRecord(Item);
-                          Validate("Item No.",Item."No.");
-                          Commit;
+                            ItemList.GetRecord(Item);
+                            Validate("Item No.", Item."No.");
+                            Commit;
                         end;
                     end;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Campaign Unit Price";"Campaign Unit Price")
+                field("Campaign Unit Price"; "Campaign Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Campaign Profit";"Campaign Profit")
+                field("Campaign Profit"; "Campaign Profit")
                 {
+                    ApplicationArea = All;
                 }
-                field(Control1160330002;Comment)
+                field(Control1160330002; Comment)
                 {
+                    ApplicationArea = All;
                     Caption = 'Comment';
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                     Caption = 'Inventory';
                     Editable = false;
                 }
-                field("Quantity On Purchase Order";"Quantity On Purchase Order")
+                field("Quantity On Purchase Order"; "Quantity On Purchase Order")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Campaign Unit Cost";"Campaign Unit Cost")
+                field("Campaign Unit Cost"; "Campaign Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field(Profit;Profit)
+                field(Profit; Profit)
                 {
+                    ApplicationArea = All;
                     Caption = 'Revenue of period';
                     Visible = false;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Unit Price Incl. VAT";"Unit Price Incl. VAT")
+                field("Unit Price Incl. VAT"; "Unit Price Incl. VAT")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Page no. in advert";"Page no. in advert")
+                field("Page no. in advert"; "Page no. in advert")
                 {
+                    ApplicationArea = All;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
-                field("Pagenumber in paper";"Pagenumber in paper")
+                field("Pagenumber in paper"; "Pagenumber in paper")
                 {
+                    ApplicationArea = All;
                 }
-                field(Photo;Photo)
+                field(Photo; Photo)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -129,9 +149,9 @@ page 6014454 "Campaign Discount Lines"
                 Caption = 'Comment';
                 Image = Comment;
                 RunObject = Page "Retail Comments";
-                RunPageLink = "Table ID"=CONST(6014414),
-                              "No."=FIELD(Code),
-                              "No. 2"=FIELD("Item No.");
+                RunPageLink = "Table ID" = CONST(6014414),
+                              "No." = FIELD(Code),
+                              "No. 2" = FIELD("Item No.");
             }
         }
     }

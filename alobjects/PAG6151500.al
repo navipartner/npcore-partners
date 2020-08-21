@@ -31,24 +31,28 @@ page 6151500 "Nc Setup"
     {
         area(content)
         {
-            field("Keep Tasks for";"Keep Tasks for")
+            field("Keep Tasks for"; "Keep Tasks for")
             {
+                ApplicationArea = All;
             }
             group(General)
             {
                 Caption = 'Order Import';
-                field("Max Task Count per Batch";"Max Task Count per Batch")
+                field("Max Task Count per Batch"; "Max Task Count per Batch")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Task Queue")
             {
                 Caption = 'Task Queue';
-                field("Task Queue Enabled";"Task Queue Enabled")
+                field("Task Queue Enabled"; "Task Queue Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Worker Group";"Task Worker Group")
+                field("Task Worker Group"; "Task Worker Group")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -97,7 +101,7 @@ page 6151500 "Nc Setup"
         //  MagentoMgt.InitNaviConnectSetup();
         //END;
         if not Get then
-          NaviConnectMgt.InitNaviConnectSetup();
+            NaviConnectMgt.InitNaviConnectSetup();
         //+NC1.17
     end;
 }

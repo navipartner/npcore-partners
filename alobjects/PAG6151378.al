@@ -14,23 +14,25 @@ page 6151378 "CS UI Functions"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("UI Code";"UI Code")
+                field("UI Code"; "UI Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Function Code";"Function Code")
+                field("Function Code"; "Function Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = false;
             }

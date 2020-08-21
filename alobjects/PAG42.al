@@ -1,4 +1,4 @@
-pageextension 6014440 pageextension6014440 extends "Sales Order" 
+pageextension 6014440 pageextension6014440 extends "Sales Order"
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //                     - Added Action Items: EmailLog and SendAsPDF
@@ -43,82 +43,94 @@ pageextension 6014440 pageextension6014440 extends "Sales Order"
     {
         addafter("Sell-to Customer Name")
         {
-            field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+            field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Payment Method Code")
         {
-            field("Magento Payment Amount";"Magento Payment Amount")
+            field("Magento Payment Amount"; "Magento Payment Amount")
             {
+                ApplicationArea = All;
             }
-            field("VAT Registration No.";"VAT Registration No.")
+            field("VAT Registration No."; "VAT Registration No.")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Ship-to Name")
         {
-            field("Ship-to Name 2";"Ship-to Name 2")
+            field("Ship-to Name 2"; "Ship-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Bill-to Name")
         {
-            field("Bill-to Name 2";"Bill-to Name 2")
+            field("Bill-to Name 2"; "Bill-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter(Control85)
         {
-            field("Bill-to Company";"Bill-to Company")
+            field("Bill-to Company"; "Bill-to Company")
             {
+                ApplicationArea = All;
             }
-            field("Bill-To Vendor No.";"Bill-To Vendor No.")
+            field("Bill-To Vendor No."; "Bill-To Vendor No.")
             {
+                ApplicationArea = All;
             }
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Shipping Advice")
         {
-            field("Delivery Location";"Delivery Location")
+            field("Delivery Location"; "Delivery Location")
             {
+                ApplicationArea = All;
             }
-            field("Delivery Instructions";"Delivery Instructions")
+            field("Delivery Instructions"; "Delivery Instructions")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Outbound Whse. Handling Time")
         {
-            field(Kolli;Kolli)
+            field(Kolli; Kolli)
             {
+                ApplicationArea = All;
             }
         }
         addafter("Attached Documents")
         {
-            part(Control6150628;"NP Attributes FactBox")
+            part(Control6150628; "NP Attributes FactBox")
             {
                 Provider = SalesLines;
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
                 Visible = true;
             }
         }
         addafter(WorkflowStatus)
         {
-            part("MCS Recom. Sales Factbox";"MCS Recom. Sales Factbox")
+            part("MCS Recom. Sales Factbox"; "MCS Recom. Sales Factbox")
             {
                 Caption = 'Recommendations';
                 Provider = SalesLines;
-                SubPageLink = "Document No."=FIELD("Document No."),
-                              "Document Line No."=FIELD("Line No.");
-                SubPageView = SORTING("Table No.","Document Type","Document No.","Document Line No.",Rating)
+                SubPageLink = "Document No." = FIELD("Document No."),
+                              "Document Line No." = FIELD("Line No.");
+                SubPageView = SORTING("Table No.", "Document Type", "Document No.", "Document Line No.", Rating)
                               ORDER(Ascending)
-                              WHERE("Table No."=CONST(37),
-                                    "Document Type"=CONST(1));
+                              WHERE("Table No." = CONST(37),
+                                    "Document Type" = CONST(1));
                 UpdatePropagation = Both;
             }
         }
@@ -142,7 +154,7 @@ pageextension 6014440 pageextension6014440 extends "Sales Order"
                 var
                     CSRfidHeader: Record "CS Rfid Header";
                 begin
-                    CSRfidHeader.OpenRfidSalesDoc(0,"No.","Sell-to Customer No.",'');
+                    CSRfidHeader.OpenRfidSalesDoc(0, "No.", "Sell-to Customer No.", '');
                 end;
             }
         }
@@ -271,7 +283,7 @@ pageextension 6014440 pageextension6014440 extends "Sales Order"
                     begin
                         //-VRT1.00
                         CurrPage.SalesLines.PAGE.GetRecord(SalesLine);
-                        VRTWrapper.SalesLineShowVariety(SalesLine,0);
+                        VRTWrapper.SalesLineShowVariety(SalesLine, 0);
                         //+VRT1.00
                     end;
                 }
@@ -290,25 +302,25 @@ pageextension 6014440 pageextension6014440 extends "Sales Order"
     //trigger OnAfterGetCurrRecord()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        DynamicEditable := CurrPage.Editable;
-        CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
-        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
-        #4..12
-          CheckItemAvailabilityInLines;
-          CallNotificationCheck := false;
-        end;
-        */
+    /*
+    DynamicEditable := CurrPage.Editable;
+    CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
+    CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
+    #4..12
+      CheckItemAvailabilityInLines;
+      CallNotificationCheck := false;
+    end;
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        #1..15
+    /*
+    #1..15
 
-        //-NPR5.49 [344166]
-        SetHasRetailVouchers();
-        //+NPR5.49 [344166]
-        */
+    //-NPR5.49 [344166]
+    SetHasRetailVouchers();
+    //+NPR5.49 [344166]
+    */
     //end;
 
 
@@ -317,25 +329,25 @@ pageextension 6014440 pageextension6014440 extends "Sales Order"
     //trigger OnOpenPage()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        if UserMgt.GetSalesFilter <> '' then begin
-          FilterGroup(2);
-          SetRange("Responsibility Center",UserMgt.GetSalesFilter);
-        #4..18
-        if ("No." <> '') and ("Sell-to Customer No." = '') then
-          DocumentIsPosted := (not Get("Document Type","No."));
-        PaymentServiceVisible := PaymentServiceSetup.IsPaymentServiceVisible;
-        */
+    /*
+    if UserMgt.GetSalesFilter <> '' then begin
+      FilterGroup(2);
+      SetRange("Responsibility Center",UserMgt.GetSalesFilter);
+    #4..18
+    if ("No." <> '') and ("Sell-to Customer No." = '') then
+      DocumentIsPosted := (not Get("Document Type","No."));
+    PaymentServiceVisible := PaymentServiceSetup.IsPaymentServiceVisible;
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        #1..21
+    /*
+    #1..21
 
-        //-NPR5.55 [379709]
-        ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
-        //+NPR5.55 [379709]
-        */
+    //-NPR5.55 [379709]
+    ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
+    //+NPR5.55 [379709]
+    */
     //end;
 
     local procedure SetHasRetailVouchers()
@@ -344,10 +356,10 @@ pageextension 6014440 pageextension6014440 extends "Sales Order"
     begin
         //-NPR5.55 [402015]
         if "No." = '' then
-          exit;
+            exit;
 
-        NpRvSaleLinePOSVoucher.SetRange("Document Type","Document Type");
-        NpRvSaleLinePOSVoucher.SetRange("Document No.","No.");
+        NpRvSaleLinePOSVoucher.SetRange("Document Type", "Document Type");
+        NpRvSaleLinePOSVoucher.SetRange("Document No.", "No.");
         HasRetailVouchers := NpRvSaleLinePOSVoucher.FindFirst;
         //+NPR5.55 [402015]
     end;

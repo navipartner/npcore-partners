@@ -12,20 +12,25 @@ page 6059826 "Transaction Email Setup Card"
         {
             group(General)
             {
-                field(Provider;Provider)
+                field(Provider; Provider)
                 {
+                    ApplicationArea = All;
                 }
-                field(Default;Default)
+                field(Default; Default)
                 {
+                    ApplicationArea = All;
                 }
-                field("Client ID";"Client ID")
+                field("Client ID"; "Client ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("API Key";"API Key")
+                field("API Key"; "API Key")
                 {
+                    ApplicationArea = All;
                 }
-                field("API URL";"API URL")
+                field("API URL"; "API URL")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

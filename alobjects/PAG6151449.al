@@ -17,23 +17,29 @@ page 6151449 "Magento Shipment Mapping"
         {
             repeater(Group)
             {
-                field("External Shipment Method Code";"External Shipment Method Code")
+                field("External Shipment Method Code"; "External Shipment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipment Method Code";"Shipment Method Code")
+                field("Shipment Method Code"; "Shipment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Agent Code";"Shipping Agent Code")
+                field("Shipping Agent Code"; "Shipping Agent Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Agent Service Code";"Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipment Fee Type";"Shipment Fee Type")
+                field("Shipment Fee Type"; "Shipment Fee Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipment Fee No.";"Shipment Fee No.")
+                field("Shipment Fee No."; "Shipment Fee No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

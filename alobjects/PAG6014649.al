@@ -23,6 +23,7 @@ page 6014649 "Generic Filter Page"
                     ShowCaption = false;
                     field(SortingKey; SortingKey)
                     {
+                        ApplicationArea = All;
                         Caption = 'Key';
                         Editable = false;
                         Lookup = true;
@@ -45,6 +46,7 @@ page 6014649 "Generic Filter Page"
                     }
                     field("Descending"; Descending)
                     {
+                        ApplicationArea = All;
                         Caption = 'Descending';
                     }
                 }
@@ -53,14 +55,17 @@ page 6014649 "Generic Filter Page"
             {
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Filter"; FilterText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Filter';
                     Lookup = true;
 
@@ -119,6 +124,7 @@ page 6014649 "Generic Filter Page"
                 }
                 field(Include; Include)
                 {
+                    ApplicationArea = All;
                     Caption = 'Include';
 
                     trigger OnValidate()
@@ -141,6 +147,7 @@ page 6014649 "Generic Filter Page"
                 }
                 field(Static; Static)
                 {
+                    ApplicationArea = All;
                     Caption = 'Static';
 
                     trigger OnValidate()

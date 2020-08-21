@@ -12,22 +12,27 @@ page 6014608 "NPR Attribute Values"
         {
             repeater(Group)
             {
-                field("Attribute Code";"Attribute Code")
+                field("Attribute Code"; "Attribute Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Text Value";"Text Value")
+                field("Text Value"; "Text Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Datetime Value";"Datetime Value")
+                field("Datetime Value"; "Datetime Value")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Numeric Value";"Numeric Value")
+                field("Numeric Value"; "Numeric Value")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Boolean Value";"Boolean Value")
+                field("Boolean Value"; "Boolean Value")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

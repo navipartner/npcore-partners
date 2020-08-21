@@ -12,8 +12,9 @@ page 6151120 "GDPR Setup"
         {
             group(General)
             {
-                field("Agreement Nos.";"Agreement Nos.")
+                field("Agreement Nos."; "Agreement Nos.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -11,29 +11,37 @@ page 6014540 "Insurrance Combination"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Company;Company)
+                field(Company; Company)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount From";"Amount From")
+                field("Amount From"; "Amount From")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Amount";"To Amount")
+                field("To Amount"; "To Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Insurance Amount";"Insurance Amount")
+                field("Insurance Amount"; "Insurance Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount as Percentage";"Amount as Percentage")
+                field("Amount as Percentage"; "Amount as Percentage")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket tekst";"Ticket tekst")
+                field("Ticket tekst"; "Ticket tekst")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

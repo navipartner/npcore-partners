@@ -13,11 +13,13 @@ page 6014680 "Endpoint Query Filter Subform"
         {
             repeater(Group)
             {
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Text";"Filter Text")
+                field("Filter Text"; "Filter Text")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

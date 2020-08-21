@@ -19,14 +19,16 @@ page 6150707 "POS Setup"
         {
             group(General)
             {
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Actions")
             {
-                field("Login Action Code";"Login Action Code")
+                field("Login Action Code"; "Login Action Code")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = LoginActionRefreshNeeded;
@@ -36,7 +38,7 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("Login Action Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("Login Action Code",FieldNo("Login Action Code"));
+                        AssistEdit("Login Action Code", FieldNo("Login Action Code"));
                         //+NPR5.40 [306347]
                     end;
 
@@ -47,8 +49,9 @@ page 6150707 "POS Setup"
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("Text Enter Action Code";"Text Enter Action Code")
+                field("Text Enter Action Code"; "Text Enter Action Code")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = TextEnterActionRefreshNeeded;
@@ -58,7 +61,7 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("Text Enter Action Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("Text Enter Action Code",FieldNo("Text Enter Action Code"));
+                        AssistEdit("Text Enter Action Code", FieldNo("Text Enter Action Code"));
                         //+NPR5.40 [306347]
                     end;
 
@@ -69,8 +72,9 @@ page 6150707 "POS Setup"
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("Item Insert Action Code";"Item Insert Action Code")
+                field("Item Insert Action Code"; "Item Insert Action Code")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = ItemInsertActionRefreshNeeded;
@@ -80,7 +84,7 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("Item Insert Action Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("Item Insert Action Code",FieldNo("Item Insert Action Code"));
+                        AssistEdit("Item Insert Action Code", FieldNo("Item Insert Action Code"));
                         //+NPR5.40 [306347]
                     end;
 
@@ -91,8 +95,9 @@ page 6150707 "POS Setup"
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("Payment Action Code";"Payment Action Code")
+                field("Payment Action Code"; "Payment Action Code")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = PaymentActionRefreshNeeded;
@@ -102,7 +107,7 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("Payment Action Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("Payment Action Code",FieldNo("Payment Action Code"));
+                        AssistEdit("Payment Action Code", FieldNo("Payment Action Code"));
                         //+NPR5.40 [306347]
                     end;
 
@@ -113,8 +118,9 @@ page 6150707 "POS Setup"
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("Customer Action Code";"Customer Action Code")
+                field("Customer Action Code"; "Customer Action Code")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = CustomerActionRefreshNeeded;
@@ -124,7 +130,7 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("Customer Action Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("Customer Action Code",FieldNo("Customer Action Code"));
+                        AssistEdit("Customer Action Code", FieldNo("Customer Action Code"));
                         //+NPR5.40 [306347]
                     end;
 
@@ -135,8 +141,9 @@ page 6150707 "POS Setup"
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("Lock POS Action Code";"Lock POS Action Code")
+                field("Lock POS Action Code"; "Lock POS Action Code")
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = LockActionRefreshNeeded;
 
@@ -145,12 +152,13 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("Lock POS Action Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("Lock POS Action Code",FieldNo("Lock POS Action Code"));
+                        AssistEdit("Lock POS Action Code", FieldNo("Lock POS Action Code"));
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("Unlock POS Action Code";"Unlock POS Action Code")
+                field("Unlock POS Action Code"; "Unlock POS Action Code")
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = UnlockActionRefreshNeeded;
 
@@ -159,12 +167,13 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("Unlock POS Action Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("Unlock POS Action Code",FieldNo("Unlock POS Action Code"));
+                        AssistEdit("Unlock POS Action Code", FieldNo("Unlock POS Action Code"));
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("OnBeforePaymentView Action";"OnBeforePaymentView Action")
+                field("OnBeforePaymentView Action"; "OnBeforePaymentView Action")
                 {
+                    ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = OnBeforePaymentViewActionRefreshNeeded;
 
@@ -173,7 +182,7 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //IF AssistEdit(FIELDNO("OnBeforePaymentView Parameters")) THEN
                         //  CurrPage.SAVERECORD();
-                        AssistEdit("OnBeforePaymentView Action",FieldNo("OnBeforePaymentView Action"));
+                        AssistEdit("OnBeforePaymentView Action", FieldNo("OnBeforePaymentView Action"));
                         //+NPR5.40 [306347]
                     end;
 
@@ -184,25 +193,27 @@ page 6150707 "POS Setup"
                         //+NPR5.40 [306347]
                     end;
                 }
-                field("Idle Timeout Action Code";"Idle Timeout Action Code")
+                field("Idle Timeout Action Code"; "Idle Timeout Action Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     begin
 
                         //-NPR5.54 [392121]
-                        AssistEdit ("Idle Timeout Action Code", FieldNo ("Idle Timeout Action Code"));
+                        AssistEdit("Idle Timeout Action Code", FieldNo("Idle Timeout Action Code"));
                         //+NPR5.54 [392121]
                     end;
                 }
-                field("Admin Menu Action Code";"Admin Menu Action Code")
+                field("Admin Menu Action Code"; "Admin Menu Action Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     begin
 
                         //-NPR5.55 [400734]
-                        AssistEdit ("Admin Menu Action Code", FieldNo ("Admin Menu Action Code"));
+                        AssistEdit("Admin Menu Action Code", FieldNo("Admin Menu Action Code"));
                         //-NPR5.55 [400734]
                     end;
                 }
@@ -252,7 +263,7 @@ page 6150707 "POS Setup"
         POSAction: Record "POS Action";
     begin
         if not Find then
-          Insert;
+            Insert;
 
         //-NPR5.40 [306347]
         POSAction.DiscoverActions();
@@ -275,14 +286,14 @@ page 6150707 "POS Setup"
         ParamMgt: Codeunit "POS Action Parameter Mgt.";
     begin
         //-NPR5.40 [306347]
-        LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("Login Action Code"),"Login Action Code");
-        TextEnterActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("Text Enter Action Code"),"Text Enter Action Code");
-        ItemInsertActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("Item Insert Action Code"),"Item Insert Action Code");
-        PaymentActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("Payment Action Code"),"Payment Action Code");
-        CustomerActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("Customer Action Code"),"Customer Action Code");
-        LockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("Lock POS Action Code"),"Lock POS Action Code");
-        UnlockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("Unlock POS Action Code"),"Unlock POS Action Code");
-        OnBeforePaymentViewActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId,'',FieldNo("OnBeforePaymentView Action"),"OnBeforePaymentView Action");
+        LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Login Action Code"), "Login Action Code");
+        TextEnterActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Text Enter Action Code"), "Text Enter Action Code");
+        ItemInsertActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Item Insert Action Code"), "Item Insert Action Code");
+        PaymentActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Payment Action Code"), "Payment Action Code");
+        CustomerActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Customer Action Code"), "Customer Action Code");
+        LockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Lock POS Action Code"), "Lock POS Action Code");
+        UnlockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Unlock POS Action Code"), "Unlock POS Action Code");
+        OnBeforePaymentViewActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("OnBeforePaymentView Action"), "OnBeforePaymentView Action");
 
         RefreshEnabled :=
           LoginActionRefreshNeeded or TextEnterActionRefreshNeeded or ItemInsertActionRefreshNeeded or PaymentActionRefreshNeeded or CustomerActionRefreshNeeded or
@@ -296,28 +307,28 @@ page 6150707 "POS Setup"
     begin
         //-NPR5.40 [306347]
         if LoginActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("Login Action Code"),"Login Action Code");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Login Action Code"), "Login Action Code");
 
         if TextEnterActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("Text Enter Action Code"),"Text Enter Action Code");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Text Enter Action Code"), "Text Enter Action Code");
 
         if ItemInsertActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("Item Insert Action Code"),"Item Insert Action Code");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Item Insert Action Code"), "Item Insert Action Code");
 
         if PaymentActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("Payment Action Code"),"Payment Action Code");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Payment Action Code"), "Payment Action Code");
 
         if CustomerActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("Customer Action Code"),"Customer Action Code");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Customer Action Code"), "Customer Action Code");
 
         if LockActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("Lock POS Action Code"),"Lock POS Action Code");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Lock POS Action Code"), "Lock POS Action Code");
 
         if UnlockActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("Unlock POS Action Code"),"Unlock POS Action Code");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Unlock POS Action Code"), "Unlock POS Action Code");
 
         if OnBeforePaymentViewActionRefreshNeeded then
-          ParamMgt.RefreshParameters(RecordId,'',FieldNo("OnBeforePaymentView Action"),"OnBeforePaymentView Action");
+            ParamMgt.RefreshParameters(RecordId, '', FieldNo("OnBeforePaymentView Action"), "OnBeforePaymentView Action");
         //+NPR5.40 [306347]
     end;
 }

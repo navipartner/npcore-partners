@@ -29,107 +29,135 @@ page 6060122 "TM Admission Schedule Entry"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("External Schedule Entry No.";"External Schedule Entry No.")
+                field("External Schedule Entry No."; "External Schedule Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Schedule Code";"Schedule Code")
+                field("Schedule Code"; "Schedule Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Cancelled;Cancelled)
+                field(Cancelled; Cancelled)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Admission Start Date";"Admission Start Date")
+                field("Admission Start Date"; "Admission Start Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admission Start Time";"Admission Start Time")
+                field("Admission Start Time"; "Admission Start Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Event Duration";"Event Duration")
+                field("Event Duration"; "Event Duration")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admission End Date";"Admission End Date")
+                field("Admission End Date"; "Admission End Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admission End Time";"Admission End Time")
+                field("Admission End Time"; "Admission End Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Admission Is";"Admission Is")
+                field("Admission Is"; "Admission Is")
                 {
+                    ApplicationArea = All;
                 }
-                field("Visibility On Web";"Visibility On Web")
+                field("Visibility On Web"; "Visibility On Web")
                 {
+                    ApplicationArea = All;
                 }
-                field("Regenerate With";"Regenerate With")
+                field("Regenerate With"; "Regenerate With")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reason Code";"Reason Code")
+                field("Reason Code"; "Reason Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Initial Entry";"Initial Entry")
+                field("Initial Entry"; "Initial Entry")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Open Reservations";"Open Reservations")
+                field("Open Reservations"; "Open Reservations")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Open Admitted";"Open Admitted")
+                field("Open Admitted"; "Open Admitted")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Departed;Departed)
+                field(Departed; Departed)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Max Capacity Per Sch. Entry";"Max Capacity Per Sch. Entry")
+                field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
+                    ApplicationArea = All;
                 }
-                field(ConcurrentCapacityText;ConcurrentCapacityText)
+                field(ConcurrentCapacityText; ConcurrentCapacityText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Concurrent Capacity';
                     Editable = false;
                 }
-                field("Event Arrival From Time";"Event Arrival From Time")
+                field("Event Arrival From Time"; "Event Arrival From Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Arrival Until Time";"Event Arrival Until Time")
+                field("Event Arrival Until Time"; "Event Arrival Until Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales From Date";"Sales From Date")
+                field("Sales From Date"; "Sales From Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales From Time";"Sales From Time")
+                field("Sales From Time"; "Sales From Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Until Date";"Sales Until Date")
+                field("Sales Until Date"; "Sales Until Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Until Time";"Sales Until Time")
+                field("Sales Until Time"; "Sales Until Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allocation By";"Allocation By")
+                field("Allocation By"; "Allocation By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Waiting List Queue";"Waiting List Queue")
+                field("Waiting List Queue"; "Waiting List Queue")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -151,7 +179,7 @@ page 6060122 "TM Admission Schedule Entry"
 
                 trigger OnAction()
                 begin
-                    NotifyTicketHolders ();
+                    NotifyTicketHolders();
                 end;
             }
         }
@@ -163,7 +191,7 @@ page 6060122 "TM Admission Schedule Entry"
                 Ellipsis = true;
                 Image = WIPLedger;
                 RunObject = Page "TM Ticket Participant Wks.";
-                RunPageLink = "Applies To Schedule Entry No."=FIELD("Entry No.");
+                RunPageLink = "Applies To Schedule Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Applies To Schedule Entry No.")
                               ORDER(Ascending);
             }
@@ -175,7 +203,7 @@ page 6060122 "TM Admission Schedule Entry"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "TM Ticket Waiting List";
-                RunPageLink = "External Schedule Entry No."=FIELD("External Schedule Entry No.");
+                RunPageLink = "External Schedule Entry No." = FIELD("External Schedule Entry No.");
             }
         }
     }
@@ -183,14 +211,14 @@ page 6060122 "TM Admission Schedule Entry"
     trigger OnAfterGetRecord()
     begin
 
-        ConcurrentCapacityText := CalculateConcurrentCapacity (Rec);
+        ConcurrentCapacityText := CalculateConcurrentCapacity(Rec);
     end;
 
     trigger OnOpenPage()
     begin
 
         //-+TM1.19 [266768]
-        Rec.SetFilter (Cancelled, '=%1', false);
+        Rec.SetFilter(Cancelled, '=%1', false);
     end;
 
     var
@@ -202,15 +230,15 @@ page 6060122 "TM Admission Schedule Entry"
         TicketParticipantWks: Record "TM Ticket Participant Wks.";
     begin
 
-        AdmissionSchManagement.CreateNotificationList ("Entry No.");
+        AdmissionSchManagement.CreateNotificationList("Entry No.");
 
-        TicketParticipantWks.FilterGroup (6);
-        TicketParticipantWks.Reset ();
-        TicketParticipantWks.SetCurrentKey ("Applies To Schedule Entry No.");
-        TicketParticipantWks.SetFilter ("Applies To Schedule Entry No.", '=%1', "Entry No.");
-        TicketParticipantWks.FilterGroup (0);
+        TicketParticipantWks.FilterGroup(6);
+        TicketParticipantWks.Reset();
+        TicketParticipantWks.SetCurrentKey("Applies To Schedule Entry No.");
+        TicketParticipantWks.SetFilter("Applies To Schedule Entry No.", '=%1', "Entry No.");
+        TicketParticipantWks.FilterGroup(0);
 
-        PAGE.Run (0, TicketParticipantWks);
+        PAGE.Run(0, TicketParticipantWks);
     end;
 
     local procedure CalculateConcurrentCapacity(AdmissionScheduleEntry: Record "TM Admission Schedule Entry") ResultText: Text[30]
@@ -223,8 +251,8 @@ page 6060122 "TM Admission Schedule Entry"
         //-TM1.45 [385922]
         ResultText := '-/-';
         with AdmissionScheduleEntry do
-          if (TicketManagement.CalculateConcurrentCapacity ("Admission Code", "Schedule Code", "Admission Start Date", Actual, MaxCapacity)) then
-            ResultText := StrSubstNo ('%1/%2', Actual, MaxCapacity);
+            if (TicketManagement.CalculateConcurrentCapacity("Admission Code", "Schedule Code", "Admission Start Date", Actual, MaxCapacity)) then
+                ResultText := StrSubstNo('%1/%2', Actual, MaxCapacity);
 
         //+TM1.45 [385922]
     end;

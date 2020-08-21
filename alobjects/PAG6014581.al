@@ -13,20 +13,25 @@ page 6014581 "Web Print Buffer"
         {
             repeater(Group)
             {
-                field("Printjob ID";"Printjob ID")
+                field("Printjob ID"; "Printjob ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Printer ID";"Printer ID")
+                field("Printer ID"; "Printer ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Data";"Print Data")
+                field("Print Data"; "Print Data")
                 {
+                    ApplicationArea = All;
                 }
-                field("Time Created";"Time Created")
+                field("Time Created"; "Time Created")
                 {
+                    ApplicationArea = All;
                 }
-                field(Printed;Printed)
+                field(Printed; Printed)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -17,26 +17,33 @@ page 6184494 "Pepper Terminal List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Terminal Type Code";"Terminal Type Code")
+                field("Terminal Type Code"; "Terminal Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Instance ID";"Instance ID")
+                field("Instance ID"; "Instance ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Configuration Code";"Configuration Code")
+                field("Configuration Code"; "Configuration Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("License ID";"License ID")
+                field("License ID"; "License ID")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -150,7 +157,7 @@ page 6184494 "Pepper Terminal List"
                 Caption = 'Transaction Requests';
                 Image = Transactions;
                 RunObject = Page "EFT Transaction Requests";
-                RunPageLink = "Pepper Terminal Code"=FIELD(Code);
+                RunPageLink = "Pepper Terminal Code" = FIELD(Code);
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
             }

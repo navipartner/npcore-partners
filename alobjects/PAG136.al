@@ -1,4 +1,4 @@
-pageextension 6014409 pageextension6014409 extends "Posted Purchase Receipt" 
+pageextension 6014409 pageextension6014409 extends "Posted Purchase Receipt"
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -15,11 +15,13 @@ pageextension 6014409 pageextension6014409 extends "Posted Purchase Receipt"
     {
         addafter("Pay-to")
         {
-            field("Pay-to E-mail";"Pay-to E-mail")
+            field("Pay-to E-mail"; "Pay-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
         }

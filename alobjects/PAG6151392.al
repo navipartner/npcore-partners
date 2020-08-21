@@ -15,39 +15,50 @@ page 6151392 "CS Posting Buffer"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(RecId;RecId)
+                field(RecId; RecId)
                 {
+                    ApplicationArea = All;
                     Caption = 'Record Id';
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field(Executed;Executed)
+                field(Executed; Executed)
                 {
+                    ApplicationArea = All;
                 }
-                field("Job Queue Status";"Job Queue Status")
+                field("Job Queue Status"; "Job Queue Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Job Type";"Job Type")
+                field("Job Type"; "Job Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Index";"Posting Index")
+                field("Posting Index"; "Posting Index")
                 {
+                    ApplicationArea = All;
                 }
-                field("Update Posting Date";"Update Posting Date")
+                field("Update Posting Date"; "Update Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Job Queue Priority for Post";"Job Queue Priority for Post")
+                field("Job Queue Priority for Post"; "Job Queue Priority for Post")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -82,8 +93,8 @@ page 6151392 "CS Posting Buffer"
 
                 trigger OnAction()
                 begin
-                    if "Job Queue Status" in ["Job Queue Status"::" ","Job Queue Status"::Posting,"Job Queue Status"::"Scheduled for Posting"] then
-                      exit;
+                    if "Job Queue Status" in ["Job Queue Status"::" ", "Job Queue Status"::Posting, "Job Queue Status"::"Scheduled for Posting"] then
+                        exit;
 
                     Delete(true);
                     CurrPage.Update;
@@ -101,27 +112,27 @@ page 6151392 "CS Posting Buffer"
                     CSPost: Codeunit "CS Post";
                     JobQueueEntry: Record "Job Queue Entry";
                 begin
-                    if "Job Queue Status" in ["Job Queue Status"::" ","Job Queue Status"::Posting] then
-                      exit;
+                    if "Job Queue Status" in ["Job Queue Status"::" ", "Job Queue Status"::Posting] then
+                        exit;
 
                     if not IsNullGuid(Rec."Job Queue Entry ID") then begin
-                      if JobQueueEntry.Get(Rec."Job Queue Entry ID") then
-                        JobQueueEntry.Delete(true);
-                      Rec."Job Queue Status" := Rec."Job Queue Status"::" ";
-                      Clear(Rec."Job Queue Entry ID");
-                      Rec.Executed := false;
-                      Rec.Modify(true);
-                      Commit;
+                        if JobQueueEntry.Get(Rec."Job Queue Entry ID") then
+                            JobQueueEntry.Delete(true);
+                        Rec."Job Queue Status" := Rec."Job Queue Status"::" ";
+                        Clear(Rec."Job Queue Entry ID");
+                        Rec.Executed := false;
+                        Rec.Modify(true);
+                        Commit;
                     end;
 
                     CSSetup.Get;
                     if CSSetup."Post with Job Queue" then begin
-                      CSPostEnqueue.Run(Rec);
+                        CSPostEnqueue.Run(Rec);
                     end else begin
-                      if CSPost.Run(Rec) then begin
-                        Rec.Executed := true;
-                        Rec.Modify(true);
-                      end;
+                        if CSPost.Run(Rec) then begin
+                            Rec.Executed := true;
+                            Rec.Modify(true);
+                        end;
                     end;
                 end;
             }
@@ -135,7 +146,7 @@ page 6151392 "CS Posting Buffer"
                     JobQueueEntry: Record "Job Queue Entry";
                 begin
                     if JobQueueEntry.Get(Rec."Job Queue Entry ID") then
-                      PAGE.RunModal(PAGE::"Job Queue Entry Card",JobQueueEntry);
+                        PAGE.RunModal(PAGE::"Job Queue Entry Card", JobQueueEntry);
                 end;
             }
         }

@@ -13,11 +13,13 @@ page 6150643 "POS Info Links"
             repeater(Group)
             {
                 Caption = 'Group';
-                field("POS Info Code";"POS Info Code")
+                field("POS Info Code"; "POS Info Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("When to Use";"When to Use")
+                field("When to Use"; "When to Use")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

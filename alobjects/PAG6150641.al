@@ -13,11 +13,13 @@ page 6150641 "POS Info Subform"
             repeater(Group)
             {
                 Caption = 'Group';
-                field(Subcode;Subcode)
+                field(Subcode; Subcode)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

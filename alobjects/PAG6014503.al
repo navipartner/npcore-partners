@@ -32,6 +32,7 @@ page 6014503 "Customer Repair Card"
                 Caption = 'General';
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     begin
@@ -41,10 +42,12 @@ page 6014503 "Customer Repair Card"
                 }
                 field("Customer Type"; "Customer Type")
                 {
+                    ApplicationArea = All;
                     Caption = 'Customer Type';
                 }
                 field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -60,47 +63,61 @@ page 6014503 "Customer Repair Card"
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
                 field("Address 2"; "Address 2")
                 {
+                    ApplicationArea = All;
                 }
                 field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(City; City)
                 {
+                    ApplicationArea = All;
                 }
                 field("Contact Person"; "Contact Person")
                 {
+                    ApplicationArea = All;
                 }
                 field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Mobile Phone No."; "Mobile Phone No.")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
                 field("E-mail"; "E-mail")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
                 field(Location; Location)
                 {
+                    ApplicationArea = All;
                 }
                 field("Bag No"; "Bag No")
                 {
+                    ApplicationArea = All;
                 }
                 field("Contact after"; "Contact after")
                 {
+                    ApplicationArea = All;
                 }
                 field("Delivery reff."; "Delivery reff.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Finalized; Finalized)
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Repairer Details")
@@ -108,6 +125,7 @@ page 6014503 "Customer Repair Card"
                 Caption = 'Repairer Details';
                 field("In-house Repairer"; "In-house Repairer")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -119,30 +137,37 @@ page 6014503 "Customer Repair Card"
                 }
                 field("Repairer No."; "Repairer No.")
                 {
+                    ApplicationArea = All;
                     Enabled = RepairedNoEnabled;
                 }
                 field("Repairer Name"; "Repairer Name")
                 {
+                    ApplicationArea = All;
                     Enabled = RepairNameEnabled;
                 }
                 field("Repairer Address"; "Repairer Address")
                 {
+                    ApplicationArea = All;
                     Enabled = RepairAddressEnabled;
                 }
                 field("Repairer Address2"; "Repairer Address2")
                 {
+                    ApplicationArea = All;
                     Enabled = RepairAddress2Enabled;
                 }
                 field("Repairer Post Code"; "Repairer Post Code")
                 {
+                    ApplicationArea = All;
                     Enabled = RepairPostCodeEnabled;
                 }
                 field("Repairer City"; "Repairer City")
                 {
+                    ApplicationArea = All;
                     Enabled = RepairCityEnabled;
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Registration)
@@ -153,6 +178,7 @@ page 6014503 "Customer Repair Card"
                     ShowCaption = false;
                     field("Item No."; "Item No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
 
                         trigger OnValidate()
@@ -169,16 +195,20 @@ page 6014503 "Customer Repair Card"
                     }
                     field("Item Description"; "Item Description")
                     {
+                        ApplicationArea = All;
                     }
                     field("Unit Cost"; "Unit Cost")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variant Code"; "Variant Code")
                     {
+                        ApplicationArea = All;
                         Caption = 'Variant code';
                     }
                     field(Worranty; Worranty)
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -189,30 +219,38 @@ page 6014503 "Customer Repair Card"
                     }
                     field("Warranty Text"; "Warranty Text")
                     {
+                        ApplicationArea = All;
                         Enabled = WarantyTextEnabled;
                     }
                     field(Status; Status)
                     {
+                        ApplicationArea = All;
                     }
                     field(Brand; Brand)
                     {
+                        ApplicationArea = All;
                     }
                     field("Serial No."; "Serial No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Alt. Serial No."; "Alt. Serial No.")
                     {
+                        ApplicationArea = All;
                     }
                     field(Accessories; Accessories)
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Accessories 1"; "Accessories 1")
                     {
+                        ApplicationArea = All;
                     }
                     field("Costs Paid by Offer"; "Costs Paid by Offer")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150658)
@@ -220,32 +258,40 @@ page 6014503 "Customer Repair Card"
                     ShowCaption = false;
                     field("Prices Including VAT"; "Prices Including VAT")
                     {
+                        ApplicationArea = All;
                     }
                     field("To Ship"; "To Ship")
                     {
+                        ApplicationArea = All;
                     }
                     field("Handed In Date"; "Handed In Date")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Expected Completion Date"; "Expected Completion Date")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Salesperson Code"; "Salesperson Code")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Date Delivered"; "Date Delivered")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Delivering Salespers."; "Delivering Salespers.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Delivering Sales Ticket No."; "Delivering Sales Ticket No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -257,21 +303,27 @@ page 6014503 "Customer Repair Card"
                     ShowCaption = false;
                     field("Invoice To"; "Invoice To")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer Name"; "Customer Name")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer Address"; "Customer Address")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer Address 2"; "Customer Address 2")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer Post Code"; "Customer Post Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer City"; "Customer City")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -283,18 +335,23 @@ page 6014503 "Customer Repair Card"
                     ShowCaption = false;
                     field("Price when Not Accepted"; "Price when Not Accepted")
                     {
+                        ApplicationArea = All;
                     }
                     field(Delivered; Delivered)
                     {
+                        ApplicationArea = All;
                     }
                     field("Service nr."; "Service nr.")
                     {
+                        ApplicationArea = All;
                     }
                     field(Type; Type)
                     {
+                        ApplicationArea = All;
                     }
                     field("Customer Answer"; "Customer Answer")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150685)
@@ -302,21 +359,27 @@ page 6014503 "Customer Repair Card"
                     ShowCaption = false;
                     field("Requested Returned, No Repair"; "Requested Returned, No Repair")
                     {
+                        ApplicationArea = All;
                     }
                     field("Approved by repairer"; "Approved by repairer")
                     {
+                        ApplicationArea = All;
                     }
                     field("Return from Repair"; "Return from Repair")
                     {
+                        ApplicationArea = All;
                     }
                     field(Claimed; Claimed)
                     {
+                        ApplicationArea = All;
                     }
                     field("Offer Sent"; "Offer Sent")
                     {
+                        ApplicationArea = All;
                     }
                     field("Reported Ready and Sent"; "Reported Ready and Sent")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -343,9 +406,11 @@ page 6014503 "Customer Repair Card"
                 Caption = 'Picture';
                 field("Picture Documentation1"; "Picture Documentation1")
                 {
+                    ApplicationArea = All;
                 }
                 field("Picture Documentation2"; "Picture Documentation2")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

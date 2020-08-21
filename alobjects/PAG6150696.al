@@ -14,37 +14,43 @@ page 6150696 "NPRE Kitchen Order Card"
         {
             group(General)
             {
-                field("Order ID";"Order ID")
+                field("Order ID"; "Order ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Created Date-Time";"Created Date-Time")
+                field("Created Date-Time"; "Created Date-Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
-                field("On Hold";"On Hold")
+                field("On Hold"; "On Hold")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014409;Notes)
+            systempart(Control6014409; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014408;Links)
+            systempart(Control6014408; Links)
             {
                 Visible = false;
             }
@@ -63,7 +69,7 @@ page 6150696 "NPRE Kitchen Order Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPRE Kitchen Requests";
-                RunPageLink = "Order ID"=FIELD("Order ID");
+                RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
             }
         }

@@ -8,8 +8,8 @@ page 6014462 "Invt. Pick Subform Scan 2"
     PageType = ListPart;
     ShowFilter = false;
     SourceTable = "Warehouse Activity Line";
-    SourceTableView = WHERE("Activity Type"=CONST("Invt. Pick"),
-                            "Rem. Qty. to Pick (Base)"=FILTER(>0));
+    SourceTableView = WHERE("Activity Type" = CONST("Invt. Pick"),
+                            "Rem. Qty. to Pick (Base)" = FILTER(> 0));
 
     layout
     {
@@ -18,32 +18,39 @@ page 6014462 "Invt. Pick Subform Scan 2"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Action Type";"Action Type")
+                field("Action Type"; "Action Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Source Document";"Source Document")
+                field("Source Document"; "Source Document")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     OptionCaption = ' ,Sales Order,,,,,,,Purchase Return Order,,Outbound Transfer,Prod. Consumption';
                     Visible = false;
                 }
-                field("Source No.";"Source No.")
+                field("Source No."; "Source No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
 
                     trigger OnValidate()
@@ -51,12 +58,14 @@ page 6014462 "Invt. Pick Subform Scan 2"
                         SerialNoOnAfterValidate;
                     end;
                 }
-                field("Serial No. Blocked";"Serial No. Blocked")
+                field("Serial No. Blocked"; "Serial No. Blocked")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Lot No.";"Lot No.")
+                field("Lot No."; "Lot No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
 
                     trigger OnValidate()
@@ -64,107 +73,131 @@ page 6014462 "Invt. Pick Subform Scan 2"
                         LotNoOnAfterValidate;
                     end;
                 }
-                field("Lot No. Blocked";"Lot No. Blocked")
+                field("Lot No. Blocked"; "Lot No. Blocked")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Expiration Date";"Expiration Date")
+                field("Expiration Date"; "Expiration Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Bin Code";"Bin Code")
+                field("Bin Code"; "Bin Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         BinCodeOnAfterValidate;
                     end;
                 }
-                field("Shelf No.";"Shelf No.")
+                field("Shelf No."; "Shelf No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. (Base)";"Qty. (Base)")
+                field("Qty. (Base)"; "Qty. (Base)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Qty. to Handle";"Qty. to Handle")
+                field("Qty. to Handle"; "Qty. to Handle")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         QtytoHandleOnAfterValidate;
                     end;
                 }
-                field("Qty. Handled";"Qty. Handled")
+                field("Qty. Handled"; "Qty. Handled")
                 {
+                    ApplicationArea = All;
                     Visible = true;
                 }
-                field("Qty. to Handle (Base)";"Qty. to Handle (Base)")
+                field("Qty. to Handle (Base)"; "Qty. to Handle (Base)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Qty. Handled (Base)";"Qty. Handled (Base)")
+                field("Qty. Handled (Base)"; "Qty. Handled (Base)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Qty. Outstanding";"Qty. Outstanding")
+                field("Qty. Outstanding"; "Qty. Outstanding")
                 {
+                    ApplicationArea = All;
                     Visible = true;
                 }
-                field("Qty. Outstanding (Base)";"Qty. Outstanding (Base)")
+                field("Qty. Outstanding (Base)"; "Qty. Outstanding (Base)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Due Date";"Due Date")
+                field("Due Date"; "Due Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Unit of Measure Code";"Unit of Measure Code")
+                field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Qty. per Unit of Measure";"Qty. per Unit of Measure")
+                field("Qty. per Unit of Measure"; "Qty. per Unit of Measure")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Shipping Advice";"Shipping Advice")
+                field("Shipping Advice"; "Shipping Advice")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Destination Type";"Destination Type")
+                field("Destination Type"; "Destination Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Destination No.";"Destination No.")
+                field("Destination No."; "Destination No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Shipping Agent Code";"Shipping Agent Code")
+                field("Shipping Agent Code"; "Shipping Agent Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Shipping Agent Service Code";"Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Shipment Method Code";"Shipment Method Code")
+                field("Shipment Method Code"; "Shipment Method Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Special Equipment Code";"Special Equipment Code")
+                field("Special Equipment Code"; "Special Equipment Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Assemble to Order";"Assemble to Order")
+                field("Assemble to Order"; "Assemble to Order")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -190,14 +223,14 @@ page 6014462 "Invt. Pick Subform Scan 2"
 
     local procedure ShowSourceLine()
     begin
-        WMSMgt.ShowSourceDocLine("Source Type","Source Subtype","Source No.","Source Line No.","Source Subline No.");
+        WMSMgt.ShowSourceDocLine("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code","Item No.","Variant Code",'')
+        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", '')
     end;
 
     procedure AutofillQtyToHandle()
@@ -258,11 +291,11 @@ page 6014462 "Invt. Pick Subform Scan 2"
         EntriesExist: Boolean;
     begin
         if "Serial No." <> '' then
-          ExpDate := ItemTrackingMgt.ExistingExpirationDate("Item No.","Variant Code",
-              "Lot No.","Serial No.",false,EntriesExist);
+            ExpDate := ItemTrackingMgt.ExistingExpirationDate("Item No.", "Variant Code",
+                "Lot No.", "Serial No.", false, EntriesExist);
 
         if ExpDate <> 0D then
-          "Expiration Date" := ExpDate;
+            "Expiration Date" := ExpDate;
     end;
 
     local procedure LotNoOnAfterValidate()
@@ -272,11 +305,11 @@ page 6014462 "Invt. Pick Subform Scan 2"
         EntriesExist: Boolean;
     begin
         if "Lot No." <> '' then
-          ExpDate := ItemTrackingMgt.ExistingExpirationDate("Item No.","Variant Code",
-              "Lot No.","Serial No.",false,EntriesExist);
+            ExpDate := ItemTrackingMgt.ExistingExpirationDate("Item No.", "Variant Code",
+                "Lot No.", "Serial No.", false, EntriesExist);
 
         if ExpDate <> 0D then
-          "Expiration Date" := ExpDate;
+            "Expiration Date" := ExpDate;
     end;
 
     local procedure BinCodeOnAfterValidate()

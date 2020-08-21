@@ -1,4 +1,4 @@
-pageextension 6014407 pageextension6014407 extends "Posted Sales Credit Memo" 
+pageextension 6014407 pageextension6014407 extends "Posted Sales Credit Memo"
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -17,35 +17,41 @@ pageextension 6014407 pageextension6014407 extends "Posted Sales Credit Memo"
     {
         addafter("Sell-to Customer Name")
         {
-            field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+            field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("EU 3-Party Trade")
         {
-            field("Magento Payment Amount";"Magento Payment Amount")
+            field("Magento Payment Amount"; "Magento Payment Amount")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Ship-to Name")
         {
-            field("Ship-to Name 2";"Ship-to Name 2")
+            field("Ship-to Name 2"; "Ship-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Bill-to Name")
         {
-            field("Bill-to Name 2";"Bill-to Name 2")
+            field("Bill-to Name 2"; "Bill-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Bill-to Contact")
         {
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
         }

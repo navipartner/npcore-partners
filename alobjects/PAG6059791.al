@@ -26,44 +26,57 @@ page 6059791 "E-mail Template"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Style = Standard;
                     StyleExpr = TRUE;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Filename; Filename)
                 {
+                    ApplicationArea = All;
                 }
                 field(Subject; Subject)
                 {
+                    ApplicationArea = All;
                 }
                 field("Verify Recipient"; "Verify Recipient")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sender as bcc"; "Sender as bcc")
                 {
+                    ApplicationArea = All;
                 }
                 field("From E-mail Name"; "From E-mail Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("From E-mail Address"; "From E-mail Address")
                 {
+                    ApplicationArea = All;
                 }
                 field("Default Recipient Address"; "Default Recipient Address")
                 {
+                    ApplicationArea = All;
                 }
                 field("Default Recipient Address CC"; "Default Recipient Address CC")
                 {
+                    ApplicationArea = All;
                 }
                 field("Default Recipient Address BCC"; "Default Recipient Address BCC")
                 {
+                    ApplicationArea = All;
                 }
                 field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                 }
                 group(Control6150644)
                 {
@@ -71,9 +84,11 @@ page 6059791 "E-mail Template"
                     Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
                     field("Use HTML Template"; "Use HTML Template")
                     {
+                        ApplicationArea = All;
                     }
                     field("FORMAT(""HTML Template"".HASVALUE)"; Format("HTML Template".HasValue))
                     {
+                        ApplicationArea = All;
                         AssistEdit = true;
                         Caption = 'HTML Template';
 
@@ -109,18 +124,22 @@ page 6059791 "E-mail Template"
                 }
                 field("Fieldnumber Start Tag"; "Fieldnumber Start Tag")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field("Fieldnumber End Tag"; "Fieldnumber End Tag")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field(Group; Group)
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field("Transactional E-mail"; "Transactional E-mail")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
 
                     trigger OnValidate()
@@ -138,6 +157,7 @@ page 6059791 "E-mail Template"
                     Visible = ("Transactional E-mail" = 1);
                     field("Transactional E-mail Code"; "Transactional E-mail Code")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
 
                         trigger OnValidate()

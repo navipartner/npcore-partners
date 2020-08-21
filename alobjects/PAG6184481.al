@@ -15,14 +15,17 @@ page 6184481 "EFT Setup"
         {
             repeater(Group)
             {
-                field("Payment Type POS";"Payment Type POS")
+                field("Payment Type POS"; "Payment Type POS")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("EFT Integration Type";"EFT Integration Type")
+                field("EFT Integration Type"; "EFT Integration Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

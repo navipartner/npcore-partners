@@ -14,49 +14,63 @@ page 6060161 "Event Planning Line List"
         {
             repeater(Group)
             {
-                field("Job No.";"Job No.")
+                field("Job No."; "Job No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Job Task No.";"Job Task No.")
+                field("Job Task No."; "Job Task No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Planning Date";"Planning Date")
+                field("Planning Date"; "Planning Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("""Calendar Item ID"" <> ''";"Calendar Item ID" <> '')
+                field("""Calendar Item ID"" <> ''"; "Calendar Item ID" <> '')
                 {
+                    ApplicationArea = All;
                     Caption = 'Meeting Req. Exists';
                     Editable = false;
                 }
-                field("Meeting Request Response";"Meeting Request Response")
+                field("Meeting Request Response"; "Meeting Request Response")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price (LCY)";"Unit Price (LCY)")
+                field("Unit Price (LCY)"; "Unit Price (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Amount (LCY)";"Line Amount (LCY)")
+                field("Line Amount (LCY)"; "Line Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -78,7 +92,7 @@ page 6060161 "Event Planning Line List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "Event Card";
-                    RunPageLink = "No."=FIELD("Job No.");
+                    RunPageLink = "No." = FIELD("Job No.");
                     ShortCutKey = 'Shift+F7';
                 }
             }

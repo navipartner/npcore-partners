@@ -15,11 +15,13 @@ page 6151440 "Magento Customer Groups"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Tax Class";"Magento Tax Class")
+                field("Magento Tax Class"; "Magento Tax Class")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

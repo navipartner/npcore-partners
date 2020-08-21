@@ -11,14 +11,17 @@ page 6150706 "POS Action Workflow"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Action Code";"Action Code")
+                field("Action Code"; "Action Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Condition Type";"Condition Type")
+                field("Condition Type"; "Condition Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

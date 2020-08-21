@@ -16,6 +16,7 @@ page 6014601 "NPR Item Availability FactBox"
         {
             field("No."; "No.")
             {
+                ApplicationArea = All;
                 Caption = 'Item No.';
                 Lookup = false;
 
@@ -26,6 +27,7 @@ page 6014601 "NPR Item Availability FactBox"
             }
             field(Availability; StrSubstNo('%1', CalcAvailability))
             {
+                ApplicationArea = All;
                 Caption = 'Availability';
                 DrillDown = true;
                 Editable = true;
@@ -38,15 +40,19 @@ page 6014601 "NPR Item Availability FactBox"
             }
             field(Inventory; Inventory)
             {
+                ApplicationArea = All;
             }
             field("Qty. on Sales Order"; "Qty. on Sales Order")
             {
+                ApplicationArea = All;
             }
             field("Qty. on Purch. Order"; "Qty. on Purch. Order")
             {
+                ApplicationArea = All;
             }
             field("Sales (Qty.)"; "Sales (Qty.)")
             {
+                ApplicationArea = All;
             }
         }
     }

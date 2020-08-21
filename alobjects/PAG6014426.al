@@ -16,44 +16,57 @@ page 6014426 "Item Group Subpage"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Inventory Posting Group";"Inventory Posting Group")
+                field("Inventory Posting Group"; "Inventory Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Discount Group";"Item Discount Group")
+                field("Item Discount Group"; "Item Discount Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Used Goods Group";"Used Goods Group")
+                field("Used Goods Group"; "Used Goods Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mixed Discount Line Exists";"Mixed Discount Line Exists")
+                field("Mixed Discount Line Exists"; "Mixed Discount Line Exists")
                 {
+                    ApplicationArea = All;
                 }
-                field(Internet;Internet)
+                field(Internet; Internet)
                 {
+                    ApplicationArea = All;
                 }
-                field("Costing Method";"Costing Method")
+                field("Costing Method"; "Costing Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -86,17 +99,19 @@ page 6014426 "Item Group Subpage"
         //+NPR4.11
 
         if GetRangeMin("Parent Item Group No.") = GetRangeMax("Parent Item Group No.") then begin
-          "Parent Item Group No." := GetRangeMin("Parent Item Group No.");
-          if ItemGroupParent.Get("Parent Item Group No.") then begin
-            Level                      := ItemGroupParent.Level + 1;
-            "VAT Prod. Posting Group"  := ItemGroupParent."VAT Prod. Posting Group";
-            "VAT Bus. Posting Group"   := ItemGroupParent."VAT Bus. Posting Group";
-            //-NPR5.48 [334217]
-            Type                       := ItemGroupParent.Type;
-            //+NPR5.48 [334217]
-          end
-          else Error(Text10600000);
-        end else Error(Text10600000);
+            "Parent Item Group No." := GetRangeMin("Parent Item Group No.");
+            if ItemGroupParent.Get("Parent Item Group No.") then begin
+                Level := ItemGroupParent.Level + 1;
+                "VAT Prod. Posting Group" := ItemGroupParent."VAT Prod. Posting Group";
+                "VAT Bus. Posting Group" := ItemGroupParent."VAT Bus. Posting Group";
+                //-NPR5.48 [334217]
+                Type := ItemGroupParent.Type;
+                //+NPR5.48 [334217]
+            end
+            else
+                Error(Text10600000);
+        end else
+            Error(Text10600000);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -105,17 +120,19 @@ page 6014426 "Item Group Subpage"
     begin
         if Count = 0 then exit;
         //-NPR4.11
-        if GetFilter("Parent Item Group No.") = ''  then exit;
+        if GetFilter("Parent Item Group No.") = '' then exit;
         //IF GETFILTER("Parent Item Group") = ''  THEN
         //   ERROR(Text0001);
         //+NPR4.11
 
         if GetRangeMin("Parent Item Group No.") = GetRangeMax("Parent Item Group No.") then begin
-          "Parent Item Group No." := GetRangeMin("Parent Item Group No.");
-          if ItemGroupParent.Get("Parent Item Group No.") then begin
-            Level := ItemGroupParent.Level + 1;
-          end else Error(Text10600000);
-        end else Error(Text10600000);
+            "Parent Item Group No." := GetRangeMin("Parent Item Group No.");
+            if ItemGroupParent.Get("Parent Item Group No.") then begin
+                Level := ItemGroupParent.Level + 1;
+            end else
+                Error(Text10600000);
+        end else
+            Error(Text10600000);
     end;
 
     var

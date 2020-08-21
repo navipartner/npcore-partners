@@ -14,29 +14,37 @@ page 6151153 "GDPR Anonymization Request"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Contact No.";"Contact No.")
+                field("Contact No."; "Contact No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Received";"Request Received")
+                field("Request Received"; "Request Received")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processed At";"Processed At")
+                field("Processed At"; "Processed At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Count";"Log Count")
+                field("Log Count"; "Log Count")
                 {
+                    ApplicationArea = All;
                 }
-                field(Reason;Reason)
+                field(Reason; Reason)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -54,7 +62,7 @@ page 6151153 "GDPR Anonymization Request"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Page "Customer GDPR Log Entries";
-                RunPageLink = "Customer No"=FIELD("Customer No.");
+                RunPageLink = "Customer No" = FIELD("Customer No.");
             }
         }
         area(processing)
@@ -71,9 +79,9 @@ page 6151153 "GDPR Anonymization Request"
                     GDPRAnonymizationRequest: Record "GDPR Anonymization Request";
                 begin
 
-                    CurrPage.SetSelectionFilter (GDPRAnonymizationRequest);
-                    AnonymizeCustomer (GDPRAnonymizationRequest);
-                    CurrPage.Update (false);
+                    CurrPage.SetSelectionFilter(GDPRAnonymizationRequest);
+                    AnonymizeCustomer(GDPRAnonymizationRequest);
+                    CurrPage.Update(false);
                 end;
             }
         }
@@ -91,48 +99,48 @@ page 6151153 "GDPR Anonymization Request"
 
         //-NPR5.55 [388813]
         //GDPRAnonymizationRequest.SETFILTER (Status, '<>%1', GDPRAnonymizationRequest.Status::ANONYMIZED);
-        GDPRAnonymizationRequest.SetFilter (Status, '=%1|=%2', GDPRAnonymizationRequest.Status::NEW, GDPRAnonymizationRequest.Status::PENDING);
+        GDPRAnonymizationRequest.SetFilter(Status, '=%1|=%2', GDPRAnonymizationRequest.Status::NEW, GDPRAnonymizationRequest.Status::PENDING);
         //+NPR5.55 [388813]
 
-        if (GDPRAnonymizationRequest.FindSet ()) then begin
-          repeat
-            Reason := '';
-            GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::PENDING;
-            GDPRAnonymizationRequest."Processed At" := CurrentDateTime ();
+        if (GDPRAnonymizationRequest.FindSet()) then begin
+            repeat
+                Reason := '';
+                GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::PENDING;
+                GDPRAnonymizationRequest."Processed At" := CurrentDateTime();
 
-            if (GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::COMPANY) then begin
-              //-NPR5.55 [388813]
-              // IF (NPGDPRManagement.DoAnonymization (GDPRAnonymizationRequest."Customer No.", Reason)) THEN BEGIN
-              //   GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
-              // END;
-              // GDPRAnonymizationRequest.Reason := COPYSTR (Reason, 1, MAXSTRLEN (GDPRAnonymizationRequest.Reason));
-              // GDPRAnonymizationRequest.MODIFY ();
+                if (GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::COMPANY) then begin
+                    //-NPR5.55 [388813]
+                    // IF (NPGDPRManagement.DoAnonymization (GDPRAnonymizationRequest."Customer No.", Reason)) THEN BEGIN
+                    //   GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
+                    // END;
+                    // GDPRAnonymizationRequest.Reason := COPYSTR (Reason, 1, MAXSTRLEN (GDPRAnonymizationRequest.Reason));
+                    // GDPRAnonymizationRequest.MODIFY ();
 
-              if (Customer.Get (GDPRAnonymizationRequest."Customer No.")) then begin
-                if (NPGDPRManagement.DoAnonymization (GDPRAnonymizationRequest."Customer No.", Reason)) then begin
-                  GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
+                    if (Customer.Get(GDPRAnonymizationRequest."Customer No.")) then begin
+                        if (NPGDPRManagement.DoAnonymization(GDPRAnonymizationRequest."Customer No.", Reason)) then begin
+                            GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
+                        end;
+                        GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                        GDPRAnonymizationRequest.Modify();
+                    end else begin
+                        Reason := 'Customer not found.';
+                        GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                        GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                        GDPRAnonymizationRequest.Modify();
+                    end;
+                    //+NPR5.55 [388813]
+
                 end;
-                GDPRAnonymizationRequest.Reason := CopyStr (Reason, 1, MaxStrLen (GDPRAnonymizationRequest.Reason));
-                GDPRAnonymizationRequest.Modify ();
-              end else begin
-                Reason := 'Customer not found.';
-                GDPRAnonymizationRequest.Reason := CopyStr (Reason, 1, MaxStrLen (GDPRAnonymizationRequest.Reason));
-                GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
-                GDPRAnonymizationRequest.Modify ();
-              end;
-              //+NPR5.55 [388813]
 
-            end;
-
-            if (GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::PERSON) then begin
-              Reason := 'Contact of type person does not have authority to request anonymization.';
-              //-NPR5.55 [388813]
-              GDPRAnonymizationRequest.Reason := CopyStr (Reason, 1, MaxStrLen (GDPRAnonymizationRequest.Reason));
-              GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
-              //+NPR5.55 [388813]
-              GDPRAnonymizationRequest.Modify ();
-            end;
-          until (GDPRAnonymizationRequest.Next () = 0);
+                if (GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::PERSON) then begin
+                    Reason := 'Contact of type person does not have authority to request anonymization.';
+                    //-NPR5.55 [388813]
+                    GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                    GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                    //+NPR5.55 [388813]
+                    GDPRAnonymizationRequest.Modify();
+                end;
+            until (GDPRAnonymizationRequest.Next() = 0);
 
         end;
     end;

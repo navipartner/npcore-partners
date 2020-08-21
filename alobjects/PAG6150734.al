@@ -12,14 +12,17 @@ page 6150734 "POS Sales Workflow Set Entries"
         {
             repeater(Group)
             {
-                field("Workflow Code";"Workflow Code")
+                field("Workflow Code"; "Workflow Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Workflow Description";"Workflow Description")
+                field("Workflow Description"; "Workflow Description")
                 {
+                    ApplicationArea = All;
                 }
-                field(Control6014406;"Workflow Steps")
+                field(Control6014406; "Workflow Steps")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -38,8 +41,8 @@ page 6150734 "POS Sales Workflow Set Entries"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Sales Workflow Steps";
-                RunPageLink = "Set Code"=FIELD("Set Code"),
-                              "Workflow Code"=FIELD("Workflow Code");
+                RunPageLink = "Set Code" = FIELD("Set Code"),
+                              "Workflow Code" = FIELD("Workflow Code");
             }
         }
     }

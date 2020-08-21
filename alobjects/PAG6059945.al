@@ -14,17 +14,21 @@ page 6059945 "CashKeeper Setup"
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Type";"Payment Type")
+                field("Payment Type"; "Payment Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("CashKeeper IP";"CashKeeper IP")
+                field("CashKeeper IP"; "CashKeeper IP")
                 {
+                    ApplicationArea = All;
                 }
-                field("Debug Mode";"Debug Mode")
+                field("Debug Mode"; "Debug Mode")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -39,14 +43,14 @@ page 6059945 "CashKeeper Setup"
                 Caption = 'CashKeeper Transaction';
                 Image = View;
                 RunObject = Page "CashKeeper Transaction";
-                RunPageLink = "Register No."=FIELD("Register No.");
+                RunPageLink = "Register No." = FIELD("Register No.");
             }
             action("CashKeeper Overview")
             {
                 Caption = 'CashKeeper Overview';
                 Image = View;
                 RunObject = Page "CashKeeper Overview";
-                RunPageLink = "Register No."=FIELD("Register No.");
+                RunPageLink = "Register No." = FIELD("Register No.");
             }
         }
     }

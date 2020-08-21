@@ -22,15 +22,17 @@ page 6014513 "Custom Object Selection List"
                 IndentationColumn = Level;
                 IndentationControls = Description;
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                     Style = Strong;
                     StyleExpr = StrongStyle;
                 }
-                field("Object ID";"Object ID")
+                field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                     Enabled = false;
@@ -54,11 +56,16 @@ page 6014513 "Custom Object Selection List"
                 trigger OnAction()
                 begin
                     case "Object Type" of
-                      "Object Type"::Table : HyperLink(GetUrl(CLIENTTYPE::Current,CompanyName,OBJECTTYPE::Table,"Object ID"));
-                      "Object Type"::Page : PAGE.Run("Object ID");
-                      "Object Type"::Report : REPORT.Run("Object ID");
-                      "Object Type"::Codeunit : CODEUNIT.Run("Object ID");
-                      "Object Type"::XMLPort : XMLPORT.Run("Object ID");
+                        "Object Type"::Table:
+                            HyperLink(GetUrl(CLIENTTYPE::Current, CompanyName, OBJECTTYPE::Table, "Object ID"));
+                        "Object Type"::Page:
+                            PAGE.Run("Object ID");
+                        "Object Type"::Report:
+                            REPORT.Run("Object ID");
+                        "Object Type"::Codeunit:
+                            CODEUNIT.Run("Object ID");
+                        "Object Type"::XMLPort:
+                            XMLPORT.Run("Object ID");
                     end;
                 end;
             }

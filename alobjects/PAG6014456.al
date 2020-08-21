@@ -56,6 +56,7 @@ page 6014456 "Table Export Wizard"
                 ShowCaption = false;
                 field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -95,6 +96,7 @@ page 6014456 "Table Export Wizard"
                 }
                 field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -120,30 +122,37 @@ page 6014456 "Table Export Wizard"
                     Caption = 'Formatting';
                     field(FieldStartDelimeter; FieldStartDelimeter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Field Start Delimeter';
                     }
                     field(FieldEndDelimeter; FieldEndDelimeter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Field End Delimeter';
                     }
                     field(FieldSeparator; FieldSeparator)
                     {
+                        ApplicationArea = All;
                         Caption = 'Field Separator';
                     }
                     field(RecordSeparator; RecordSeparator)
                     {
+                        ApplicationArea = All;
                         Caption = 'Record Separator';
                     }
                     field(DataItemSeparator; DataItemSeparator)
                     {
+                        ApplicationArea = All;
                         Caption = 'Data Item Separator';
                     }
                     field(EscapeCharacter; EscapeCharacter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Escape Character';
                     }
                     field(ExportDataInXmlFormat; ExportDataInXmlFormat)
                     {
+                        ApplicationArea = All;
                         Caption = 'Use Xml-Format';
                     }
                 }
@@ -152,18 +161,22 @@ page 6014456 "Table Export Wizard"
                     Caption = 'Data Settings';
                     field(UseCompanyName; UseCompanyName)
                     {
+                        ApplicationArea = All;
                         Caption = 'Company';
                     }
                     field(OutFileEncoding; OutFileEncoding)
                     {
+                        ApplicationArea = All;
                         Caption = 'File Encoding';
                     }
                     field(FileMode; FileMode)
                     {
+                        ApplicationArea = All;
                         Caption = 'File Mode';
                     }
                     field(SkipFlowFields; SkipFlowFields)
                     {
+                        ApplicationArea = All;
                         Caption = 'Skip Flow Fields';
                     }
                 }
@@ -172,6 +185,7 @@ page 6014456 "Table Export Wizard"
                     Caption = 'Export Settings';
                     field(RaiseErrors; RaiseErrors)
                     {
+                        ApplicationArea = All;
                         Caption = 'Raise Errors';
                     }
                 }

@@ -11,11 +11,13 @@ page 6151366 "CS Select Entries"
     {
         area(content)
         {
-            field("Item No.";"Item No.")
+            field("Item No."; "Item No.")
             {
+                ApplicationArea = All;
             }
-            field("Variant Code";"Variant Code")
+            field("Variant Code"; "Variant Code")
             {
+                ApplicationArea = All;
             }
         }
     }

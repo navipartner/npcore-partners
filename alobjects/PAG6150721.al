@@ -15,22 +15,27 @@ page 6150721 "POS Keyboard Binding Setup"
         {
             repeater(Group)
             {
-                field("Action Code";"Action Code")
+                field("Action Code"; "Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Key Bind";"Key Bind")
+                field("Key Bind"; "Key Bind")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Key Bind";"Default Key Bind")
+                field("Default Key Bind"; "Default Key Bind")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

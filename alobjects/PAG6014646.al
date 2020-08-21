@@ -17,16 +17,19 @@ page 6014646 "Tax Free Gen. Handler Params"
         {
             repeater(Group)
             {
-                field(Parameter;Parameter)
+                field(Parameter; Parameter)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -39,7 +42,7 @@ page 6014646 "Tax Free Gen. Handler Params"
     procedure SetRec(var tmpHandlerParameter: Record "Tax Free Handler Parameters" temporary)
     begin
         if not tmpHandlerParameter.IsTemporary then
-          exit;
+            exit;
 
         Rec.Copy(tmpHandlerParameter, true);
     end;
@@ -47,7 +50,7 @@ page 6014646 "Tax Free Gen. Handler Params"
     procedure GetRec(var tmpHandlerParameter: Record "Tax Free Handler Parameters" temporary)
     begin
         if not tmpHandlerParameter.IsTemporary then
-          exit;
+            exit;
 
         tmpHandlerParameter.Copy(Rec, true);
     end;

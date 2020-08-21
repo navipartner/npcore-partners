@@ -13,14 +13,17 @@ page 6059960 "MCS Person Business Entities"
         {
             repeater(Group)
             {
-                field(PersonId;PersonId)
+                field(PersonId; PersonId)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Id";"Table Id")
+                field("Table Id"; "Table Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(KeyText;KeyText)
+                field(KeyText; KeyText)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }

@@ -1,4 +1,4 @@
-pageextension 6014487 pageextension6014487 extends "Sales Order List" 
+pageextension 6014487 pageextension6014487 extends "Sales Order List"
 {
     // NPR5.36/KENU/20170830 CASE 283379 Added field "Promised Delivery Date"
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
@@ -12,8 +12,9 @@ pageextension 6014487 pageextension6014487 extends "Sales Order List"
         }
         addafter("Requested Delivery Date")
         {
-            field("Promised Delivery Date";"Promised Delivery Date")
+            field("Promised Delivery Date"; "Promised Delivery Date")
             {
+                ApplicationArea = All;
             }
         }
     }
@@ -42,19 +43,19 @@ pageextension 6014487 pageextension6014487 extends "Sales Order List"
 
     //trigger OnAfterGetRecord()
     //var
-        //RecordLink: Record "Record Link";
-        //RecRef: RecordRef;
+    //RecordLink: Record "Record Link";
+    //RecRef: RecordRef;
     //begin
-        /*
-        //-NPR5.38 [296960]
-        HasNotes := false;
-        RecRef.GetTable(Rec);
-        RecordLink.SetRange("Record ID",RecRef.RecordId);
-        if RecordLink.FindFirst then
-          if RecordLink.Note.HasValue then
-            HasNotes := true;
-        //+NPR5.38 [296960]
-        */
+    /*
+    //-NPR5.38 [296960]
+    HasNotes := false;
+    RecRef.GetTable(Rec);
+    RecordLink.SetRange("Record ID",RecRef.RecordId);
+    if RecordLink.FindFirst then
+      if RecordLink.Note.HasValue then
+        HasNotes := true;
+    //+NPR5.38 [296960]
+    */
     //end;
 }
 

@@ -12,22 +12,27 @@ page 6014606 "NPR Attribute Translations"
         {
             repeater(Group)
             {
-                field("Attribute Code";"Attribute Code")
+                field("Attribute Code"; "Attribute Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Language ID";"Language ID")
+                field("Language ID"; "Language ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Code Caption";"Code Caption")
+                field("Code Caption"; "Code Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Caption";"Filter Caption")
+                field("Filter Caption"; "Filter Caption")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -15,18 +15,22 @@ page 6014669 "Stock-Take Calc. Inv. Transfer"
         {
             group(General)
             {
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(PostingDate;PostingDate)
+                field(PostingDate; PostingDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Posting Date';
                 }
-                field("Conf Calc. Date";"Conf Calc. Date")
+                field("Conf Calc. Date"; "Conf Calc. Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(TransferAction;TransferAction)
+                field(TransferAction; TransferAction)
                 {
+                    ApplicationArea = All;
                     Caption = 'Transfer Action';
                 }
             }
@@ -45,7 +49,7 @@ page 6014669 "Stock-Take Calc. Inv. Transfer"
         PostingDate := PhysInvJournal."Inventory Calc. Date";
         //-NPR5.29 [263879]
         //ColumnDim := DimSelectionBuf.GetDimSelectionText(3,REPORT::"Calculate Inventory",'');
-        ColumnDim := DimSelectionBuf.GetDimSelectionText(3,REPORT::"Retail Calculate Inventory",'');
+        ColumnDim := DimSelectionBuf.GetDimSelectionText(3, REPORT::"Retail Calculate Inventory", '');
         //+NPR5.29 [263879]
         TransferAction := PhysInvJournal."Transfer Action";
     end;
@@ -59,12 +63,12 @@ page 6014669 "Stock-Take Calc. Inv. Transfer"
 
     procedure GetUserTransferAction() rTransferAction: Integer
     begin
-        exit (TransferAction);
+        exit(TransferAction);
     end;
 
     procedure GetPostingDate() rPostingDate: Date
     begin
-        exit (PostingDate);
+        exit(PostingDate);
     end;
 }
 

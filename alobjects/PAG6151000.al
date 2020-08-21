@@ -15,11 +15,13 @@ page 6151000 "NPR Upgrade History"
         {
             repeater(Group)
             {
-                field("Upgrade Time";"Upgrade Time")
+                field("Upgrade Time"; "Upgrade Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

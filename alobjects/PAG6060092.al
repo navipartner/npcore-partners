@@ -14,59 +14,77 @@ page 6060092 "MM Admission Service Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Action";Action)
+                field("Action"; Action)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created Date";"Created Date")
+                field("Created Date"; "Created Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Token;Token)
+                field(Token; Token)
                 {
+                    ApplicationArea = All;
                 }
-                field("Key";Key)
+                field("Key"; Key)
                 {
+                    ApplicationArea = All;
                 }
-                field("Scanner Station Id";"Scanner Station Id")
+                field("Scanner Station Id"; "Scanner Station Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Barcode";"Request Barcode")
+                field("Request Barcode"; "Request Barcode")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Scanner Station Id";"Request Scanner Station Id")
+                field("Request Scanner Station Id"; "Request Scanner Station Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request No";"Request No")
+                field("Request No"; "Request No")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Token";"Request Token")
+                field("Request Token"; "Request Token")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response No";"Response No")
+                field("Response No"; "Response No")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response Token";"Response Token")
+                field("Response Token"; "Response Token")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response Name";"Response Name")
+                field("Response Name"; "Response Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response PictureBase64";"Response PictureBase64")
+                field("Response PictureBase64"; "Response PictureBase64")
                 {
+                    ApplicationArea = All;
                 }
-                field("Error Number";"Error Number")
+                field("Error Number"; "Error Number")
                 {
+                    ApplicationArea = All;
                 }
-                field("Error Description";"Error Description")
+                field("Error Description"; "Error Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Value";"Return Value")
+                field("Return Value"; "Return Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -97,17 +115,17 @@ page 6060092 "MM Admission Service Log"
                     RefPictureBase64: Text;
                     RefTransaktion: Code[10];
                 begin
-                    GaestByNrResponse := MMAdmissionServiceWS.GuestValidation("Request Barcode","Scanner Station Id",RefNo,RefToken,RefErrorNumber, RefErrorDescription);
+                    GaestByNrResponse := MMAdmissionServiceWS.GuestValidation("Request Barcode", "Scanner Station Id", RefNo, RefToken, RefErrorNumber, RefErrorDescription);
                     Message('Web Service function GuestValidation Status: ' + Format(GaestByNrResponse));
                     if (RefErrorNumber = '') then begin
-                      GaestEnteredDoorResponse := MMAdmissionServiceWS.GuestArrivalV2(RefNo,RefToken,"Scanner Station Id",RefName, RefPictureBase64,RefTransaktion,RefErrorNumber, RefErrorDescription);
-                      Message('Web Service function GuestArrivalV2 Status: ' + Format(GaestEnteredDoorResponse));
-                      if (RefErrorNumber = '') then begin
-                        Message('Ticket/Membership validated OK');
-                      end else
-                        Message('Web Service function GuestArrivalV2 Error:\' + RefErrorNumber + '\' + RefErrorDescription);
+                        GaestEnteredDoorResponse := MMAdmissionServiceWS.GuestArrivalV2(RefNo, RefToken, "Scanner Station Id", RefName, RefPictureBase64, RefTransaktion, RefErrorNumber, RefErrorDescription);
+                        Message('Web Service function GuestArrivalV2 Status: ' + Format(GaestEnteredDoorResponse));
+                        if (RefErrorNumber = '') then begin
+                            Message('Ticket/Membership validated OK');
+                        end else
+                            Message('Web Service function GuestArrivalV2 Error:\' + RefErrorNumber + '\' + RefErrorDescription);
                     end else
-                      Message('Web Service function GuestValidation Error:\' + RefErrorNumber + '\' + RefErrorDescription);
+                        Message('Web Service function GuestValidation Error:\' + RefErrorNumber + '\' + RefErrorDescription);
                 end;
             }
         }

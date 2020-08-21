@@ -29,21 +29,24 @@ page 6151411 "Magento Pictures"
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field(MiniatureLine;TempMagentoPicture.Picture)
+                    field(MiniatureLine; TempMagentoPicture.Picture)
                     {
-                        ApplicationArea = Basic,Suite;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Miniature';
                         Editable = false;
                         Visible = MiniatureLinePicture;
                     }
-                    field(Type;Type)
+                    field(Type; Type)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Count";Counter)
+                    field("Count"; Counter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Count';
 
                         trigger OnDrillDown()
@@ -51,14 +54,17 @@ page 6151411 "Magento Pictures"
                             DrillDownCounter();
                         end;
                     }
-                    field("Last Date Modified";"Last Date Modified")
+                    field("Last Date Modified"; "Last Date Modified")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Last Time Modified";"Last Time Modified")
+                    field("Last Time Modified"; "Last Time Modified")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Size (kb)";"Size (kb)")
+                    field("Size (kb)"; "Size (kb)")
                     {
+                        ApplicationArea = All;
                         Visible = false;
                     }
                 }
@@ -66,12 +72,12 @@ page 6151411 "Magento Pictures"
         }
         area(factboxes)
         {
-            part(DragDropAddin;"Magento DragDropPic. Addin")
+            part(DragDropAddin; "Magento DragDropPic. Addin")
             {
                 Caption = 'DragAndDrop Picture';
                 ShowFilter = false;
-                SubPageLink = Type=FIELD(Type),
-                              Name=FIELD(Name);
+                SubPageLink = Type = FIELD(Type),
+                              Name = FIELD(Name);
             }
         }
     }
@@ -100,12 +106,12 @@ page 6151411 "Magento Pictures"
                     Total := Count;
                     Window.Open(Text000);
                     if FindSet then
-                      repeat
-                        Counter += 1;
-                        Window.Update(1,Round((Counter / Total) * 10000,1));
+                        repeat
+                            Counter += 1;
+                            Window.Update(1, Round((Counter / Total) * 10000, 1));
 
-                        Mark(not TryCheckPicture());
-                      until Next = 0;
+                            Mark(not TryCheckPicture());
+                        until Next = 0;
                     Window.Close;
 
                     MarkedOnly(true);
@@ -122,13 +128,13 @@ page 6151411 "Magento Pictures"
     begin
         CountRelations();
         //-MAG10.00.2.00 [258544]
-        if TempMagentoPicture.Get(Type,Name) then begin
-          TempMagentoPicture.CalcFields(Picture);
-          exit;
+        if TempMagentoPicture.Get(Type, Name) then begin
+            TempMagentoPicture.CalcFields(Picture);
+            exit;
         end;
         Clear(TempMagentoPicture2);
         if MiniatureLinePicture then
-          DownloadPicture(TempMagentoPicture2);
+            DownloadPicture(TempMagentoPicture2);
 
         TempMagentoPicture.Init;
         TempMagentoPicture := Rec;
@@ -162,26 +168,26 @@ page 6151411 "Magento Pictures"
     begin
         Counter := 0;
         case Type of
-          Type::Item:
-            begin
-              MagentoPictureLink.SetRange("Picture Name",Name);
-              Counter := MagentoPictureLink.Count;
-            end;
-          Type::"Item Group":
-            begin
-              MagentoItemGroup.SetRange(Picture,Name);
-              Counter := MagentoItemGroup.Count;
-            end;
-          Type::Brand:
-            begin
-              MagentoBrand.SetRange(Picture,Name);
-              Counter := MagentoBrand.Count;
-            end;
-          Type::Customer:
-            begin
-              MagentoAttributeLabel.SetRange(Image,Name);
-              Counter := MagentoAttributeLabel.Count;
-            end;
+            Type::Item:
+                begin
+                    MagentoPictureLink.SetRange("Picture Name", Name);
+                    Counter := MagentoPictureLink.Count;
+                end;
+            Type::"Item Group":
+                begin
+                    MagentoItemGroup.SetRange(Picture, Name);
+                    Counter := MagentoItemGroup.Count;
+                end;
+            Type::Brand:
+                begin
+                    MagentoBrand.SetRange(Picture, Name);
+                    Counter := MagentoBrand.Count;
+                end;
+            Type::Customer:
+                begin
+                    MagentoAttributeLabel.SetRange(Image, Name);
+                    Counter := MagentoAttributeLabel.Count;
+                end;
         end;
     end;
 
@@ -195,42 +201,42 @@ page 6151411 "Magento Pictures"
         TempItem2: Record Item temporary;
     begin
         if Counter <> 0 then begin
-          case Type of
-            Type::Item:
-              begin
-                Clear(MagentoPictureLink);
-                MagentoPictureLink.SetRange("Picture Name",Name);
-                if MagentoPictureLink.FindSet then
-                  repeat
-                    if not TempItem.Get(MagentoPictureLink."Item No.") then begin
-                      //-MAG2.22 [361234]
-                      if Item.Get(MagentoPictureLink."Item No.") then begin
-                        TempItem.Init;
-                        TempItem := Item;
-                        TempItem.Insert;
-                      end else begin
-                        TempItem.Init;
-                        TempItem."No." := MagentoPictureLink."Item No.";
-                        TempItem.Insert;
-                      end;
-                      //+MAG2.22 [361234]
+            case Type of
+                Type::Item:
+                    begin
+                        Clear(MagentoPictureLink);
+                        MagentoPictureLink.SetRange("Picture Name", Name);
+                        if MagentoPictureLink.FindSet then
+                            repeat
+                                if not TempItem.Get(MagentoPictureLink."Item No.") then begin
+                                    //-MAG2.22 [361234]
+                                    if Item.Get(MagentoPictureLink."Item No.") then begin
+                                        TempItem.Init;
+                                        TempItem := Item;
+                                        TempItem.Insert;
+                                    end else begin
+                                        TempItem.Init;
+                                        TempItem."No." := MagentoPictureLink."Item No.";
+                                        TempItem.Insert;
+                                    end;
+                                    //+MAG2.22 [361234]
+                                end;
+                            until MagentoPictureLink.Next = 0;
+                        PAGE.Run(PAGE::"Retail Item List", TempItem);
                     end;
-                  until MagentoPictureLink.Next = 0;
-                PAGE.Run(PAGE::"Retail Item List",TempItem);
-              end;
-            Type::"Item Group":
-              begin
-                Clear(MagentoItemGroup);
-                MagentoItemGroup.SetRange(Picture,Name);
-                PAGE.Run(PAGE::"Magento Category List",MagentoItemGroup);
-              end;
-            Type::Brand:
-              begin
-                Clear(MagentoBrand);
-                MagentoBrand.SetRange(Picture,Name);
-                PAGE.Run(PAGE::"Magento Brands",MagentoBrand);
-              end;
-          end;
+                Type::"Item Group":
+                    begin
+                        Clear(MagentoItemGroup);
+                        MagentoItemGroup.SetRange(Picture, Name);
+                        PAGE.Run(PAGE::"Magento Category List", MagentoItemGroup);
+                    end;
+                Type::Brand:
+                    begin
+                        Clear(MagentoBrand);
+                        MagentoBrand.SetRange(Picture, Name);
+                        PAGE.Run(PAGE::"Magento Brands", MagentoBrand);
+                    end;
+            end;
         end;
     end;
 
@@ -242,9 +248,9 @@ page 6151411 "Magento Pictures"
     begin
         //-MAG1.21
         if not MagentoSetup.Get then
-          exit;
-        MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre,MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
-        MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture,MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
+            exit;
+        MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
+        MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
         //+MAG1.21
     end;
 

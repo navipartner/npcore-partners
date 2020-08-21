@@ -12,11 +12,13 @@ page 6014534 "Touch Screen - Return Reasons"
             repeater(Control6150616)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

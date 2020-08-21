@@ -14,20 +14,25 @@ page 6014442 "Item - Series Number"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expiration Date";"Expiration Date")
+                field("Expiration Date"; "Expiration Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

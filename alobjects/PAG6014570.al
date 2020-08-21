@@ -14,61 +14,77 @@ page 6014570 "Retail Admin Activities"
             cuegroup(POS)
             {
                 Caption = 'POS';
-                field("User Setups";"User Setups")
+                field("User Setups"; "User Setups")
                 {
+                    ApplicationArea = All;
                 }
-                field(Salespersons;Salespersons)
+                field(Salespersons; Salespersons)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Stores";"POS Stores")
+                field("POS Stores"; "POS Stores")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Units";"POS Units")
+                field("POS Units"; "POS Units")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cash Registers";"Cash Registers")
+                field("Cash Registers"; "Cash Registers")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Bins";"POS Payment Bins")
+                field("POS Payment Bins"; "POS Payment Bins")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Methods";"POS Payment Methods")
+                field("POS Payment Methods"; "POS Payment Methods")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Posting Setups";"POS Posting Setups")
+                field("POS Posting Setups"; "POS Posting Setups")
                 {
+                    ApplicationArea = All;
                 }
             }
             cuegroup(Tickets)
             {
                 Caption = 'Tickets';
-                field("Ticket Types";"Ticket Types")
+                field("Ticket Types"; "Ticket Types")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Admission BOMs";"Ticket Admission BOMs")
+                field("Ticket Admission BOMs"; "Ticket Admission BOMs")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Schedules";"Ticket Schedules")
+                field("Ticket Schedules"; "Ticket Schedules")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Admissions";"Ticket Admissions")
+                field("Ticket Admissions"; "Ticket Admissions")
                 {
+                    ApplicationArea = All;
                 }
             }
             cuegroup(Members)
             {
                 Caption = 'Members';
-                field("Membership Setup";"Membership Setup")
+                field("Membership Setup"; "Membership Setup")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Sales Setup";"Membership Sales Setup")
+                field("Membership Sales Setup"; "Membership Sales Setup")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Alteration";"Member Alteration")
+                field("Member Alteration"; "Member Alteration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Community";"Member Community")
+                field("Member Community"; "Member Community")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -82,8 +98,8 @@ page 6014570 "Retail Admin Activities"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

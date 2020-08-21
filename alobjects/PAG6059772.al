@@ -15,43 +15,53 @@ page 6059772 "Member Card Types Card"
                 group(Control6150616)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Card No. Series";"Card No. Series")
+                    field("Card No. Series"; "Card No. Series")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150624)
                 {
                     ShowCaption = false;
-                    field("EAN Prefix";"EAN Prefix")
+                    field("EAN Prefix"; "EAN Prefix")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Expiration Calculation";"Expiration Calculation")
+                    field("Expiration Calculation"; "Expiration Calculation")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Point Account";"Point Account")
+                    field("Point Account"; "Point Account")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Post Point Earnings";"Post Point Earnings")
+                    field("Post Point Earnings"; "Post Point Earnings")
                     {
+                        ApplicationArea = All;
                     }
-                    field("PaymentTypePOS.""No.""";PaymentTypePOS."No.")
+                    field("PaymentTypePOS.""No."""; PaymentTypePOS."No.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Payment Type';
                         Editable = false;
                     }
-                    field(BalAccountType;BalAccountType)
+                    field(BalAccountType; BalAccountType)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         ShowCaption = false;
                     }
-                    field(BalAccount;BalAccount)
+                    field(BalAccount; BalAccount)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         ShowCaption = false;
                     }
@@ -60,18 +70,20 @@ page 6059772 "Member Card Types Card"
             group("Card Setup")
             {
                 Caption = 'Card Setup';
-                field("Card Expiration Formula";"Card Expiration Formula")
+                field("Card Expiration Formula"; "Card Expiration Formula")
                 {
+                    ApplicationArea = All;
                     Caption = 'Card Expiration Formula';
                 }
-                field("Customer Template";"Customer Template")
+                field("Customer Template"; "Customer Template")
                 {
+                    ApplicationArea = All;
                     Caption = 'Customer Price Group';
                 }
             }
-            part(Control6150629;"Member Card Types Subform")
+            part(Control6150629; "Member Card Types Subform")
             {
-                SubPageLink = "Card Code"=FIELD(Code);
+                SubPageLink = "Card Code" = FIELD(Code);
             }
         }
     }
@@ -93,17 +105,20 @@ page 6059772 "Member Card Types Card"
     trigger OnAfterGetRecord()
     begin
         PaymentTypePOS.Reset;
-        PaymentTypePOS.SetRange("Processing Type",PaymentTypePOS."Processing Type"::"Point Card");
-        PaymentTypePOS.SetRange("Loyalty Card Type",Code);
+        PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::"Point Card");
+        PaymentTypePOS.SetRange("Loyalty Card Type", Code);
 
         if PaymentTypePOS.FindFirst then;
 
         BalAccountType := PaymentTypePOS."Account Type";
 
         case BalAccountType of
-          BalAccountType::"G/L Account" : BalAccount := PaymentTypePOS."G/L Account No.";
-          BalAccountType::Customer  : BalAccount := PaymentTypePOS."Customer No.";
-          BalAccountType::Bank  : BalAccount := PaymentTypePOS."Bank Acc. No.";
+            BalAccountType::"G/L Account":
+                BalAccount := PaymentTypePOS."G/L Account No.";
+            BalAccountType::Customer:
+                BalAccount := PaymentTypePOS."Customer No.";
+            BalAccountType::Bank:
+                BalAccount := PaymentTypePOS."Bank Acc. No.";
         end;
     end;
 

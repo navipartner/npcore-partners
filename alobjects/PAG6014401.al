@@ -15,56 +15,69 @@ page 6014401 "Debit sale info"
                 group(Control6150616)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
 
                         trigger OnAssistEdit()
                         begin
 
                             if AssistEdit(xRec) then
-                              CurrPage.Update;
+                                CurrPage.Update;
                         end;
                     }
-                    field("Sell-to Customer No.";"Sell-to Customer No.")
+                    field("Sell-to Customer No."; "Sell-to Customer No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sell-to Customer Name";"Sell-to Customer Name")
+                    field("Sell-to Customer Name"; "Sell-to Customer Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+                    field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sell-to Address";"Sell-to Address")
+                    field("Sell-to Address"; "Sell-to Address")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sell-to Address 2";"Sell-to Address 2")
+                    field("Sell-to Address 2"; "Sell-to Address 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sell-to Post Code";"Sell-to Post Code")
+                    field("Sell-to Post Code"; "Sell-to Post Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sell-to City";"Sell-to City")
+                    field("Sell-to City"; "Sell-to City")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sell-to Contact";"Sell-to Contact")
+                    field("Sell-to Contact"; "Sell-to Contact")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Your Reference";"Your Reference")
+                    field("Your Reference"; "Your Reference")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150627)
                 {
                     ShowCaption = false;
-                    field("Posting Date";"Posting Date")
+                    field("Posting Date"; "Posting Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Document Date";"Document Date")
+                    field("Document Date"; "Document Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Salesperson Code";"Salesperson Code")
+                    field("Salesperson Code"; "Salesperson Code")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
@@ -75,54 +88,69 @@ page 6014401 "Debit sale info"
                 group(Control6150633)
                 {
                     ShowCaption = false;
-                    field("Bill-to Customer No.";"Bill-to Customer No.")
+                    field("Bill-to Customer No."; "Bill-to Customer No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bill-to Name";"Bill-to Name")
+                    field("Bill-to Name"; "Bill-to Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bill-to Name 2";"Bill-to Name 2")
+                    field("Bill-to Name 2"; "Bill-to Name 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bill-to Address";"Bill-to Address")
+                    field("Bill-to Address"; "Bill-to Address")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bill-to Address 2";"Bill-to Address 2")
+                    field("Bill-to Address 2"; "Bill-to Address 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bill-to Post Code";"Bill-to Post Code")
+                    field("Bill-to Post Code"; "Bill-to Post Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bill-to City";"Bill-to City")
+                    field("Bill-to City"; "Bill-to City")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Bill-to Contact";"Bill-to Contact")
+                    field("Bill-to Contact"; "Bill-to Contact")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150642)
                 {
                     ShowCaption = false;
-                    field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                    field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                    field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Payment Terms Code";"Payment Terms Code")
+                    field("Payment Terms Code"; "Payment Terms Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Due Date";"Due Date")
+                    field("Due Date"; "Due Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Payment Discount %";"Payment Discount %")
+                    field("Payment Discount %"; "Payment Discount %")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Pmt. Discount Date";"Pmt. Discount Date")
+                    field("Pmt. Discount Date"; "Pmt. Discount Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Payment Method Code";"Payment Method Code")
+                    field("Payment Method Code"; "Payment Method Code")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -132,48 +160,61 @@ page 6014401 "Debit sale info"
                 group(Control6150652)
                 {
                     ShowCaption = false;
-                    field("Ship-to Code";"Ship-to Code")
+                    field("Ship-to Code"; "Ship-to Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Name";"Ship-to Name")
+                    field("Ship-to Name"; "Ship-to Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Name 2";"Ship-to Name 2")
+                    field("Ship-to Name 2"; "Ship-to Name 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Address";"Ship-to Address")
+                    field("Ship-to Address"; "Ship-to Address")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Address 2";"Ship-to Address 2")
+                    field("Ship-to Address 2"; "Ship-to Address 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Post Code";"Ship-to Post Code")
+                    field("Ship-to Post Code"; "Ship-to Post Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to City";"Ship-to City")
+                    field("Ship-to City"; "Ship-to City")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Contact";"Ship-to Contact")
+                    field("Ship-to Contact"; "Ship-to Contact")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150662)
                 {
                     ShowCaption = false;
-                    field("Location Code";"Location Code")
+                    field("Location Code"; "Location Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Shipment Method Code";"Shipment Method Code")
+                    field("Shipment Method Code"; "Shipment Method Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Shipping Agent Code";"Shipping Agent Code")
+                    field("Shipping Agent Code"; "Shipping Agent Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Package Tracking No.";"Package Tracking No.")
+                    field("Package Tracking No."; "Package Tracking No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Shipment Date";"Shipment Date")
+                    field("Shipment Date"; "Shipment Date")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

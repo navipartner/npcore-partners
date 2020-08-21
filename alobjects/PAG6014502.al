@@ -14,62 +14,81 @@ page 6014502 "Accessory Unfold Worksheet"
         {
             repeater(Group)
             {
-                field("Accessory Item No.";"Accessory Item No.")
+                field("Accessory Item No."; "Accessory Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Ledger Entry No.";"Item Ledger Entry No.")
+                field("Item Ledger Entry No."; "Item Ledger Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Type";"Source Type")
+                field("Source Type"; "Source Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source No.";"Source No.")
+                field("Source No."; "Source No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Line No.";"Document Line No.")
+                field("Document Line No."; "Document Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cash Register No.";"Cash Register No.")
+                field("Cash Register No."; "Cash Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Time";"Document Time")
+                field("Document Time"; "Document Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -107,12 +126,12 @@ page 6014502 "Accessory Unfold Worksheet"
                 var
                     AccessoryUnfoldMgt: Codeunit "Accessory Unfold Mgt.";
                 begin
-                    if not Confirm(Text000,true) then
-                      exit;
+                    if not Confirm(Text000, true) then
+                        exit;
 
                     if not AccessoryUnfoldMgt.PostWorksheet(Rec) then begin
-                      Message(Text001);
-                      exit;
+                        Message(Text001);
+                        exit;
                     end;
 
                     CurrPage.Update(false);
@@ -127,7 +146,7 @@ page 6014502 "Accessory Unfold Worksheet"
                 Caption = 'Accessory Unfold Entries';
                 Image = Line;
                 RunObject = Page "Accessory Unfold Entries";
-                RunPageLink = "Accessory Item No."=FIELD("Accessory Item No.");
+                RunPageLink = "Accessory Item No." = FIELD("Accessory Item No.");
             }
         }
     }

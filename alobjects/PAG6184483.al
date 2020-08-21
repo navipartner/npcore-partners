@@ -19,14 +19,17 @@ page 6184483 "EFT Integration Types"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit ID";"Codeunit ID")
+                field("Codeunit ID"; "Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -42,7 +45,7 @@ page 6184483 "EFT Integration Types"
     begin
         //-NPR5.46 [290734]
         if Rec.IsEmpty then begin
-          EFTInterface.OnDiscoverIntegrations(Rec);
+            EFTInterface.OnDiscoverIntegrations(Rec);
         end;
         //+NPR5.46 [290734]
     end;

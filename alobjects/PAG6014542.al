@@ -14,23 +14,29 @@ page 6014542 "Touch Screen - Layout List"
             repeater(Control6150620)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Resolution Width";"Resolution Width")
+                field("Resolution Width"; "Resolution Width")
                 {
+                    ApplicationArea = All;
                 }
-                field("Resolution Height";"Resolution Height")
+                field("Resolution Height"; "Resolution Height")
                 {
+                    ApplicationArea = All;
                 }
-                field("Button Count Vertical";"Button Count Vertical")
+                field("Button Count Vertical"; "Button Count Vertical")
                 {
+                    ApplicationArea = All;
                 }
-                field("Button Count Horizontal";"Button Count Horizontal")
+                field("Button Count Horizontal"; "Button Count Horizontal")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

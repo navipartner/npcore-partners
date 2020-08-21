@@ -13,9 +13,9 @@ page 6014485 "Table Import Wizard"
     PromotedActionCategories = 'New,Process,Execution,Template,Data,Test6,Test7,Test8';
     SourceTable = AllObj;
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Object Type","Object ID")
+    SourceTableView = SORTING("Object Type", "Object ID")
                       ORDER(Ascending)
-                      WHERE("Object Type"=CONST(Table));
+                      WHERE("Object Type" = CONST(Table));
     UsageCategory = Administration;
 
     layout
@@ -33,8 +33,9 @@ page 6014485 "Table Import Wizard"
                     {
                         Editable = false;
                         ShowCaption = false;
-                        field("Object ID";"Object ID")
+                        field("Object ID"; "Object ID")
                         {
+                            ApplicationArea = All;
                             Editable = false;
 
                             trigger OnLookup(var Text: Text): Boolean
@@ -43,24 +44,25 @@ page 6014485 "Table Import Wizard"
                                 AllObj: Record AllObj;
                                 ac: Action;
                             begin
-                                AllObj.SetRange("Object Type",AllObj."Object Type"::Table);
+                                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
 
                                 if "Object ID" > 0 then
-                                  if AllObj.Get(AllObj."Object Type"::Table,"Object ID") then;
+                                    if AllObj.Get(AllObj."Object Type"::Table, "Object ID") then;
 
                                 AllObjects.SetTableView(AllObj);
                                 AllObjects.SetRecord(AllObj);
                                 AllObjects.LookupMode(true);
 
                                 if AllObjects.RunModal = ACTION::LookupOK then begin
-                                  AllObjects.GetRecord(AllObj);
-                                  TransferFields(AllObj);
-                                  Insert;
+                                    AllObjects.GetRecord(AllObj);
+                                    TransferFields(AllObj);
+                                    Insert;
                                 end;
                             end;
                         }
-                        field("Object Name";"Object Name")
+                        field("Object Name"; "Object Name")
                         {
+                            ApplicationArea = All;
                             Editable = false;
 
                             trigger OnValidate()
@@ -71,8 +73,9 @@ page 6014485 "Table Import Wizard"
                                 "Object Name" := AllObj."Object Name";
                             end;
                         }
-                        field("TempCommentLine.Comment";TempCommentLine.Comment)
+                        field("TempCommentLine.Comment"; TempCommentLine.Comment)
                         {
+                            ApplicationArea = All;
                             Caption = 'Rows Imported';
                         }
                     }
@@ -80,64 +83,78 @@ page 6014485 "Table Import Wizard"
                 group(Formatting)
                 {
                     Caption = 'Formatting';
-                    field(FieldStartDelimeter;FieldStartDelimeter)
+                    field(FieldStartDelimeter; FieldStartDelimeter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Field Start Delimeter';
                     }
-                    field(FieldEndDelimeter;FieldEndDelimeter)
+                    field(FieldEndDelimeter; FieldEndDelimeter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Field End Delimeter';
                     }
-                    field(FieldSeparator;FieldSeparator)
+                    field(FieldSeparator; FieldSeparator)
                     {
+                        ApplicationArea = All;
                         Caption = 'Field Separator';
                     }
-                    field(RecordSeparator;RecordSeparator)
+                    field(RecordSeparator; RecordSeparator)
                     {
+                        ApplicationArea = All;
                         Caption = 'Record Separator';
                     }
-                    field(DataItemSeparator;DataItemSeparator)
+                    field(DataItemSeparator; DataItemSeparator)
                     {
+                        ApplicationArea = All;
                         Caption = 'Data Item Separator';
                     }
-                    field(EscapeCharacter;EscapeCharacter)
+                    field(EscapeCharacter; EscapeCharacter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Escape Character';
                     }
-                    field(ImportDataInXmlFormat;ImportDataInXmlFormat)
+                    field(ImportDataInXmlFormat; ImportDataInXmlFormat)
                     {
+                        ApplicationArea = All;
                         Caption = 'Use Xml-Format';
                     }
                 }
                 group("Data Settings")
                 {
                     Caption = 'Data Settings';
-                    field(InFileEncoding;InFileEncoding)
+                    field(InFileEncoding; InFileEncoding)
                     {
+                        ApplicationArea = All;
                         Caption = 'File Encoding';
                     }
-                    field(FileMode;FileMode)
+                    field(FileMode; FileMode)
                     {
+                        ApplicationArea = All;
                         Caption = 'File Mode';
                     }
-                    field(ErrorOnMissingFields;ErrorOnMissingFields)
+                    field(ErrorOnMissingFields; ErrorOnMissingFields)
                     {
+                        ApplicationArea = All;
                         Caption = 'Error On Missing Fields';
                     }
-                    field(ErrorOnDataMismatch;ErrorOnDataMismatch)
+                    field(ErrorOnDataMismatch; ErrorOnDataMismatch)
                     {
+                        ApplicationArea = All;
                         Caption = 'Error On Data Mismatch';
                     }
-                    field(AutoSave;AutoSave)
+                    field(AutoSave; AutoSave)
                     {
+                        ApplicationArea = All;
                         Caption = 'AutoSave';
                     }
-                    field(AutoUpdate;AutoUpdate)
+                    field(AutoUpdate; AutoUpdate)
                     {
+                        ApplicationArea = All;
                         Caption = 'AutoUpdate';
                     }
-                    field(AutoReplace;AutoReplace)
+                    field(AutoReplace; AutoReplace)
                     {
+                        ApplicationArea = All;
                         Caption = 'AutoReplace';
                     }
                 }
@@ -178,7 +195,7 @@ page 6014485 "Table Import Wizard"
 
     trigger OnAfterGetRecord()
     begin
-        TempCommentLine.SetRange("No.",Format("Object ID"));
+        TempCommentLine.SetRange("No.", Format("Object ID"));
         if TempCommentLine.FindSet then;
     end;
 
@@ -216,7 +233,7 @@ page 6014485 "Table Import Wizard"
         AllObj: Record AllObj;
     begin
         Init;
-        AllObj.Get(AllObj."Object Type"::Table,TableID);
+        AllObj.Get(AllObj."Object Type"::Table, TableID);
         TransferFields(AllObj);
         if Insert then;
     end;
@@ -262,22 +279,22 @@ page 6014485 "Table Import Wizard"
         //+NPR5.41 [308570]
 
         case FileMode of
-          //-NPR5.38 [301053]
-          // FileMode::ADOStream :
-          //   BEGIN
-          //     TableImportLibrary.SetFileModeADO;
-          //     TableImportLibrary.SetInFileEncoding(InFileEncoding);
-          //   END;
-          //+NPR5.38 [301053]
-          //-NPR5.42
-          //FileMode::OStream :
-          //  TableImportLibrary.SetFileModeOStream;
-          //+NPR5.42
-          FileMode::DotNetStream :
-            begin
-            TableImportLibrary.SetFileModeDotNetStream;
-            TableImportLibrary.SetInFileEncoding(InFileEncoding);
-            end;
+            //-NPR5.38 [301053]
+            // FileMode::ADOStream :
+            //   BEGIN
+            //     TableImportLibrary.SetFileModeADO;
+            //     TableImportLibrary.SetInFileEncoding(InFileEncoding);
+            //   END;
+            //+NPR5.38 [301053]
+            //-NPR5.42
+            //FileMode::OStream :
+            //  TableImportLibrary.SetFileModeOStream;
+            //+NPR5.42
+            FileMode::DotNetStream:
+                begin
+                    TableImportLibrary.SetFileModeDotNetStream;
+                    TableImportLibrary.SetInFileEncoding(InFileEncoding);
+                end;
         end;
 
         //-NPR5.48 [340086]
@@ -289,10 +306,10 @@ page 6014485 "Table Import Wizard"
         // TableImportLibrary.Reset;
 
         if TableImportLibrary.Run then begin
-          TableImportLibrary.GetImportHistory(Rec);
-          TableImportLibrary.GetImportDetails(TempCommentLine);
+            TableImportLibrary.GetImportHistory(Rec);
+            TableImportLibrary.GetImportDetails(TempCommentLine);
         end else
-          Message(TableImportLibrary.GetLastPosition());
+            Message(TableImportLibrary.GetLastPosition());
         //+NPR5.48 [340086]
 
         CurrPage.Update(false);
@@ -300,29 +317,29 @@ page 6014485 "Table Import Wizard"
 
     procedure SetDefaultVars()
     begin
-        AutoSave              := true;
-        AutoUpdate            := true;
-        AutoReplace           := false;
+        AutoSave := true;
+        AutoUpdate := true;
+        AutoReplace := false;
         //-NPR5.48 [340086]
         //RaiseErrors           := FALSE;
         ErrorOnDataMismatch := true;
         ErrorOnMissingFields := false;
         //+NPR5.48 [340086]
-        ShowStatus            := true;
-        InFileEncoding        := 'utf-8';
-        FileMode              := FileMode::DotNetStream;
-        TrimSpecialChars      := false;
-        FileName              := '';
+        ShowStatus := true;
+        InFileEncoding := 'utf-8';
+        FileMode := FileMode::DotNetStream;
+        TrimSpecialChars := false;
+        FileName := '';
         //-NPR5.48 [340086]
         // FieldStartDelimeter   := '"';
         // FieldEndDelimeter     := '"';
         // FieldSeparator        := ';';
-        FieldStartDelimeter   := '';
-        FieldEndDelimeter     := '';
-        FieldSeparator        := '|';
+        FieldStartDelimeter := '';
+        FieldEndDelimeter := '';
+        FieldSeparator := '|';
         //+NPR5.48 [340086]
-        RecordSeparator       := '<NEWLINE>';
-        DataItemSeparator     := '<NEWLINE><NEWLINE>';
+        RecordSeparator := '<NEWLINE>';
+        DataItemSeparator := '<NEWLINE><NEWLINE>';
         //-NPR5.41 [308570]
         ImportDataInXmlFormat := true;
         //+NPR5.41 [308570]

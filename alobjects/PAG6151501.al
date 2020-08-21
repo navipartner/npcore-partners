@@ -17,20 +17,25 @@ page 6151501 "Nc Task Setup"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Task Processor Code";"Task Processor Code")
+                field("Task Processor Code"; "Task Processor Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit ID";"Codeunit ID")
+                field("Codeunit ID"; "Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit Name";"Codeunit Name")
+                field("Codeunit Name"; "Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

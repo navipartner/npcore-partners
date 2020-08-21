@@ -15,17 +15,21 @@ page 6060062 "Item Category Mapping"
         {
             repeater(Group)
             {
-                field("Item Category Code";"Item Category Code")
+                field("Item Category Code"; "Item Category Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Material";"Item Material")
+                field("Item Material"; "Item Material")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Material Density";"Item Material Density")
+                field("Item Material Density"; "Item Material Density")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group";"Item Group")
+                field("Item Group"; "Item Group")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

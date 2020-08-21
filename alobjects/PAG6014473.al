@@ -14,23 +14,29 @@ page 6014473 "Retail Journal Print"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity to Print";"Quantity to Print")
+                field("Quantity to Print"; "Quantity to Print")
                 {
+                    ApplicationArea = All;
                 }
-                field(Print;Print)
+                field(Print; Print)
                 {
+                    ApplicationArea = All;
                     Caption = 'Print';
 
                     trigger OnValidate()
@@ -41,19 +47,23 @@ page 6014473 "Retail Journal Print"
                         LabelLibrary.ToggleLine(RecRef);
                     end;
                 }
-                field(Barcode;Barcode)
+                field(Barcode; Barcode)
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Price Incl. Vat";"Discount Price Incl. Vat")
+                field("Discount Price Incl. Vat"; "Discount Price Incl. Vat")
                 {
+                    ApplicationArea = All;
                     Caption = 'Unit Price';
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Vendor Item No.";"Vendor Item No.")
+                field("Vendor Item No."; "Vendor Item No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -138,7 +148,7 @@ page 6014473 "Retail Journal Print"
     begin
         RecRef.GetTable(Rec);
         if LabelLibrary.SelectionContains(RecRef) then
-          LabelLibrary.ToggleLine(RecRef);
+            LabelLibrary.ToggleLine(RecRef);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)

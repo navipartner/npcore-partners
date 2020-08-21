@@ -25,36 +25,43 @@ page 6151403 "Magento Websites"
                 repeater(Control6150613)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Default Website";"Default Website")
+                    field("Default Website"; "Default Website")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                    field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                    field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                     {
+                        ApplicationArea = All;
                         Visible = false;
                     }
-                    field("Location Code";"Location Code")
+                    field("Location Code"; "Location Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sales Order No. Series";"Sales Order No. Series")
+                    field("Sales Order No. Series"; "Sales Order No. Series")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150620)
                 {
                     ShowCaption = false;
-                    part(Stores;"Magento Store Subform")
+                    part(Stores; "Magento Store Subform")
                     {
                         Caption = 'Stores';
-                        SubPageLink = "Website Code"=FIELD(Code);
+                        SubPageLink = "Website Code" = FIELD(Code);
                     }
                 }
             }

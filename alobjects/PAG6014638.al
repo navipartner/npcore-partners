@@ -14,14 +14,17 @@ page 6014638 "RP Template Card"
             group(General)
             {
                 Editable = NOT Archived;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Printer Type";"Printer Type")
+                field("Printer Type"; "Printer Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Printer Device";"Printer Device")
+                field("Printer Device"; "Printer Device")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     ToolTip = 'Blank = Decide based on printername keyword match.';
 
@@ -30,15 +33,18 @@ page 6014638 "RP Template Card"
                         LookupDevice();
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Archived;Archived)
+                field(Archived; Archived)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Editable = false;
 
@@ -46,67 +52,80 @@ page 6014638 "RP Template Card"
                     var
                         RPTemplateArchive: Record "RP Template Archive";
                     begin
-                        RPTemplateArchive.SetRange(Code,Code);
+                        RPTemplateArchive.SetRange(Code, Code);
                         PAGE.RunModal(PAGE::"RP Template Archive List", RPTemplateArchive);
                     end;
                 }
-                field("Version Comments";"Version Comments")
+                field("Version Comments"; "Version Comments")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Modified At";"Last Modified At")
+                field("Last Modified At"; "Last Modified At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Last Modified By";"Last Modified By")
+                field("Last Modified By"; "Last Modified By")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Default Decimal Rounding";"Default Decimal Rounding")
+                field("Default Decimal Rounding"; "Default Decimal Rounding")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Line Settings")
             {
                 Caption = 'Line Settings';
                 Editable = NOT Archived;
-                Visible = "Printer Type"=1;
+                Visible = "Printer Type" = 1;
                 group("Two Column Distribution")
                 {
                     Caption = 'Two Column Distribution';
-                    field("Two Column Width 1";"Two Column Width 1")
+                    field("Two Column Width 1"; "Two Column Width 1")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Two Column Width 2";"Two Column Width 2")
+                    field("Two Column Width 2"; "Two Column Width 2")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Three Column Distribution")
                 {
                     Caption = 'Three Column Distribution';
-                    field("Three Column Width 1";"Three Column Width 1")
+                    field("Three Column Width 1"; "Three Column Width 1")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Three Column Width 2";"Three Column Width 2")
+                    field("Three Column Width 2"; "Three Column Width 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Three Column Width 3";"Three Column Width 3")
+                    field("Three Column Width 3"; "Three Column Width 3")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Four Column Distribution")
                 {
                     Caption = 'Four Column Distribution';
-                    field("Four Column Width 1";"Four Column Width 1")
+                    field("Four Column Width 1"; "Four Column Width 1")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Four Column Width 2";"Four Column Width 2")
+                    field("Four Column Width 2"; "Four Column Width 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Four Column Width 3";"Four Column Width 3")
+                    field("Four Column Width 3"; "Four Column Width 3")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Four Column Width 4";"Four Column Width 4")
+                    field("Four Column Width 4"; "Four Column Width 4")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -114,25 +133,30 @@ page 6014638 "RP Template Card"
             {
                 Caption = 'Processing';
                 Editable = NOT Archived;
-                field("Pre Processing Codeunit";"Pre Processing Codeunit")
+                field("Pre Processing Codeunit"; "Pre Processing Codeunit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Processing Object Type";"Print Processing Object Type")
+                field("Print Processing Object Type"; "Print Processing Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Processing Object ID";"Print Processing Object ID")
+                field("Print Processing Object ID"; "Print Processing Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Processing Codeunit";"Post Processing Codeunit")
+                field("Post Processing Codeunit"; "Post Processing Codeunit")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Media)
             {
                 Caption = 'Media';
                 Editable = NOT Archived;
-                field("tmpMediaInfo.Picture";tmpMediaInfo.Picture)
+                field("tmpMediaInfo.Picture"; tmpMediaInfo.Picture)
                 {
+                    ApplicationArea = All;
                     Caption = 'Media Roll Picture';
 
                     trigger OnValidate()
@@ -145,8 +169,9 @@ page 6014638 "RP Template Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field("tmpMediaInfo.URL";tmpMediaInfo.URL)
+                field("tmpMediaInfo.URL"; tmpMediaInfo.URL)
                 {
+                    ApplicationArea = All;
                     Caption = 'Media Roll URL';
 
                     trigger OnValidate()
@@ -159,8 +184,9 @@ page 6014638 "RP Template Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field("tmpMediaInfo.Description";tmpMediaInfo.Description)
+                field("tmpMediaInfo.Description"; tmpMediaInfo.Description)
                 {
+                    ApplicationArea = All;
                     Caption = 'Media Roll Description';
 
                     trigger OnValidate()
@@ -189,7 +215,7 @@ page 6014638 "RP Template Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "RP Data Items";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
             }
             action("Edit Layout")
             {
@@ -199,7 +225,7 @@ page 6014638 "RP Template Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "RP Template Designer";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
             }
             action("Edit Device Settings")
             {
@@ -209,7 +235,7 @@ page 6014638 "RP Template Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "RP Device Settings";
-                RunPageLink = Template=FIELD(Code);
+                RunPageLink = Template = FIELD(Code);
             }
             action("New Version")
             {
@@ -252,7 +278,7 @@ page 6014638 "RP Template Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "RP Template Archive List";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
             }
         }
     }
@@ -262,22 +288,22 @@ page 6014638 "RP Template Card"
         MediaInfo: Record "RP Template Media Info";
     begin
         if GetMediaInfoRecord(MediaInfo, false) then
-          tmpMediaInfo := MediaInfo;
+            tmpMediaInfo := MediaInfo;
     end;
 
     var
         tmpMediaInfo: Record "RP Template Media Info";
 
-    local procedure GetMediaInfoRecord(var MediaInfo: Record "RP Template Media Info";WithInsert: Boolean) Return: Boolean
+    local procedure GetMediaInfoRecord(var MediaInfo: Record "RP Template Media Info"; WithInsert: Boolean) Return: Boolean
     begin
         MediaInfo.SetAutoCalcFields(Picture);
         Return := MediaInfo.Get(Code);
         if not Return then
-          if WithInsert then begin
-            MediaInfo.Init;
-            MediaInfo.Template := Code;
-            Return := MediaInfo.Insert;
-          end;
+            if WithInsert then begin
+                MediaInfo.Init;
+                MediaInfo.Template := Code;
+                Return := MediaInfo.Insert;
+            end;
     end;
 }
 

@@ -13,8 +13,9 @@ page 6014623 "Generic Key List"
         {
             repeater(Group)
             {
-                field(SortingKey;SortingKey)
+                field(SortingKey; SortingKey)
                 {
+                    ApplicationArea = All;
                     Caption = 'Sorting Key';
                 }
             }
@@ -33,10 +34,10 @@ page 6014623 "Generic Key List"
     trigger OnOpenPage()
     begin
         if not RecRefSet then
-          Error(Text001);
+            Error(Text001);
         KeyCount := RecRef.KeyCount;
         FilterGroup := 2;
-        SetRange(Number,1,KeyCount);
+        SetRange(Number, 1, KeyCount);
         FilterGroup := 0;
         BuildKeyList();
         SetPosition(Rec.FieldName(Number) + '=CONST(' + Format(CurrSortingKeyIndex) + ')');
@@ -46,13 +47,13 @@ page 6014623 "Generic Key List"
         RecRef: RecordRef;
         RecRefSet: Boolean;
         SortingKey: Text;
-        SortingKeyArr: array [40] of Text;
+        SortingKeyArr: array[40] of Text;
         Text001: Label 'You must use function SetParameters before running the page.';
         CurrSortingKey: Text;
         CurrSortingKeyIndex: Integer;
         KeyCount: Integer;
 
-    procedure SetParameters(RecRefHere: RecordRef;CurrSortingKeyHere: Text)
+    procedure SetParameters(RecRefHere: RecordRef; CurrSortingKeyHere: Text)
     begin
         RecRef := RecRefHere;
         RecRefSet := true;
@@ -65,9 +66,9 @@ page 6014623 "Generic Key List"
         GenericFilterPageMgt: Codeunit "Generic Filter Page Mgt.";
     begin
         for i := 1 to KeyCount do begin
-          SortingKeyArr[i] := GenericFilterPageMgt.ReadKeyString(RecRef,i);
-          if SortingKeyArr[i] = CurrSortingKey then
-            CurrSortingKeyIndex := i;
+            SortingKeyArr[i] := GenericFilterPageMgt.ReadKeyString(RecRef, i);
+            if SortingKeyArr[i] = CurrSortingKey then
+                CurrSortingKeyIndex := i;
         end;
     end;
 

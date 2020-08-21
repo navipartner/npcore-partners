@@ -21,23 +21,28 @@ page 6014658 ".NET Assemblies"
             {
                 field("Assembly Name"; "Assembly Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Assembly.HASVALUE"; Assembly.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'DLL Imported';
                     Editable = false;
                 }
                 field("""Debug Information"".HASVALUE"; "Debug Information".HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'PDB Imported';
                     Editable = false;
                 }
                 field("MD5 Hash"; "MD5 Hash")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

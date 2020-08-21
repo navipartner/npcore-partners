@@ -12,8 +12,9 @@ page 6014498 "Serial Numbers Lookup"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

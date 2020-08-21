@@ -13,20 +13,23 @@ page 6151565 "NpXml Wsdl Input Dialog"
             group("Import WSDL")
             {
                 Caption = 'Import WSDL';
-                field(Wsdl;Wsdl)
+                field(Wsdl; Wsdl)
                 {
+                    ApplicationArea = All;
                     Caption = 'WSDL (url or file path)';
                     ExtendedDatatype = URL;
                 }
                 group("When using NTLM username and password are reqired.")
                 {
                     Caption = 'When using NTLM username and password are reqired.';
-                    field(Username;Username)
+                    field(Username; Username)
                     {
+                        ApplicationArea = All;
                         Caption = 'Username';
                     }
-                    field(Password;Password)
+                    field(Password; Password)
                     {
+                        ApplicationArea = All;
                         Caption = 'Password';
                         ExtendedDatatype = Masked;
                     }

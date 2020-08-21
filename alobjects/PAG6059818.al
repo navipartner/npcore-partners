@@ -14,6 +14,7 @@ page 6059818 "Retail Sales Chart by Shop"
         {
             field("Date Range"; StatusText)
             {
+                ApplicationArea = All;
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;

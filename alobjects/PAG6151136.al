@@ -12,20 +12,25 @@ page 6151136 "TM Concurrent Admission Setup"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Capacity";"Total Capacity")
+                field("Total Capacity"; "Total Capacity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Capacity Control";"Capacity Control")
+                field("Capacity Control"; "Capacity Control")
                 {
+                    ApplicationArea = All;
                 }
-                field("Concurrency Type";"Concurrency Type")
+                field("Concurrency Type"; "Concurrency Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

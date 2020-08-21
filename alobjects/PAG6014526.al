@@ -27,24 +27,31 @@ page 6014526 "Touch Screen - Customers"
                 ShowCaption = false;
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
                 field("Address 2"; "Address 2")
                 {
+                    ApplicationArea = All;
                 }
                 field(City; City)
                 {
+                    ApplicationArea = All;
                 }
                 field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Balance; Balance)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

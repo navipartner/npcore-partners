@@ -16,29 +16,36 @@ page 6060097 "Ean Box Events"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Module Name";"Module Name")
+                field("Module Name"; "Module Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Action Code";"Action Code")
+                field("Action Code"; "Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Action Description";"Action Description")
+                field("Action Description"; "Action Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS View";"POS View")
+                field("POS View"; "POS View")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Event Codeunit";"Event Codeunit")
+                field("Event Codeunit"; "Event Codeunit")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -60,9 +67,9 @@ page 6060097 "Ean Box Events"
                 begin
                     EanBoxSetupMgt.InitEanBoxEventParameters(Rec);
 
-                    EanBoxParameter.SetRange("Setup Code",'');
-                    EanBoxParameter.SetRange("Event Code",Code);
-                    PAGE.Run(0,EanBoxParameter);
+                    EanBoxParameter.SetRange("Setup Code", '');
+                    EanBoxParameter.SetRange("Event Code", Code);
+                    PAGE.Run(0, EanBoxParameter);
                 end;
             }
         }

@@ -16,17 +16,21 @@ page 6151250 "NP Retail Enter. Act - Ticket"
                 Caption = 'Tickets';
                 field("Issued Tickets"; "Issued Tickets")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ticket Requests"; "Ticket Requests")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "TM Ticket Request";
                 }
                 field("Ticket Schedules"; "Ticket Schedules")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "TM Ticket Schedules";
                 }
                 field("Ticket Admissions"; "Ticket Admissions")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "TM Ticket Admissions";
                 }
             }
@@ -35,13 +39,16 @@ page 6151250 "NP Retail Enter. Act - Ticket"
                 Caption = 'Members';
                 field(Control6; Members)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
                 field(Memberships; Memberships)
                 {
+                    ApplicationArea = All;
                 }
                 field(Membercards; Membercards)
                 {
+                    ApplicationArea = All;
                 }
             }
 
@@ -50,12 +57,15 @@ page 6151250 "NP Retail Enter. Act - Ticket"
                 Caption = 'Master';
                 field(Items; Items)
                 {
+                    ApplicationArea = All;
                 }
                 field(Contacts; Contacts)
                 {
+                    ApplicationArea = All;
                 }
                 field(Customers; Customers)
                 {
+                    ApplicationArea = All;
                 }
 
             }

@@ -34,37 +34,44 @@ page 6060112 "TM Ticket Select Schedule"
             {
                 field("Schedule Code"; "Schedule Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Admission Start Date"; "Admission Start Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = CalendarExceptionText = '';
                 }
                 field("Admission Start Time"; "Admission Start Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Remaining Reservation"; RemainingReservations)
                 {
+                    ApplicationArea = All;
                     Caption = 'Remaining Reservation';
                     Editable = false;
                     Visible = false;
                 }
                 field(RemainingAdmitted; RemainingAdmitted)
                 {
+                    ApplicationArea = All;
                     Caption = 'Remaining Admitted';
                     Editable = false;
                     Visible = false;
                 }
                 field(Remaining; RemainingText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Remaining';
                     Editable = false;
                     Style = Unfavorable;
@@ -72,6 +79,7 @@ page 6060112 "TM Ticket Select Schedule"
                 }
                 field(CalendarException; CalendarExceptionText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Calendar Exception';
                     Editable = false;
                     Style = Unfavorable;
@@ -84,6 +92,7 @@ page 6060112 "TM Ticket Select Schedule"
                 ShowCaption = false;
                 field(LocalDateTimeText; LocalDateTimeText)
                 {
+                    ApplicationArea = All;
                     Caption = 'Time:';
                     Enabled = false;
                 }
@@ -108,7 +117,7 @@ page 6060112 "TM Ticket Select Schedule"
 
         //-TM1.48 [411704]
         //TicketManagement.GetAdmissionCapacity ("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
-        TicketManagement.GetTicketCapacity (gTicketItemNo, gTicketVariantCode, "Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+        TicketManagement.GetTicketCapacity(gTicketItemNo, gTicketVariantCode, "Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
         //+TM1.48 [411704]
 
         RemainingReservations := MaxCapacity - "Open Reservations";

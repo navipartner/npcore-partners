@@ -15,24 +15,29 @@ page 6060067 "Items by Loc. Overview Matrix"
             repeater(Control6014401)
             {
                 ShowCaption = false;
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Item Description";"Item Description")
+                field("Item Description"; "Item Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description";"Variant Description")
+                field("Variant Description"; "Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field(Inventory;Quantity)
+                field(Inventory; Quantity)
                 {
+                    ApplicationArea = All;
                     Caption = 'Total Inventory';
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
 
                     trigger OnDrillDown()
@@ -40,11 +45,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(0);
                     end;
                 }
-                field(Field1;MATRIX_CellData[1])
+                field(Field1; MATRIX_CellData[1])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field1Visible;
 
@@ -53,11 +59,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(1);
                     end;
                 }
-                field(Field2;MATRIX_CellData[2])
+                field(Field2; MATRIX_CellData[2])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field2Visible;
 
@@ -66,11 +73,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(2);
                     end;
                 }
-                field(Field3;MATRIX_CellData[3])
+                field(Field3; MATRIX_CellData[3])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field3Visible;
 
@@ -79,11 +87,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(3);
                     end;
                 }
-                field(Field4;MATRIX_CellData[4])
+                field(Field4; MATRIX_CellData[4])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field4Visible;
 
@@ -92,11 +101,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(4);
                     end;
                 }
-                field(Field5;MATRIX_CellData[5])
+                field(Field5; MATRIX_CellData[5])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field5Visible;
 
@@ -105,11 +115,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(5);
                     end;
                 }
-                field(Field6;MATRIX_CellData[6])
+                field(Field6; MATRIX_CellData[6])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field6Visible;
 
@@ -118,11 +129,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(6);
                     end;
                 }
-                field(Field7;MATRIX_CellData[7])
+                field(Field7; MATRIX_CellData[7])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field7Visible;
 
@@ -131,11 +143,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(7);
                     end;
                 }
-                field(Field8;MATRIX_CellData[8])
+                field(Field8; MATRIX_CellData[8])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field8Visible;
 
@@ -144,11 +157,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(8);
                     end;
                 }
-                field(Field9;MATRIX_CellData[9])
+                field(Field9; MATRIX_CellData[9])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field9Visible;
 
@@ -157,11 +171,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(9);
                     end;
                 }
-                field(Field10;MATRIX_CellData[10])
+                field(Field10; MATRIX_CellData[10])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field10Visible;
 
@@ -170,11 +185,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(10);
                     end;
                 }
-                field(Field11;MATRIX_CellData[11])
+                field(Field11; MATRIX_CellData[11])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field11Visible;
 
@@ -183,11 +199,12 @@ page 6060067 "Items by Loc. Overview Matrix"
                         MatrixOnDrillDown(11);
                     end;
                 }
-                field(Field12;MATRIX_CellData[12])
+                field(Field12; MATRIX_CellData[12])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field12Visible;
 
@@ -210,10 +227,10 @@ page 6060067 "Items by Loc. Overview Matrix"
     begin
         MATRIX_CurrentColumnOrdinal := 0;
         if MatrixRecord.FindSet then
-          repeat
-            MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
-            MATRIX_CellData[MATRIX_CurrentColumnOrdinal] := MatrixCalcCell(MATRIX_CurrentColumnOrdinal);
-          until (MatrixRecord.Next(1) = 0) or (MATRIX_CurrentColumnOrdinal = MatrixMaxNoOfColumns());
+            repeat
+                MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
+                MATRIX_CellData[MATRIX_CurrentColumnOrdinal] := MatrixCalcCell(MATRIX_CurrentColumnOrdinal);
+            until (MatrixRecord.Next(1) = 0) or (MATRIX_CurrentColumnOrdinal = MatrixMaxNoOfColumns());
 
         Quantity := MatrixCalcCell(0);
     end;
@@ -232,7 +249,7 @@ page 6060067 "Items by Loc. Overview Matrix"
         ItemVariantTmp.Code := "Variant Code";
         Found := ItemVariantTmp.Find(Which);
         if Found then
-          CopyItemVariantToBuf;
+            CopyItemVariantToBuf;
         exit(Found);
     end;
 
@@ -267,7 +284,7 @@ page 6060067 "Items by Loc. Overview Matrix"
         ItemVariantTmp.Code := "Variant Code";
         ResultSteps := ItemVariantTmp.Next(Steps);
         if ResultSteps <> 0 then
-          CopyItemVariantToBuf;
+            CopyItemVariantToBuf;
         exit(ResultSteps);
     end;
 
@@ -278,16 +295,16 @@ page 6060067 "Items by Loc. Overview Matrix"
 
     var
         ItemVariantTmp: Record "Item Variant" temporary;
-        MatrixRecords: array [32] of Record Location;
+        MatrixRecords: array[32] of Record Location;
         MatrixRecord: Record Location temporary;
         MatrixMgt: Codeunit "Matrix Management";
         MATRIX_CurrentNoOfMatrixColumn: Integer;
-        MATRIX_CellData: array [32] of Decimal;
+        MATRIX_CellData: array[32] of Decimal;
         ShowItems: Option "On Inventory","Not on Inventory",All;
-        MATRIX_CaptionSet: array [32] of Text[80];
+        MATRIX_CaptionSet: array[32] of Text[80];
         ItemFilter: Code[250];
         VariantFilter: Code[250];
-        VarietyValueFilter: array [4] of Code[250];
+        VarietyValueFilter: array[4] of Code[250];
         WOutVariantLbl: Label '<W/Out Variant Code>';
         Field1Visible: Boolean;
         Field2Visible: Boolean;
@@ -301,22 +318,22 @@ page 6060067 "Items by Loc. Overview Matrix"
         Field10Visible: Boolean;
         Field11Visible: Boolean;
         Field12Visible: Boolean;
-        EmtpyCodeValueTxt: Label '<NO CODE>', Comment='Maximum length = 10';
+        EmtpyCodeValueTxt: Label '<NO CODE>', Comment = 'Maximum length = 10';
 
-    procedure SetFilters(_ItemFilter: Code[250];_VariantFilter: Code[250];_VarietyValueFilter: array [4] of Code[250];_ShowItems: Option "On Inventory","Not on Inventory",All)
+    procedure SetFilters(_ItemFilter: Code[250]; _VariantFilter: Code[250]; _VarietyValueFilter: array[4] of Code[250]; _ShowItems: Option "On Inventory","Not on Inventory",All)
     begin
         ItemFilter := _ItemFilter;
         VariantFilter := _VariantFilter;
-        CopyArray(VarietyValueFilter,_VarietyValueFilter,1);
+        CopyArray(VarietyValueFilter, _VarietyValueFilter, 1);
         ShowItems := _ShowItems;
     end;
 
-    procedure Load(_MatrixColumns: array [32] of Text[80];var _MatrixRecords: array [32] of Record Location;var _MatrixRecord: Record Location)
+    procedure Load(_MatrixColumns: array[32] of Text[80]; var _MatrixRecords: array[32] of Record Location; var _MatrixRecord: Record Location)
     begin
         Clear(MATRIX_CellData);
-        CopyArray(MATRIX_CaptionSet,_MatrixColumns,1);
-        CopyArray(MatrixRecords,_MatrixRecords,1);
-        MatrixRecord.Copy(_MatrixRecord,true);
+        CopyArray(MATRIX_CaptionSet, _MatrixColumns, 1);
+        CopyArray(MatrixRecords, _MatrixRecords, 1);
+        MatrixRecord.Copy(_MatrixRecord, true);
         SetVisible(false);
     end;
 
@@ -327,36 +344,36 @@ page 6060067 "Items by Loc. Overview Matrix"
     begin
         ItemVariantTmp.DeleteAll;
         if Item.FindSet then
-          repeat
-            ItemVariant.SetRange("Item No.",Item."No.");
-            if ItemVariant.FindSet then
-              repeat
-                ItemVariantTmp := ItemVariant;
+            repeat
+                ItemVariant.SetRange("Item No.", Item."No.");
+                if ItemVariant.FindSet then
+                    repeat
+                        ItemVariantTmp := ItemVariant;
+                        ItemVariantTmp.Insert;
+                    until ItemVariant.Next = 0;
+                ItemVariantTmp.Init;
+                ItemVariantTmp."Item No." := Item."No.";
+                ItemVariantTmp.Code := '';
+                ItemVariantTmp.Description := WOutVariantLbl;
                 ItemVariantTmp.Insert;
-              until ItemVariant.Next = 0;
-            ItemVariantTmp.Init;
-            ItemVariantTmp."Item No." := Item."No.";
-            ItemVariantTmp.Code := '';
-            ItemVariantTmp.Description := WOutVariantLbl;
-            ItemVariantTmp.Insert;
-          until Item.Next = 0;
+            until Item.Next = 0;
     end;
 
     local procedure ApplyFilters()
     begin
         ItemVariantTmp.Reset;
         if ItemFilter <> '' then
-          ItemVariantTmp.SetFilter("Item No.",ItemFilter);
+            ItemVariantTmp.SetFilter("Item No.", ItemFilter);
         if VariantFilter <> '' then
-          ItemVariantTmp.SetFilter(Code,VariantFilter);
+            ItemVariantTmp.SetFilter(Code, VariantFilter);
         if VarietyValueFilter[1] <> '' then
-          ItemVariantTmp.SetFilter("Variety 1 Value",VarietyValueFilter[1]);
+            ItemVariantTmp.SetFilter("Variety 1 Value", VarietyValueFilter[1]);
         if VarietyValueFilter[2] <> '' then
-          ItemVariantTmp.SetFilter("Variety 2 Value",VarietyValueFilter[2]);
+            ItemVariantTmp.SetFilter("Variety 2 Value", VarietyValueFilter[2]);
         if VarietyValueFilter[3] <> '' then
-          ItemVariantTmp.SetFilter("Variety 3 Value",VarietyValueFilter[3]);
+            ItemVariantTmp.SetFilter("Variety 3 Value", VarietyValueFilter[3]);
         if VarietyValueFilter[4] <> '' then
-          ItemVariantTmp.SetFilter("Variety 4 Value",VarietyValueFilter[4]);
+            ItemVariantTmp.SetFilter("Variety 4 Value", VarietyValueFilter[4]);
     end;
 
     local procedure CopyItemVariantToBuf()
@@ -376,12 +393,12 @@ page 6060067 "Items by Loc. Overview Matrix"
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         ItemLedgerEntry.SetCurrentKey(
-          "Item No.","Entry Type","Variant Code","Drop Shipment","Location Code","Posting Date");
-        ItemLedgerEntry.SetRange("Item No.","Item No.");
-        ItemLedgerEntry.SetRange("Variant Code","Variant Code");
+          "Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
+        ItemLedgerEntry.SetRange("Item No.", "Item No.");
+        ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
         if ColumnID <> 0 then
-          ItemLedgerEntry.SetRange("Location Code",AdjustMatrixRecordCode(MatrixRecords[ColumnID].Code));
-        PAGE.Run(0,ItemLedgerEntry);
+            ItemLedgerEntry.SetRange("Location Code", AdjustMatrixRecordCode(MatrixRecords[ColumnID].Code));
+        PAGE.Run(0, ItemLedgerEntry);
     end;
 
     local procedure MatrixCalcCell(ColumnID: Integer): Decimal
@@ -389,9 +406,9 @@ page 6060067 "Items by Loc. Overview Matrix"
         Item: Record Item;
     begin
         Item.Get(ItemVariantTmp."Item No.");
-        Item.SetRange("Variant Filter",ItemVariantTmp.Code);
+        Item.SetRange("Variant Filter", ItemVariantTmp.Code);
         if ColumnID <> 0 then
-          Item.SetRange("Location Filter",AdjustMatrixRecordCode(MatrixRecords[ColumnID].Code));
+            Item.SetRange("Location Filter", AdjustMatrixRecordCode(MatrixRecords[ColumnID].Code));
         Item.CalcFields(Inventory);
         exit(Item.Inventory);
     end;
@@ -427,9 +444,9 @@ page 6060067 "Items by Loc. Overview Matrix"
     local procedure AdjustMatrixRecordCode("Code": Code[10]): Code[10]
     begin
         if Code = EmptyCodeValue then
-          exit('')
+            exit('')
         else
-          exit(Code);
+            exit(Code);
     end;
 }
 

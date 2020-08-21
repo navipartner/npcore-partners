@@ -25,87 +25,109 @@ page 6014431 "Gift Voucher List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Offline - No.";"Offline - No.")
+                field("Offline - No."; "Offline - No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'Offline-No.';
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Issue Date";"Issue Date")
+                field("Issue Date"; "Issue Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Issuing POS Entry No";"Issuing POS Entry No")
+                field("Issuing POS Entry No"; "Issuing POS Entry No")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issuing POS Sale Line No.";"Issuing POS Sale Line No.")
+                field("Issuing POS Sale Line No."; "Issuing POS Sale Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issuing POS Unit No.";"Issuing POS Unit No.")
+                field("Issuing POS Unit No."; "Issuing POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field(Salesperson;Salesperson)
+                field(Salesperson; Salesperson)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Cashed Date";"Cashed Date")
+                field("Cashed Date"; "Cashed Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Cashed Salesperson";"Cashed Salesperson")
+                field("Cashed Salesperson"; "Cashed Salesperson")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Cashed on Sales Ticket No.";"Cashed on Sales Ticket No.")
+                field("Cashed on Sales Ticket No."; "Cashed on Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Cashed in Store";"Cashed in Store")
+                field("Cashed in Store"; "Cashed in Store")
                 {
+                    ApplicationArea = All;
                     Caption = '<Cashed in Store';
                     Editable = false;
                 }
-                field("Cashed POS Entry No.";"Cashed POS Entry No.")
+                field("Cashed POS Entry No."; "Cashed POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed POS Payment Line No.";"Cashed POS Payment Line No.")
+                field("Cashed POS Payment Line No."; "Cashed POS Payment Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cashed POS Unit No.";"Cashed POS Unit No.")
+                field("Cashed POS Unit No."; "Cashed POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -141,11 +163,11 @@ page 6014431 "Gift Voucher List"
                         GiftVoucher: Record "Gift Voucher";
                     begin
                         //-NPR5.29
-                        TestField(Status,Status::Open);
+                        TestField(Status, Status::Open);
                         GiftVoucher.FilterGroup(2);
-                        GiftVoucher.SetRange("No.","No.");
+                        GiftVoucher.SetRange("No.", "No.");
                         GiftVoucher.FilterGroup(0);
-                        GiftVoucher.PrintGiftVoucher(false,true);
+                        GiftVoucher.PrintGiftVoucher(false, true);
                         //+NPR5.29
                     end;
                 }
@@ -162,9 +184,9 @@ page 6014431 "Gift Voucher List"
                 begin
                     //-MAG2.01
                     if not Customer.Get("Customer No.") then
-                      exit;
+                        exit;
                     if Customer."E-Mail" <> '' then
-                      MagentoGiftVoucherMgt.EmailGiftVoucher(Rec,Customer."E-Mail");
+                        MagentoGiftVoucherMgt.EmailGiftVoucher(Rec, Customer."E-Mail");
                     //+MAG2.01
                 end;
             }
@@ -215,7 +237,7 @@ page 6014431 "Gift Voucher List"
                 trigger OnAction()
                 begin
                     //-NPR5.33
-                    REPORT.Run(REPORT::"Cashed Gift Vouchers",true,true,Rec);
+                    REPORT.Run(REPORT::"Cashed Gift Vouchers", true, true, Rec);
                     //+NPR5.33
                 end;
             }
@@ -258,27 +280,28 @@ page 6014431 "Gift Voucher List"
         RetailSetup.Get;
 
         if FindNo <> '' then begin
-          SetFilter("No.",'=%1',FindNo);
-          if not Find('-') then begin
-            if RetailSetup."Use I-Comm" then begin
-              RecIComm.Get;
-              if RecIComm."Company - Clearing" <> '' then begin
-                GiftVoucher.ChangeCompany(RecIComm."Company - Clearing");
-                GiftVoucher.SetFilter("No.",'=%1',FindNo);
-                if not GiftVoucher.Find('-') then
-                  Error(txtfind,FindNo)
-                else begin
-                  GiftVoucher2.Init;
-                  GiftVoucher2.Copy(GiftVoucher);
-                  GiftVoucher2."External Gift Voucher" := true;
-                  GiftVoucher2."Issuing Register No." := GiftVoucher."Register No.";
-                  GiftVoucher2."Issuing Sales Ticket No."   := GiftVoucher."Sales Ticket No.";
-                  GiftVoucher2.Insert;
-                end;
-              end;
-            end else Error(txtfind,FindNo);
-          end;
-          CurrPage.Update(false);
+            SetFilter("No.", '=%1', FindNo);
+            if not Find('-') then begin
+                if RetailSetup."Use I-Comm" then begin
+                    RecIComm.Get;
+                    if RecIComm."Company - Clearing" <> '' then begin
+                        GiftVoucher.ChangeCompany(RecIComm."Company - Clearing");
+                        GiftVoucher.SetFilter("No.", '=%1', FindNo);
+                        if not GiftVoucher.Find('-') then
+                            Error(txtfind, FindNo)
+                        else begin
+                            GiftVoucher2.Init;
+                            GiftVoucher2.Copy(GiftVoucher);
+                            GiftVoucher2."External Gift Voucher" := true;
+                            GiftVoucher2."Issuing Register No." := GiftVoucher."Register No.";
+                            GiftVoucher2."Issuing Sales Ticket No." := GiftVoucher."Sales Ticket No.";
+                            GiftVoucher2.Insert;
+                        end;
+                    end;
+                end else
+                    Error(txtfind, FindNo);
+            end;
+            CurrPage.Update(false);
         end;
         //+NPR3.0c
     end;

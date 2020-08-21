@@ -1,4 +1,4 @@
-pageextension 6014479 pageextension6014479 extends "Inventory Put-away" 
+pageextension 6014479 pageextension6014479 extends "Inventory Put-away"
 {
     // NPR5.48/TS  /20181214  CASE 339845 Added Field Assigned User Id
     // NPR5.55/BHR /20200713  CASE 414268 Print Label
@@ -6,8 +6,9 @@ pageextension 6014479 pageextension6014479 extends "Inventory Put-away"
     {
         addafter("External Document No.2")
         {
-            field("Assigned User ID";"Assigned User ID")
+            field("Assigned User ID"; "Assigned User ID")
             {
+                ApplicationArea = All;
             }
         }
     }

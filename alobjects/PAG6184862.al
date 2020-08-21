@@ -12,17 +12,21 @@ page 6184862 "Azr. Storage Cognitive Search"
         {
             repeater(Group)
             {
-                field("Account Name";"Account Name")
+                field("Account Name"; "Account Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Search Service Name";"Search Service Name")
+                field("Search Service Name"; "Search Service Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Index;Index)
+                field(Index; Index)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -16,6 +16,7 @@ page 6014627 "Hardware Connector"
         {
             field(PageCaption;PageCaption)
             {
+ApplicationArea = All;
                 Style = Strong;
                 StyleExpr = TRUE;
             }

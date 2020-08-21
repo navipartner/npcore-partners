@@ -16,29 +16,37 @@ page 6151367 "CS Transfer Handling Batch"
         {
             repeater(Group)
             {
-                field("Device Id";"Device Id")
+                field("Device Id"; "Device Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Tags;Tags)
+                field(Tags; Tags)
                 {
+                    ApplicationArea = All;
                 }
-                field(Handled;Handled)
+                field(Handled; Handled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Started";"Posting Started")
+                field("Posting Started"; "Posting Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Ended";"Posting Ended")
+                field("Posting Ended"; "Posting Ended")
                 {
+                    ApplicationArea = All;
                 }
-                field("Area";Area)
+                field("Area"; Area)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

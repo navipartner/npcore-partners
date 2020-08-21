@@ -15,40 +15,51 @@ page 6184850 "FR Audit Setup"
         {
             group(General)
             {
-                field("Certification No.";"Certification No.")
+                field("Certification No."; "Certification No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Certification Category";"Certification Category")
+                field("Certification Category"; "Certification Category")
                 {
+                    ApplicationArea = All;
                 }
-                field("Signing Certificate Password";"Signing Certificate Password")
+                field("Signing Certificate Password"; "Signing Certificate Password")
                 {
+                    ApplicationArea = All;
                 }
-                field("Signing Certificate Thumbprint";"Signing Certificate Thumbprint")
+                field("Signing Certificate Thumbprint"; "Signing Certificate Thumbprint")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Monthly Workshift Duration";"Monthly Workshift Duration")
+                field("Monthly Workshift Duration"; "Monthly Workshift Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Yearly Workshift Duration";"Yearly Workshift Duration")
+                field("Yearly Workshift Duration"; "Yearly Workshift Duration")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Auto Archived Workshift";"Last Auto Archived Workshift")
+                field("Last Auto Archived Workshift"; "Last Auto Archived Workshift")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Auto Archive URL";"Auto Archive URL")
+                field("Auto Archive URL"; "Auto Archive URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Archive API Key";"Auto Archive API Key")
+                field("Auto Archive API Key"; "Auto Archive API Key")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Archive SAS";"Auto Archive SAS")
+                field("Auto Archive SAS"; "Auto Archive SAS")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item VAT Identifier Filter";"Item VAT Identifier Filter")
+                field("Item VAT Identifier Filter"; "Item VAT Identifier Filter")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     var
@@ -57,7 +68,7 @@ page 6184850 "FR Audit Setup"
                     begin
                         NewFilter := FRAuditMgt.GetItemVATIdentifierFilter("Item VAT Identifier Filter");
                         if NewFilter <> '' then
-                          "Item VAT Identifier Filter" := NewFilter;
+                            "Item VAT Identifier Filter" := NewFilter;
                     end;
                 }
             }
@@ -98,7 +109,7 @@ page 6184850 "FR Audit Setup"
                 begin
                     //-NPR5.51 [356076]
                     if PAGE.RunModal(0, POSUnit) <> ACTION::LookupOK then
-                      exit;
+                        exit;
 
                     POSAuditLogMgt.InitializeLog(POSUnit."No.");
                     //+NPR5.51 [356076]
@@ -122,20 +133,20 @@ page 6184850 "FR Audit Setup"
                 begin
                     //-NPR5.51 [356076]
                     if PAGE.RunModal(0, POSUnit) <> ACTION::LookupOK then
-                      exit;
+                        exit;
 
                     repeat
-                      Clear(InputDialog);
-                      InputDialog.LookupMode := true;
-                      InputDialog.SetInput(1, DescriptionOut, CAPTION_PARTNER_MOD);
-                      if InputDialog.RunModal = ACTION::LookupOK then
-                        ID := InputDialog.InputText(1, DescriptionOut);
+                        Clear(InputDialog);
+                        InputDialog.LookupMode := true;
+                        InputDialog.SetInput(1, DescriptionOut, CAPTION_PARTNER_MOD);
+                        if InputDialog.RunModal = ACTION::LookupOK then
+                            ID := InputDialog.InputText(1, DescriptionOut);
                     until (DescriptionOut <> '') or (ID = 0);
                     if (ID = 0) then
-                      exit;
+                        exit;
 
                     if DescriptionOut = '' then
-                      exit;
+                        exit;
 
                     POSAuditLogMgt.LogPartnerModification(POSUnit."No.", DescriptionOut);
                     //+NPR5.51 [356076]
@@ -165,8 +176,8 @@ page 6184850 "FR Audit Setup"
     trigger OnOpenPage()
     begin
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 

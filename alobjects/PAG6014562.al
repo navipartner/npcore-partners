@@ -14,36 +14,43 @@ page 6014562 "RP Data Item Links"
         {
             repeater(Group)
             {
-                field("Parent Field ID";"Parent Field ID")
+                field("Parent Field ID"; "Parent Field ID")
                 {
-                    Enabled = "Filter Type"=0;
+                    ApplicationArea = All;
+                    Enabled = "Filter Type" = 0;
                     Style = Subordinate;
-                    StyleExpr = "Filter Type"<>0;
+                    StyleExpr = "Filter Type" <> 0;
                 }
-                field("Parent Field Name";"Parent Field Name")
+                field("Parent Field Name"; "Parent Field Name")
                 {
-                    Enabled = "Filter Type"=0;
+                    ApplicationArea = All;
+                    Enabled = "Filter Type" = 0;
                     Style = Subordinate;
-                    StyleExpr = "Filter Type"<>0;
+                    StyleExpr = "Filter Type" <> 0;
                 }
-                field("Filter Type";"Filter Type")
+                field("Filter Type"; "Filter Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field ID";"Field ID")
+                field("Field ID"; "Field ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Value";"Filter Value")
+                field("Filter Value"; "Filter Value")
                 {
-                    Enabled = "Filter Type"<>0;
+                    ApplicationArea = All;
+                    Enabled = "Filter Type" <> 0;
                 }
-                field("Link Type";"Link Type")
+                field("Link Type"; "Link Type")
                 {
-                    Enabled = "Filter Type"=0;
+                    ApplicationArea = All;
+                    Enabled = "Filter Type" = 0;
                     Style = Subordinate;
-                    StyleExpr = "Filter Type"<>0;
+                    StyleExpr = "Filter Type" <> 0;
                 }
             }
         }

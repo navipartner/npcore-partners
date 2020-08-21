@@ -18,35 +18,45 @@ page 6059786 "TM Ticket Access Entry List"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket No.";"Ticket No.")
+                field("Ticket No."; "Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Type Code";"Ticket Type Code")
+                field("Ticket Type Code"; "Ticket Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Access Date";"Access Date")
+                field("Access Date"; "Access Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Access Time";"Access Time")
+                field("Access Time"; "Access Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Card Code";"Member Card Code")
+                field("Member Card Code"; "Member Card Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -83,7 +93,7 @@ page 6059786 "TM Ticket Access Entry List"
 
                     //-TM1.27 [301140]
                     NoValue := -1;
-                    MessageId := TicketManagement.ValidateTicketForArrival (0, "Ticket No.", "Admission Code", NoValue, true, MessageText);
+                    MessageId := TicketManagement.ValidateTicketForArrival(0, "Ticket No.", "Admission Code", NoValue, true, MessageText);
                     //MessageId := TicketManagement.ValidateTicketForArrival (0, "Ticket No.", "Admission Code", -1, TRUE, MessageText);
                     //+TM1.27 [301140]
                 end;
@@ -100,7 +110,7 @@ page 6059786 "TM Ticket Access Entry List"
                     MessageText: Text;
                 begin
 
-                    MessageId := TicketManagement.ValidateTicketForDeparture (0, "Ticket No.", "Admission Code", true, MessageText);
+                    MessageId := TicketManagement.ValidateTicketForDeparture(0, "Ticket No.", "Admission Code", true, MessageText);
                 end;
             }
             action("Block/Unblock")
@@ -110,7 +120,7 @@ page 6059786 "TM Ticket Access Entry List"
 
                 trigger OnAction()
                 begin
-                    ToggleBlockUnblock ();
+                    ToggleBlockUnblock();
                 end;
             }
         }
@@ -122,18 +132,20 @@ page 6059786 "TM Ticket Access Entry List"
         TicketAccessEntry2: Record "TM Ticket Access Entry";
     begin
 
-        CurrPage.SetSelectionFilter (TicketAccessEntry);
-        if (TicketAccessEntry.FindSet ()) then begin
-          repeat
-            TicketAccessEntry2.Get (TicketAccessEntry."Entry No.");
+        CurrPage.SetSelectionFilter(TicketAccessEntry);
+        if (TicketAccessEntry.FindSet()) then begin
+            repeat
+                TicketAccessEntry2.Get(TicketAccessEntry."Entry No.");
 
-            case TicketAccessEntry.Status of
-              TicketAccessEntry.Status::ACCESS : TicketAccessEntry2.Status := TicketAccessEntry2.Status::BLOCKED;
-              TicketAccessEntry.Status::BLOCKED : TicketAccessEntry2.Status := TicketAccessEntry2.Status::ACCESS;
-            end;
+                case TicketAccessEntry.Status of
+                    TicketAccessEntry.Status::ACCESS:
+                        TicketAccessEntry2.Status := TicketAccessEntry2.Status::BLOCKED;
+                    TicketAccessEntry.Status::BLOCKED:
+                        TicketAccessEntry2.Status := TicketAccessEntry2.Status::ACCESS;
+                end;
 
-            TicketAccessEntry2.Modify ();
-          until (TicketAccessEntry.Next () = 0);
+                TicketAccessEntry2.Modify();
+            until (TicketAccessEntry.Next() = 0);
         end;
     end;
 }

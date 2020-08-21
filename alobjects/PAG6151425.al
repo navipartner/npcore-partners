@@ -14,63 +14,75 @@ page 6151425 "Magento Custom Option Card"
         {
             group(General)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     begin
                         NoAssistEdit();
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update(true);
                     end;
                 }
-                field(Required;Required)
+                field(Required; Required)
                 {
+                    ApplicationArea = All;
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                 }
-                field("Max Length";"Max Length")
+                field("Max Length"; "Max Length")
                 {
+                    ApplicationArea = All;
                     Editable = MaxLengthEditable;
                 }
-                field(Price;Price)
+                field(Price; Price)
                 {
+                    ApplicationArea = All;
                     Caption = 'Price';
                     Editable = PriceEditable;
                 }
-                field("Price Type";"Price Type")
+                field("Price Type"; "Price Type")
                 {
+                    ApplicationArea = All;
                     Editable = PriceTypeEditable;
                 }
-                field("Sales Type";"Sales Type")
+                field("Sales Type"; "Sales Type")
                 {
+                    ApplicationArea = All;
                     Editable = SalesTypeEditable;
                 }
-                field("Sales No.";"Sales No.")
+                field("Sales No."; "Sales No.")
                 {
+                    ApplicationArea = All;
                     Editable = SalesNoEditable;
                 }
-                field("Item Count";"Item Count")
+                field("Item Count"; "Item Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Price Includes VAT";"Price Includes VAT")
+                field("Price Includes VAT"; "Price Includes VAT")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6150628;"Magento Custom Option Subform")
+            part(Control6150628; "Magento Custom Option Subform")
             {
                 ShowFilter = false;
-                SubPageLink = "Custom Option No."=FIELD("No.");
+                SubPageLink = "Custom Option No." = FIELD("No.");
                 Visible = CustomOptionValuesVisible;
             }
         }
@@ -105,18 +117,18 @@ page 6151425 "Magento Custom Option Card"
     begin
         MagentoCustomOption.Copy(Rec);
         MagentoCustomOption.InitNoSeries();
-        if NoSeriesMgt.SelectSeries(MagentoCustomOption."No. Series",xRec."No. Series",MagentoCustomOption."No. Series") then
-          Rec := MagentoCustomOption;
+        if NoSeriesMgt.SelectSeries(MagentoCustomOption."No. Series", xRec."No. Series", MagentoCustomOption."No. Series") then
+            Rec := MagentoCustomOption;
     end;
 
     local procedure SetEditable()
     begin
-        PriceEditable := (Type in [Type::TextField,Type::TextArea,Type::File,Type::Date,Type::DateTime,Type::Time]);
-        PriceTypeEditable := (Type in [Type::TextField,Type::TextArea,Type::File,Type::Date,Type::DateTime,Type::Time]);
-        SalesTypeEditable := (Type in [Type::TextField,Type::TextArea,Type::File,Type::Date,Type::DateTime,Type::Time]);
-        SalesNoEditable := (Type in [Type::TextField,Type::TextArea,Type::File,Type::Date,Type::DateTime,Type::Time]);
-        MaxLengthEditable := (Type in [Type::TextField,Type::TextArea]);
-        CustomOptionValuesVisible := (Type in [Type::SelectDropDown,Type::SelectRadioButtons,Type::SelectCheckbox,Type::SelectMultiple]);
+        PriceEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
+        PriceTypeEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
+        SalesTypeEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
+        SalesNoEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
+        MaxLengthEditable := (Type in [Type::TextField, Type::TextArea]);
+        CustomOptionValuesVisible := (Type in [Type::SelectDropDown, Type::SelectRadioButtons, Type::SelectCheckbox, Type::SelectMultiple]);
     end;
 }
 

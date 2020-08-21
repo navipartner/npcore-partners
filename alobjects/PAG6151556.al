@@ -17,8 +17,9 @@ page 6151556 "NpXml Filters"
         {
             repeater(Group)
             {
-                field("Filter Type";"Filter Type")
+                field("Filter Type"; "Filter Type")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -27,23 +28,28 @@ page 6151556 "NpXml Filters"
                         //+NC1.08
                     end;
                 }
-                field("Parent Field No.";"Parent Field No.")
+                field("Parent Field No."; "Parent Field No.")
                 {
+                    ApplicationArea = All;
                     Enabled = ParentFieldNoEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT ParentFieldNoEnabled;
                 }
-                field("Parent Field Name";"Parent Field Name")
+                field("Parent Field Name"; "Parent Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Value";"Filter Value")
+                field("Filter Value"; "Filter Value")
                 {
+                    ApplicationArea = All;
                     Enabled = FilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT FilterValueEnabled;

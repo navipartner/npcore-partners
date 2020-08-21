@@ -12,8 +12,9 @@ page 6151365 "CS Upd. Unknown Entries"
         {
             repeater(Group)
             {
-                field("Tag Id";"Tag Id")
+                field("Tag Id"; "Tag Id")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -45,45 +46,46 @@ page 6151365 "CS Upd. Unknown Entries"
                 begin
                     CurrPage.SetSelectionFilter(CSStockTakesData);
                     if CSStockTakesData.GetFilters = '' then
-                      Error(NoSelectionErr);
+                        Error(NoSelectionErr);
 
                     CSSelectEntries.Caption(StrSubstNo(SelectItemVariantCapt, CSStockTakesData.FieldCaption("Item No."), CSStockTakesData.FieldCaption("Variant Code")));
                     CSSelectEntries.LookupMode(true);
 
                     if CSSelectEntries.RunModal <> ACTION::Yes then
-                      exit;
+                        exit;
 
                     CSSelectEntries.GetRecord(TempCSStockTakesData);
 
                     if TempCSStockTakesData."Item No." = '' then
-                      Error(NoItemNumberErr, CSStockTakesData.FieldCaption("Item No."), ItemCrossReference.TableCaption);
+                        Error(NoItemNumberErr, CSStockTakesData.FieldCaption("Item No."), ItemCrossReference.TableCaption);
 
                     Item.Get(TempCSStockTakesData."Item No.");
                     Item.CalcFields("Has Variants");
                     if Item."Has Variants" and (TempCSStockTakesData."Variant Code" = '') then
-                      Error(NoVariantSelectedErr, TempCSStockTakesData."Item No.");
+                        Error(NoVariantSelectedErr, TempCSStockTakesData."Item No.");
 
                     if not Confirm(ConfirmUpdateMsg, true, CSStockTakesData.Count,
                       CSStockTakesData.FieldCaption("Item No."), TempCSStockTakesData."Item No.",
                       CSStockTakesData.FieldCaption("Variant Code"), TempCSStockTakesData."Variant Code")
                     then
-                      exit;
+                        exit;
 
 
-                    if CSStockTakesData.FindSet then repeat
-                      ItemCrossReference.Init;
-                      ItemCrossReference.Validate("Item No.", TempCSStockTakesData."Item No.");
-                      ItemCrossReference.Validate("Variant Code", TempCSStockTakesData."Variant Code");
-                      ItemCrossReference."Cross-Reference No." := CopyStr(CSStockTakesData."Tag Id", 5);
-                      ItemCrossReference."Cross-Reference Type" := ItemCrossReference."Cross-Reference Type"::"Bar Code";
-                      ItemCrossReference."Is Retail Serial No." := true;
-                      if ItemCrossReference.Insert(true) then begin
-                        CSHelperFunctions.UpdateItemCrossRefFromRecord(ItemCrossReference);
-                        CSStockTakesData.Validate("Item No.", TempCSStockTakesData."Item No.");
-                        CSStockTakesData."Variant Code" := TempCSStockTakesData."Variant Code";
-                        CSStockTakesData.Modify(false);
-                      end;
-                    until CSStockTakesData.Next = 0;
+                    if CSStockTakesData.FindSet then
+                        repeat
+                            ItemCrossReference.Init;
+                            ItemCrossReference.Validate("Item No.", TempCSStockTakesData."Item No.");
+                            ItemCrossReference.Validate("Variant Code", TempCSStockTakesData."Variant Code");
+                            ItemCrossReference."Cross-Reference No." := CopyStr(CSStockTakesData."Tag Id", 5);
+                            ItemCrossReference."Cross-Reference Type" := ItemCrossReference."Cross-Reference Type"::"Bar Code";
+                            ItemCrossReference."Is Retail Serial No." := true;
+                            if ItemCrossReference.Insert(true) then begin
+                                CSHelperFunctions.UpdateItemCrossRefFromRecord(ItemCrossReference);
+                                CSStockTakesData.Validate("Item No.", TempCSStockTakesData."Item No.");
+                                CSStockTakesData."Variant Code" := TempCSStockTakesData."Variant Code";
+                                CSStockTakesData.Modify(false);
+                            end;
+                        until CSStockTakesData.Next = 0;
 
                     CurrPage.Update;
                 end;

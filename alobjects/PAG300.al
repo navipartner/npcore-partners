@@ -1,12 +1,13 @@
-pageextension 6014431 pageextension6014431 extends "Ship-to Address" 
+pageextension 6014431 pageextension6014431 extends "Ship-to Address"
 {
     // NPR5.34/TR  /20170721  CASE 282454 Added "Name 2" to the list.
     layout
     {
         addafter(GLN)
         {
-            field("Name 2";"Name 2")
+            field("Name 2"; "Name 2")
             {
+                ApplicationArea = All;
                 Importance = Additional;
             }
         }

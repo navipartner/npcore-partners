@@ -17,14 +17,17 @@ page 6014459 "Item Group List"
             {
                 IndentationColumn = Level;
                 IndentationControls = "No.";
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Level;Level)
+                field(Level; Level)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

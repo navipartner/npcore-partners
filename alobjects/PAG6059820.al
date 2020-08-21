@@ -16,20 +16,25 @@ page 6059820 "Transactional Email Setup"
         {
             repeater(Group)
             {
-                field(Provider;Provider)
+                field(Provider; Provider)
                 {
+                    ApplicationArea = All;
                 }
-                field(Default;Default)
+                field(Default; Default)
                 {
+                    ApplicationArea = All;
                 }
-                field("Client ID";"Client ID")
+                field("Client ID"; "Client ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("API Key";"API Key")
+                field("API Key"; "API Key")
                 {
+                    ApplicationArea = All;
                 }
-                field("<API Key>";"API URL")
+                field("<API Key>"; "API URL")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

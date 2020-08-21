@@ -21,49 +21,61 @@ page 6014451 "Mixed Discount Lines"
             {
                 ShowCaption = false;
                 Visible = (MixType <> 1);
-                field("Disc. Grouping Type";"Disc. Grouping Type")
+                field("Disc. Grouping Type"; "Disc. Grouping Type")
                 {
+                    ApplicationArea = All;
                     OptionCaption = 'Item,Item Group,Item Disc. Group';
                 }
-                field("Cross-Reference No.";"Cross-Reference No.")
+                field("Cross-Reference No."; "Cross-Reference No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
-                    Enabled = ("Disc. Grouping Type"=0);
+                    ApplicationArea = All;
+                    Enabled = ("Disc. Grouping Type" = 0);
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                     Enabled = Lot;
                     Visible = Lot;
                 }
-                field("Unit cost";"Unit cost")
+                field("Unit cost"; "Unit cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit price";"Unit price")
+                field("Unit price"; "Unit price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit price incl. VAT";"Unit price incl. VAT")
+                field("Unit price incl. VAT"; "Unit price incl. VAT")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
-                field(TotalAmount;TotalAmount)
+                field(TotalAmount; TotalAmount)
                 {
+                    ApplicationArea = All;
                     Caption = 'Mix Discount Price';
                     Visible = (DiscountType <> 4);
                 }
@@ -71,30 +83,35 @@ page 6014451 "Mixed Discount Lines"
             repeater(MixLines)
             {
                 Visible = (MixType = 1);
-                field(NoCom;"No.")
+                field(NoCom; "No.")
                 {
+                    ApplicationArea = All;
                     Caption = 'Part Code';
                     Lookup = true;
                     LookupPageID = "Mixed Discount Part List";
                 }
-                field(DescriptionCom;GetDescription())
+                field(DescriptionCom; GetDescription())
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
                 }
-                field("CalcMinQty()";CalcMinQty())
+                field("CalcMinQty()"; CalcMinQty())
                 {
+                    ApplicationArea = All;
                     Caption = 'Min. Qty.';
-                    DecimalPlaces = 0:5;
+                    DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = (MixType = 1);
                 }
-                field(MinimumDiscount;CalcExpectedAmount(false))
+                field(MinimumDiscount; CalcExpectedAmount(false))
                 {
+                    ApplicationArea = All;
                     Caption = 'Min. Expected Amount';
                 }
-                field(MaximumDiscount;CalcExpectedAmount(true))
+                field(MaximumDiscount; CalcExpectedAmount(true))
                 {
+                    ApplicationArea = All;
                     Caption = 'Max. Expected Amount';
                     Editable = false;
                 }
@@ -125,11 +142,11 @@ page 6014451 "Mixed Discount Lines"
 
                     Init;
                     "Disc. Grouping Type" := "Disc. Grouping Type"::"Mix Discount";
-                    Validate("No.",MixedDiscount.Code);
+                    Validate("No.", MixedDiscount.Code);
                     Insert(true);
 
                     Commit;
-                    PAGE.Run(PAGE::"Mixed Discount",MixedDiscount);
+                    PAGE.Run(PAGE::"Mixed Discount", MixedDiscount);
                     //+NPR5.31 [262904]
                 end;
             }
@@ -139,7 +156,7 @@ page 6014451 "Mixed Discount Lines"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "Mixed Discount";
-                RunPageLink = Code=FIELD("No.");
+                RunPageLink = Code = FIELD("No.");
                 Visible = (MixType = 1);
             }
         }
@@ -188,12 +205,12 @@ page 6014451 "Mixed Discount Lines"
     begin
         //-NPR5.31 [262904]
         if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
-          exit(0);
+            exit(0);
 
         if not MixedDiscount.Get("No.") then
-          exit(0);
+            exit(0);
 
-        exit(MixedDiscountMgt.CalcExpectedAmountPerBatch(MixedDiscount,FindMaxDisc,TempPriorityBuffer));
+        exit(MixedDiscountMgt.CalcExpectedAmountPerBatch(MixedDiscount, FindMaxDisc, TempPriorityBuffer));
         //+NPR5.31 [262904]
     end;
 
@@ -203,9 +220,9 @@ page 6014451 "Mixed Discount Lines"
     begin
         //-NPR5.31 [262904]
         if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
-          exit(0);
+            exit(0);
         if not MixedDiscount.Get("No.") then
-          exit(0);
+            exit(0);
 
         exit(MixedDiscount.CalcMinQty());
         //+NPR5.31 [262904]
@@ -217,9 +234,9 @@ page 6014451 "Mixed Discount Lines"
     begin
         //+NPR5.31 [262904]
         if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
-          exit('');
+            exit('');
         if not MixedDiscount.Get("No.") then
-          exit('');
+            exit('');
 
         exit(MixedDiscount.Description);
         //+NPR5.31 [262904]
@@ -234,10 +251,10 @@ page 6014451 "Mixed Discount Lines"
 
         FilterGroup(2);
         case MixType of
-          MixedDiscount."Mix Type"::Combination:
-            SetRange("Disc. Grouping Type","Disc. Grouping Type"::"Mix Discount");
-          else
-            SetRange("Disc. Grouping Type","Disc. Grouping Type"::Item,"Disc. Grouping Type"::"Item Disc. Group");
+            MixedDiscount."Mix Type"::Combination:
+                SetRange("Disc. Grouping Type", "Disc. Grouping Type"::"Mix Discount");
+            else
+                SetRange("Disc. Grouping Type", "Disc. Grouping Type"::Item, "Disc. Grouping Type"::"Item Disc. Group");
         end;
         FilterGroup(0);
 
@@ -251,7 +268,7 @@ page 6014451 "Mixed Discount Lines"
     begin
         //-NPR5.55 [393386]
         if not MixedDiscount.Get(Code) then
-          exit;
+            exit;
 
         exit(MixedDiscount."Total Amount");
         //+NPR5.55 [393386]

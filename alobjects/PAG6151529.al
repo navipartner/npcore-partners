@@ -13,52 +13,65 @@ page 6151529 "Nc Collector Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
-                field("Max. Lines per Collection";"Max. Lines per Collection")
+                field("Max. Lines per Collection"; "Max. Lines per Collection")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wait to Send";"Wait to Send")
+                field("Wait to Send"; "Wait to Send")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Obsolete Lines";"Delete Obsolete Lines")
+                field("Delete Obsolete Lines"; "Delete Obsolete Lines")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Sent Collections After";"Delete Sent Collections After")
+                field("Delete Sent Collections After"; "Delete Sent Collections After")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Changes)
             {
-                field("Record Modify";"Record Modify")
+                field("Record Modify"; "Record Modify")
                 {
+                    ApplicationArea = All;
                 }
-                field("Record Insert";"Record Insert")
+                field("Record Insert"; "Record Insert")
                 {
+                    ApplicationArea = All;
                 }
-                field("Record Delete";"Record Delete")
+                field("Record Delete"; "Record Delete")
                 {
+                    ApplicationArea = All;
                 }
-                field("Record Rename";"Record Rename")
+                field("Record Rename"; "Record Rename")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6150625;"Nc Collector Filters")
+            part(Control6150625; "Nc Collector Filters")
             {
-                SubPageLink = "Collector Code"=FIELD(Code);
+                SubPageLink = "Collector Code" = FIELD(Code);
             }
         }
     }
@@ -72,14 +85,14 @@ page 6151529 "Nc Collector Card"
                 Caption = 'Collection Lines';
                 Image = XMLFile;
                 RunObject = Page "Nc Collection Lines";
-                RunPageLink = "Collector Code"=FIELD(Code);
+                RunPageLink = "Collector Code" = FIELD(Code);
             }
             action(Collections)
             {
                 Caption = 'Collections';
                 Image = XMLFileGroup;
                 RunObject = Page "Nc Collection List";
-                RunPageLink = "Collector Code"=FIELD(Code);
+                RunPageLink = "Collector Code" = FIELD(Code);
             }
         }
         area(processing)

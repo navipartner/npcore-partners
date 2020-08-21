@@ -37,88 +37,112 @@ page 6150617 "POS Unit Card"
             group(General)
             {
                 Caption = 'General';
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lock Timeout";"Lock Timeout")
+                field("Lock Timeout"; "Lock Timeout")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default POS Payment Bin";"Default POS Payment Bin")
+                field("Default POS Payment Bin"; "Default POS Payment Bin")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("Item Price Codeunit ID";"Item Price Codeunit ID")
+                field("Item Price Codeunit ID"; "Item Price Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Price Codeunit Name";"Item Price Codeunit Name")
+                field("Item Price Codeunit Name"; "Item Price Codeunit Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Price Function";"Item Price Function")
+                field("Item Price Function"; "Item Price Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Kiosk Mode Unlock PIN";"Kiosk Mode Unlock PIN")
+                field("Kiosk Mode Unlock PIN"; "Kiosk Mode Unlock PIN")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Type";"POS Type")
+                field("POS Type"; "POS Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit Serial No";"POS Unit Serial No")
+                field("POS Unit Serial No"; "POS Unit Serial No")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Profiles)
             {
                 Caption = 'Profiles';
-                field("POS Audit Profile";"POS Audit Profile")
+                field("POS Audit Profile"; "POS Audit Profile")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("POS View Profile";"POS View Profile")
+                field("POS View Profile"; "POS View Profile")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("POS End of Day Profile";"POS End of Day Profile")
+                field("POS End of Day Profile"; "POS End of Day Profile")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Posting Profile";"POS Posting Profile")
+                field("POS Posting Profile"; "POS Posting Profile")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit Receipt Text Profile";"POS Unit Receipt Text Profile")
+                field("POS Unit Receipt Text Profile"; "POS Unit Receipt Text Profile")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ean Box Sales Setup";"Ean Box Sales Setup")
+                field("Ean Box Sales Setup"; "Ean Box Sales Setup")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("POS Sales Workflow Set";"POS Sales Workflow Set")
+                field("POS Sales Workflow Set"; "POS Sales Workflow Set")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global POS Sales Setup";"Global POS Sales Setup")
+                field("Global POS Sales Setup"; "Global POS Sales Setup")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Named Actions Profile";"POS Named Actions Profile")
+                field("POS Named Actions Profile"; "POS Named Actions Profile")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Restaurant Profile";"POS Restaurant Profile")
+                field("POS Restaurant Profile"; "POS Restaurant Profile")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -133,8 +157,8 @@ page 6150617 "POS Unit Card"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6150615),
-                              "No."=FIELD("No.");
+                RunPageLink = "Table ID" = CONST(6150615),
+                              "No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+D';
             }
             action("POS Unit Identity List")
@@ -151,7 +175,7 @@ page 6150617 "POS Unit Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Period Register List";
-                RunPageLink = "POS Unit No."=FIELD("No.");
+                RunPageLink = "POS Unit No." = FIELD("No.");
             }
             action("POS Entries")
             {
@@ -161,14 +185,14 @@ page 6150617 "POS Unit Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Entry List";
-                RunPageLink = "POS Unit No."=FIELD("No.");
+                RunPageLink = "POS Unit No." = FIELD("No.");
             }
             action("POS Unit Bins")
             {
                 Caption = 'POS Unit Bins';
                 Image = List;
                 RunObject = Page "POS Unit to Bin Relation";
-                RunPageLink = "POS Unit No."=FIELD("No.");
+                RunPageLink = "POS Unit No." = FIELD("No.");
             }
         }
     }

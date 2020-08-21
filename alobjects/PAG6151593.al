@@ -17,32 +17,41 @@ page 6151593 "NpDc Coupons"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Coupon Type";"Coupon Type")
+                field("Coupon Type"; "Coupon Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Quantity";"Remaining Quantity")
+                field("Remaining Quantity"; "Remaining Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -71,10 +80,10 @@ page 6151593 "NpDc Coupons"
                     begin
                         CurrPage.SetSelectionFilter(Coupon);
                         if not Coupon.FindSet then
-                          exit;
+                            exit;
 
                         repeat
-                          NpDcCouponMgt.PrintCoupon(Coupon);
+                            NpDcCouponMgt.PrintCoupon(Coupon);
                         until Coupon.Next = 0;
                     end;
                 }
@@ -94,8 +103,8 @@ page 6151593 "NpDc Coupons"
                         NpDcCouponMgt: Codeunit "NpDc Coupon Mgt.";
                     begin
                         CurrPage.SetSelectionFilter(Coupon);
-                        if not Confirm(Text000,false,Coupon.Count) then
-                          exit;
+                        if not Confirm(Text000, false, Coupon.Count) then
+                            exit;
 
                         NpDcCouponMgt.ArchiveCoupons(Coupon);
                     end;
@@ -108,7 +117,7 @@ page 6151593 "NpDc Coupons"
                     trigger OnAction()
                     begin
                         //-NPR5.37 [293232]
-                        SetFilter("Ending Date",'>%1&<%2',0DT,CurrentDateTime);
+                        SetFilter("Ending Date", '>%1&<%2', 0DT, CurrentDateTime);
                         //+NPR5.37 [293232]
                     end;
                 }
@@ -121,7 +130,7 @@ page 6151593 "NpDc Coupons"
                 Caption = 'Coupon Entries';
                 Image = Entries;
                 RunObject = Page "NpDc Coupon Entries";
-                RunPageLink = "Coupon No."=FIELD("No.");
+                RunPageLink = "Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
             }
         }

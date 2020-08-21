@@ -10,17 +10,21 @@ page 6014599 "Connection Profiles"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Hosting type";"Hosting type")
+                field("Hosting type"; "Hosting type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Card Extension";"Credit Card Extension")
+                field("Credit Card Extension"; "Credit Card Extension")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

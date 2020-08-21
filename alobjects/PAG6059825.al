@@ -18,38 +18,49 @@ page 6059825 "Transactional Email Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Provider;Provider)
+                field(Provider; Provider)
                 {
+                    ApplicationArea = All;
                 }
-                field("Message ID";"Message ID")
+                field("Message ID"; "Message ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Status Message";"Status Message")
+                field("Status Message"; "Status Message")
                 {
+                    ApplicationArea = All;
                 }
-                field(Recipient;Recipient)
+                field(Recipient; Recipient)
                 {
+                    ApplicationArea = All;
                 }
-                field(Subject;Subject)
+                field(Subject; Subject)
                 {
+                    ApplicationArea = All;
                 }
-                field("Smart Email ID";"Smart Email ID")
+                field("Smart Email ID"; "Smart Email ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sent At";"Sent At")
+                field("Sent At"; "Sent At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Opens";"Total Opens")
+                field("Total Opens"; "Total Opens")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Clicks";"Total Clicks")
+                field("Total Clicks"; "Total Clicks")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -72,11 +83,11 @@ page 6059825 "Transactional Email Log"
                 begin
                     CurrPage.SetSelectionFilter(LogEntry);
                     if LogEntry.FindSet then
-                      repeat
+                        repeat
+                            //-NPR5.55 [343266]
+                            TransactionalEmailMgt.GetMessageDetails(LogEntry);
                         //-NPR5.55 [343266]
-                        TransactionalEmailMgt.GetMessageDetails(LogEntry);
-                        //-NPR5.55 [343266]
-                      until LogEntry.Next = 0;
+                        until LogEntry.Next = 0;
                 end;
             }
         }

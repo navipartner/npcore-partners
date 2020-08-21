@@ -14,17 +14,21 @@ page 6060160 "Event Attribute Templates"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Row Template Name";"Row Template Name")
+                field("Row Template Name"; "Row Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Column Template Name";"Column Template Name")
+                field("Column Template Name"; "Column Template Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -58,7 +62,7 @@ page 6060160 "Event Attribute Templates"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Event Attribute Temp. Filters";
-                RunPageLink = "Template Name"=FIELD(Name);
+                RunPageLink = "Template Name" = FIELD(Name);
             }
         }
     }

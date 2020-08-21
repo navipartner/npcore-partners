@@ -15,17 +15,21 @@ page 6060058 "Item Worksheet Template"
         {
             group(General)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register Lines";"Register Lines")
+                field("Register Lines"; "Register Lines")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Processed Lines";"Delete Processed Lines")
+                field("Delete Processed Lines"; "Delete Processed Lines")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -34,75 +38,94 @@ page 6060058 "Item Worksheet Template"
                         //+NPR5.35 [268786]
                     end;
                 }
-                field("Leave Skipped Line on Register";"Leave Skipped Line on Register")
+                field("Leave Skipped Line on Register"; "Leave Skipped Line on Register")
                 {
+                    ApplicationArea = All;
                     Editable = LeaveSkippedLineonRegisterEditable;
                 }
-                field("Sales Price Handling";"Sales Price Handling")
+                field("Sales Price Handling"; "Sales Price Handling")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Price Handling";"Purchase Price Handling")
+                field("Purchase Price Handling"; "Purchase Price Handling")
                 {
+                    ApplicationArea = All;
                 }
-                field("Combine Variants to Item by";"Combine Variants to Item by")
+                field("Combine Variants to Item by"; "Combine Variants to Item by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Match by Item No. Only";"Match by Item No. Only")
+                field("Match by Item No. Only"; "Match by Item No. Only")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Unvalidated Duplicates";"Delete Unvalidated Duplicates")
+                field("Delete Unvalidated Duplicates"; "Delete Unvalidated Duplicates")
                 {
+                    ApplicationArea = All;
                 }
-                field("Do not Apply Internal Barcode";"Do not Apply Internal Barcode")
+                field("Do not Apply Internal Barcode"; "Do not Apply Internal Barcode")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Numbering)
             {
-                field("Item No. Creation by";"Item No. Creation by")
+                field("Item No. Creation by"; "Item No. Creation by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No. Prefix";"Item No. Prefix")
+                field("Item No. Prefix"; "Item No. Prefix")
                 {
+                    ApplicationArea = All;
                 }
-                field("Prefix Code";"Prefix Code")
+                field("Prefix Code"; "Prefix Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Validation)
             {
-                field("Error Handling";"Error Handling")
+                field("Error Handling"; "Error Handling")
                 {
+                    ApplicationArea = All;
                 }
-                field("Test Validation";"Test Validation")
+                field("Test Validation"; "Test Validation")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Barcodes)
             {
-                field("Create Internal Barcodes";"Create Internal Barcodes")
+                field("Create Internal Barcodes"; "Create Internal Barcodes")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Vendor  Barcodes";"Create Vendor  Barcodes")
+                field("Create Vendor  Barcodes"; "Create Vendor  Barcodes")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Web Integration")
             {
-                field("Allow Web Service Update";"Allow Web Service Update")
+                field("Allow Web Service Update"; "Allow Web Service Update")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Info Query Name";"Item Info Query Name")
+                field("Item Info Query Name"; "Item Info Query Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Info Query Type";"Item Info Query Type")
+                field("Item Info Query Type"; "Item Info Query Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Info Query By";"Item Info Query By")
+                field("Item Info Query By"; "Item Info Query By")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

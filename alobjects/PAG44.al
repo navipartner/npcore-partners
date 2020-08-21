@@ -1,4 +1,4 @@
-pageextension 6014444 pageextension6014444 extends "Sales Credit Memo" 
+pageextension 6014444 pageextension6014444 extends "Sales Credit Memo"
 {
     // NPR5.23/TS/20160603 CASE 2430085 Added field Posting Description
     // NPR5.29/TJ/20160113 CASE 262797 Restored standard values of property ToolTipML on some actions
@@ -11,23 +11,27 @@ pageextension 6014444 pageextension6014444 extends "Sales Credit Memo"
     {
         addafter("Responsibility Center")
         {
-            field(NPRPostingDescription1;"Posting Description")
+            field(NPRPostingDescription1; "Posting Description")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Payment Method Code")
         {
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
         }
         addafter("EU 3-Party Trade")
         {
-            field("Magento Payment Amount";"Magento Payment Amount")
+            field("Magento Payment Amount"; "Magento Payment Amount")
             {
+                ApplicationArea = All;
             }
         }
     }

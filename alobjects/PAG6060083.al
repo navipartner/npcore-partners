@@ -12,31 +12,39 @@ page 6060083 "MCS Rec. Business Rules"
         {
             repeater(Group)
             {
-                field("Model No.";"Model No.")
+                field("Model No."; "Model No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Rule No.";"Rule No.")
+                field("Rule No."; "Rule No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
-                field("Rule Type";"Rule Type")
+                field("Rule Type"; "Rule Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Block Seed Item No.";"Block Seed Item No.")
+                field("Block Seed Item No."; "Block Seed Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Sent Date Time";"Last Sent Date Time")
+                field("Last Sent Date Time"; "Last Sent Date Time")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -68,10 +76,10 @@ page 6060083 "MCS Rec. Business Rules"
         MCSAddRecBusinessRules: Report "MCS Add Rec. Business Rules";
     begin
         if "Model No." = '' then
-          exit;
+            exit;
         Clear(MCSAddRecBusinessRules);
         MCSRecommendationsModel.Reset;
-        MCSRecommendationsModel.SetRange(Code,Rec."Model No.");
+        MCSRecommendationsModel.SetRange(Code, Rec."Model No.");
         MCSAddRecBusinessRules.SetTableView(MCSRecommendationsModel);
         MCSAddRecBusinessRules.RunModal;
     end;

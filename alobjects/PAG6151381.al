@@ -15,14 +15,17 @@ page 6151381 "CS Rfid Tag Models"
         {
             repeater(Group)
             {
-                field(Family;Family)
+                field(Family; Family)
                 {
+                    ApplicationArea = All;
                 }
-                field(Model;Model)
+                field(Model; Model)
                 {
+                    ApplicationArea = All;
                 }
-                field(Discontinued;Discontinued)
+                field(Discontinued; Discontinued)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -16,35 +16,45 @@ page 6014413 "Phone Number Lookup"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field("Country/Region Code";"Country/Region Code")
+                field("Country/Region Code"; "Country/Region Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mobile Phone No.";"Mobile Phone No.")
+                field("Mobile Phone No."; "Mobile Phone No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-Mail";"E-Mail")
+                field("E-Mail"; "E-Mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Home Page";"Home Page")
+                field("Home Page"; "Home Page")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Registration No.";"VAT Registration No.")
+                field("VAT Registration No."; "VAT Registration No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

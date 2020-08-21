@@ -13,17 +13,21 @@ page 6059949 "NaviDocs Entry Attachments"
         {
             repeater(Group)
             {
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("File Extension";"File Extension")
+                field("File Extension"; "File Extension")
                 {
+                    ApplicationArea = All;
                 }
-                field(Data;Data.HasValue)
+                field(Data; Data.HasValue)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

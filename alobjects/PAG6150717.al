@@ -13,51 +13,65 @@ page 6150717 "POS Menu Filter SubPage"
         {
             repeater(Group)
             {
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Object Id";"Object Id")
+                field("Object Id"; "Object Id")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Filter Code";"Filter Code")
+                field("Filter Code"; "Filter Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Name";"Object Name")
+                field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Value";"Filter Value")
+                field("Filter Value"; "Filter Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Sale POS Field Id";"Filter Sale POS Field Id")
+                field("Filter Sale POS Field Id"; "Filter Sale POS Field Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Sale POS Field Name";"Filter Sale POS Field Name")
+                field("Filter Sale POS Field Name"; "Filter Sale POS Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Sale Line POS Field Id";"Filter Sale Line POS Field Id")
+                field("Filter Sale Line POS Field Id"; "Filter Sale Line POS Field Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Sale Line POS Field Nam";"Filter Sale Line POS Field Nam")
+                field("Filter Sale Line POS Field Nam"; "Filter Sale Line POS Field Nam")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

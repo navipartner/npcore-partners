@@ -17,8 +17,9 @@ page 6151537 "Nc Endpoint Types"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -36,7 +37,7 @@ page 6151537 "Nc Endpoint Types"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Nc Endpoints";
-                RunPageLink = "Endpoint Type"=FIELD(Code);
+                RunPageLink = "Endpoint Type" = FIELD(Code);
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
             }

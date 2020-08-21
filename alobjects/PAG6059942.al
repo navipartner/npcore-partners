@@ -15,14 +15,15 @@ page 6059942 "SMS Template Subform"
             repeater(Group)
             {
                 IndentationColumn = 0;
-                field("SMS Text";"SMS Text")
+                field("SMS Text"; "SMS Text")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                     ToolTip = 'Use {{Field Number}} to insert a field value in the text.';
 
                     trigger OnValidate()
                     begin
-                        SetCurrentKey("Template Code","Line No.");
+                        SetCurrentKey("Template Code", "Line No.");
                         CurrPage.Update;
                     end;
                 }
@@ -59,7 +60,7 @@ page 6059942 "SMS Template Subform"
     begin
         //-NPR5.40 [304312]
         if SMSTemplateHeader.Get("Template Code") then
-          "SMS Text" += SMSManagement.AFReportLink(SMSTemplateHeader."Report ID");
+            "SMS Text" += SMSManagement.AFReportLink(SMSTemplateHeader."Report ID");
         //+NPR5.40 [304312]
     end;
 

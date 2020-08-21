@@ -19,17 +19,21 @@ page 6059795 "E-mail Templates"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -81,7 +85,7 @@ page 6059795 "E-mail Templates"
                     Path: Text;
                 begin
                     //-NPR5.48 [341711]
-                    EmailTemplateMgt.ImportHtmlTemplate(Path,true,Rec);
+                    EmailTemplateMgt.ImportHtmlTemplate(Path, true, Rec);
                     //+NPR5.48 [341711]
                 end;
             }
@@ -96,7 +100,7 @@ page 6059795 "E-mail Templates"
                     EmailTemplateMgt: Codeunit "E-mail Template Mgt.";
                 begin
                     //-NPR5.48 [341711]
-                    EmailTemplateMgt.ExportHtmlTemplate(Rec,true);
+                    EmailTemplateMgt.ExportHtmlTemplate(Rec, true);
                     //+NPR5.48 [341711]
                 end;
             }
@@ -138,7 +142,7 @@ page 6059795 "E-mail Templates"
                 Caption = 'E-mail Log';
                 Image = ListPage;
                 RunObject = Page "E-mail Log";
-                RunPageLink = "Table No."=FIELD("Table No.");
+                RunPageLink = "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("Entry No.");
             }
             action(EmailTemplateFilters)
@@ -146,9 +150,9 @@ page 6059795 "E-mail Templates"
                 Caption = 'Email Template Filters';
                 Image = UseFilters;
                 RunObject = Page "E-mail Template Filters";
-                RunPageLink = "E-mail Template Code"=FIELD(Code),
-                              "Table No."=FIELD("Table No.");
-                RunPageView = SORTING("E-mail Template Code","Table No.","Line No.");
+                RunPageLink = "E-mail Template Code" = FIELD(Code),
+                              "Table No." = FIELD("Table No.");
+                RunPageView = SORTING("E-mail Template Code", "Table No.", "Line No.");
             }
             action(AttachedFiles)
             {
@@ -162,9 +166,9 @@ page 6059795 "E-mail Templates"
                 begin
                     RecRef.GetTable(Rec);
                     Clear(RetailAttachments);
-                    RetailAttachments.SetRange("Table No.",RecRef.Number);
-                    RetailAttachments.SetRange("Primary Key",RecRef.GetPosition(false));
-                    PAGE.Run(PAGE::"E-mail Attachments",RetailAttachments);
+                    RetailAttachments.SetRange("Table No.", RecRef.Number);
+                    RetailAttachments.SetRange("Primary Key", RecRef.GetPosition(false));
+                    PAGE.Run(PAGE::"E-mail Attachments", RetailAttachments);
                 end;
             }
             action(AdditionalReports)
@@ -172,7 +176,7 @@ page 6059795 "E-mail Templates"
                 Caption = 'Additional Reports';
                 Image = "Report";
                 RunObject = Page "E-mail Template Reports";
-                RunPageLink = "E-mail Template Code"=FIELD(Code);
+                RunPageLink = "E-mail Template Code" = FIELD(Code);
             }
         }
     }

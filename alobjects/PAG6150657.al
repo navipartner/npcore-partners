@@ -13,32 +13,41 @@ page 6150657 "POS Posting Setup"
         {
             repeater(Group)
             {
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Method Code";"POS Payment Method Code")
+                field("POS Payment Method Code"; "POS Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Bin Code";"POS Payment Bin Code")
+                field("POS Payment Bin Code"; "POS Payment Bin Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account Type";"Account Type")
+                field("Account Type"; "Account Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account No.";"Account No.")
+                field("Account No."; "Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Difference Account Type";"Difference Account Type")
+                field("Difference Account Type"; "Difference Account Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Close to POS Bin No.";"Close to POS Bin No.")
+                field("Close to POS Bin No."; "Close to POS Bin No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Difference Acc. No.";"Difference Acc. No.")
+                field("Difference Acc. No."; "Difference Acc. No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Difference Acc. No. (Neg)";"Difference Acc. No. (Neg)")
+                field("Difference Acc. No. (Neg)"; "Difference Acc. No. (Neg)")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

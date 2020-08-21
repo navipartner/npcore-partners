@@ -17,14 +17,17 @@ page 6151252 "NP Retail Activities 1"
                 ShowCaption = false;
                 field("Sales Orders"; "Sales Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                 }
                 field("Daily Sales Orders"; "Daily Sales Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                 }
                 field("Import Pending"; "Import Pending")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Nc Import List";
                 }
             }

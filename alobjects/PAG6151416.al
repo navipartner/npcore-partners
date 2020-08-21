@@ -29,23 +29,28 @@ page 6151416 "Magento Categories"
             repeater(Group)
             {
                 IndentationColumn = Level;
-                IndentationControls = Id,Name;
+                IndentationControls = Id, Name;
                 ShowAsTree = true;
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Parent Category Id";"Parent Category Id")
+                field("Parent Category Id"; "Parent Category Id")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -90,7 +95,7 @@ page 6151416 "Magento Categories"
                     MagentoDisplayConfig: Record "Magento Display Config";
                 begin
                     //-MAG1.21
-                    MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::"Item Group");
+                    MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::"Item Group");
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                     MagentoDisplayConfigPage.Run;
                     //+MAG1.21

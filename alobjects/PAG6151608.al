@@ -12,29 +12,37 @@ page 6151608 "NpDc Ext. Coupon Reservations"
         {
             repeater(Group)
             {
-                field("External Document No.";"External Document No.")
+                field("External Document No."; "External Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Inserted at";"Inserted at")
+                field("Inserted at"; "Inserted at")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Coupon Type";"Coupon Type")
+                field("Coupon Type"; "Coupon Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Coupon No.";"Coupon No.")
+                field("Coupon No."; "Coupon No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

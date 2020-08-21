@@ -17,52 +17,63 @@ page 6150665 "NPRE Seating"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Seating Location";"Seating Location")
+                field("Seating Location"; "Seating Location")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocking Reason";"Blocking Reason")
+                field("Blocking Reason"; "Blocking Reason")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Capasity Tab")
             {
                 Caption = 'Capasity';
-                field("Fixed Capasity";"Fixed Capasity")
+                field("Fixed Capasity"; "Fixed Capasity")
                 {
+                    ApplicationArea = All;
                 }
-                field(Capacity;Capacity)
+                field(Capacity; Capacity)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(StatusGr)
             {
                 Caption = 'Status';
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Status Description FF";"Status Description FF")
+                field("Status Description FF"; "Status Description FF")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
             group("Current Acvtivity")
             {
                 Caption = 'Current Acvtivity';
-                field("Current Waiter Pad FF";"Current Waiter Pad FF")
+                field("Current Waiter Pad FF"; "Current Waiter Pad FF")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Multiple Waiter Pad FF";"Multiple Waiter Pad FF")
+                field("Multiple Waiter Pad FF"; "Multiple Waiter Pad FF")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
@@ -81,8 +92,8 @@ page 6150665 "NPRE Seating"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6150665),
-                                  "No."=FIELD(Code);
+                    RunPageLink = "Table ID" = CONST(6150665),
+                                  "No." = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+D';
                 }
             }
@@ -115,8 +126,8 @@ page 6150665 "NPRE Seating"
         WaiterPadList.LookupMode(true);
         WaiterPadList.Editable(false);
         if WaiterPadList.RunModal = ACTION::LookupOK then begin
-          WaiterPadList.GetRecord(WaiterPad);
-          WaiterPadManagement.LinkSeatingToWaiterPad(WaiterPad."No.", Rec.Code);
+            WaiterPadList.GetRecord(WaiterPad);
+            WaiterPadManagement.LinkSeatingToWaiterPad(WaiterPad."No.", Rec.Code);
         end;
     end;
 }

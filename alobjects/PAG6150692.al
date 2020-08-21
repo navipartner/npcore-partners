@@ -13,28 +13,35 @@ page 6150692 "NPRE Kitchen Request Stations"
         {
             repeater(Group)
             {
-                field("Request No.";"Request No.")
+                field("Request No."; "Request No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Production Restaurant Code";"Production Restaurant Code")
+                field("Production Restaurant Code"; "Production Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Kitchen Station";"Kitchen Station")
+                field("Kitchen Station"; "Kitchen Station")
                 {
+                    ApplicationArea = All;
                 }
-                field("Production Status";"Production Status")
+                field("Production Status"; "Production Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Date-Time";"Start Date-Time")
+                field("Start Date-Time"; "Start Date-Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Date-Time";"End Date-Time")
+                field("End Date-Time"; "End Date-Time")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

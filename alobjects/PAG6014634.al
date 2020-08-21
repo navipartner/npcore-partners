@@ -14,17 +14,21 @@ page 6014634 "GCP Setup"
         {
             repeater(Group)
             {
-                field("Printer ID";"Printer ID")
+                field("Printer ID"; "Printer ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object ID";"Object ID")
+                field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("""Cloud Job Ticket"".HASVALUE()";"Cloud Job Ticket".HasValue())
+                field("""Cloud Job Ticket"".HASVALUE()"; "Cloud Job Ticket".HasValue())
                 {
+                    ApplicationArea = All;
                     Caption = 'Settings Stored';
                 }
             }
@@ -66,7 +70,7 @@ page 6014634 "GCP Setup"
                     GCPMgt: Codeunit "GCP Mgt.";
                 begin
                     if GCPAuthSetup.RunModal = ACTION::OK then begin
-                      GCPMgt.CreateAccountTokens(GCPAuthSetup.GetAuthCode() );
+                        GCPMgt.CreateAccountTokens(GCPAuthSetup.GetAuthCode());
                     end;
                 end;
             }
@@ -85,7 +89,7 @@ page 6014634 "GCP Setup"
                 begin
                     CurrPage.SetSelectionFilter(GCPPrintSetting);
                     if not GCPPrintSetting.FindFirst then
-                      exit;
+                        exit;
 
                     GCPMgt.ViewPrinterInfo(GCPPrintSetting."Printer ID");
                 end;

@@ -17,15 +17,17 @@ page 6060156 "Event Copy Attr./Templ."
             group(Options)
             {
                 Caption = 'Options';
-                field(FromEventNo;FromEventNo)
+                field(FromEventNo; FromEventNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'From Event No.';
-                    TableRelation = Job."No." WHERE (Event=CONST(true));
+                    TableRelation = Job."No." WHERE(Event = CONST(true));
                 }
-                field(ToEventNo;ToEventNo)
+                field(ToEventNo; ToEventNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'To Event No.';
-                    TableRelation = Job."No." WHERE (Event=CONST(true));
+                    TableRelation = Job."No." WHERE(Event = CONST(true));
                 }
             }
         }
@@ -40,32 +42,32 @@ page 6060156 "Event Copy Attr./Templ."
         JobFrom: Record Job;
         JobTo: Record Job;
     begin
-        if CloseAction in [ACTION::OK,ACTION::LookupOK] then begin
-          ValidateUserInput();
-          case CopyWhat of
-            //-NPR5.31 [269162]
-            //CopyWhat::Attributes: CopySuccess:= EventMgt.CopyAttributes(FromEventNo,ToEventNo,ResponseMsg);
-            CopyWhat::Attributes:
-              begin
-                //-NPR5.33 [277972]
-                /*
-                JobFrom.GET(FromEventNo);
-                JobTo.GET(ToEventNo);
-                JobTo.VALIDATE("Event Attribute Template Name",JobFrom."Event Attribute Template Name");
-                JobTo.MODIFY;
-                */
-                //+NPR5.33 [277972]
-                EventAttrMgt.CopyAttributes('',FromEventNo,ToEventNo,ResponseMsg);
-                CopySuccess := true;
-              end;
-            //-NPR5.31 [269162]
-            CopyWhat::CustTemplate,CopyWhat::TeamTemplate:
-              CopySuccess := EventMgt.CopyTemplates(FromEventNo,ToEventNo,CopyWhat,ResponseMsg);
-          end;
-          if CopySuccess then
-            Message(CopySuccessTxt)
-          else
-            Error(ResponseMsg);
+        if CloseAction in [ACTION::OK, ACTION::LookupOK] then begin
+            ValidateUserInput();
+            case CopyWhat of
+                //-NPR5.31 [269162]
+                //CopyWhat::Attributes: CopySuccess:= EventMgt.CopyAttributes(FromEventNo,ToEventNo,ResponseMsg);
+                CopyWhat::Attributes:
+                    begin
+                        //-NPR5.33 [277972]
+                        /*
+                        JobFrom.GET(FromEventNo);
+                        JobTo.GET(ToEventNo);
+                        JobTo.VALIDATE("Event Attribute Template Name",JobFrom."Event Attribute Template Name");
+                        JobTo.MODIFY;
+                        */
+                        //+NPR5.33 [277972]
+                        EventAttrMgt.CopyAttributes('', FromEventNo, ToEventNo, ResponseMsg);
+                        CopySuccess := true;
+                    end;
+                //-NPR5.31 [269162]
+                CopyWhat::CustTemplate, CopyWhat::TeamTemplate:
+                    CopySuccess := EventMgt.CopyTemplates(FromEventNo, ToEventNo, CopyWhat, ResponseMsg);
+            end;
+            if CopySuccess then
+                Message(CopySuccessTxt)
+            else
+                Error(ResponseMsg);
         end;
 
     end;
@@ -87,7 +89,7 @@ page 6060156 "Event Copy Attr./Templ."
         NothingToCopyTxt: Label 'There was nothing to copy.';
         ResponseMsg: Text;
 
-    procedure SetFromEvent(FromEventNoHere: Code[20];CopyWhatHere: Option Attributes,CustTemplate,TeamTemplate)
+    procedure SetFromEvent(FromEventNoHere: Code[20]; CopyWhatHere: Option Attributes,CustTemplate,TeamTemplate)
     begin
         //-NPR5.31 [269162]
         //FromEventNo := EventHere."No.";
@@ -95,22 +97,22 @@ page 6060156 "Event Copy Attr./Templ."
         //+NPR5.31 [269162]
         CopyWhat := CopyWhatHere;
         case CopyWhat of
-          CopyWhat::Attributes:
-            PageCaption := CopyAttributesTxt;
-          CopyWhat::CustTemplate:
-            PageCaption := CopyCustTemplateTxt;
-          CopyWhat::TeamTemplate:
-            PageCaption := CopyTeamTemplateTxt;
+            CopyWhat::Attributes:
+                PageCaption := CopyAttributesTxt;
+            CopyWhat::CustTemplate:
+                PageCaption := CopyCustTemplateTxt;
+            CopyWhat::TeamTemplate:
+                PageCaption := CopyTeamTemplateTxt;
         end;
     end;
 
     local procedure ValidateUserInput()
     begin
         if (FromEventNo = '') or (ToEventNo = '') then
-          Error(SpecifyFromToEvents);
+            Error(SpecifyFromToEvents);
 
         if FromEventNo = ToEventNo then
-          Error(CantCopyToSameEvent);
+            Error(CantCopyToSameEvent);
     end;
 }
 

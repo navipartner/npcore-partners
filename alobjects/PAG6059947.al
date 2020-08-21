@@ -12,11 +12,13 @@ page 6059947 "Sales Price Maintenance Groups"
         {
             repeater(Group)
             {
-                field("Item Group";"Item Group")
+                field("Item Group"; "Item Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

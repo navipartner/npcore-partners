@@ -19,42 +19,53 @@ page 6060131 "MM Member Cards ListPart"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("External Card No.";"External Card No.")
+                field("External Card No."; "External Card No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("External Card No. Last 4";"External Card No. Last 4")
+                field("External Card No. Last 4"; "External Card No. Last 4")
                 {
+                    ApplicationArea = All;
                     Enabled = false;
                 }
-                field("Pin Code";"Pin Code")
+                field("Pin Code"; "Pin Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid Until";"Valid Until")
+                field("Valid Until"; "Valid Until")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Is Temporary";"Card Is Temporary")
+                field("Card Is Temporary"; "Card Is Temporary")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Block Reason";"Block Reason")
+                field("Block Reason"; "Block Reason")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document ID";"Document ID")
+                field("Document ID"; "Document ID")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -74,7 +85,7 @@ page 6060131 "MM Member Cards ListPart"
                 var
                     MemberRetailIntegration: Codeunit "MM Member Retail Integration";
                 begin
-                    MemberRetailIntegration.PrintMemberCard ("Member Entry No.", "Entry No.");
+                    MemberRetailIntegration.PrintMemberCard("Member Entry No.", "Entry No.");
                 end;
             }
             action("Card Card")
@@ -83,7 +94,7 @@ page 6060131 "MM Member Cards ListPart"
                 Image = Voucher;
                 Promoted = true;
                 RunObject = Page "MM Member Card Card";
-                RunPageLink = "Entry No."=FIELD("Entry No.");
+                RunPageLink = "Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Entry No.");
             }
         }
@@ -92,7 +103,7 @@ page 6060131 "MM Member Cards ListPart"
     procedure GetCurrentEntryNo() EntryNo: Integer
     begin
 
-        exit (Rec."Entry No.");
+        exit(Rec."Entry No.");
     end;
 }
 

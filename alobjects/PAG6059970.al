@@ -19,87 +19,103 @@ page 6059970 "Variety Setup"
         {
             group(General)
             {
-                field("Variety Enabled";"Variety Enabled")
+                field("Variety Enabled"; "Variety Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Journal Blocking";"Item Journal Blocking")
+                field("Item Journal Blocking"; "Item Journal Blocking")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description";"Variant Description")
+                field("Variant Description"; "Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description 2";"Variant Description 2")
+                field("Variant Description 2"; "Variant Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Variant Code From";"Create Variant Code From")
+                field("Create Variant Code From"; "Create Variant Code From")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Barcode (Alternative No.)")
             {
                 Caption = 'Barcode (Alternative No.)';
-                field("Create Alt. No. automatic";"Create Alt. No. automatic")
+                field("Create Alt. No. automatic"; "Create Alt. No. automatic")
                 {
+                    ApplicationArea = All;
                 }
-                field("Barcode Type (Alt. No.)";"Barcode Type (Alt. No.)")
+                field("Barcode Type (Alt. No.)"; "Barcode Type (Alt. No.)")
                 {
+                    ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
                 }
-                field("Alt. No. No. Series (I)";"Alt. No. No. Series (I)")
+                field("Alt. No. No. Series (I)"; "Alt. No. No. Series (I)")
                 {
+                    ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
 
                     trigger OnValidate()
                     begin
                         //-NPR5.33 [242105]
                         if "Alt. No. No. Series (V)" = '' then
-                          "Alt. No. No. Series (V)" := "Alt. No. No. Series (I)";
+                            "Alt. No. No. Series (V)" := "Alt. No. No. Series (I)";
                         //+NPR5.33 [242105]
                     end;
                 }
-                field("Alt. No. No. Series (V)";"Alt. No. No. Series (V)")
+                field("Alt. No. No. Series (V)"; "Alt. No. No. Series (V)")
                 {
+                    ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
                 }
             }
             group("Barcode (Item Cross Ref.)")
             {
                 Caption = 'Barcode (Item Cross Ref.)';
-                field("Create Item Cross Ref. auto.";"Create Item Cross Ref. auto.")
+                field("Create Item Cross Ref. auto."; "Create Item Cross Ref. auto.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Barcode Type (Item Cross Ref.)";"Barcode Type (Item Cross Ref.)")
+                field("Barcode Type (Item Cross Ref.)"; "Barcode Type (Item Cross Ref.)")
                 {
+                    ApplicationArea = All;
                     Editable = "Create Item Cross Ref. auto.";
                 }
-                field("Item Cross Ref. No. Series (I)";"Item Cross Ref. No. Series (I)")
+                field("Item Cross Ref. No. Series (I)"; "Item Cross Ref. No. Series (I)")
                 {
+                    ApplicationArea = All;
                     Editable = "Create Item Cross Ref. auto.";
 
                     trigger OnValidate()
                     begin
                         //-NPR5.33 [242105]
                         if "Item Cross Ref. No. Series (V)" = '' then
-                          "Item Cross Ref. No. Series (V)" := "Item Cross Ref. No. Series (I)";
+                            "Item Cross Ref. No. Series (V)" := "Item Cross Ref. No. Series (I)";
                         //+NPR5.33 [242105]
                     end;
                 }
-                field("Item Cross Ref. No. Series (V)";"Item Cross Ref. No. Series (V)")
+                field("Item Cross Ref. No. Series (V)"; "Item Cross Ref. No. Series (V)")
                 {
+                    ApplicationArea = All;
                     Editable = "Create Item Cross Ref. auto.";
                 }
-                field("Item Cross Ref. Description(I)";"Item Cross Ref. Description(I)")
+                field("Item Cross Ref. Description(I)"; "Item Cross Ref. Description(I)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Cross Ref. Description(V)";"Item Cross Ref. Description(V)")
+                field("Item Cross Ref. Description(V)"; "Item Cross Ref. Description(V)")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(View)
             {
                 Caption = 'View';
-                field("Hide Inactive Values";"Hide Inactive Values")
+                field("Hide Inactive Values"; "Hide Inactive Values")
                 {
+                    ApplicationArea = All;
                     ToolTip = 'Whether Inactive Values should be hidden in the Variant Matrix by default';
                 }
             }
@@ -182,7 +198,7 @@ page 6059970 "Variety Setup"
                     Promoted = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Alternative Number";
-                    RunPageView = SORTING("Alt. No.",Type);
+                    RunPageView = SORTING("Alt. No.", Type);
                 }
                 action("Item Cross Reference")
                 {
@@ -191,7 +207,7 @@ page 6059970 "Variety Setup"
                     Promoted = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Item Cross Reference Entries";
-                    RunPageView = SORTING("Cross-Reference Type","Cross-Reference No.");
+                    RunPageView = SORTING("Cross-Reference Type", "Cross-Reference No.");
                 }
             }
             group(Update)
@@ -319,8 +335,8 @@ page 6059970 "Variety Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

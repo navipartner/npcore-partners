@@ -17,6 +17,7 @@ page 6151335 "NP Retail Resturant Cue"
 
                 field("Gross turnover"; "Gross turnover")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -27,6 +28,7 @@ page 6151335 "NP Retail Resturant Cue"
 
                 field("Amount per guest"; "Amount per guest")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -37,6 +39,7 @@ page 6151335 "NP Retail Resturant Cue"
 
                 field("Revenue per seat hour"; "Revenue per seat hour")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -47,6 +50,7 @@ page 6151335 "NP Retail Resturant Cue"
 
                 field("Table turnover"; "Table turnover")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -61,6 +65,7 @@ page 6151335 "NP Retail Resturant Cue"
                 Caption = 'Status';
                 field("Occupied Tables"; "Occupied table")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -70,6 +75,7 @@ page 6151335 "NP Retail Resturant Cue"
                 }
                 field("Total free tables"; "Total free tables")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -78,6 +84,7 @@ page 6151335 "NP Retail Resturant Cue"
                 }
                 field("Inhouse guests"; "Inhouse guests")
                 {
+                    ApplicationArea = All;
                     trigger OnDrillDown()
                     begin
                         DrilldownDownInhouseguests();
@@ -86,6 +93,7 @@ page 6151335 "NP Retail Resturant Cue"
                 }
                 field("Available seats"; "Available seats")
                 {
+                    ApplicationArea = All;
                     trigger OnDrillDown()
                     begin
                         DrilldownDownAvailableseats();
@@ -98,10 +106,12 @@ page 6151335 "NP Retail Resturant Cue"
                 Caption = 'Day Summary';
                 field("Total guests"; "Total guests")
                 {
+                    ApplicationArea = All;
 
                 }
                 field(Transactions; Transactions)
                 {
+                    ApplicationArea = All;
                     trigger OnDrillDown()
                     begin
                         DrilldownTransaction();
@@ -109,10 +119,12 @@ page 6151335 "NP Retail Resturant Cue"
                 }
                 field("No-Shows"; "No-Shows")
                 {
+                    ApplicationArea = All;
 
                 }
                 field("Canceled reservations"; "Canceled reservations")
                 {
+                    ApplicationArea = All;
                     Caption = 'Cancelled reservations';
 
                 }
@@ -130,7 +142,7 @@ page 6151335 "NP Retail Resturant Cue"
     end;
 
 
-        procedure DrilldownGrossTurnover()
+    procedure DrilldownGrossTurnover()
     var
         POSEntry: Record "POS Entry";
     begin
@@ -141,7 +153,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(Page::"POS Entries", POSEntry);
     end;
 
-        procedure DrilldownAmountPerGuest()
+    procedure DrilldownAmountPerGuest()
     var
         POSEntry: Record "POS Entry";
     begin
@@ -154,7 +166,7 @@ page 6151335 "NP Retail Resturant Cue"
 
 
 
-        procedure DrilldownDownOccuipedtable()
+    procedure DrilldownDownOccuipedtable()
     var
         seating: Record "NPRE Seating";
 
@@ -164,7 +176,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-        procedure DrilldownDownFreetable()
+    procedure DrilldownDownFreetable()
     var
         seating: Record "NPRE Seating";
 
@@ -174,7 +186,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-        procedure DrilldownDownInhouseguests()
+    procedure DrilldownDownInhouseguests()
     var
         seating: Record "NPRE Seating";
     begin
@@ -183,7 +195,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-        procedure DrilldownDownAvailableseats()
+    procedure DrilldownDownAvailableseats()
     var
         seating: Record "NPRE Seating";
 
@@ -193,7 +205,7 @@ page 6151335 "NP Retail Resturant Cue"
         Page.run(page::"NPRE Seating List", seating);
     end;
 
-        procedure DrilldownTransaction()
+    procedure DrilldownTransaction()
     var
         POSEntry: Record "POS Entry";
     begin

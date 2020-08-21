@@ -13,45 +13,58 @@ page 6151059 "Distribution Lines"
         {
             repeater(Group)
             {
-                field("Distribution Line";"Distribution Line")
+                field("Distribution Line"; "Distribution Line")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Item";"Distribution Item")
+                field("Distribution Item"; "Distribution Item")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Variant";"Item Variant")
+                field("Item Variant"; "Item Variant")
                 {
+                    ApplicationArea = All;
                 }
-                field(Location;Location)
+                field(Location; Location)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Group Member";"Distribution Group Member")
+                field("Distribution Group Member"; "Distribution Group Member")
                 {
+                    ApplicationArea = All;
                 }
-                field("Action Required";"Action Required")
+                field("Action Required"; "Action Required")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Distribution Quantity";"Distribution Quantity")
+                field("Distribution Quantity"; "Distribution Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Avaliable Quantity";"Avaliable Quantity")
+                field("Avaliable Quantity"; "Avaliable Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Demanded Quantity";"Demanded Quantity")
+                field("Demanded Quantity"; "Demanded Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Org. Distribution Quantity";"Org. Distribution Quantity")
+                field("Org. Distribution Quantity"; "Org. Distribution Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Cost Value (LCY)";"Distribution Cost Value (LCY)")
+                field("Distribution Cost Value (LCY)"; "Distribution Cost Value (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Created";"Date Created")
+                field("Date Created"; "Date Created")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

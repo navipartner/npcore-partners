@@ -33,80 +33,103 @@ page 6059785 "TM Ticket List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Ticket No.";"External Ticket No.")
+                field("External Ticket No."; "External Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Type Code";"Ticket Type Code")
+                field("Ticket Type Code"; "Ticket Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From Date";"Valid From Date")
+                field("Valid From Date"; "Valid From Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From Time";"Valid From Time")
+                field("Valid From Time"; "Valid From Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid To Date";"Valid To Date")
+                field("Valid To Date"; "Valid To Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid To Time";"Valid To Time")
+                field("Valid To Time"; "Valid To Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked Date";"Blocked Date")
+                field("Blocked Date"; "Blocked Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Printed Date";"Printed Date")
+                field("Printed Date"; "Printed Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Date";"Document Date")
+                field("Document Date"; "Document Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Code";"Source Code")
+                field("Source Code"; "Source Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Sales Header Type";"Sales Header Type")
+                field("Sales Header Type"; "Sales Header Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Sales Header No.";"Sales Header No.")
+                field("Sales Header No."; "Sales Header No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Sales Receipt No.";"Sales Receipt No.")
+                field("Sales Receipt No."; "Sales Receipt No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Member Card No.";"External Member Card No.")
+                field("External Member Card No."; "External Member Card No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Of Access";"No. Of Access")
+                field("No. Of Access"; "No. Of Access")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -125,7 +148,7 @@ page 6059785 "TM Ticket List"
 
                 trigger OnAction()
                 begin
-                    CreateETicket ();
+                    CreateETicket();
                 end;
             }
             separator(Separator6014403)
@@ -138,7 +161,7 @@ page 6059785 "TM Ticket List"
 
                 trigger OnAction()
                 begin
-                    ToggleTicketBlock ();
+                    ToggleTicketBlock();
                 end;
             }
             action("Revoke Ticket")
@@ -149,7 +172,7 @@ page 6059785 "TM Ticket List"
 
                 trigger OnAction()
                 begin
-                    RevokeTicket ();
+                    RevokeTicket();
                 end;
             }
         }
@@ -164,7 +187,7 @@ page 6059785 "TM Ticket List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "TM Ticket Access Entry List";
-                RunPageLink = "Ticket No."=FIELD("No.");
+                RunPageLink = "Ticket No." = FIELD("No.");
             }
             action(Ticketholder)
             {
@@ -176,7 +199,7 @@ page 6059785 "TM Ticket List"
 
                 trigger OnAction()
                 begin
-                    ChangeTicketholder ();
+                    ChangeTicketholder();
                 end;
             }
             action("Ticket Request")
@@ -187,7 +210,7 @@ page 6059785 "TM Ticket List"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "TM Ticket Request";
-                RunPageLink = "Entry No."=FIELD("Ticket Reservation Entry No.");
+                RunPageLink = "Entry No." = FIELD("Ticket Reservation Entry No.");
             }
             separator(Separator6014406)
             {
@@ -204,7 +227,7 @@ page 6059785 "TM Ticket List"
                     DIYTicketPrint: Codeunit "TM Ticket DIY Ticket Print";
                 begin
 
-                    DIYTicketPrint.ViewOnlineSingleTicket (Rec."No.");
+                    DIYTicketPrint.ViewOnlineSingleTicket(Rec."No.");
                 end;
             }
             action("View Ticket Notifications")
@@ -213,7 +236,7 @@ page 6059785 "TM Ticket List"
                 Ellipsis = true;
                 Image = ElectronicNumber;
                 RunObject = Page "TM Ticket Notification Entry";
-                RunPageLink = "Ticket No."=FIELD("No.");
+                RunPageLink = "Ticket No." = FIELD("No.");
             }
             separator(Separator6014407)
             {
@@ -232,12 +255,12 @@ page 6059785 "TM Ticket List"
                 begin
 
                     CurrPage.SetSelectionFilter(Ticket);
-                    Ticket.FindSet ();
+                    Ticket.FindSet();
                     repeat
-                      Ticket2.Get (Ticket."No.");
-                      Ticket2.SetRecFilter;
-                      TicketManagement.PrintSingleTicket(Ticket2);
-                    until (Ticket.Next () = 0);
+                        Ticket2.Get(Ticket."No.");
+                        Ticket2.SetRecFilter;
+                        TicketManagement.PrintSingleTicket(Ticket2);
+                    until (Ticket.Next() = 0);
                 end;
             }
             action("Report Issued Tickets")
@@ -253,7 +276,7 @@ page 6059785 "TM Ticket List"
     begin
 
         //-+TM1.19 [266768]
-        Rec.SetFilter (Blocked, '=%1', false);
+        Rec.SetFilter(Blocked, '=%1', false);
     end;
 
     var
@@ -269,7 +292,7 @@ page 6059785 "TM Ticket List"
         SuggestNotificationMethod: Option NA,EMAIL,SMS;
     begin
 
-        TicketReservationRequest.Get ("Ticket Reservation Entry No.");
+        TicketReservationRequest.Get("Ticket Reservation Entry No.");
 
 
         //-TM90.1.46 [387138]
@@ -283,7 +306,7 @@ page 6059785 "TM Ticket List"
         // END;
 
         //TicketNotifyParticipant.AquireTicketParticipant (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address");
-        TicketNotifyParticipant.AquireTicketParticipantForce (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
+        TicketNotifyParticipant.AquireTicketParticipantForce(TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
         //+TM90.1.46 [387138]
     end;
 
@@ -294,27 +317,27 @@ page 6059785 "TM Ticket List"
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
     begin
 
-        CurrPage.SetSelectionFilter (Ticket);
-        if (Ticket.FindSet ()) then begin
-          repeat
-            Ticket2.Get (Ticket."No.");
+        CurrPage.SetSelectionFilter(Ticket);
+        if (Ticket.FindSet()) then begin
+            repeat
+                Ticket2.Get(Ticket."No.");
 
-            Ticket2.Blocked := (not Ticket.Blocked);
-            if (Ticket2.Blocked) then
-              Ticket2."Blocked Date" := Today
-            else
-              Ticket2."Blocked Date" := 0D;
+                Ticket2.Blocked := (not Ticket.Blocked);
+                if (Ticket2.Blocked) then
+                    Ticket2."Blocked Date" := Today
+                else
+                    Ticket2."Blocked Date" := 0D;
 
-            Ticket2.Modify ();
+                Ticket2.Modify();
 
-            //-TM1.38 [332109]
-            if (Ticket2.Blocked) then
-              TicketRequestManager.OnAfterBlockTicketPublisher (Ticket."No.");
-            if (not Ticket2.Blocked) then
-              TicketRequestManager.OnAfterUnblockTicketPublisher (Ticket."No.");
+                //-TM1.38 [332109]
+                if (Ticket2.Blocked) then
+                    TicketRequestManager.OnAfterBlockTicketPublisher(Ticket."No.");
+                if (not Ticket2.Blocked) then
+                    TicketRequestManager.OnAfterUnblockTicketPublisher(Ticket."No.");
             //+TM1.38 [332109]
 
-          until (Ticket.Next () = 0);
+            until (Ticket.Next() = 0);
         end;
     end;
 
@@ -330,20 +353,20 @@ page 6059785 "TM Ticket List"
     begin
 
         //-TM1.26 [296731]
-        CurrPage.SetSelectionFilter (Ticket);
-        TicketCount := Ticket.Count ();
+        CurrPage.SetSelectionFilter(Ticket);
+        TicketCount := Ticket.Count();
 
-        if (not Confirm (CONFIRM_REVOKE_TICKET, false, TicketCount)) then
-          Error ('');
+        if (not Confirm(CONFIRM_REVOKE_TICKET, false, TicketCount)) then
+            Error('');
 
-        if (Ticket.FindSet ()) then begin
-          Token := TicketRequestManager.GetNewToken ();
-          repeat
-            AmountToReverse := 0;
-            QtyToReverse := 0;
-            TicketRequestManager.POS_CreateRevokeRequest (Token, Ticket."No.", UserId, 0, AmountToReverse, QtyToReverse);
-          until (Ticket.Next () = 0);
-          TicketRequestManager.RevokeReservationTokenRequest (Token, false, true, ResponseMessage);
+        if (Ticket.FindSet()) then begin
+            Token := TicketRequestManager.GetNewToken();
+            repeat
+                AmountToReverse := 0;
+                QtyToReverse := 0;
+                TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", UserId, 0, AmountToReverse, QtyToReverse);
+            until (Ticket.Next() = 0);
+            TicketRequestManager.RevokeReservationTokenRequest(Token, false, true, ResponseMessage);
         end;
         //+TM1.26 [296731]
     end;
@@ -356,21 +379,21 @@ page 6059785 "TM Ticket List"
         TicketCount: Integer;
     begin
 
-        CurrPage.SetSelectionFilter (Ticket);
-        TicketCount := Ticket.Count ();
+        CurrPage.SetSelectionFilter(Ticket);
+        TicketCount := Ticket.Count();
 
         if (TicketCount > 1) then
-          if (not (Confirm (CONFIRM_ETICKET, true, TicketCount))) then
-            Error ('');
+            if (not (Confirm(CONFIRM_ETICKET, true, TicketCount))) then
+                Error('');
 
-        if (Ticket.FindSet ()) then begin
-          repeat
-            if (not TicketRequestManager.CreateAndSendETicket (Rec."No.", ReasonText)) then
-              Error (ReasonText);
-          until (Ticket.Next () = 0);
+        if (Ticket.FindSet()) then begin
+            repeat
+                if (not TicketRequestManager.CreateAndSendETicket(Rec."No.", ReasonText)) then
+                    Error(ReasonText);
+            until (Ticket.Next() = 0);
         end;
 
-        Message (ETICKET_SENT);
+        Message(ETICKET_SENT);
     end;
 }
 

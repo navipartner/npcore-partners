@@ -16,30 +16,35 @@ page 6150688 "NPRE Kitchen Order List"
         {
             repeater(Group)
             {
-                field("Order ID";"Order ID")
+                field("Order ID"; "Order ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created Date-Time";"Created Date-Time")
+                field("Created Date-Time"; "Created Date-Time")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014408;Notes)
+            systempart(Control6014408; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014407;Links)
+            systempart(Control6014407; Links)
             {
                 Visible = false;
             }
@@ -58,7 +63,7 @@ page 6150688 "NPRE Kitchen Order List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPRE Kitchen Requests";
-                RunPageLink = "Order ID"=FIELD("Order ID");
+                RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
             }
         }

@@ -12,7 +12,7 @@ page 6059905 "Task Queue"
     {
         area(content)
         {
-            usercontrol(PingPong;"Microsoft.Dynamics.Nav.Client.PingPong")
+            usercontrol(PingPong; "Microsoft.Dynamics.Nav.Client.PingPong")
             {
 
                 trigger AddInReady()
@@ -28,48 +28,60 @@ page 6059905 "Task Queue"
             }
             repeater(Group)
             {
-                field(Company;Company)
+                field(Company; Company)
                 {
+                    ApplicationArea = All;
                     Editable = SetEditable;
                 }
-                field("Task Template";"Task Template")
+                field("Task Template"; "Task Template")
                 {
+                    ApplicationArea = All;
                     Editable = SetEditable;
                 }
-                field("Task Batch";"Task Batch")
+                field("Task Batch"; "Task Batch")
                 {
+                    ApplicationArea = All;
                     Editable = SetEditable;
                 }
-                field("Task Line No.";"Task Line No.")
+                field("Task Line No."; "Task Line No.")
                 {
+                    ApplicationArea = All;
                     Editable = SetEditable;
                 }
-                field("Next Run time";"Next Run time")
+                field("Next Run time"; "Next Run time")
                 {
+                    ApplicationArea = All;
                     Editable = SetEditable;
                 }
-                field("Task Worker Group";"Task Worker Group")
+                field("Task Worker Group"; "Task Worker Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Assigned To User";"Assigned To User")
+                field("Assigned To User"; "Assigned To User")
                 {
+                    ApplicationArea = All;
                     DrillDown = false;
                     Lookup = false;
                 }
-                field("Assigned Time";"Assigned Time")
+                field("Assigned Time"; "Assigned Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Started Time";"Started Time")
+                field("Started Time"; "Started Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Estimated Duration";"Estimated Duration")
+                field("Estimated Duration"; "Estimated Duration")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -83,7 +95,7 @@ page 6059905 "Task Queue"
     begin
         //-TQ1.28
         if Company <> CompanyName then
-          Error(Text001);
+            Error(Text001);
         //+TQ1.28
     end;
 

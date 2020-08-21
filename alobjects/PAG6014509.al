@@ -14,23 +14,29 @@ page 6014509 "Accessory List - Register"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                 }
-                field(Vendor;Vendor)
+                field(Vendor; Vendor)
                 {
+                    ApplicationArea = All;
                 }
-                field("Buy-from Vendor Name";"Buy-from Vendor Name")
+                field("Buy-from Vendor Name"; "Buy-from Vendor Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

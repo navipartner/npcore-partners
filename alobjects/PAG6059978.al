@@ -15,7 +15,7 @@ page 6059978 "Variety Matrix Bool"
     PageType = List;
     SourceTable = "Variety Buffer";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Variety 1 Sort Order","Variety 2 Sort Order","Variety 3 Sort Order","Variety 4 Sort Order");
+    SourceTableView = SORTING("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
 
     layout
     {
@@ -24,8 +24,9 @@ page 6059978 "Variety Matrix Bool"
             group(Control6150615)
             {
                 ShowCaption = false;
-                field("CurrVRTField.Description";CurrVRTField.Description)
+                field("CurrVRTField.Description"; CurrVRTField.Description)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Field';
                     Editable = false;
 
@@ -34,31 +35,33 @@ page 6059978 "Variety Matrix Bool"
 
                         //-NPR5.30 [266203]
                         if PAGE.RunModal(0, CurrVRTField) = ACTION::LookupOK then
-                          UpdateMatrix(false); //-NPR5.36 Parameter added;
+                            UpdateMatrix(false); //-NPR5.36 Parameter added;
                         //+NPR5.30 [266203]
                     end;
                 }
-                field(ShowAsCrossVRT;ShowAsCrossVRT)
+                field(ShowAsCrossVRT; ShowAsCrossVRT)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Horisontal';
 
                     trigger OnValidate()
                     begin
                         //-NPR5.31 [271133]
-                        MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                         //+NPR5.31 [271133]
 
                         UpdateMatrix(false); //-NPR5.36 Parameter added
                     end;
                 }
-                field(HideInactive;HideInactive)
+                field(HideInactive; HideInactive)
                 {
+                    ApplicationArea = All;
                     Caption = 'Hide Inactive Values';
 
                     trigger OnValidate()
                     begin
                         //-NPR5.31 [271133]
-                        MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                         //+NPR5.31 [271133]
 
                         UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -69,40 +72,46 @@ page 6059978 "Variety Matrix Bool"
             {
                 FreezeColumn = "Variety 4 Value";
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = 'Strong';
                 }
-                field("Variety 1 Value";"Variety 1 Value")
+                field("Variety 1 Value"; "Variety 1 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 1";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety1;
                 }
-                field("Variety 2 Value";"Variety 2 Value")
+                field("Variety 2 Value"; "Variety 2 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 2";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety2;
                 }
-                field("Variety 3 Value";"Variety 3 Value")
+                field("Variety 3 Value"; "Variety 3 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 3";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety3;
                 }
-                field("Variety 4 Value";"Variety 4 Value")
+                field("Variety 4 Value"; "Variety 4 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + Item."Variety 4";
                     Editable = false;
                     Visible = showvariety4;
                 }
-                field(Field1;MATRIX_CellData[1])
+                field(Field1; MATRIX_CellData[1])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     Visible = visible1;
@@ -112,8 +121,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(1);
                     end;
                 }
-                field(Field2;MATRIX_CellData[2])
+                field(Field2; MATRIX_CellData[2])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     Visible = visible2;
@@ -123,8 +133,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(2);
                     end;
                 }
-                field(Field3;MATRIX_CellData[3])
+                field(Field3; MATRIX_CellData[3])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     Visible = Visible3;
@@ -134,8 +145,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(3);
                     end;
                 }
-                field(Field4;MATRIX_CellData[4])
+                field(Field4; MATRIX_CellData[4])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     Visible = Visible4;
@@ -145,8 +157,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(4);
                     end;
                 }
-                field(Field5;MATRIX_CellData[5])
+                field(Field5; MATRIX_CellData[5])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     Visible = Visible5;
@@ -156,8 +169,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(5);
                     end;
                 }
-                field(Field6;MATRIX_CellData[6])
+                field(Field6; MATRIX_CellData[6])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     Visible = Visible6;
@@ -167,8 +181,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(6);
                     end;
                 }
-                field(Field7;MATRIX_CellData[7])
+                field(Field7; MATRIX_CellData[7])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     Visible = Visible7;
@@ -178,8 +193,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(7);
                     end;
                 }
-                field(Field8;MATRIX_CellData[8])
+                field(Field8; MATRIX_CellData[8])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     Visible = Visible8;
@@ -189,8 +205,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(8);
                     end;
                 }
-                field(Field9;MATRIX_CellData[9])
+                field(Field9; MATRIX_CellData[9])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     Visible = Visible9;
@@ -200,8 +217,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(9);
                     end;
                 }
-                field(Field10;MATRIX_CellData[10])
+                field(Field10; MATRIX_CellData[10])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     Visible = Visible10;
@@ -211,8 +229,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(10);
                     end;
                 }
-                field(Field11;MATRIX_CellData[11])
+                field(Field11; MATRIX_CellData[11])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     Visible = Visible11;
@@ -222,8 +241,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(11);
                     end;
                 }
-                field(Field12;MATRIX_CellData[12])
+                field(Field12; MATRIX_CellData[12])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     Visible = Visible12;
@@ -233,8 +253,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(12);
                     end;
                 }
-                field(Field13;MATRIX_CellData[13])
+                field(Field13; MATRIX_CellData[13])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[13];
                     Visible = Visible13;
@@ -244,8 +265,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(13);
                     end;
                 }
-                field(Field14;MATRIX_CellData[14])
+                field(Field14; MATRIX_CellData[14])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[14];
                     Visible = Visible14;
@@ -255,8 +277,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(14);
                     end;
                 }
-                field(Field15;MATRIX_CellData[15])
+                field(Field15; MATRIX_CellData[15])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[15];
                     Visible = Visible15;
@@ -266,8 +289,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(15);
                     end;
                 }
-                field(Field16;MATRIX_CellData[16])
+                field(Field16; MATRIX_CellData[16])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[16];
                     Visible = Visible16;
@@ -277,8 +301,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(16);
                     end;
                 }
-                field(Field17;MATRIX_CellData[17])
+                field(Field17; MATRIX_CellData[17])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[17];
                     Visible = Visible17;
@@ -288,8 +313,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(17);
                     end;
                 }
-                field(Field18;MATRIX_CellData[18])
+                field(Field18; MATRIX_CellData[18])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[18];
                     Visible = Visible18;
@@ -299,8 +325,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(18);
                     end;
                 }
-                field(Field19;MATRIX_CellData[19])
+                field(Field19; MATRIX_CellData[19])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[19];
                     Visible = Visible19;
@@ -310,8 +337,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(19);
                     end;
                 }
-                field(Field20;MATRIX_CellData[20])
+                field(Field20; MATRIX_CellData[20])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[20];
                     Visible = Visible20;
@@ -321,8 +349,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(20);
                     end;
                 }
-                field(Field21;MATRIX_CellData[21])
+                field(Field21; MATRIX_CellData[21])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[21];
                     Visible = Visible21;
@@ -332,8 +361,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(21);
                     end;
                 }
-                field(Field22;MATRIX_CellData[22])
+                field(Field22; MATRIX_CellData[22])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[22];
                     Visible = Visible22;
@@ -343,8 +373,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(22);
                     end;
                 }
-                field(Field23;MATRIX_CellData[23])
+                field(Field23; MATRIX_CellData[23])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[23];
                     Visible = Visible23;
@@ -354,8 +385,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(23);
                     end;
                 }
-                field(Field24;MATRIX_CellData[24])
+                field(Field24; MATRIX_CellData[24])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[24];
                     Visible = Visible24;
@@ -365,8 +397,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(24);
                     end;
                 }
-                field(Field25;MATRIX_CellData[25])
+                field(Field25; MATRIX_CellData[25])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[25];
                     Visible = Visible25;
@@ -376,8 +409,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(25);
                     end;
                 }
-                field(Field26;MATRIX_CellData[26])
+                field(Field26; MATRIX_CellData[26])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[26];
                     Visible = Visible26;
@@ -387,8 +421,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(26);
                     end;
                 }
-                field(Field27;MATRIX_CellData[27])
+                field(Field27; MATRIX_CellData[27])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[27];
                     Visible = Visible27;
@@ -398,8 +433,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(27);
                     end;
                 }
-                field(Field28;MATRIX_CellData[28])
+                field(Field28; MATRIX_CellData[28])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[28];
                     Visible = Visible28;
@@ -409,8 +445,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(28);
                     end;
                 }
-                field(Field29;MATRIX_CellData[29])
+                field(Field29; MATRIX_CellData[29])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[29];
                     Visible = Visible29;
@@ -420,8 +457,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(29);
                     end;
                 }
-                field(Field30;MATRIX_CellData[30])
+                field(Field30; MATRIX_CellData[30])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[30];
                     Visible = Visible30;
@@ -431,8 +469,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(30);
                     end;
                 }
-                field(Field31;MATRIX_CellData[31])
+                field(Field31; MATRIX_CellData[31])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[31];
                     Visible = Visible31;
@@ -442,8 +481,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(31);
                     end;
                 }
-                field(Field32;MATRIX_CellData[32])
+                field(Field32; MATRIX_CellData[32])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[32];
                     Visible = Visible32;
@@ -453,8 +493,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(32);
                     end;
                 }
-                field(Field33;MATRIX_CellData[33])
+                field(Field33; MATRIX_CellData[33])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[33];
                     Visible = Visible33;
@@ -464,8 +505,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(33);
                     end;
                 }
-                field(Field34;MATRIX_CellData[34])
+                field(Field34; MATRIX_CellData[34])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[34];
                     Visible = Visible34;
@@ -475,8 +517,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(34);
                     end;
                 }
-                field(Field35;MATRIX_CellData[35])
+                field(Field35; MATRIX_CellData[35])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[35];
                     Visible = Visible35;
@@ -486,8 +529,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(35);
                     end;
                 }
-                field(Field36;MATRIX_CellData[36])
+                field(Field36; MATRIX_CellData[36])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[36];
                     Visible = Visible36;
@@ -497,8 +541,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(36);
                     end;
                 }
-                field(Field37;MATRIX_CellData[37])
+                field(Field37; MATRIX_CellData[37])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[37];
                     Visible = Visible37;
@@ -508,8 +553,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(37);
                     end;
                 }
-                field(Field38;MATRIX_CellData[38])
+                field(Field38; MATRIX_CellData[38])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[38];
                     Visible = Visible38;
@@ -519,8 +565,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(38);
                     end;
                 }
-                field(Field39;MATRIX_CellData[39])
+                field(Field39; MATRIX_CellData[39])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[39];
                     Visible = Visible39;
@@ -530,8 +577,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(39);
                     end;
                 }
-                field(Field40;MATRIX_CellData[40])
+                field(Field40; MATRIX_CellData[40])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[40];
                     Visible = Visible40;
@@ -541,8 +589,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(40);
                     end;
                 }
-                field(Field41;MATRIX_CellData[41])
+                field(Field41; MATRIX_CellData[41])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[41];
                     Visible = Visible41;
@@ -552,8 +601,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(41);
                     end;
                 }
-                field(Field42;MATRIX_CellData[42])
+                field(Field42; MATRIX_CellData[42])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[42];
                     Visible = Visible42;
@@ -563,8 +613,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(42);
                     end;
                 }
-                field(Field43;MATRIX_CellData[43])
+                field(Field43; MATRIX_CellData[43])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[43];
                     Visible = Visible43;
@@ -574,8 +625,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(43);
                     end;
                 }
-                field(Field44;MATRIX_CellData[44])
+                field(Field44; MATRIX_CellData[44])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[44];
                     Visible = Visible44;
@@ -585,8 +637,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(44);
                     end;
                 }
-                field(Field45;MATRIX_CellData[45])
+                field(Field45; MATRIX_CellData[45])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[45];
                     Visible = Visible45;
@@ -596,8 +649,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(45);
                     end;
                 }
-                field(Field46;MATRIX_CellData[46])
+                field(Field46; MATRIX_CellData[46])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[46];
                     Visible = Visible46;
@@ -607,8 +661,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(46);
                     end;
                 }
-                field(Field47;MATRIX_CellData[47])
+                field(Field47; MATRIX_CellData[47])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[47];
                     Visible = Visible47;
@@ -618,8 +673,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(47);
                     end;
                 }
-                field(Field48;MATRIX_CellData[48])
+                field(Field48; MATRIX_CellData[48])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[48];
                     Visible = Visible48;
@@ -629,8 +685,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(48);
                     end;
                 }
-                field(Field49;MATRIX_CellData[49])
+                field(Field49; MATRIX_CellData[49])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[49];
                     Visible = Visible49;
@@ -640,8 +697,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(49);
                     end;
                 }
-                field(Field50;MATRIX_CellData[50])
+                field(Field50; MATRIX_CellData[50])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[50];
                     Visible = Visible50;
@@ -651,8 +709,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(50);
                     end;
                 }
-                field(Field51;MATRIX_CellData[51])
+                field(Field51; MATRIX_CellData[51])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[51];
                     Visible = Visible51;
@@ -662,8 +721,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(51);
                     end;
                 }
-                field(Field52;MATRIX_CellData[52])
+                field(Field52; MATRIX_CellData[52])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[52];
                     Visible = Visible52;
@@ -673,8 +733,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(52);
                     end;
                 }
-                field(Field53;MATRIX_CellData[53])
+                field(Field53; MATRIX_CellData[53])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[53];
                     Visible = Visible53;
@@ -684,8 +745,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(53);
                     end;
                 }
-                field(Field54;MATRIX_CellData[54])
+                field(Field54; MATRIX_CellData[54])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[54];
                     Visible = Visible54;
@@ -695,8 +757,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(54);
                     end;
                 }
-                field(Field55;MATRIX_CellData[55])
+                field(Field55; MATRIX_CellData[55])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[55];
                     Visible = Visible55;
@@ -706,8 +769,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(55);
                     end;
                 }
-                field(Field56;MATRIX_CellData[56])
+                field(Field56; MATRIX_CellData[56])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[56];
                     Visible = Visible56;
@@ -717,8 +781,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(56);
                     end;
                 }
-                field(Field57;MATRIX_CellData[57])
+                field(Field57; MATRIX_CellData[57])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[57];
                     Visible = Visible57;
@@ -728,8 +793,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(57);
                     end;
                 }
-                field(Field58;MATRIX_CellData[58])
+                field(Field58; MATRIX_CellData[58])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[58];
                     Visible = Visible58;
@@ -739,8 +805,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(58);
                     end;
                 }
-                field(Field59;MATRIX_CellData[59])
+                field(Field59; MATRIX_CellData[59])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[59];
                     Visible = Visible59;
@@ -750,8 +817,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(59);
                     end;
                 }
-                field(Field60;MATRIX_CellData[60])
+                field(Field60; MATRIX_CellData[60])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[60];
                     Visible = Visible60;
@@ -761,8 +829,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(60);
                     end;
                 }
-                field(Field61;MATRIX_CellData[61])
+                field(Field61; MATRIX_CellData[61])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[61];
                     Visible = Visible61;
@@ -772,8 +841,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(61);
                     end;
                 }
-                field(Field62;MATRIX_CellData[62])
+                field(Field62; MATRIX_CellData[62])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[62];
                     Visible = Visible62;
@@ -783,8 +853,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(62);
                     end;
                 }
-                field(Field63;MATRIX_CellData[63])
+                field(Field63; MATRIX_CellData[63])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[63];
                     Visible = Visible63;
@@ -794,8 +865,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(63);
                     end;
                 }
-                field(Field64;MATRIX_CellData[64])
+                field(Field64; MATRIX_CellData[64])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[64];
                     Visible = Visible64;
@@ -805,8 +877,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(64);
                     end;
                 }
-                field(Field65;MATRIX_CellData[65])
+                field(Field65; MATRIX_CellData[65])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[65];
                     Visible = Visible65;
@@ -816,8 +889,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(65);
                     end;
                 }
-                field(Field66;MATRIX_CellData[66])
+                field(Field66; MATRIX_CellData[66])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[66];
                     Visible = Visible66;
@@ -827,8 +901,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(66);
                     end;
                 }
-                field(Field67;MATRIX_CellData[67])
+                field(Field67; MATRIX_CellData[67])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[67];
                     Visible = Visible67;
@@ -838,8 +913,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(67);
                     end;
                 }
-                field(Field68;MATRIX_CellData[68])
+                field(Field68; MATRIX_CellData[68])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[68];
                     Visible = Visible68;
@@ -849,8 +925,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(68);
                     end;
                 }
-                field(Field69;MATRIX_CellData[69])
+                field(Field69; MATRIX_CellData[69])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[69];
                     Visible = Visible69;
@@ -860,8 +937,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(69);
                     end;
                 }
-                field(Field70;MATRIX_CellData[70])
+                field(Field70; MATRIX_CellData[70])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[70];
                     Visible = Visible70;
@@ -871,8 +949,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(70);
                     end;
                 }
-                field(Field71;MATRIX_CellData[71])
+                field(Field71; MATRIX_CellData[71])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[71];
                     Visible = Visible71;
@@ -882,8 +961,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(71);
                     end;
                 }
-                field(Field72;MATRIX_CellData[72])
+                field(Field72; MATRIX_CellData[72])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[72];
                     Visible = Visible72;
@@ -893,8 +973,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(72);
                     end;
                 }
-                field(Field73;MATRIX_CellData[73])
+                field(Field73; MATRIX_CellData[73])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[73];
                     Visible = Visible73;
@@ -904,8 +985,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(73);
                     end;
                 }
-                field(Field74;MATRIX_CellData[74])
+                field(Field74; MATRIX_CellData[74])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[74];
                     Visible = Visible74;
@@ -915,8 +997,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(74);
                     end;
                 }
-                field(Field75;MATRIX_CellData[75])
+                field(Field75; MATRIX_CellData[75])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[75];
                     Visible = Visible75;
@@ -926,8 +1009,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(75);
                     end;
                 }
-                field(Field76;MATRIX_CellData[76])
+                field(Field76; MATRIX_CellData[76])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[76];
                     Visible = Visible76;
@@ -937,8 +1021,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(76);
                     end;
                 }
-                field(Field77;MATRIX_CellData[77])
+                field(Field77; MATRIX_CellData[77])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[77];
                     Visible = Visible77;
@@ -948,8 +1033,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(77);
                     end;
                 }
-                field(Field78;MATRIX_CellData[78])
+                field(Field78; MATRIX_CellData[78])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[78];
                     Visible = Visible78;
@@ -959,8 +1045,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(78);
                     end;
                 }
-                field(Field79;MATRIX_CellData[79])
+                field(Field79; MATRIX_CellData[79])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[79];
                     Visible = Visible79;
@@ -970,8 +1057,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(79);
                     end;
                 }
-                field(Field80;MATRIX_CellData[80])
+                field(Field80; MATRIX_CellData[80])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[80];
                     Visible = Visible80;
@@ -981,8 +1069,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(80);
                     end;
                 }
-                field(Field81;MATRIX_CellData[81])
+                field(Field81; MATRIX_CellData[81])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[81];
                     Visible = Visible81;
@@ -992,8 +1081,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(81);
                     end;
                 }
-                field(Field82;MATRIX_CellData[82])
+                field(Field82; MATRIX_CellData[82])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[82];
                     Visible = Visible82;
@@ -1003,8 +1093,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(82);
                     end;
                 }
-                field(Field83;MATRIX_CellData[83])
+                field(Field83; MATRIX_CellData[83])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[83];
                     Visible = Visible83;
@@ -1014,8 +1105,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(83);
                     end;
                 }
-                field(Field84;MATRIX_CellData[84])
+                field(Field84; MATRIX_CellData[84])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[84];
                     Visible = Visible84;
@@ -1025,8 +1117,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(84);
                     end;
                 }
-                field(Field85;MATRIX_CellData[85])
+                field(Field85; MATRIX_CellData[85])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[85];
                     Visible = Visible85;
@@ -1036,8 +1129,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(85);
                     end;
                 }
-                field(Field86;MATRIX_CellData[86])
+                field(Field86; MATRIX_CellData[86])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[86];
                     Visible = Visible86;
@@ -1047,8 +1141,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(86);
                     end;
                 }
-                field(Field87;MATRIX_CellData[87])
+                field(Field87; MATRIX_CellData[87])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[87];
                     Visible = Visible87;
@@ -1058,8 +1153,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(87);
                     end;
                 }
-                field(Field88;MATRIX_CellData[88])
+                field(Field88; MATRIX_CellData[88])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[88];
                     Visible = Visible88;
@@ -1069,8 +1165,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(88);
                     end;
                 }
-                field(Field89;MATRIX_CellData[89])
+                field(Field89; MATRIX_CellData[89])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[89];
                     Visible = Visible89;
@@ -1080,8 +1177,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(89);
                     end;
                 }
-                field(Field90;MATRIX_CellData[90])
+                field(Field90; MATRIX_CellData[90])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[90];
                     Visible = Visible90;
@@ -1091,8 +1189,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(90);
                     end;
                 }
-                field(Field91;MATRIX_CellData[91])
+                field(Field91; MATRIX_CellData[91])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[91];
                     Visible = Visible91;
@@ -1102,8 +1201,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(91);
                     end;
                 }
-                field(Field92;MATRIX_CellData[92])
+                field(Field92; MATRIX_CellData[92])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[92];
                     Visible = Visible92;
@@ -1113,8 +1213,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(92);
                     end;
                 }
-                field(Field93;MATRIX_CellData[93])
+                field(Field93; MATRIX_CellData[93])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[93];
                     Visible = Visible93;
@@ -1124,8 +1225,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(93);
                     end;
                 }
-                field(Field94;MATRIX_CellData[94])
+                field(Field94; MATRIX_CellData[94])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[94];
                     Visible = Visible94;
@@ -1135,8 +1237,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(94);
                     end;
                 }
-                field(Field95;MATRIX_CellData[95])
+                field(Field95; MATRIX_CellData[95])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[95];
                     Visible = Visible95;
@@ -1146,8 +1249,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(95);
                     end;
                 }
-                field(Field96;MATRIX_CellData[96])
+                field(Field96; MATRIX_CellData[96])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[96];
                     Visible = Visible96;
@@ -1157,8 +1261,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(96);
                     end;
                 }
-                field(Field97;MATRIX_CellData[97])
+                field(Field97; MATRIX_CellData[97])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[97];
                     Visible = Visible97;
@@ -1168,8 +1273,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(97);
                     end;
                 }
-                field(Field98;MATRIX_CellData[98])
+                field(Field98; MATRIX_CellData[98])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[98];
                     Visible = Visible98;
@@ -1179,8 +1285,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(98);
                     end;
                 }
-                field(Field99;MATRIX_CellData[99])
+                field(Field99; MATRIX_CellData[99])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[99];
                     Visible = Visible99;
@@ -1190,8 +1297,9 @@ page 6059978 "Variety Matrix Bool"
                         SetValue(99);
                     end;
                 }
-                field(Field100;MATRIX_CellData[100])
+                field(Field100; MATRIX_CellData[100])
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[100];
                     Visible = Visible100;
@@ -1212,35 +1320,38 @@ page 6059978 "Variety Matrix Bool"
                     group(Control6150629)
                     {
                         ShowCaption = false;
-                        field("Currently Showing";CurrVRTField.Description)
+                        field("Currently Showing"; CurrVRTField.Description)
                         {
+                            ApplicationArea = All;
                             Caption = 'Currently Showing';
                         }
                     }
                     group("Variety 1")
                     {
                         Caption = 'Variety 1';
-                        field("Item.""Variety 1""";Item."Variety 1")
+                        field("Item.""Variety 1"""; Item."Variety 1")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 1 Table""";Item."Variety 1 Table")
+                        field("Item.""Variety 1 Table"""; Item."Variety 1 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                     VRTLookupFunc.LookupVarietyValues(Item,0);
+                                VRTLookupFunc.LookupVarietyValues(Item, 0);
 
                                 //-NPR5.36 [285733]
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");//Is this one needed?
-                                //+NPR5.36 [285733]
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");//Is this one needed?
+                                                                           //+NPR5.36 [285733]
 
-                                     //-NPR5.31 [271133]
-                                     MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
-                                     //+NPR5.31 [271133]
+                                //-NPR5.31 [271133]
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                                //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
                             end;
@@ -1249,23 +1360,25 @@ page 6059978 "Variety Matrix Bool"
                     group("Variety 2")
                     {
                         Caption = 'Variety 2';
-                        field("Item.""Variety 2""";Item."Variety 2")
+                        field("Item.""Variety 2"""; Item."Variety 2")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 2 Table""";Item."Variety 2 Table")
+                        field("Item.""Variety 2 Table"""; Item."Variety 2 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item,1);
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");
-                                    //-NPR5.31 [271133]
-                                    MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
-                                    //+NPR5.31 [271133]
+                                VRTLookupFunc.LookupVarietyValues(Item, 1);
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
+                                //-NPR5.31 [271133]
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                                //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
                             end;
@@ -1274,22 +1387,24 @@ page 6059978 "Variety Matrix Bool"
                     group("Variety 3")
                     {
                         Caption = 'Variety 3';
-                        field("Item.""Variety 3""";Item."Variety 3")
+                        field("Item.""Variety 3"""; Item."Variety 3")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 3 Table""";Item."Variety 3 Table")
+                        field("Item.""Variety 3 Table"""; Item."Variety 3 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item,2);
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");
+                                VRTLookupFunc.LookupVarietyValues(Item, 2);
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
                                 //-NPR5.31 [271133]
-                                MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                                 //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -1299,22 +1414,24 @@ page 6059978 "Variety Matrix Bool"
                     group("Variety 4")
                     {
                         Caption = 'Variety 4';
-                        field("Item.""Variety 4""";Item."Variety 4")
+                        field("Item.""Variety 4"""; Item."Variety 4")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
                         }
-                        field("Item.""Variety 4 Table""";Item."Variety 4 Table")
+                        field("Item.""Variety 4 Table"""; Item."Variety 4 Table")
                         {
+                            ApplicationArea = All;
                             ShowCaption = false;
 
                             trigger OnDrillDown()
                             var
                                 VRTLookupFunc: Codeunit "Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item,3);
-                                VRTMatrixMgt.SetRecord(RecRef,Item."No.");
+                                VRTLookupFunc.LookupVarietyValues(Item, 3);
+                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
                                 //-NPR5.31 [271133]
-                                MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
                                 //+NPR5.31 [271133]
 
                                 UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -1342,7 +1459,7 @@ page 6059978 "Variety Matrix Bool"
                 var
                     VRTCloneData: Codeunit "Variety Clone Data";
                 begin
-                    VRTCloneData.CreateTableCopy(Item,0,false);
+                    VRTCloneData.CreateTableCopy(Item, 0, false);
                     CurrPage.Update(false);
                 end;
             }
@@ -1421,8 +1538,8 @@ page 6059978 "Variety Matrix Bool"
     begin
         MATRIX_CurrentColumnOrdinal := 0;
         while MATRIX_CurrentColumnOrdinal < MATRIX_CurrentNoOfMatrixColumn do begin
-          MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
-          MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
+            MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
+            MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
         end;
     end;
 
@@ -1431,7 +1548,7 @@ page 6059978 "Variety Matrix Bool"
         Initialize();
         ShowAsCrossVRT := Item."Cross Variety No.";
         //-NPR5.31 [271133]
-        MATRIX_GenerateColumnCaptions(0,Item, ShowAsCrossVRT);
+        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
         //+NPR5.31 [271133]
 
         UpdateMatrix(true); //-NPR5.36 Parameter added
@@ -1439,10 +1556,10 @@ page 6059978 "Variety Matrix Bool"
 
     var
         VarietySetup: Record "Variety Setup";
-        MatrixRecords: array [100] of Record "Variety Buffer" temporary;
+        MatrixRecords: array[100] of Record "Variety Buffer" temporary;
         MatrixRecord: Record "Variety Buffer" temporary;
         MATRIX_CurrentNoOfMatrixColumn: Integer;
-        MATRIX_CellData: array [100] of Boolean;
+        MATRIX_CellData: array[100] of Boolean;
         Item: Record Item;
         ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4;
         RecRef: RecordRef;
@@ -1455,8 +1572,8 @@ page 6059978 "Variety Matrix Bool"
         ShowVariety2: Boolean;
         ShowVariety3: Boolean;
         ShowVariety4: Boolean;
-        MATRIX_MatrixRecords: array [100] of Record "Variety Buffer" temporary;
-        MATRIX_CaptionSet: array [100] of Text[1024];
+        MATRIX_MatrixRecords: array[100] of Record "Variety Buffer" temporary;
+        MATRIX_CaptionSet: array[100] of Text[1024];
         MATRIX_CaptionRange: Text[1024];
         MATRIX_PrimKeyFirstCaptionInCu: Text[1024];
         MATRIX_CurrentNoOfColumns: Integer;
@@ -1666,22 +1783,22 @@ page 6059978 "Variety Matrix Bool"
     local procedure Initialize()
     begin
         if Initialized then
-          exit;
+            exit;
 
         VarietySetup.Get;
-        VarietySetup.TestField("Variety Enabled",true);
+        VarietySetup.TestField("Variety Enabled", true);
 
         HideInactive := false;
         Initialized := true;
     end;
 
-    procedure Load(MatrixColumns1: array [100] of Text[1024];var MatrixRecords1: array [100] of Record "Variety Buffer";CurrentNoOfMatrixColumns: Integer)
+    procedure Load(MatrixColumns1: array[100] of Text[1024]; var MatrixRecords1: array[100] of Record "Variety Buffer"; CurrentNoOfMatrixColumns: Integer)
     var
         i: Integer;
     begin
-        CopyArray(MATRIX_CaptionSet,MatrixColumns1,1);
+        CopyArray(MATRIX_CaptionSet, MatrixColumns1, 1);
         for i := 1 to ArrayLen(MatrixRecords) do
-          MatrixRecords[i].Copy(MatrixRecords1[i]);
+            MatrixRecords[i].Copy(MatrixRecords1[i]);
 
         MATRIX_CurrentNoOfMatrixColumn := CurrentNoOfMatrixColumns;
     end;
@@ -1695,10 +1812,14 @@ page 6059978 "Variety Matrix Bool"
 
         VRTBuffer := Rec;
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety2: VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety3: VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
-          ShowAsCrossVRT::Variety4: VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety1:
+                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety2:
+                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety3:
+                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+            ShowAsCrossVRT::Variety4:
+                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
         TMPBool := VRTMatrixMgt.GetValueBool(VRTBuffer."Variety 1 Value", VRTBuffer."Variety 2 Value",
                                                 VRTBuffer."Variety 3 Value", VRTBuffer."Variety 4 Value",
@@ -1723,17 +1844,21 @@ page 6059978 "Variety Matrix Bool"
         //LoadMatrixRecords(Rec, Item."No.", ShowAsCrossVRT);
         LoadMatrixRows(Rec, Item, ShowAsCrossVRT, HideInactive);
         if ReloadMatrixData then
-          VRTMatrixMgt.LoadMatrixData(Item."No.", HideInactive);
+            VRTMatrixMgt.LoadMatrixData(Item."No.", HideInactive);
         //+NPR5.36 [285733]
 
         SetVisible;
 
         //Are the sorting order 100% correct with 3 or 4 Variety in use?
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: Rec.SetCurrentKey("Variety 2 Sort Order","Variety 3 Sort Order","Variety 4 Sort Order","Variety 1 Sort Order");
-          ShowAsCrossVRT::Variety2: Rec.SetCurrentKey("Variety 3 Sort Order","Variety 4 Sort Order","Variety 1 Sort Order","Variety 2 Sort Order");
-          ShowAsCrossVRT::Variety3: Rec.SetCurrentKey("Variety 4 Sort Order","Variety 1 Sort Order","Variety 2 Sort Order","Variety 3 Sort Order");
-          ShowAsCrossVRT::Variety4: Rec.SetCurrentKey("Variety 1 Sort Order","Variety 2 Sort Order","Variety 3 Sort Order","Variety 4 Sort Order");
+            ShowAsCrossVRT::Variety1:
+                Rec.SetCurrentKey("Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order", "Variety 1 Sort Order");
+            ShowAsCrossVRT::Variety2:
+                Rec.SetCurrentKey("Variety 3 Sort Order", "Variety 4 Sort Order", "Variety 1 Sort Order", "Variety 2 Sort Order");
+            ShowAsCrossVRT::Variety3:
+                Rec.SetCurrentKey("Variety 4 Sort Order", "Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order");
+            ShowAsCrossVRT::Variety4:
+                Rec.SetCurrentKey("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
         end;
 
         ShowVariety1 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety1) and (Item."Variety 1" <> ''));
@@ -1774,36 +1899,37 @@ page 6059978 "Variety Matrix Bool"
         CurrPage.Update(false);
     end;
 
-    procedure SetRecordRef(RecRef2: RecordRef;var Item2: Record Item;ShowFieldNo: Integer)
+    procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
     begin
         RecRef := RecRef2;
         Item := Item2;
         LocationFilter := Item2.GetFilter("Location Filter");
-        VRTMatrixMgt.SetRecord(RecRef2,Item."No.");
+        VRTMatrixMgt.SetRecord(RecRef2, Item."No.");
         //CurrVRTField.SETRANGE(Type, CurrVRTField.Type::Field);
         CurrVRTField.SetRange("Table No.", RecRef.Number);
 
         //-NPR5.32 [274170]
-        if CurrVRTField.FindSet then repeat
-          if CurrVRTField.Type = CurrVRTField.Type::Field then begin
-            CurrVRTField.CalcFields("Field Type Name");
-            if CurrVRTField."Field Type Name" = 'Boolean' then
-              CurrVRTField.Mark(true);
-          end else
-            CurrVRTField.Mark(true);
-        until CurrVRTField.Next = 0;
+        if CurrVRTField.FindSet then
+            repeat
+                if CurrVRTField.Type = CurrVRTField.Type::Field then begin
+                    CurrVRTField.CalcFields("Field Type Name");
+                    if CurrVRTField."Field Type Name" = 'Boolean' then
+                        CurrVRTField.Mark(true);
+                end else
+                    CurrVRTField.Mark(true);
+            until CurrVRTField.Next = 0;
         CurrVRTField.MarkedOnly(true);
         //+NPR5.32 [274170]
 
         if ShowFieldNo <> 0 then
-          CurrVRTField.SetRange("Field No.", ShowFieldNo)
+            CurrVRTField.SetRange("Field No.", ShowFieldNo)
         else
-          CurrVRTField.SetRange("Is Table Default", true);
+            CurrVRTField.SetRange("Is Table Default", true);
 
         if not CurrVRTField.FindFirst then begin
-          CurrVRTField.SetRange("Field No.");
-          CurrVRTField.SetRange("Is Table Default");
-          CurrVRTField.FindFirst;
+            CurrVRTField.SetRange("Field No.");
+            CurrVRTField.SetRange("Is Table Default");
+            CurrVRTField.FindFirst;
         end;
         CurrVRTField.SetRange("Field No.");
         CurrVRTField.SetRange("Is Table Default");
@@ -1821,17 +1947,21 @@ page 6059978 "Variety Matrix Bool"
         VRT3Value := "Variety 3 Value";
         VRT4Value := "Variety 4 Value";
         case ShowAsCrossVRT of
-          ShowAsCrossVRT::Variety1: VRT1Value := MATRIX_CaptionSet[FieldNo];
-          ShowAsCrossVRT::Variety2: VRT2Value := MATRIX_CaptionSet[FieldNo];
-          ShowAsCrossVRT::Variety3: VRT3Value := MATRIX_CaptionSet[FieldNo];
-          ShowAsCrossVRT::Variety4: VRT4Value := MATRIX_CaptionSet[FieldNo];
+            ShowAsCrossVRT::Variety1:
+                VRT1Value := MATRIX_CaptionSet[FieldNo];
+            ShowAsCrossVRT::Variety2:
+                VRT2Value := MATRIX_CaptionSet[FieldNo];
+            ShowAsCrossVRT::Variety3:
+                VRT3Value := MATRIX_CaptionSet[FieldNo];
+            ShowAsCrossVRT::Variety4:
+                VRT4Value := MATRIX_CaptionSet[FieldNo];
         end;
 
         VRTMatrixMgt.SetValue(VRT1Value, VRT2Value, VRT3Value, VRT4Value, CurrVRTField, Format(MATRIX_CellData[FieldNo]));
         MATRIX_CellData[FieldNo] := VRTMatrixMgt.GetValueBool(VRT1Value, VRT2Value, VRT3Value, VRT4Value, CurrVRTField, LocationFilter, GD1, GD2);
     end;
 
-    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn;Item: Record Item;ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
+    procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     begin
         //-NPR5.31 [271133]
         Clear(MATRIX_MatrixRecords);
@@ -1839,8 +1969,8 @@ page 6059978 "Variety Matrix Bool"
         //+NPR5.31 [271133]
 
         if MATRIX_CurrentNoOfMatrixColumn > MATRIX_CurrentNoOfColumns then begin
-          //The cross variants is decreased. Data that are outside new arraylength must be cleared;
-          Clear(MATRIX_CellData);
+            //The cross variants is decreased. Data that are outside new arraylength must be cleared;
+            Clear(MATRIX_CellData);
         end;
     end;
 

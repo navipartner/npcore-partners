@@ -35,8 +35,9 @@ page 6014423 "Report Selection - Retail"
             group(Control6150624)
             {
                 ShowCaption = false;
-                field(ReportType2;ReportType2)
+                field(ReportType2; ReportType2)
                 {
+                    ApplicationArea = All;
                     OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry),Transfer Order,Inv.PutAway Label';
                     ShowCaption = false;
 
@@ -50,41 +51,52 @@ page 6014423 "Report Selection - Retail"
             repeater(Control6150626)
             {
                 ShowCaption = false;
-                field(Sequence;Sequence)
+                field(Sequence; Sequence)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Report Name";"Report Name")
+                field("Report Name"; "Report Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("XML Port ID";"XML Port ID")
+                field("XML Port ID"; "XML Port ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("XML Port Name";"XML Port Name")
+                field("XML Port Name"; "XML Port Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Codeunit ID";"Codeunit ID")
+                field("Codeunit ID"; "Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit Name";"Codeunit Name")
+                field("Codeunit Name"; "Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Template";"Print Template")
+                field("Print Template"; "Print Template")
                 {
+                    ApplicationArea = All;
                     Width = 20;
                 }
-                field("Filter Object ID";"Filter Object ID")
+                field("Filter Object ID"; "Filter Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Record Filter";"Record Filter")
+                field("Record Filter"; "Record Filter")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
 
                     trigger OnAssistEdit()
@@ -98,21 +110,22 @@ page 6014423 "Report Selection - Retail"
                         AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
                         AllObjWithCaption.SetRange("Object ID", "Filter Object ID");
                         if AllObjWithCaption.FindFirst then
-                          TableCaption := AllObjWithCaption."Object Caption";
+                            TableCaption := AllObjWithCaption."Object Caption";
 
 
                         TableFilter.FilterGroup(2);
                         TableFilter.SetRange("Table Number", "Filter Object ID");
                         TableFilter.FilterGroup(0);
                         TableFilterPage.SetTableView(TableFilter);
-                        TableFilterPage.SetSourceTable(Format("Record Filter"),"Filter Object ID", TableCaption);
+                        TableFilterPage.SetSourceTable(Format("Record Filter"), "Filter Object ID", TableCaption);
                         if ACTION::OK = TableFilterPage.RunModal then
-                          Evaluate("Record Filter",TableFilterPage.CreateTextTableFilter(false));
+                            Evaluate("Record Filter", TableFilterPage.CreateTextTableFilter(false));
                         //+NPR4.18
                     end;
                 }
-                field(Optional;Optional)
+                field(Optional; Optional)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -155,7 +168,7 @@ page 6014423 "Report Selection - Retail"
     local procedure SetUsageFilter()
     begin
         FilterGroup(2);
-        SetRange("Report Type",ReportType2);
+        SetRange("Report Type", ReportType2);
         FilterGroup(0);
     end;
 

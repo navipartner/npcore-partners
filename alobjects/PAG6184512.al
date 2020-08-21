@@ -12,11 +12,13 @@ page 6184512 "EFT BIN Group Payment Links"
         {
             repeater(Group)
             {
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Type POS";"Payment Type POS")
+                field("Payment Type POS"; "Payment Type POS")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -29,11 +29,13 @@ page 6151414 "Magento Category Card"
                 {
                     Enabled = (NOT Root);
                     ShowCaption = false;
-                    field(Id;Id)
+                    field(Id; Id)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -41,15 +43,16 @@ page 6151414 "Magento Category Card"
                             //IF "Seo Link" <> '' THEN
                             //  IF NOT CONFIRM(Text001,FALSE) THEN
                             //    EXIT
-                            if not Confirm(Text001,false) then
-                              exit;
-                            Validate("Seo Link",Name);
+                            if not Confirm(Text001, false) then
+                                exit;
+                            Validate("Seo Link", Name);
                             //-MAG2.17 [333862]
                             CurrPage.Update(true);
                         end;
                     }
-                    field("FORMAT(Description.HASVALUE)";Format(Description.HasValue))
+                    field("FORMAT(Description.HASVALUE)"; Format(Description.HasValue))
                     {
+                        ApplicationArea = All;
                         AssistEdit = true;
                         Caption = 'Description';
 
@@ -61,13 +64,14 @@ page 6151414 "Magento Category Card"
                             RecRef.GetTable(Rec);
                             FieldRef := RecRef.Field(FieldNo(Description));
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                              RecRef.SetTable(Rec);
-                              Modify(true);
+                                RecRef.SetTable(Rec);
+                                Modify(true);
                             end;
                         end;
                     }
-                    field("FORMAT(""Short Description"".HASVALUE)";Format("Short Description".HasValue))
+                    field("FORMAT(""Short Description"".HASVALUE)"; Format("Short Description".HasValue))
                     {
+                        ApplicationArea = All;
                         Caption = 'Short Description';
 
                         trigger OnAssistEdit()
@@ -79,72 +83,82 @@ page 6151414 "Magento Category Card"
                             RecRef.GetTable(Rec);
                             FieldRef := RecRef.Field(FieldNo("Short Description"));
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                              RecRef.SetTable(Rec);
-                              Modify(true);
+                                RecRef.SetTable(Rec);
+                                Modify(true);
                             end;
                             //+MAG2.20 [346352]
                         end;
                     }
-                    field(Picture;Picture)
+                    field(Picture; Picture)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150620)
                 {
                     Editable = (NOT Root);
                     ShowCaption = false;
-                    field("Is Active";"Is Active")
+                    field("Is Active"; "Is Active")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Is Anchor";"Is Anchor")
+                    field("Is Anchor"; "Is Anchor")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Show In Navigation Menu";"Show In Navigation Menu")
+                    field("Show In Navigation Menu"; "Show In Navigation Menu")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Seo Link";"Seo Link")
+                    field("Seo Link"; "Seo Link")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Meta Title";"Meta Title")
+                    field("Meta Title"; "Meta Title")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Meta Keywords";"Meta Keywords")
+                    field("Meta Keywords"; "Meta Keywords")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Meta Description";"Meta Description")
+                    field("Meta Description"; "Meta Description")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Sorting;Sorting)
+                    field(Sorting; Sorting)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Icon;Icon)
+                    field(Icon; Icon)
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
-            part(MagentoChildCategories;"Magento Child Categories")
+            part(MagentoChildCategories; "Magento Child Categories")
             {
                 Caption = 'Child Categories';
                 ShowFilter = false;
-                SubPageLink = "Parent Category Id"=FIELD(FILTER(Id));
+                SubPageLink = "Parent Category Id" = FIELD(FILTER(Id));
                 Visible = MagentoItemGroupSubformVisible;
             }
         }
         area(factboxes)
         {
-            part(PictureDragDropAddin;"Magento DragDropPic. Addin")
+            part(PictureDragDropAddin; "Magento DragDropPic. Addin")
             {
-                SubPageLink = Type=CONST("Item Group"),
-                              Name=FIELD(Picture);
+                SubPageLink = Type = CONST("Item Group"),
+                              Name = FIELD(Picture);
                 Visible = (NOT HasSetupCategories);
             }
-            part(IconPictureDragDropAddin;"Magento DragDropPic. Addin")
+            part(IconPictureDragDropAddin; "Magento DragDropPic. Addin")
             {
                 Caption = 'Icon';
                 Editable = false;
                 ShowFilter = false;
-                SubPageLink = Type=CONST("Item Group"),
-                              Name=FIELD(Icon);
+                SubPageLink = Type = CONST("Item Group"),
+                              Name = FIELD(Icon);
                 Visible = (NOT HasSetupCategories);
             }
         }
@@ -166,8 +180,8 @@ page 6151414 "Magento Category Card"
                     MagentoDisplayConfig: Record "Magento Display Config";
                 begin
                     //-MAG1.21
-                    MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::"Item Group");
-                    MagentoDisplayConfig.SetRange("No.",Id);
+                    MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::"Item Group");
+                    MagentoDisplayConfig.SetRange("No.", Id);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                     MagentoDisplayConfigPage.Run;
                     //+MAG1.21
@@ -182,8 +196,8 @@ page 6151414 "Magento Category Card"
         CurrPage.MagentoChildCategories.PAGE.SetParentItemGroup(Rec);
         //-MAG2.17 [324862]
         //CurrPage.PictureDragDropAddin.PAGE.SetItemGroupNo("No.");
-        CurrPage.PictureDragDropAddin.PAGE.SetItemGroupNo(Id,false);
-        CurrPage.IconPictureDragDropAddin.PAGE.SetItemGroupNo(Id,true);
+        CurrPage.PictureDragDropAddin.PAGE.SetItemGroupNo(Id, false);
+        CurrPage.IconPictureDragDropAddin.PAGE.SetItemGroupNo(Id, true);
         //+MAG2.17 [324862]
     end;
 

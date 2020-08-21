@@ -21,25 +21,30 @@ page 6151012 "NpRv Voucher Type Card"
                 group(Control6014420)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014424)
                 {
                     ShowCaption = false;
-                    field("Voucher Qty. (Open)";"Voucher Qty. (Open)")
+                    field("Voucher Qty. (Open)"; "Voucher Qty. (Open)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Voucher Qty. (Closed)";"Voucher Qty. (Closed)")
+                    field("Voucher Qty. (Closed)"; "Voucher Qty. (Closed)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Arch. Voucher Qty.";"Arch. Voucher Qty.")
+                    field("Arch. Voucher Qty."; "Arch. Voucher Qty.")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -49,42 +54,51 @@ page 6151012 "NpRv Voucher Type Card"
                 group(Control6014425)
                 {
                     ShowCaption = false;
-                    field("Send Voucher Module";"Send Voucher Module")
+                    field("Send Voucher Module"; "Send Voucher Module")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Account No.";"Account No.")
+                    field("Account No."; "Account No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field("Partner Code";"Partner Code")
+                    field("Partner Code"; "Partner Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Allow Top-up";"Allow Top-up")
+                    field("Allow Top-up"; "Allow Top-up")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Minimum Amount Issue";"Minimum Amount Issue")
+                    field("Minimum Amount Issue"; "Minimum Amount Issue")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("No. Series";"No. Series")
+                    field("No. Series"; "No. Series")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
-                    field("Arch. No. Series";"Arch. No. Series")
+                    field("Arch. No. Series"; "Arch. No. Series")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Reference No. Type";"Reference No. Type")
+                    field("Reference No. Type"; "Reference No. Type")
                     {
+                        ApplicationArea = All;
                     }
                     group(Control6014407)
                     {
                         ShowCaption = false;
-                        Visible = ("Reference No. Type"=0);
-                        field("Reference No. Pattern";"Reference No. Pattern")
+                        Visible = ("Reference No. Type" = 0);
+                        field("Reference No. Pattern"; "Reference No. Pattern")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                             ToolTip = '[S] ~ Voucher No. || [N] ~ Random Number || [N*3] ~ 3 Random Numbers || [AN] ~ Random Char || [AN*3] ~ 3 Random Chars';
                         }
@@ -92,27 +106,33 @@ page 6151012 "NpRv Voucher Type Card"
                     group(Control6014405)
                     {
                         ShowCaption = false;
-                        Visible = ("Reference No. Type"=1);
-                        field(EAN13ReferenceNoPattern;"Reference No. Pattern")
+                        Visible = ("Reference No. Type" = 1);
+                        field(EAN13ReferenceNoPattern; "Reference No. Pattern")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                             ToolTip = '[S] ~ Voucher No. || [N] ~ Random Number || [N*3] ~ 3 Random Numbers';
                         }
                     }
-                    field("Print Template Code";"Print Template Code")
+                    field("Print Template Code"; "Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("E-mail Template Code";"E-mail Template Code")
+                    field("E-mail Template Code"; "E-mail Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("SMS Template Code";"SMS Template Code")
+                    field("SMS Template Code"; "SMS Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Send Method via POS";"Send Method via POS")
+                    field("Send Method via POS"; "Send Method via POS")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Voucher Message";"Voucher Message")
+                    field("Voucher Message"; "Voucher Message")
                     {
+                        ApplicationArea = All;
                         MultiLine = true;
                     }
                 }
@@ -123,15 +143,17 @@ page 6151012 "NpRv Voucher Type Card"
                 group(Control6014427)
                 {
                     ShowCaption = false;
-                    field("Validate Voucher Module";"Validate Voucher Module")
+                    field("Validate Voucher Module"; "Validate Voucher Module")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014428)
                 {
                     ShowCaption = false;
-                    field("Valid Period";"Valid Period")
+                    field("Valid Period"; "Valid Period")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                 }
@@ -139,11 +161,13 @@ page 6151012 "NpRv Voucher Type Card"
             group("Apply Payment")
             {
                 Caption = 'Apply Payment';
-                field("Apply Payment Module";"Apply Payment Module")
+                field("Apply Payment Module"; "Apply Payment Module")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Type";"Payment Type")
+                field("Payment Type"; "Payment Type")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
             }
@@ -213,7 +237,7 @@ page 6151012 "NpRv Voucher Type Card"
                 Caption = 'Vouchers';
                 Image = Voucher;
                 RunObject = Page "NpRv Vouchers";
-                RunPageLink = "Voucher Type"=FIELD(Code);
+                RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
             }
             action("Partner Card")
@@ -221,7 +245,7 @@ page 6151012 "NpRv Voucher Type Card"
                 Caption = 'Partner Card';
                 Image = UserSetup;
                 RunObject = Page "NpRv Partner Card";
-                RunPageLink = Code=FIELD("Partner Code");
+                RunPageLink = Code = FIELD("Partner Code");
                 Visible = "Partner Code" <> '';
             }
             action("Partner Relations")
@@ -229,7 +253,7 @@ page 6151012 "NpRv Voucher Type Card"
                 Caption = 'Partner Relations';
                 Image = UserCertificate;
                 RunObject = Page "NpRv Partner Relations";
-                RunPageLink = "Voucher Type"=FIELD(Code);
+                RunPageLink = "Voucher Type" = FIELD(Code);
             }
         }
     }
@@ -249,13 +273,13 @@ page 6151012 "NpRv Voucher Type Card"
         NpRvModuleMgt: Codeunit "NpRv Module Mgt.";
     begin
         HasIssueVoucherSetup := false;
-        NpRvModuleMgt.OnHasSendVoucherSetup(Rec,HasIssueVoucherSetup);
+        NpRvModuleMgt.OnHasSendVoucherSetup(Rec, HasIssueVoucherSetup);
 
         HasValidateVoucherSetup := false;
-        NpRvModuleMgt.OnHasValidateVoucherSetup(Rec,HasValidateVoucherSetup);
+        NpRvModuleMgt.OnHasValidateVoucherSetup(Rec, HasValidateVoucherSetup);
 
         HasApplyPaymentSetup := false;
-        NpRvModuleMgt.OnHasApplyPaymentSetup(Rec,HasApplyPaymentSetup);
+        NpRvModuleMgt.OnHasApplyPaymentSetup(Rec, HasApplyPaymentSetup);
 
         CurrPage.Update(false);
     end;

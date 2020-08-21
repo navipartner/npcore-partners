@@ -19,44 +19,53 @@ page 6014561 "RP Data Items"
                 FreezeColumn = Name;
                 IndentationColumn = Level;
                 IndentationControls = "Data Source";
-                field("Data Source";"Data Source")
+                field("Data Source"; "Data Source")
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = Level = 0;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Iteration Type";"Iteration Type")
+                field("Iteration Type"; "Iteration Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Key ID";"Key ID")
+                field("Key ID"; "Key ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sort Order";"Sort Order")
+                field("Sort Order"; "Sort Order")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Fields";"Total Fields")
+                field("Total Fields"; "Total Fields")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field ID";"Field ID")
+                field("Field ID"; "Field ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Skip Template If Empty";"Skip Template If Empty")
+                field("Skip Template If Empty"; "Skip Template If Empty")
                 {
+                    ApplicationArea = All;
                 }
-                field("Skip Template If Not Empty";"Skip Template If Not Empty")
+                field("Skip Template If Not Empty"; "Skip Template If Not Empty")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014404;"RP Data Item Links")
+            part(Control6014404; "RP Data Item Links")
             {
                 ShowFilter = false;
-                SubPageLink = "Data Item Code"=FIELD(Code),
-                              "Parent Line No."=FIELD("Parent Line No."),
-                              "Child Line No."=FIELD("Line No."),
-                              "Parent Table ID"=FIELD("Parent Table ID"),
-                              "Table ID"=FIELD("Table ID");
+                SubPageLink = "Data Item Code" = FIELD(Code),
+                              "Parent Line No." = FIELD("Parent Line No."),
+                              "Child Line No." = FIELD("Line No."),
+                              "Parent Table ID" = FIELD("Parent Table ID"),
+                              "Table ID" = FIELD("Table ID");
             }
         }
     }
@@ -99,8 +108,8 @@ page 6014561 "RP Data Items"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "RP Data Item Constraints";
-                RunPageLink = "Data Item Code"=FIELD(Code),
-                              "Data Item Line No."=FIELD("Line No.");
+                RunPageLink = "Data Item Code" = FIELD(Code),
+                              "Data Item Line No." = FIELD("Line No.");
             }
         }
     }
@@ -115,10 +124,11 @@ page 6014561 "RP Data Items"
         // MODIFY(TRUE);
 
         CurrPage.SetSelectionFilter(DataItem);
-        if DataItem.FindSet then repeat
-          DataItem.Validate(Level, DataItem.Level+1);
-          DataItem.Modify(true);
-        until DataItem.Next = 0;
+        if DataItem.FindSet then
+            repeat
+                DataItem.Validate(Level, DataItem.Level + 1);
+                DataItem.Modify(true);
+            until DataItem.Next = 0;
         //+NPR5.34 [284505]
     end;
 
@@ -133,12 +143,13 @@ page 6014561 "RP Data Items"
         // MODIFY(TRUE);
 
         CurrPage.SetSelectionFilter(DataItem);
-        if DataItem.FindSet then repeat
-          if DataItem.Level > 0 then begin
-            DataItem.Validate(Level, DataItem.Level-1);
-            DataItem.Modify(true);
-          end;
-        until DataItem.Next = 0;
+        if DataItem.FindSet then
+            repeat
+                if DataItem.Level > 0 then begin
+                    DataItem.Validate(Level, DataItem.Level - 1);
+                    DataItem.Modify(true);
+                end;
+            until DataItem.Next = 0;
         //+NPR5.34 [284505]
     end;
 

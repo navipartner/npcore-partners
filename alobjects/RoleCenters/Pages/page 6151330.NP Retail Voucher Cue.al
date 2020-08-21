@@ -17,6 +17,7 @@ page 6151330 "NP Retail Voucher Cue"
 
                 field("Retail Voucher"; "Retail Vouchers")
                 {
+                    ApplicationArea = All;
                     DrillDownPageId = "NpRv Vouchers";
                     //Visible = VisibilityRetailVoucher;
 
@@ -24,12 +25,14 @@ page 6151330 "NP Retail Voucher Cue"
 
                 field("Gift Voucher"; "Gift Vouchers")
                 {
+                    ApplicationArea = All;
                     DrillDownPageId = "Gift Voucher List";
                     //Visible = VisibilityGiftVoucher;
                 }
 
                 field("Credit Voucher"; "Credit Vouchers")
                 {
+                    ApplicationArea = All;
                     DrillDownPageId = "Credit Voucher List";
                     Visible = VisibilityCreditVoucher;
                     //Visible = false;

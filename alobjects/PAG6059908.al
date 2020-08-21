@@ -14,29 +14,37 @@ page 6059908 "Session Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Type";"Log Type")
+                field("Log Type"; "Log Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log Time";"Log Time")
+                field("Log Time"; "Log Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Worker Group";"Task Worker Group")
+                field("Task Worker Group"; "Task Worker Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Server Instance ID";"Server Instance ID")
+                field("Server Instance ID"; "Server Instance ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Error Message";"Error Message")
+                field("Error Message"; "Error Message")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

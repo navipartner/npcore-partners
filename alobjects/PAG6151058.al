@@ -13,20 +13,25 @@ page 6151058 "Distribution Grp Memb Listpart"
         {
             repeater(Group)
             {
-                field("Distribution Group";"Distribution Group")
+                field("Distribution Group"; "Distribution Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(Location;Location)
+                field(Location; Location)
                 {
+                    ApplicationArea = All;
                 }
-                field(Store;Store)
+                field(Store; Store)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Share Pct.";"Distribution Share Pct.")
+                field("Distribution Share Pct."; "Distribution Share Pct.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -42,7 +47,7 @@ page 6151058 "Distribution Grp Memb Listpart"
                 Image = SKU;
                 Promoted = true;
                 RunObject = Page "Retail Replenishment SKU List";
-                RunPageLink = "Location Code"=FIELD(Location);
+                RunPageLink = "Location Code" = FIELD(Location);
             }
             action("Distribution Lines")
             {
@@ -58,7 +63,7 @@ page 6151058 "Distribution Grp Memb Listpart"
                 Image = ItemAvailability;
                 Promoted = true;
                 RunObject = Page "Retail Repl. Demand Lines";
-                RunPageLink = "Location Code"=FIELD(Location);
+                RunPageLink = "Location Code" = FIELD(Location);
             }
         }
     }

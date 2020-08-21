@@ -15,43 +15,52 @@ page 6059964 "MPOS QR Code List"
         {
             repeater(Group)
             {
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Password;Password)
+                field(Password; Password)
                 {
+                    ApplicationArea = All;
                     ExtendedDatatype = Masked;
                 }
-                field("Client Type";"Client Type")
+                field("Client Type"; "Client Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Company;Company)
+                field(Company; Company)
                 {
+                    ApplicationArea = All;
                 }
-                field(Tenant;Tenant)
+                field(Tenant; Tenant)
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Gateway";"Payment Gateway")
+                field("Payment Gateway"; "Payment Gateway")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cash Register Id";"Cash Register Id")
+                field("Cash Register Id"; "Cash Register Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Url;Url)
+                field(Url; Url)
                 {
+                    ApplicationArea = All;
                 }
-                field("Webservice Url";"Webservice Url")
+                field("Webservice Url"; "Webservice Url")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            part(Control6014419;"MPOS QR Code FactBox")
+            part(Control6014419; "MPOS QR Code FactBox")
             {
-                SubPageLink = "User ID"=FIELD("User ID"),
-                              Company=FIELD(Company),
-                              "Cash Register Id"=FIELD("Cash Register Id");
+                SubPageLink = "User ID" = FIELD("User ID"),
+                              Company = FIELD(Company),
+                              "Cash Register Id" = FIELD("Cash Register Id");
             }
         }
     }

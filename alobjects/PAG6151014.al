@@ -26,38 +26,49 @@ page 6151014 "NpRv Voucher Card"
                     ShowCaption = false;
                     field("No."; "No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Voucher Type"; "Voucher Type")
                     {
+                        ApplicationArea = All;
                     }
                     field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
                     field("Account No."; "Account No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                     field("Issue Register No."; "Issue Register No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Issue Document Type"; "Issue Document Type")
                     {
+                        ApplicationArea = All;
                     }
                     field("Issue Document No."; "Issue Document No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Issue External Document No."; "Issue External Document No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Issue Partner Code"; "Issue Partner Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("Partner Clearing"; "Partner Clearing")
                     {
+                        ApplicationArea = All;
                     }
                     field("Allow Top-up"; "Allow Top-up")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014422)
@@ -65,19 +76,24 @@ page 6151014 "NpRv Voucher Card"
                     ShowCaption = false;
                     field("Issue Date"; "Issue Date")
                     {
+                        ApplicationArea = All;
                     }
                     field(Open; Open)
                     {
+                        ApplicationArea = All;
                     }
                     field("Initial Amount"; "Initial Amount")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                     field(Amount; Amount)
                     {
+                        ApplicationArea = All;
                     }
                     field("In-use Quantity"; "In-use Quantity")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -89,6 +105,7 @@ page 6151014 "NpRv Voucher Card"
                     ShowCaption = false;
                     field("Send Voucher Module"; "Send Voucher Module")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014415)
@@ -96,27 +113,35 @@ page 6151014 "NpRv Voucher Card"
                     ShowCaption = false;
                     field("Reference No."; "Reference No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Send via Print"; "Send via Print")
                     {
+                        ApplicationArea = All;
                     }
                     field("Print Template Code"; "Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("Send via E-mail"; "Send via E-mail")
                     {
+                        ApplicationArea = All;
                     }
                     field("E-mail Template Code"; "E-mail Template Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("Send via SMS"; "Send via SMS")
                     {
+                        ApplicationArea = All;
                     }
                     field("SMS Template Code"; "SMS Template Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("No. Send"; "No. Send")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Contact)
@@ -124,46 +149,60 @@ page 6151014 "NpRv Voucher Card"
                     Caption = 'Contact';
                     field("Customer No."; "Customer No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Contact No."; "Contact No.")
                     {
+                        ApplicationArea = All;
                     }
                     field(Name; Name)
                     {
+                        ApplicationArea = All;
                     }
                     field("Name 2"; "Name 2")
                     {
+                        ApplicationArea = All;
                     }
                     field(Address; Address)
                     {
+                        ApplicationArea = All;
                     }
                     field("Address 2"; "Address 2")
                     {
+                        ApplicationArea = All;
                     }
                     field("Post Code"; "Post Code")
                     {
+                        ApplicationArea = All;
                     }
                     field(City; City)
                     {
+                        ApplicationArea = All;
                     }
                     field(County; County)
                     {
+                        ApplicationArea = All;
                     }
                     field("Country/Region Code"; "Country/Region Code")
                     {
+                        ApplicationArea = All;
                     }
                     field("E-mail"; "E-mail")
                     {
+                        ApplicationArea = All;
                     }
                     field("Phone No."; "Phone No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Language Code"; "Language Code")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
                     field("Voucher Message"; "Voucher Message")
                     {
+                        ApplicationArea = All;
                         MultiLine = true;
                     }
                 }
@@ -176,6 +215,7 @@ page 6151014 "NpRv Voucher Card"
                     ShowCaption = false;
                     field("Validate Voucher Module"; "Validate Voucher Module")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014409)
@@ -183,9 +223,11 @@ page 6151014 "NpRv Voucher Card"
                     ShowCaption = false;
                     field("Starting Date"; "Starting Date")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ending Date"; "Ending Date")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -194,6 +236,7 @@ page 6151014 "NpRv Voucher Card"
                 Caption = 'Apply Payment';
                 field("Apply Payment Module"; "Apply Payment Module")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -16,12 +16,14 @@ page 6059799 "E-mail Template Choice List"
         {
             repeater(Group)
             {
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                     Caption = 'Selected';
                 }
-                field("Field Caption";"Field Caption")
+                field("Field Caption"; "Field Caption")
                 {
+                    ApplicationArea = All;
                     Caption = 'E-mail Template';
                     Editable = false;
                 }

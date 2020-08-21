@@ -18,11 +18,13 @@ page 6151405 "Magento Website Links"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Website Code";"Website Code")
+                field("Website Code"; "Website Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Website Name";"Website Name")
+                field("Website Name"; "Website Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

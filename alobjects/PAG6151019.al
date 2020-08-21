@@ -11,11 +11,13 @@ page 6151019 "NpRv Return Voucher Card"
         {
             group(General)
             {
-                field("Return Voucher Type";"Return Voucher Type")
+                field("Return Voucher Type"; "Return Voucher Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Voucher Description";"Return Voucher Description")
+                field("Return Voucher Description"; "Return Voucher Description")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

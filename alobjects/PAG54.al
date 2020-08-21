@@ -1,4 +1,4 @@
-pageextension 6014457 pageextension6014457 extends "Purchase Order Subform" 
+pageextension 6014457 pageextension6014457 extends "Purchase Order Subform"
 {
     // NPR4.13/MMV/20150708 CASE 214173 Changed "No." to variable to handle barcode scanning OnValidate trigger.
     // NPR4.14/???/20150804 CASE 219456 changed number assignment
@@ -22,21 +22,24 @@ pageextension 6014457 pageextension6014457 extends "Purchase Order Subform"
     {
         addafter("No.")
         {
-            field("Vendor Item No.";"Vendor Item No.")
+            field("Vendor Item No."; "Vendor Item No.")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
         addafter(Description)
         {
-            field("Description 2";"Description 2")
+            field("Description 2"; "Description 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Line No.")
         {
-            field("Exchange Label";"Exchange Label")
+            field("Exchange Label"; "Exchange Label")
             {
+                ApplicationArea = All;
                 Visible = false;
 
                 trigger OnValidate()
@@ -49,52 +52,53 @@ pageextension 6014457 pageextension6014457 extends "Purchase Order Subform"
                 begin
                     //-NPR5.50 [347542]
                     ExchangeLabel.Reset;
-                    ExchangeLabel.SetRange(Barcode,"Exchange Label");
+                    ExchangeLabel.SetRange(Barcode, "Exchange Label");
                     if ExchangeLabel.FindFirst then begin
-                      Validate(Type,Type::Item);
-                      Validate("No.",ExchangeLabel."Item No.");
-                      Validate("Variant Code",ExchangeLabel."Variant Code");
-                      "Exchange Label" := ExchangeLabel.Barcode;
-                      Validate(Quantity,ExchangeLabel.Quantity);
-                      ItemCheck.Reset;
-                      if ItemCheck.Get("No.") then
-                        Validate("Direct Unit Cost",ItemCheck."Unit Cost");
+                        Validate(Type, Type::Item);
+                        Validate("No.", ExchangeLabel."Item No.");
+                        Validate("Variant Code", ExchangeLabel."Variant Code");
+                        "Exchange Label" := ExchangeLabel.Barcode;
+                        Validate(Quantity, ExchangeLabel.Quantity);
+                        ItemCheck.Reset;
+                        if ItemCheck.Get("No.") then
+                            Validate("Direct Unit Cost", ItemCheck."Unit Cost");
 
-                      CurrPage.Update;
+                        CurrPage.Update;
 
-                      if ExchangeLabel."Sales Ticket No." <> '' then begin
-                        ExchangeLabelMultiple.Reset;
-                        ExchangeLabelMultiple.SetFilter(Barcode,'<>%1',"Exchange Label");
-                        ExchangeLabelMultiple.SetFilter("No.",'<>%1',ExchangeLabel."No.");
-                        ExchangeLabelMultiple.SetRange("Store ID",ExchangeLabel."Store ID");
-                        ExchangeLabelMultiple.SetRange("Sales Ticket No.",ExchangeLabel."Sales Ticket No.");
-                        if ExchangeLabelMultiple.Count > 0 then begin
-                          if ExchangeLabelMultiple.FindSet then repeat
-                            PurchaseLineCheck.Reset;
-                            PurchaseLineCheck.SetRange("Document Type","Document Type");
-                            PurchaseLineCheck.SetRange("Document No.","Document No.");
-                            if PurchaseLineCheck.FindLast then ;
+                        if ExchangeLabel."Sales Ticket No." <> '' then begin
+                            ExchangeLabelMultiple.Reset;
+                            ExchangeLabelMultiple.SetFilter(Barcode, '<>%1', "Exchange Label");
+                            ExchangeLabelMultiple.SetFilter("No.", '<>%1', ExchangeLabel."No.");
+                            ExchangeLabelMultiple.SetRange("Store ID", ExchangeLabel."Store ID");
+                            ExchangeLabelMultiple.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
+                            if ExchangeLabelMultiple.Count > 0 then begin
+                                if ExchangeLabelMultiple.FindSet then
+                                    repeat
+                                        PurchaseLineCheck.Reset;
+                                        PurchaseLineCheck.SetRange("Document Type", "Document Type");
+                                        PurchaseLineCheck.SetRange("Document No.", "Document No.");
+                                        if PurchaseLineCheck.FindLast then;
 
-                            PurchaseLineInsrt.Reset;
-                            PurchaseLineInsrt.Init;
-                            PurchaseLineInsrt.Validate("Document Type","Document Type");
-                            PurchaseLineInsrt.Validate("Document No.","Document No.");
-                            PurchaseLineInsrt."Line No." := PurchaseLineCheck."Line No." + 10000;
-                            PurchaseLineInsrt.Validate(Type,PurchaseLineInsrt.Type::Item);
-                            PurchaseLineInsrt.Validate("Buy-from Vendor No.","Buy-from Vendor No.");
-                            PurchaseLineInsrt.Validate("No.",ExchangeLabelMultiple."Item No.");
-                            PurchaseLineInsrt.Validate("Variant Code",ExchangeLabelMultiple."Variant Code");
-                            PurchaseLineInsrt."Exchange Label" := ExchangeLabelMultiple.Barcode;
-                            PurchaseLineInsrt.Validate(Quantity,ExchangeLabelMultiple.Quantity);
-                            ItemCheck.Reset;
-                            if ItemCheck.Get(ExchangeLabelMultiple."Item No.") then
-                              PurchaseLineInsrt.Validate("Direct Unit Cost",ItemCheck."Unit Cost");
-                            PurchaseLineInsrt.Insert;
-                            CurrPage.Update;
+                                        PurchaseLineInsrt.Reset;
+                                        PurchaseLineInsrt.Init;
+                                        PurchaseLineInsrt.Validate("Document Type", "Document Type");
+                                        PurchaseLineInsrt.Validate("Document No.", "Document No.");
+                                        PurchaseLineInsrt."Line No." := PurchaseLineCheck."Line No." + 10000;
+                                        PurchaseLineInsrt.Validate(Type, PurchaseLineInsrt.Type::Item);
+                                        PurchaseLineInsrt.Validate("Buy-from Vendor No.", "Buy-from Vendor No.");
+                                        PurchaseLineInsrt.Validate("No.", ExchangeLabelMultiple."Item No.");
+                                        PurchaseLineInsrt.Validate("Variant Code", ExchangeLabelMultiple."Variant Code");
+                                        PurchaseLineInsrt."Exchange Label" := ExchangeLabelMultiple.Barcode;
+                                        PurchaseLineInsrt.Validate(Quantity, ExchangeLabelMultiple.Quantity);
+                                        ItemCheck.Reset;
+                                        if ItemCheck.Get(ExchangeLabelMultiple."Item No.") then
+                                            PurchaseLineInsrt.Validate("Direct Unit Cost", ItemCheck."Unit Cost");
+                                        PurchaseLineInsrt.Insert;
+                                        CurrPage.Update;
 
-                          until ExchangeLabelMultiple.Next = 0;
+                                    until ExchangeLabelMultiple.Next = 0;
+                            end;
                         end;
-                      end;
                     end;
                     //+NPR5.50 [347542]
                 end;
@@ -116,7 +120,7 @@ pageextension 6014457 pageextension6014457 extends "Purchase Order Subform"
         {
             action(Nonstockitems)
             {
-                AccessByPermission = TableData "Nonstock Item"=R;
+                AccessByPermission = TableData "Nonstock Item" = R;
                 Caption = 'Nonstoc&k Items';
                 Image = NonStockItem;
             }

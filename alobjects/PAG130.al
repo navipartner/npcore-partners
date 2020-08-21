@@ -1,4 +1,4 @@
-pageextension 6014403 pageextension6014403 extends "Posted Sales Shipment" 
+pageextension 6014403 pageextension6014403 extends "Posted Sales Shipment"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // 
@@ -22,44 +22,51 @@ pageextension 6014403 pageextension6014403 extends "Posted Sales Shipment"
     {
         addafter("Sell-to Customer Name")
         {
-            field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+            field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Ship-to Name")
         {
-            field("Ship-to Name 2";"Ship-to Name 2")
+            field("Ship-to Name 2"; "Ship-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Ship-to Contact")
         {
-            field(Kolli;Kolli)
+            field(Kolli; Kolli)
             {
+                ApplicationArea = All;
                 Editable = false;
                 Importance = Promoted;
             }
         }
         addafter("Shipment Date")
         {
-            field("Delivery Location";"Delivery Location")
+            field("Delivery Location"; "Delivery Location")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
         }
         addafter("Bill-to Name")
         {
-            field("Bill-to Name 2";"Bill-to Name 2")
+            field("Bill-to Name 2"; "Bill-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Bill-to Contact")
         {
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
         }

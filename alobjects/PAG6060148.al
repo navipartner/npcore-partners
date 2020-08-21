@@ -12,20 +12,21 @@ page 6060148 "RC Membership Burndown Chart"
     {
         area(content)
         {
-            field(StatusText;StatusText)
+            field(StatusText; StatusText)
             {
+                ApplicationArea = All;
                 Caption = 'Status Text';
                 ShowCaption = false;
             }
-            usercontrol(BusinessChart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
+            usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
                 trigger AddInReady()
                 begin
                     IsChartAddInReady := true;
-                    MembershipBurndownMgt.OnPageOpen (MembershipBurndownSetup);
+                    MembershipBurndownMgt.OnPageOpen(MembershipBurndownSetup);
                     UpdateStatus;
                     if IsChartDataReady then
-                      UpdateChart;
+                        UpdateChart;
                 end;
             }
         }
@@ -142,7 +143,7 @@ page 6060148 "RC Membership Burndown Chart"
 
                         trigger OnAction()
                         begin
-                            MembershipBurndownSetup.SetPeriodType (MembershipBurndownSetup."Show Change As"::ACK);
+                            MembershipBurndownSetup.SetPeriodType(MembershipBurndownSetup."Show Change As"::ACK);
                             UpdateStatus;
                         end;
                     }
@@ -153,7 +154,7 @@ page 6060148 "RC Membership Burndown Chart"
 
                         trigger OnAction()
                         begin
-                            MembershipBurndownSetup.SetPeriodType  (MembershipBurndownSetup."Show Change As"::NET);
+                            MembershipBurndownSetup.SetPeriodType(MembershipBurndownSetup."Show Change As"::NET);
                             UpdateStatus;
                         end;
                     }
@@ -244,7 +245,7 @@ page 6060148 "RC Membership Burndown Chart"
         IsChartDataReady := true;
 
         if not IsChartAddInReady then
-          SetActionsEnabled;
+            SetActionsEnabled;
     end;
 
     trigger OnOpenPage()
@@ -288,9 +289,9 @@ page 6060148 "RC Membership Burndown Chart"
     local procedure UpdateChart()
     begin
         if not NeedsUpdate then
-          exit;
+            exit;
         if not IsChartAddInReady then
-          exit;
+            exit;
         MembershipBurndownMgt.UpdateData(Rec);
         Update(CurrPage.BusinessChart);
         UpdateStatus;
@@ -311,7 +312,7 @@ page 6060148 "RC Membership Burndown Chart"
         OldMembershipBurndownSetup := MembershipBurndownSetup;
 
         if NeedsUpdate then
-          StatusText := MembershipBurndownSetup.GetCurrentSelectionText;
+            StatusText := MembershipBurndownSetup.GetCurrentSelectionText;
 
         SetActionsEnabled;
     end;

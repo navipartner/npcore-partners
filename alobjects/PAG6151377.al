@@ -16,30 +16,35 @@ page 6151377 "CS UIs"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Records in List";"No. of Records in List")
+                field("No. of Records in List"; "No. of Records in List")
                 {
+                    ApplicationArea = All;
                 }
-                field("Handling Codeunit";"Handling Codeunit")
+                field("Handling Codeunit"; "Handling Codeunit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Next UI";"Next UI")
+                field("Next UI"; "Next UI")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = false;
             }

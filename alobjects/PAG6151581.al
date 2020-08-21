@@ -12,11 +12,13 @@ page 6151581 "Event Attribute Temp. Filters"
         {
             repeater(Group)
             {
-                field("Filter Name";"Filter Name")
+                field("Filter Name"; "Filter Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -52,8 +54,8 @@ page 6151581 "Event Attribute Temp. Filters"
 
                 trigger OnAction()
                 begin
-                    if not EventAttrMgt.ShowEventsInAttributesFilter("Template Name","Filter Name") then
-                      Message(NoEventsInFilter);
+                    if not EventAttrMgt.ShowEventsInAttributesFilter("Template Name", "Filter Name") then
+                        Message(NoEventsInFilter);
                 end;
             }
         }

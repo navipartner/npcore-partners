@@ -13,22 +13,26 @@ page 6151126 "NpIa Item AddOn Card"
         {
             group(General)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Comment POS Info Code";"Comment POS Info Code")
+                field("Comment POS Info Code"; "Comment POS Info Code")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014405;"NpIa Item AddOn Subform")
+            part(Control6014405; "NpIa Item AddOn Subform")
             {
-                SubPageLink = "AddOn No."=FIELD("No.");
+                SubPageLink = "AddOn No." = FIELD("No.");
             }
         }
     }

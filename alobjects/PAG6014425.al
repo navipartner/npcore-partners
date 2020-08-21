@@ -117,6 +117,7 @@ page 6014425 "Retail Item Card"
                     ShowCaption = false;
                     field(SearchNo; SearchNo)
                     {
+                        ApplicationArea = All;
                         Caption = 'Find Item Card';
 
                         trigger OnValidate()
@@ -145,6 +146,7 @@ page 6014425 "Retail Item Card"
                     ShowCaption = false;
                     field(Barcode; Barcode)
                     {
+                        ApplicationArea = All;
                         Caption = 'Create barcode';
 
                         trigger OnAssistEdit()
@@ -178,6 +180,7 @@ page 6014425 "Retail Item Card"
                 Caption = 'General';
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
 
                     trigger OnAssistEdit()
@@ -188,31 +191,40 @@ page 6014425 "Retail Item Card"
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field("Item Status"; "Item Status")
                 {
+                    ApplicationArea = All;
                 }
                 field("Item Group"; "Item Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Base Unit of Measure"; "Base Unit of Measure")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Assembly BOM"; "Assembly BOM")
                 {
+                    ApplicationArea = All;
                 }
                 field("Shelf No."; "Shelf No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(AverageCostLCY; AverageCostLCY)
                 {
+                    ApplicationArea = All;
                     Caption = 'Average Cost (LCY)';
                     Editable = false;
 
@@ -231,12 +243,15 @@ page 6014425 "Retail Item Card"
                 }
                 field("Automatic Ext. Texts"; "Automatic Ext. Texts")
                 {
+                    ApplicationArea = All;
                 }
                 field("Created From Nonstock Item"; "Created From Nonstock Item")
                 {
+                    ApplicationArea = All;
                 }
                 field("Item Category Code"; "Item Category Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -245,15 +260,19 @@ page 6014425 "Retail Item Card"
                 }
                 field("Price Includes VAT"; "Price Includes VAT")
                 {
+                    ApplicationArea = All;
                 }
                 field("Label Barcode"; "Label Barcode")
                 {
+                    ApplicationArea = All;
                 }
                 field("Service Item Group"; "Service Item Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Search Description"; "Search Description")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -262,45 +281,58 @@ page 6014425 "Retail Item Card"
                 }
                 field("Inventory Value Zero"; "Inventory Value Zero")
                 {
+                    ApplicationArea = All;
                 }
                 field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Sales (Qty.)"; "Sales (Qty.)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Qty. on Purch. Order"; "Qty. on Purch. Order")
                 {
+                    ApplicationArea = All;
                 }
                 field("Qty. on Prod. Order"; "Qty. on Prod. Order")
                 {
+                    ApplicationArea = All;
                 }
                 field("Qty. on Component Lines"; "Qty. on Component Lines")
                 {
+                    ApplicationArea = All;
                 }
                 field("Qty. on Sales Order"; "Qty. on Sales Order")
                 {
+                    ApplicationArea = All;
                 }
                 field("Qty. on Service Order"; "Qty. on Service Order")
                 {
+                    ApplicationArea = All;
                 }
                 field("Qty. on Job Order"; "Qty. on Job Order")
                 {
+                    ApplicationArea = All;
                 }
                 field("Qty. on Assembly Order"; "Qty. on Assembly Order")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field("Qty. on Asm. Component"; "Qty. on Asm. Component")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field("Group sale"; "Group sale")
                 {
+                    ApplicationArea = All;
                 }
                 field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -309,22 +341,28 @@ page 6014425 "Retail Item Card"
                 }
                 field("Blocked on Pos"; "Blocked on Pos")
                 {
+                    ApplicationArea = All;
                 }
                 field("Custom Discount Blocked"; "Custom Discount Blocked")
                 {
+                    ApplicationArea = All;
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                 }
                 field("Vendor Item No."; "Vendor Item No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Item Brand"; "Item Brand")
                 {
+                    ApplicationArea = All;
                 }
                 field("Statistics Group"; "Statistics Group")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -333,6 +371,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_01_GEN; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -351,6 +390,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_02_GEN; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -369,6 +409,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_03_GEN; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -387,6 +428,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_04_GEN; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -405,6 +447,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_05_GEN; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -423,13 +466,16 @@ page 6014425 "Retail Item Card"
                 }
                 field(Condition; Condition)
                 {
+                    ApplicationArea = All;
                 }
                 field(Season; Season)
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field("Shelf Label Type"; "Shelf Label Type")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Extra Fields")
@@ -437,6 +483,7 @@ page 6014425 "Retail Item Card"
                 Caption = 'Extra Fields';
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -457,6 +504,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -477,6 +525,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -497,6 +546,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -517,6 +567,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -537,6 +588,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -557,6 +609,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -577,6 +630,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -597,6 +651,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -617,6 +672,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -637,6 +693,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_11; NPRAttrTextArray[11])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,11,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible11;
@@ -657,6 +714,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_12; NPRAttrTextArray[12])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,12,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible12;
@@ -677,6 +735,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_13; NPRAttrTextArray[13])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,13,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible13;
@@ -697,6 +756,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_14; NPRAttrTextArray[14])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,14,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible14;
@@ -717,6 +777,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_15; NPRAttrTextArray[15])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,15,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible15;
@@ -737,6 +798,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_16; NPRAttrTextArray[16])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,16,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible16;
@@ -757,6 +819,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_17; NPRAttrTextArray[17])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,17,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible17;
@@ -777,6 +840,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_18; NPRAttrTextArray[18])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,18,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible18;
@@ -797,6 +861,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_19; NPRAttrTextArray[19])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,19,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible19;
@@ -817,6 +882,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_20; NPRAttrTextArray[20])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,20,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible20;
@@ -837,6 +903,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_21; NPRAttrTextArray[21])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,21,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible21;
@@ -857,6 +924,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_22; NPRAttrTextArray[22])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,22,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible22;
@@ -877,6 +945,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_23; NPRAttrTextArray[23])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,23,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible23;
@@ -897,6 +966,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_24; NPRAttrTextArray[24])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,24,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible24;
@@ -917,6 +987,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_25; NPRAttrTextArray[25])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,25,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible25;
@@ -937,6 +1008,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_26; NPRAttrTextArray[26])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,26,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible26;
@@ -957,6 +1029,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_27; NPRAttrTextArray[27])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,27,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible27;
@@ -977,6 +1050,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_28; NPRAttrTextArray[28])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,28,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible28;
@@ -997,6 +1071,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_29; NPRAttrTextArray[29])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,29,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible29;
@@ -1017,6 +1092,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_30; NPRAttrTextArray[30])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,30,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible30;
@@ -1037,6 +1113,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_31; NPRAttrTextArray[31])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,31,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible31;
@@ -1057,6 +1134,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_32; NPRAttrTextArray[32])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,32,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible32;
@@ -1077,6 +1155,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_33; NPRAttrTextArray[33])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,33,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible33;
@@ -1097,6 +1176,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_34; NPRAttrTextArray[34])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,34,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible34;
@@ -1117,6 +1197,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_35; NPRAttrTextArray[35])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,35,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible35;
@@ -1137,6 +1218,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_36; NPRAttrTextArray[36])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,36,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible36;
@@ -1157,6 +1239,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_37; NPRAttrTextArray[37])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,37,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible37;
@@ -1177,6 +1260,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_38; NPRAttrTextArray[38])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,38,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible38;
@@ -1197,6 +1281,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_39; NPRAttrTextArray[39])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,39,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible39;
@@ -1217,6 +1302,7 @@ page 6014425 "Retail Item Card"
                 }
                 field(NPRAttrTextArray_40; NPRAttrTextArray[40])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,40,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible40;
@@ -1241,6 +1327,7 @@ page 6014425 "Retail Item Card"
                 Caption = 'Invoicing';
                 field("Costing Method"; "Costing Method")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
 
                     trigger OnValidate()
@@ -1251,12 +1338,15 @@ page 6014425 "Retail Item Card"
                 }
                 field("Cost is Adjusted"; "Cost is Adjusted")
                 {
+                    ApplicationArea = All;
                 }
                 field("Cost is Posted to G/L"; "Cost is Posted to G/L")
                 {
+                    ApplicationArea = All;
                 }
                 field("Standard Cost"; "Standard Cost")
                 {
+                    ApplicationArea = All;
                     Enabled = StandardCostEnable;
 
                     trigger OnDrillDown()
@@ -1273,6 +1363,7 @@ page 6014425 "Retail Item Card"
                 }
                 field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                     Enabled = UnitCostEnable;
 
                     trigger OnDrillDown()
@@ -1284,12 +1375,15 @@ page 6014425 "Retail Item Card"
                 }
                 field("Overhead Rate"; "Overhead Rate")
                 {
+                    ApplicationArea = All;
                 }
                 field("Indirect Cost %"; "Indirect Cost %")
                 {
+                    ApplicationArea = All;
                 }
                 field("Last Direct Cost"; "Last Direct Cost")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -1298,6 +1392,7 @@ page 6014425 "Retail Item Card"
                 }
                 field("Price/Profit Calculation"; "Price/Profit Calculation")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -1306,6 +1401,7 @@ page 6014425 "Retail Item Card"
                 }
                 field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -1314,6 +1410,7 @@ page 6014425 "Retail Item Card"
                 }
                 field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
 
                     trigger OnValidate()
@@ -1323,9 +1420,11 @@ page 6014425 "Retail Item Card"
                 }
                 field("Unit List Price"; "Unit List Price")
                 {
+                    ApplicationArea = All;
                 }
                 field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
 
                     trigger OnValidate()
@@ -1335,6 +1434,7 @@ page 6014425 "Retail Item Card"
                 }
                 field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -1343,26 +1443,33 @@ page 6014425 "Retail Item Card"
                 }
                 field("Tax Group Code"; "Tax Group Code")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 field("Inventory Posting Group"; "Inventory Posting Group")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("VAT Bus. Posting Gr. (Price)"; "VAT Bus. Posting Gr. (Price)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Net Invoiced Qty."; "Net Invoiced Qty.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Allow Invoice Disc."; "Allow Invoice Disc.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Item Disc. Group"; "Item Disc. Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -1371,19 +1478,24 @@ page 6014425 "Retail Item Card"
                 }
                 field("Application Wksh. User ID"; "Application Wksh. User ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Units per Parcel"; "Units per Parcel")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Sale Blocked"; "Sale Blocked")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Replenishment)
@@ -1391,16 +1503,19 @@ page 6014425 "Retail Item Card"
                 Caption = 'Replenishment';
                 field("Replenishment System"; "Replenishment System")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Lead Time Calculation"; "Lead Time Calculation")
                 {
+                    ApplicationArea = All;
                 }
                 group(Purchase)
                 {
                     Caption = 'Purchase';
                     field("Vendor No."; "Vendor No.")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -1409,6 +1524,7 @@ page 6014425 "Retail Item Card"
                     }
                     field(VendorItemNo2; "Vendor Item No.")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -1417,6 +1533,7 @@ page 6014425 "Retail Item Card"
                     }
                     field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -1425,6 +1542,7 @@ page 6014425 "Retail Item Card"
                     }
                     field("Purchase Blocked"; "Purchase Blocked")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control230)
@@ -1432,24 +1550,31 @@ page 6014425 "Retail Item Card"
                     Caption = 'Production';
                     field("Manufacturing Policy"; "Manufacturing Policy")
                     {
+                        ApplicationArea = All;
                     }
                     field("Routing No."; "Routing No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Production BOM No."; "Production BOM No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Rounding Precision"; "Rounding Precision")
                     {
+                        ApplicationArea = All;
                     }
                     field("Flushing Method"; "Flushing Method")
                     {
+                        ApplicationArea = All;
                     }
                     field("Scrap %"; "Scrap %")
                     {
+                        ApplicationArea = All;
                     }
                     field("Lot Size"; "Lot Size")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Assembly)
@@ -1457,6 +1582,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Assembly';
                     field("Assembly Policy"; "Assembly Policy")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -1465,6 +1591,7 @@ page 6014425 "Retail Item Card"
                 Caption = 'Planning';
                 field("Reordering Policy"; "Reordering Policy")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
 
                     trigger OnValidate()
@@ -1474,31 +1601,39 @@ page 6014425 "Retail Item Card"
                 }
                 field(Reserve; Reserve)
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Order Tracking Policy"; "Order Tracking Policy")
                 {
+                    ApplicationArea = All;
                 }
                 field("Stockkeeping Unit Exists"; "Stockkeeping Unit Exists")
                 {
+                    ApplicationArea = All;
                 }
                 field("Dampener Period"; "Dampener Period")
                 {
+                    ApplicationArea = All;
                     Enabled = DampenerPeriodEnable;
                 }
                 field("Dampener Quantity"; "Dampener Quantity")
                 {
+                    ApplicationArea = All;
                     Enabled = DampenerQtyEnable;
                 }
                 field(Critical; Critical)
                 {
+                    ApplicationArea = All;
                 }
                 field("Safety Lead Time"; "Safety Lead Time")
                 {
+                    ApplicationArea = All;
                     Enabled = SafetyLeadTimeEnable;
                 }
                 field("Safety Stock Quantity"; "Safety Stock Quantity")
                 {
+                    ApplicationArea = All;
                     Enabled = SafetyStockQtyEnable;
                 }
                 group("Lot-for-Lot Parameters")
@@ -1506,6 +1641,7 @@ page 6014425 "Retail Item Card"
                     Caption = 'Lot-for-Lot Parameters';
                     field("Include Inventory"; "Include Inventory")
                     {
+                        ApplicationArea = All;
                         Enabled = IncludeInventoryEnable;
 
                         trigger OnValidate()
@@ -1515,10 +1651,12 @@ page 6014425 "Retail Item Card"
                     }
                     field("Lot Accumulation Period"; "Lot Accumulation Period")
                     {
+                        ApplicationArea = All;
                         Enabled = LotAccumulationPeriodEnable;
                     }
                     field("Rescheduling Period"; "Rescheduling Period")
                     {
+                        ApplicationArea = All;
                         Enabled = ReschedulingPeriodEnable;
                     }
                 }
@@ -1534,6 +1672,7 @@ page 6014425 "Retail Item Card"
                             ShowCaption = false;
                             field("Reorder Point"; "Reorder Point")
                             {
+                                ApplicationArea = All;
                                 Enabled = ReorderPointEnable;
 
                                 trigger OnValidate()
@@ -1543,10 +1682,12 @@ page 6014425 "Retail Item Card"
                             }
                             field("Reorder Quantity"; "Reorder Quantity")
                             {
+                                ApplicationArea = All;
                                 Enabled = ReorderQtyEnable;
                             }
                             field("Maximum Inventory"; "Maximum Inventory")
                             {
+                                ApplicationArea = All;
                                 Enabled = MaximumInventoryEnable;
 
                                 trigger OnValidate()
@@ -1558,11 +1699,13 @@ page 6014425 "Retail Item Card"
                     }
                     field("Overflow Level"; "Overflow Level")
                     {
+                        ApplicationArea = All;
                         Enabled = OverflowLevelEnable;
                         Importance = Additional;
                     }
                     field("Time Bucket"; "Time Bucket")
                     {
+                        ApplicationArea = All;
                         Enabled = TimeBucketEnable;
                         Importance = Additional;
                     }
@@ -1579,14 +1722,17 @@ page 6014425 "Retail Item Card"
                             ShowCaption = false;
                             field("Minimum Order Quantity"; "Minimum Order Quantity")
                             {
+                                ApplicationArea = All;
                                 Enabled = MinimumOrderQtyEnable;
                             }
                             field("Maximum Order Quantity"; "Maximum Order Quantity")
                             {
+                                ApplicationArea = All;
                                 Enabled = MaximumOrderQtyEnable;
                             }
                             field("Order Multiple"; "Order Multiple")
                             {
+                                ApplicationArea = All;
                                 Enabled = OrderMultipleEnable;
                             }
                         }
@@ -1598,15 +1744,19 @@ page 6014425 "Retail Item Card"
                 Caption = 'Foreign Trade';
                 field("Tariff No."; "Tariff No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Net Weight"; "Net Weight")
                 {
+                    ApplicationArea = All;
                 }
                 field("Gross Weight"; "Gross Weight")
                 {
+                    ApplicationArea = All;
                 }
                 field("Country/Region of Origin Code"; "Country/Region of Origin Code")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Item Tracking")
@@ -1614,16 +1764,20 @@ page 6014425 "Retail Item Card"
                 Caption = 'Item Tracking';
                 field("Item Tracking Code"; "Item Tracking Code")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Serial Nos."; "Serial Nos.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Lot Nos."; "Lot Nos.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Expiration Calculation"; "Expiration Calculation")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Control1907509201)
@@ -1631,29 +1785,37 @@ page 6014425 "Retail Item Card"
                 Caption = 'Warehouse';
                 field("Special Equipment Code"; "Special Equipment Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Put-away Template Code"; "Put-away Template Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Put-away Unit of Measure Code"; "Put-away Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Phys Invt Counting Period Code"; "Phys Invt Counting Period Code")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Last Phys. Invt. Date"; "Last Phys. Invt. Date")
                 {
+                    ApplicationArea = All;
                 }
                 field("Last Counting Period Update"; "Last Counting Period Update")
                 {
+                    ApplicationArea = All;
                 }
                 field("Identifier Code"; "Identifier Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Use Cross-Docking"; "Use Cross-Docking")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Variety)
@@ -1664,37 +1826,48 @@ page 6014425 "Retail Item Card"
                     ShowCaption = false;
                     field("Has Variants"; "Has Variants")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                     field("Variety Group"; "Variety Group")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 1"; "Variety 1")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 1 Table"; "Variety 1 Table")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 2"; "Variety 2")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 2 Table"; "Variety 2 Table")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 3"; "Variety 3")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 3 Table"; "Variety 3 Table")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 4"; "Variety 4")
                     {
+                        ApplicationArea = All;
                     }
                     field("Variety 4 Table"; "Variety 4 Table")
                     {
+                        ApplicationArea = All;
                     }
                     field("Cross Variety No."; "Cross Variety No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -1706,12 +1879,15 @@ page 6014425 "Retail Item Card"
                     ShowCaption = false;
                     field("Item AddOn No."; "Item AddOn No.")
                     {
+                        ApplicationArea = All;
                     }
                     field("Guarantee Index"; "Guarantee Index")
                     {
+                        ApplicationArea = All;
                     }
                     field("Insurrance category"; "Insurrance category")
                     {
+                        ApplicationArea = All;
                         Width = 30;
                     }
                 }
@@ -1720,18 +1896,23 @@ page 6014425 "Retail Item Card"
                     ShowCaption = false;
                     field("Explode BOM auto"; "Explode BOM auto")
                     {
+                        ApplicationArea = All;
                     }
                     field("Guarantee voucher"; "Guarantee voucher")
                     {
+                        ApplicationArea = All;
                     }
                     field("No Print on Reciept"; "No Print on Reciept")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ticket Type"; "Ticket Type")
                     {
+                        ApplicationArea = All;
                     }
                     field(NPRAttrTextArray_06_GEN; NPRAttrTextArray[6])
                     {
+                        ApplicationArea = All;
                         CaptionClass = '6014555,27,6,2';
                         Editable = NPRAttrEditable;
                         Visible = NPRAttrVisible06;
@@ -1743,6 +1924,7 @@ page 6014425 "Retail Item Card"
                     }
                     field(NPRAttrTextArray_07_GEN; NPRAttrTextArray[7])
                     {
+                        ApplicationArea = All;
                         CaptionClass = '6014555,27,7,2';
                         Editable = NPRAttrEditable;
                         Visible = NPRAttrVisible07;
@@ -1754,6 +1936,7 @@ page 6014425 "Retail Item Card"
                     }
                     field(NPRAttrTextArray_08_GEN; NPRAttrTextArray[8])
                     {
+                        ApplicationArea = All;
                         CaptionClass = '6014555,27,8,2';
                         Editable = NPRAttrEditable;
                         Visible = NPRAttrVisible08;
@@ -1765,6 +1948,7 @@ page 6014425 "Retail Item Card"
                     }
                     field(NPRAttrTextArray_09_GEN; NPRAttrTextArray[9])
                     {
+                        ApplicationArea = All;
                         CaptionClass = '6014555,27,9,2';
                         Editable = NPRAttrEditable;
                         Visible = NPRAttrVisible09;
@@ -1776,6 +1960,7 @@ page 6014425 "Retail Item Card"
                     }
                     field(NPRAttrTextArray_10_GEN; NPRAttrTextArray[10])
                     {
+                        ApplicationArea = All;
                         CaptionClass = '6014555,27,10,2';
                         Editable = NPRAttrEditable;
                         Visible = NPRAttrVisible10;
@@ -1787,6 +1972,7 @@ page 6014425 "Retail Item Card"
                     }
                     field("Print Tags"; "Print Tags")
                     {
+                        ApplicationArea = All;
                         AssistEdit = true;
                         Editable = false;
 
@@ -1805,6 +1991,7 @@ page 6014425 "Retail Item Card"
                     }
                     field("NPRE Item Routing Profile"; "NPRE Item Routing Profile")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("NPR Attributes")
@@ -1821,6 +2008,7 @@ page 6014425 "Retail Item Card"
                     ShowCaption = false;
                     field("Magento Item"; "Magento Item")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
 
                         trigger OnValidate()
@@ -1833,10 +2021,12 @@ page 6014425 "Retail Item Card"
                     }
                     field("Magento Status"; "Magento Status")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Magento Name"; "Magento Name")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -1854,6 +2044,7 @@ page 6014425 "Retail Item Card"
                     }
                     field("FORMAT(""Magento Description"".HASVALUE)"; Format("Magento Description".HasValue))
                     {
+                        ApplicationArea = All;
                         Caption = 'Magento Description';
 
                         trigger OnAssistEdit()
@@ -1878,6 +2069,7 @@ page 6014425 "Retail Item Card"
                     }
                     field("FORMAT(""Magento Short Description"".HASVALUE)"; Format("Magento Short Description".HasValue))
                     {
+                        ApplicationArea = All;
                         Caption = 'Magento Short Description';
 
                         trigger OnAssistEdit()
@@ -1904,38 +2096,48 @@ page 6014425 "Retail Item Card"
                     }
                     field("Magento Brand"; "Magento Brand")
                     {
+                        ApplicationArea = All;
                         Visible = MagentoEnabledBrand;
                     }
                     field(MagentoUnitPrice; "Unit Price")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Product New From"; "Product New From")
                     {
+                        ApplicationArea = All;
                     }
                     field("Product New To"; "Product New To")
                     {
+                        ApplicationArea = All;
                     }
                     field("Featured From"; "Featured From")
                     {
+                        ApplicationArea = All;
                     }
                     field("Featured To"; "Featured To")
                     {
+                        ApplicationArea = All;
                     }
                     field("Special Price"; "Special Price")
                     {
+                        ApplicationArea = All;
                         Visible = MagentoEnabledSpecialPrices;
                     }
                     field("Special Price From"; "Special Price From")
                     {
+                        ApplicationArea = All;
                         Visible = MagentoEnabledSpecialPrices;
                     }
                     field("Special Price To"; "Special Price To")
                     {
+                        ApplicationArea = All;
                         Visible = MagentoEnabledSpecialPrices;
                     }
                     field("Custom Options"; "Custom Options")
                     {
+                        ApplicationArea = All;
                         Visible = MagentoEnabledCustomOptions;
 
                         trigger OnAssistEdit()
@@ -1952,24 +2154,32 @@ page 6014425 "Retail Item Card"
                     }
                     field(Backorder; Backorder)
                     {
+                        ApplicationArea = All;
                     }
                     field("Display Only"; "Display Only")
                     {
+                        ApplicationArea = All;
                         ToolTip = 'test';
                     }
                     field("Display only Text"; "Display only Text")
-                    { }
+                    {
+                        ApplicationArea = All;
+                    }
                     field("Seo Link"; "Seo Link")
                     {
+                        ApplicationArea = All;
                     }
                     field("Meta Title"; "Meta Title")
                     {
+                        ApplicationArea = All;
                     }
                     field("Meta Description"; "Meta Description")
                     {
+                        ApplicationArea = All;
                     }
                     field("Attribute Set ID"; "Attribute Set ID")
                     {
+                        ApplicationArea = All;
                         AssistEdit = true;
                         Editable = NOT "Magento Item";
                         Visible = MagentoEnabledAttributeSet;
@@ -1994,6 +2204,7 @@ page 6014425 "Retail Item Card"
                     Visible = MagentoPictureVarietyTypeVisible;
                     field("Magento Picture Variety Type"; "Magento Picture Variety Type")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 part("Category Links"; "Magento Category Links")

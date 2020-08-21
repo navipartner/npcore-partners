@@ -1,4 +1,4 @@
-pageextension 6014450 pageextension6014450 extends "Purchase Quote" 
+pageextension 6014450 pageextension6014450 extends "Purchase Quote"
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -13,11 +13,13 @@ pageextension 6014450 pageextension6014450 extends "Purchase Quote"
     {
         addafter(Control51)
         {
-            field("Pay-to E-mail";"Pay-to E-mail")
+            field("Pay-to E-mail"; "Pay-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
         }
     }

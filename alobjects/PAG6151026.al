@@ -15,20 +15,25 @@ page 6151026 "NpRv Partners"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Service Url";"Service Url")
+                field("Service Url"; "Service Url")
                 {
+                    ApplicationArea = All;
                 }
-                field("Service Username";"Service Username")
+                field("Service Username"; "Service Username")
                 {
+                    ApplicationArea = All;
                 }
-                field("Service Password";"Service Password")
+                field("Service Password"; "Service Password")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -43,7 +48,7 @@ page 6151026 "NpRv Partners"
                 Caption = 'Partner Relations';
                 Image = UserCertificate;
                 RunObject = Page "NpRv Partner Relations";
-                RunPageLink = "Partner Code"=FIELD(Code);
+                RunPageLink = "Partner Code" = FIELD(Code);
             }
         }
     }

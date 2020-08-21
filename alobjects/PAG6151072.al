@@ -16,20 +16,25 @@ page 6151072 "Purchase Price Factbox"
         {
             repeater(Group)
             {
-                field("Minimum Quantity";"Minimum Quantity")
+                field("Minimum Quantity"; "Minimum Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Unit Cost";"Direct Unit Cost")
+                field("Direct Unit Cost"; "Direct Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Date";"Ending Date")
+                field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

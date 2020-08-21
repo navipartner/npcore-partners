@@ -1,4 +1,4 @@
-pageextension 6014439 pageextension6014439 extends "Sales Quote" 
+pageextension 6014439 pageextension6014439 extends "Sales Quote"
 {
     // NPR7.100.000/LS/220114  : Retail Merge :
     //                                        Adddedactions : Matrix, E-Mail Log, Send AsPDF
@@ -16,11 +16,13 @@ pageextension 6014439 pageextension6014439 extends "Sales Quote"
     {
         addafter(Control49)
         {
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
         }
     }

@@ -20,21 +20,22 @@ page 6059902 "Task Journal"
     {
         area(content)
         {
-            field(CurrentJnlBatchName;CurrentJnlBatchName)
+            field(CurrentJnlBatchName; CurrentJnlBatchName)
             {
+                ApplicationArea = All;
                 Caption = 'Batch Name';
                 Lookup = true;
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
                     CurrPage.SaveRecord;
-                    JobJnlManagement.LookupName(CurrentJnlBatchName,Rec);
+                    JobJnlManagement.LookupName(CurrentJnlBatchName, Rec);
                     CurrPage.Update(false);
                 end;
 
                 trigger OnValidate()
                 begin
-                    JobJnlManagement.CheckName(CurrentJnlBatchName,Rec);
+                    JobJnlManagement.CheckName(CurrentJnlBatchName, Rec);
                     CurrentJnlBatchNameOnAfterVali;
                 end;
             }
@@ -43,23 +44,29 @@ page 6059902 "Task Journal"
                 IndentationColumn = NameIndent;
                 IndentationControls = Description;
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object No.";"Object No.")
+                field("Object No."; "Object No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Report Name";"Report Name")
+                field("Report Name"; "Report Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field(NextExecutionTime;NextExecutionTime)
+                field(NextExecutionTime; NextExecutionTime)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -69,25 +76,31 @@ page 6059902 "Task Journal"
                         //+TQ1.25
                     end;
                 }
-                field("Call Object With Task Record";"Call Object With Task Record")
+                field("Call Object With Task Record"; "Call Object With Task Record")
                 {
+                    ApplicationArea = All;
                 }
-                field(Recurrence;Recurrence)
+                field(Recurrence; Recurrence)
                 {
+                    ApplicationArea = All;
                 }
-                field("Recurrence Interval";"Recurrence Interval")
+                field("Recurrence Interval"; "Recurrence Interval")
                 {
+                    ApplicationArea = All;
                 }
-                field("Dependence Type";"Dependence Type")
+                field("Dependence Type"; "Dependence Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(LastStatus;LastStatus)
+                field(LastStatus; LastStatus)
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Status';
                     Editable = false;
                 }
-                field(LastExecutionTime;LastExecutionTime)
+                field(LastExecutionTime; LastExecutionTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Execution Time';
                     Editable = false;
                 }
@@ -101,8 +114,9 @@ page 6059902 "Task Journal"
                     group("Job Description")
                     {
                         Caption = 'Job Description';
-                        field(JobDescription;JobDescription)
+                        field(JobDescription; JobDescription)
                         {
+                            ApplicationArea = All;
                             Editable = false;
                             ShowCaption = false;
                         }
@@ -110,8 +124,9 @@ page 6059902 "Task Journal"
                     group("Account Name")
                     {
                         Caption = 'Account Name';
-                        field(AccName;AccName)
+                        field(AccName; AccName)
                         {
+                            ApplicationArea = All;
                             Caption = 'Account Name';
                             Editable = false;
                         }
@@ -121,11 +136,11 @@ page 6059902 "Task Journal"
         }
         area(factboxes)
         {
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = false;
             }
@@ -146,9 +161,9 @@ page 6059902 "Task Journal"
                     Image = EditLines;
                     Promoted = true;
                     RunObject = Page "TQ Task Card";
-                    RunPageLink = "Journal Template Name"=FIELD("Journal Template Name"),
-                                  "Journal Batch Name"=FIELD("Journal Batch Name"),
-                                  "Line No."=FIELD("Line No.");
+                    RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
+                                  "Journal Batch Name" = FIELD("Journal Batch Name"),
+                                  "Line No." = FIELD("Line No.");
                     ShortCutKey = 'Shift+F7';
                 }
                 action("Task Log")
@@ -159,10 +174,10 @@ page 6059902 "Task Journal"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "Task Log (Task)";
-                    RunPageLink = "Journal Template Name"=FIELD("Journal Template Name"),
-                                  "Journal Batch Name"=FIELD("Journal Batch Name"),
-                                  "Line No."=FIELD("Line No.");
-                    RunPageView = SORTING("Journal Template Name","Journal Batch Name","Line No.");
+                    RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
+                                  "Journal Batch Name" = FIELD("Journal Batch Name"),
+                                  "Line No." = FIELD("Line No.");
+                    RunPageView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
                     ShortCutKey = 'Ctrl+F7';
                 }
             }
@@ -227,7 +242,7 @@ page 6059902 "Task Journal"
 
     trigger OnAfterGetCurrRecord()
     begin
-        JobJnlManagement.GetNames(Rec,JobDescription,AccName);
+        JobJnlManagement.GetNames(Rec, JobDescription, AccName);
     end;
 
     trigger OnAfterGetRecord()
@@ -251,15 +266,15 @@ page 6059902 "Task Journal"
     begin
         OpenedFromBatch := ("Journal Batch Name" <> '') and ("Journal Template Name" = '');
         if OpenedFromBatch then begin
-          CurrentJnlBatchName := "Journal Batch Name";
-          JobJnlManagement.OpenJnl(CurrentJnlBatchName,Rec);
-          exit;
+            CurrentJnlBatchName := "Journal Batch Name";
+            JobJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
+            exit;
         end;
-        JobJnlManagement.TemplateSelection(PAGE::"Task Journal",0, Rec,JnlSelected);
+        JobJnlManagement.TemplateSelection(PAGE::"Task Journal", 0, Rec, JnlSelected);
 
         if not JnlSelected then
-          Error('');
-        JobJnlManagement.OpenJnl(CurrentJnlBatchName,Rec);
+            Error('');
+        JobJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
     end;
 
     var
@@ -286,16 +301,16 @@ page 6059902 "Task Journal"
     begin
         LastStatus := LastStatus::" ";
         LastExecutionTime := 0DT;
-        TaskLogTask.SetCurrentKey("Journal Template Name","Journal Batch Name","Line No.");
+        TaskLogTask.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Line No.");
         TaskLogTask.SetRange("Journal Template Name", "Journal Template Name");
         TaskLogTask.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLogTask.SetRange("Line No.", "Line No.");
         if TaskLogTask.FindLast then begin
-          if (TaskLogTask."Object Type" <> "Object Type") or
-             (TaskLogTask."Object No." <> "Object No.") then
-            exit;
-          LastStatus := TaskLogTask.Status;
-          LastExecutionTime := TaskLogTask."Ending Time";
+            if (TaskLogTask."Object Type" <> "Object Type") or
+               (TaskLogTask."Object No." <> "Object No.") then
+                exit;
+            LastStatus := TaskLogTask.Status;
+            LastExecutionTime := TaskLogTask."Ending Time";
         end;
     end;
 }

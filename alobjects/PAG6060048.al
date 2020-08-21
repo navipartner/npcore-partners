@@ -8,7 +8,7 @@ page 6060048 "Reg. Item Wsht Variety Subpage"
     Editable = false;
     PageType = List;
     SourceTable = "Reg. Item Wsht Variant Line";
-    SourceTableView = SORTING("Registered Worksheet No.","Registered Worksheet Line No.","Variety 1 Value","Variety 2 Value","Variety 3 Value","Variety 4 Value")
+    SourceTableView = SORTING("Registered Worksheet No.", "Registered Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                       ORDER(Ascending);
 
     layout
@@ -19,62 +19,77 @@ page 6060048 "Reg. Item Wsht Variety Subpage"
             {
                 IndentationColumn = Level;
                 ShowAsTree = true;
-                field(Level;Level)
+                field(Level; Level)
                 {
+                    ApplicationArea = All;
                     AutoFormatType = 2;
                     Editable = false;
                     Visible = false;
                 }
-                field("Heading Text";"Heading Text")
+                field("Heading Text"; "Heading Text")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variety 1 Value";"Variety 1 Value")
+                field("Variety 1 Value"; "Variety 1 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[1];
                     Visible = Variety1InUse;
                 }
-                field("Variety 2 Value";"Variety 2 Value")
+                field("Variety 2 Value"; "Variety 2 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[2];
                     Visible = Variety2InUse;
                 }
-                field("Variety 3 Value";"Variety 3 Value")
+                field("Variety 3 Value"; "Variety 3 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[3];
                     Visible = Variety3InUse;
                 }
-                field("Variety 4 Value";"Variety 4 Value")
+                field("Variety 4 Value"; "Variety 4 Value")
                 {
+                    ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[4];
                     Visible = Variety4InUse;
                 }
-                field("Action";Action)
+                field("Action"; Action)
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Existing Variant Code";"Existing Variant Code")
+                field("Existing Variant Code"; "Existing Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Existing Variant Blocked";"Existing Variant Blocked")
+                field("Existing Variant Blocked"; "Existing Variant Blocked")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Bar Code";"Internal Bar Code")
+                field("Internal Bar Code"; "Internal Bar Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendors Bar Code";"Vendors Bar Code")
+                field("Vendors Bar Code"; "Vendors Bar Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Price";"Sales Price")
+                field("Sales Price"; "Sales Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Unit Cost";"Direct Unit Cost")
+                field("Direct Unit Cost"; "Direct Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -85,7 +100,7 @@ page 6060048 "Reg. Item Wsht Variety Subpage"
     }
 
     var
-        FieldCaptionNew: array [4] of Text;
+        FieldCaptionNew: array[4] of Text;
         RegItemWorksheetLine: Record "Registered Item Worksheet Line";
         [InDataSet]
         Variety1InUse: Boolean;
@@ -101,8 +116,8 @@ page 6060048 "Reg. Item Wsht Variety Subpage"
         RegItemWorksheetLine := RegItemWorksheetLineHere;
 
         FilterGroup := 2;
-        SetRange("Registered Worksheet No.",RegItemWorksheetLine."Registered Worksheet No.");
-        SetRange("Registered Worksheet Line No.",RegItemWorksheetLine."Line No.");
+        SetRange("Registered Worksheet No.", RegItemWorksheetLine."Registered Worksheet No.");
+        SetRange("Registered Worksheet Line No.", RegItemWorksheetLine."Line No.");
         FilterGroup := 0;
 
         MakeCaptions();
@@ -112,19 +127,19 @@ page 6060048 "Reg. Item Wsht Variety Subpage"
     begin
         Variety1InUse := (RegItemWorksheetLine."Variety 1" <> '') and (RegItemWorksheetLine."Variety 1 Table (New)" <> '');
         if Variety1InUse then
-          FieldCaptionNew[1] := RegItemWorksheetLine."Variety 1" + '; ' + RegItemWorksheetLine."Variety 1 Table (New)";
+            FieldCaptionNew[1] := RegItemWorksheetLine."Variety 1" + '; ' + RegItemWorksheetLine."Variety 1 Table (New)";
 
         Variety2InUse := (RegItemWorksheetLine."Variety 2" <> '') and (RegItemWorksheetLine."Variety 2 Table (New)" <> '');
         if Variety2InUse then
-          FieldCaptionNew[2] := RegItemWorksheetLine."Variety 2" + '; ' + RegItemWorksheetLine."Variety 2 Table (New)";
+            FieldCaptionNew[2] := RegItemWorksheetLine."Variety 2" + '; ' + RegItemWorksheetLine."Variety 2 Table (New)";
 
         Variety3InUse := (RegItemWorksheetLine."Variety 3" <> '') and (RegItemWorksheetLine."Variety 3 Table (New)" <> '');
         if Variety3InUse then
-          FieldCaptionNew[3] := RegItemWorksheetLine."Variety 3" + '; ' + RegItemWorksheetLine."Variety 3 Table (New)";
+            FieldCaptionNew[3] := RegItemWorksheetLine."Variety 3" + '; ' + RegItemWorksheetLine."Variety 3 Table (New)";
 
         Variety4InUse := (RegItemWorksheetLine."Variety 4" <> '') and (RegItemWorksheetLine."Variety 4 Table (New)" <> '');
         if Variety4InUse then
-          FieldCaptionNew[4] := RegItemWorksheetLine."Variety 4" + '; ' + RegItemWorksheetLine."Variety 4 Table (New)";
+            FieldCaptionNew[4] := RegItemWorksheetLine."Variety 4" + '; ' + RegItemWorksheetLine."Variety 4 Table (New)";
     end;
 
     procedure UpdateSubPage()

@@ -16,8 +16,9 @@ page 6150674 "POS Prepayment Invoices"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     var
@@ -27,18 +28,22 @@ page 6150674 "POS Prepayment Invoices"
                         PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                     end;
                 }
-                field("Due Date";"Due Date")
+                field("Due Date"; "Due Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field(FullyPaid;FullyPaid)
+                field(FullyPaid; FullyPaid)
                 {
+                    ApplicationArea = All;
                     Caption = 'Fully Paid';
                 }
-                field(RemainingAmount;RemainingAmount)
+                field(RemainingAmount; RemainingAmount)
                 {
+                    ApplicationArea = All;
                     Caption = 'Remaining Payment';
                 }
             }
@@ -70,7 +75,7 @@ page 6150674 "POS Prepayment Invoices"
         CustLedgerEntry.SetRange("Document No.", "No.");
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
         if not CustLedgerEntry.FindFirst then
-          exit;
+            exit;
 
         RemainingAmount := CustLedgerEntry."Remaining Amt. (LCY)";
         FullyPaid := not CustLedgerEntry.Open;

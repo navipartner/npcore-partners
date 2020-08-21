@@ -10,14 +10,17 @@ page 6014444 "Quantity Discount Line"
         {
             repeater(Group)
             {
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field(Total;Total)
+                field(Total; Total)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

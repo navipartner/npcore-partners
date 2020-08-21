@@ -27,27 +27,35 @@ page 6059897 "Data Log Setup"
             {
                 field("Table ID"; "Table ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Log Insertion"; "Log Insertion")
                 {
+                    ApplicationArea = All;
                 }
                 field("Log Modification"; "Log Modification")
                 {
+                    ApplicationArea = All;
                 }
                 field("Log Deletion"; "Log Deletion")
                 {
+                    ApplicationArea = All;
                 }
                 field("Keep Log for"; "Keep Log for")
                 {
+                    ApplicationArea = All;
                 }
                 field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

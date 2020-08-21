@@ -15,32 +15,41 @@ page 6184500 "CleanCash Setup List"
         {
             repeater(Group)
             {
-                field(Register;Register)
+                field(Register; Register)
                 {
+                    ApplicationArea = All;
                 }
-                field("Connection String";"Connection String")
+                field("Connection String"; "Connection String")
                 {
+                    ApplicationArea = All;
                 }
-                field("Run Local";"Run Local")
+                field("Run Local"; "Run Local")
                 {
+                    ApplicationArea = All;
                 }
-                field("Organization ID";"Organization ID")
+                field("Organization ID"; "Organization ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Register No.";"CleanCash Register No.")
+                field("CleanCash Register No."; "CleanCash Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Z Report Time";"Last Z Report Time")
+                field("Last Z Report Time"; "Last Z Report Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Multi Organization ID Per POS";"Multi Organization ID Per POS")
+                field("Multi Organization ID Per POS"; "Multi Organization ID Per POS")
                 {
+                    ApplicationArea = All;
                 }
-                field(Training;Training)
+                field(Training; Training)
                 {
+                    ApplicationArea = All;
                 }
-                field("Show Error Message";"Show Error Message")
+                field("Show Error Message"; "Show Error Message")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

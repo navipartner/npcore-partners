@@ -14,6 +14,7 @@ page 6059963 "MPOS QR Code FactBox"
         {
             field("QR code"; "QR code")
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
         }

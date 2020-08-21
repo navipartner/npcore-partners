@@ -14,19 +14,22 @@ page 6060100 "Ean Box Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS View";"POS View")
+                field("POS View"; "POS View")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014402;"Ean Box Setup Events")
+            part(Control6014402; "Ean Box Setup Events")
             {
-                SubPageLink = "Setup Code"=FIELD(Code);
+                SubPageLink = "Setup Code" = FIELD(Code);
             }
         }
     }

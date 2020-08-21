@@ -10,9 +10,9 @@ page 6014527 "Touch Screen - G/L Accounts"
     SourceTable = "G/L Account";
     SourceTableView = SORTING("Search Name")
                       ORDER(Ascending)
-                      WHERE("No."=FILTER(<>''),
-                            Blocked=CONST(false),
-                            "Retail Payment"=CONST(true));
+                      WHERE("No." = FILTER(<> ''),
+                            Blocked = CONST(false),
+                            "Retail Payment" = CONST(true));
 
     layout
     {
@@ -21,11 +21,13 @@ page 6014527 "Touch Screen - G/L Accounts"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

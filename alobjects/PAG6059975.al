@@ -16,109 +16,140 @@ page 6059975 "Variety Fields Setup"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Disabled;Disabled)
+                field(Disabled; Disabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Matrix Subscriber 1";"Variety Matrix Subscriber 1")
+                field("Variety Matrix Subscriber 1"; "Variety Matrix Subscriber 1")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sort Order";"Sort Order")
+                field("Sort Order"; "Sort Order")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Validate Field";"Validate Field")
+                field("Validate Field"; "Validate Field")
                 {
+                    ApplicationArea = All;
                 }
-                field("Editable Field";"Editable Field")
+                field("Editable Field"; "Editable Field")
                 {
+                    ApplicationArea = All;
                 }
-                field("Is Table Default";"Is Table Default")
+                field("Is Table Default"; "Is Table Default")
                 {
+                    ApplicationArea = All;
                 }
-                field("OnDrillDown Codeunit ID";"OnDrillDown Codeunit ID")
+                field("OnDrillDown Codeunit ID"; "OnDrillDown Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Use Location Filter";"Use Location Filter")
+                field("Use Location Filter"; "Use Location Filter")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Use Global Dim 1 Filter";"Use Global Dim 1 Filter")
+                field("Use Global Dim 1 Filter"; "Use Global Dim 1 Filter")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Use Global Dim 2 Filter";"Use Global Dim 2 Filter")
+                field("Use Global Dim 2 Filter"; "Use Global Dim 2 Filter")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Secondary Type";"Secondary Type")
+                field("Secondary Type"; "Secondary Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Secondary Table No.";"Secondary Table No.")
+                field("Secondary Table No."; "Secondary Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Secondary Field No.";"Secondary Field No.")
+                field("Secondary Field No."; "Secondary Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety Matrix Subscriber 2";"Variety Matrix Subscriber 2")
+                field("Variety Matrix Subscriber 2"; "Variety Matrix Subscriber 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Secondary Description";"Secondary Description")
+                field("Secondary Description"; "Secondary Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Location Filter (Sec)";"Use Location Filter (Sec)")
+                field("Use Location Filter (Sec)"; "Use Location Filter (Sec)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Use Global Dim 1 Filter (Sec)";"Use Global Dim 1 Filter (Sec)")
+                field("Use Global Dim 1 Filter (Sec)"; "Use Global Dim 1 Filter (Sec)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Use Global Dim 2 Filter (Sec)";"Use Global Dim 2 Filter (Sec)")
+                field("Use Global Dim 2 Filter (Sec)"; "Use Global Dim 2 Filter (Sec)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("OnLookup Subscriber";"OnLookup Subscriber")
+                field("OnLookup Subscriber"; "OnLookup Subscriber")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use OnLookup Return Value";"Use OnLookup Return Value")
+                field("Use OnLookup Return Value"; "Use OnLookup Return Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("OnDrillDown Subscriber";"OnDrillDown Subscriber")
+                field("OnDrillDown Subscriber"; "OnDrillDown Subscriber")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use OnDrillDown Return Value";"Use OnDrillDown Return Value")
+                field("Use OnDrillDown Return Value"; "Use OnDrillDown Return Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lookup Type";"Lookup Type")
+                field("Lookup Type"; "Lookup Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Lookup Object No.";"Lookup Object No.")
+                field("Lookup Object No."; "Lookup Object No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Call Codeunit with rec";"Call Codeunit with rec")
+                field("Call Codeunit with rec"; "Call Codeunit with rec")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Function Identifier";"Function Identifier")
+                field("Function Identifier"; "Function Identifier")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Field Type Name";"Field Type Name")
+                field("Field Type Name"; "Field Type Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

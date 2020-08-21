@@ -14,14 +14,17 @@ page 6184891 "Storage Setup"
         {
             repeater(Group)
             {
-                field("Storage Type";"Storage Type")
+                field("Storage Type"; "Storage Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Storage ID";"Storage ID")
+                field("Storage ID"; "Storage ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -14,39 +14,48 @@ page 6060090 "MM Admission Service Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Validate Members";"Validate Members")
+                field("Validate Members"; "Validate Members")
                 {
+                    ApplicationArea = All;
                 }
-                field("Validate Tickes";"Validate Tickes")
+                field("Validate Tickes"; "Validate Tickes")
                 {
+                    ApplicationArea = All;
                 }
-                field("Validate Re-Scan";"Validate Re-Scan")
+                field("Validate Re-Scan"; "Validate Re-Scan")
                 {
+                    ApplicationArea = All;
                 }
-                field("Validate Scanner Station";"Validate Scanner Station")
+                field("Validate Scanner Station"; "Validate Scanner Station")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allowed Re-Scan Interval";"Allowed Re-Scan Interval")
+                field("Allowed Re-Scan Interval"; "Allowed Re-Scan Interval")
                 {
+                    ApplicationArea = All;
                 }
-                field("Web Service Is Published";"Web Service Is Published")
+                field("Web Service Is Published"; "Web Service Is Published")
                 {
+                    ApplicationArea = All;
                 }
-                field("Guest Avatar";"Guest Avatar")
+                field("Guest Avatar"; "Guest Avatar")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Turnstile)
             {
                 Caption = 'Turnstile';
-                field("Turnstile Default Image";"Turnstile Default Image")
+                field("Turnstile Default Image"; "Turnstile Default Image")
                 {
+                    ApplicationArea = All;
                 }
-                field("Turnstile Error Image";"Turnstile Error Image")
+                field("Turnstile Error Image"; "Turnstile Error Image")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Turnstiles;"MM Admission Scanner Stations")
+            part(Turnstiles; "MM Admission Scanner Stations")
             {
                 Caption = 'Turnstiles';
                 ShowFilter = false;

@@ -13,7 +13,7 @@ page 6151485 "Magento Top 10 SalesPerson"
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search E-Mail")
                       ORDER(Descending)
-                      WHERE("Sales (Qty.)"=FILTER(<>0));
+                      WHERE("Sales (Qty.)" = FILTER(<> 0));
 
     layout
     {
@@ -21,31 +21,36 @@ page 6151485 "Magento Top 10 SalesPerson"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         //-MAG1.22
                         //PAGE.RUN(6014428,REC);
                         SalesPerson.Get(Code);
-                        PAGE.Run(PAGE::"Salesperson Card",SalesPerson);
+                        PAGE.Run(PAGE::"Salesperson Card", SalesPerson);
                         //+MAG1.22
                     end;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales (LCY)";"Sales (LCY)")
+                field("Sales (LCY)"; "Sales (LCY)")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Sales Amount (Actual)';
                 }
-                field("Sales (Qty.)";"Sales (Qty.)")
+                field("Sales (Qty.)"; "Sales (Qty.)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Search E-Mail";"Search E-Mail")
+                field("Search E-Mail"; "Search E-Mail")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -76,7 +81,7 @@ page 6151485 "Magento Top 10 SalesPerson"
 
                     trigger OnAction()
                     begin
-                        PeriodType := PeriodType::Week ;
+                        PeriodType := PeriodType::Week;
                         UpdateList;
                     end;
                 }
@@ -135,25 +140,25 @@ page 6151485 "Magento Top 10 SalesPerson"
         DeleteAll;
         Setdate;
         Clear(Query1);
-        Query1.SetFilter(Query1.Date_Filter,'%1..%2',StartDate,Enddate);
+        Query1.SetFilter(Query1.Date_Filter, '%1..%2', StartDate, Enddate);
         Query1.Open;
         while Query1.Read do begin
-          SalesPerson.Get(Query1.Code);
-          TransferFields(SalesPerson);
-          //-MAG1.22
-          if Insert then;
-          //+MAG1.22
-          SetFilter("Date Filter",'%1..%2',StartDate,Enddate);
-          CalcFields("Sales (Qty.)");
+            SalesPerson.Get(Query1.Code);
+            TransferFields(SalesPerson);
+            //-MAG1.22
+            if Insert then;
+            //+MAG1.22
+            SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+            CalcFields("Sales (Qty.)");
 
-          //-MAG1.22
-          //"Search E-Mail" := FORMAT(ROUND("Sales (Qty.)",0.01) * 100);
-          "Search E-Mail" := Format(Round(-"Sales (Qty.)",0.01) * 100,20,1);
-          "Search E-Mail" := PadStr('',15 - StrLen("Search E-Mail"),'0') + "Search E-Mail";
-          Modify;
-          //+MAG1.22
+            //-MAG1.22
+            //"Search E-Mail" := FORMAT(ROUND("Sales (Qty.)",0.01) * 100);
+            "Search E-Mail" := Format(Round(-"Sales (Qty.)", 0.01) * 100, 20, 1);
+            "Search E-Mail" := PadStr('', 15 - StrLen("Search E-Mail"), '0') + "Search E-Mail";
+            Modify;
+            //+MAG1.22
         end;
-         Query1.Close;
+        Query1.Close;
     end;
 
     local procedure Setdate()
@@ -161,31 +166,31 @@ page 6151485 "Magento Top 10 SalesPerson"
         DatePeriod: Record Date;
     begin
         case PeriodType of
-          PeriodType::Day :
-           begin
-            StartDate := CurrDate;
-            Enddate := CurrDate;
-           end;
-          PeriodType::Week :
-           begin
-            StartDate := CalcDate('<-CW>',CurrDate);
-            Enddate := CalcDate('<CW>',CurrDate);
-           end;
-          PeriodType::Month :
-           begin
-            StartDate := CalcDate('<-CM>',CurrDate);
-            Enddate := CalcDate('<CM>',CurrDate);
-           end;
-          PeriodType::Quarter :
-          begin
-            StartDate := CalcDate('<-CQ>',CurrDate);
-            Enddate := CalcDate('<CQ>',CurrDate);
-          end;
-          PeriodType::Year :
-          begin
-            StartDate := CalcDate('<-CY>',CurrDate);
-            Enddate := CalcDate('<CY>',CurrDate);
-          end;
+            PeriodType::Day:
+                begin
+                    StartDate := CurrDate;
+                    Enddate := CurrDate;
+                end;
+            PeriodType::Week:
+                begin
+                    StartDate := CalcDate('<-CW>', CurrDate);
+                    Enddate := CalcDate('<CW>', CurrDate);
+                end;
+            PeriodType::Month:
+                begin
+                    StartDate := CalcDate('<-CM>', CurrDate);
+                    Enddate := CalcDate('<CM>', CurrDate);
+                end;
+            PeriodType::Quarter:
+                begin
+                    StartDate := CalcDate('<-CQ>', CurrDate);
+                    Enddate := CalcDate('<CQ>', CurrDate);
+                end;
+            PeriodType::Year:
+                begin
+                    StartDate := CalcDate('<-CY>', CurrDate);
+                    Enddate := CalcDate('<CY>', CurrDate);
+                end;
         end;
     end;
 }

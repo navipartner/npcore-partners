@@ -17,16 +17,19 @@ page 6151486 "M2 Value Buffer List"
         {
             repeater(Group)
             {
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                     Visible = ShowValue;
                 }
-                field(Label;Label)
+                field(Label; Label)
                 {
+                    ApplicationArea = All;
                     Visible = ShowLabel;
                 }
-                field(Position;Position)
+                field(Position; Position)
                 {
+                    ApplicationArea = All;
                     Visible = ShowPosition;
                 }
             }
@@ -64,12 +67,12 @@ page 6151486 "M2 Value Buffer List"
 
     procedure GetSourceTable(var M2ValueBuffer2: Record "M2 Value Buffer" temporary)
     begin
-        M2ValueBuffer2.Copy(Rec,true);
+        M2ValueBuffer2.Copy(Rec, true);
     end;
 
     procedure SetSourceTable(var M2ValueBuffer2: Record "M2 Value Buffer" temporary)
     begin
-        Rec.Copy(M2ValueBuffer2,true);
+        Rec.Copy(M2ValueBuffer2, true);
     end;
 }
 

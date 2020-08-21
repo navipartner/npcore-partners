@@ -19,35 +19,45 @@ page 6060139 "MM Create Membership"
             repeater(Group)
             {
                 Editable = false;
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From Base";"Valid From Base")
+                field("Valid From Base"; "Valid From Base")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Cut-Off Date Calculation";"Sales Cut-Off Date Calculation")
+                field("Sales Cut-Off Date Calculation"; "Sales Cut-Off Date Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From Date Calculation";"Valid From Date Calculation")
+                field("Valid From Date Calculation"; "Valid From Date Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid Until Calculation";"Valid Until Calculation")
+                field("Valid Until Calculation"; "Valid Until Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Duration Formula";"Duration Formula")
+                field("Duration Formula"; "Duration Formula")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -67,7 +77,7 @@ page 6060139 "MM Create Membership"
 
                 trigger OnAction()
                 begin
-                    CreateMembership ();
+                    CreateMembership();
                 end;
             }
         }
@@ -90,7 +100,7 @@ page 6060139 "MM Create Membership"
                 Caption = 'Memberships';
                 Image = List;
                 RunObject = Page "MM Memberships";
-                RunPageLink = "Membership Code"=FIELD("Membership Code");
+                RunPageLink = "Membership Code" = FIELD("Membership Code");
             }
             action("Community Setup")
             {
@@ -126,7 +136,7 @@ page 6060139 "MM Create Membership"
         //  MembershipPage.RUN ();
         // END;
 
-        MembershipSalesSetup.CreateMembership (Rec);
+        MembershipSalesSetup.CreateMembership(Rec);
         //+MM1.40 [363147]
     end;
 }

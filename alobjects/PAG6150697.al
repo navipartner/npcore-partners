@@ -13,40 +13,51 @@ page 6150697 "NPRE Kitchen Req. Source Links"
         {
             repeater(Group)
             {
-                field("Request No.";"Request No.")
+                field("Request No."; "Request No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Document Type";"Source Document Type")
+                field("Source Document Type"; "Source Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Document Subtype";"Source Document Subtype")
+                field("Source Document Subtype"; "Source Document Subtype")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Source Document No.";"Source Document No.")
+                field("Source Document No."; "Source Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Document Line No.";"Source Document Line No.")
+                field("Source Document Line No."; "Source Document Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity (Base)";"Quantity (Base)")
+                field("Quantity (Base)"; "Quantity (Base)")
                 {
+                    ApplicationArea = All;
                 }
-                field(Context;Context)
+                field(Context; Context)
                 {
+                    ApplicationArea = All;
                 }
-                field("Serving Step";"Serving Step")
+                field("Serving Step"; "Serving Step")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Created Date-Time";"Created Date-Time")
+                field("Created Date-Time"; "Created Date-Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -13,14 +13,17 @@ page 6014582 "Store Groups"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blank Location";"Blank Location")
+                field("Blank Location"; "Blank Location")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

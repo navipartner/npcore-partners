@@ -11,9 +11,9 @@ page 6014480 "Object List"
     PageType = List;
     PromotedActionCategories = 'Types,Action,Reports_caption,Category4_caption,Category5_caption,Category6_caption,Category7_caption,Category8_caption,Category9_caption,Category10_caption';
     SourceTable = AllObj;
-    SourceTableView = SORTING("Object Type","Object ID")
+    SourceTableView = SORTING("Object Type", "Object ID")
                       ORDER(Ascending)
-                      WHERE("Object Type"=FILTER(<>TableData));
+                      WHERE("Object Type" = FILTER(<> TableData));
     UsageCategory = Administration;
 
     layout
@@ -23,14 +23,17 @@ page 6014480 "Object List"
             repeater(Control1160150004)
             {
                 ShowCaption = false;
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object ID";"Object ID")
+                field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Name";"Object Name")
+                field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -52,7 +55,7 @@ page 6014480 "Object List"
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type",ObjectTypeOpt::Table);
+                        SetRange("Object Type", ObjectTypeOpt::Table);
                     end;
                 }
                 action("CodeUnit")
@@ -64,7 +67,7 @@ page 6014480 "Object List"
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type",ObjectTypeOpt::Codeunit);
+                        SetRange("Object Type", ObjectTypeOpt::Codeunit);
                     end;
                 }
                 action("Report")
@@ -76,7 +79,7 @@ page 6014480 "Object List"
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type",ObjectTypeOpt::Report);
+                        SetRange("Object Type", ObjectTypeOpt::Report);
                     end;
                 }
                 action("Page")
@@ -88,7 +91,7 @@ page 6014480 "Object List"
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type",ObjectTypeOpt::Page);
+                        SetRange("Object Type", ObjectTypeOpt::Page);
                     end;
                 }
                 action("XMLPort")
@@ -100,7 +103,7 @@ page 6014480 "Object List"
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type",ObjectTypeOpt::XMLPort);
+                        SetRange("Object Type", ObjectTypeOpt::XMLPort);
                     end;
                 }
                 action(All)
@@ -137,11 +140,16 @@ page 6014480 "Object List"
                     //IF "Object Type"="Object Type"::XMLport THEN
                     //  XMLPORT.RUN("Object ID");
                     case "Object Type" of
-                      "Object Type"::Table : HyperLink(GetUrl(CLIENTTYPE::Current,CompanyName,OBJECTTYPE::Table,"Object ID"));
-                      "Object Type"::Page : PAGE.Run("Object ID");
-                      "Object Type"::Report : REPORT.Run("Object ID");
-                      "Object Type"::Codeunit : CODEUNIT.Run("Object ID");
-                      "Object Type"::XMLport : XMLPORT.Run("Object ID");
+                        "Object Type"::Table:
+                            HyperLink(GetUrl(CLIENTTYPE::Current, CompanyName, OBJECTTYPE::Table, "Object ID"));
+                        "Object Type"::Page:
+                            PAGE.Run("Object ID");
+                        "Object Type"::Report:
+                            REPORT.Run("Object ID");
+                        "Object Type"::Codeunit:
+                            CODEUNIT.Run("Object ID");
+                        "Object Type"::XMLport:
+                            XMLPORT.Run("Object ID");
                     end;
                     //+NPR70.00.01.01
                 end;

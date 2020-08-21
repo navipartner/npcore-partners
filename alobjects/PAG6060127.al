@@ -34,43 +34,56 @@ page 6060127 "MM Memberships"
             {
                 field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Issued Date"; "Issued Date")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
                 field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
                 field("Auto-Renew"; "Auto-Renew")
                 {
+                    ApplicationArea = All;
                 }
                 field("Auto-Renew Payment Method Code"; "Auto-Renew Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(DisplayName; DisplayName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Member Display Name';
                 }
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -78,12 +91,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (1);
+                        SetMasterDataAttributeValue(1);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -91,12 +105,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (2);
+                        SetMasterDataAttributeValue(2);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -104,12 +119,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (3);
+                        SetMasterDataAttributeValue(3);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -117,12 +133,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (4);
+                        SetMasterDataAttributeValue(4);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -130,12 +147,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (5);
+                        SetMasterDataAttributeValue(5);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -143,12 +161,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (6);
+                        SetMasterDataAttributeValue(6);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -156,12 +175,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (7);
+                        SetMasterDataAttributeValue(7);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -169,12 +189,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (8);
+                        SetMasterDataAttributeValue(8);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -182,12 +203,13 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (9);
+                        SetMasterDataAttributeValue(9);
                         //+MM1.40 [360242]
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -195,7 +217,7 @@ page 6060127 "MM Memberships"
                     trigger OnValidate()
                     begin
                         //-MM1.40 [360242]
-                        SetMasterDataAttributeValue (10);
+                        SetMasterDataAttributeValue(10);
                         //+MM1.40 [360242]
                     end;
                 }
@@ -266,8 +288,8 @@ page 6060127 "MM Memberships"
                     begin
                         //-MM1.43 [387750]
                         TestField("Customer No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,"Customer No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, "Customer No.");
                         //+MM1.43 [387750]
                     end;
                 }
@@ -287,8 +309,8 @@ page 6060127 "MM Memberships"
                     begin
                         //-MM1.43 [387750]
                         TestField("Customer No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
-                          RaptorMgt.ShowRaptorData(RaptorAction,"Customer No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
+                            RaptorMgt.ShowRaptorData(RaptorAction, "Customer No.");
                         //+MM1.43 [387750]
                     end;
                 }

@@ -16,21 +16,25 @@ page 6184478 "EFT Type Payment Gen. Param."
         {
             repeater(Group)
             {
-                field(ParameterName;ParameterName)
+                field(ParameterName; ParameterName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Name';
                     Editable = false;
                 }
-                field(ParameterDescription;ParameterDescription)
+                field(ParameterDescription; ParameterDescription)
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(ParameterValue;ParameterValue)
+                field(ParameterValue; ParameterValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Value';
                     Editable = "User Configurable";
 
@@ -73,7 +77,7 @@ page 6184478 "EFT Type Payment Gen. Param."
         Clear(ParameterName);
         OnGetParameterNameCaption(Rec, ParameterName);
         if (ParameterName = '') then
-          ParameterName := Name;
+            ParameterName := Name;
     end;
 
     local procedure SetParameterDescription()
@@ -90,11 +94,11 @@ page 6184478 "EFT Type Payment Gen. Param."
         Clear(ParameterValue);
         OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
         if ParameterOptionString = '' then
-          ParameterOptionString := OptionString;
+            ParameterOptionString := OptionString;
         if (ParameterOptionString = '') or ("Data Type" <> "Data Type"::Option) then
-          ParameterValue := Value
+            ParameterValue := Value
         else
-          ParameterValue := GetOptionStringCaption(ParameterOptionString)
+            ParameterValue := GetOptionStringCaption(ParameterOptionString)
     end;
 
     local procedure GetOptionStringCaption(ParameterOptionStringCaption: Text): Text
@@ -105,15 +109,15 @@ page 6184478 "EFT Type Payment Gen. Param."
     begin
         Evaluate(Option, Rec.Value);
         if TrySelectStr(Option, ParameterOptionStringCaption, OptionCaption) then
-          exit(OptionCaption)
+            exit(OptionCaption)
         else
-          exit(Value);
+            exit(Value);
     end;
 
     [TryFunction]
-    local procedure TrySelectStr(Ordinal: Integer;OptionString: Text;var OptionOut: Text)
+    local procedure TrySelectStr(Ordinal: Integer; OptionString: Text; var OptionOut: Text)
     begin
-        OptionOut := SelectStr(Ordinal+1, OptionString);
+        OptionOut := SelectStr(Ordinal + 1, OptionString);
     end;
 }
 

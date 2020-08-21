@@ -16,15 +16,19 @@ page 6014692 "Retail Admin Activities - Tick"
                 Caption = 'Tickets';
                 field("Ticket Types"; "Ticket Types")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ticket Admission BOMs"; "Ticket Admission BOMs")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ticket Schedules"; "Ticket Schedules")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ticket Admissions"; "Ticket Admissions")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

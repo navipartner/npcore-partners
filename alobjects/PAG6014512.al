@@ -20,25 +20,29 @@ page 6014512 "Custom Object Selection Setup"
                 IndentationColumn = Level;
                 IndentationControls = Description;
                 ShowCaption = false;
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         EvaluateObjectType;
                     end;
                 }
-                field("Object ID";"Object ID")
+                field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
                     Enabled = DisableObjectID;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = StrongStyle;
                 }
-                field("Group Code";"Group Code")
+                field("Group Code"; "Group Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -57,8 +61,8 @@ page 6014512 "Custom Object Selection Setup"
                 trigger OnAction()
                 begin
                     if Level > 0 then begin
-                      Level -=1;
-                      Modify(true);
+                        Level -= 1;
+                        Modify(true);
                     end;
                 end;
             }
@@ -70,7 +74,7 @@ page 6014512 "Custom Object Selection Setup"
 
                 trigger OnAction()
                 begin
-                    Level +=1;
+                    Level += 1;
                     Modify(true);
                 end;
             }

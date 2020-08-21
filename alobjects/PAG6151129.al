@@ -12,8 +12,9 @@ page 6151129 "NpIa Item AddOn Line Setup"
         {
             group(General)
             {
-                field("Unit Price % from Master";"Unit Price % from Master")
+                field("Unit Price % from Master"; "Unit Price % from Master")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

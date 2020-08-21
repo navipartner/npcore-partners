@@ -16,18 +16,22 @@ page 6151457 "Magento Attribute Group"
         {
             repeater(Group)
             {
-                field("Attribute Group ID";"Attribute Group ID")
+                field("Attribute Group ID"; "Attribute Group ID")
                 {
-                    TableRelation = "Magento Attribute Group" WHERE ("Attribute Set ID"=FIELD("Attribute Set ID"));
+                    ApplicationArea = All;
+                    TableRelation = "Magento Attribute Group" WHERE("Attribute Set ID" = FIELD("Attribute Set ID"));
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute Set ID";"Attribute Set ID")
+                field("Attribute Set ID"; "Attribute Set ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sort Order";"Sort Order")
+                field("Sort Order"; "Sort Order")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

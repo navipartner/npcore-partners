@@ -17,17 +17,21 @@ page 6151522 "Nc Endpoint FTP List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Server;Server)
+                field(Server; Server)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

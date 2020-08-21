@@ -27,7 +27,7 @@ page 6060152 "Event List"
     Editable = false;
     PageType = List;
     SourceTable = Job;
-    SourceTableView = WHERE(Event=CONST(true));
+    SourceTableView = WHERE(Event = CONST(true));
     UsageCategory = Lists;
 
     layout
@@ -37,93 +37,110 @@ page 6060152 "Event List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Bill-to Customer No.";"Bill-to Customer No.")
+                field("Bill-to Customer No."; "Bill-to Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bill-to Name";"Bill-to Name")
+                field("Bill-to Name"; "Bill-to Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Status";"Event Status")
+                field("Event Status"; "Event Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Person Responsible";"Person Responsible")
+                field("Person Responsible"; "Person Responsible")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Next Invoice Date";"Next Invoice Date")
+                field("Next Invoice Date"; "Next Invoice Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Job Posting Group";"Job Posting Group")
+                field("Job Posting Group"; "Job Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Search Description";"Search Description")
+                field("Search Description"; "Search Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount";"Total Amount")
+                field("Total Amount"; "Total Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Est. Total Amount Incl. VAT";"Est. Total Amount Incl. VAT")
+                field("Est. Total Amount Incl. VAT"; "Est. Total Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Person Responsible Name";"Person Responsible Name")
+                field("Person Responsible Name"; "Person Responsible Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("% of Overdue Planning Lines";PercentOverdue)
+                field("% of Overdue Planning Lines"; PercentOverdue)
                 {
+                    ApplicationArea = All;
                     Caption = '% of Overdue Planning Lines';
                     Editable = false;
                     Visible = false;
                 }
-                field("% Completed";PercentCompleted)
+                field("% Completed"; PercentCompleted)
                 {
+                    ApplicationArea = All;
                     Caption = '% Completed';
                     Editable = false;
                     Visible = false;
                 }
-                field("% Invoiced";PercentInvoiced)
+                field("% Invoiced"; PercentInvoiced)
                 {
+                    ApplicationArea = All;
                     Caption = '% Invoiced';
                     Editable = false;
                     Visible = false;
                 }
-                field("Creation Date";"Creation Date")
+                field("Creation Date"; "Creation Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            part(Control1907234507;"Sales Hist. Bill-to FactBox")
+            part(Control1907234507; "Sales Hist. Bill-to FactBox")
             {
-                SubPageLink = "No."=FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
             }
-            part(Control1902018507;"Customer Statistics FactBox")
+            part(Control1902018507; "Customer Statistics FactBox")
             {
-                SubPageLink = "No."=FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
             }
-            part(Control1905650007;"Job WIP/Recognition FactBox")
+            part(Control1905650007; "Job WIP/Recognition FactBox")
             {
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
                 Visible = true;
             }
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = true;
             }
@@ -146,7 +163,7 @@ page 6060152 "Event List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "Event Task Lines";
-                    RunPageLink = "Job No."=FIELD("No.");
+                    RunPageLink = "Job No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+T';
                 }
                 group("&Dimensions")
@@ -158,13 +175,13 @@ page 6060152 "Event List"
                         Caption = 'Dimensions-&Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID"=CONST(167),
-                                      "No."=FIELD("No.");
+                        RunPageLink = "Table ID" = CONST(167),
+                                      "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
                     }
                     action("Dimensions-&Multiple")
                     {
-                        AccessByPermission = TableData Dimension=R;
+                        AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
 
@@ -176,7 +193,7 @@ page 6060152 "Event List"
                             CurrPage.SetSelectionFilter(Job);
                             //-NPR5.50 [353381]
                             //DefaultDimMultiple.SetMultiJob(Job);
-                            DefaultDimMultiple.SetMultiRecord(Job,Job.FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Job, Job.FieldNo("No."));
                             //+NPR5.50 [353381]
                             DefaultDimMultiple.RunModal;
                         end;
@@ -189,7 +206,7 @@ page 6060152 "Event List"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "Event Statistics";
-                    RunPageLink = "No."=FIELD("No.");
+                    RunPageLink = "No." = FIELD("No.");
                     ShortCutKey = 'F7';
                 }
                 action(SalesDocuments)
@@ -219,8 +236,8 @@ page 6060152 "Event List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name"=CONST(Job),
-                                  "No."=FIELD("No.");
+                    RunPageLink = "Table Name" = CONST(Job),
+                                  "No." = FIELD("No.");
                 }
                 action(ActivityLog)
                 {
@@ -243,7 +260,7 @@ page 6060152 "Event List"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "Event Attributes";
-                    RunPageLink = "Job No."=FIELD("No.");
+                    RunPageLink = "Job No." = FIELD("No.");
 
                     trigger OnAction()
                     begin
@@ -284,7 +301,7 @@ page 6060152 "Event List"
                         EventExchIntTempEntries: Page "Event Exch. Int. Temp. Entries";
                         EventExchIntTempEntry: Record "Event Exch. Int. Temp. Entry";
                     begin
-                        EventExchIntTempEntry.SetRange("Source Record ID",Rec.RecordId);
+                        EventExchIntTempEntry.SetRange("Source Record ID", Rec.RecordId);
                         EventExchIntTempEntries.SetTableView(EventExchIntTempEntry);
                         EventExchIntTempEntries.Run;
                     end;
@@ -311,21 +328,21 @@ page 6060152 "Event List"
                     Caption = '&Resource';
                     Image = Resource;
                     RunObject = Page "Job Resource Prices";
-                    RunPageLink = "Job No."=FIELD("No.");
+                    RunPageLink = "Job No." = FIELD("No.");
                 }
                 action("&Item")
                 {
                     Caption = '&Item';
                     Image = Item;
                     RunObject = Page "Job Item Prices";
-                    RunPageLink = "Job No."=FIELD("No.");
+                    RunPageLink = "Job No." = FIELD("No.");
                 }
                 action("&G/L Account")
                 {
                     Caption = '&G/L Account';
                     Image = JobPrice;
                     RunObject = Page "Job G/L Account Prices";
-                    RunPageLink = "Job No."=FIELD("No.");
+                    RunPageLink = "Job No." = FIELD("No.");
                 }
             }
             group("Plan&ning")
@@ -356,8 +373,8 @@ page 6060152 "Event List"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "Job Ledger Entries";
-                    RunPageLink = "Job No."=FIELD("No.");
-                    RunPageView = SORTING("Job No.","Job Task No.","Entry Type","Posting Date");
+                    RunPageLink = "Job No." = FIELD("No.");
+                    RunPageView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                 }
             }
@@ -405,9 +422,9 @@ page 6060152 "Event List"
                         EventCopy.SetFromJob(Rec);
                         EventCopy.RunModal;
                         if EventCopy.GetConfirmAnswer then begin
-                          EventCopy.GetTargetJob(NewJob);
-                          EventCard.SetTableView(NewJob);
-                          EventCard.Run;
+                            EventCopy.GetTargetJob(NewJob);
+                            EventCard.SetTableView(NewJob);
+                            EventCard.Run;
                         end;
                         //+NPR5.32 [275974]
 
@@ -426,7 +443,7 @@ page 6060152 "Event List"
                         JobTask: Record "Job Task";
                     begin
                         //-NPR5.36 [287804]
-                        JobTask.SetRange("Job No.",Rec."No.");
+                        JobTask.SetRange("Job No.", Rec."No.");
                         JobCreateSalesInvoice.SetTableView(JobTask);
                         JobCreateSalesInvoice.Run;
                         //+NPR5.36 [287804]
@@ -447,7 +464,7 @@ page 6060152 "Event List"
                     begin
                         //-NPR5.31 [269162]
                         //EventCopy.SetFromEvent(Rec,0);
-                        EventCopy.SetFromEvent("No.",0);
+                        EventCopy.SetFromEvent("No.", 0);
                         //+NPR5.31 [269162]
                         EventCopy.RunModal;
                     end;
@@ -505,7 +522,7 @@ page 6060152 "Event List"
                         begin
                             //-NPR5.55 [374887]
                             //EventEmailMgt.SendEMail(Rec,0);
-                            EventEmailMgt.SendEMail(Rec,0,0);
+                            EventEmailMgt.SendEMail(Rec, 0, 0);
                             //+NPR5.55 [374887]
                             CurrPage.Update(false);
                         end;
@@ -520,7 +537,7 @@ page 6060152 "Event List"
                         begin
                             //-NPR5.55 [374887]
                             //EventEmailMgt.SendEMail(Rec,1);
-                            EventEmailMgt.SendEMail(Rec,1,0);
+                            EventEmailMgt.SendEMail(Rec, 1, 0);
                             //+NPR5.55 [374887]
                             CurrPage.Update(false);
                         end;

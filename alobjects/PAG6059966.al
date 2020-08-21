@@ -16,38 +16,49 @@ page 6059966 "MPOS Nets Transactions List"
         {
             repeater(Group)
             {
-                field("Transaction No.";"Transaction No.")
+                field("Transaction No."; "Transaction No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Line No.";"Sales Line No.")
+                field("Sales Line No."; "Sales Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Session Id";"Session Id")
+                field("Session Id"; "Session Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Merchant Reference";"Merchant Reference")
+                field("Merchant Reference"; "Merchant Reference")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Callback Result";"Callback Result")
+                field("Callback Result"; "Callback Result")
                 {
+                    ApplicationArea = All;
                 }
-                field("Callback StatusDescription";"Callback StatusDescription")
+                field("Callback StatusDescription"; "Callback StatusDescription")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created Date";"Created Date")
+                field("Created Date"; "Created Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("EFT Transaction Entry No.";"EFT Transaction Entry No.")
+                field("EFT Transaction Entry No."; "EFT Transaction Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

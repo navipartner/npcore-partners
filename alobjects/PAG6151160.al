@@ -5,7 +5,7 @@ page 6151160 "MM Loyalty Store Setup Server"
     Caption = 'Loyalty Store Setup (Server)';
     PageType = List;
     SourceTable = "MM Loyalty Store Setup";
-    SourceTableView = WHERE(Setup=CONST(SERVER));
+    SourceTableView = WHERE(Setup = CONST(SERVER));
 
     layout
     {
@@ -13,56 +13,73 @@ page 6151160 "MM Loyalty Store Setup Server"
         {
             repeater(Group)
             {
-                field(Setup;Setup)
+                field(Setup; Setup)
                 {
+                    ApplicationArea = All;
                 }
-                field("Client Company Name";"Client Company Name")
+                field("Client Company Name"; "Client Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Code";"Store Code")
+                field("Store Code"; "Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Code";"Unit Code")
+                field("Unit Code"; "Unit Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Authorization Code";"Authorization Code")
+                field("Authorization Code"; "Authorization Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Accept Client Transactions";"Accept Client Transactions")
+                field("Accept Client Transactions"; "Accept Client Transactions")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Name";"Customer Name")
+                field("Customer Name"; "Customer Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Model";"Posting Model")
+                field("Posting Model"; "Posting Model")
                 {
+                    ApplicationArea = All;
                 }
-                field("Loyalty Setup Code";"Loyalty Setup Code")
+                field("Loyalty Setup Code"; "Loyalty Setup Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Burn Points Currency Code";"Burn Points Currency Code")
+                field("Burn Points Currency Code"; "Burn Points Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("G/L Account No.";"G/L Account No.")
+                field("G/L Account No."; "G/L Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Invoice No. Series";"Invoice No. Series")
+                field("Invoice No. Series"; "Invoice No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reconciliation Period";"Reconciliation Period")
+                field("Reconciliation Period"; "Reconciliation Period")
                 {
+                    ApplicationArea = All;
                 }
-                field("Outstanding Earn Points";"Outstanding Earn Points")
+                field("Outstanding Earn Points"; "Outstanding Earn Points")
                 {
+                    ApplicationArea = All;
                 }
-                field("Outstanding Burn Points";"Outstanding Burn Points")
+                field("Outstanding Burn Points"; "Outstanding Burn Points")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -80,9 +97,9 @@ page 6151160 "MM Loyalty Store Setup Server"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "MM Loyalty Server Trans. Log";
-                RunPageLink = "Company Name"=FIELD("Client Company Name"),
-                              "POS Store Code"=FIELD("Store Code"),
-                              "POS Unit Code"=FIELD("Unit Code");
+                RunPageLink = "Company Name" = FIELD("Client Company Name"),
+                              "POS Store Code" = FIELD("Store Code"),
+                              "POS Unit Code" = FIELD("Unit Code");
             }
         }
         area(processing)
@@ -100,7 +117,7 @@ page 6151160 "MM Loyalty Store Setup Server"
                     LoyaltyPointsMgrServer: Codeunit "MM Loyalty Points Mgr (Server)";
                 begin
 
-                    LoyaltyPointsMgrServer.InvoiceAllStorePoints ();
+                    LoyaltyPointsMgrServer.InvoiceAllStorePoints();
                 end;
             }
             action("Reconcile Selected Store")
@@ -116,7 +133,7 @@ page 6151160 "MM Loyalty Store Setup Server"
                     LoyaltyPointsMgrServer: Codeunit "MM Loyalty Points Mgr (Server)";
                 begin
 
-                    LoyaltyPointsMgrServer.InvoiceOneStorePoints (Rec);
+                    LoyaltyPointsMgrServer.InvoiceOneStorePoints(Rec);
                 end;
             }
         }

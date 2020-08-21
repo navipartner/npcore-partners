@@ -17,24 +17,30 @@ page 6060075 "MM Membership Auto-Renew Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Entry No.";"Membership Entry No.")
+                field("Membership Entry No."; "Membership Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("External Membership No.";"External Membership No.")
+                field("External Membership No."; "External Membership No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response Status";"Response Status")
+                field("Response Status"; "Response Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Response Message";"Response Message")
+                field("Response Message"; "Response Message")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -52,7 +58,7 @@ page 6060075 "MM Membership Auto-Renew Log"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "MM Membership Card";
-                RunPageLink = "Entry No."=FIELD("Membership Entry No.");
+                RunPageLink = "Entry No." = FIELD("Membership Entry No.");
             }
         }
     }

@@ -13,8 +13,9 @@ page 6151561 "NpXml Field Value Buffer"
         {
             repeater(Group)
             {
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

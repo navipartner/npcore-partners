@@ -14,30 +14,38 @@ page 6151124 "GDPR Consent Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Entry Approval State";"Entry Approval State")
+                field("Entry Approval State"; "Entry Approval State")
                 {
+                    ApplicationArea = All;
                 }
-                field("State Change";"State Change")
+                field("State Change"; "State Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From Date";"Valid From Date")
+                field("Valid From Date"; "Valid From Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Agreement No.";"Agreement No.")
+                field("Agreement No."; "Agreement No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Agreement Version";"Agreement Version")
+                field("Agreement Version"; "Agreement Version")
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Subject Id";"Data Subject Id")
+                field("Data Subject Id"; "Data Subject Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Changed By";"Last Changed By")
+                field("Last Changed By"; "Last Changed By")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -57,15 +65,15 @@ page 6151124 "GDPR Consent Log"
 
                 trigger OnAction()
                 begin
-                    FilterGroup (2);
+                    FilterGroup(2);
                     if ("Agreement No." = '') then
-                      "Agreement No." := GetFilter ("Agreement No.");
+                        "Agreement No." := GetFilter("Agreement No.");
 
                     if ("Data Subject Id" = '') then
-                      "Data Subject Id" := GetFilter ("Data Subject Id");
-                    FilterGroup (0);
+                        "Data Subject Id" := GetFilter("Data Subject Id");
+                    FilterGroup(0);
 
-                    GDPRManagement.CreateAgreementAcceptEntry ("Agreement No.", 0, "Data Subject Id");
+                    GDPRManagement.CreateAgreementAcceptEntry("Agreement No.", 0, "Data Subject Id");
                 end;
             }
             action(Reject)
@@ -79,15 +87,15 @@ page 6151124 "GDPR Consent Log"
                 trigger OnAction()
                 begin
 
-                    FilterGroup (2);
+                    FilterGroup(2);
                     if ("Agreement No." = '') then
-                      "Agreement No." := GetFilter ("Agreement No.");
+                        "Agreement No." := GetFilter("Agreement No.");
 
                     if ("Data Subject Id" = '') then
-                      "Data Subject Id" := GetFilter ("Data Subject Id");
-                    FilterGroup (0);
+                        "Data Subject Id" := GetFilter("Data Subject Id");
+                    FilterGroup(0);
 
-                    GDPRManagement.CreateAgreementRejectEntry ("Agreement No.", 0, "Data Subject Id");
+                    GDPRManagement.CreateAgreementRejectEntry("Agreement No.", 0, "Data Subject Id");
                 end;
             }
             action(Pending)
@@ -101,15 +109,15 @@ page 6151124 "GDPR Consent Log"
                 trigger OnAction()
                 begin
 
-                    FilterGroup (2);
+                    FilterGroup(2);
                     if ("Agreement No." = '') then
-                      "Agreement No." := GetFilter ("Agreement No.");
+                        "Agreement No." := GetFilter("Agreement No.");
 
                     if ("Data Subject Id" = '') then
-                      "Data Subject Id" := GetFilter ("Data Subject Id");
-                    FilterGroup (0);
+                        "Data Subject Id" := GetFilter("Data Subject Id");
+                    FilterGroup(0);
 
-                    GDPRManagement.CreateAgreementPendingEntry ("Agreement No.", 0, "Data Subject Id");
+                    GDPRManagement.CreateAgreementPendingEntry("Agreement No.", 0, "Data Subject Id");
                 end;
             }
         }

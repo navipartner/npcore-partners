@@ -12,8 +12,9 @@ page 6151220 "PrintNode Setup"
         {
             group(General)
             {
-                field("API Key";"API Key")
+                field("API Key"; "API Key")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -42,8 +43,8 @@ page 6151220 "PrintNode Setup"
     begin
         Reset;
         if not Get() then begin
-          Init();
-          Insert(true);
+            Init();
+            Insert(true);
         end;
     end;
 }

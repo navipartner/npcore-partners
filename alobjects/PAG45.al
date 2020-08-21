@@ -1,4 +1,4 @@
-pageextension 6014445 pageextension6014445 extends "Sales List" 
+pageextension 6014445 pageextension6014445 extends "Sales List"
 {
     // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
     //                                     Control "Assigned User ID": property 'Visible' set to false
@@ -11,15 +11,18 @@ pageextension 6014445 pageextension6014445 extends "Sales List"
         }
         addafter("Document Date")
         {
-            field(Amount;Amount)
+            field(Amount; Amount)
             {
+                ApplicationArea = All;
                 Visible = false;
             }
-            field("Amount Including VAT";"Amount Including VAT")
+            field("Amount Including VAT"; "Amount Including VAT")
             {
+                ApplicationArea = All;
             }
-            field(PrepmtAmtInclVAT;PrepmtAmtInclVAT)
+            field(PrepmtAmtInclVAT; PrepmtAmtInclVAT)
             {
+                ApplicationArea = All;
                 AutoFormatExpression = "Currency Code";
                 AutoFormatType = 1;
                 Caption = 'Invoiced Prepmt. Amt. Incl. VAT';
@@ -28,12 +31,13 @@ pageextension 6014445 pageextension6014445 extends "Sales List"
                 begin
                     //-NPR5.53 [360297]
                     if "Document Type" = "Document Type"::Order then
-                      PostedPrepmtDocumentBuffer.ShowPostedDocumentList(RecordId);
+                        PostedPrepmtDocumentBuffer.ShowPostedDocumentList(RecordId);
                     //+NPR5.53 [360297]
                 end;
             }
-            field(RemainingAmtInclVAT;RemainingAmtInclVAT)
+            field(RemainingAmtInclVAT; RemainingAmtInclVAT)
             {
+                ApplicationArea = All;
                 AutoFormatExpression = "Currency Code";
                 AutoFormatType = 1;
                 Caption = 'Remaining Amount Incl. VAT';
@@ -52,16 +56,16 @@ pageextension 6014445 pageextension6014445 extends "Sales List"
 
     //trigger OnAfterGetRecord()
     //begin
-        /*
-        //-NPR5.53 [360297]
-        if "Document Type" = "Document Type"::Order then begin
-          PostedPrepmtDocumentBuffer.Generate(RecordId,true);
-          PrepmtAmtInclVAT := PostedPrepmtDocumentBuffer.TotalAmtInclVAT(RecordId);
-        end else
-          PrepmtAmtInclVAT := 0;
-        RemainingAmtInclVAT := "Amount Including VAT" - PrepmtAmtInclVAT;
-        //+NPR5.53 [360297]
-        */
+    /*
+    //-NPR5.53 [360297]
+    if "Document Type" = "Document Type"::Order then begin
+      PostedPrepmtDocumentBuffer.Generate(RecordId,true);
+      PrepmtAmtInclVAT := PostedPrepmtDocumentBuffer.TotalAmtInclVAT(RecordId);
+    end else
+      PrepmtAmtInclVAT := 0;
+    RemainingAmtInclVAT := "Amount Including VAT" - PrepmtAmtInclVAT;
+    //+NPR5.53 [360297]
+    */
     //end;
 
 
@@ -70,19 +74,19 @@ pageextension 6014445 pageextension6014445 extends "Sales List"
     //trigger OnOpenPage()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        CopySellToCustomerFilter;
-        */
+    /*
+    CopySellToCustomerFilter;
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        CopySellToCustomerFilter;
-        //-NPR5.53 [360297]
-        PostedPrepmtDocumentBuffer.Reset;
-        PostedPrepmtDocumentBuffer.DeleteAll;
-        //+NPR5.53 [360297]
-        */
+    /*
+    CopySellToCustomerFilter;
+    //-NPR5.53 [360297]
+    PostedPrepmtDocumentBuffer.Reset;
+    PostedPrepmtDocumentBuffer.DeleteAll;
+    //+NPR5.53 [360297]
+    */
     //end;
 }
 

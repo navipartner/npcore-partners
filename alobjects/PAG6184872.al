@@ -13,8 +13,9 @@ page 6184872 "DropBox Dir. Select"
         {
             repeater(Group)
             {
-                field("File Name";"File Name")
+                field("File Name"; "File Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

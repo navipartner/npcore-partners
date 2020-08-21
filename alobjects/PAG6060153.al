@@ -34,24 +34,27 @@ page 6060153 "Event Activities"
             cuegroup(Control7)
             {
                 ShowCaption = false;
-                field("Upcoming Events";"Upcoming Events")
+                field("Upcoming Events"; "Upcoming Events")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         DrillDownPage(FieldNo("Upcoming Events"));
                     end;
                 }
-                field("Completed Events";"Completed Events")
+                field("Completed Events"; "Completed Events")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
                         DrillDownPage(FieldNo("Completed Events"));
                     end;
                 }
-                field("Cancelled Events";"Cancelled Events")
+                field("Cancelled Events"; "Cancelled Events")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin
@@ -70,11 +73,11 @@ page 6060153 "Event Activities"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
 
-        SetFilter("Date Filter",'>=%1',WorkDate);
+        SetFilter("Date Filter", '>=%1', WorkDate);
     end;
 
     local procedure DrillDownPage(FieldNo2: Integer)
@@ -82,11 +85,14 @@ page 6060153 "Event Activities"
         EventList: Page "Event List";
         Job: Record Job;
     begin
-        Job.SetRange("Event",true);
+        Job.SetRange("Event", true);
         case FieldNo2 of
-          Rec.FieldNo("Upcoming Events"): Job.SetFilter("Starting Date",GetFilter("Date Filter"));
-          Rec.FieldNo("Completed Events"): Job.SetRange("Event Status",Job."Event Status"::Completed);
-          Rec.FieldNo("Cancelled Events"): Job.SetRange("Event Status",Job."Event Status"::Cancelled);
+            Rec.FieldNo("Upcoming Events"):
+                Job.SetFilter("Starting Date", GetFilter("Date Filter"));
+            Rec.FieldNo("Completed Events"):
+                Job.SetRange("Event Status", Job."Event Status"::Completed);
+            Rec.FieldNo("Cancelled Events"):
+                Job.SetRange("Event Status", Job."Event Status"::Cancelled);
         end;
         EventList.SetTableView(Job);
         EventList.Run;

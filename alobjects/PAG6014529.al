@@ -23,13 +23,16 @@ page 6014529 "Touch Screen - Balancing Line"
                 ShowCaption = false;
                 field(Weight; Weight)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
                 field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Control6150621)
@@ -37,6 +40,7 @@ page 6014529 "Touch Screen - Balancing Line"
                 ShowCaption = false;
                 field("Sum"; Sum)
                 {
+                    ApplicationArea = All;
                     Caption = 'Total';
                     Editable = false;
                 }
