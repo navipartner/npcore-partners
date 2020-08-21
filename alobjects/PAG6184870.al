@@ -14,12 +14,15 @@ page 6184870 "DropBox Setup"
             {
                 field("Account Code"; "Account Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(DropBoxToken; DropBoxToken)
                 {
+                    ApplicationArea = All;
                     Caption = 'DropBox Access Token';
                     ExtendedDatatype = Masked;
                     ToolTip = 'https://www.dropbox.com/developers/apps -> select your app -> OAuth 2 section -> Generate Access token';
@@ -31,10 +34,12 @@ page 6184870 "DropBox Setup"
                 }
                 field(Timeout; Timeout)
                 {
+                    ApplicationArea = All;
                     ToolTip = 'Miliseconds';
                 }
                 field("Storage On Server"; "Storage On Server")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

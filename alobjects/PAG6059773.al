@@ -14,26 +14,33 @@ page 6059773 "Member Card Transaction Logs"
         {
             repeater(Group)
             {
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction No.";"Transaction No.")
+                field("Transaction No."; "Transaction No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Code";"Card Code")
+                field("Card Code"; "Card Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Points";"Remaining Points")
+                field("Remaining Points"; "Remaining Points")
                 {
+                    ApplicationArea = All;
                 }
-                field(Points;Points)
+                field(Points; Points)
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Value Entry No.";"Value Entry No.")
+                field("Value Entry No."; "Value Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -62,18 +69,20 @@ page 6059773 "Member Card Transaction Logs"
 
         if GetRangeMin("Card Code") = '' then exit;
         if GetRangeMin("Card Code") = GetRangeMax("Card Code") then begin
-          "Card Code" := GetRangeMin("Card Code");
-        end else Error('Sidste');
+            "Card Code" := GetRangeMin("Card Code");
+        end else
+            Error('Sidste');
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
 
         if Count = 0 then exit;
-        if GetFilter("Card Code") = ''  then exit;
+        if GetFilter("Card Code") = '' then exit;
         if GetRangeMin("Card Code") = GetRangeMax("Card Code") then begin
-          "Card Code" := GetRangeMin("Card Code");
-        end else Error('Sidste');
+            "Card Code" := GetRangeMin("Card Code");
+        end else
+            Error('Sidste');
     end;
 
     trigger OnOpenPage()

@@ -17,15 +17,19 @@ page 6151570 "AF Setup"
             {
                 field("Enable Azure Functions"; "Enable Azure Functions")
                 {
+                    ApplicationArea = All;
                 }
                 field("Customer Tag"; "Customer Tag")
                 {
+                    ApplicationArea = All;
                 }
                 field("Web Service Is Published"; "Web Service Is Published")
                 {
+                    ApplicationArea = All;
                 }
                 field("Web Service Url"; "Web Service Url")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Spire Barcode")
@@ -33,12 +37,15 @@ page 6151570 "AF Setup"
                 Caption = 'Spire Barcode';
                 field("Spire Barcode - API Key"; "Spire Barcode - API Key")
                 {
+                    ApplicationArea = All;
                 }
                 field("Spire Barcode - Base Url"; "Spire Barcode - Base Url")
                 {
+                    ApplicationArea = All;
                 }
                 field("Spire Barcode - API Routing"; "Spire Barcode - API Routing")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Control6014405)
@@ -46,18 +53,23 @@ page 6151570 "AF Setup"
                 Caption = 'Notification Hub';
                 field("Notification - API Key"; "Notification - API Key")
                 {
+                    ApplicationArea = All;
                 }
                 field("Notification - Base Url"; "Notification - Base Url")
                 {
+                    ApplicationArea = All;
                 }
                 field("Notification - API Routing"; "Notification - API Routing")
                 {
+                    ApplicationArea = All;
                 }
                 field("Notification - Conn. String"; "Notification - Conn. String")
                 {
+                    ApplicationArea = All;
                 }
                 field("Notification - Hub Path"; "Notification - Hub Path")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Msg Service")
@@ -65,57 +77,74 @@ page 6151570 "AF Setup"
                 Caption = 'Msg Service';
                 field("Msg Service - Site Created"; "Msg Service - Site Created")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - API Key"; "Msg Service - API Key")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Base Url"; "Msg Service - Base Url")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Base Web Url"; "Msg Service - Base Web Url")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - API Routing"; "Msg Service - API Routing")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Name"; "Msg Service - Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Title"; "Msg Service - Title")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Description"; "Msg Service - Description")
                 {
+                    ApplicationArea = All;
                 }
                 field(WebsiteUrl; WebsiteUrl)
                 {
+                    ApplicationArea = All;
                     Caption = 'Msg Service - Website Url';
                     Editable = false;
                     ExtendedDatatype = URL;
                 }
                 field("Msg Service - Report ID"; "Msg Service - Report ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Report Caption"; "Msg Service - Report Caption")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Source Type"; "Msg Service - Source Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Encryption Key"; "Msg Service - Encryption Key")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - NAV WS User"; "Msg Service - NAV WS User")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - NAV WS Password"; "Msg Service - NAV WS Password")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Image"; "Msg Service - Image")
                 {
+                    ApplicationArea = All;
                 }
                 field("Msg Service - Icon"; "Msg Service - Icon")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("OIO Validation")
@@ -123,15 +152,19 @@ page 6151570 "AF Setup"
                 Caption = 'OIO Validation';
                 field("OIO Validation - Enable"; "OIO Validation - Enable")
                 {
+                    ApplicationArea = All;
                 }
                 field("OIO Validation - API Key"; "OIO Validation - API Key")
                 {
+                    ApplicationArea = All;
                 }
                 field("OIO Validation - Base Url"; "OIO Validation - Base Url")
                 {
+                    ApplicationArea = All;
                 }
                 field("OIO Validation - API Routing"; "OIO Validation - API Routing")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

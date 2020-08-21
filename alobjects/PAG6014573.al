@@ -18,78 +18,91 @@ page 6014573 "Tax Free GB I2 Info Capture"
                 ShowCaption = false;
                 field("Passport Number"; "Passport Number")
                 {
+                    ApplicationArea = All;
                     Editable = PassportNumberEditable;
                     ShowMandatory = PassportNumberMandatory;
                     Visible = PassportNumberMode <> PassportNumberMode::Hide;
                 }
                 field("First Name"; "First Name")
                 {
+                    ApplicationArea = All;
                     Editable = FirstNameEditable;
                     ShowMandatory = FirstNameMandatory;
                     Visible = FirstNameMode <> FirstNameMode::Hide;
                 }
                 field("Last Name"; "Last Name")
                 {
+                    ApplicationArea = All;
                     Editable = LastNameEditable;
                     ShowMandatory = LastNameMandatory;
                     Visible = LastNameMode <> LastNameMode::Hide;
                 }
                 field(Street; Street)
                 {
+                    ApplicationArea = All;
                     Editable = StreetEditable;
                     ShowMandatory = StreetMandatory;
                     Visible = StreetMode <> StreetMode::Hide;
                 }
                 field("Postal Code"; "Postal Code")
                 {
+                    ApplicationArea = All;
                     Editable = PostalCodeEditable;
                     ShowMandatory = PostalCodeMandatory;
                     Visible = PostalCodeMode <> PostalCodeMode::Hide;
                 }
                 field(Town; Town)
                 {
+                    ApplicationArea = All;
                     Editable = TownEditable;
                     ShowMandatory = TownMandatory;
                     Visible = TownMode <> TownMode::Hide;
                 }
                 field("E-mail"; "E-mail")
                 {
+                    ApplicationArea = All;
                     Editable = EmailEditable;
                     ShowMandatory = EmailMandatory;
                     Visible = EmailMode <> EmailMode::Hide;
                 }
                 field("Country Of Residence"; "Country Of Residence")
                 {
+                    ApplicationArea = All;
                     Editable = CountryCodeEditable;
                     ShowMandatory = CountryCodeMandatory;
                     Visible = CountryCodeMode <> CountryCodeMode::Hide;
                 }
                 field("Passport Country"; "Passport Country")
                 {
+                    ApplicationArea = All;
                     Editable = PassportCountryCodeEditable;
                     ShowMandatory = PassportCountryCodeMandatory;
                     Visible = PassportCountryCodeMode <> PassportCountryCodeMode::Hide;
                 }
                 field("Date Of Birth"; "Date Of Birth")
                 {
+                    ApplicationArea = All;
                     Editable = DateOfBirthEditable;
                     ShowMandatory = DateOfBirthMandatory;
                     Visible = DateOfBirthMode <> DateOfBirthMode::Hide;
                 }
                 field("Departure Date"; "Departure Date")
                 {
+                    ApplicationArea = All;
                     Editable = DepartureEditable;
                     ShowMandatory = DepartureMandatory;
                     Visible = DepartureDateMode <> DepartureDateMode::Hide;
                 }
                 field("Arrival Date"; "Arrival Date")
                 {
+                    ApplicationArea = All;
                     Editable = ArrivalEditable;
                     ShowMandatory = ArrivalMandatory;
                     Visible = ArrivalDateMode <> ArrivalDateMode::Hide;
                 }
                 field("Final Destination Country"; "Final Destination Country")
                 {
+                    ApplicationArea = All;
                     Editable = FinalDestinationCountryCodeEditable;
                     ShowMandatory = FinalDestinationCountryCodeMandatory;
                     Visible = FinalDestinationCountryCodeMode <> FinalDestinationCountryCodeMode::Hide;
@@ -101,17 +114,20 @@ page 6014573 "Tax Free GB I2 Info Capture"
                 Visible = MobileNumberMode <> MobileNumberMode::Hide;
                 field("Mobile No. Country"; "Mobile No. Country")
                 {
+                    ApplicationArea = All;
                     Editable = MobileNumberEditable;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
                 }
                 field("Mobile No. Prefix Formatted"; "Mobile No. Prefix Formatted")
                 {
+                    ApplicationArea = All;
                     Caption = 'Phone Prefix';
                     Editable = false;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
                 }
                 field("Mobile No."; "Mobile No.")
                 {
+                    ApplicationArea = All;
                     Editable = MobileNumberEditable;
                     ShowMandatory = MobileNumberMandatory;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;

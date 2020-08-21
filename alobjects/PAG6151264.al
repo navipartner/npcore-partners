@@ -14,50 +14,61 @@ page 6151264 "POS Unit Receipt Text Profiles"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text off";"Sales Ticket Line Text off")
+                field("Sales Ticket Line Text off"; "Sales Ticket Line Text off")
                 {
+                    ApplicationArea = All;
 
                     trigger OnAssistEdit()
                     var
                         RetailComment: Record "Retail Comment";
                     begin
                         if "Sales Ticket Line Text off" = "Sales Ticket Line Text off"::Comment then begin
-                          RetailComment.SetRange("Table ID",DATABASE::"POS Unit");
-                          RetailComment.SetRange("No.",Code);
-                          RetailComment.SetRange(Integer,1000);
-                          PAGE.RunModal(PAGE::"Retail Comments",RetailComment);
+                            RetailComment.SetRange("Table ID", DATABASE::"POS Unit");
+                            RetailComment.SetRange("No.", Code);
+                            RetailComment.SetRange(Integer, 1000);
+                            PAGE.RunModal(PAGE::"Retail Comments", RetailComment);
                         end;
                     end;
                 }
-                field("Sales Ticket Line Text1";"Sales Ticket Line Text1")
+                field("Sales Ticket Line Text1"; "Sales Ticket Line Text1")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text2";"Sales Ticket Line Text2")
+                field("Sales Ticket Line Text2"; "Sales Ticket Line Text2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text3";"Sales Ticket Line Text3")
+                field("Sales Ticket Line Text3"; "Sales Ticket Line Text3")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text4";"Sales Ticket Line Text4")
+                field("Sales Ticket Line Text4"; "Sales Ticket Line Text4")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text5";"Sales Ticket Line Text5")
+                field("Sales Ticket Line Text5"; "Sales Ticket Line Text5")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text6";"Sales Ticket Line Text6")
+                field("Sales Ticket Line Text6"; "Sales Ticket Line Text6")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text7";"Sales Ticket Line Text7")
+                field("Sales Ticket Line Text7"; "Sales Ticket Line Text7")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text8";"Sales Ticket Line Text8")
+                field("Sales Ticket Line Text8"; "Sales Ticket Line Text8")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Line Text9";"Sales Ticket Line Text9")
+                field("Sales Ticket Line Text9"; "Sales Ticket Line Text9")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

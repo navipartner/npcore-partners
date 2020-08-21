@@ -1,4 +1,4 @@
-pageextension 6014481 pageextension6014481 extends "Resource Card" 
+pageextension 6014481 pageextension6014481 extends "Resource Card"
 {
     // NPR5.29/TJ/20161013 CASE 248723 New field E-Mail
     // NPR5.32/TJ/20170519 CASE 275966 New field Over Capacitate Resource
@@ -8,14 +8,16 @@ pageextension 6014481 pageextension6014481 extends "Resource Card"
     {
         addafter("Time Sheet Approver User ID")
         {
-            field("Over Capacitate Resource";"Over Capacitate Resource")
+            field("Over Capacitate Resource"; "Over Capacitate Resource")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Employment Date")
         {
-            field("E-Mail";"E-Mail")
+            field("E-Mail"; "E-Mail")
             {
+                ApplicationArea = All;
             }
         }
     }

@@ -12,17 +12,21 @@ page 6151218 "NpCs Open. Hour Calendar"
         {
             repeater(Group)
             {
-                field("Calendar Date";"Calendar Date")
+                field("Calendar Date"; "Calendar Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("End Time";"End Time")
+                field("End Time"; "End Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Weekday;Weekday)
+                field(Weekday; Weekday)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

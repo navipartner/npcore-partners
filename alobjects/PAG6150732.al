@@ -15,11 +15,13 @@ page 6150732 "POS Sales Workflow Sets"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

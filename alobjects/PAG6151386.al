@@ -21,119 +21,154 @@ page 6151386 "CS Stock-Takes Card"
         {
             group(General)
             {
-                field("Stock-Take Id";"Stock-Take Id")
+                field("Stock-Take Id"; "Stock-Take Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field(Closed;Closed)
+                field(Closed; Closed)
                 {
+                    ApplicationArea = All;
                 }
-                field("Closed By";"Closed By")
+                field("Closed By"; "Closed By")
                 {
+                    ApplicationArea = All;
                 }
-                field(Approved;Approved)
+                field(Approved; Approved)
                 {
+                    ApplicationArea = All;
                 }
-                field("Approved By";"Approved By")
+                field("Approved By"; "Approved By")
                 {
+                    ApplicationArea = All;
                 }
-                field(Location;Location)
+                field(Location; Location)
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Template Name";"Journal Template Name")
+                field("Journal Template Name"; "Journal Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Batch Name";"Journal Batch Name")
+                field("Journal Batch Name"; "Journal Batch Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Posted";"Journal Posted")
+                field("Journal Posted"; "Journal Posted")
                 {
+                    ApplicationArea = All;
                 }
-                field("Inventory Calculated";"Inventory Calculated")
+                field("Inventory Calculated"; "Inventory Calculated")
                 {
+                    ApplicationArea = All;
                 }
-                field("Predicted Qty.";"Predicted Qty.")
+                field("Predicted Qty."; "Predicted Qty.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unknown Entries";"Unknown Entries")
+                field("Unknown Entries"; "Unknown Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Manuel Posting";"Manuel Posting")
+                field("Manuel Posting"; "Manuel Posting")
                 {
+                    ApplicationArea = All;
                 }
-                field("Adjust Inventory";"Adjust Inventory")
+                field("Adjust Inventory"; "Adjust Inventory")
                 {
+                    ApplicationArea = All;
                 }
-                field(Note;Note)
+                field(Note; Note)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Stockroom)
             {
-                field("Stockroom Started";"Stockroom Started")
+                field("Stockroom Started"; "Stockroom Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Started By";"Stockroom Started By")
+                field("Stockroom Started By"; "Stockroom Started By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Entries";"Stockroom Entries")
+                field("Stockroom Entries"; "Stockroom Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Closed";"Stockroom Closed")
+                field("Stockroom Closed"; "Stockroom Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Closed By";"Stockroom Closed By")
+                field("Stockroom Closed By"; "Stockroom Closed By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stockroom Duration";"Stockroom Duration")
+                field("Stockroom Duration"; "Stockroom Duration")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Sales floor")
             {
-                field("Salesfloor Started";"Salesfloor Started")
+                field("Salesfloor Started"; "Salesfloor Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Started By";"Salesfloor Started By")
+                field("Salesfloor Started By"; "Salesfloor Started By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Entries";"Salesfloor Entries")
+                field("Salesfloor Entries"; "Salesfloor Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Closed";"Salesfloor Closed")
+                field("Salesfloor Closed"; "Salesfloor Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Closed By";"Salesfloor Closed By")
+                field("Salesfloor Closed By"; "Salesfloor Closed By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesfloor Duration";"Salesfloor Duration")
+                field("Salesfloor Duration"; "Salesfloor Duration")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Refill)
             {
-                field("Refill Started";"Refill Started")
+                field("Refill Started"; "Refill Started")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Started By";"Refill Started By")
+                field("Refill Started By"; "Refill Started By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Entries";"Refill Entries")
+                field("Refill Entries"; "Refill Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Closed";"Refill Closed")
+                field("Refill Closed"; "Refill Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Closed By";"Refill Closed By")
+                field("Refill Closed By"; "Refill Closed By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Refill Duration";"Refill Duration")
+                field("Refill Duration"; "Refill Duration")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -163,7 +198,7 @@ page 6151386 "CS Stock-Takes Card"
                 Caption = 'Tag Data';
                 Image = DataEntry;
                 RunObject = Page "CS Stock-Takes Data List";
-                RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
+                RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
             }
             group(Overview)
             {
@@ -173,15 +208,15 @@ page 6151386 "CS Stock-Takes Card"
                     Caption = 'Devices';
                     Image = MiniForm;
                     RunObject = Page "CS Devices";
-                    RunPageLink = Location=FIELD(Location);
+                    RunPageLink = Location = FIELD(Location);
                 }
                 action("&Item Journal")
                 {
                     Caption = '&Item Journal';
                     Image = Worksheet2;
                     RunObject = Page "Phys. Inventory Journal";
-                    RunPageLink = "Journal Template Name"=FIELD("Journal Template Name"),
-                                  "Journal Batch Name"=FIELD("Journal Batch Name");
+                    RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
+                                  "Journal Batch Name" = FIELD("Journal Batch Name");
                 }
             }
             group(Process)
@@ -197,22 +232,22 @@ page 6151386 "CS Stock-Takes Card"
                         QtyCalculated: Decimal;
                     begin
                         if "Journal Posted" then
-                          exit;
+                            exit;
 
                         QtyCalculated := 0;
                         Clear(CalcItemJournalLine);
-                        CalcItemJournalLine.SetRange("Journal Template Name","Journal Template Name");
-                        CalcItemJournalLine.SetRange("Journal Batch Name","Journal Batch Name");
-                        CalcItemJournalLine.SetRange("Location Code",Location);
+                        CalcItemJournalLine.SetRange("Journal Template Name", "Journal Template Name");
+                        CalcItemJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+                        CalcItemJournalLine.SetRange("Location Code", Location);
                         if CalcItemJournalLine.FindSet then begin
-                          repeat
-                            QtyCalculated += CalcItemJournalLine."Qty. (Calculated)"
-                          until CalcItemJournalLine.Next = 0;
+                            repeat
+                                QtyCalculated += CalcItemJournalLine."Qty. (Calculated)"
+                            until CalcItemJournalLine.Next = 0;
                         end;
 
-                        if Confirm(StrSubstNo(Txt001,Rec."Predicted Qty.",QtyCalculated),true) then begin
-                          "Predicted Qty." := QtyCalculated;
-                          Modify;
+                        if Confirm(StrSubstNo(Txt001, Rec."Predicted Qty.", QtyCalculated), true) then begin
+                            "Predicted Qty." := QtyCalculated;
+                            Modify;
                         end;
                     end;
                 }
@@ -224,7 +259,7 @@ page 6151386 "CS Stock-Takes Card"
                     trigger OnAction()
                     begin
                         if "Journal Posted" then
-                          exit;
+                            exit;
 
                         "Manuel Posting" := true;
                         Modify;
@@ -238,8 +273,8 @@ page 6151386 "CS Stock-Takes Card"
                     trigger OnAction()
                     begin
                         if "Journal Posted" then begin
-                          "Journal Posted" := false;
-                          Modify;
+                            "Journal Posted" := false;
+                            Modify;
                         end;
                     end;
                 }
@@ -251,8 +286,8 @@ page 6151386 "CS Stock-Takes Card"
                     trigger OnAction()
                     begin
                         if not "Journal Posted" then begin
-                          "Journal Posted" := true;
-                          Modify;
+                            "Journal Posted" := true;
+                            Modify;
                         end;
                     end;
                 }
@@ -263,8 +298,8 @@ page 6151386 "CS Stock-Takes Card"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "CS Upd. Unknown Entries";
-                    RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
-                    RunPageView = WHERE("Item No."=CONST(''));
+                    RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
+                    RunPageView = WHERE("Item No." = CONST(''));
                 }
             }
         }

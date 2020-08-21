@@ -12,44 +12,57 @@ page 6151137 "TM Waiting List Setup"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Simultaneous Notification Cnt.";"Simultaneous Notification Cnt.")
+                field("Simultaneous Notification Cnt."; "Simultaneous Notification Cnt.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max Notifications per Address";"Max Notifications per Address")
+                field("Max Notifications per Address"; "Max Notifications per Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expires In (Minutes)";"Expires In (Minutes)")
+                field("Expires In (Minutes)"; "Expires In (Minutes)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Delay (Minutes)";"Notification Delay (Minutes)")
+                field("Notification Delay (Minutes)"; "Notification Delay (Minutes)")
                 {
+                    ApplicationArea = All;
                 }
-                field(URL;URL)
+                field(URL; URL)
                 {
+                    ApplicationArea = All;
                 }
-                field("Activate WL at Remaining Qty.";"Activate WL at Remaining Qty.")
+                field("Activate WL at Remaining Qty."; "Activate WL at Remaining Qty.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaing Capacity Threshold";"Remaing Capacity Threshold")
+                field("Remaing Capacity Threshold"; "Remaing Capacity Threshold")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify Daily From Time";"Notify Daily From Time")
+                field("Notify Daily From Time"; "Notify Daily From Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify Daily Until Time";"Notify Daily Until Time")
+                field("Notify Daily Until Time"; "Notify Daily Until Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify On Opt-In";"Notify On Opt-In")
+                field("Notify On Opt-In"; "Notify On Opt-In")
                 {
+                    ApplicationArea = All;
                 }
-                field("Enforce Same Item";"Enforce Same Item")
+                field("Enforce Same Item"; "Enforce Same Item")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -66,7 +79,7 @@ page 6151137 "TM Waiting List Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "E-mail Templates";
-                RunPageView = WHERE("Table No."=CONST(6060110));
+                RunPageView = WHERE("Table No." = CONST(6060110));
             }
             action("SMS Template")
             {
@@ -75,7 +88,7 @@ page 6151137 "TM Waiting List Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "SMS Template List";
-                RunPageView = WHERE("Table No."=CONST(6060110));
+                RunPageView = WHERE("Table No." = CONST(6060110));
             }
         }
     }

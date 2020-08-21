@@ -14,11 +14,13 @@ page 6059822 "Smart Email Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Provider;Provider)
+                field(Provider; Provider)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -27,21 +29,26 @@ page 6059822 "Smart Email Card"
                         //+NPR5.55 [343266]
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Merge Table ID";"Merge Table ID")
+                field("Merge Table ID"; "Merge Table ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Caption";"Table Caption")
+                field("Table Caption"; "Table Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("Smart Email ID";"Smart Email ID")
+                field("Smart Email ID"; "Smart Email ID")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("NpXml Template Code";"NpXml Template Code")
+                field("NpXml Template Code"; "NpXml Template Code")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -54,8 +61,9 @@ page 6059822 "Smart Email Card"
                 {
                     ShowCaption = false;
                     Visible = ShowMergeLanguage;
-                    field("Merge Language (Mailchimp)";"Merge Language (Mailchimp)")
+                    field("Merge Language (Mailchimp)"; "Merge Language (Mailchimp)")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -63,34 +71,40 @@ page 6059822 "Smart Email Card"
             {
                 Caption = 'Template Details';
                 Editable = false;
-                field("Smart Email Name";"Smart Email Name")
+                field("Smart Email Name"; "Smart Email Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Subject;Subject)
+                field(Subject; Subject)
                 {
+                    ApplicationArea = All;
                 }
-                field(From;From)
+                field(From; From)
                 {
+                    ApplicationArea = All;
                 }
-                field("Reply To";"Reply To")
+                field("Reply To"; "Reply To")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014403;"Smart Email Variables")
+            part(Control6014403; "Smart Email Variables")
             {
-                SubPageLink = "Transactional Email Code"=FIELD(Code);
+                SubPageLink = "Transactional Email Code" = FIELD(Code);
                 Visible = ShowVariablesSubPage;
             }
             group(Preview)
             {
                 Caption = 'Preview';
-                field("Preview Url";"Preview Url")
+                field("Preview Url"; "Preview Url")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     ExtendedDatatype = URL;
 

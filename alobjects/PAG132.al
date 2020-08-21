@@ -1,4 +1,4 @@
-pageextension 6014405 pageextension6014405 extends "Posted Sales Invoice" 
+pageextension 6014405 pageextension6014405 extends "Posted Sales Invoice"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // 
@@ -21,35 +21,41 @@ pageextension 6014405 pageextension6014405 extends "Posted Sales Invoice"
     {
         addafter("Sell-to Customer Name")
         {
-            field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+            field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Payment Method Code")
         {
-            field("Magento Payment Amount";"Magento Payment Amount")
+            field("Magento Payment Amount"; "Magento Payment Amount")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Ship-to Name")
         {
-            field("Ship-to Name 2";"Ship-to Name 2")
+            field("Ship-to Name 2"; "Ship-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Bill-to Name")
         {
-            field("Bill-to Name 2";"Bill-to Name 2")
+            field("Bill-to Name 2"; "Bill-to Name 2")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Bill-to")
         {
-            field("Bill-to E-mail";"Bill-to E-mail")
+            field("Bill-to E-mail"; "Bill-to E-mail")
             {
+                ApplicationArea = All;
             }
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
                 Editable = false;
             }
         }

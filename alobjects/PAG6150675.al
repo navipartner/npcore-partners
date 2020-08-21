@@ -23,8 +23,9 @@ page 6150675 "POS Entry Card"
     {
         area(content)
         {
-            field(AdvancedPostingWarning;TextAdvancedPostingOff)
+            field(AdvancedPostingWarning; TextAdvancedPostingOff)
             {
+                ApplicationArea = All;
                 Caption = 'Advanced Posting Warning';
                 Editable = false;
                 MultiLine = false;
@@ -33,8 +34,9 @@ page 6150675 "POS Entry Card"
                 StyleExpr = TRUE;
                 Visible = AdvancedPostingOff;
             }
-            field(ClicktoSeeAuditRoll;TextClicktoSeeAuditRoll)
+            field(ClicktoSeeAuditRoll; TextClicktoSeeAuditRoll)
             {
+                ApplicationArea = All;
                 Caption = 'Click to See Audit Roll';
                 LookupPageID = "POS Entries";
                 ShowCaption = false;
@@ -50,59 +52,76 @@ page 6150675 "POS Entry Card"
             }
             group(Group)
             {
-                field("System Entry";"System Entry")
+                field("System Entry"; "System Entry")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fiscal No.";"Fiscal No.")
+                field("Fiscal No."; "Fiscal No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Period Register No.";"POS Period Register No.")
+                field("POS Period Register No."; "POS Period Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Date";"Entry Date")
+                field("Entry Date"; "Entry Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(LastOpenSalesDocumentNo;LastOpenSalesDocumentNo)
+                field(LastOpenSalesDocumentNo; LastOpenSalesDocumentNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Open Sales Doc.';
                     Visible = false;
 
@@ -113,14 +132,15 @@ page 6150675 "POS Entry Card"
                     begin
                         //-NPR5.50 [300557]
                         if TryGetLastOpenSalesDoc(POSEntrySalesDocLink) then begin
-                          POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
-                          PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
+                            POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
+                            PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
                         end;
                         //+NPR5.50 [300557]
                     end;
                 }
-                field(LastPostedSalesDocumentNo;LastPostedSalesDocumentNo)
+                field(LastPostedSalesDocumentNo; LastPostedSalesDocumentNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Posted Sales Doc.';
                     Visible = false;
 
@@ -131,106 +151,122 @@ page 6150675 "POS Entry Card"
                     begin
                         //-NPR5.50 [300557]
                         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then begin
-                          POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
-                          PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
+                            POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
+                            PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
                         end;
                         //+NPR5.50 [300557]
                     end;
                 }
-                field("No. of Print Output Entries";"No. of Print Output Entries")
+                field("No. of Print Output Entries"; "No. of Print Output Entries")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Post Item Entry Status";"Post Item Entry Status")
+                field("Post Item Entry Status"; "Post Item Entry Status")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Post Entry Status";"Post Entry Status")
+                field("Post Entry Status"; "Post Entry Status")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Amount Excl. Tax";"Amount Excl. Tax")
+                field("Amount Excl. Tax"; "Amount Excl. Tax")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Tax Amount";"Tax Amount")
+                field("Tax Amount"; "Tax Amount")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Amount Incl. Tax";"Amount Incl. Tax")
+                field("Amount Incl. Tax"; "Amount Incl. Tax")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Rounding Amount (LCY)";"Rounding Amount (LCY)")
+                field("Rounding Amount (LCY)"; "Rounding Amount (LCY)")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Prices Including VAT";"Prices Including VAT")
+                field("Prices Including VAT"; "Prices Including VAT")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Reason Code";"Reason Code")
+                field("Reason Code"; "Reason Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Tax Area Code";"Tax Area Code")
+                field("Tax Area Code"; "Tax Area Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("POS Sale ID";"POS Sale ID")
+                field("POS Sale ID"; "POS Sale ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Transaction Type";"Transaction Type")
+                field("Transaction Type"; "Transaction Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Transport Method";"Transport Method")
+                field("Transport Method"; "Transport Method")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Exit Point";"Exit Point")
+                field("Exit Point"; "Exit Point")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Area";Area)
+                field("Area"; Area)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
-            part(Sales;"POS Sale Line Subpage")
+            part(Sales; "POS Sale Line Subpage")
             {
                 Caption = 'Sales';
                 Editable = false;
-                SubPageLink = "POS Entry No."=FIELD("Entry No.");
+                SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = HasSaleLines;
             }
-            part(Payments;"POS Payment Line Subpage")
+            part(Payments; "POS Payment Line Subpage")
             {
                 Caption = 'Payments';
                 Editable = false;
-                SubPageLink = "POS Entry No."=FIELD("Entry No.");
+                SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = HasPaymentLines;
             }
-            part(Taxes;"POS Tax Line Subpage")
+            part(Taxes; "POS Tax Line Subpage")
             {
                 Caption = 'Taxes';
                 Editable = false;
-                SubPageLink = "POS Entry No."=FIELD("Entry No.");
-                SubPageView = SORTING("POS Entry No.","Tax Area Code for Key","Tax Jurisdiction Code","VAT Identifier","Tax %","Tax Group Code","Expense/Capitalize","Tax Type","Use Tax",Positive)
+                SubPageLink = "POS Entry No." = FIELD("Entry No.");
+                SubPageView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive)
                               ORDER(Ascending);
                 Visible = HasTaxLines;
             }
         }
         area(factboxes)
         {
-            part(Control6014466;"POS Entry Factbox")
+            part(Control6014466; "POS Entry Factbox")
             {
-                SubPageLink = "Entry No."=FIELD("Entry No.");
+                SubPageLink = "Entry No." = FIELD("Entry No.");
             }
         }
     }
@@ -247,14 +283,14 @@ page 6150675 "POS Entry Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Posting Log";
-                RunPageLink = "Entry No."=FIELD("POS Posting Log Entry No.");
+                RunPageLink = "Entry No." = FIELD("POS Posting Log Entry No.");
             }
             action("Sales Lines")
             {
                 Caption = 'Sales Lines';
                 Image = Sales;
                 RunObject = Page "POS Sales Line List";
-                RunPageLink = "POS Entry No."=FIELD("Entry No.");
+                RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
             }
             action("Payment Lines")
@@ -262,7 +298,7 @@ page 6150675 "POS Entry Card"
                 Caption = 'Payment Lines';
                 Image = Payment;
                 RunObject = Page "POS Payment Line List";
-                RunPageLink = "POS Entry No."=FIELD("Entry No.");
+                RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
             }
             action("Balancing Lines")
@@ -270,16 +306,16 @@ page 6150675 "POS Entry Card"
                 Caption = 'Balancing Lines';
                 Image = Balance;
                 RunObject = Page "POS Balancing Line";
-                RunPageLink = "POS Entry No."=FIELD("Entry No.");
+                RunPageLink = "POS Entry No." = FIELD("Entry No.");
             }
             action("Comment Lines")
             {
                 Caption = 'Comment Lines';
                 Image = Comment;
                 RunObject = Page "POS Entry Comments";
-                RunPageLink = "Table ID"=CONST(6150621),
-                              "POS Entry No."=FIELD("Entry No.");
-                RunPageView = SORTING("Table ID","POS Entry No.","POS Entry Line No.",Code,"Line No.")
+                RunPageLink = "Table ID" = CONST(6150621),
+                              "POS Entry No." = FIELD("Entry No.");
+                RunPageView = SORTING("Table ID", "POS Entry No.", "POS Entry Line No.", Code, "Line No.")
                               ORDER(Ascending);
             }
             action(ShowDimensions)
@@ -306,7 +342,7 @@ page 6150675 "POS Entry Card"
                 begin
                     //-NPR5.38 [302690]
                     if not POSEntryManagement.ShowSalesDocument(Rec) then
-                      Error(TextSalesDocNotFound,"Sales Document Type","Sales Document No.");
+                        Error(TextSalesDocNotFound, "Sales Document Type", "Sales Document No.");
                     //+NPR5.38 [302690]
                 end;
             }
@@ -315,15 +351,15 @@ page 6150675 "POS Entry Card"
                 Caption = 'POS Info POS Entry';
                 Image = Info;
                 RunObject = Page "POS Info POS Entry";
-                RunPageLink = "POS Entry No."=FIELD("Entry No.");
-                RunPageView = SORTING("POS Info Code","POS Entry No.","Entry No.");
+                RunPageLink = "POS Entry No." = FIELD("Entry No.");
+                RunPageView = SORTING("POS Info Code", "POS Entry No.", "Entry No.");
             }
             action("POS Info Audit Roll")
             {
                 Caption = 'POS Info Audit Roll';
                 Image = "Action";
                 RunObject = Page "POS Info Audit Roll";
-                RunPageLink = "Sales Ticket No."=FIELD("Document No.");
+                RunPageLink = "Sales Ticket No." = FIELD("Document No.");
                 Visible = false;
             }
             action("POS Audit Log")
@@ -368,7 +404,7 @@ page 6150675 "POS Entry Card"
                 begin
 
                     //-NPR5.50 [345376]
-                    ShowWorkshift (Rec);
+                    ShowWorkshift(Rec);
                     //+NPR5.50 [345376]
                 end;
             }
@@ -376,7 +412,7 @@ page 6150675 "POS Entry Card"
             {
                 Image = PeriodEntries;
                 RunObject = Page "POS Period Register List";
-                RunPageLink = "No."=FIELD("POS Period Register No.");
+                RunPageLink = "No." = FIELD("POS Period Register No.");
             }
             group(Vouchers)
             {
@@ -391,14 +427,14 @@ page 6150675 "POS Entry Card"
                         Caption = 'Issued';
                         Image = PostedPayableVoucher;
                         RunObject = Page "Gift Voucher List";
-                        RunPageLink = "Issuing POS Entry No"=FIELD("Entry No.");
+                        RunPageLink = "Issuing POS Entry No" = FIELD("Entry No.");
                     }
                     action(RedeemedGiftVouchers)
                     {
                         Caption = 'Redeemed';
                         Image = PostedReceivableVoucher;
                         RunObject = Page "Gift Voucher List";
-                        RunPageLink = "Cashed POS Entry No."=FIELD("Entry No.");
+                        RunPageLink = "Cashed POS Entry No." = FIELD("Entry No.");
                     }
                 }
                 group("Credit Vouchers")
@@ -410,14 +446,14 @@ page 6150675 "POS Entry Card"
                         Caption = 'Issued';
                         Image = PostedPayableVoucher;
                         RunObject = Page "Credit Voucher List";
-                        RunPageLink = "Issuing POS Entry No"=FIELD("Entry No.");
+                        RunPageLink = "Issuing POS Entry No" = FIELD("Entry No.");
                     }
                     action(RedeemdedCreditVouchers)
                     {
                         Caption = 'Redeemed';
                         Image = PostedReceivableVoucher;
                         RunObject = Page "Credit Voucher List";
-                        RunPageLink = "Cashed POS Entry No."=FIELD("Entry No.");
+                        RunPageLink = "Cashed POS Entry No." = FIELD("Entry No.");
                     }
                 }
                 group("Tax Free Vouchers")
@@ -436,7 +472,7 @@ page 6150675 "POS Entry Card"
                         begin
                             //-NPR5.39 [304165]
                             if "Entry Type" = "Entry Type"::"Direct Sale" then
-                              TaxFree.VoucherIssueFromPOSSale("Document No.");
+                                TaxFree.VoucherIssueFromPOSSale("Document No.");
                             //+NPR5.39 [304165]
                         end;
                     }
@@ -445,7 +481,7 @@ page 6150675 "POS Entry Card"
                         Caption = 'Issued';
                         Image = PostedPayableVoucher;
                         RunObject = Page "Tax Free Voucher";
-                        RunPageLink = "Sales Receipt No."=FIELD("Document No.");
+                        RunPageLink = "Sales Receipt No." = FIELD("Document No.");
                     }
                 }
             }
@@ -457,7 +493,7 @@ page 6150675 "POS Entry Card"
                     Caption = 'Voucher Lines';
                     Image = RefreshVoucher;
                     RunObject = Page "NpRv Vouchers";
-                    RunPageLink = "Issue Document No."=FIELD("Document No.");
+                    RunPageLink = "Issue Document No." = FIELD("Document No.");
 
                     trigger OnAction()
                     var
@@ -492,7 +528,7 @@ page 6150675 "POS Entry Card"
                     Caption = 'EFT Transaction Requests';
                     Image = CreditCardLog;
                     RunObject = Page "EFT Transaction Requests";
-                    RunPageLink = "Sales Ticket No."=FIELD("Document No.");
+                    RunPageLink = "Sales Ticket No." = FIELD("Document No.");
                 }
             }
         }
@@ -511,11 +547,11 @@ page 6150675 "POS Entry Card"
                     POSPostEntries: Codeunit "POS Post Entries";
                     POSEntryToPost: Record "POS Entry";
                 begin
-                    POSEntryToPost.SetRange("Entry No.","Entry No.");
+                    POSEntryToPost.SetRange("Entry No.", "Entry No.");
                     if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
-                      POSPostEntries.SetPostItemEntries(true);
+                        POSPostEntries.SetPostItemEntries(true);
                     if Rec."Post Entry Status" < "Post Entry Status"::Posted then
-                      POSPostEntries.SetPostPOSEntries(true);
+                        POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
                     POSPostEntries.Run(POSEntryToPost);
@@ -551,50 +587,50 @@ page 6150675 "POS Entry Card"
                     // POSPostEntries.SetPostCompressed(CONFIRM(TextPostCompressed));
                     // POSPostEntries.RUN(POSEntryToPost);
 
-                    ItemPosting := Confirm (TextPostItemEntries);
-                    POSPosting := Confirm (TextPostPosEntries);
+                    ItemPosting := Confirm(TextPostItemEntries);
+                    POSPosting := Confirm(TextPostPosEntries);
 
                     POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
                     POSPostEntries.SetStopOnError(true);
 
                     if (ItemPosting) then begin
-                      POSEntryToPost.Reset;
-                      POSEntryToPost.CopyFilters(Rec);
-                      POSEntryToPost.SetFilter("Post Item Entry Status",'<2');
-                      POSPostEntries.SetPostItemEntries (true);
-                      POSPostEntries.SetPostPOSEntries (false);
-                      repeat
+                        POSEntryToPost.Reset;
+                        POSEntryToPost.CopyFilters(Rec);
+                        POSEntryToPost.SetFilter("Post Item Entry Status", '<2');
+                        POSPostEntries.SetPostItemEntries(true);
+                        POSPostEntries.SetPostPOSEntries(false);
+                        repeat
 
-                        if (POSEntryToPost.FindLast ()) then
-                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+                            if (POSEntryToPost.FindLast()) then
+                                POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
 
-                        POSPostEntries.Run (POSEntryToPost);
-                        Commit;
+                            POSPostEntries.Run(POSEntryToPost);
+                            Commit;
 
-                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
-                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+                            ErrorDuringPosting := not POSEntryToPost.IsEmpty();
+                            POSEntryToPost.SetFilter("POS Period Register No.", GetFilter("POS Period Register No."));
 
-                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                        until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
                     end;
 
                     if (POSPosting) then begin
-                      POSEntryToPost.Reset;
-                      POSEntryToPost.CopyFilters(Rec);
-                      POSEntryToPost.SetFilter("Post Entry Status",'<2');
-                      POSPostEntries.SetPostItemEntries (false);
-                      POSPostEntries.SetPostPOSEntries (true);
-                      repeat
+                        POSEntryToPost.Reset;
+                        POSEntryToPost.CopyFilters(Rec);
+                        POSEntryToPost.SetFilter("Post Entry Status", '<2');
+                        POSPostEntries.SetPostItemEntries(false);
+                        POSPostEntries.SetPostPOSEntries(true);
+                        repeat
 
-                        if (POSEntryToPost.FindLast ()) then
-                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+                            if (POSEntryToPost.FindLast()) then
+                                POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
 
-                        POSPostEntries.Run (POSEntryToPost);
-                        Commit;
+                            POSPostEntries.Run(POSEntryToPost);
+                            Commit;
 
-                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
-                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+                            ErrorDuringPosting := not POSEntryToPost.IsEmpty();
+                            POSEntryToPost.SetFilter("POS Period Register No.", GetFilter("POS Period Register No."));
 
-                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                        until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
                     end;
                     //+NPR5.51 [359403]
 
@@ -611,11 +647,11 @@ page 6150675 "POS Entry Card"
                     POSEntryToPost: Record "POS Entry";
                     POSPostEntries: Codeunit "POS Post Entries";
                 begin
-                    POSEntryToPost.SetRange("Entry No.","Entry No.");
+                    POSEntryToPost.SetRange("Entry No.", "Entry No.");
                     if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
-                      POSPostEntries.SetPostItemEntries(true);
+                        POSPostEntries.SetPostItemEntries(true);
                     if Rec."Post Entry Status" < "Post Entry Status"::Posted then
-                      POSPostEntries.SetPostPOSEntries(true);
+                        POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
                     POSPostEntries.Preview(POSEntryToPost);
@@ -657,11 +693,11 @@ page 6150675 "POS Entry Card"
                     POSPostEntries: Codeunit "POS Post Entries";
                 begin
                     //-NPR5.37 [293133]
-                    POSEntryToPost.SetRange("Entry No.","Entry No.");
+                    POSEntryToPost.SetRange("Entry No.", "Entry No.");
                     if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
-                      POSPostEntries.SetPostItemEntries(true);
+                        POSPostEntries.SetPostItemEntries(true);
                     if Rec."Post Entry Status" < "Post Entry Status"::Posted then
-                      POSPostEntries.SetPostPOSEntries(true);
+                        POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
                     POSPostEntries.CompareToAuditRoll(POSEntryToPost);
@@ -685,11 +721,11 @@ page 6150675 "POS Entry Card"
                     // Navigate.SetDoc("Posting Date","Document No.");
                     // Navigate.RUN;
 
-                    Navigate.SetDoc("Posting Date","Document No.");
+                    Navigate.SetDoc("Posting Date", "Document No.");
                     if ("Entry Type" <> "Entry Type"::Balancing) then
-                      if (POSPeriodRegister.Get ("POS Period Register No.")) then
-                        if (POSPeriodRegister."Document No." <> '') then
-                          Navigate.SetDoc ("Posting Date", POSPeriodRegister."Document No.");
+                        if (POSPeriodRegister.Get("POS Period Register No.")) then
+                            if (POSPeriodRegister."Document No." <> '') then
+                                Navigate.SetDoc("Posting Date", POSPeriodRegister."Document No.");
 
                     Navigate.Run;
                     //+NPR5.51 [359508]
@@ -798,9 +834,9 @@ page 6150675 "POS Entry Card"
                         EFTTransactionRequest.SetRange("Sales Ticket No.", "Document No.");
                         EFTTransactionRequest.SetRange("Register No.", "POS Unit No.");
                         if EFTTransactionRequest.FindSet then
-                          repeat
-                            EFTTransactionRequest.PrintReceipts(true);
-                          until EFTTransactionRequest.Next = 0;
+                            repeat
+                                EFTTransactionRequest.PrintReceipts(true);
+                            until EFTTransactionRequest.Next = 0;
                         //+NPR5.46 [290734]
                     end;
                 }
@@ -809,7 +845,7 @@ page 6150675 "POS Entry Card"
                     Caption = 'Print Log';
                     Image = Log;
                     RunObject = Page "POS Entry Output Log";
-                    RunPageLink = "POS Entry No."=FIELD("Entry No.");
+                    RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 }
                 action("Entry Overview")
                 {
@@ -824,8 +860,8 @@ page 6150675 "POS Entry Card"
                     begin
                         //-NPR5.40
                         Clear(POSEntry);
-                        POSEntry.SetRange("POS Store Code",Rec."POS Store Code");
-                        REPORT.Run(REPORT::"Posting Overview POS",true,true,POSEntry);
+                        POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
+                        REPORT.Run(REPORT::"Posting Overview POS", true, true, POSEntry);
                         //+NPR5.40
                     end;
                 }
@@ -864,14 +900,14 @@ page 6150675 "POS Entry Card"
         //-NPR5.50 [300557]
         LastOpenSalesDocumentNo := '';
         if TryGetLastOpenSalesDoc(POSEntrySalesDocLink) then
-          LastOpenSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
+            LastOpenSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
         POSEntrySalesDocLink.Reset;
 
         LastPostedSalesDocumentNo := '';
         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then
-          LastPostedSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
+            LastPostedSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
         //+NPR5.50 [300557]
-        CalcFields("Sale Lines","Payment Lines","Tax Lines");
+        CalcFields("Sale Lines", "Payment Lines", "Tax Lines");
         HasSaleLines := "Sale Lines" > 0;
         HasPaymentLines := "Payment Lines" > 0;
         HasTaxLines := "Tax Lines" > 0;
@@ -882,7 +918,7 @@ page 6150675 "POS Entry Card"
         NPRetailSetup: Record "NP Retail Setup";
     begin
         NPRetailSetup.Get;
-        TestMode :=  (NPRetailSetup."Environment Type" in [NPRetailSetup."Environment Type"::DEV,NPRetailSetup."Environment Type"::TEST]);
+        TestMode := (NPRetailSetup."Environment Type" in [NPRetailSetup."Environment Type"::DEV, NPRetailSetup."Environment Type"::TEST]);
         AdvancedPostingOff := (not NPRetailSetup."Advanced Posting Activated");
     end;
 
@@ -937,21 +973,21 @@ page 6150675 "POS Entry Card"
 
         //-NPR5.50 [352319]
         if (POSEntry."Entry No." <> 0) then begin
-          POSWorkshiftCheckpoint.SetFilter ("POS Entry No.", '=%1', POSEntry."Entry No.");
-          if (POSWorkshiftCheckpoint.FindLast ()) then begin
-            PAGE.Run (PAGE::"POS Workshift Checkpoint Card", POSWorkshiftCheckpoint);
-          end else begin
-            POSWorkshiftCheckpoint.Reset ();
-            POSWorkshiftCheckpoint.SetFilter ("POS Unit No.", '=%1', POSEntry."POS Unit No.");
-            POSWorkshiftCheckpoint.SetFilter (Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
-            POSWorkshiftCheckpoint.SetFilter (Open, '=%1', false);
-            if (POSWorkshiftCheckpoint.FindSet ()) then
-              PAGE.Run (PAGE::"POS Workshift Checkpoints", POSWorkshiftCheckpoint);
-          end;
+            POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', POSEntry."Entry No.");
+            if (POSWorkshiftCheckpoint.FindLast()) then begin
+                PAGE.Run(PAGE::"POS Workshift Checkpoint Card", POSWorkshiftCheckpoint);
+            end else begin
+                POSWorkshiftCheckpoint.Reset();
+                POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSEntry."POS Unit No.");
+                POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+                POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
+                if (POSWorkshiftCheckpoint.FindSet()) then
+                    PAGE.Run(PAGE::"POS Workshift Checkpoints", POSWorkshiftCheckpoint);
+            end;
         end else begin
-          POSWorkshiftCheckpoint.SetFilter (Open, '=%1', false);
-          POSWorkshiftCheckpoint.SetFilter (Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
-          PAGE.Run (PAGE::"POS Workshift Checkpoints", POSWorkshiftCheckpoint);
+            POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
+            POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+            PAGE.Run(PAGE::"POS Workshift Checkpoints", POSWorkshiftCheckpoint);
         end;
         //+NPR5.50 [352319]
     end;

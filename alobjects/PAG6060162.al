@@ -13,11 +13,13 @@ page 6060162 "Event Attribute Col. Templates"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -35,7 +37,7 @@ page 6060162 "Event Attribute Col. Templates"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Event Attribute Column Values";
-                RunPageLink = "Template Name"=FIELD(Name);
+                RunPageLink = "Template Name" = FIELD(Name);
             }
         }
     }

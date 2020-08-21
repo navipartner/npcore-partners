@@ -1,4 +1,4 @@
-pageextension 6014448 pageextension6014448 extends "Jobs Setup" 
+pageextension 6014448 pageextension6014448 extends "Jobs Setup"
 {
     // NPR5.29/TJ/20161014 CASE 248723 New tab Events with new fields
     // NPR5.32/TJ/20170525 CASE 275953 New field "Appointment Lasts Whole Day"
@@ -18,34 +18,42 @@ pageextension 6014448 pageextension6014448 extends "Jobs Setup"
                 group("Auto. Setup")
                 {
                     Caption = 'Auto. Setup';
-                    field("Auto. Create Job Task Line";"Auto. Create Job Task Line")
+                    field("Auto. Create Job Task Line"; "Auto. Create Job Task Line")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Def. Job Task No.";"Def. Job Task No.")
+                    field("Def. Job Task No."; "Def. Job Task No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Def. Job Task Description";"Def. Job Task Description")
+                    field("Def. Job Task Description"; "Def. Job Task Description")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Post Event on Sales Inv. Post";"Post Event on Sales Inv. Post")
+                    field("Post Event on Sales Inv. Post"; "Post Event on Sales Inv. Post")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Time Setup")
                 {
                     Caption = 'Time Setup';
-                    field("Qty. Relates to Start/End Time";"Qty. Relates to Start/End Time")
+                    field("Qty. Relates to Start/End Time"; "Qty. Relates to Start/End Time")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Time Calc. Unit of Measure";"Time Calc. Unit of Measure")
+                    field("Time Calc. Unit of Measure"; "Time Calc. Unit of Measure")
                     {
+                        ApplicationArea = All;
                     }
                 }
-                field("Over Capacitate Resource";"Over Capacitate Resource")
+                field("Over Capacitate Resource"; "Over Capacitate Resource")
                 {
+                    ApplicationArea = All;
                 }
-                field("""Block Event Deletion"".HASVALUE";"Block Event Deletion".HasValue)
+                field("""Block Event Deletion"".HASVALUE"; "Block Event Deletion".HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Block Event Deletion';
                     Editable = false;
                 }

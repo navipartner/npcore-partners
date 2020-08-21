@@ -14,32 +14,41 @@ page 6059911 "Task Output Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Log Entry No.";"Task Log Entry No.")
+                field("Task Log Entry No."; "Task Log Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Template Name";"Journal Template Name")
+                field("Journal Template Name"; "Journal Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Batch Name";"Journal Batch Name")
+                field("Journal Batch Name"; "Journal Batch Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Line No.";"Journal Line No.")
+                field("Journal Line No."; "Journal Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(File;File)
+                field(File; File)
                 {
+                    ApplicationArea = All;
                 }
-                field("File Name";"File Name")
+                field("File Name"; "File Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Import DateTime";"Import DateTime")
+                field("Import DateTime"; "Import DateTime")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -61,12 +70,12 @@ page 6059911 "Task Output Log"
                 begin
                     CalcFields(File);
                     if not File.HasValue then begin
-                      Message(ReportIsEmptyMsg);
-                      exit;
+                        Message(ReportIsEmptyMsg);
+                        exit;
                     end;
 
                     File.CreateInStream(Instr);
-                    Downloaded := DownloadFromStream(Instr,FileDownLoadTxt,'','',"File Name");
+                    Downloaded := DownloadFromStream(Instr, FileDownLoadTxt, '', '', "File Name");
                 end;
             }
         }

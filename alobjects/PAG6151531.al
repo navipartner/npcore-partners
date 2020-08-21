@@ -14,23 +14,29 @@ page 6151531 "Nc Collection List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Collector Code";"Collector Code")
+                field("Collector Code"; "Collector Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Creation Date";"Creation Date")
+                field("Creation Date"; "Creation Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Lines";"No. of Lines")
+                field("No. of Lines"; "No. of Lines")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -45,7 +51,7 @@ page 6151531 "Nc Collection List"
                 Caption = 'Lines';
                 Image = XMLFile;
                 RunObject = Page "Nc Collection Lines";
-                RunPageLink = "Collection No."=FIELD("No.");
+                RunPageLink = "Collection No." = FIELD("No.");
             }
         }
         area(processing)
@@ -59,7 +65,7 @@ page 6151531 "Nc Collection List"
 
                     trigger OnAction()
                     begin
-                        NcCollectorManagement.SetCollectionStatus(Rec,0);
+                        NcCollectorManagement.SetCollectionStatus(Rec, 0);
                         CurrPage.Update;
                     end;
                 }
@@ -70,7 +76,7 @@ page 6151531 "Nc Collection List"
 
                     trigger OnAction()
                     begin
-                        NcCollectorManagement.SetCollectionStatus(Rec,1);
+                        NcCollectorManagement.SetCollectionStatus(Rec, 1);
                         CurrPage.Update;
                     end;
                 }
@@ -81,7 +87,7 @@ page 6151531 "Nc Collection List"
 
                     trigger OnAction()
                     begin
-                        NcCollectorManagement.SetCollectionStatus(Rec,2);
+                        NcCollectorManagement.SetCollectionStatus(Rec, 2);
                         CurrPage.Update;
                     end;
                 }

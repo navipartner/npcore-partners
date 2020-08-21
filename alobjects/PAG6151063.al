@@ -15,20 +15,25 @@ page 6151063 "Distribution Plans"
         {
             repeater(Group)
             {
-                field("Distribution Group";"Distribution Group")
+                field("Distribution Group"; "Distribution Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Hiearachy";"Item Hiearachy")
+                field("Item Hiearachy"; "Item Hiearachy")
                 {
+                    ApplicationArea = All;
                 }
-                field("Distribution Type";"Distribution Type")
+                field("Distribution Type"; "Distribution Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Required Date";"Required Date")
+                field("Required Date"; "Required Date")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

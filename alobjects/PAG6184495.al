@@ -15,17 +15,21 @@ page 6184495 "Pepper Terminal Types"
         {
             repeater(Group)
             {
-                field(ID;ID)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
-                field(Deprecated;Deprecated)
+                field(Deprecated; Deprecated)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

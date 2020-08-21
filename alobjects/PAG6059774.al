@@ -15,59 +15,74 @@ page 6059774 "Member Card Issued Card"
                 group(Control6150615)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Customer No";"Customer No")
+                    field("Customer No"; "Customer No")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Name;Name)
+                    field(Name; Name)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Address;Address)
+                    field(Address; Address)
                     {
+                        ApplicationArea = All;
                     }
-                    field("ZIP Code";"ZIP Code")
+                    field("ZIP Code"; "ZIP Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field(City;City)
+                    field(City; City)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Status;Status)
+                    field(Status; Status)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Reference;Reference)
+                    field(Reference; Reference)
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150624)
                 {
                     ShowCaption = false;
-                    field("Valid Until";"Valid Until")
+                    field("Valid Until"; "Valid Until")
                     {
+                        ApplicationArea = All;
                         Caption = 'Valid Until';
                     }
-                    field("Points (Total)";"Points (Total)")
+                    field("Points (Total)"; "Points (Total)")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Canceling Salesperson";"Canceling Salesperson")
+                    field("Canceling Salesperson"; "Canceling Salesperson")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Created in Company";"Created in Company")
+                    field("Created in Company"; "Created in Company")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Card Type";"Card Type")
+                    field("Card Type"; "Card Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Issue Date";"Issue Date")
+                    field("Issue Date"; "Issue Date")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field(Salesperson;Salesperson)
+                    field(Salesperson; Salesperson)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
@@ -94,7 +109,7 @@ page 6059774 "Member Card Issued Card"
     begin
 
         PointCardTypes.Get("Card Type");
-        SetFilter("Expiration Date Filter",'%1..%2',CalcDate(PointCardTypes."Expiration Calculation",Today),Today);
+        SetFilter("Expiration Date Filter", '%1..%2', CalcDate(PointCardTypes."Expiration Calculation", Today), Today);
         CalcFields("Points (Total)");
     end;
 }

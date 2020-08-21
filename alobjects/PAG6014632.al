@@ -17,46 +17,55 @@ page 6014632 "RP Import Worksheet"
         {
             repeater(Group)
             {
-                field(Template;Template)
+                field(Template; Template)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     StyleExpr = Style;
                     Width = 80;
                 }
-                field("New Template";"New Template")
+                field("New Template"; "New Template")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Action";Action)
+                field("Action"; Action)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         Style := SetStyle();
                     end;
                 }
-                field("Existing Version";"Existing Version")
+                field("Existing Version"; "Existing Version")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Existing Description";"Existing Description")
+                field("Existing Description"; "Existing Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Existing Last Modified At";"Existing Last Modified At")
+                field("Existing Last Modified At"; "Existing Last Modified At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("New Version";"New Version")
+                field("New Version"; "New Version")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("New Description";"New Description")
+                field("New Description"; "New Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("New Last Modified At";"New Last Modified At")
+                field("New Last Modified At"; "New Last Modified At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

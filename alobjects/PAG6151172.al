@@ -19,9 +19,11 @@ page 6151172 "NpGp POS Sales Setup Card"
                     ShowCaption = false;
                     field("Code"; Code)
                     {
+                        ApplicationArea = All;
                     }
                     field("Company Name"; "Company Name")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014408)
@@ -29,12 +31,15 @@ page 6151172 "NpGp POS Sales Setup Card"
                     ShowCaption = false;
                     field("Service Url"; "Service Url")
                     {
+                        ApplicationArea = All;
                     }
                     field("Service Username"; "Service Username")
                     {
+                        ApplicationArea = All;
                     }
                     field(Password; Password)
                     {
+                        ApplicationArea = All;
                         Caption = 'Service Password';
                         ExtendedDatatype = Masked;
 
@@ -47,6 +52,7 @@ page 6151172 "NpGp POS Sales Setup Card"
                     }
                     field("Sync POS Sales Immediately"; "Sync POS Sales Immediately")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

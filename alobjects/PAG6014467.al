@@ -17,30 +17,38 @@ page 6014467 "Quantity Discount List"
         {
             repeater(Group)
             {
-                field("Main No.";"Main No.")
+                field("Main No."; "Main No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Date";"Starting Date")
+                field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Date";"Closing Date")
+                field("Closing Date"; "Closing Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     Caption = 'Shortcut Dimension 1 Code';
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -55,8 +63,8 @@ page 6014467 "Quantity Discount List"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6014439),
-                              "No."=FIELD("Main No.");
+                RunPageLink = "Table ID" = CONST(6014439),
+                              "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
             }
         }

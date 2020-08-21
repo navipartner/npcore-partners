@@ -13,11 +13,13 @@ page 6059996 "Scanner Service Setup"
         {
             group(General)
             {
-                field("Log Request";"Log Request")
+                field("Log Request"; "Log Request")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

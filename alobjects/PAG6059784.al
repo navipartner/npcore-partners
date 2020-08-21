@@ -23,67 +23,87 @@ page 6059784 "TM Ticket Type"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Related Ticket Type";"Related Ticket Type")
+                field("Related Ticket Type"; "Related Ticket Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Print Ticket";"Print Ticket")
+                field("Print Ticket"; "Print Ticket")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Object Type";"Print Object Type")
+                field("Print Object Type"; "Print Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("RP Template Code";"RP Template Code")
+                field("RP Template Code"; "RP Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Object ID";"Print Object ID")
+                field("Print Object ID"; "Print Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Registration";"Admission Registration")
+                field("Admission Registration"; "Admission Registration")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Series";"No. Series")
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Ticket Pattern";"External Ticket Pattern")
+                field("External Ticket Pattern"; "External Ticket Pattern")
                 {
+                    ApplicationArea = All;
                 }
-                field("Activation Method";"Activation Method")
+                field("Activation Method"; "Activation Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Configuration Source";"Ticket Configuration Source")
+                field("Ticket Configuration Source"; "Ticket Configuration Source")
                 {
+                    ApplicationArea = All;
                 }
-                field("Duration Formula";"Duration Formula")
+                field("Duration Formula"; "Duration Formula")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ticket Entry Validation";"Ticket Entry Validation")
+                field("Ticket Entry Validation"; "Ticket Entry Validation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max No. Of Entries";"Max No. Of Entries")
+                field("Max No. Of Entries"; "Max No. Of Entries")
                 {
+                    ApplicationArea = All;
                 }
-                field("Is Ticket";"Is Ticket")
+                field("Is Ticket"; "Is Ticket")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Membership Sales Item No.";"Membership Sales Item No.")
+                field("Membership Sales Item No."; "Membership Sales Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("DIY Print Layout Code";"DIY Print Layout Code")
+                field("DIY Print Layout Code"; "DIY Print Layout Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("eTicket Activated";"eTicket Activated")
+                field("eTicket Activated"; "eTicket Activated")
                 {
+                    ApplicationArea = All;
                 }
-                field("eTicket Type Code";"eTicket Type Code")
+                field("eTicket Type Code"; "eTicket Type Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -109,7 +129,7 @@ page 6059784 "TM Ticket Type"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Retail Item List";
-                RunPageLink = "Ticket Type"=FIELD(Code);
+                RunPageLink = "Ticket Type" = FIELD(Code);
             }
             action(Admissions)
             {
@@ -137,7 +157,7 @@ page 6059784 "TM Ticket Type"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "E-mail Templates";
-                RunPageView = WHERE("Table No."=CONST(6060110));
+                RunPageView = WHERE("Table No." = CONST(6060110));
             }
             action("SMS Template")
             {
@@ -146,7 +166,7 @@ page 6059784 "TM Ticket Type"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "SMS Template List";
-                RunPageView = WHERE("Table No."=CONST(6060110));
+                RunPageView = WHERE("Table No." = CONST(6060110));
             }
             action("Edit Pass Template")
             {
@@ -157,7 +177,7 @@ page 6059784 "TM Ticket Type"
 
                 trigger OnAction()
                 begin
-                    EditPassTemplate ();
+                    EditPassTemplate();
                 end;
             }
         }
@@ -168,13 +188,13 @@ page 6059784 "TM Ticket Type"
 
     procedure HideTickets()
     begin
-        SetRange("Is Ticket",false);
+        SetRange("Is Ticket", false);
     end;
 
     local procedure EditPassTemplate()
     begin
 
-        Rec.EditPassTemplate ();
+        Rec.EditPassTemplate();
         CurrPage.Update(true);
     end;
 }

@@ -14,86 +14,113 @@ page 6014666 "Stock-Take Templates"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Filter";"Item Group Filter")
+                field("Item Group Filter"; "Item Group Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Code Filter";"Vendor Code Filter")
+                field("Vendor Code Filter"; "Vendor Code Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Session Based Loading";"Session Based Loading")
+                field("Session Based Loading"; "Session Based Loading")
                 {
+                    ApplicationArea = All;
                 }
-                field("Session Based Transfer";"Session Based Transfer")
+                field("Session Based Transfer"; "Session Based Transfer")
                 {
+                    ApplicationArea = All;
                 }
-                field("Aggregation Level";"Aggregation Level")
+                field("Aggregation Level"; "Aggregation Level")
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Release";"Data Release")
+                field("Data Release"; "Data Release")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transfer Action";"Transfer Action")
+                field("Transfer Action"; "Transfer Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Defaul Profile";"Defaul Profile")
+                field("Defaul Profile"; "Defaul Profile")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow User Modification";"Allow User Modification")
+                field("Allow User Modification"; "Allow User Modification")
                 {
+                    ApplicationArea = All;
                 }
-                field("Items Out-of-Scope";"Items Out-of-Scope")
+                field("Items Out-of-Scope"; "Items Out-of-Scope")
                 {
+                    ApplicationArea = All;
                 }
-                field("Items in Scope Not Counted";"Items in Scope Not Counted")
+                field("Items in Scope Not Counted"; "Items in Scope Not Counted")
                 {
+                    ApplicationArea = All;
                 }
-                field("Barcode Not Accepted";"Barcode Not Accepted")
+                field("Barcode Not Accepted"; "Barcode Not Accepted")
                 {
+                    ApplicationArea = All;
                 }
-                field("Counting Method";"Counting Method")
+                field("Counting Method"; "Counting Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Suggested Unit Cost Source";"Suggested Unit Cost Source")
+                field("Suggested Unit Cost Source"; "Suggested Unit Cost Source")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Unit Cost Change";"Allow Unit Cost Change")
+                field("Allow Unit Cost Change"; "Allow Unit Cost Change")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Journal Template Name";"Item Journal Template Name")
+                field("Item Journal Template Name"; "Item Journal Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Journal Batch Name";"Item Journal Batch Name")
+                field("Item Journal Batch Name"; "Item Journal Batch Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Journal Batch Usage";"Item Journal Batch Usage")
+                field("Item Journal Batch Usage"; "Item Journal Batch Usage")
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked Item";"Blocked Item")
+                field("Blocked Item"; "Blocked Item")
                 {
+                    ApplicationArea = All;
                 }
-                field("Suppress Not Counted";"Suppress Not Counted")
+                field("Suppress Not Counted"; "Suppress Not Counted")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock Take Method";"Stock Take Method")
+                field("Stock Take Method"; "Stock Take Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("Adjustment Method";"Adjustment Method")
+                field("Adjustment Method"; "Adjustment Method")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -113,7 +140,7 @@ page 6014666 "Stock-Take Templates"
                 Image = Card;
                 Promoted = true;
                 RunObject = Page "Stock-Take Template Card";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F5';
             }
             action(CreateDefaultTemplates)
@@ -128,7 +155,7 @@ page 6014666 "Stock-Take Templates"
                 var
                     StockTakeMgr: Codeunit "Stock-Take Manager";
                 begin
-                    StockTakeMgr.CreateDefaultTemplates ();
+                    StockTakeMgr.CreateDefaultTemplates();
                 end;
             }
         }
@@ -139,7 +166,7 @@ page 6014666 "Stock-Take Templates"
                 Caption = 'Configurations';
                 Image = Components;
                 RunObject = Page "Stock-Take Configurations";
-                RunPageLink = "Stock-Take Template Code"=FIELD(Code);
+                RunPageLink = "Stock-Take Template Code" = FIELD(Code);
             }
         }
     }

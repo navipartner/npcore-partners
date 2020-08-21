@@ -18,14 +18,17 @@ page 6184511 "EFT BIN Group List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -16,14 +16,17 @@ page 6014610 "Retail Campaigns"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Category Id";"Magento Category Id")
+                field("Magento Category Id"; "Magento Category Id")
                 {
+                    ApplicationArea = All;
                     Visible = MagentoEnabled;
                 }
             }

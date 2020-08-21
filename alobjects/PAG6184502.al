@@ -20,77 +20,101 @@ page 6184502 "CleanCash Audit Roll List"
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sale Date";"Sale Date")
+                field("Sale Date"; "Sale Date")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Type";"Receipt Type")
+                field("Receipt Type"; "Receipt Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Total";"Receipt Total")
+                field("Receipt Total"; "Receipt Total")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Total Neg";"Receipt Total Neg")
+                field("Receipt Total Neg"; "Receipt Total Neg")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Time";"Receipt Time")
+                field("Receipt Time"; "Receipt Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(VatRate1;VatRate1)
+                field(VatRate1; VatRate1)
                 {
+                    ApplicationArea = All;
                 }
-                field(VatAmount1;VatAmount1)
+                field(VatAmount1; VatAmount1)
                 {
+                    ApplicationArea = All;
                 }
-                field(VatRate2;VatRate2)
+                field(VatRate2; VatRate2)
                 {
+                    ApplicationArea = All;
                 }
-                field(VatAmount2;VatAmount2)
+                field(VatAmount2; VatAmount2)
                 {
+                    ApplicationArea = All;
                 }
-                field(VatRate3;VatRate3)
+                field(VatRate3; VatRate3)
                 {
+                    ApplicationArea = All;
                 }
-                field(VatAmount3;VatAmount3)
+                field(VatAmount3; VatAmount3)
                 {
+                    ApplicationArea = All;
                 }
-                field(VatRate4;VatRate4)
+                field(VatRate4; VatRate4)
                 {
+                    ApplicationArea = All;
                 }
-                field(VatAmount4;VatAmount4)
+                field(VatAmount4; VatAmount4)
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket Type";"Sales Ticket Type")
+                field("Sales Ticket Type"; "Sales Ticket Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Time";"Closing Time")
+                field("Closing Time"; "Closing Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Register No.";"CleanCash Register No.")
+                field("CleanCash Register No."; "CleanCash Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Reciept No.";"CleanCash Reciept No.")
+                field("CleanCash Reciept No."; "CleanCash Reciept No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Serial No.";"CleanCash Serial No.")
+                field("CleanCash Serial No."; "CleanCash Serial No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Control Code";"CleanCash Control Code")
+                field("CleanCash Control Code"; "CleanCash Control Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Copy Serial No.";"CleanCash Copy Serial No.")
+                field("CleanCash Copy Serial No."; "CleanCash Copy Serial No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Copy Control Code";"CleanCash Copy Control Code")
+                field("CleanCash Copy Control Code"; "CleanCash Copy Control Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -122,10 +146,10 @@ page 6184502 "CleanCash Audit Roll List"
                     CleanCashCommunication: Codeunit "CleanCash Communication";
                 begin
                     //-NPR5.55 [409228]
-                    Rec.TestField("CleanCash Control Code",'');
-                    Rec.TestField("CleanCash Copy Control Code",'');
-                    Rec.TestField("Receipt Type",'');
-                    CleanCashCommunication.RunSingelSalesTicket(Rec."Sales Ticket No.",Rec."Register No.");
+                    Rec.TestField("CleanCash Control Code", '');
+                    Rec.TestField("CleanCash Copy Control Code", '');
+                    Rec.TestField("Receipt Type", '');
+                    CleanCashCommunication.RunSingelSalesTicket(Rec."Sales Ticket No.", Rec."Register No.");
                     CurrPage.Update(false);
                     //+NPR5.55 [409228]
                 end;

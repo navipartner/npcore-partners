@@ -14,8 +14,9 @@ page 6184499 "EFT Tr. Rq. Comment Subform"
     {
         area(content)
         {
-            field(Receipt1Text;Receipt1Text)
+            field(Receipt1Text; Receipt1Text)
             {
+                ApplicationArea = All;
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
@@ -30,8 +31,9 @@ page 6184499 "EFT Tr. Rq. Comment Subform"
                     //+NPR5.46 [290734]
                 end;
             }
-            field(Receipt2Text;Receipt2Text)
+            field(Receipt2Text; Receipt2Text)
             {
+                ApplicationArea = All;
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
@@ -48,8 +50,9 @@ page 6184499 "EFT Tr. Rq. Comment Subform"
             }
             repeater(Group)
             {
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -62,15 +65,15 @@ page 6184499 "EFT Tr. Rq. Comment Subform"
     trigger OnAfterGetCurrRecord()
     begin
         if not EFTTransactionRequest.Get("Entry No.") then
-          EFTTransactionRequest.Init;
+            EFTTransactionRequest.Init;
         if EFTTransactionRequest."Receipt 1".HasValue then
-          Receipt1Text := StrSubstNo(TxtClickReceipt,'1')
+            Receipt1Text := StrSubstNo(TxtClickReceipt, '1')
         else
-          Receipt1Text := '';
+            Receipt1Text := '';
         if EFTTransactionRequest."Receipt 2".HasValue then
-          Receipt2Text := StrSubstNo(TxtClickReceipt,'2')
+            Receipt2Text := StrSubstNo(TxtClickReceipt, '2')
         else
-          Receipt2Text := '';
+            Receipt2Text := '';
     end;
 
     var

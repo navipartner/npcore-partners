@@ -15,14 +15,17 @@ page 6014478 "RFID Setup"
             group(General)
             {
                 Caption = 'General';
-                field("RFID Value No. Series";"RFID Value No. Series")
+                field("RFID Value No. Series"; "RFID Value No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("RFID Hex Value Length";"RFID Hex Value Length")
+                field("RFID Hex Value Length"; "RFID Hex Value Length")
                 {
+                    ApplicationArea = All;
                 }
-                field("RFID Hex Value Prefix";"RFID Hex Value Prefix")
+                field("RFID Hex Value Prefix"; "RFID Hex Value Prefix")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -36,8 +39,8 @@ page 6014478 "RFID Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

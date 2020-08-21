@@ -17,17 +17,21 @@ page 6151438 "Magento Store List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Website Code";"Website Code")
+                field("Website Code"; "Website Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Language Code";"Language Code")
+                field("Language Code"; "Language Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -45,7 +49,7 @@ page 6151438 "Magento Store List"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "Magento Store Item List";
-                RunPageLink = "Store Code"=FIELD(Code);
+                RunPageLink = "Store Code" = FIELD(Code);
                 Visible = MultiStore;
             }
         }

@@ -13,23 +13,29 @@ page 6060069 "MM Admission Scanner Stations"
         {
             repeater(Group)
             {
-                field("Scanner Station Id";"Scanner Station Id")
+                field("Scanner Station Id"; "Scanner Station Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Guest Avatar";"Guest Avatar")
+                field("Guest Avatar"; "Guest Avatar")
                 {
+                    ApplicationArea = All;
                 }
-                field("Turnstile Default Image";"Turnstile Default Image")
+                field("Turnstile Default Image"; "Turnstile Default Image")
                 {
+                    ApplicationArea = All;
                 }
-                field("Turnstile Error Image";"Turnstile Error Image")
+                field("Turnstile Error Image"; "Turnstile Error Image")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Activated;Activated)
+                field(Activated; Activated)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

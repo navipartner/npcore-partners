@@ -25,30 +25,36 @@ page 6151439 "Magento Store Item List"
                         ShowCaption = false;
                         repeater(Group)
                         {
-                            field("Item No.";"Item No.")
+                            field("Item No."; "Item No.")
                             {
+                                ApplicationArea = All;
                             }
-                            field(Webshop;Webshop)
+                            field(Webshop; Webshop)
                             {
+                                ApplicationArea = All;
                             }
-                            field("Store Code";"Store Code")
+                            field("Store Code"; "Store Code")
                             {
+                                ApplicationArea = All;
                                 Editable = false;
                             }
-                            field("Website Code";"Website Code")
+                            field("Website Code"; "Website Code")
                             {
+                                ApplicationArea = All;
                                 Editable = false;
                             }
-                            field(Enabled;Enabled)
+                            field(Enabled; Enabled)
                             {
+                                ApplicationArea = All;
 
                                 trigger OnValidate()
                                 begin
                                     CurrPage.Update(true);
                                 end;
                             }
-                            field(GetEnabledFieldsCaption;GetEnabledFieldsCaption)
+                            field(GetEnabledFieldsCaption; GetEnabledFieldsCaption)
                             {
+                                ApplicationArea = All;
                                 Caption = 'Fields Enabled';
                                 Editable = false;
                             }
@@ -61,10 +67,10 @@ page 6151439 "Magento Store Item List"
                     group(Control6150623)
                     {
                         ShowCaption = false;
-                        part(MagentoCategoryLinks;"Magento Category Links")
+                        part(MagentoCategoryLinks; "Magento Category Links")
                         {
                             Caption = 'Magento Category Links';
-                            SubPageLink = "Item No."=FIELD("Item No.");
+                            SubPageLink = "Item No." = FIELD("Item No.");
                         }
                     }
                     group(Control6150693)
@@ -82,15 +88,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150689)
                                     {
                                         ShowCaption = false;
-                                        field("Unit Price";"Unit Price")
+                                        field("Unit Price"; "Unit Price")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150687)
                                     {
                                         ShowCaption = false;
-                                        field("Unit Price Enabled";"Unit Price Enabled")
+                                        field("Unit Price Enabled"; "Unit Price Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -101,15 +109,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150686)
                                     {
                                         ShowCaption = false;
-                                        field("Product New From";"Product New From")
+                                        field("Product New From"; "Product New From")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150684)
                                     {
                                         ShowCaption = false;
-                                        field("Product New From Enabled";"Product New From Enabled")
+                                        field("Product New From Enabled"; "Product New From Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -120,15 +130,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150679)
                                     {
                                         ShowCaption = false;
-                                        field("Product New To";"Product New To")
+                                        field("Product New To"; "Product New To")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150677)
                                     {
                                         ShowCaption = false;
-                                        field("Product New To Enabled";"Product New To Enabled")
+                                        field("Product New To Enabled"; "Product New To Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -139,15 +151,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150676)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price";"Special Price")
+                                        field("Special Price"; "Special Price")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150674)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price Enabled";"Special Price Enabled")
+                                        field("Special Price Enabled"; "Special Price Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -158,15 +172,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150669)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price From";"Special Price From")
+                                        field("Special Price From"; "Special Price From")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150667)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price From Enabled";"Special Price From Enabled")
+                                        field("Special Price From Enabled"; "Special Price From Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -177,15 +193,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150666)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price To";"Special Price To")
+                                        field("Special Price To"; "Special Price To")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150664)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price To Enabled";"Special Price To Enabled")
+                                        field("Special Price To Enabled"; "Special Price To Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -204,16 +222,18 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150657)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Name";"Webshop Name")
+                                        field("Webshop Name"; "Webshop Name")
                                         {
+                                            ApplicationArea = All;
                                             Caption = 'Name';
                                         }
                                     }
                                     group(Control6150655)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Name Enabled";"Webshop Name Enabled")
+                                        field("Webshop Name Enabled"; "Webshop Name Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -224,8 +244,9 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150654)
                                     {
                                         ShowCaption = false;
-                                        field("FORMAT(""Webshop Description"".HASVALUE)";Format("Webshop Description".HasValue))
+                                        field("FORMAT(""Webshop Description"".HASVALUE)"; Format("Webshop Description".HasValue))
                                         {
+                                            ApplicationArea = All;
                                             Caption = 'Description';
 
                                             trigger OnAssistEdit()
@@ -237,8 +258,8 @@ page 6151439 "Magento Store Item List"
                                                 RecRef.GetTable(Rec);
                                                 FieldRef := RecRef.Field(FieldNo("Webshop Description"));
                                                 if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                                  RecRef.SetTable(Rec);
-                                                  Modify(true);
+                                                    RecRef.SetTable(Rec);
+                                                    Modify(true);
                                                 end;
                                             end;
                                         }
@@ -246,8 +267,9 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150650)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Description Enabled";"Webshop Description Enabled")
+                                        field("Webshop Description Enabled"; "Webshop Description Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -258,8 +280,9 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150645)
                                     {
                                         ShowCaption = false;
-                                        field("FORMAT(""Webshop Short Desc."".HASVALUE)";Format("Webshop Short Desc.".HasValue))
+                                        field("FORMAT(""Webshop Short Desc."".HASVALUE)"; Format("Webshop Short Desc.".HasValue))
                                         {
+                                            ApplicationArea = All;
                                             Caption = 'Short Description';
 
                                             trigger OnAssistEdit()
@@ -271,8 +294,8 @@ page 6151439 "Magento Store Item List"
                                                 RecRef.GetTable(Rec);
                                                 FieldRef := RecRef.Field(FieldNo("Webshop Short Desc."));
                                                 if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                                                  RecRef.SetTable(Rec);
-                                                  Modify(true);
+                                                    RecRef.SetTable(Rec);
+                                                    Modify(true);
                                                 end;
                                             end;
                                         }
@@ -280,8 +303,9 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150643)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Short Desc. Enabled";"Webshop Short Desc. Enabled")
+                                        field("Webshop Short Desc. Enabled"; "Webshop Short Desc. Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -292,8 +316,9 @@ page 6151439 "Magento Store Item List"
                                     group(Control6151400)
                                     {
                                         ShowCaption = false;
-                                        field(Visibility;Visibility)
+                                        field(Visibility; Visibility)
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                 }
@@ -303,15 +328,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150642)
                                     {
                                         ShowCaption = false;
-                                        field("Display Only";"Display Only")
+                                        field("Display Only"; "Display Only")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150640)
                                     {
                                         ShowCaption = false;
-                                        field("Display Only Enabled";"Display Only Enabled")
+                                        field("Display Only Enabled"; "Display Only Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -322,15 +349,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150635)
                                     {
                                         ShowCaption = false;
-                                        field("Seo Link";"Seo Link")
+                                        field("Seo Link"; "Seo Link")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150633)
                                     {
                                         ShowCaption = false;
-                                        field("Seo Link Enabled";"Seo Link Enabled")
+                                        field("Seo Link Enabled"; "Seo Link Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -341,15 +370,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150632)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Title";"Meta Title")
+                                        field("Meta Title"; "Meta Title")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150630)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Title Enabled";"Meta Title Enabled")
+                                        field("Meta Title Enabled"; "Meta Title Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }
@@ -360,15 +391,17 @@ page 6151439 "Magento Store Item List"
                                     group(Control6150619)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Description";"Meta Description")
+                                        field("Meta Description"; "Meta Description")
                                         {
+                                            ApplicationArea = All;
                                         }
                                     }
                                     group(Control6150616)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Description Enabled";"Meta Description Enabled")
+                                        field("Meta Description Enabled"; "Meta Description Enabled")
                                         {
+                                            ApplicationArea = All;
                                             ShowCaption = false;
                                         }
                                     }

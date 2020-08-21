@@ -13,17 +13,21 @@ page 6151393 "CS Store Users"
         {
             repeater(Group)
             {
-                field("User ID";"User ID")
+                field("User ID"; "User ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store";"POS Store")
+                field("POS Store"; "POS Store")
                 {
+                    ApplicationArea = All;
                 }
-                field(Supervisor;Supervisor)
+                field(Supervisor; Supervisor)
                 {
+                    ApplicationArea = All;
                 }
-                field("Adjust Inventory";"Adjust Inventory")
+                field("Adjust Inventory"; "Adjust Inventory")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

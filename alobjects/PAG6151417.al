@@ -18,20 +18,25 @@ page 6151417 "Magento Child Categories"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Count";"Item Count")
+                field("Item Count"; "Item Count")
                 {
+                    ApplicationArea = All;
 
                     trigger OnDrillDown()
                     begin

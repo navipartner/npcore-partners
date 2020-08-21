@@ -12,14 +12,17 @@ page 6151571 "AF Test Objects"
         {
             repeater(Group)
             {
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object ID";"Object ID")
+                field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Object Name";"Object Name")
+                field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -40,7 +43,8 @@ page 6151571 "AF Test Objects"
                 trigger OnAction()
                 begin
                     case "Object Type" of
-                      "Object Type"::Page : PAGE.Run("Object ID");
+                        "Object Type"::Page:
+                            PAGE.Run("Object ID");
                     end;
                 end;
             }

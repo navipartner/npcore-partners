@@ -14,23 +14,29 @@ page 6059992 "Item Repair Tests"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Test No.";"Test No.")
+                field("Test No."; "Test No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Test Group";"Test Group")
+                field("Test Group"; "Test Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Success;Success)
+                field(Success; Success)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

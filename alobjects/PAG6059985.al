@@ -15,21 +15,25 @@ page 6059985 "Retail Document Activities"
             cuegroup("Open Documents")
             {
                 Caption = 'Open Documents';
-                field("Selection Contracts Open";"Selection Contracts Open")
+                field("Selection Contracts Open"; "Selection Contracts Open")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Retail Document List";
                 }
-                field("Customizations Open";"Customizations Open")
+                field("Customizations Open"; "Customizations Open")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Retail Document List";
                 }
-                field("Retail Orders Open";"Retail Orders Open")
+                field("Retail Orders Open"; "Retail Orders Open")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Retail Document List";
                     Visible = NOT UseStandardOrderDocument;
                 }
-                field("Number of Open Orders";"Number of Open Orders")
+                field("Number of Open Orders"; "Number of Open Orders")
                 {
+                    ApplicationArea = All;
                     Visible = UseStandardOrderDocument;
                 }
 
@@ -40,45 +44,49 @@ page 6059985 "Retail Document Activities"
                         Caption = 'New Selection Contract';
                         RunObject = Page "Retail Document Header";
                         RunPageMode = Create;
-                        RunPageView = SORTING("Document Type","No.")
-                                      WHERE("Document Type"=CONST("Selection Contract"));
+                        RunPageView = SORTING("Document Type", "No.")
+                                      WHERE("Document Type" = CONST("Selection Contract"));
                     }
                     action("New Customization")
                     {
                         Caption = 'New Customization';
                         RunObject = Page "Retail Document Header";
                         RunPageMode = Create;
-                        RunPageView = SORTING("Document Type","No.")
-                                      WHERE("Document Type"=CONST("Selection Contract"));
+                        RunPageView = SORTING("Document Type", "No.")
+                                      WHERE("Document Type" = CONST("Selection Contract"));
                     }
                     action("New Retail Order")
                     {
                         Caption = 'New Retail Order';
                         RunObject = Page "Retail Document Header";
                         RunPageMode = Create;
-                        RunPageView = SORTING("Document Type","No.")
-                                      WHERE("Document Type"=CONST("Selection Contract"));
+                        RunPageView = SORTING("Document Type", "No.")
+                                      WHERE("Document Type" = CONST("Selection Contract"));
                     }
                 }
             }
             cuegroup("Cashed Documents")
             {
                 Caption = 'Cashed Documents';
-                field("Selection Contracts Cashed";"Selection Contracts Cashed")
+                field("Selection Contracts Cashed"; "Selection Contracts Cashed")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Retail Document List";
                 }
-                field("Customizations Cashed";"Customizations Cashed")
+                field("Customizations Cashed"; "Customizations Cashed")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Retail Document List";
                 }
-                field("Retail Orders Cashed";"Retail Orders Cashed")
+                field("Retail Orders Cashed"; "Retail Orders Cashed")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Retail Document List";
                     Visible = NOT UseStandardOrderDocument;
                 }
-                field("Number of Posted Orders";"Number of Posted Orders")
+                field("Number of Posted Orders"; "Number of Posted Orders")
                 {
+                    ApplicationArea = All;
                     Visible = UseStandardOrderDocument;
                 }
             }
@@ -103,8 +111,8 @@ page 6059985 "Retail Document Activities"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 

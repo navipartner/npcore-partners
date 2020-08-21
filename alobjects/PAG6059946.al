@@ -14,50 +14,65 @@ page 6059946 "CashKeeper Transaction"
         {
             repeater(Group)
             {
-                field("Transaction No.";"Transaction No.")
+                field("Transaction No."; "Transaction No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Line No.";"Sales Line No.")
+                field("Sales Line No."; "Sales Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("CK Error Code";"CK Error Code")
+                field("CK Error Code"; "CK Error Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("CK Error Description";"CK Error Description")
+                field("CK Error Description"; "CK Error Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Order ID";"Order ID")
+                field("Order ID"; "Order ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Type";"Payment Type")
+                field("Payment Type"; "Payment Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Action";Action)
+                field("Action"; Action)
                 {
+                    ApplicationArea = All;
                 }
-                field("Value In Cents";"Value In Cents")
+                field("Value In Cents"; "Value In Cents")
                 {
+                    ApplicationArea = All;
                 }
-                field("Paid In Value";"Paid In Value")
+                field("Paid In Value"; "Paid In Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Paid Out Value";"Paid Out Value")
+                field("Paid Out Value"; "Paid Out Value")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field(Reversed;Reversed)
+                field(Reversed; Reversed)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -20,32 +20,39 @@ page 6150660 "NPRE Waiter Pad"
             group(Control6014423)
             {
                 ShowCaption = false;
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                     Caption = 'Opened';
                     Editable = false;
                 }
-                field("Current Seating FF";"Current Seating FF")
+                field("Current Seating FF"; "Current Seating FF")
                 {
+                    ApplicationArea = All;
                     Caption = 'Seating';
                     Editable = false;
                 }
-                field("Current Seating Description";"Current Seating Description")
+                field("Current Seating Description"; "Current Seating Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Number of Guests";"Number of Guests")
+                field("Number of Guests"; "Number of Guests")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Status Description FF";"Status Description FF")
+                field("Status Description FF"; "Status Description FF")
                 {
+                    ApplicationArea = All;
                     Caption = 'Waiter Pad Status';
                     DrillDown = false;
 
@@ -56,19 +63,21 @@ page 6150660 "NPRE Waiter Pad"
                     begin
                         //-NPR5.53 [360258]
                         NewStatusCode := Status;
-                        if LookupFlowStatus(FlowStatus."Status Object"::WaiterPad,NewStatusCode) then begin
-                          Validate(Status,NewStatusCode);
-                          CalcFields("Status Description FF");
+                        if LookupFlowStatus(FlowStatus."Status Object"::WaiterPad, NewStatusCode) then begin
+                            Validate(Status, NewStatusCode);
+                            CalcFields("Status Description FF");
                         end;
                         //+NPR5.53 [360258]
                     end;
                 }
-                field("Serving Step Code";"Serving Step Code")
+                field("Serving Step Code"; "Serving Step Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Serving Step Description";"Serving Step Description")
+                field("Serving Step Description"; "Serving Step Description")
                 {
+                    ApplicationArea = All;
                     Caption = 'Serving Step';
                     DrillDown = false;
 
@@ -79,37 +88,41 @@ page 6150660 "NPRE Waiter Pad"
                     begin
                         //-NPR5.53 [360258]
                         NewStatusCode := "Serving Step Code";
-                        if LookupFlowStatus(FlowStatus."Status Object"::WaiterPadLineMealFlow,NewStatusCode) then begin
-                          Validate("Serving Step Code",NewStatusCode);
-                          CalcFields("Serving Step Description");
+                        if LookupFlowStatus(FlowStatus."Status Object"::WaiterPadLineMealFlow, NewStatusCode) then begin
+                            Validate("Serving Step Code", NewStatusCode);
+                            CalcFields("Serving Step Description");
                         end;
                         //+NPR5.53 [360258]
                     end;
                 }
-                field("Pre-receipt Printed";"Pre-receipt Printed")
+                field("Pre-receipt Printed"; "Pre-receipt Printed")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
-            part(WaiterPadLinesSubpage;"NPRE Waiter Pad Subform")
+            part(WaiterPadLinesSubpage; "NPRE Waiter Pad Subform")
             {
-                SubPageLink = "Waiter Pad No."=FIELD("No.");
+                SubPageLink = "Waiter Pad No." = FIELD("No.");
                 UpdatePropagation = Both;
             }
             group(ClosingStatus)
             {
                 Caption = 'Closed';
                 Editable = false;
-                field(Closed;Closed)
+                field(Closed; Closed)
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Close Date";"Close Date")
+                field("Close Date"; "Close Date")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Close Time";"Close Time")
+                field("Close Time"; "Close Time")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
             }
@@ -138,7 +151,7 @@ page 6150660 "NPRE Waiter Pad"
                         trigger OnAction()
                         begin
                             //HospitalityPrint.PrintWaiterPadPreOrderToKitchenPressed(Rec);  //NPR5.55 [399170]-revoked
-                            HospitalityPrint.PrintWaiterPadPreOrderToKitchenPressed(Rec,true);  //NPR5.55 [399170]
+                            HospitalityPrint.PrintWaiterPadPreOrderToKitchenPressed(Rec, true);  //NPR5.55 [399170]
                         end;
                     }
                     action(RunNext)
@@ -152,7 +165,7 @@ page 6150660 "NPRE Waiter Pad"
 
                         trigger OnAction()
                         begin
-                            HospitalityPrint.RequestRunServingStepToKitchen(Rec,true,'');  //NPR5.53 [360258]
+                            HospitalityPrint.RequestRunServingStepToKitchen(Rec, true, '');  //NPR5.53 [360258]
                         end;
                     }
                     action(RunServingStep)
@@ -186,12 +199,12 @@ page 6150660 "NPRE Waiter Pad"
                             //-NPR5.53 [360258]
                             Clear(WaiterPadLine);
                             CurrPage.WaiterPadLinesSubpage.PAGE.GetSelection(WaiterPadLine);
-                            WaiterPadLine.SetRange("Waiter Pad No.","No.");
+                            WaiterPadLine.SetRange("Waiter Pad No.", "No.");
                             WaiterPadLine.MarkedOnly(true);
                             if not WaiterPadLine.IsEmpty then begin
-                              //HospitalityPrint.PrintWaiterPadLinesToKitchen(Rec,WaiterPadLine,PrintTemplate."Print Type"::"Serving Request",'',FALSE);  //NPR5.55 [399170]-revoked
-                              HospitalityPrint.PrintWaiterPadLinesToKitchen(Rec,WaiterPadLine,PrintTemplate."Print Type"::"Serving Request",'',false,true);  //NPR5.55 [399170]
-                              CurrPage.WaiterPadLinesSubpage.PAGE.ClearMarkedLines();
+                                //HospitalityPrint.PrintWaiterPadLinesToKitchen(Rec,WaiterPadLine,PrintTemplate."Print Type"::"Serving Request",'',FALSE);  //NPR5.55 [399170]-revoked
+                                HospitalityPrint.PrintWaiterPadLinesToKitchen(Rec, WaiterPadLine, PrintTemplate."Print Type"::"Serving Request", '', false, true);  //NPR5.55 [399170]
+                                CurrPage.WaiterPadLinesSubpage.PAGE.ClearMarkedLines();
                             end;
                             //+NPR5.53 [360258]
                         end;
@@ -243,7 +256,7 @@ page 6150660 "NPRE Waiter Pad"
                         NPHWaiterPad: Page "NPRE Waiter Pad";
                     begin
                         if NPHWaiterPadPOSManagement.MergeWaiterPadUI(Rec) then begin
-                          CurrPage.Close;
+                            CurrPage.Close;
                         end;
                     end;
                 }
@@ -297,25 +310,25 @@ page 6150660 "NPRE Waiter Pad"
         SeatingList.LookupMode(true);
         SeatingList.Editable(false);
         if SeatingList.RunModal = ACTION::LookupOK then begin
-          SeatingList.GetRecord(Seating);
-          WaiterPadManagement.LinkSeatingToWaiterPad(Rec."No.", Seating.Code);
+            SeatingList.GetRecord(Seating);
+            WaiterPadManagement.LinkSeatingToWaiterPad(Rec."No.", Seating.Code);
         end;
     end;
 
-    local procedure LookupFlowStatus(StatusObjectType: Integer;var StatusCode: Code[10]): Boolean
+    local procedure LookupFlowStatus(StatusObjectType: Integer; var StatusCode: Code[10]): Boolean
     var
         FlowStatus: Record "NPRE Flow Status";
     begin
         //-NPR5.53 [360258]
-        FlowStatus.SetRange("Status Object",StatusObjectType);
+        FlowStatus.SetRange("Status Object", StatusObjectType);
         if StatusCode <> '' then begin
-          FlowStatus."Status Object" := StatusObjectType;
-          FlowStatus.Code := StatusCode;
-          if FlowStatus.Find('=><') then;
+            FlowStatus."Status Object" := StatusObjectType;
+            FlowStatus.Code := StatusCode;
+            if FlowStatus.Find('=><') then;
         end;
-        if PAGE.RunModal(0,FlowStatus) = ACTION::LookupOK then begin
-          StatusCode := FlowStatus.Code;
-          exit(true);
+        if PAGE.RunModal(0, FlowStatus) = ACTION::LookupOK then begin
+            StatusCode := FlowStatus.Code;
+            exit(true);
         end;
         exit(false);
         //+NPR5.53 [360258]

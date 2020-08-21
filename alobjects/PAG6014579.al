@@ -21,18 +21,21 @@ page 6014579 "Retail List"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Choice;Choice)
+                field(Choice; Choice)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Chosen;Chosen)
+                field(Chosen; Chosen)
                 {
+                    ApplicationArea = All;
                     ColumnSpan = 2;
                     Enabled = MultipleChoice;
                     Visible = MultipleChoice;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = ShowValue;
                     Visible = ShowValue;
@@ -77,7 +80,7 @@ page 6014579 "Retail List"
     begin
         //-NPR5.26 [241549]
         if not TempRetailList.IsTemporary then
-          exit;
+            exit;
 
         Rec.Copy(TempRetailList, true);
         Rec.CopyFilters(TempRetailList);
@@ -88,7 +91,7 @@ page 6014579 "Retail List"
     begin
         //-NPR5.26 [241549]
         if not TempRetailListOut.IsTemporary then
-          exit;
+            exit;
 
         TempRetailListOut.Copy(Rec, true);
         TempRetailListOut.CopyFilters(Rec);

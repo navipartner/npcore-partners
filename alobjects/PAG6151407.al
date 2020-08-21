@@ -17,15 +17,18 @@ page 6151407 "Magento Tax Classes"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Config. Template Code";"Customer Config. Template Code")
+                field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
-                    Enabled = "Type"=1;
+                    ApplicationArea = All;
+                    Enabled = "Type" = 1;
                 }
             }
         }

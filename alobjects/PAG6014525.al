@@ -16,31 +16,39 @@ page 6014525 "Touch Screen - Items"
             repeater(Control6150624)
             {
                 ShowCaption = false;
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(ItemGroupName;ItemGroupName)
+                field(ItemGroupName; ItemGroupName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Group';
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Item No.";"Vendor Item No.")
+                field("Vendor Item No."; "Vendor Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(VendorName;VendorName)
+                field(VendorName; VendorName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Vendor';
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -79,7 +87,7 @@ page 6014525 "Touch Screen - Items"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByEvent);
+                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent);
                         end;
                     }
                     action(Period)
@@ -87,36 +95,36 @@ page 6014525 "Touch Screen - Items"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action(Variant)
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
                         RunObject = Page "Item Availability by Variant";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action(Location)
                     {
                         Caption = 'Location';
                         Image = Warehouse;
                         RunObject = Page "Item Availability by Location";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action("BOM Level")
                     {
@@ -125,7 +133,7 @@ page 6014525 "Touch Screen - Items"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByBOM);
+                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM);
                         end;
                     }
                     action(Timeline)
@@ -149,12 +157,12 @@ page 6014525 "Touch Screen - Items"
         Vendor: Record Vendor;
     begin
         if ItemGroup.Get("Item Group") then;
-          ItemGroupName := ItemGroup.Description;
+        ItemGroupName := ItemGroup.Description;
 
-        if Vendor.Get( "Vendor No." ) then
-          VendorName    := Vendor.Name
+        if Vendor.Get("Vendor No.") then
+            VendorName := Vendor.Name
         else
-          VendorName    := '';
+            VendorName := '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean

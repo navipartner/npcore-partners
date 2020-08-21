@@ -30,50 +30,60 @@ page 6151552 "NpXml Template List"
                 Caption = 'Xml Templates';
                 repeater(Group)
                 {
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Task Processor Code";"Task Processor Code")
+                    field("Task Processor Code"; "Task Processor Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Xml Root Name";"Xml Root Name")
+                    field("Xml Root Name"; "Xml Root Name")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Table No.";"Table No.")
+                    field("Table No."; "Table No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Template Version";"Template Version")
+                    field("Template Version"; "Template Version")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Transaction Task";"Transaction Task")
+                    field("Transaction Task"; "Transaction Task")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Batch Task";"Batch Task")
+                    field("Batch Task"; "Batch Task")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("File Transfer";"File Transfer")
+                    field("File Transfer"; "File Transfer")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("FTP Transfer";"FTP Transfer")
+                    field("FTP Transfer"; "FTP Transfer")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("API Transfer";"API Transfer")
+                    field("API Transfer"; "API Transfer")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
-                part(Control6150623;"NpXml Template Trigger List")
+                part(Control6150623; "NpXml Template Trigger List")
                 {
                     Editable = false;
                     ShowFilter = false;
-                    SubPageLink = "Xml Template Code"=FIELD(Code);
+                    SubPageLink = "Xml Template Code" = FIELD(Code);
                 }
             }
         }
@@ -91,7 +101,7 @@ page 6151552 "NpXml Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NpXml Elements";
-                RunPageLink = "Xml Template Code"=FIELD(Code);
+                RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
             }
             action("View Field Mapping")
@@ -102,7 +112,7 @@ page 6151552 "NpXml Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NpXml Elements";
-                RunPageLink = "Xml Template Code"=FIELD(Code);
+                RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
             }
         }
@@ -166,8 +176,8 @@ page 6151552 "NpXml Template List"
                 begin
                     //-NC2.05 [269051]
                     CurrPage.SetSelectionFilter(NpXmlTemplate);
-                    if not Confirm(Text000,true,NpXmlTemplate.Count) then
-                      exit;
+                    if not Confirm(Text000, true, NpXmlTemplate.Count) then
+                        exit;
 
                     NpXmlTemplate.DeleteAll(true);
                     //+NC2.05 [269051]

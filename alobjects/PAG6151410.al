@@ -18,14 +18,17 @@ page 6151410 "Magento VAT Product Groups"
         {
             repeater(Group)
             {
-                field("VAT Product Posting Group";"VAT Product Posting Group")
+                field("VAT Product Posting Group"; "VAT Product Posting Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Tax Class";"Magento Tax Class")
+                field("Magento Tax Class"; "Magento Tax Class")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

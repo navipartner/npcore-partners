@@ -15,110 +15,145 @@ page 6150670 "POS Balancing Line"
         {
             repeater(Group)
             {
-                field("Entry Date";"Entry Date")
+                field("Entry Date"; "Entry Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Period Register No.";"POS Period Register No.")
+                field("POS Period Register No."; "POS Period Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Bin Code";"POS Payment Bin Code")
+                field("POS Payment Bin Code"; "POS Payment Bin Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Payment Method Code";"POS Payment Method Code")
+                field("POS Payment Method Code"; "POS Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Calculated Amount";"Calculated Amount")
+                field("Calculated Amount"; "Calculated Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Amount";"Balanced Amount")
+                field("Balanced Amount"; "Balanced Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Diff. Amount";"Balanced Diff. Amount")
+                field("Balanced Diff. Amount"; "Balanced Diff. Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Float Amount";"New Float Amount")
+                field("New Float Amount"; "New Float Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Calculated Quantity";"Calculated Quantity")
+                field("Calculated Quantity"; "Calculated Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Quantity";"Balanced Quantity")
+                field("Balanced Quantity"; "Balanced Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balanced Diff. Quantity";"Balanced Diff. Quantity")
+                field("Balanced Diff. Quantity"; "Balanced Diff. Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Deposited Quantity";"Deposited Quantity")
+                field("Deposited Quantity"; "Deposited Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closing Quantity";"Closing Quantity")
+                field("Closing Quantity"; "Closing Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Deposit-To Bin Amount";"Deposit-To Bin Amount")
+                field("Deposit-To Bin Amount"; "Deposit-To Bin Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Deposit-To Bin Code";"Deposit-To Bin Code")
+                field("Deposit-To Bin Code"; "Deposit-To Bin Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Deposit-To Reference";"Deposit-To Reference")
+                field("Deposit-To Reference"; "Deposit-To Reference")
                 {
+                    ApplicationArea = All;
                 }
-                field("Move-To Bin Amount";"Move-To Bin Amount")
+                field("Move-To Bin Amount"; "Move-To Bin Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Move-To Bin Code";"Move-To Bin Code")
+                field("Move-To Bin Code"; "Move-To Bin Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Move-To Reference";"Move-To Reference")
+                field("Move-To Reference"; "Move-To Reference")
                 {
+                    ApplicationArea = All;
                 }
-                field("Balancing Details";"Balancing Details")
+                field("Balancing Details"; "Balancing Details")
                 {
+                    ApplicationArea = All;
                 }
-                field("Orig. POS Sale ID";"Orig. POS Sale ID")
+                field("Orig. POS Sale ID"; "Orig. POS Sale ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Orig. POS Line No.";"Orig. POS Line No.")
+                field("Orig. POS Line No."; "Orig. POS Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Bin Checkpoint Entry No.";"POS Bin Checkpoint Entry No.")
+                field("POS Bin Checkpoint Entry No."; "POS Bin Checkpoint Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Dimension Set ID";"Dimension Set ID")
+                field("Dimension Set ID"; "Dimension Set ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -138,7 +173,7 @@ page 6150670 "POS Balancing Line"
                     Promoted = true;
                     PromotedCategory = Category4;
                     RunObject = Page "POS Entry Card";
-                    RunPageLink = "Entry No."=FIELD("POS Entry No.");
+                    RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
                 }
             }

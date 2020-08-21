@@ -17,75 +17,95 @@ page 6060079 "TM Ticket Setup"
         {
             group("Ticket Print")
             {
-                field("Print Server Generator URL";"Print Server Generator URL")
+                field("Print Server Generator URL"; "Print Server Generator URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Server Gen. Username";"Print Server Gen. Username")
+                field("Print Server Gen. Username"; "Print Server Gen. Username")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Server Gen. Password";"Print Server Gen. Password")
+                field("Print Server Gen. Password"; "Print Server Gen. Password")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Server Ticket URL";"Print Server Ticket URL")
+                field("Print Server Ticket URL"; "Print Server Ticket URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Server Order URL";"Print Server Order URL")
+                field("Print Server Order URL"; "Print Server Order URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Ticket Language";"Default Ticket Language")
+                field("Default Ticket Language"; "Default Ticket Language")
                 {
+                    ApplicationArea = All;
                 }
-                field("Timeout (ms)";"Timeout (ms)")
+                field("Timeout (ms)"; "Timeout (ms)")
                 {
+                    ApplicationArea = All;
                 }
                 group("Description Selection")
                 {
-                    field("Store Code";"Store Code")
+                    field("Store Code"; "Store Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Title";"Ticket Title")
+                    field("Ticket Title"; "Ticket Title")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Sub Title";"Ticket Sub Title")
+                    field("Ticket Sub Title"; "Ticket Sub Title")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Name";"Ticket Name")
+                    field("Ticket Name"; "Ticket Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Description";"Ticket Description")
+                    field("Ticket Description"; "Ticket Description")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Full Description";"Ticket Full Description")
+                    field("Ticket Full Description"; "Ticket Full Description")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(eTicket)
             {
                 Caption = 'eTicket';
-                field("NP-Pass Server Base URL";"NP-Pass Server Base URL")
+                field("NP-Pass Server Base URL"; "NP-Pass Server Base URL")
                 {
+                    ApplicationArea = All;
                 }
-                field("NP-Pass Notification Method";"NP-Pass Notification Method")
+                field("NP-Pass Notification Method"; "NP-Pass Notification Method")
                 {
+                    ApplicationArea = All;
                 }
-                field("NP-Pass API";"NP-Pass API")
+                field("NP-Pass API"; "NP-Pass API")
                 {
+                    ApplicationArea = All;
                 }
-                field("NP-Pass Token";"NP-Pass Token")
+                field("NP-Pass Token"; "NP-Pass Token")
                 {
+                    ApplicationArea = All;
                 }
                 group(Control)
                 {
                     Caption = 'Control';
-                    field("Suppress Print When eTicket";"Suppress Print When eTicket")
+                    field("Suppress Print When eTicket"; "Suppress Print When eTicket")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Show Send Fail Message In POS";"Show Send Fail Message In POS")
+                    field("Show Send Fail Message In POS"; "Show Send Fail Message In POS")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Show Message Body (Debug)";"Show Message Body (Debug)")
+                    field("Show Message Body (Debug)"; "Show Message Body (Debug)")
                     {
+                        ApplicationArea = All;
                         Visible = false;
                     }
                 }
@@ -96,62 +116,78 @@ page 6060079 "TM Ticket Setup"
                 group(Prepaid)
                 {
                     Caption = 'Prepaid';
-                    field("Prepaid Excel Export Prompt";"Prepaid Excel Export Prompt")
+                    field("Prepaid Excel Export Prompt"; "Prepaid Excel Export Prompt")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Prepaid Offline Valid. Prompt";"Prepaid Offline Valid. Prompt")
+                    field("Prepaid Offline Valid. Prompt"; "Prepaid Offline Valid. Prompt")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Prepaid Ticket Result List";"Prepaid Ticket Result List")
+                    field("Prepaid Ticket Result List"; "Prepaid Ticket Result List")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Prepaid Default Quantity";"Prepaid Default Quantity")
+                    field("Prepaid Default Quantity"; "Prepaid Default Quantity")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Prepaid Ticket Server Export";"Prepaid Ticket Server Export")
+                    field("Prepaid Ticket Server Export"; "Prepaid Ticket Server Export")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Postpaid)
                 {
                     Caption = 'Postpaid';
-                    field("Postpaid Excel Export Prompt";"Postpaid Excel Export Prompt")
+                    field("Postpaid Excel Export Prompt"; "Postpaid Excel Export Prompt")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Postpaid Ticket Result List";"Postpaid Ticket Result List")
+                    field("Postpaid Ticket Result List"; "Postpaid Ticket Result List")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Postpaid Default Quantity";"Postpaid Default Quantity")
+                    field("Postpaid Default Quantity"; "Postpaid Default Quantity")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Postpaid Ticket Server Export";"Postpaid Ticket Server Export")
+                    field("Postpaid Ticket Server Export"; "Postpaid Ticket Server Export")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(Wizard)
             {
                 Caption = 'Wizard';
-                field("Wizard Ticket Type No. Series";"Wizard Ticket Type No. Series")
+                field("Wizard Ticket Type No. Series"; "Wizard Ticket Type No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wizard Ticket Type Template";"Wizard Ticket Type Template")
+                field("Wizard Ticket Type Template"; "Wizard Ticket Type Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wizard Ticket Bom Template";"Wizard Ticket Bom Template")
+                field("Wizard Ticket Bom Template"; "Wizard Ticket Bom Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wizard Adm. Code No. Series";"Wizard Adm. Code No. Series")
+                field("Wizard Adm. Code No. Series"; "Wizard Adm. Code No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wizard Admission Template";"Wizard Admission Template")
+                field("Wizard Admission Template"; "Wizard Admission Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wizard Sch. Code No. Series";"Wizard Sch. Code No. Series")
+                field("Wizard Sch. Code No. Series"; "Wizard Sch. Code No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Wizard Item No. Series";"Wizard Item No. Series")
+                field("Wizard Item No. Series"; "Wizard Item No. Series")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

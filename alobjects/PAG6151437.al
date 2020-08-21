@@ -20,8 +20,9 @@ page 6151437 "Magento Item Attribute Values"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Selected;Selected)
+                field(Selected; Selected)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     var
@@ -29,24 +30,25 @@ page 6151437 "Magento Item Attribute Values"
                     begin
                         MagentoAttribute.Get("Attribute ID");
                         if Selected then begin
-                          if MagentoAttribute.Type in [MagentoAttribute.Type::Single,MagentoAttribute.Type::"Text Area (single)"] then begin
-                            ModifyAll(Selected,false);
-                            //-MAG1.13
-                            //FIND;
-                            CurrPage.Update(false);
-                            //+MAG1.13
-                            //-MAG2.09 [292926]
-                            Find;
-                            //+MAG2.09 [292926]
-                            Selected := true;
-                            Modify(true);
-                          end;
+                            if MagentoAttribute.Type in [MagentoAttribute.Type::Single, MagentoAttribute.Type::"Text Area (single)"] then begin
+                                ModifyAll(Selected, false);
+                                //-MAG1.13
+                                //FIND;
+                                CurrPage.Update(false);
+                                //+MAG1.13
+                                //-MAG2.09 [292926]
+                                Find;
+                                //+MAG2.09 [292926]
+                                Selected := true;
+                                Modify(true);
+                            end;
                         end;
                         CurrPage.Update;
                     end;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

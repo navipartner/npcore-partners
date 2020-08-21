@@ -13,17 +13,21 @@ page 6184485 "Pepper Card Types"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Type POS";"Payment Type POS")
+                field("Payment Type POS"; "Payment Type POS")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Type Group Code";"Card Type Group Code")
+                field("Card Type Group Code"; "Card Type Group Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -38,8 +42,8 @@ page 6184485 "Pepper Card Types"
                 Caption = 'Fees';
                 Image = InsertStartingFee;
                 RunObject = Page "Pepper Card Type Fees";
-                RunPageLink = "Card Type Code"=FIELD(Code);
-                RunPageView = SORTING("Card Type Code","Minimum Amount")
+                RunPageLink = "Card Type Code" = FIELD(Code);
+                RunPageView = SORTING("Card Type Code", "Minimum Amount")
                               ORDER(Ascending);
             }
         }

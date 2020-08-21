@@ -24,17 +24,19 @@ page 6060110 "TM Ticket Aquire Participant"
                 group(Control6014411)
                 {
                     ShowCaption = false;
-                    field("Notification Method";"Notification Method")
+                    field("Notification Method"; "Notification Method")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Notification Address";"Notification Address")
+                    field("Notification Address"; "Notification Address")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = RequireNotificationAddress;
                         Width = 40;
 
                         trigger OnValidate()
                         begin
-                            CheckEmail ();
+                            CheckEmail();
                         end;
                     }
                 }
@@ -42,114 +44,124 @@ page 6060110 "TM Ticket Aquire Participant"
             group(Attributes)
             {
                 Caption = 'Attributes';
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 1, "Entry No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 1, "Entry No.", NPRAttrTextArray[1]);
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 2, "Entry No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 2, "Entry No.", NPRAttrTextArray[2]);
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 3, "Entry No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 3, "Entry No.", NPRAttrTextArray[3]);
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 4, "Entry No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 4, "Entry No.", NPRAttrTextArray[4]);
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 5, "Entry No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 5, "Entry No.", NPRAttrTextArray[5]);
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 6, "Entry No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 6, "Entry No.", NPRAttrTextArray[6]);
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 7, "Entry No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 7, "Entry No.", NPRAttrTextArray[7]);
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request",8, "Entry No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 8, "Entry No.", NPRAttrTextArray[8]);
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 9, "Entry No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 9, "Entry No.", NPRAttrTextArray[9]);
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,6060116,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue (DATABASE::"TM Ticket Reservation Request", 10, "Entry No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"TM Ticket Reservation Request", 10, "Entry No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
@@ -164,8 +176,8 @@ page 6060110 "TM Ticket Aquire Participant"
     begin
 
         //-TM1.23 [284752]
-        NPRAttrManagement.GetEntryAttributeValue (NPRAttrTextArray, DATABASE::"TM Ticket Reservation Request", "Entry No.");
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"TM Ticket Reservation Request", "Entry No.");
+        NPRAttrEditable := CurrPage.Editable();
         //+TM1.23 [284752]
     end;
 
@@ -174,16 +186,18 @@ page 6060110 "TM Ticket Aquire Participant"
         //-TM1.38 [332109]
         //IF ("Notification Address" <> '') THEN BEGIN
         if (("Notification Address" <> '') or (SuggestNotificationMethod <> SuggestNotificationMethod::NA)) then begin
-        //+TM1.38 [332109]
+            //+TM1.38 [332109]
 
-          "Notification Address" := SuggestNotificationAddress;
+            "Notification Address" := SuggestNotificationAddress;
 
-          case SuggestNotificationMethod of
-            SuggestNotificationMethod::EMAIL : "Notification Method" := "Notification Method"::EMAIL;
-            SuggestNotificationMethod::SMS   : "Notification Method" := "Notification Method"::SMS;
-            else
-              "Notification Method" := "Notification Method"::NA;
-          end;
+            case SuggestNotificationMethod of
+                SuggestNotificationMethod::EMAIL:
+                    "Notification Method" := "Notification Method"::EMAIL;
+                SuggestNotificationMethod::SMS:
+                    "Notification Method" := "Notification Method"::SMS;
+                else
+                    "Notification Method" := "Notification Method"::NA;
+            end;
         end;
     end;
 
@@ -191,7 +205,7 @@ page 6060110 "TM Ticket Aquire Participant"
     begin
         //-TM1.23 [284752]
 
-        NPRAttrManagement.GetAttributeVisibility (DATABASE::"TM Ticket Reservation Request", NPRAttrVisibleArray);
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::"TM Ticket Reservation Request", NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
         NPRAttrVisible03 := NPRAttrVisibleArray[3];
@@ -203,20 +217,20 @@ page 6060110 "TM Ticket Aquire Participant"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrEditable := CurrPage.Editable();
         //+TM1.23 [284752]
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if (CloseAction = ACTION::LookupOK) then begin
-          if (RequireNotificationAddress) then
-            TestField ("Notification Address");
+            if (RequireNotificationAddress) then
+                TestField("Notification Address");
 
         end else begin
-          if ((RequireNotificationAddress) and ("Notification Address" = '')) then
-            if (Confirm (EMAIL_INVALID_CONFIRM, true, FieldCaption("Notification Address"))) then
-              Error ('');
+            if ((RequireNotificationAddress) and ("Notification Address" = '')) then
+                if (Confirm(EMAIL_INVALID_CONFIRM, true, FieldCaption("Notification Address"))) then
+                    Error('');
         end;
     end;
 
@@ -227,10 +241,10 @@ page 6060110 "TM Ticket Aquire Participant"
         RequireNotificationAddress: Boolean;
         SuggestNotificationMethod: Option NA,EMAIL,SMS;
         SuggestNotificationAddress: Text[100];
-        NPRAttrTextArray: array [40] of Text[100];
+        NPRAttrTextArray: array[40] of Text[100];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -247,27 +261,27 @@ page 6060110 "TM Ticket Aquire Participant"
         ValidEmail: Boolean;
     begin
         if ("Notification Method" = "Notification Method"::EMAIL) then begin
-          ValidEmail := (StrPos ("Notification Address", '@') > 1);
-          if (ValidEmail) then
-            ValidEmail := (StrPos (CopyStr ("Notification Address", StrPos ("Notification Address", '@')), '.') > 1);
+            ValidEmail := (StrPos("Notification Address", '@') > 1);
+            if (ValidEmail) then
+                ValidEmail := (StrPos(CopyStr("Notification Address", StrPos("Notification Address", '@')), '.') > 1);
 
-          if (not ValidEmail) then
-            if (Confirm (EMAIL_INVALID_CONFIRM, true, FieldCaption("Notification Address"))) then
-              Error (INVALID_VALUE, FieldCaption ("Notification Address"));
+            if (not ValidEmail) then
+                if (Confirm(EMAIL_INVALID_CONFIRM, true, FieldCaption("Notification Address"))) then
+                    Error(INVALID_VALUE, FieldCaption("Notification Address"));
         end;
 
         if (RequireNotificationAddress) then
-          TestField ("Notification Address");
+            TestField("Notification Address");
     end;
 
     procedure SetAdmissionCode(AdmissionCode: Code[20])
     begin
 
-        Admission.Get (AdmissionCode);
+        Admission.Get(AdmissionCode);
         RequireNotificationAddress := (Admission."Ticketholder Notification Type" = Admission."Ticketholder Notification Type"::REQUIRED);
     end;
 
-    procedure SetDefaultNotification(Method: Option NA,EMAIL,SMS;Address: Text[100])
+    procedure SetDefaultNotification(Method: Option NA,EMAIL,SMS; Address: Text[100])
     begin
 
         SuggestNotificationMethod := Method;

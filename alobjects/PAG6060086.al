@@ -16,8 +16,9 @@ page 6060086 "MCS Recom. Sales Factbox"
         {
             repeater(Group)
             {
-                field(RecDescr;RecDescr)
+                field(RecDescr; RecDescr)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -52,7 +53,7 @@ page 6060086 "MCS Recom. Sales Factbox"
         TempText: Text;
         MCSRecommendationsLine: Record "MCS Recommendations Line";
     begin
-        exit("Item No."  + ' - ' + Description + ' (  '+ Format(Round(Rating *100,1)) + '% )');
+        exit("Item No." + ' - ' + Description + ' (  ' + Format(Round(Rating * 100, 1)) + '% )');
     end;
 }
 

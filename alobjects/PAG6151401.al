@@ -54,11 +54,13 @@ page 6151401 "Magento Setup"
         {
             group(Generelt)
             {
-                field("Magento Enabled";"Magento Enabled")
+                field("Magento Enabled"; "Magento Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento Version";"Magento Version")
+                field("Magento Version"; "Magento Version")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -67,36 +69,43 @@ page 6151401 "Magento Setup"
                         //+MAG2.26 [404580]
                     end;
                 }
-                field("Magento Url";"Magento Url")
+                field("Magento Url"; "Magento Url")
                 {
+                    ApplicationArea = All;
                 }
                 group("Magento Api")
                 {
                     Caption = 'Magento Api';
                     Visible = "Magento Enabled";
-                    field("Api Url";"Api Url")
+                    field("Api Url"; "Api Url")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Api Username Type";"Api Username Type")
+                    field("Api Username Type"; "Api Username Type")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Api Username";"Api Username")
+                    field("Api Username"; "Api Username")
                     {
+                        ApplicationArea = All;
                         Enabled = "Api Username Type" = "Api Username Type"::Custom;
                         Importance = Additional;
                     }
-                    field("Api Password";"Api Password")
+                    field("Api Password"; "Api Password")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Api Authorization";"Api Authorization")
+                    field("Api Authorization"; "Api Authorization")
                     {
+                        ApplicationArea = All;
                     }
                 }
-                field("FORMAT(""Generic Setup"".HASVALUE)";Format("Generic Setup".HasValue))
+                field("FORMAT(""Generic Setup"".HASVALUE)"; Format("Generic Setup".HasValue))
                 {
+                    ApplicationArea = All;
                     Caption = 'NpXml Setup';
                     Importance = Additional;
 
@@ -113,27 +122,33 @@ page 6151401 "Magento Setup"
                 group("Managed Nav Module")
                 {
                     Caption = 'Managed Nav Module';
-                    field("Managed Nav Modules Enabled";"Managed Nav Modules Enabled")
+                    field("Managed Nav Modules Enabled"; "Managed Nav Modules Enabled")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Managed Nav Api Url";"Managed Nav Api Url")
+                    field("Managed Nav Api Url"; "Managed Nav Api Url")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Managed Nav Api Username";"Managed Nav Api Username")
+                    field("Managed Nav Api Username"; "Managed Nav Api Username")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Managed Nav Api Password";"Managed Nav Api Password")
+                    field("Managed Nav Api Password"; "Managed Nav Api Password")
                     {
+                        ApplicationArea = All;
                         Importance = Additional;
                     }
-                    field("Version No.";"Version No.")
+                    field("Version No."; "Version No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Version Coverage";"Version Coverage")
+                    field("Version Coverage"; "Version Coverage")
                     {
+                        ApplicationArea = All;
 
                         trigger OnDrillDown()
                         var
@@ -148,8 +163,9 @@ page 6151401 "Magento Setup"
             }
             group(Moduler)
             {
-                field("Variant System";"Variant System")
+                field("Variant System"; "Variant System")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -162,60 +178,74 @@ page 6151401 "Magento Setup"
                 {
                     ShowCaption = false;
                     Visible = ("Variant System" = 2);
-                    field("Picture Variety Type";"Picture Variety Type")
+                    field("Picture Variety Type"; "Picture Variety Type")
                     {
+                        ApplicationArea = All;
                         ToolTip = 'This setup enables differentiation of variant pictures';
                     }
                 }
                 group(Control6151446)
                 {
                     ShowCaption = false;
-                    Visible = ("Variant System" = 2) AND ("Picture Variety Type"=0);
-                    field("Variant Picture Dimension";"Variant Picture Dimension")
+                    Visible = ("Variant System" = 2) AND ("Picture Variety Type" = 0);
+                    field("Variant Picture Dimension"; "Variant Picture Dimension")
                     {
+                        ApplicationArea = All;
                         ToolTip = 'This setup enables differentiation of variant pictures';
                     }
                 }
-                field("Miniature Picture";"Miniature Picture")
+                field("Miniature Picture"; "Miniature Picture")
                 {
+                    ApplicationArea = All;
                     ToolTip = 'Note that Line Picture might affect performance on the Picture List';
                 }
-                field("Max. Picture Size";"Max. Picture Size")
+                field("Max. Picture Size"; "Max. Picture Size")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto Seo Link Disabled";"Auto Seo Link Disabled")
+                field("Auto Seo Link Disabled"; "Auto Seo Link Disabled")
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
                 group("B2C Modules")
                 {
                     Caption = 'B2C Modules';
-                    field("Multistore Enabled";"Multistore Enabled")
+                    field("Multistore Enabled"; "Multistore Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Brands Enabled";"Brands Enabled")
+                    field("Brands Enabled"; "Brands Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Attributes Enabled";"Attributes Enabled")
+                    field("Attributes Enabled"; "Attributes Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Product Relations Enabled";"Product Relations Enabled")
+                    field("Product Relations Enabled"; "Product Relations Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Special Prices Enabled";"Special Prices Enabled")
+                    field("Special Prices Enabled"; "Special Prices Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Tier Prices Enabled";"Tier Prices Enabled")
+                    field("Tier Prices Enabled"; "Tier Prices Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Customer Group Prices Enabled";"Customer Group Prices Enabled")
+                    field("Customer Group Prices Enabled"; "Customer Group Prices Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Gift Voucher Enabled";"Gift Voucher Enabled")
+                    field("Gift Voucher Enabled"; "Gift Voucher Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Custom Options Enabled";"Custom Options Enabled")
+                    field("Custom Options Enabled"; "Custom Options Enabled")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         var
@@ -227,26 +257,30 @@ page 6151401 "Magento Setup"
                             //+MAG1.22
                         end;
                     }
-                    field("Bundled Products Enabled";"Bundled Products Enabled")
+                    field("Bundled Products Enabled"; "Bundled Products Enabled")
                     {
+                        ApplicationArea = All;
                     }
                     group(Control6150658)
                     {
                         Caption = '';
                         Visible = "Custom Options Enabled";
-                        field("Custom Options No. Series";"Custom Options No. Series")
+                        field("Custom Options No. Series"; "Custom Options No. Series")
                         {
+                            ApplicationArea = All;
                         }
                     }
-                    field("Tickets Enabled";"Tickets Enabled")
+                    field("Tickets Enabled"; "Tickets Enabled")
                     {
+                        ApplicationArea = All;
                     }
                     group(Control6151449)
                     {
                         ShowCaption = false;
                         Visible = ("Magento Version" = "Magento Version"::"2");
-                        field("Collect in Store Enabled";"Collect in Store Enabled")
+                        field("Collect in Store Enabled"; "Collect in Store Enabled")
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }
@@ -254,17 +288,21 @@ page 6151401 "Magento Setup"
                 {
                     Caption = 'B2B Modules';
                     Visible = ("Magento Version" <> "Magento Version"::"2");
-                    field("Customers Enabled";"Customers Enabled")
+                    field("Customers Enabled"; "Customers Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sales Prices Enabled";"Sales Prices Enabled")
+                    field("Sales Prices Enabled"; "Sales Prices Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Sales Line Discounts Enabled";"Sales Line Discounts Enabled")
+                    field("Sales Line Discounts Enabled"; "Sales Line Discounts Enabled")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Item Disc. Group Enabled";"Item Disc. Group Enabled")
+                    field("Item Disc. Group Enabled"; "Item Disc. Group Enabled")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -272,88 +310,105 @@ page 6151401 "Magento Setup"
             {
                 Caption = 'Collect in Store';
                 Visible = "Collect in Store Enabled";
-                field("NpCs From Store Code";"NpCs From Store Code")
+                field("NpCs From Store Code"; "NpCs From Store Code")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("NpCs Workflow Code";"NpCs Workflow Code")
+                field("NpCs Workflow Code"; "NpCs Workflow Code")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
             }
-            part(NpCsStoreCardWorkflows;"NpCs Store Card Workflows")
+            part(NpCsStoreCardWorkflows; "NpCs Store Card Workflows")
             {
                 Caption = 'Collect Stores';
                 Editable = ("NpCs Workflow Code" <> '');
-                SubPageLink = "Workflow Code"=FIELD("NpCs Workflow Code");
+                SubPageLink = "Workflow Code" = FIELD("NpCs Workflow Code");
                 Visible = "Collect in Store Enabled";
             }
             group(GiftVoucher)
             {
                 Caption = 'Gift Voucher';
                 Visible = "Gift Voucher Enabled";
-                field("Gift Voucher Activation";"Gift Voucher Activation")
+                field("Gift Voucher Activation"; "Gift Voucher Activation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Item No.";"Gift Voucher Item No.")
+                field("Gift Voucher Item No."; "Gift Voucher Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Account No.";"Gift Voucher Account No.")
+                field("Gift Voucher Account No."; "Gift Voucher Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Report";"Gift Voucher Report")
+                field("Gift Voucher Report"; "Gift Voucher Report")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Language Code";"Gift Voucher Language Code")
+                field("Gift Voucher Language Code"; "Gift Voucher Language Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Valid Period";"Gift Voucher Valid Period")
+                field("Gift Voucher Valid Period"; "Gift Voucher Valid Period")
                 {
+                    ApplicationArea = All;
                 }
-                field("Gift Voucher Code Pattern";"Gift Voucher Code Pattern")
+                field("Gift Voucher Code Pattern"; "Gift Voucher Code Pattern")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(CreditVoucher)
             {
                 Caption = 'Credit Voucher';
                 Visible = "Gift Voucher Enabled";
-                field("Credit Voucher Account No.";"Credit Voucher Account No.")
+                field("Credit Voucher Account No."; "Credit Voucher Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Voucher Report";"Credit Voucher Report")
+                field("Credit Voucher Report"; "Credit Voucher Report")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Voucher Language Code";"Credit Voucher Language Code")
+                field("Credit Voucher Language Code"; "Credit Voucher Language Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Voucher Valid Period";"Credit Voucher Valid Period")
+                field("Credit Voucher Valid Period"; "Credit Voucher Valid Period")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Voucher Code Pattern";"Credit Voucher Code Pattern")
+                field("Credit Voucher Code Pattern"; "Credit Voucher Code Pattern")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Replicate Special Price")
             {
                 Caption = 'Replicate Special Price';
                 Visible = "Special Prices Enabled";
-                field("Replicate to Sales Prices";"Replicate to Sales Prices")
+                field("Replicate to Sales Prices"; "Replicate to Sales Prices")
                 {
+                    ApplicationArea = All;
                 }
                 group(Control6151429)
                 {
                     ShowCaption = false;
                     Visible = "Replicate to Sales Prices";
-                    field("Replicate to Sales Type";"Replicate to Sales Type")
+                    field("Replicate to Sales Type"; "Replicate to Sales Type")
                     {
+                        ApplicationArea = All;
                     }
                     group(Control6151427)
                     {
                         ShowCaption = false;
                         Visible = "Replicate to Sales Type" <> 2;
-                        field("Replicate to Sales Code";"Replicate to Sales Code")
+                        field("Replicate to Sales Code"; "Replicate to Sales Code")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                         }
                     }
@@ -362,8 +417,9 @@ page 6151401 "Magento Setup"
             group(Stock)
             {
                 Caption = 'Stock';
-                field("Stock Calculation Method";"Stock Calculation Method")
+                field("Stock Calculation Method"; "Stock Calculation Method")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -376,8 +432,9 @@ page 6151401 "Magento Setup"
                 {
                     ShowCaption = false;
                     Visible = ("Stock Calculation Method" = "Stock Calculation Method"::Function);
-                    field("Stock Function Name";"Stock Function Name")
+                    field("Stock Function Name"; "Stock Function Name")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
 
                         trigger OnValidate()
@@ -387,16 +444,19 @@ page 6151401 "Magento Setup"
                             //+MAG2.26 [402488]
                         end;
                     }
-                    field("Stock Codeunit Id";"Stock Codeunit Id")
+                    field("Stock Codeunit Id"; "Stock Codeunit Id")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Stock Codeunit Name";"Stock Codeunit Name")
+                    field("Stock Codeunit Name"; "Stock Codeunit Name")
                     {
+                        ApplicationArea = All;
                     }
                 }
-                field("Stock NpXml Template";"Stock NpXml Template")
+                field("Stock NpXml Template"; "Stock NpXml Template")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -409,14 +469,16 @@ page 6151401 "Magento Setup"
                 {
                     Caption = '';
                     Visible = (NOT "Intercompany Inventory Enabled");
-                    field("Inventory Location Filter";"Inventory Location Filter")
+                    field("Inventory Location Filter"; "Inventory Location Filter")
                     {
+                        ApplicationArea = All;
                     }
                 }
-                field("Intercompany Inventory Enabled";"Intercompany Inventory Enabled")
+                field("Intercompany Inventory Enabled"; "Intercompany Inventory Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                part("Inventory Companies";"Magento Inventory Companies")
+                part("Inventory Companies"; "Magento Inventory Companies")
                 {
                     Caption = 'Inventory Companies';
                     ShowFilter = false;
@@ -425,79 +487,96 @@ page 6151401 "Magento Setup"
             }
             group(Customer)
             {
-                field("Customer Update Mode";"Customer Update Mode")
+                field("Customer Update Mode"; "Customer Update Mode")
                 {
+                    ApplicationArea = All;
                 }
                 group(Control6151460)
                 {
                     ShowCaption = false;
                     Visible = ("Customer Update Mode" = "Customer Update Mode"::Fixed);
-                    field("Fixed Customer No.";"Fixed Customer No.")
+                    field("Fixed Customer No."; "Fixed Customer No.")
                     {
+                        ApplicationArea = All;
                         ShowMandatory = true;
                     }
                 }
-                field("Customer Mapping";"Customer Mapping")
+                field("Customer Mapping"; "Customer Mapping")
                 {
+                    ApplicationArea = All;
                 }
                 group(Control6151428)
                 {
                     ShowCaption = false;
-                    Visible = ("Customer Template Code"='');
-                    field("Customer Posting Group";"Customer Posting Group")
+                    Visible = ("Customer Template Code" = '');
+                    field("Customer Posting Group"; "Customer Posting Group")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Payment Terms Code";"Payment Terms Code")
+                    field("Payment Terms Code"; "Payment Terms Code")
                     {
+                        ApplicationArea = All;
                     }
                 }
-                field("Customer Template Code";"Customer Template Code")
+                field("Customer Template Code"; "Customer Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Config. Template Code";"Customer Config. Template Code")
+                field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Order Import")
             {
                 Caption = 'Order Import';
-                field("Payment Fee Account No.";"Payment Fee Account No.")
+                field("Payment Fee Account No."; "Payment Fee Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Release Order on Import";"Release Order on Import")
+                field("Release Order on Import"; "Release Order on Import")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Order Confirmation";"Send Order Confirmation")
+                field("Send Order Confirmation"; "Send Order Confirmation")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-mail Template (Order Conf.)";"E-mail Template (Order Conf.)")
+                field("E-mail Template (Order Conf.)"; "E-mail Template (Order Conf.)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Blank Code for LCY";"Use Blank Code for LCY")
+                field("Use Blank Code for LCY"; "Use Blank Code for LCY")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-mail Retail Vouchers to";"E-mail Retail Vouchers to")
+                field("E-mail Retail Vouchers to"; "E-mail Retail Vouchers to")
                 {
+                    ApplicationArea = All;
                 }
                 group("Post On Import")
                 {
                     Caption = 'Post On Import';
-                    field("Post Retail Vouchers on Import";"Post Retail Vouchers on Import")
+                    field("Post Retail Vouchers on Import"; "Post Retail Vouchers on Import")
                     {
+                        ApplicationArea = All;
                         ToolTip = 'Immediately post Sales Order Lines for new Retail Vouchers';
                     }
-                    field("Post Tickets on Import";"Post Tickets on Import")
+                    field("Post Tickets on Import"; "Post Tickets on Import")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Post Memberships on Import";"Post Memberships on Import")
+                    field("Post Memberships on Import"; "Post Memberships on Import")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
-            part(Control6151459;"Magento Setup Post on Import")
+            part(Control6151459; "Magento Setup Post on Import")
             {
             }
         }
@@ -820,7 +899,7 @@ page 6151401 "Magento Setup"
                         MagentoMgt: Codeunit "Magento Mgt.";
                     begin
                         MagentoMgt.InitItemSync();
-                        Message(StrSubstNo(Text002,Text00201));
+                        Message(StrSubstNo(Text002, Text00201));
                     end;
                 }
             }
@@ -868,7 +947,7 @@ page 6151401 "Magento Setup"
     trigger OnOpenPage()
     begin
         if not Get then
-          Insert;
+            Insert;
 
         //-MAG2.26 [406591]
         CurrPage.NpCsStoreCardWorkflows.PAGE.SetStoreCodeVisible(true);

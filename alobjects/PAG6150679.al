@@ -18,20 +18,25 @@ page 6150679 "NPRE Flow Statuses"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field("Status Object"; "Status Object")
                 {
+                    ApplicationArea = All;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("Flow Order"; "Flow Order")
                 {
+                    ApplicationArea = All;
                 }
                 field(AssignedPrintCategories; AssignedPrintCategoriesAsFilterString())
                 {
+                    ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
                     Visible = ShowPrintCategories;
 

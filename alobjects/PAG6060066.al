@@ -13,14 +13,16 @@ page 6060066 "Items by Location Overview"
             group(General)
             {
                 Caption = 'General';
-                field(ShowItems;ShowItems)
+                field(ShowItems; ShowItems)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Items';
                     OptionCaption = 'On Inventory,Not on Inventory,All';
                     Visible = false;
                 }
-                field(ShowInTransit;ShowInTransit)
+                field(ShowInTransit; ShowInTransit)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Items in Transit';
 
                     trigger OnValidate()
@@ -28,8 +30,9 @@ page 6060066 "Items by Location Overview"
                         RefreshMatrix(MATRIX_SetWanted::Initial);
                     end;
                 }
-                field(ShowColumnName;ShowColumnName)
+                field(ShowColumnName; ShowColumnName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Show Column Name';
 
                     trigger OnValidate()
@@ -38,14 +41,15 @@ page 6060066 "Items by Location Overview"
                     end;
                 }
             }
-            part(MATRIX;"Items by Loc. Overview Matrix")
+            part(MATRIX; "Items by Loc. Overview Matrix")
             {
             }
             group(Filters)
             {
                 Caption = 'Filters';
-                field(ItemFilter;ItemFilter)
+                field(ItemFilter; ItemFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -53,19 +57,19 @@ page 6060066 "Items by Location Overview"
                         Item: Record Item;
                         ItemList: Page "Item List";
                     begin
-                        Item.SetRange(Blocked,false);
-                        Item.SetRange("Blocked on Pos",false);
+                        Item.SetRange(Blocked, false);
+                        Item.SetRange("Blocked on Pos", false);
                         if ItemFilter <> '' then begin
-                          Item.SetFilter("No.",ItemFilter);
-                          if Item.FindFirst then;
-                          Item.SetRange("No.");
+                            Item.SetFilter("No.", ItemFilter);
+                            if Item.FindFirst then;
+                            Item.SetRange("No.");
                         end;
                         ItemList.SetTableView(Item);
                         ItemList.SetRecord(Item);
                         ItemList.LookupMode(true);
                         if ItemList.RunModal = ACTION::LookupOK then begin
-                          Text := ItemList.GetSelectionFilter;
-                          exit(true);
+                            Text := ItemList.GetSelectionFilter;
+                            exit(true);
                         end;
                     end;
 
@@ -74,8 +78,9 @@ page 6060066 "Items by Location Overview"
                         FilterOnAfterValidate;
                     end;
                 }
-                field(VariantFilter;VariantFilter)
+                field(VariantFilter; VariantFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Variant Filter';
 
                     trigger OnValidate()
@@ -83,8 +88,9 @@ page 6060066 "Items by Location Overview"
                         FilterOnAfterValidate;
                     end;
                 }
-                field("VarietyValueFilter[1]";VarietyValueFilter[1])
+                field("VarietyValueFilter[1]"; VarietyValueFilter[1])
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 1 Value Filter';
 
                     trigger OnValidate()
@@ -92,8 +98,9 @@ page 6060066 "Items by Location Overview"
                         FilterOnAfterValidate;
                     end;
                 }
-                field("VarietyValueFilter[2]";VarietyValueFilter[2])
+                field("VarietyValueFilter[2]"; VarietyValueFilter[2])
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 2 Value Filter';
 
                     trigger OnValidate()
@@ -101,8 +108,9 @@ page 6060066 "Items by Location Overview"
                         FilterOnAfterValidate;
                     end;
                 }
-                field("VarietyValueFilter[3]";VarietyValueFilter[3])
+                field("VarietyValueFilter[3]"; VarietyValueFilter[3])
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 3 Value Filter';
 
                     trigger OnValidate()
@@ -110,8 +118,9 @@ page 6060066 "Items by Location Overview"
                         FilterOnAfterValidate;
                     end;
                 }
-                field("VarietyValueFilter[4]";VarietyValueFilter[4])
+                field("VarietyValueFilter[4]"; VarietyValueFilter[4])
                 {
+                    ApplicationArea = All;
                     Caption = 'Variety 4 Value Filter';
 
                     trigger OnValidate()
@@ -199,7 +208,7 @@ page 6060066 "Items by Location Overview"
 
     var
         MatrixRecordTmp: Record Location temporary;
-        MatrixRecords: array [32] of Record Location;
+        MatrixRecords: array[32] of Record Location;
         MatrixSubPage: Page "Items by Loc. Overview Matrix";
         MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn;
         ShowItems: Option "On Inventory","Not on Inventory",All;
@@ -207,9 +216,9 @@ page 6060066 "Items by Location Overview"
         ItemFilter: Code[250];
         LocationFilter: Code[250];
         VariantFilter: Code[250];
-        VarietyValueFilter: array [4] of Code[250];
+        VarietyValueFilter: array[4] of Code[250];
         MATRIX_CaptionRange: Text[1024];
-        MATRIX_CaptionSet: array [32] of Text[80];
+        MATRIX_CaptionSet: array[32] of Text[80];
         MATRIX_PKFirstRecInCurrSet: Text[1024];
         ShowColumnName: Boolean;
         ShowInTransit: Boolean;
@@ -223,22 +232,22 @@ page 6060066 "Items by Location Overview"
         CurrentMatrixRecordOrdinal: Integer;
     begin
         if SetWanted = SetWanted::Initial then begin
-          MatrixRecordTmp.DeleteAll;
-          MatrixRecord.Reset;
-          if LocationFilter <> '' then
-            MatrixRecord.SetFilter(Code,LocationFilter);
-          MatrixRecord.SetRange("Use As In-Transit",ShowInTransit);
-          if MatrixRecord.FindSet then
-            repeat
-              MatrixRecordTmp := MatrixRecord;
-              MatrixRecordTmp.Insert;
-            until MatrixRecord.Next = 0;
-          if (LocationFilter = '') and not ShowInTransit then begin
-            MatrixRecordTmp.Init;
-            MatrixRecordTmp.Code := MatrixSubPage.EmptyCodeValue;
-            MatrixRecordTmp.Name := MatrixSubPage.EmptyCodeValue;
-            MatrixRecordTmp.Insert;
-          end;
+            MatrixRecordTmp.DeleteAll;
+            MatrixRecord.Reset;
+            if LocationFilter <> '' then
+                MatrixRecord.SetFilter(Code, LocationFilter);
+            MatrixRecord.SetRange("Use As In-Transit", ShowInTransit);
+            if MatrixRecord.FindSet then
+                repeat
+                    MatrixRecordTmp := MatrixRecord;
+                    MatrixRecordTmp.Insert;
+                until MatrixRecord.Next = 0;
+            if (LocationFilter = '') and not ShowInTransit then begin
+                MatrixRecordTmp.Init;
+                MatrixRecordTmp.Code := MatrixSubPage.EmptyCodeValue;
+                MatrixRecordTmp.Name := MatrixSubPage.EmptyCodeValue;
+                MatrixRecordTmp.Insert;
+            end;
         end;
 
         Clear(MATRIX_CaptionSet);
@@ -249,28 +258,28 @@ page 6060066 "Items by Location Overview"
         RecRef.SetTable(MatrixRecordTmp);
 
         if ShowColumnName then
-          CaptionFieldNo := MatrixRecord.FieldNo(Name)
+            CaptionFieldNo := MatrixRecord.FieldNo(Name)
         else
-          CaptionFieldNo := MatrixRecord.FieldNo(Code);
+            CaptionFieldNo := MatrixRecord.FieldNo(Code);
 
         MatrixMgt.GenerateMatrixData(
-          RecRef,SetWanted,MatrixSubPage.MatrixMaxNoOfColumns(),CaptionFieldNo,MATRIX_PKFirstRecInCurrSet,
-          MATRIX_CaptionSet,MATRIX_CaptionRange,MATRIX_CurrSetLength);
+          RecRef, SetWanted, MatrixSubPage.MatrixMaxNoOfColumns(), CaptionFieldNo, MATRIX_PKFirstRecInCurrSet,
+          MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrSetLength);
 
         if MATRIX_CurrSetLength > 0 then begin
-          MatrixRecordTmp.SetPosition(MATRIX_PKFirstRecInCurrSet);
-          MatrixRecordTmp.Find;
-          repeat
-            MatrixRecords[CurrentMatrixRecordOrdinal].Copy(MatrixRecordTmp);
-            CurrentMatrixRecordOrdinal := CurrentMatrixRecordOrdinal + 1;
-          until (CurrentMatrixRecordOrdinal > MATRIX_CurrSetLength) or (MatrixRecordTmp.Next <> 1);
+            MatrixRecordTmp.SetPosition(MATRIX_PKFirstRecInCurrSet);
+            MatrixRecordTmp.Find;
+            repeat
+                MatrixRecords[CurrentMatrixRecordOrdinal].Copy(MatrixRecordTmp);
+                CurrentMatrixRecordOrdinal := CurrentMatrixRecordOrdinal + 1;
+            until (CurrentMatrixRecordOrdinal > MATRIX_CurrSetLength) or (MatrixRecordTmp.Next <> 1);
         end;
     end;
 
     local procedure UpdateMatrixSubPage()
     begin
-        CurrPage.MATRIX.PAGE.SetFilters(ItemFilter,VariantFilter,VarietyValueFilter,ShowItems);
-        CurrPage.MATRIX.PAGE.Load(MATRIX_CaptionSet,MatrixRecords,MatrixRecordTmp);
+        CurrPage.MATRIX.PAGE.SetFilters(ItemFilter, VariantFilter, VarietyValueFilter, ShowItems);
+        CurrPage.MATRIX.PAGE.Load(MATRIX_CaptionSet, MatrixRecords, MatrixRecordTmp);
         CurrPage.Update(false);
     end;
 

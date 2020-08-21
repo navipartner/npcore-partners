@@ -11,24 +11,27 @@ page 6150625 "POS NPRE Restaurant Profiles"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014406;Notes)
+            systempart(Control6014406; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014407;Links)
+            systempart(Control6014407; Links)
             {
                 Visible = false;
             }

@@ -13,38 +13,49 @@ page 6151170 "NpGp Detailed POS S. Entries"
         {
             repeater(Group)
             {
-                field("Entry Time";"Entry Time")
+                field("Entry Time"; "Entry Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Quantity";"Remaining Quantity")
+                field("Remaining Quantity"; "Remaining Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field(Positive;Positive)
+                field(Positive; Positive)
                 {
+                    ApplicationArea = All;
                 }
-                field("Closed by Entry No.";"Closed by Entry No.")
+                field("Closed by Entry No."; "Closed by Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Applies to Store Code";"Applies to Store Code")
+                field("Applies to Store Code"; "Applies to Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cross Store Application";"Cross Store Application")
+                field("Cross Store Application"; "Cross Store Application")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

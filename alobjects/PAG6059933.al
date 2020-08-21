@@ -15,44 +15,57 @@ page 6059933 "Doc. Exchange Paths"
         {
             repeater(Group)
             {
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Direction;Direction)
+                field(Direction; Direction)
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Export FTP Settings";"Use Export FTP Settings")
+                field("Use Export FTP Settings"; "Use Export FTP Settings")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Path;Path)
+                field(Path; Path)
                 {
+                    ApplicationArea = All;
                 }
-                field("Archive Path";"Archive Path")
+                field("Archive Path"; "Archive Path")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unmatched Items Wsht. Template";"Unmatched Items Wsht. Template")
+                field("Unmatched Items Wsht. Template"; "Unmatched Items Wsht. Template")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unmatched Items Wsht. Name";"Unmatched Items Wsht. Name")
+                field("Unmatched Items Wsht. Name"; "Unmatched Items Wsht. Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Autom. Create Unmatched Items";"Autom. Create Unmatched Items")
+                field("Autom. Create Unmatched Items"; "Autom. Create Unmatched Items")
                 {
+                    ApplicationArea = All;
                 }
-                field("Autom. Query Item Information";"Autom. Query Item Information")
+                field("Autom. Query Item Information"; "Autom. Query Item Information")
                 {
+                    ApplicationArea = All;
                 }
-                field("Electronic Format Code";"Electronic Format Code")
+                field("Electronic Format Code"; "Electronic Format Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Localization Format Code";"Localization Format Code")
+                field("Localization Format Code"; "Localization Format Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

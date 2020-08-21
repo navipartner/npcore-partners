@@ -14,29 +14,37 @@ page 6014489 "Report Usage Log Entries"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Database Name";"Database Name")
+                field("Database Name"; "Database Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tenant Id";"Tenant Id")
+                field("Tenant Id"; "Tenant Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Report Id";"Report Id")
+                field("Report Id"; "Report Id")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("User Id";"User Id")
+                field("User Id"; "User Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Used on";"Used on")
+                field("Used on"; "Used on")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -1,4 +1,4 @@
-pageextension 6014425 pageextension6014425 extends "Customer Card" 
+pageextension 6014425 pageextension6014425 extends "Customer Card"
 {
     // PN1.00/MH/20140725  NAV-AddOn: PDF2NAV
     //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting (Billing-page).
@@ -43,19 +43,23 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
         {
             field("To Anonymize On"; "To Anonymize On")
             {
+                ApplicationArea = All;
                 Editable = ToAnonymizeEditable;
             }
             field(Anonymized; Anonymized)
             {
+                ApplicationArea = All;
             }
             field("Anonymized Date"; "Anonymized Date")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Disable Search by Name")
         {
             field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
@@ -67,6 +71,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
@@ -78,6 +83,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
@@ -89,6 +95,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
@@ -100,6 +107,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
@@ -117,17 +125,21 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
                 Caption = 'Magento';
                 field("Magento Display Group"; "Magento Display Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Magento Store Code"; "Magento Store Code")
                 {
+                    ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
                 }
                 field("Magento Shipping Group"; "Magento Shipping Group")
                 {
+                    ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
                 }
                 field("Magento Payment Group"; "Magento Payment Group")
                 {
+                    ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
                 }
             }
@@ -136,6 +148,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
                 Caption = 'Extra Fields';
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,18,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -147,6 +160,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,18,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -158,6 +172,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,18,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -169,6 +184,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,18,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -180,6 +196,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,18,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -197,6 +214,7 @@ pageextension 6014425 pageextension6014425 extends "Customer Card"
         {
             field("Document Processing"; "Document Processing")
             {
+                ApplicationArea = All;
             }
         }
     }

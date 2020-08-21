@@ -10,17 +10,21 @@ page 6014437 "Sale POS - Saved Sale Line"
         {
             repeater("Saved Sales Lines")
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

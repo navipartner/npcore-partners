@@ -9,8 +9,9 @@ page 6014420 "Master No. Input Dialog"
     {
         area(content)
         {
-            field("InputNo.";"InputNo.")
+            field("InputNo."; "InputNo.")
             {
+                ApplicationArea = All;
                 CaptionClass = Captions;
                 Caption = 'Input No.';
 
@@ -28,25 +29,25 @@ page 6014420 "Master No. Input Dialog"
 
     var
         "InputNo.": Text;
-        Vars: array [10] of Variant;
+        Vars: array[10] of Variant;
         Captions: Text;
 
-    procedure SetInput(Variable: Variant;Description: Text[250])
+    procedure SetInput(Variable: Variant; Description: Text[250])
     begin
         "InputNo." := Format(Variable);
-        Captions  := Description;
+        Captions := Description;
     end;
 
     procedure InputCode(var OutVar: Code[20]): Code[20]
     begin
-        Evaluate(OutVar,"InputNo.");
+        Evaluate(OutVar, "InputNo.");
     end;
 
     local procedure StoreInput(var Value: Text)
     var
         CodeVar: Code[20];
     begin
-        Evaluate(CodeVar,Value);
+        Evaluate(CodeVar, Value);
     end;
 
     local procedure InputNo()

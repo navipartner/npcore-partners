@@ -19,43 +19,52 @@ page 6014506 "Used Goods Reg. Card"
                 group(Control6150616)
                 {
                     ShowCaption = false;
-                    field(Status;Status)
+                    field(Status; Status)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         OptionCaption = 'MainPost,,SubPost';
                     }
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
 
                         trigger OnAssistEdit()
                         begin
                             //-NPR5.26
                             if Assistedit(xRec) then
-                              CurrPage.Update;
+                                CurrPage.Update;
                             Link := "No.";
                             //+NPR5.26
                         end;
                     }
-                    field("Location Code";"Location Code")
+                    field("Location Code"; "Location Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Salesperson Code";"Salesperson Code")
+                    field("Salesperson Code"; "Salesperson Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Subject;Subject)
+                    field(Subject; Subject)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Search Name";"Search Name")
+                    field("Search Name"; "Search Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Serienummer;Serienummer)
+                    field(Serienummer; Serienummer)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Puljemomsordning;Puljemomsordning)
+                    field(Puljemomsordning; Puljemomsordning)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Item No. Created";"Item No. Created")
+                    field("Item No. Created"; "Item No. Created")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         var
@@ -64,23 +73,23 @@ page 6014506 "Used Goods Reg. Card"
                         begin
                             //-NPR5.26
                             if xRec."Item No. Created" <> '' then
-                              Error(ErrUsedGoodAlreadySet);
+                                Error(ErrUsedGoodAlreadySet);
 
                             FotoOps.Get;
                             if FotoOps."Used Goods Serial No. Mgt." then begin
-                              if Serienummer <> '' then begin
-                                FotoOps.TestField( "Used Goods Item Tracking Code" );
-                                "Brugtvare lagermetode" := "Brugtvare lagermetode"::Serienummer;
-                              end else begin
-                                "Brugtvare lagermetode" := FotoOps."Used Goods Inventory Method";
-                              end;
+                                if Serienummer <> '' then begin
+                                    FotoOps.TestField("Used Goods Item Tracking Code");
+                                    "Brugtvare lagermetode" := "Brugtvare lagermetode"::Serienummer;
+                                end else begin
+                                    "Brugtvare lagermetode" := FotoOps."Used Goods Inventory Method";
+                                end;
                             end else
-                              "Brugtvare lagermetode" := FotoOps."Used Goods Inventory Method";
+                                "Brugtvare lagermetode" := FotoOps."Used Goods Inventory Method";
 
 
                             SelectedItem.Get("Item No. Created");
                             if SelectedItem."Second-hand number" <> '' then
-                              Error(ErrItemAlreadySH);
+                                Error(ErrItemAlreadySH);
                             Stand := SelectedItem.Condition;
                             "Salgspris inkl. Moms" := SelectedItem."Unit Price";
                             "Unit Cost" := SelectedItem."Unit Cost";
@@ -92,39 +101,47 @@ page 6014506 "Used Goods Reg. Card"
                             SelectedItem."Second-hand number" := "No.";
                             SelectedItem."Second-hand" := true;
                             SelectedItem.Modify(true);
-                            Message(StrSubstNo(Text10600001,"Item No. Created"));
+                            Message(StrSubstNo(Text10600001, "Item No. Created"));
                             //+NPR5.26
                         end;
                     }
-                    field(Link;Link)
+                    field(Link; Link)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
                 group(Control6150625)
                 {
                     ShowCaption = false;
-                    field("Purchase Date";"Purchase Date")
+                    field("Purchase Date"; "Purchase Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Beholdning;Beholdning)
+                    field(Beholdning; Beholdning)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Unit Cost";"Unit Cost")
+                    field("Unit Cost"; "Unit Cost")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Paid;Paid)
+                    field(Paid; Paid)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Salgspris inkl. Moms";"Salgspris inkl. Moms")
+                    field("Salgspris inkl. Moms"; "Salgspris inkl. Moms")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Item Group No.";"Item Group No.")
+                    field("Item Group No."; "Item Group No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Stand;Stand)
+                    field(Stand; Stand)
                     {
+                        ApplicationArea = All;
                         Caption = 'Condition';
                     }
                 }
@@ -132,32 +149,41 @@ page 6014506 "Used Goods Reg. Card"
             group("Customer Information")
             {
                 Caption = 'Customer Information';
-                field("Purchased By Customer No.";"Purchased By Customer No.")
+                field("Purchased By Customer No."; "Purchased By Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("Address 2";"Address 2")
+                field("Address 2"; "Address 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(By;By)
+                field(By; By)
                 {
+                    ApplicationArea = All;
                 }
-                field(Identification;Identification)
+                field(Identification; Identification)
                 {
+                    ApplicationArea = All;
                 }
-                field("Identification Number";"Identification Number")
+                field("Identification Number"; "Identification Number")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -185,9 +211,9 @@ page 6014506 "Used Goods Reg. Card"
                     //+NPR5.27
                     RetailSetup.TestField("Used Goods No. Management");
                     if Link = '' then
-                      Link := "No.";
+                        Link := "No.";
                     Modify;
-                    NoSeriesManagement.InitSeries(RetailSetup."Used Goods No. Management",xRec.Nummerserie,0D,UsedGoodsRegistration."No.",UsedGoodsRegistration.Nummerserie);
+                    NoSeriesManagement.InitSeries(RetailSetup."Used Goods No. Management", xRec.Nummerserie, 0D, UsedGoodsRegistration."No.", UsedGoodsRegistration.Nummerserie);
                     UsedGoodsRegistration.Insert;
                     UsedGoodsRegistration."Purchase Date" := "Purchase Date";
                     UsedGoodsRegistration."Purchased By Customer No." := "Purchased By Customer No.";
@@ -230,25 +256,26 @@ page 6014506 "Used Goods Reg. Card"
                         TempUsedGoodsRegistration.SetCurrentKey(Link);
                         TempUsedGoodsRegistration.DeleteAll;
                         if Link <> '' then begin
-                          UsedGoodsRegistration.Get(Link);
-                          UsedGoodsRegistration.SetRange(Link,UsedGoodsRegistration."No.");
-                          if UsedGoodsRegistration.Find('-') then repeat
-                            TempUsedGoodsRegistration := UsedGoodsRegistration;
-                            TempUsedGoodsRegistration.Insert;
-                          until UsedGoodsRegistration.Next = 0;
-                          PageAction :=// FORM.RUNMODAL(FORM::"Used Goods Link List",TempUsedGoodsRegistration);
-                                        PAGE.RunModal(PAGE::"Used Goods Link List",TempUsedGoodsRegistration);
+                            UsedGoodsRegistration.Get(Link);
+                            UsedGoodsRegistration.SetRange(Link, UsedGoodsRegistration."No.");
+                            if UsedGoodsRegistration.Find('-') then
+                                repeat
+                                    TempUsedGoodsRegistration := UsedGoodsRegistration;
+                                    TempUsedGoodsRegistration.Insert;
+                                until UsedGoodsRegistration.Next = 0;
+                            PageAction :=// FORM.RUNMODAL(FORM::"Used Goods Link List",TempUsedGoodsRegistration);
+                                          PAGE.RunModal(PAGE::"Used Goods Link List", TempUsedGoodsRegistration);
 
-                          if PageAction = ACTION::LookupOK then
-                            Get(TempUsedGoodsRegistration."No.");
+                            if PageAction = ACTION::LookupOK then
+                                Get(TempUsedGoodsRegistration."No.");
                         end else begin
-                          UsedGoodsRegistration.SetCurrentKey("No.");
-                          UsedGoodsRegistration := Rec;
-                          UsedGoodsRegistration.FilterGroup := 2;
-                          UsedGoodsRegistration.SetRange("No.","No.");
-                          UsedGoodsRegistration.FilterGroup := 0;
-                          //FORM.RUNMODAL(FORM::"Used Goods Link List",UsedGoodsRegistration);
-                          PAGE.RunModal(PAGE::"Used Goods Link List",UsedGoodsRegistration);
+                            UsedGoodsRegistration.SetCurrentKey("No.");
+                            UsedGoodsRegistration := Rec;
+                            UsedGoodsRegistration.FilterGroup := 2;
+                            UsedGoodsRegistration.SetRange("No.", "No.");
+                            UsedGoodsRegistration.FilterGroup := 0;
+                            //FORM.RUNMODAL(FORM::"Used Goods Link List",UsedGoodsRegistration);
+                            PAGE.RunModal(PAGE::"Used Goods Link List", UsedGoodsRegistration);
                         end;
                     end;
                 }
@@ -269,7 +296,7 @@ page 6014506 "Used Goods Reg. Card"
                         TestField("Salesperson Code");
                         // TESTFIELD("Kostercentralen Registreret d.");
                         TestField("Salgspris inkl. Moms");
-                        CODEUNIT.Run((CODEUNIT::"Convert used goods"),Rec);
+                        CODEUNIT.Run((CODEUNIT::"Convert used goods"), Rec);
                     end;
                 }
                 action("Create Sales Credit Memo")
@@ -301,7 +328,7 @@ page 6014506 "Used Goods Reg. Card"
                         TestField("Item No. Created");
                         Item.Get("Item No. Created");
                         //FORM.RUNMODAL(FORM::"Item card - Retail",Vare);
-                        PAGE.RunModal(PAGE:: "Retail Item Card",Item);
+                        PAGE.RunModal(PAGE::"Retail Item Card", Item);
                     end;
                 }
                 action("Item Entry")
@@ -316,10 +343,10 @@ page 6014506 "Used Goods Reg. Card"
 
                         TestField("Item No. Created");
                         ItemLedgerEntry.FilterGroup := 2;
-                        ItemLedgerEntry.SetCurrentKey("Item No.","Variant Code");
-                        ItemLedgerEntry.SetRange("Item No.","Item No. Created");
+                        ItemLedgerEntry.SetCurrentKey("Item No.", "Variant Code");
+                        ItemLedgerEntry.SetRange("Item No.", "Item No. Created");
                         ItemLedgerEntry.FilterGroup := 0;
-                        PAGE.RunModal(PAGE::"Item Ledger Entries",ItemLedgerEntry);
+                        PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgerEntry);
                     end;
                 }
                 action("Registration Card")
@@ -341,14 +368,14 @@ page 6014506 "Used Goods Reg. Card"
                         TestField(Subject);
                         TestField(Identification);
                         TestField("Identification Number");
-                        if Link <>'' then
-                          xUsedGoodsRegistration.Get(Link)
+                        if Link <> '' then
+                            xUsedGoodsRegistration.Get(Link)
                         else
-                          xUsedGoodsRegistration.Get("No.");
+                            xUsedGoodsRegistration.Get("No.");
                         xUsedGoodsRegistration.FilterGroup := 2;
-                        xUsedGoodsRegistration.SetRange("No.",xUsedGoodsRegistration."No.");
+                        xUsedGoodsRegistration.SetRange("No.", xUsedGoodsRegistration."No.");
                         xUsedGoodsRegistration.FilterGroup := 0;
-                        REPORT.RunModal(REPORT::"Register Used Goods",true,false,xUsedGoodsRegistration);
+                        REPORT.RunModal(REPORT::"Register Used Goods", true, false, xUsedGoodsRegistration);
                     end;
                 }
                 action("Create Used Item and Print Label")
@@ -368,7 +395,7 @@ page 6014506 "Used Goods Reg. Card"
                         TestField("Purchased By Customer No.");
                         TestField("Salesperson Code");
                         TestField("Salgspris inkl. Moms");
-                        CODEUNIT.Run((CODEUNIT::"Convert used goods"),Rec);
+                        CODEUNIT.Run((CODEUNIT::"Convert used goods"), Rec);
 
                         TestField("Item No. Created");
                         Item.Get("Item No. Created");
@@ -394,13 +421,13 @@ page 6014506 "Used Goods Reg. Card"
         END;
         */
         //-NPR5.30
-        if (Link <> '') and ("No."<> Link) then
-         Status := Status::SubPost;
+        if (Link <> '') and ("No." <> Link) then
+            Status := Status::SubPost;
         if "No." = Link then
-          Status := Status::MainPost;
+            Status := Status::MainPost;
         if Link = '' then begin
-          Status := Status::SinglePost;
-          Link := "No.";
+            Status := Status::SinglePost;
+            Link := "No.";
         end;
         //+NPR5.30
 

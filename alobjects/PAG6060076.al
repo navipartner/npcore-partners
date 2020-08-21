@@ -18,194 +18,245 @@ page 6060076 "MM Membership Setup Card"
         {
             group(General)
             {
-                field("Community Code";"Community Code")
+                field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }
             group(Setup)
             {
-                field("Membership Type";"Membership Type")
+                field("Membership Type"; "Membership Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Information";"Member Information")
+                field("Member Information"; "Member Information")
                 {
+                    ApplicationArea = All;
                 }
-                field(Perpetual;Perpetual)
+                field(Perpetual; Perpetual)
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Role Assignment";"Member Role Assignment")
+                field("Member Role Assignment"; "Member Role Assignment")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Member Cardinality";"Membership Member Cardinality")
+                field("Membership Member Cardinality"; "Membership Member Cardinality")
                 {
+                    ApplicationArea = All;
                 }
-                field("Anonymous Member Cardinality";"Anonymous Member Cardinality")
+                field("Anonymous Member Cardinality"; "Anonymous Member Cardinality")
                 {
+                    ApplicationArea = All;
                 }
-                field("Confirm Member On Card Scan";"Confirm Member On Card Scan")
+                field("Confirm Member On Card Scan"; "Confirm Member On Card Scan")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Membership Delete";"Allow Membership Delete")
+                field("Allow Membership Delete"; "Allow Membership Delete")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto-Renew Model";"Auto-Renew Model")
+                field("Auto-Renew Model"; "Auto-Renew Model")
                 {
+                    ApplicationArea = All;
                 }
-                field("Recurring Payment Code";"Recurring Payment Code")
+                field("Recurring Payment Code"; "Recurring Payment Code")
                 {
+                    ApplicationArea = All;
                 }
                 group("Age Verification")
                 {
                     Caption = 'Age Verification';
-                    field("Enable Age Verification";"Enable Age Verification")
+                    field("Enable Age Verification"; "Enable Age Verification")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Validate Age Against";"Validate Age Against")
+                    field("Validate Age Against"; "Validate Age Against")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(Print)
             {
-                field("POS Print Action";"POS Print Action")
+                field("POS Print Action"; "POS Print Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Web Service Print Action";"Web Service Print Action")
+                field("Web Service Print Action"; "Web Service Print Action")
                 {
+                    ApplicationArea = All;
                 }
                 group(Account)
                 {
-                    field("Account Print Object Type";"Account Print Object Type")
+                    field("Account Print Object Type"; "Account Print Object Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Account Print Template Code";"Account Print Template Code")
+                    field("Account Print Template Code"; "Account Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Account Print Object ID";"Account Print Object ID")
+                    field("Account Print Object ID"; "Account Print Object ID")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Receipt)
                 {
-                    field("Receipt Print Object Type";"Receipt Print Object Type")
+                    field("Receipt Print Object Type"; "Receipt Print Object Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Receipt Print Template Code";"Receipt Print Template Code")
+                    field("Receipt Print Template Code"; "Receipt Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Receipt Print Object ID";"Receipt Print Object ID")
+                    field("Receipt Print Object ID"; "Receipt Print Object ID")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Membercard)
                 {
-                    field("Card Print Object Type";"Card Print Object Type")
+                    field("Card Print Object Type"; "Card Print Object Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Card Print Template Code";"Card Print Template Code")
+                    field("Card Print Template Code"; "Card Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Card Print Object ID";"Card Print Object ID")
+                    field("Card Print Object ID"; "Card Print Object ID")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Membercard Swipe")
                 {
                     Caption = 'On Membercard Swipe';
-                    field("Ticket Print Model";"Ticket Print Model")
+                    field("Ticket Print Model"; "Ticket Print Model")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Print Object Type";"Ticket Print Object Type")
+                    field("Ticket Print Object Type"; "Ticket Print Object Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Print Object ID";"Ticket Print Object ID")
+                    field("Ticket Print Object ID"; "Ticket Print Object ID")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ticket Print Template Code";"Ticket Print Template Code")
+                    field("Ticket Print Template Code"; "Ticket Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group("CRM & Loyalty")
             {
-                field("Loyalty Card";"Loyalty Card")
+                field("Loyalty Card"; "Loyalty Card")
                 {
+                    ApplicationArea = All;
                 }
-                field("Loyalty Code";"Loyalty Code")
+                field("Loyalty Code"; "Loyalty Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Contact Config. Template Code";"Contact Config. Template Code")
+                field("Contact Config. Template Code"; "Contact Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Config. Template Code";"Customer Config. Template Code")
+                field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Welcome Notification";"Create Welcome Notification")
+                field("Create Welcome Notification"; "Create Welcome Notification")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create Renewal Notifications";"Create Renewal Notifications")
+                field("Create Renewal Notifications"; "Create Renewal Notifications")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Customer No.";"Membership Customer No.")
+                field("Membership Customer No."; "Membership Customer No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Card)
             {
-                field("Card Expire Date Calculation";"Card Expire Date Calculation")
+                field("Card Expire Date Calculation"; "Card Expire Date Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Scheme";"Card Number Scheme")
+                field("Card Number Scheme"; "Card Number Scheme")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Prefix";"Card Number Prefix")
+                field("Card Number Prefix"; "Card Number Prefix")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Length";"Card Number Length")
+                field("Card Number Length"; "Card Number Length")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Validation";"Card Number Validation")
+                field("Card Number Validation"; "Card Number Validation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number No. Series";"Card Number No. Series")
+                field("Card Number No. Series"; "Card Number No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Valid Until";"Card Number Valid Until")
+                field("Card Number Valid Until"; "Card Number Valid Until")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number Pattern";"Card Number Pattern")
+                field("Card Number Pattern"; "Card Number Pattern")
                 {
+                    ApplicationArea = All;
                 }
-                field("Enable NP Pass Integration";"Enable NP Pass Integration")
+                field("Enable NP Pass Integration"; "Enable NP Pass Integration")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("On Membercard Swipe")
             {
-                field("Ticket Item Barcode";"Ticket Item Barcode")
+                field("Ticket Item Barcode"; "Ticket Item Barcode")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(GDPR)
             {
-                field("GDPR Mode";"GDPR Mode")
+                field("GDPR Mode"; "GDPR Mode")
                 {
+                    ApplicationArea = All;
                 }
-                field("GDPR Agreement No.";"GDPR Agreement No.")
+                field("GDPR Agreement No."; "GDPR Agreement No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

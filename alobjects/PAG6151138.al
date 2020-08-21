@@ -13,54 +13,67 @@ page 6151138 "TM Ticket Waiting List"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("External Schedule Entry No.";"External Schedule Entry No.")
+                field("External Schedule Entry No."; "External Schedule Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Schedule Entry Description";"Schedule Entry Description")
+                field("Schedule Entry Description"; "Schedule Entry Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Notification Address";"Notification Address")
+                field("Notification Address"; "Notification Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created At";"Created At")
+                field("Created At"; "Created At")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Token;Token)
+                field(Token; Token)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Count";"Notification Count")
+                field("Notification Count"; "Notification Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notified At";"Notified At")
+                field("Notified At"; "Notified At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notification Expires At";"Notification Expires At")
+                field("Notification Expires At"; "Notification Expires At")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -79,7 +92,7 @@ page 6151138 "TM Ticket Waiting List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "TM Ticket Notification Entry";
-                RunPageLink = "Ticket Token"=FIELD(Token);
+                RunPageLink = "Ticket Token" = FIELD(Token);
             }
             action("Notify Now")
             {
@@ -97,12 +110,12 @@ page 6151138 "TM Ticket Waiting List"
                     TicketNotifyParticipant: Codeunit "TM Ticket Notify Participant";
                 begin
 
-                    TicketWaitingListMgr.CreateWaitingListNotification (Rec, TmpTicketNotificationEntry);
+                    TicketWaitingListMgr.CreateWaitingListNotification(Rec, TmpTicketNotificationEntry);
                     Commit;
 
-                    TmpTicketNotificationEntry.FindFirst ();
-                    TicketNotificationEntry.SetFilter ("Entry No.", '=%1', TmpTicketNotificationEntry."Entry No.");
-                    TicketNotifyParticipant.SendGeneralNotification (TicketNotificationEntry);
+                    TmpTicketNotificationEntry.FindFirst();
+                    TicketNotificationEntry.SetFilter("Entry No.", '=%1', TmpTicketNotificationEntry."Entry No.");
+                    TicketNotifyParticipant.SendGeneralNotification(TicketNotificationEntry);
                 end;
             }
         }

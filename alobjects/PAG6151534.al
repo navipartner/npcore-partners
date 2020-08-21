@@ -12,11 +12,13 @@ page 6151534 "Nc Collector Req. Filter Subf."
         {
             repeater(Group)
             {
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Filter Text";"Filter Text")
+                field("Filter Text"; "Filter Text")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

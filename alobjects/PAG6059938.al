@@ -13,42 +13,53 @@ page 6059938 "Permission Range"
             group(Control6150626)
             {
                 ShowCaption = false;
-                field(SERIALNUMBER;SerialNumber)
+                field(SERIALNUMBER; SerialNumber)
                 {
+                    ApplicationArea = All;
                     Caption = 'License No.';
                 }
             }
             repeater(Group)
             {
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Index;Index)
+                field(Index; Index)
                 {
+                    ApplicationArea = All;
                 }
-                field(From;From)
+                field(From; From)
                 {
+                    ApplicationArea = All;
                 }
-                field("To";"To")
+                field("To"; "To")
                 {
+                    ApplicationArea = All;
                 }
-                field("Read Permission";"Read Permission")
+                field("Read Permission"; "Read Permission")
                 {
+                    ApplicationArea = All;
                 }
-                field("Insert Permission";"Insert Permission")
+                field("Insert Permission"; "Insert Permission")
                 {
+                    ApplicationArea = All;
                 }
-                field("Modify Permission";"Modify Permission")
+                field("Modify Permission"; "Modify Permission")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Permission";"Delete Permission")
+                field("Delete Permission"; "Delete Permission")
                 {
+                    ApplicationArea = All;
                 }
-                field("Execute Permission";"Execute Permission")
+                field("Execute Permission"; "Execute Permission")
                 {
+                    ApplicationArea = All;
                 }
-                field("Limited Usage Permission";"Limited Usage Permission")
+                field("Limited Usage Permission"; "Limited Usage Permission")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -16,25 +16,28 @@ page 6150683 "NPRE Restaurants"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Name 2";"Name 2")
+                field("Name 2"; "Name 2")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014406;Notes)
+            systempart(Control6014406; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014407;Links)
+            systempart(Control6014407; Links)
             {
                 Visible = false;
             }
@@ -53,14 +56,14 @@ page 6150683 "NPRE Restaurants"
                     Caption = 'Stations';
                     Image = Departments;
                     RunObject = Page "NPRE Kitchen Stations";
-                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                    RunPageLink = "Restaurant Code" = FIELD(Code);
                 }
                 action(KitchenStationSelection)
                 {
                     Caption = 'Station Selection Setup';
                     Image = Troubleshoot;
                     RunObject = Page "NPRE Kitchen Station Selection";
-                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                    RunPageLink = "Restaurant Code" = FIELD(Code);
                 }
                 action(ShowKitchenRequests)
                 {
@@ -89,7 +92,7 @@ page 6150683 "NPRE Restaurants"
                     Caption = 'Locations';
                     Image = Zones;
                     RunObject = Page "NPRE Seating Location";
-                    RunPageLink = "Restaurant Code"=FIELD(Code);
+                    RunPageLink = "Restaurant Code" = FIELD(Code);
                 }
                 action(Seatings)
                 {

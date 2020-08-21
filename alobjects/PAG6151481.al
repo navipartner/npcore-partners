@@ -56,15 +56,18 @@ page 6151481 "Magento Retail Activities"
                         ShowCaption = false;
                         field("Sales Orders"; "Sales Orders")
                         {
+                            ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
                         }
                         field("Sales Quotes"; "Sales Quotes")
                         {
+                            ApplicationArea = All;
                             DrillDownPageID = "Sales Quotes";
                             Visible = false;
                         }
                         field("Sales Return Orders"; "Sales Return Orders")
                         {
+                            ApplicationArea = All;
                             DrillDownPageID = "Sales Return Order List";
                         }
                     }
@@ -81,11 +84,13 @@ page 6151481 "Magento Retail Activities"
                         ShowCaption = false;
                         field("Magento Orders"; "Magento Orders")
                         {
+                            ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
                             Visible = false;
                         }
                         field("Daily Sales Invoices"; "Daily Sales Invoices")
                         {
+                            ApplicationArea = All;
                             Caption = 'Daily Sales Invoices';
                             DrillDownPageID = "Posted Sales Invoices";
                             Visible = false;
@@ -104,15 +109,18 @@ page 6151481 "Magento Retail Activities"
                         ShowCaption = false;
                         field("Import Pending"; "Import Pending")
                         {
+                            ApplicationArea = All;
                             DrillDownPageID = "Nc Import List";
                         }
                         field("Tasks Unprocessed"; "Tasks Unprocessed")
                         {
+                            ApplicationArea = All;
                             DrillDownPageID = "Nc Task List";
                             Visible = false;
                         }
                         field("Daily Sales Orders"; "Daily Sales Orders")
                         {
+                            ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
                         }
                     }

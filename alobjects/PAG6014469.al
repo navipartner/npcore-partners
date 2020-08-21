@@ -44,73 +44,95 @@ page 6014469 "Retail Document Header"
             group(General)
             {
                 Caption = 'General';
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                     OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Quote';
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Type";"Customer Type")
+                field("Customer Type"; "Customer Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("First Name";"First Name")
+                field("First Name"; "First Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
+                    ApplicationArea = All;
                 }
-                field("Address 2";"Address 2")
+                field("Address 2"; "Address 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(City;City)
+                field(City; City)
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Country Code";"Country Code")
+                field("Country Code"; "Country Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Date";"Document Date")
+                field("Document Date"; "Document Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                 }
-                field("Time of Day";"Time of Day")
+                field("Time of Day"; "Time of Day")
                 {
+                    ApplicationArea = All;
                 }
-                field(Phone;Phone)
+                field(Phone; Phone)
                 {
+                    ApplicationArea = All;
                 }
-                field(Mobile;Mobile)
+                field(Mobile; Mobile)
                 {
+                    ApplicationArea = All;
                 }
-                field("E-mail";"E-mail")
+                field("E-mail"; "E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field(Reference;Reference)
+                field(Reference; Reference)
                 {
+                    ApplicationArea = All;
                     Caption = 'Reference';
                 }
-                field("Contract Status";"Contract Status")
+                field("Contract Status"; "Contract Status")
                 {
+                    ApplicationArea = All;
                 }
-                field(Cashed;Cashed)
+                field(Cashed; Cashed)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Delivery1)
@@ -119,68 +141,87 @@ page 6014469 "Retail Document Header"
                 group(Control6150648)
                 {
                     ShowCaption = false;
-                    field("Ship-to Name";"Ship-to Name")
+                    field("Ship-to Name"; "Ship-to Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Address";"Ship-to Address")
+                    field("Ship-to Address"; "Ship-to Address")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Address 2";"Ship-to Address 2")
+                    field("Ship-to Address 2"; "Ship-to Address 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Post Code";"Ship-to Post Code")
+                    field("Ship-to Post Code"; "Ship-to Post Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to City";"Ship-to City")
+                    field("Ship-to City"; "Ship-to City")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Attention";"Ship-to Attention")
+                    field("Ship-to Attention"; "Ship-to Attention")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150655)
                 {
                     ShowCaption = false;
-                    field(Delivery;Delivery)
+                    field(Delivery; Delivery)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Shipping Type";"Shipping Type")
+                    field("Shipping Type"; "Shipping Type")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Delivery by Vendor";"Delivery by Vendor")
+                    field("Delivery by Vendor"; "Delivery by Vendor")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Resource Ship-by n Persons";"Resource Ship-by n Persons")
+                    field("Resource Ship-by n Persons"; "Resource Ship-by n Persons")
                     {
+                        ApplicationArea = All;
                         Caption = 'Persons';
                     }
-                    field("Estimated Time Use";"Estimated Time Use")
+                    field("Estimated Time Use"; "Estimated Time Use")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Resource Ship-by Car";"Resource Ship-by Car")
+                    field("Resource Ship-by Car"; "Resource Ship-by Car")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Resource.Name";Resource.Name)
+                    field("Resource.Name"; Resource.Name)
                     {
+                        ApplicationArea = All;
                         Caption = 'Resource Name';
                     }
-                    field("Return Date";"Return Date")
+                    field("Return Date"; "Return Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Delivery Date";"Delivery Date")
+                    field("Delivery Date"; "Delivery Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Delivery Time 1";"Delivery Time 1")
+                    field("Delivery Time 1"; "Delivery Time 1")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Delivery Time 2";"Delivery Time 2")
+                    field("Delivery Time 2"; "Delivery Time 2")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Resource Date";"Ship-to Resource Date")
+                    field("Ship-to Resource Date"; "Ship-to Resource Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ship-to Resource Time";"Ship-to Resource Time")
+                    field("Ship-to Resource Time"; "Ship-to Resource Time")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -190,49 +231,60 @@ page 6014469 "Retail Document Header"
                 group(Control6150671)
                 {
                     ShowCaption = false;
-                    field(Via;Via)
+                    field(Via; Via)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Rent Register";"Rent Register")
+                    field("Rent Register"; "Rent Register")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Rent Sales Ticket";"Rent Sales Ticket")
+                    field("Rent Sales Ticket"; "Rent Sales Ticket")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Rent Salesperson";"Rent Salesperson")
+                    field("Rent Salesperson"; "Rent Salesperson")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6150676)
                 {
                     ShowCaption = false;
-                    field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                    field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                     {
+                        ApplicationArea = All;
                         Caption = 'Shortcut Dimension 1 Code';
                     }
-                    field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
+                    field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                     {
+                        ApplicationArea = All;
                         Caption = 'Shortcut Dimension 2 Code';
                     }
-                    field("ID Card";"ID Card")
+                    field("ID Card"; "ID Card")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(Purchase)
             {
                 Caption = 'Purchase';
-                field("Vendor Index";"Vendor Index")
+                field("Vendor Index"; "Vendor Index")
                 {
+                    ApplicationArea = All;
                 }
-                field("Purchase Order No.";"Purchase Order No.")
+                field("Purchase Order No."; "Purchase Order No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Order No.";"Order No.")
+                field("Order No."; "Order No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Notify Customer";"Notify Customer")
+                field("Notify Customer"; "Notify Customer")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Customer Letter")
@@ -241,14 +293,17 @@ page 6014469 "Retail Document Header"
                 group(Control6150696)
                 {
                     ShowCaption = false;
-                    field(Status;Status)
+                    field(Status; Status)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Letter Printed";"Letter Printed")
+                    field("Letter Printed"; "Letter Printed")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Invoice No.";"Invoice No.")
+                    field("Invoice No."; "Invoice No.")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -258,29 +313,34 @@ page 6014469 "Retail Document Header"
                 group(Control6150698)
                 {
                     ShowCaption = false;
-                    field(Deposit;Deposit)
+                    field(Deposit; Deposit)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Prices Including VAT";"Prices Including VAT")
+                    field("Prices Including VAT"; "Prices Including VAT")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Payment Method Code";"Payment Method Code")
+                    field("Payment Method Code"; "Payment Method Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Invoice No.1";"Invoice No.")
+                    field("Invoice No.1"; "Invoice No.")
                     {
+                        ApplicationArea = All;
                         Caption = 'Invoice No.';
                     }
-                    field("Req. Return Date";"Req. Return Date")
+                    field("Req. Return Date"; "Req. Return Date")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
-            part(RetailDocumentLines1;"Retail Document Lines")
+            part(RetailDocumentLines1; "Retail Document Lines")
             {
-                SubPageLink = "Document Type"=FIELD("Document Type"),
-                              "Document No."=FIELD("No.");
-                SubPageView = SORTING("Document Type","Document No.","Line No.");
+                SubPageLink = "Document Type" = FIELD("Document Type"),
+                              "Document No." = FIELD("No.");
+                SubPageView = SORTING("Document Type", "Document No.", "Line No.");
             }
         }
     }
@@ -309,7 +369,7 @@ page 6014469 "Retail Document Header"
 
                 trigger OnAction()
                 begin
-                    ExitCode:='';
+                    ExitCode := '';
                 end;
             }
             group(Print)
@@ -324,17 +384,17 @@ page 6014469 "Retail Document Header"
                     var
                         ReportSelectionRetail: Record "Report Selection Retail";
                     begin
-                        RetailDocumentHeader.SetRange("Document Type","Document Type");
-                        RetailDocumentHeader.SetRange("No.","No.");
+                        RetailDocumentHeader.SetRange("Document Type", "Document Type");
+                        RetailDocumentHeader.SetRange("No.", "No.");
                         if RetailDocumentHeader.Find('-') then;
                         //-NPR5.29
                         //RetailDocumentHeader."Copy no.":=RetailDocumentHeader."Copy no."+1;
                         //RetailDocumentHeader.MODIFY();
                         //+NPR5.29
-                        ReportSelectionRetail.SetRange("Report Type",ReportSelectionRetail."Report Type"::Tailor);
+                        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::Tailor);
                         ReportSelectionRetail.Find('-');
                         repeat
-                          REPORT.Run(ReportSelectionRetail."Report ID",true,false,RetailDocumentHeader);
+                            REPORT.Run(ReportSelectionRetail."Report ID", true, false, RetailDocumentHeader);
                         until ReportSelectionRetail.Next = 0;
                         //-NPR5.29
                         RetailDocumentHeader."Copy No." := RetailDocumentHeader."Copy No." + 1;
@@ -364,7 +424,7 @@ page 6014469 "Retail Document Header"
                     begin
                         RetailDocumentHeader.Copy(Rec);
                         RetailDocumentHeader.SetRecFilter;
-                        REPORT.RunModal(REPORT::"Return Reason Code Statistics",true,false,RetailDocumentHeader);
+                        REPORT.RunModal(REPORT::"Return Reason Code Statistics", true, false, RetailDocumentHeader);
                         /*true=faLSE HVIS FILTER IKKE SKAL VISES*/
 
                     end;
@@ -378,10 +438,10 @@ page 6014469 "Retail Document Header"
                     var
                         ReportSelectionContract: Record "Report Selection - Contract";
                     begin
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Purchase contract");
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Purchase contract");
                         ReportSelectionContract.Find('-');
                         repeat
-                          REPORT.Run(ReportSelectionContract."Report ID",true,false,Rec);
+                            REPORT.Run(ReportSelectionContract."Report ID", true, false, Rec);
                         until ReportSelectionContract.Next = 0;
                     end;
                 }
@@ -395,12 +455,12 @@ page 6014469 "Retail Document Header"
                         ReportSelectionContract: Record "Report Selection - Contract";
                         ThisRetailDocumentHeader: Record "Retail Document Header";
                     begin
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Rental contract");
+                        ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Rental contract");
                         ReportSelectionContract.Find('-');
-                        ThisRetailDocumentHeader.SetFilter("Document Type",'%1',Rec."Document Type");
-                        ThisRetailDocumentHeader.SetFilter("No.","No.");
+                        ThisRetailDocumentHeader.SetFilter("Document Type", '%1', Rec."Document Type");
+                        ThisRetailDocumentHeader.SetFilter("No.", "No.");
                         repeat
-                          REPORT.Run(ReportSelectionContract."Report ID",true,false,ThisRetailDocumentHeader);
+                            REPORT.Run(ReportSelectionContract."Report ID", true, false, ThisRetailDocumentHeader);
                         until ReportSelectionContract.Next = 0;
                     end;
                 }
@@ -425,12 +485,12 @@ page 6014469 "Retail Document Header"
 
                         //-NPR5.30 [266874]
                         //cle.SETCURRENTKEY("Document Type","External Document No.","Customer No.");
-                        CustLedgerEntry.SetCurrentKey("Customer No.","Posting Date");
+                        CustLedgerEntry.SetCurrentKey("Customer No.", "Posting Date");
                         //+NPR5.30 [266874]
 
-                        CustLedgerEntry.SetRange("Customer No.","Customer No.");
+                        CustLedgerEntry.SetRange("Customer No.", "Customer No.");
                         CustLedgerEntry.SetRange("Document Type");
-                        CustLedgerEntry.SetRange("External Document No.","No.");
+                        CustLedgerEntry.SetRange("External Document No.", "No.");
 
                         CustomerDetailTrialBal.SetTableView(Customer);
                         CustomerDetailTrialBal.SetTableView(CustLedgerEntry);
@@ -458,7 +518,7 @@ page 6014469 "Retail Document Header"
                     trigger OnAction()
                     begin
                         CreateInvoice;
-                        Validate("Contract Status","Contract Status"::"Transmitted to invoice");
+                        Validate("Contract Status", "Contract Status"::"Transmitted to invoice");
                         Modify(true);
                     end;
                 }
@@ -527,11 +587,11 @@ page 6014469 "Retail Document Header"
     begin
         if (("Customer No." = '') or ("Customer Type" = "Customer Type"::Kontant))
           and (Deposit > 0) then
-        Error(ErrNoCustDeposit);
+            Error(ErrNoCustDeposit);
 
         if ("Customer No." = '') and (ExitCode = 'OK') then
-          if not Confirm(Txt001, false) then
-            exit(false);
+            if not Confirm(Txt001, false) then
+                exit(false);
     end;
 
     var

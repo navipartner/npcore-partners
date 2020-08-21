@@ -14,32 +14,41 @@ page 6151054 "POS Payment View Event Setup"
         {
             group(General)
             {
-                field("Dimension Popup Enabled";"Dimension Popup Enabled")
+                field("Dimension Popup Enabled"; "Dimension Popup Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Dimension Code";"Dimension Code")
+                field("Dimension Code"; "Dimension Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Popup per";"Popup per")
+                field("Popup per"; "Popup per")
                 {
+                    ApplicationArea = All;
                 }
-                field("Popup every";"Popup every")
+                field("Popup every"; "Popup every")
                 {
+                    ApplicationArea = All;
                 }
-                field("Popup Start Time";"Popup Start Time")
+                field("Popup Start Time"; "Popup Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Popup End Time";"Popup End Time")
+                field("Popup End Time"; "Popup End Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Popup Mode";"Popup Mode")
+                field("Popup Mode"; "Popup Mode")
                 {
+                    ApplicationArea = All;
                 }
-                field("Create New Dimension Values";"Create New Dimension Values")
+                field("Create New Dimension Values"; "Create New Dimension Values")
                 {
+                    ApplicationArea = All;
                 }
-                field("Skip Popup on Dimension Value";"Skip Popup on Dimension Value")
+                field("Skip Popup on Dimension Value"; "Skip Popup on Dimension Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -67,8 +76,8 @@ page 6151054 "POS Payment View Event Setup"
     trigger OnInit()
     begin
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

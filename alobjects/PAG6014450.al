@@ -30,6 +30,7 @@ page 6014450 "Mixed Discount"
                     ShowCaption = false;
                     field("Code"; Code)
                     {
+                        ApplicationArea = All;
 
                         trigger OnAssistEdit()
                         begin
@@ -39,6 +40,7 @@ page 6014450 "Mixed Discount"
                     }
                     field(Description; Description)
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     group(Control6014409)
@@ -47,6 +49,7 @@ page 6014450 "Mixed Discount"
                         Visible = ("Mix Type" <> 2);
                         field("Mix Type"; "Mix Type")
                         {
+                            ApplicationArea = All;
                             OptionCaption = 'Standard,Combination';
 
                             trigger OnValidate()
@@ -63,9 +66,10 @@ page 6014450 "Mixed Discount"
                         group(Control6014428)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type"<>4);
-                            field(Lot;Lot)
+                            Visible = ("Discount Type" <> 4);
+                            field(Lot; Lot)
                             {
+                                ApplicationArea = All;
                                 ToolTip = 'Define Quantity on Lines - All items and quantity on lines must be bought';
 
                                 trigger OnValidate()
@@ -81,6 +85,7 @@ page 6014450 "Mixed Discount"
                             Visible = (NOT Lot);
                             field("Min. Quantity"; "Min. Quantity")
                             {
+                                ApplicationArea = All;
 
                                 trigger OnValidate()
                                 begin
@@ -89,6 +94,7 @@ page 6014450 "Mixed Discount"
                             }
                             field("Max. Quantity"; "Max. Quantity")
                             {
+                                ApplicationArea = All;
                             }
                         }
                     }
@@ -98,6 +104,7 @@ page 6014450 "Mixed Discount"
                         Visible = ("Mix Type" = 1) OR (Lot);
                         field("CalcMinQty()"; CalcMinQty())
                         {
+                            ApplicationArea = All;
                             Caption = 'Item Qty. per Lot';
                             DecimalPlaces = 0 : 5;
 
@@ -113,6 +120,7 @@ page 6014450 "Mixed Discount"
                         Visible = ("Mix Type" <> 2);
                         field("Discount Type"; "Discount Type")
                         {
+                            ApplicationArea = All;
 
                             trigger OnValidate()
                             begin
@@ -123,9 +131,10 @@ page 6014450 "Mixed Discount"
                         group(Control6014403)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type"=0);
+                            Visible = ("Discount Type" = 0);
                             field("Total Amount"; "Total Amount")
                             {
+                                ApplicationArea = All;
 
                                 trigger OnValidate()
                                 begin
@@ -134,14 +143,16 @@ page 6014450 "Mixed Discount"
                             }
                             field("Total Amount Excl. VAT"; "Total Amount Excl. VAT")
                             {
+                                ApplicationArea = All;
                             }
                         }
                         group(Control6014426)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type"=4);
-                            field(DiscAmountExclVAT;"Total Amount Excl. VAT")
+                            Visible = ("Discount Type" = 4);
+                            field(DiscAmountExclVAT; "Total Amount Excl. VAT")
                             {
+                                ApplicationArea = All;
                                 Caption = 'Discount Amount Excl. VAT';
 
                                 trigger OnValidate()
@@ -156,6 +167,7 @@ page 6014450 "Mixed Discount"
                             Visible = "Discount Type" = 1;
                             field("Total Discount %"; "Total Discount %")
                             {
+                                ApplicationArea = All;
 
                                 trigger OnValidate()
                                 begin
@@ -169,6 +181,7 @@ page 6014450 "Mixed Discount"
                             Visible = "Discount Type" = 2;
                             field("Total Discount Amount"; "Total Discount Amount")
                             {
+                                ApplicationArea = All;
 
                                 trigger OnValidate()
                                 begin
@@ -182,6 +195,7 @@ page 6014450 "Mixed Discount"
                             Visible = "Discount Type" = 3;
                             field("Item Discount Qty."; "Item Discount Qty.")
                             {
+                                ApplicationArea = All;
 
                                 trigger OnValidate()
                                 begin
@@ -190,6 +204,7 @@ page 6014450 "Mixed Discount"
                             }
                             field("Item Discount %"; "Item Discount %")
                             {
+                                ApplicationArea = All;
 
                                 trigger OnValidate()
                                 begin
@@ -200,13 +215,15 @@ page 6014450 "Mixed Discount"
                         group(Control6014407)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type"<>2) AND ("Discount Type"<>4) AND (NOT "Lot");
+                            Visible = ("Discount Type" <> 2) AND ("Discount Type" <> 4) AND (NOT "Lot");
                             field(MinimumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, false))
                             {
+                                ApplicationArea = All;
                                 Caption = 'Min. Discount Amount';
                             }
                             field(MaximumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                             {
+                                ApplicationArea = All;
                                 Caption = 'Max. Discount Amount';
                                 Editable = false;
                             }
@@ -217,6 +234,7 @@ page 6014450 "Mixed Discount"
                             Visible = ("Discount Type" <> 2) AND ("Lot");
                             field(Discount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                             {
+                                ApplicationArea = All;
                                 Caption = 'Discount Amount';
                                 Editable = false;
                             }
@@ -228,10 +246,12 @@ page 6014450 "Mixed Discount"
                     ShowCaption = false;
                     field("Created the"; "Created the")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                     field("Last Date Modified"; "Last Date Modified")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                     group(Control6014411)
@@ -240,9 +260,11 @@ page 6014450 "Mixed Discount"
                         Visible = "Mix Type" <> 2;
                         field("Block Custom Discount"; "Block Custom Discount")
                         {
+                            ApplicationArea = All;
                         }
                         field(Status; Status)
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }
@@ -256,22 +278,27 @@ page 6014450 "Mixed Discount"
                     ShowCaption = false;
                     field("Starting date"; "Starting date")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Ending date"; "Ending date")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Starting time"; "Starting time")
                     {
+                        ApplicationArea = All;
                         Visible = false;
                     }
                     field("Ending time"; "Ending time")
                     {
+                        ApplicationArea = All;
                         Visible = false;
                     }
                     field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
                     {
+                        ApplicationArea = All;
                         AssistEdit = false;
 
                         trigger OnAssistEdit()
@@ -289,9 +316,9 @@ page 6014450 "Mixed Discount"
                     }
                 }
             }
-            part(DiscountLevels;"Mixed Discount Levels")
+            part(DiscountLevels; "Mixed Discount Levels")
             {
-                SubPageLink = "Mixed Discount Code"=FIELD(Code);
+                SubPageLink = "Mixed Discount Code" = FIELD(Code);
                 Visible = DiscountLevelsApplicable;
             }
             part(SubForm; "Mixed Discount Lines")

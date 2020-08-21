@@ -12,20 +12,25 @@ page 6014464 "Register Period List"
         {
             repeater(Group)
             {
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Closed";"Date Closed")
+                field("Date Closed"; "Date Closed")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Balancing Time";"Balancing Time")
+                field("Balancing Time"; "Balancing Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Date Active";"Last Date Active")
+                field("Last Date Active"; "Last Date Active")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

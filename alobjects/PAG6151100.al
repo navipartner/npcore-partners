@@ -14,23 +14,28 @@ page 6151100 "NpRi Reimbursement Modules"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Subscriber Codeunit ID";"Subscriber Codeunit ID")
+                field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Subscriber Codeunit Name";"Subscriber Codeunit Name")
+                field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

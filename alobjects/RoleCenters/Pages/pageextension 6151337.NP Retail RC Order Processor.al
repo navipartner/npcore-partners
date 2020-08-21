@@ -16,6 +16,7 @@ pageextension 6151337 "NP Retail RC Order Processor" extends "Headline RC Order 
                 Editable = false;
                 field("'Biggest sales for today is ' + FORMAT(highestPOSSales,0,'<Precision,2><sign><Integer Thousand><Decimals,3>')+ ' !'"; 'Highest POS Sales for today is ' + Format(highestPOSSales) + ' !')
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -26,6 +27,7 @@ pageextension 6151337 "NP Retail RC Order Processor" extends "Headline RC Order 
                 Editable = false;
                 field("'Biggest sales for today is ' + FORMAT(highestSalesInv,0,'<Precision,2><sign><Integer Thousand><Decimals,3>') + ' !'"; 'Highest Sales Invoice for today is ' + Format(highestSalesInv) + ' !')
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -35,6 +37,7 @@ pageextension 6151337 "NP Retail RC Order Processor" extends "Headline RC Order 
                 Editable = false;
                 field("'Top Sales Person for today is ' + TopSalesPerson +' !'"; 'Top Sales Person for today is ' + TopSalesPerson + ' !')
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -45,6 +48,7 @@ pageextension 6151337 "NP Retail RC Order Processor" extends "Headline RC Order 
                 Editable = false;
                 field("'Average Basket is ' +  FORMAT(AvgBasket,0,'<Precision,2><sign><Integer Thousand><Decimals,3>') + ' !'"; 'Average Basket is ' + FORMAT(AverageBasket, 0, '<Precision,2><sign><Integer Thousand><Decimals,3>') + ' !')
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }

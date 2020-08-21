@@ -25,48 +25,62 @@ page 6014427 "Item Group Tree"
                 ShowAsTree = true;
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
                 field("Parent Item Group No."; "Parent Item Group No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Inventory Posting Group"; "Inventory Posting Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
                 field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                 }
                 field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field(Level; Level)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Sorting-Key"; "Sorting-Key")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

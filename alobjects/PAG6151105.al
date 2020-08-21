@@ -14,20 +14,25 @@ page 6151105 "NpRi Parties"
         {
             repeater(Group)
             {
-                field("Party Type";"Party Type")
+                field("Party Type"; "Party Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Reimburse every";"Reimburse every")
+                field("Reimburse every"; "Reimburse every")
                 {
+                    ApplicationArea = All;
                 }
-                field("Next Posting Date Calculation";"Next Posting Date Calculation")
+                field("Next Posting Date Calculation"; "Next Posting Date Calculation")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -42,8 +47,8 @@ page 6151105 "NpRi Parties"
                 Caption = 'Reimbursements';
                 Image = List;
                 RunObject = Page "NpRi Reimbursements";
-                RunPageLink = "Party Type"=FIELD("Party Type"),
-                              "Party No."=FIELD("No.");
+                RunPageLink = "Party Type" = FIELD("Party Type"),
+                              "Party No." = FIELD("No.");
             }
         }
     }

@@ -18,11 +18,13 @@ page 6151432 "Magento Attribute Labels"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                 }
-                field("FORMAT(""Text Field"".HASVALUE)";Format("Text Field".HasValue))
+                field("FORMAT(""Text Field"".HASVALUE)"; Format("Text Field".HasValue))
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Caption = 'Text Field';
                     Visible = TextFieldVisible;
@@ -35,13 +37,14 @@ page 6151432 "Magento Attribute Labels"
                         RecRef.GetTable(Rec);
                         FieldRef := RecRef.Field(FieldNo("Text Field"));
                         if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                          RecRef.SetTable(Rec);
-                          Modify(true);
+                            RecRef.SetTable(Rec);
+                            Modify(true);
                         end;
                     end;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

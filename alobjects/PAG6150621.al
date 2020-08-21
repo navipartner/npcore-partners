@@ -13,25 +13,30 @@ page 6150621 "POS Unit to Bin Relation"
         {
             repeater(Group)
             {
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("POS Unit Status";"POS Unit Status")
+                field("POS Unit Status"; "POS Unit Status")
                 {
+                    ApplicationArea = All;
                     Visible = ShowUnitInfo;
                 }
-                field("POS Unit Name";"POS Unit Name")
+                field("POS Unit Name"; "POS Unit Name")
                 {
+                    ApplicationArea = All;
                     Visible = ShowUnitInfo;
                 }
-                field("POS Payment Bin No.";"POS Payment Bin No.")
+                field("POS Payment Bin No."; "POS Payment Bin No.")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                     Visible = ShowBinInfo;
                 }
-                field("POS Payment Bin Status";"POS Payment Bin Status")
+                field("POS Payment Bin Status"; "POS Payment Bin Status")
                 {
+                    ApplicationArea = All;
                     Visible = ShowBinInfo;
                 }
             }

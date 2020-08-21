@@ -16,41 +16,53 @@ page 6184852 "FR POS Audit Log Aux. Info"
         {
             repeater(Group)
             {
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("NPR Version";"NPR Version")
+                field("NPR Version"; "NPR Version")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Name";"Store Name")
+                field("Store Name"; "Store Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Name 2";"Store Name 2")
+                field("Store Name 2"; "Store Name 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Address";"Store Address")
+                field("Store Address"; "Store Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Address 2";"Store Address 2")
+                field("Store Address 2"; "Store Address 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Post Code";"Store Post Code")
+                field("Store Post Code"; "Store Post Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store City";"Store City")
+                field("Store City"; "Store City")
                 {
+                    ApplicationArea = All;
                 }
-                field("Store Siret";"Store Siret")
+                field("Store Siret"; "Store Siret")
                 {
+                    ApplicationArea = All;
                 }
-                field(APE;APE)
+                field(APE; APE)
                 {
+                    ApplicationArea = All;
                 }
-                field("Intra-comm. VAT ID";"Intra-comm. VAT ID")
+                field("Intra-comm. VAT ID"; "Intra-comm. VAT ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Name";"Salesperson Name")
+                field("Salesperson Name"; "Salesperson Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

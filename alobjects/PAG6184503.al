@@ -14,14 +14,17 @@ page 6184503 "CleanCash Register List"
         {
             repeater(Group)
             {
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash No. Series";"CleanCash No. Series")
+                field("CleanCash No. Series"; "CleanCash No. Series")
                 {
+                    ApplicationArea = All;
                 }
-                field("CleanCash Integration";"CleanCash Integration")
+                field("CleanCash Integration"; "CleanCash Integration")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

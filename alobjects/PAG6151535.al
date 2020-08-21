@@ -16,16 +16,19 @@ page 6151535 "Nc Coll. Create Outgoing Req."
         {
             group(General)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                     Lookup = true;
-                    TableRelation = Object.ID WHERE (Type=CONST(Table));
+                    TableRelation = Object.ID WHERE(Type = CONST(Table));
                 }
-                field("Table View";"Table View")
+                field("Table View"; "Table View")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -53,8 +56,8 @@ page 6151535 "Nc Coll. Create Outgoing Req."
         TextConfirmCreate: Label 'Would you like to create this Outgoing Collector Request?';
     begin
         if (Name <> '') and ("Table No." <> 0) then
-          if Confirm(TextConfirmCreate) then
-            CreateCollectorRequest;
+            if Confirm(TextConfirmCreate) then
+                CreateCollectorRequest;
     end;
 
     trigger OnOpenPage()
@@ -75,13 +78,13 @@ page 6151535 "Nc Coll. Create Outgoing Req."
         TestField("Table No.");
         NcCollectorRequest.Init;
         NcCollectorRequest.Insert(true);
-        NcCollectorRequest.Validate(Direction,NcCollectorRequest.Direction::Outgoing);
-        NcCollectorRequest.Validate(Name,Name);
-        NcCollectorRequest.Validate("Collector Code","Collector Code");
-        NcCollectorRequest.Validate("Table No.","Table No.");
-        NcCollectorRequest.Validate("Table View","Table View");
+        NcCollectorRequest.Validate(Direction, NcCollectorRequest.Direction::Outgoing);
+        NcCollectorRequest.Validate(Name, Name);
+        NcCollectorRequest.Validate("Collector Code", "Collector Code");
+        NcCollectorRequest.Validate("Table No.", "Table No.");
+        NcCollectorRequest.Validate("Table View", "Table View");
         NcCollectorRequest.Modify(true);
-        Message(TextCreated,NcCollectorRequest."No.");
+        Message(TextCreated, NcCollectorRequest."No.");
     end;
 }
 

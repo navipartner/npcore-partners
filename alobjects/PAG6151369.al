@@ -19,56 +19,73 @@ page 6151369 "CS Stock-Takes Data"
         {
             repeater(Group)
             {
-                field("Stock-Take Id";"Stock-Take Id")
+                field("Stock-Take Id"; "Stock-Take Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tag Id";"Tag Id")
+                field("Tag Id"; "Tag Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Code";"Item Group Code")
+                field("Item Group Code"; "Item Group Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Description";"Item Description")
+                field("Item Description"; "Item Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Description";"Variant Description")
+                field("Variant Description"; "Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Group Description";"Item Group Description")
+                field("Item Group Description"; "Item Group Description")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
-                field(Approved;Approved)
+                field(Approved; Approved)
                 {
+                    ApplicationArea = All;
                 }
-                field("Approved By";"Approved By")
+                field("Approved By"; "Approved By")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transferred To Worksheet";"Transferred To Worksheet")
+                field("Transferred To Worksheet"; "Transferred To Worksheet")
                 {
+                    ApplicationArea = All;
                 }
-                field("Combined key";"Combined key")
+                field("Combined key"; "Combined key")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Area";Area)
+                field("Area"; Area)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

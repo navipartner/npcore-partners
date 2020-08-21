@@ -14,20 +14,25 @@ page 6059899 "Data Log Records Subform"
         {
             repeater(Group)
             {
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Previous Field Value";"Previous Field Value")
+                field("Previous Field Value"; "Previous Field Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Value Changed";"Field Value Changed")
+                field("Field Value Changed"; "Field Value Changed")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Value";"Field Value")
+                field("Field Value"; "Field Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -11,11 +11,13 @@ page 6150714 "POS Stargate Package Method"
         {
             repeater(Group)
             {
-                field("Method Name";"Method Name")
+                field("Method Name"; "Method Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Package Name";"Package Name")
+                field("Package Name"; "Package Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

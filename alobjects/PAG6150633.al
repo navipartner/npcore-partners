@@ -23,6 +23,7 @@ page 6150633 "NPRE Select Flow Status"
             {
                 field(Selected; Selected)
                 {
+                    ApplicationArea = All;
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
@@ -34,24 +35,29 @@ page 6150633 "NPRE Select Flow Status"
                 }
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Status Object"; "Status Object")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Flow Order"; "Flow Order")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field(AssignedPrintCategories; AssignedPrintCategoriesAsFilterString())
                 {
+                    ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = ShowPrintCategories;

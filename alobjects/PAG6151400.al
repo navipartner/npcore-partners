@@ -23,18 +23,21 @@ page 6151400 "Magento Generic Setup Buffer"
                 IndentationColumn = Level;
                 IndentationControls = Name;
                 ShowAsTree = true;
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Enabled = false;
                     Style = Strong;
                     StyleExpr = Container;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT Container;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                     Enabled = false;
                 }
             }
@@ -48,7 +51,7 @@ page 6151400 "Magento Generic Setup Buffer"
     trigger OnAfterGetCurrRecord()
     begin
         if "Root Element" <> '' then
-          CurrPage.Caption("Root Element");
+            CurrPage.Caption("Root Element");
     end;
 
     trigger OnOpenPage()
@@ -59,7 +62,7 @@ page 6151400 "Magento Generic Setup Buffer"
         //-MAG2.01 [262316]
         //SendKeys.Send('+{F10}E{ENTER}');
         if CurrentClientType = CLIENTTYPE::Windows then
-          SendKeys.Send('+{F10}E{ENTER}');
+            SendKeys.Send('+{F10}E{ENTER}');
         //+MAG2.01 [262316]
     end;
 
@@ -71,7 +74,7 @@ page 6151400 "Magento Generic Setup Buffer"
     procedure SetSourceTable(var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
     begin
         //-MAG1.21
-        Copy(TempGenericSetupBuffer,true);
+        Copy(TempGenericSetupBuffer, true);
         //+MAG1.21
     end;
 }

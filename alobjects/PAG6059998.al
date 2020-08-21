@@ -14,39 +14,48 @@ page 6059998 "Scanner Service Log Card"
         {
             group(General)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Start";"Request Start")
+                field("Request Start"; "Request Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request End";"Request End")
+                field("Request End"; "Request End")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Function";"Request Function")
+                field("Request Function"; "Request Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Request";"Internal Request")
+                field("Internal Request"; "Internal Request")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Log No.";"Internal Log No.")
+                field("Internal Log No."; "Internal Log No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current User";"Current User")
+                field("Current User"; "Current User")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(XML)
             {
                 Caption = 'XML';
-                field(RequestData;RequestData)
+                field(RequestData; RequestData)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     MultiLine = true;
                     ShowCaption = false;
                 }
-                field(ResponseData;ResponseData)
+                field(ResponseData; ResponseData)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     MultiLine = true;
                     ShowCaption = false;
@@ -56,11 +65,13 @@ page 6059998 "Scanner Service Log Card"
             {
                 Caption = 'XML Debug';
                 Visible = false;
-                field("Debug Request Data";"Debug Request Data")
+                field("Debug Request Data"; "Debug Request Data")
                 {
+                    ApplicationArea = All;
                 }
-                field(ResponseDataDebug;ResponseDataDebug)
+                field(ResponseDataDebug; ResponseDataDebug)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     MultiLine = true;
                     ShowCaption = false;
@@ -83,10 +94,10 @@ page 6059998 "Scanner Service Log Card"
 
                     trigger OnAction()
                     begin
-                        if "Debug Request Data" <> ''  then
-                          ResponseDataDebug := DWFunctions.InternalRequest("Debug Request Data",true,Id)
+                        if "Debug Request Data" <> '' then
+                            ResponseDataDebug := DWFunctions.InternalRequest("Debug Request Data", true, Id)
                         else
-                          ResponseDataDebug := DWFunctions.InternalRequest(RequestData,true,Id);
+                            ResponseDataDebug := DWFunctions.InternalRequest(RequestData, true, Id);
                     end;
                 }
             }
@@ -95,20 +106,20 @@ page 6059998 "Scanner Service Log Card"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Request Data","Response Data");
+        CalcFields("Request Data", "Response Data");
 
         if not "Request Data".HasValue then
-          RequestData := ''
+            RequestData := ''
         else begin
-          "Request Data".CreateInStream(IStream);
-          IStream.Read(RequestData,MaxStrLen(RequestData));
+            "Request Data".CreateInStream(IStream);
+            IStream.Read(RequestData, MaxStrLen(RequestData));
         end;
 
         if not "Response Data".HasValue then
-          ResponseData := ''
+            ResponseData := ''
         else begin
-          "Response Data".CreateInStream(IStream);
-          IStream.Read(ResponseData,MaxStrLen(RequestData));
+            "Response Data".CreateInStream(IStream);
+            IStream.Read(ResponseData, MaxStrLen(RequestData));
         end;
     end;
 

@@ -1,4 +1,4 @@
-pageextension 6014459 pageextension6014459 extends "Purch. Invoice Subform" 
+pageextension 6014459 pageextension6014459 extends "Purch. Invoice Subform"
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // NPR4.13/MMV /20150724 CASE 214173 Changed "No." to variable to handle barcode scanning OnValidate trigger.
@@ -19,14 +19,16 @@ pageextension 6014459 pageextension6014459 extends "Purch. Invoice Subform"
     {
         addafter("No.")
         {
-            field("Vendor Item No.";"Vendor Item No.")
+            field("Vendor Item No."; "Vendor Item No.")
             {
+                ApplicationArea = All;
             }
         }
         addafter("Line No.")
         {
-            field("Exchange Label";"Exchange Label")
+            field("Exchange Label"; "Exchange Label")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }

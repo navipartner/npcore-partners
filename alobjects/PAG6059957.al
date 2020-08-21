@@ -14,11 +14,13 @@ page 6059957 "MCS Person Groups"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(PersonGroupId;PersonGroupId)
+                field(PersonGroupId; PersonGroupId)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

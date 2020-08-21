@@ -13,14 +13,17 @@ page 6014537 "Scanner - List"
         {
             repeater(Group)
             {
-                field(ID;ID)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Port;Port)
+                field(Port; Port)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

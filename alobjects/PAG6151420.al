@@ -22,17 +22,21 @@ page 6151420 "Magento Brands"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Picture;Picture)
+                field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -83,7 +87,7 @@ page 6151420 "Magento Brands"
                     MagentoDisplayConfig: Record "Magento Display Config";
                 begin
                     //-MAG1.21
-                    MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::Brand);
+                    MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Brand);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                     MagentoDisplayConfigPage.Run;
                     //+MAG1.21

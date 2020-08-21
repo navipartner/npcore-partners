@@ -14,14 +14,17 @@ page 6184892 "Storage Types"
         {
             repeater(Group)
             {
-                field("Storage Type";"Storage Type")
+                field("Storage Type"; "Storage Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit";Codeunit)
+                field("Codeunit"; Codeunit)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

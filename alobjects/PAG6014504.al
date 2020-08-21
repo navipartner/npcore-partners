@@ -16,51 +16,63 @@ page 6014504 "Customer Repair Journal"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Date;Date)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
-                field(Text;Text)
+                field(Text; Text)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Part No.";"Item Part No.")
+                field("Item Part No."; "Item Part No.")
                 {
+                    ApplicationArea = All;
                     Visible = Show2;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Visible = Show2;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Visible = show2;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                     Visible = show2;
                 }
-                field("Qty Posted";"Qty Posted")
+                field("Qty Posted"; "Qty Posted")
                 {
+                    ApplicationArea = All;
                     Visible = Show2;
                 }
-                field("Unit Price Excl. VAT";"Unit Price Excl. VAT")
+                field("Unit Price Excl. VAT"; "Unit Price Excl. VAT")
                 {
+                    ApplicationArea = All;
                     Visible = Show2;
                 }
-                field("Amount Including VAT";"Amount Including VAT")
+                field("Amount Including VAT"; "Amount Including VAT")
                 {
+                    ApplicationArea = All;
                     Visible = show2;
                 }
-                field("Expenses to be charged";"Expenses to be charged")
+                field("Expenses to be charged"; "Expenses to be charged")
                 {
+                    ApplicationArea = All;
                     Enabled = EnableExpense;
                     Visible = show2;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                     Visible = show2;
                 }
-                field("VAT Amount";"VAT Amount")
+                field("VAT Amount"; "VAT Amount")
                 {
+                    ApplicationArea = All;
                     Visible = show2;
                 }
             }
@@ -75,10 +87,10 @@ page 6014504 "Customer Repair Journal"
     begin
         //-NPR5.30 [262923]
         if CustomerRepair.Get("Customer Repair No.") then begin
-          if (CustomerRepair.Status <> CustomerRepair.Status::Claimed)  and (Description <> '') then
-            EnableExpense := true
-           else
-            EnableExpense := false;
+            if (CustomerRepair.Status <> CustomerRepair.Status::Claimed) and (Description <> '') then
+                EnableExpense := true
+            else
+                EnableExpense := false;
         end;
         //NPR5.30 [262923]
     end;
@@ -91,7 +103,7 @@ page 6014504 "Customer Repair Journal"
 
     procedure ShowField(var ShowField1: Boolean)
     begin
-        Show2:=ShowField1;
+        Show2 := ShowField1;
         CurrPage.Update(true);
         CurrPage.Activate(Show2);
     end;

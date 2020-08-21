@@ -12,14 +12,17 @@ page 6151028 "NpRv Partner Relations"
         {
             repeater(Group)
             {
-                field("Partner Code";"Partner Code")
+                field("Partner Code"; "Partner Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Partner Name";"Partner Name")
+                field("Partner Name"; "Partner Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Voucher Type";"Voucher Type")
+                field("Voucher Type"; "Voucher Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

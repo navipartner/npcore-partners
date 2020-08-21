@@ -21,29 +21,37 @@ page 6060111 "TM Ticket Quick Statistics"
             repeater(Group)
             {
                 Editable = false;
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Start Date";"Admission Start Date")
+                field("Admission Start Date"; "Admission Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission Start Time";"Admission Start Time")
+                field("Admission Start Time"; "Admission Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Admission End Time";"Admission End Time")
+                field("Admission End Time"; "Admission End Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Open Reservations";"Open Reservations")
+                field("Open Reservations"; "Open Reservations")
                 {
+                    ApplicationArea = All;
                 }
-                field("Open Admitted";"Open Admitted")
+                field("Open Admitted"; "Open Admitted")
                 {
+                    ApplicationArea = All;
                 }
-                field(Departed;Departed)
+                field(Departed; Departed)
                 {
+                    ApplicationArea = All;
                 }
-                field(AdmittedCount;AdmittedCount)
+                field(AdmittedCount; AdmittedCount)
                 {
+                    ApplicationArea = All;
                     Caption = 'Admitted Today';
                 }
             }
@@ -63,9 +71,9 @@ page 6060111 "TM Ticket Quick Statistics"
     begin
 
         if (not FilterIsSet) and (GuiAllowed) then
-          GlobalAdmissionScheduleEntryFilter.SetFilter ("Admission Start Date", '=%1', Today);
+            GlobalAdmissionScheduleEntryFilter.SetFilter("Admission Start Date", '=%1', Today);
 
-        FillRecordList ();
+        FillRecordList();
     end;
 
     var
@@ -85,14 +93,14 @@ page 6060111 "TM Ticket Quick Statistics"
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
     begin
 
-        AdmissionScheduleEntry.CopyFilters (GlobalAdmissionScheduleEntryFilter);
-        AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
-        AdmissionScheduleEntry.SetFilter ("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::OPEN);
-        if (AdmissionScheduleEntry.FindSet ()) then begin
-          repeat
-            Rec.TransferFields (AdmissionScheduleEntry, true);
-            Rec.Insert ();
-          until (AdmissionScheduleEntry.Next () = 0);
+        AdmissionScheduleEntry.CopyFilters(GlobalAdmissionScheduleEntryFilter);
+        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        AdmissionScheduleEntry.SetFilter("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::OPEN);
+        if (AdmissionScheduleEntry.FindSet()) then begin
+            repeat
+                Rec.TransferFields(AdmissionScheduleEntry, true);
+                Rec.Insert();
+            until (AdmissionScheduleEntry.Next() = 0);
         end;
     end;
 }

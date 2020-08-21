@@ -18,14 +18,17 @@ page 6014597 "Product Group Code Statistics"
             repeater(Control6150623)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("-""Sale Quantity""";-"Sale Quantity")
+                field("-""Sale Quantity"""; -"Sale Quantity")
                 {
+                    ApplicationArea = All;
                     Caption = 'Sale (QTY)';
 
                     trigger OnAssistEdit()
@@ -34,19 +37,21 @@ page 6014597 "Product Group Code Statistics"
                         ItemledgerEntryForm: Page "Item Ledger Entries";
                     begin
 
-                        SetItemLedgerEntryFilter( ItemledgerEntry );
-                        ItemledgerEntryForm.SetTableView( ItemledgerEntry );
-                        ItemledgerEntryForm.Editable( false );
+                        SetItemLedgerEntryFilter(ItemledgerEntry);
+                        ItemledgerEntryForm.SetTableView(ItemledgerEntry);
+                        ItemledgerEntryForm.Editable(false);
                         ItemledgerEntryForm.RunModal;
                     end;
                 }
-                field("-""LastYear Sale Quantity""";-"LastYear Sale Quantity")
+                field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                     Visible = LSQTY;
                 }
-                field("Sale Amount";"Sale Amount")
+                field("Sale Amount"; "Sale Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'Sale (LCY)';
 
                     trigger OnDrillDown()
@@ -54,45 +59,53 @@ page 6014597 "Product Group Code Statistics"
                         ValueEntry: Record "Value Entry";
                         ValueEntryForm: Page "Value Entries";
                     begin
-                        SetValueEntryFilter( ValueEntry );
-                        ValueEntryForm.SetTableView( ValueEntry );
-                        ValueEntryForm.Editable( false );
+                        SetValueEntryFilter(ValueEntry);
+                        ValueEntryForm.SetTableView(ValueEntry);
+                        ValueEntryForm.Editable(false);
                         ValueEntryForm.RunModal;
                     end;
                 }
-                field(SalesAmt;SalesAmt)
+                field(SalesAmt; SalesAmt)
                 {
+                    ApplicationArea = All;
                     Caption = 'SalesAmtILE';
                 }
-                field("LastYear Sale Amount";"LastYear Sale Amount")
+                field("LastYear Sale Amount"; "LastYear Sale Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'No.';
                     Visible = LSAmount;
                 }
-                field("-CostAmt";-CostAmt)
+                field("-CostAmt"; -CostAmt)
                 {
+                    ApplicationArea = All;
                     Caption = 'Cost (LCY)';
                 }
-                field("-""Last Year CostAmt""";-"Last Year CostAmt")
+                field("-""Last Year CostAmt"""; -"Last Year CostAmt")
                 {
+                    ApplicationArea = All;
                     Caption = 'Last year Cost Amount';
                     Visible = LSAmount;
                 }
-                field("Profit Amount";"Profit Amount")
+                field("Profit Amount"; "Profit Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit (LCY)';
                 }
-                field("LastYear Profit Amount";"LastYear Profit Amount")
+                field("LastYear Profit Amount"; "LastYear Profit Amount")
                 {
+                    ApplicationArea = All;
                     Caption = 'Last Year Proifit Amount';
                     Visible = LPA;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                     Caption = 'Profit %';
                 }
-                field("LastYear Profit %";"LastYear Profit %")
+                field("LastYear Profit %"; "LastYear Profit %")
                 {
+                    ApplicationArea = All;
                     Caption = '-> Last year';
                     Visible = "LP%";
                 }
@@ -111,10 +124,10 @@ page 6014597 "Product Group Code Statistics"
 
     trigger OnOpenPage()
     begin
-        if ( Periodestart = 0D ) then
-          Periodestart := Today;
-        if ( Periodeslut = 0D ) then
-          Periodeslut := Today;
+        if (Periodestart = 0D) then
+            Periodestart := Today;
+        if (Periodeslut = 0D) then
+            Periodeslut := Today;
     end;
 
     var
@@ -152,20 +165,20 @@ page 6014597 "Product Group Code Statistics"
         ItemLedgerEntryNo: Integer;
         ItemCategoryCode: Code[20];
 
-    procedure SetFilter(GlobalDim1: Code[20];GlobalDim2: Code[20];DatoStart: Date;DatoEnd: Date;LastYearCalc: Text[50];ProductGoupCodeFilter: Code[10];ItemNoFilter: Code[20];ItemCategoryFilter: Code[20])
+    procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; LastYearCalc: Text[50]; ProductGoupCodeFilter: Code[10]; ItemNoFilter: Code[20]; ItemCategoryFilter: Code[20])
     begin
         //SetFilter()
-        if ( Dim1Filter <> GlobalDim1 ) or ( Dim2Filter <> GlobalDim2 ) or ( Periodestart <> DatoStart ) or
-           ( Periodeslut <> DatoEnd )then
-        ReleaseLock;
+        if (Dim1Filter <> GlobalDim1) or (Dim2Filter <> GlobalDim2) or (Periodestart <> DatoStart) or
+           (Periodeslut <> DatoEnd) then
+            ReleaseLock;
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
         Periodestart := DatoStart;
         Periodeslut := DatoEnd;
         CalcLastYear := LastYearCalc;
         //-NPR5.31
-        ProductGroupCode := ProductGoupCodeFilter ;
-        ItemCategoryCode :=  ItemCategoryFilter;
+        ProductGroupCode := ProductGoupCodeFilter;
+        ItemCategoryCode := ItemCategoryFilter;
         //+NPR5.31
         ItemNo := ItemNoFilter;
         CurrPage.Update;
@@ -178,36 +191,36 @@ page 6014597 "Product Group Code Statistics"
     begin
         //Calc()
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcFields ( "Sales Amount (Actual)" );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcFields("Sales Amount (Actual)");
 
         ItemLedgerEntryNo := ItemLedgerEntry."Entry No.";
-        SetValueEntryFilter( ValueEntry );
+        SetValueEntryFilter(ValueEntry);
 
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
         "Sale Quantity" := 0;
 
         "Sale Quantity" := ItemLedgerEntry.Quantity;
         //"Sale Amount" := ItemLedgerEntry."Sales Amount (Actual)";
-        "Sale Amount"  := ValueEntry."Sales Amount (Actual)" ;
+        "Sale Amount" := ValueEntry."Sales Amount (Actual)";
         "Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
         //-NPR4.12
-        CostAmt:= ValueEntry."Cost Amount (Actual)";
+        CostAmt := ValueEntry."Cost Amount (Actual)";
         //+NPR4.12
 
         if "Sale Amount" <> 0 then
-          "Profit %" := "Profit Amount" / "Sale Amount" * 100
+            "Profit %" := "Profit Amount" / "Sale Amount" * 100
         else
-          "Profit %" := 0;
+            "Profit %" := 0;
 
         // Calc last year
         LastYear := true;
 
-        SetValueEntryFilter( ValueEntry );
-        ValueEntry.CalcSums( "Cost Amount (Actual)", "Sales Amount (Actual)" );
+        SetValueEntryFilter(ValueEntry);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-        SetItemLedgerEntryFilter( ItemLedgerEntry );
-        ItemLedgerEntry.CalcSums( Quantity );
+        SetItemLedgerEntryFilter(ItemLedgerEntry);
+        ItemLedgerEntry.CalcSums(Quantity);
 
         "LastYear Sale Quantity" := ItemLedgerEntry.Quantity;
         "LastYear Sale Amount" := ValueEntry."Sales Amount (Actual)";
@@ -215,9 +228,9 @@ page 6014597 "Product Group Code Statistics"
         "Last Year CostAmt" := ValueEntry."Cost Amount (Actual)";
 
         if "LastYear Sale Amount" <> 0 then
-          "LastYear Profit %" := "LastYear Profit Amount" / "LastYear Sale Amount" * 100
+            "LastYear Profit %" := "LastYear Profit Amount" / "LastYear Sale Amount" * 100
         else
-          "LastYear Profit %" := 0;
+            "LastYear Profit %" := 0;
 
         LastYear := false;
     end;
@@ -225,8 +238,8 @@ page 6014597 "Product Group Code Statistics"
     procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
         //SetItemLedgerEntryFilter
-        ItemLedgerEntry.SetCurrentKey( "Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        ItemLedgerEntry.SetRange( "Entry Type", ItemLedgerEntry."Entry Type"::Sale );
+        ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
         //-NPR5.48 [340615]
         /*
         //-NPR5.31 [272890]
@@ -239,35 +252,35 @@ page 6014597 "Product Group Code Statistics"
         */
         //+NPR5.48 [340615]
         if ItemCategoryCode <> '' then
-          ItemLedgerEntry.SetRange("Item Category Code",ItemCategoryCode)
+            ItemLedgerEntry.SetRange("Item Category Code", ItemCategoryCode)
         else
-          ItemLedgerEntry.SetRange("Item Category Code");
-        
-        ItemLedgerEntry.SetRange( "Item No.","No.");
+            ItemLedgerEntry.SetRange("Item Category Code");
+
+        ItemLedgerEntry.SetRange("Item No.", "No.");
         if not LastYear then
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', Periodestart, Periodeslut )
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-          ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', CalcDate(CalcLastYear,Periodestart), CalcDate(CalcLastYear,Periodeslut) );
+            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
         if not ItemLedgerEntry.FindSet then
-          exit;
+            exit;
         if ItemGroupFilter <> '' then
-          ItemLedgerEntry.SetRange( "Item Group No.", ItemGroupFilter )
+            ItemLedgerEntry.SetRange("Item Group No.", ItemGroupFilter)
         else
-          ItemLedgerEntry.SetRange( "Item Group No." );
-        
+            ItemLedgerEntry.SetRange("Item Group No.");
+
         if Dim1Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 1 Code" );
-        
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code");
+
         if Dim2Filter <> '' then
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ItemLedgerEntry.SetRange( "Global Dimension 2 Code" );
-        
-        
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code");
+
+
         //IF ItemNo <> '' THEN
-         // ItemLedgerEntry.SETRANGE( "Item No.", ItemNo)
+        // ItemLedgerEntry.SETRANGE( "Item No.", ItemNo)
         //ELSE
 
     end;
@@ -278,29 +291,29 @@ page 6014597 "Product Group Code Statistics"
         //-NPR5.55 [361515]
         //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
         //+NPR5.55 [361515]
-        ValueEntry.SetRange( "Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale );
-        ValueEntry.SetRange( "Item No.", "No." );
+        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+        ValueEntry.SetRange("Item No.", "No.");
         if not LastYear then
-          ValueEntry.SetFilter( "Posting Date", '%1..%2', Periodestart, Periodeslut )
+            ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-          ValueEntry.SetFilter( "Posting Date", '%1..%2',CalcDate(CalcLastYear,Periodestart), CalcDate(CalcLastYear,Periodeslut) );
+            ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
         if ItemGroupFilter <> '' then
-          ValueEntry.SetRange( "Item Group No.", ItemGroupFilter )
+            ValueEntry.SetRange("Item Group No.", ItemGroupFilter)
         else
-          ValueEntry.SetRange( "Item Group No." );
+            ValueEntry.SetRange("Item Group No.");
 
         if Dim1Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 1 Code", Dim1Filter )
+            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 1 Code" );
+            ValueEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-          ValueEntry.SetRange( "Global Dimension 2 Code", Dim2Filter )
+            ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-          ValueEntry.SetRange( "Global Dimension 2 Code" );
+            ValueEntry.SetRange("Global Dimension 2 Code");
         if ItemLedgerEntryNo <> 0 then
-            ValueEntry.SetRange("Item Ledger Entry No.",ItemLedgerEntryNo);
+            ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntryNo);
     end;
 
     procedure ChangeEmptyFilter(): Boolean
@@ -316,44 +329,45 @@ page 6014597 "Product Group Code Statistics"
 
         ClearMarks;
         if HideEmpty then begin
-          Current := Rec;
-          Dlg.Open( txtDlg );
-          if Item.Find('-') then repeat
-            Count += 1;
-            Dlg.Update( 1, Item."No." );
-            Dlg.Update( 2, Round( Count / Item.Count * 10000, 1, '=' ));
-            SetItemLedgerEntryFilter( ItemLedgerEntry );
-            ItemLedgerEntry.SetRange( "Item No.", Item."No." );
-            ItemLedgerEntry.CalcSums( Quantity );
-            if ItemLedgerEntry.Quantity <> 0 then begin
-              Get( Item."No." );
-              Mark( true );
-            end;
-          until Item.Next = 0;
-          Dlg.Close;
+            Current := Rec;
+            Dlg.Open(txtDlg);
+            if Item.Find('-') then
+                repeat
+                    Count += 1;
+                    Dlg.Update(1, Item."No.");
+                    Dlg.Update(2, Round(Count / Item.Count * 10000, 1, '='));
+                    SetItemLedgerEntryFilter(ItemLedgerEntry);
+                    ItemLedgerEntry.SetRange("Item No.", Item."No.");
+                    ItemLedgerEntry.CalcSums(Quantity);
+                    if ItemLedgerEntry.Quantity <> 0 then begin
+                        Get(Item."No.");
+                        Mark(true);
+                    end;
+                until Item.Next = 0;
+            Dlg.Close;
 
-          MarkedOnly( true );
-          Rec := Current;
+            MarkedOnly(true);
+            Rec := Current;
         end else begin
-          MarkedOnly( false );
+            MarkedOnly(false);
         end;
 
         //CurrForm.UPDATE;
         CurrPage.Update;
-        exit( HideEmpty );
+        exit(HideEmpty);
     end;
 
     procedure InitForm()
     begin
         //InitForm()
         Reset;
-        Dim1Filter := '' ;
-        Dim2Filter := '' ;
+        Dim1Filter := '';
+        Dim2Filter := '';
         Periodestart := Today;
         Periodeslut := Today;
-        ItemGroupFilter := '' ;
-        ProductGroupCode := '' ;
-        ItemCategoryCode :=  '';
+        ItemGroupFilter := '';
+        ProductGroupCode := '';
+        ItemCategoryCode := '';
 
         HideEmpty := true;
     end;
@@ -362,9 +376,9 @@ page 6014597 "Product Group Code Statistics"
     begin
         //UpdateHidden()
         if HideEmpty then begin
-          HideEmpty := false;
-          ChangeEmptyFilter;
-          CurrPage.Update;
+            HideEmpty := false;
+            ChangeEmptyFilter;
+            CurrPage.Update;
         end;
     end;
 
@@ -372,8 +386,8 @@ page 6014597 "Product Group Code Statistics"
     begin
         //ReleaseLock()
         if Count = 0 then begin
-          MarkedOnly( false );
-          ClearMarks;
+            MarkedOnly(false);
+            ClearMarks;
         end;
     end;
 

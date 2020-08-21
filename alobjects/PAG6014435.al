@@ -12,7 +12,7 @@ page 6014435 "Payment Type - Register"
     SourceTable = "Payment Type POS";
     SourceTableView = SORTING("No.")
                       ORDER(Ascending)
-                      WHERE(Status=CONST(Active));
+                      WHERE(Status = CONST(Active));
 
     layout
     {
@@ -21,14 +21,17 @@ page 6014435 "Payment Type - Register"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Type";"Processing Type")
+                field("Processing Type"; "Processing Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -47,8 +50,8 @@ page 6014435 "Payment Type - Register"
                     Caption = 'Dimensions-Single';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014402),
-                                  "No."=FIELD("No.");
+                    RunPageLink = "Table ID" = CONST(6014402),
+                                  "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                 }
                 action("Dimensions-Mulitple")

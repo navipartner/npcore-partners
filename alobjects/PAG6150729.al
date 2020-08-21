@@ -16,23 +16,29 @@ page 6150729 "POS Sales Workflows"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Publisher Codeunit ID";"Publisher Codeunit ID")
+                field("Publisher Codeunit ID"; "Publisher Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Publisher Codeunit Name";"Publisher Codeunit Name")
+                field("Publisher Codeunit Name"; "Publisher Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Publisher Function";"Publisher Function")
+                field("Publisher Function"; "Publisher Function")
                 {
+                    ApplicationArea = All;
                 }
-                field(Control6014410;"Workflow Steps")
+                field(Control6014410; "Workflow Steps")
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -51,8 +57,8 @@ page 6150729 "POS Sales Workflows"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Sales Workflow Steps";
-                RunPageLink = "Set Code"=CONST(''),
-                              "Workflow Code"=FIELD(Code);
+                RunPageLink = "Set Code" = CONST(''),
+                              "Workflow Code" = FIELD(Code);
             }
             action("Initiate Workflow Steps")
             {
@@ -69,11 +75,11 @@ page 6150729 "POS Sales Workflows"
                 begin
                     CurrPage.SetSelectionFilter(POSSalesWorkflow);
                     if POSSalesWorkflow.FindSet then
-                      repeat
-                        StepsInitiated += POSSalesWorkflow.InitPOSSalesWorkflowSteps();
-                      until POSSalesWorkflow.Next = 0;
+                        repeat
+                            StepsInitiated += POSSalesWorkflow.InitPOSSalesWorkflowSteps();
+                        until POSSalesWorkflow.Next = 0;
 
-                    Message(Text000,StepsInitiated);
+                    Message(Text000, StepsInitiated);
                 end;
             }
         }

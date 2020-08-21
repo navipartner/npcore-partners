@@ -14,27 +14,34 @@ page 6059972 "Variety Table"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Use in Variant Description";"Use in Variant Description")
+                field("Use in Variant Description"; "Use in Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Pre tag In Variant Description";"Pre tag In Variant Description")
+                field("Pre tag In Variant Description"; "Pre tag In Variant Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Description field";"Use Description field")
+                field("Use Description field"; "Use Description field")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lock Table";"Lock Table")
+                field("Lock Table"; "Lock Table")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -52,9 +59,9 @@ page 6059972 "Variety Table"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Variety Value";
-                RunPageLink = Type=FIELD(Type),
-                              Table=FIELD(Code);
-                RunPageView = SORTING(Type,Table,Value);
+                RunPageLink = Type = FIELD(Type),
+                              Table = FIELD(Code);
+                RunPageView = SORTING(Type, Table, Value);
             }
         }
     }

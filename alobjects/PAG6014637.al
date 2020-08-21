@@ -24,149 +24,176 @@ page 6014637 "RP Template Matrix Designer"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Type Option";"Type Option")
+                field("Type Option"; "Type Option")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(X;X)
+                field(X; X)
                 {
-                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
-                    Style = Subordinate;
-                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
-                    Width = 4;
-                }
-                field(Y;Y)
-                {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                     Width = 4;
                 }
-                field("Prefix Next Line";"Prefix Next Line")
+                field(Y; Y)
                 {
+                    ApplicationArea = All;
+                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
+                    Style = Subordinate;
+                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    Width = 4;
+                }
+                field("Prefix Next Line"; "Prefix Next Line")
+                {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Data Item Name";"Data Item Name")
+                field("Data Item Name"; "Data Item Name")
                 {
+                    ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = "Type" = 1;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Operator;Operator)
+                field(Operator; Operator)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Field 2 Name";"Field 2 Name")
+                field("Field 2 Name"; "Field 2 Name")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Attribute;Attribute)
+                field(Attribute; Attribute)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Prefix;Prefix)
+                field(Prefix; Prefix)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field(Postfix;Postfix)
+                field(Postfix; Postfix)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Default Value";"Default Value")
+                field("Default Value"; "Default Value")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Default Value Record Required";"Default Value Record Required")
+                field("Default Value Record Required"; "Default Value Record Required")
                 {
+                    ApplicationArea = All;
                 }
-                field(Align;Align)
+                field(Align; Align)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(Rotation;Rotation)
+                field(Rotation; Rotation)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(Width;Width)
+                field(Width; Width)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field(Height;Height)
+                field(Height; Height)
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                 }
-                field("Start Char";"Start Char")
+                field("Start Char"; "Start Char")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Max Length";"Max Length")
+                field("Max Length"; "Max Length")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Blank Zero";"Blank Zero")
+                field("Blank Zero"; "Blank Zero")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Skip If Empty";"Skip If Empty")
+                field("Skip If Empty"; "Skip If Empty")
                 {
+                    ApplicationArea = All;
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
                 }
-                field("Root Record No.";"Root Record No.")
+                field("Root Record No."; "Root Record No.")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                 }
-                field("Data Item Record No.";"Data Item Record No.")
+                field("Data Item Record No."; "Data Item Record No.")
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                 }
-                field(Comments;Comments)
+                field(Comments; Comments)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Codeunit";"Processing Codeunit")
+                field("Processing Codeunit"; "Processing Codeunit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Function ID";"Processing Function ID")
+                field("Processing Function ID"; "Processing Function ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Function Parameter";"Processing Function Parameter")
+                field("Processing Function Parameter"; "Processing Function Parameter")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

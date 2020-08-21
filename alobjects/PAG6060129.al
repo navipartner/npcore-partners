@@ -21,54 +21,68 @@ page 6060129 "MM Membership Ledger Entries"
             repeater(Group)
             {
                 Editable = false;
-                field("Activate On First Use";"Activate On First Use")
+                field("Activate On First Use"; "Activate On First Use")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Valid From Date";"Valid From Date")
+                field("Valid From Date"; "Valid From Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid Until Date";"Valid Until Date")
+                field("Valid Until Date"; "Valid Until Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created At";"Created At")
+                field("Created At"; "Created At")
                 {
+                    ApplicationArea = All;
                 }
-                field(Context;Context)
+                field(Context; Context)
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt No.";"Receipt No.")
+                field("Receipt No."; "Receipt No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Auto-Renew Entry No.";"Auto-Renew Entry No.")
+                field("Auto-Renew Entry No."; "Auto-Renew Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(RemainingAmountLCY;RemainingAmountLCY)
+                field(RemainingAmountLCY; RemainingAmountLCY)
                 {
+                    ApplicationArea = All;
                     Caption = 'Remaining Amount (LCY)';
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = AccentuateAmount;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked By";"Blocked By")
+                field("Blocked By"; "Blocked By")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -82,8 +96,8 @@ page 6060129 "MM Membership Ledger Entries"
     begin
 
         AccentuateAmount := false;
-        if (Rec.CalculateRemainingAmount (OriginalAmountLCY, RemainingAmountLCY, DueDate)) then
-          AccentuateAmount := ((RemainingAmountLCY > 0) and (DueDate < Today));
+        if (Rec.CalculateRemainingAmount(OriginalAmountLCY, RemainingAmountLCY, DueDate)) then
+            AccentuateAmount := ((RemainingAmountLCY > 0) and (DueDate < Today));
     end;
 
     var

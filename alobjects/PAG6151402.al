@@ -15,25 +15,31 @@ page 6151402 "Magento Inventory Companies"
         {
             repeater(Group)
             {
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Filter";"Location Filter")
+                field("Location Filter"; "Location Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Api Username";"Api Username")
+                field("Api Username"; "Api Username")
                 {
+                    ApplicationArea = All;
                 }
-                field("Api Password";"Api Password")
+                field("Api Password"; "Api Password")
                 {
+                    ApplicationArea = All;
                     ExtendedDatatype = Masked;
                 }
-                field("Api Url";"Api Url")
+                field("Api Url"; "Api Url")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Api Domain";"Api Domain")
+                field("Api Domain"; "Api Domain")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -68,7 +74,7 @@ page 6151402 "Magento Inventory Companies"
     begin
         if Item.ChangeCompany("Company Name") then;
         Item.FindFirst;
-        MagentoInventoryNpXmlValue.CalcMagentoInventoryCompany(Rec,Item."No.",'');
+        MagentoInventoryNpXmlValue.CalcMagentoInventoryCompany(Rec, Item."No.", '');
         Message(Text000);
     end;
 }

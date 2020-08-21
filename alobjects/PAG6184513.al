@@ -12,23 +12,26 @@ page 6184513 "EFT BIN Group Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control6014405;"EFT BIN Group Payment Links")
+            part(Control6014405; "EFT BIN Group Payment Links")
             {
-                SubPageLink = "Group Code"=FIELD(Code);
+                SubPageLink = "Group Code" = FIELD(Code);
             }
-            part(Control6014406;"EFT BIN Range SubPage")
+            part(Control6014406; "EFT BIN Range SubPage")
             {
-                SubPageLink = "BIN Group Code"=FIELD(Code);
+                SubPageLink = "BIN Group Code" = FIELD(Code);
             }
         }
     }

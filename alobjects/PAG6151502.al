@@ -44,11 +44,13 @@ page 6151502 "Nc Task List"
                     Caption = 'Filters';
                     field("COUNT"; Count)
                     {
+                        ApplicationArea = All;
                         Caption = 'Quantity';
                         Editable = false;
                     }
                     field(TaskProcessorFilter; TaskProcessorFilter)
                     {
+                        ApplicationArea = All;
                         Caption = 'Task Processor';
                         TableRelation = "Nc Task Processor";
 
@@ -59,6 +61,7 @@ page 6151502 "Nc Task List"
                     }
                     field("Show Exported"; ShowProcessed)
                     {
+                        ApplicationArea = All;
                         Caption = 'Show Processed';
 
                         trigger OnValidate()
@@ -72,12 +75,14 @@ page 6151502 "Nc Task List"
                     ShowCaption = false;
                     field(Control6150656; '')
                     {
+                        ApplicationArea = All;
                         Caption = 'Response:                                                                                                                                                                                                                                                                               _';
                         HideValue = true;
                         ShowCaption = false;
                     }
                     field(ResponseText; ResponseText)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
@@ -89,54 +94,68 @@ page 6151502 "Nc Task List"
                 ShowCaption = false;
                 field("Task Processor Code"; "Task Processor Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(Processed; Processed)
                 {
+                    ApplicationArea = All;
                 }
                 field("Process Error"; "Process Error")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Record Value"; "Record Value")
                 {
+                    ApplicationArea = All;
                 }
                 field("Record Position"; "Record Position")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Log Date"; "Log Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Last Checked1"; "Last Processing Started at")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Last Processing Completed at"; "Last Processing Completed at")
                 {
+                    ApplicationArea = All;
                 }
                 field("Last Processing Duration"; "Last Processing Duration")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Process Count"; "Process Count")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

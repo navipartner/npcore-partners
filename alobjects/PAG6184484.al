@@ -13,26 +13,32 @@ page 6184484 "Pepper Terminal Type Card"
         {
             group(General)
             {
-                field(ID;ID)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Active;Active)
+                field(Active; Active)
                 {
+                    ApplicationArea = All;
                 }
-                field("Force Fixed Currency Check";"Force Fixed Currency Check")
+                field("Force Fixed Currency Check"; "Force Fixed Currency Check")
                 {
+                    ApplicationArea = All;
                 }
-                field(Deprecated;Deprecated)
+                field(Deprecated; Deprecated)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(ATOS)
             {
-                field(Overtender;Overtender)
+                field(Overtender; Overtender)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -13,20 +13,25 @@ page 6151422 "Magento Setup Event Subs."
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit ID";"Codeunit ID")
+                field("Codeunit ID"; "Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Function Name";"Function Name")
+                field("Function Name"; "Function Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit Name";"Codeunit Name")
+                field("Codeunit Name"; "Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

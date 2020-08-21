@@ -18,23 +18,29 @@ page 6151526 "Nc Endpoint File List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Path;Path)
+                field(Path; Path)
                 {
+                    ApplicationArea = All;
                 }
-                field("Client Path";"Client Path")
+                field("Client Path"; "Client Path")
                 {
+                    ApplicationArea = All;
                 }
-                field(Filename;Filename)
+                field(Filename; Filename)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

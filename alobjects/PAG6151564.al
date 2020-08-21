@@ -15,11 +15,13 @@ page 6151564 "NpXml Namespaces"
         {
             repeater(Group)
             {
-                field(Alias;Alias)
+                field(Alias; Alias)
                 {
+                    ApplicationArea = All;
                 }
-                field(Namespace;Namespace)
+                field(Namespace; Namespace)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

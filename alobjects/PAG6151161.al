@@ -12,50 +12,65 @@ page 6151161 "MM Loyalty Server Trans. Log"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Company Name";"Company Name")
+                field("Company Name"; "Company Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit Code";"POS Unit Code")
+                field("POS Unit Code"; "POS Unit Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Card Number";"Card Number")
+                field("Card Number"; "Card Number")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reference Number";"Reference Number")
+                field("Reference Number"; "Reference Number")
                 {
+                    ApplicationArea = All;
                 }
-                field("Foreign Transaction Id";"Foreign Transaction Id")
+                field("Foreign Transaction Id"; "Foreign Transaction Id")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Date";"Transaction Date")
+                field("Transaction Date"; "Transaction Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Time";"Transaction Time")
+                field("Transaction Time"; "Transaction Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Authorization Code";"Authorization Code")
+                field("Authorization Code"; "Authorization Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Earned Points";"Earned Points")
+                field("Earned Points"; "Earned Points")
                 {
+                    ApplicationArea = All;
                 }
-                field("Burned Points";"Burned Points")
+                field("Burned Points"; "Burned Points")
                 {
+                    ApplicationArea = All;
                 }
-                field(Balance;Balance)
+                field(Balance; Balance)
                 {
+                    ApplicationArea = All;
                 }
-                field("Reservation is Captured";"Reservation is Captured")
+                field("Reservation is Captured"; "Reservation is Captured")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -81,12 +96,12 @@ page 6151161 "MM Loyalty Server Trans. Log"
                 begin
 
                     if ("Entry Type" = "Entry Type"::RECONCILE) then begin
-                      Navigate.SetDoc ("Transaction Date", "Reference Number");
-                      Navigate.Run;
+                        Navigate.SetDoc("Transaction Date", "Reference Number");
+                        Navigate.Run;
                     end else begin
-                      MembershipPointEntry.SetFilter ("Document No.", '=%1', "Reference Number");
-                      MembershipPointEntryPage.SetTableView (MembershipPointEntry);
-                      MembershipPointEntryPage.Run ();
+                        MembershipPointEntry.SetFilter("Document No.", '=%1', "Reference Number");
+                        MembershipPointEntryPage.SetTableView(MembershipPointEntry);
+                        MembershipPointEntryPage.Run();
                     end;
                 end;
             }

@@ -20,8 +20,9 @@ page 6151447 "Magento Item Picture Factbox"
                 ShowCaption = false;
                 Visible = HasPicture;
             }
-            field("TempMagentoPicture.Picture";TempMagentoPicture.Picture)
+            field("TempMagentoPicture.Picture"; TempMagentoPicture.Picture)
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
         }
@@ -53,29 +54,29 @@ page 6151447 "Magento Item Picture Factbox"
         //-NPR5.42 [287064]
         Initialize();
         if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
-          exit;
-        if not (MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre,MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"]) then
-          exit;
+            exit;
+        if not (MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"]) then
+            exit;
         //+MAG2.20 [353499]
         //+NPR5.42 [287064]
         //-MAG2.24 [379760]
         Clear(TempMagentoPicture.Picture);
-        MagentoPictureLink.SetRange("Item No.","No.");
-        MagentoPictureLink.SetRange("Base Image",true);
+        MagentoPictureLink.SetRange("Item No.", "No.");
+        MagentoPictureLink.SetRange("Base Image", true);
         if not MagentoPictureLink.FindFirst then
-          exit;
+            exit;
 
-        if not MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then
-          exit;
+        if not MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
+            exit;
         //+MAG2.24 [379760]
 
-        if MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then begin
-          TempMagentoPicture.Init;
-          TempMagentoPicture := MagentoPicture;
+        if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then begin
+            TempMagentoPicture.Init;
+            TempMagentoPicture := MagentoPicture;
         end else begin
-          TempMagentoPicture.Init;
-          TempMagentoPicture.Type := TempMagentoPicture.Type::Item;
-          TempMagentoPicture.Name := MagentoPictureLink."Picture Name";
+            TempMagentoPicture.Init;
+            TempMagentoPicture.Type := TempMagentoPicture.Type::Item;
+            TempMagentoPicture.Name := MagentoPictureLink."Picture Name";
         end;
 
         //-MAG10.00.2.00 [258544]
@@ -92,7 +93,7 @@ page 6151447 "Magento Item Picture Factbox"
     begin
         //-NPR5.42 [287064]
         if Initialized then
-          exit;
+            exit;
 
         if MagentoSetup.Get then;
         Initialized := true;

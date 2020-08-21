@@ -6,7 +6,7 @@ page 6014414 "Pacsoft Shipment Doc. Services"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Pacsoft Shipment Doc. Services";
-    SourceTableView = SORTING("Entry No.","Shipping Agent Code","Shipping Agent Service Code");
+    SourceTableView = SORTING("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
     UsageCategory = Lists;
 
     layout
@@ -15,11 +15,13 @@ page 6014414 "Pacsoft Shipment Doc. Services"
         {
             repeater(Group)
             {
-                field("Shipping Agent Service Code";"Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -19,44 +19,52 @@ page 6059767 "NaviDocs Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Enable NaviDocs";"Enable NaviDocs")
+                field("Enable NaviDocs"; "Enable NaviDocs")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Processing)
             {
                 Caption = 'Processing';
-                field("Max Retry Qty";"Max Retry Qty")
+                field("Max Retry Qty"; "Max Retry Qty")
                 {
+                    ApplicationArea = All;
                 }
-                field("Send Warming E-mail";"Send Warming E-mail")
+                field("Send Warming E-mail"; "Send Warming E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("Warning E-mail";"Warning E-mail")
+                field("Warning E-mail"; "Warning E-mail")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Integration)
             {
-                field("Pdf2Nav Send pdf";"Pdf2Nav Send pdf")
+                field("Pdf2Nav Send pdf"; "Pdf2Nav Send pdf")
                 {
+                    ApplicationArea = All;
                     Caption = 'Pdf2Nav send via NaviDocs';
                 }
-                field("Pdf2Nav Table Filter";"Pdf2Nav Table Filter")
+                field("Pdf2Nav Table Filter"; "Pdf2Nav Table Filter")
                 {
+                    ApplicationArea = All;
                     Caption = 'Tablefilter';
                 }
             }
             group(Logging)
             {
                 Caption = 'Logging';
-                field("Log to Activity Log";"Log to Activity Log")
+                field("Log to Activity Log"; "Log to Activity Log")
                 {
+                    ApplicationArea = All;
                     Editable = ShowLogToActivityLog;
                     Visible = ShowLogToActivityLog;
                 }
-                field("Keep Log for";"Keep Log for")
+                field("Keep Log for"; "Keep Log for")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -71,8 +79,8 @@ page 6059767 "NaviDocs Setup"
         //-NPR5.23 [236043]
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
         //+NPR5.23 [236043]
         //-NPR5.30 [243998]

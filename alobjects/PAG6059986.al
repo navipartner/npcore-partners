@@ -14,8 +14,9 @@ page 6059986 "Sale POS Activities"
             cuegroup(Cues)
             {
                 Caption = ' ';
-                field("Saved Sales";"Saved Sales")
+                field("Saved Sales"; "Saved Sales")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Touch Screen - Saved sales";
                 }
             }
@@ -31,23 +32,24 @@ page 6059986 "Sale POS Activities"
         if not RetailConfiguration.Get then exit;
 
         case RetailConfiguration."Show saved expeditions" of
-          RetailConfiguration."Show saved expeditions"::All :;
-          RetailConfiguration."Show saved expeditions"::Register :
-            SetFilter("Register Filter",RetailFormCode.FetchRegisterNumber);
-          RetailConfiguration."Show saved expeditions"::Salesperson :
-              // Fix for salesperson
-            ;
-          RetailConfiguration."Show saved expeditions"::"Register+Salesperson" :
-            begin
-              // Fix for salesperson
-              SetFilter("Register Filter",RetailFormCode.FetchRegisterNumber);
-            end;
+            RetailConfiguration."Show saved expeditions"::All:
+                ;
+            RetailConfiguration."Show saved expeditions"::Register:
+                SetFilter("Register Filter", RetailFormCode.FetchRegisterNumber);
+            RetailConfiguration."Show saved expeditions"::Salesperson:
+                // Fix for salesperson
+                ;
+            RetailConfiguration."Show saved expeditions"::"Register+Salesperson":
+                begin
+                    // Fix for salesperson
+                    SetFilter("Register Filter", RetailFormCode.FetchRegisterNumber);
+                end;
         end;
 
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 

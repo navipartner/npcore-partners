@@ -13,44 +13,53 @@ page 6151101 "NpRi Reimbursement Templates"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Collection Module";"Data Collection Module")
+                field("Data Collection Module"; "Data Collection Module")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         SetHasDataCollectionFilters();
                     end;
                 }
-                field("Data Collection Description";"Data Collection Description")
+                field("Data Collection Description"; "Data Collection Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Data Collection Summary";"Data Collection Summary")
+                field("Data Collection Summary"; "Data Collection Summary")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Reimbursement Module";"Reimbursement Module")
+                field("Reimbursement Module"; "Reimbursement Module")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         SetHasReimbursementParameters();
                     end;
                 }
-                field("Reimbursement Description";"Reimbursement Description")
+                field("Reimbursement Description"; "Reimbursement Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reimbursement Summary";"Reimbursement Summary")
+                field("Reimbursement Summary"; "Reimbursement Summary")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Posting Description";"Posting Description")
+                field("Posting Description"; "Posting Description")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -110,7 +119,7 @@ page 6151101 "NpRi Reimbursement Templates"
         NpRiDataCollectionMgt: Codeunit "NpRi Data Collection Mgt.";
     begin
         HasDataCollectionFilters := false;
-        NpRiDataCollectionMgt.HasTemplateFilters(Rec,HasDataCollectionFilters);
+        NpRiDataCollectionMgt.HasTemplateFilters(Rec, HasDataCollectionFilters);
     end;
 
     local procedure SetHasReimbursementParameters()
@@ -118,7 +127,7 @@ page 6151101 "NpRi Reimbursement Templates"
         NpRiReimbursementMgt: Codeunit "NpRi Reimbursement Mgt.";
     begin
         HasReimbursementParameters := false;
-        NpRiReimbursementMgt.HasTemplateParameters(Rec,HasReimbursementParameters);
+        NpRiReimbursementMgt.HasTemplateParameters(Rec, HasReimbursementParameters);
     end;
 }
 

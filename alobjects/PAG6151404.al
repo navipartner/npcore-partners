@@ -17,20 +17,25 @@ page 6151404 "Magento Website List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Website";"Default Website")
+                field("Default Website"; "Default Website")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

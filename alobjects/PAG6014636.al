@@ -14,42 +14,50 @@ page 6014636 "Send SMS"
                 group(Control6150615)
                 {
                     ShowCaption = false;
-                    field(Sender;Sender)
+                    field(Sender; Sender)
                     {
+                        ApplicationArea = All;
                         Caption = 'Sender';
                     }
-                    field(txtNum;ToSMS)
+                    field(txtNum; ToSMS)
                     {
+                        ApplicationArea = All;
                         Caption = 'Mobile Number';
                     }
                 }
                 group(Control6150618)
                 {
                     ShowCaption = false;
-                    field("FORMAT(LettersLeft) + ' tegn tilbage'";Format(LettersLeft) + ' tegn tilbage')
+                    field("FORMAT(LettersLeft) + ' tegn tilbage'"; Format(LettersLeft) + ' tegn tilbage')
                     {
+                        ApplicationArea = All;
                     }
-                    field("SMS text (max. 160 characters)";'')
+                    field("SMS text (max. 160 characters)"; '')
                     {
+                        ApplicationArea = All;
                         Caption = 'SMS text (max. 160 characters)';
                         ShowCaption = false;
                     }
                 }
             }
-            field("SMStekst[1]";SMStekst[1])
+            field("SMStekst[1]"; SMStekst[1])
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
-            field("SMStekst[2]";SMStekst[2])
+            field("SMStekst[2]"; SMStekst[2])
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
-            field("SMStekst[3]";SMStekst[3])
+            field("SMStekst[3]"; SMStekst[3])
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
-            field("SMStekst[4]";SMStekst[4])
+            field("SMStekst[4]"; SMStekst[4])
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
         }
@@ -72,8 +80,8 @@ page 6014636 "Send SMS"
                     SMStekst[2] := '';
                     SMStekst[3] := '';
                     SMStekst[4] := '';
-                    Sender      := '';
-                    ToSMS       := '';
+                    Sender := '';
+                    ToSMS := '';
                 end;
             }
             action(Close)
@@ -103,7 +111,7 @@ page 6014636 "Send SMS"
                     //"I-Comm".GET;
                     //SMSCode.SmsEclub(toSMS,SMStekst[1] + SMStekst[2] + SMStekst[3] + SMStekst[4],sender);
                     //MESSAGE('Beskeden er sendt.');
-                    SmsMgt.SendSMS(ToSMS,Sender,SMStekst[1] + SMStekst[2] + SMStekst[3] + SMStekst[4]);
+                    SmsMgt.SendSMS(ToSMS, Sender, SMStekst[1] + SMStekst[2] + SMStekst[3] + SMStekst[4]);
                     //+NPR5.27 [255580]
                 end;
             }
@@ -119,7 +127,7 @@ page 6014636 "Send SMS"
     end;
 
     var
-        SMStekst: array [4] of Text;
+        SMStekst: array[4] of Text;
         ToSMS: Text[30];
         Sender: Text[100];
         BSlash: Label '\';
@@ -127,7 +135,7 @@ page 6014636 "Send SMS"
 
     procedure LettersLeft(): Integer
     begin
-        exit(160-StrLen(SMStekst[1]+SMStekst[2]+SMStekst[3]+SMStekst[4]));
+        exit(160 - StrLen(SMStekst[1] + SMStekst[2] + SMStekst[3] + SMStekst[4]));
     end;
 }
 

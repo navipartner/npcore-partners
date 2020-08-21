@@ -13,82 +13,106 @@ page 6151103 "NpRi Reimbursement Entries"
         {
             repeater(Group)
             {
-                field("Party Type";"Party Type")
+                field("Party Type"; "Party Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Party No.";"Party No.")
+                field("Party No."; "Party No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Template Code";"Template Code")
+                field("Template Code"; "Template Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Company Name";"Source Company Name")
+                field("Source Company Name"; "Source Company Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Source Table No.";"Source Table No.")
+                field("Source Table No."; "Source Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Table Name";"Source Table Name")
+                field("Source Table Name"; "Source Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Source Record Position";"Source Record Position")
+                field("Source Record Position"; "Source Record Position")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Source Entry No.";"Source Entry No.")
+                field("Source Entry No."; "Source Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field(Positive;Positive)
+                field(Positive; Positive)
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("Remaining Amount";"Remaining Amount")
+                field("Remaining Amount"; "Remaining Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Closed by Entry No.";"Closed by Entry No.")
+                field("Closed by Entry No."; "Closed by Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document Type";"Document Type")
+                field("Document Type"; "Document Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account Type";"Account Type")
+                field("Account Type"; "Account Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Account No.";"Account No.")
+                field("Account No."; "Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Reimbursement Amount";"Reimbursement Amount")
+                field("Reimbursement Amount"; "Reimbursement Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last modified by";"Last modified by")
+                field("Last modified by"; "Last modified by")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last modified at";"Last modified at")
+                field("Last modified at"; "Last modified at")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -163,7 +187,7 @@ page 6151103 "NpRi Reimbursement Entries"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date","Document No.");
+                    Navigate.SetDoc("Posting Date", "Document No.");
                     Navigate.Run;
                 end;
             }

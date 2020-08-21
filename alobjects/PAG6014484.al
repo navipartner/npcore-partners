@@ -11,11 +11,13 @@ page 6014484 "Touch Screen - Meta F. Trans"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Language Code";"Language Code")
+                field("Language Code"; "Language Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -16,71 +16,93 @@ page 6059990 "Item Repair Action"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Ledger Entry Qty.";"Item Ledger Entry Qty.")
+                field("Item Ledger Entry Qty."; "Item Ledger Entry Qty.")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. Of tests";"No. Of tests")
+                field("No. Of tests"; "No. Of tests")
                 {
+                    ApplicationArea = All;
                 }
-                field("No.Of Errors";"No.Of Errors")
+                field("No.Of Errors"; "No.Of Errors")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Action";"Variant Action")
+                field("Variant Action"; "Variant Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 1 Action";"Variety 1 Action")
+                field("Variety 1 Action"; "Variety 1 Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 2 Action";"Variety 2 Action")
+                field("Variety 2 Action"; "Variety 2 Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 3 Action";"Variety 3 Action")
+                field("Variety 3 Action"; "Variety 3 Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variety 4 Action";"Variety 4 Action")
+                field("Variety 4 Action"; "Variety 4 Action")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 1";"New Variety 1")
+                field("New Variety 1"; "New Variety 1")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 1 Table";"New Variety 1 Table")
+                field("New Variety 1 Table"; "New Variety 1 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 1 Value";"New Variety 1 Value")
+                field("New Variety 1 Value"; "New Variety 1 Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 2";"New Variety 2")
+                field("New Variety 2"; "New Variety 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 2 Table";"New Variety 2 Table")
+                field("New Variety 2 Table"; "New Variety 2 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 2 Value";"New Variety 2 Value")
+                field("New Variety 2 Value"; "New Variety 2 Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 3";"New Variety 3")
+                field("New Variety 3"; "New Variety 3")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 3 Table";"New Variety 3 Table")
+                field("New Variety 3 Table"; "New Variety 3 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 3 Value";"New Variety 3 Value")
+                field("New Variety 3 Value"; "New Variety 3 Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 4";"New Variety 4")
+                field("New Variety 4"; "New Variety 4")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 4 Table";"New Variety 4 Table")
+                field("New Variety 4 Table"; "New Variety 4 Table")
                 {
+                    ApplicationArea = All;
                 }
-                field("New Variety 4 Value";"New Variety 4 Value")
+                field("New Variety 4 Value"; "New Variety 4 Value")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

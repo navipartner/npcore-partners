@@ -13,14 +13,17 @@ page 6184492 "Pepper Instances"
         {
             repeater(Group)
             {
-                field(ID;ID)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Configuration Code";"Configuration Code")
+                field("Configuration Code"; "Configuration Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -35,7 +38,7 @@ page 6184492 "Pepper Instances"
                 Caption = 'Terminals';
                 Image = MiniForm;
                 RunObject = Page "Pepper Terminal List";
-                RunPageLink = "Instance ID"=FIELD(ID);
+                RunPageLink = "Instance ID" = FIELD(ID);
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
             }

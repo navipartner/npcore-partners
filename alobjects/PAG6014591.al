@@ -14,53 +14,61 @@ page 6014591 "Sales Statistics Time Period"
             group("Start Date & Time ")
             {
                 Caption = 'Start Date & Time';
-                field(StartDate;StartDate)
+                field(StartDate; StartDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'Start Date';
                     ShowCaption = true;
                 }
-                field(StartTime;StartTime)
+                field(StartTime; StartTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'Start Time';
                 }
             }
             group("End Date & Time")
             {
                 Caption = 'End Date & Time';
-                field(EndDate;EndDate)
+                field(EndDate; EndDate)
                 {
+                    ApplicationArea = All;
                     Caption = 'End Date';
                 }
-                field(EndTime;EndTime)
+                field(EndTime; EndTime)
                 {
+                    ApplicationArea = All;
                     Caption = 'End Time';
                 }
             }
             group("Filtering Options")
             {
                 Caption = 'Filtering Options';
-                field(StatisticsBy;StatisticsBy)
+                field(StatisticsBy; StatisticsBy)
                 {
+                    ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Statistics By';
                 }
-                field(ItemNoFilter;ItemNoFilter)
+                field(ItemNoFilter; ItemNoFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item No Filter';
                     TableRelation = Item."No.";
                 }
-                field(ItemGroupFilter;ItemGroupFilter)
+                field(ItemGroupFilter; ItemGroupFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Group Filter';
-                    TableRelation = "Item Group" WHERE (Blocked=CONST(false));
+                    TableRelation = "Item Group" WHERE(Blocked = CONST(false));
                 }
-                field(ItemCategoryCodeFilter;ItemCategoryCodeFilter)
+                field(ItemCategoryCodeFilter; ItemCategoryCodeFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Category Code Filter';
                     TableRelation = "Item Category";
                 }
             }
-            part(SaleStatisticsSubform;"Sales Statistics Subform")
+            part(SaleStatisticsSubform; "Sales Statistics Subform")
             {
                 Caption = 'Data';
             }
@@ -81,7 +89,7 @@ page 6014591 "Sales Statistics Time Period"
 
                 trigger OnAction()
                 begin
-                    CurrPage.SaleStatisticsSubform.PAGE.PopulateTemp(StartDate,EndDate,StartTime,EndTime,StatisticsBy,ItemNoFilter,ItemCategoryCodeFilter,ItemGroupFilter,Dim1Filter,Dim2Filter);
+                    CurrPage.SaleStatisticsSubform.PAGE.PopulateTemp(StartDate, EndDate, StartTime, EndTime, StatisticsBy, ItemNoFilter, ItemCategoryCodeFilter, ItemGroupFilter, Dim1Filter, Dim2Filter);
                     CurrPage.Update;
                 end;
             }
@@ -103,7 +111,7 @@ page 6014591 "Sales Statistics Time Period"
         Dim1Filter: Text;
         Dim2Filter: Text;
 
-    procedure SetGlobals(var InStartDate: Date;var InEndDate: Date;var InStartTime: Time;var InEndTime: Time;var InVarStatisticsBy: Option;var InVarItemFilter: Text;var InVarItemCatFilter: Text;var InVarItemGroupFilter: Text;var InVarDim1Filter: Text;var InVarDim2Filter: Text)
+    procedure SetGlobals(var InStartDate: Date; var InEndDate: Date; var InStartTime: Time; var InEndTime: Time; var InVarStatisticsBy: Option; var InVarItemFilter: Text; var InVarItemCatFilter: Text; var InVarItemGroupFilter: Text; var InVarDim1Filter: Text; var InVarDim2Filter: Text)
     begin
         //-NPR5.53 [371446]
         InStartDate := StartDate;

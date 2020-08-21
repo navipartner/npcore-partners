@@ -21,269 +21,357 @@ page 6150629 "POS Workshift Checkpoints"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created At";"Created At")
+                field("Created At"; "Created At")
                 {
+                    ApplicationArea = All;
                 }
-                field(Open;Open)
+                field(Open; Open)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No.";"POS Entry No.")
+                field("POS Entry No."; "POS Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Period Type";"Period Type")
+                field("Period Type"; "Period Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Consolidated With Entry No.";"Consolidated With Entry No.")
+                field("Consolidated With Entry No."; "Consolidated With Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Debtor Payment (LCY)";"Debtor Payment (LCY)")
+                field("Debtor Payment (LCY)"; "Debtor Payment (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("GL Payment (LCY)";"GL Payment (LCY)")
+                field("GL Payment (LCY)"; "GL Payment (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Rounding (LCY)";"Rounding (LCY)")
+                field("Rounding (LCY)"; "Rounding (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Item Sales (LCY)";"Credit Item Sales (LCY)")
+                field("Credit Item Sales (LCY)"; "Credit Item Sales (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Item Quantity Sum";"Credit Item Quantity Sum")
+                field("Credit Item Quantity Sum"; "Credit Item Quantity Sum")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Net Sales Amount (LCY)";"Credit Net Sales Amount (LCY)")
+                field("Credit Net Sales Amount (LCY)"; "Credit Net Sales Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Sales Count";"Credit Sales Count")
+                field("Credit Sales Count"; "Credit Sales Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Sales Amount (LCY)";"Credit Sales Amount (LCY)")
+                field("Credit Sales Amount (LCY)"; "Credit Sales Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Issued Vouchers (LCY)";"Issued Vouchers (LCY)")
+                field("Issued Vouchers (LCY)"; "Issued Vouchers (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Redeemed Vouchers (LCY)";"Redeemed Vouchers (LCY)")
+                field("Redeemed Vouchers (LCY)"; "Redeemed Vouchers (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Local Currency (LCY)";"Local Currency (LCY)")
+                field("Local Currency (LCY)"; "Local Currency (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Foreign Currency (LCY)";"Foreign Currency (LCY)")
+                field("Foreign Currency (LCY)"; "Foreign Currency (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("EFT (LCY)";"EFT (LCY)")
+                field("EFT (LCY)"; "EFT (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Manual Card (LCY)";"Manual Card (LCY)")
+                field("Manual Card (LCY)"; "Manual Card (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Other Credit Card (LCY)";"Other Credit Card (LCY)")
+                field("Other Credit Card (LCY)"; "Other Credit Card (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cash Terminal (LCY)";"Cash Terminal (LCY)")
+                field("Cash Terminal (LCY)"; "Cash Terminal (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Redeemed Credit Voucher (LCY)";"Redeemed Credit Voucher (LCY)")
+                field("Redeemed Credit Voucher (LCY)"; "Redeemed Credit Voucher (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created Credit Voucher (LCY)";"Created Credit Voucher (LCY)")
+                field("Created Credit Voucher (LCY)"; "Created Credit Voucher (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Item Sales (LCY)";"Direct Item Sales (LCY)")
+                field("Direct Item Sales (LCY)"; "Direct Item Sales (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Sales - Staff (LCY)";"Direct Sales - Staff (LCY)")
+                field("Direct Sales - Staff (LCY)"; "Direct Sales - Staff (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Item Net Sales (LCY)";"Direct Item Net Sales (LCY)")
+                field("Direct Item Net Sales (LCY)"; "Direct Item Net Sales (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Sales Count";"Direct Sales Count")
+                field("Direct Sales Count"; "Direct Sales Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cancelled Sales Count";"Cancelled Sales Count")
+                field("Cancelled Sales Count"; "Cancelled Sales Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net Turnover (LCY)";"Net Turnover (LCY)")
+                field("Net Turnover (LCY)"; "Net Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Turnover (LCY)";"Turnover (LCY)")
+                field("Turnover (LCY)"; "Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Turnover (LCY)";"Direct Turnover (LCY)")
+                field("Direct Turnover (LCY)"; "Direct Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Negative Turnover (LCY)";"Direct Negative Turnover (LCY)")
+                field("Direct Negative Turnover (LCY)"; "Direct Negative Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Net Turnover (LCY)";"Direct Net Turnover (LCY)")
+                field("Direct Net Turnover (LCY)"; "Direct Net Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Net Cost (LCY)";"Net Cost (LCY)")
+                field("Net Cost (LCY)"; "Net Cost (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Profit Amount (LCY)";"Profit Amount (LCY)")
+                field("Profit Amount (LCY)"; "Profit Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Item Returns (LCY)";"Direct Item Returns (LCY)")
+                field("Direct Item Returns (LCY)"; "Direct Item Returns (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Item Returns Line Count";"Direct Item Returns Line Count")
+                field("Direct Item Returns Line Count"; "Direct Item Returns Line Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Real. Sale Amt. (LCY)";"Credit Real. Sale Amt. (LCY)")
+                field("Credit Real. Sale Amt. (LCY)"; "Credit Real. Sale Amt. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Unreal. Sale Amt. (LCY)";"Credit Unreal. Sale Amt. (LCY)")
+                field("Credit Unreal. Sale Amt. (LCY)"; "Credit Unreal. Sale Amt. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Real. Return Amt. (LCY)";"Credit Real. Return Amt. (LCY)")
+                field("Credit Real. Return Amt. (LCY)"; "Credit Real. Return Amt. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Unreal. Ret. Amt. (LCY)";"Credit Unreal. Ret. Amt. (LCY)")
+                field("Credit Unreal. Ret. Amt. (LCY)"; "Credit Unreal. Ret. Amt. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Turnover (LCY)";"Credit Turnover (LCY)")
+                field("Credit Turnover (LCY)"; "Credit Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Credit Net Turnover (LCY)";"Credit Net Turnover (LCY)")
+                field("Credit Net Turnover (LCY)"; "Credit Net Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Discount (LCY)";"Total Discount (LCY)")
+                field("Total Discount (LCY)"; "Total Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Net Discount (LCY)";"Total Net Discount (LCY)")
+                field("Total Net Discount (LCY)"; "Total Net Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Discount %";"Total Discount %")
+                field("Total Discount %"; "Total Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Campaign Discount (LCY)";"Campaign Discount (LCY)")
+                field("Campaign Discount (LCY)"; "Campaign Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Campaign Discount %";"Campaign Discount %")
+                field("Campaign Discount %"; "Campaign Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mix Discount (LCY)";"Mix Discount (LCY)")
+                field("Mix Discount (LCY)"; "Mix Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mix Discount %";"Mix Discount %")
+                field("Mix Discount %"; "Mix Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity Discount (LCY)";"Quantity Discount (LCY)")
+                field("Quantity Discount (LCY)"; "Quantity Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Quantity Discount %";"Quantity Discount %")
+                field("Quantity Discount %"; "Quantity Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Custom Discount (LCY)";"Custom Discount (LCY)")
+                field("Custom Discount (LCY)"; "Custom Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Custom Discount %";"Custom Discount %")
+                field("Custom Discount %"; "Custom Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("BOM Discount (LCY)";"BOM Discount (LCY)")
+                field("BOM Discount (LCY)"; "BOM Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("BOM Discount %";"BOM Discount %")
+                field("BOM Discount %"; "BOM Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Discount (LCY)";"Customer Discount (LCY)")
+                field("Customer Discount (LCY)"; "Customer Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Discount %";"Customer Discount %")
+                field("Customer Discount %"; "Customer Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount (LCY)";"Line Discount (LCY)")
+                field("Line Discount (LCY)"; "Line Discount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Discount %";"Line Discount %")
+                field("Line Discount %"; "Line Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Calculated Diff (LCY)";"Calculated Diff (LCY)")
+                field("Calculated Diff (LCY)"; "Calculated Diff (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Item Quantity Sum";"Direct Item Quantity Sum")
+                field("Direct Item Quantity Sum"; "Direct Item Quantity Sum")
                 {
+                    ApplicationArea = All;
                 }
-                field("Direct Item Sales Line Count";"Direct Item Sales Line Count")
+                field("Direct Item Sales Line Count"; "Direct Item Sales Line Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipts Count";"Receipts Count")
+                field("Receipts Count"; "Receipts Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Cash Drawer Open Count";"Cash Drawer Open Count")
+                field("Cash Drawer Open Count"; "Cash Drawer Open Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Copies Count";"Receipt Copies Count")
+                field("Receipt Copies Count"; "Receipt Copies Count")
                 {
+                    ApplicationArea = All;
                 }
-                field("Receipt Copies Sales (LCY)";"Receipt Copies Sales (LCY)")
+                field("Receipt Copies Sales (LCY)"; "Receipt Copies Sales (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bin Transfer Out Amount (LCY)";"Bin Transfer Out Amount (LCY)")
+                field("Bin Transfer Out Amount (LCY)"; "Bin Transfer Out Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bin Transfer In Amount (LCY)";"Bin Transfer In Amount (LCY)")
+                field("Bin Transfer In Amount (LCY)"; "Bin Transfer In Amount (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Opening Cash (LCY)";"Opening Cash (LCY)")
+                field("Opening Cash (LCY)"; "Opening Cash (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Perpetual Dir. Item Sales(LCY)";"Perpetual Dir. Item Sales(LCY)")
+                field("Perpetual Dir. Item Sales(LCY)"; "Perpetual Dir. Item Sales(LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Perpetual Dir. Item Ret. (LCY)";"Perpetual Dir. Item Ret. (LCY)")
+                field("Perpetual Dir. Item Ret. (LCY)"; "Perpetual Dir. Item Ret. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Perpetual Dir. Turnover (LCY)";"Perpetual Dir. Turnover (LCY)")
+                field("Perpetual Dir. Turnover (LCY)"; "Perpetual Dir. Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Perpetual Dir. Neg. Turn (LCY)";"Perpetual Dir. Neg. Turn (LCY)")
+                field("Perpetual Dir. Neg. Turn (LCY)"; "Perpetual Dir. Neg. Turn (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Perpetual Rounding Amt. (LCY)";"Perpetual Rounding Amt. (LCY)")
+                field("Perpetual Rounding Amt. (LCY)"; "Perpetual Rounding Amt. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No. Filter";"POS Unit No. Filter")
+                field("POS Unit No. Filter"; "POS Unit No. Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Open Filter";"Open Filter")
+                field("Open Filter"; "Open Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Entry No. Filter";"POS Entry No. Filter")
+                field("POS Entry No. Filter"; "POS Entry No. Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("Type Filter";"Type Filter")
+                field("Type Filter"; "Type Filter")
                 {
+                    ApplicationArea = All;
                 }
-                field("FF Total Dir. Item Sales (LCY)";"FF Total Dir. Item Sales (LCY)")
+                field("FF Total Dir. Item Sales (LCY)"; "FF Total Dir. Item Sales (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("FF Total Dir. Item Return(LCY)";"FF Total Dir. Item Return(LCY)")
+                field("FF Total Dir. Item Return(LCY)"; "FF Total Dir. Item Return(LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("FF Total Dir. Turnover (LCY)";"FF Total Dir. Turnover (LCY)")
+                field("FF Total Dir. Turnover (LCY)"; "FF Total Dir. Turnover (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("FF Total Dir. Neg. Turn. (LCY)";"FF Total Dir. Neg. Turn. (LCY)")
+                field("FF Total Dir. Neg. Turn. (LCY)"; "FF Total Dir. Neg. Turn. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
-                field("FF Total Rounding Amt. (LCY)";"FF Total Rounding Amt. (LCY)")
+                field("FF Total Rounding Amt. (LCY)"; "FF Total Rounding Amt. (LCY)")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -302,7 +390,7 @@ page 6150629 "POS Workshift Checkpoints"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Workshift Checkpoint Card";
-                RunPageLink = "Entry No."=FIELD("Entry No.");
+                RunPageLink = "Entry No." = FIELD("Entry No.");
             }
             action(Archive)
             {

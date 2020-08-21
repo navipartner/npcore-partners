@@ -19,35 +19,45 @@ page 6151128 "NpIa Item AddOn Line Options"
         {
             repeater(Group)
             {
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Per Unit";"Per Unit")
+                field("Per Unit"; "Per Unit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fixed Quantity";"Fixed Quantity")
+                field("Fixed Quantity"; "Fixed Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Unit Price";"Use Unit Price")
+                field("Use Unit Price"; "Use Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount %";"Discount %")
+                field("Discount %"; "Discount %")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

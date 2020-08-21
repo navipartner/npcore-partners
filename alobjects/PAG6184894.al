@@ -15,29 +15,36 @@ page 6184894 "Storage Operation Parameters"
         {
             repeater(Group)
             {
-                field("Storage Type";"Storage Type")
+                field("Storage Type"; "Storage Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Operation Code";"Operation Code")
+                field("Operation Code"; "Operation Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Parameter Name";"Parameter Name")
+                field("Parameter Name"; "Parameter Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Parameter Value";"Parameter Value")
+                field("Parameter Value"; "Parameter Value")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Parameter Key";"Parameter Key")
+                field("Parameter Key"; "Parameter Key")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Mandatory For Job Queue";"Mandatory For Job Queue")
+                field("Mandatory For Job Queue"; "Mandatory For Job Queue")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

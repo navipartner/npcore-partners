@@ -19,46 +19,59 @@ page 6151127 "NpIa Item AddOn Subform"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                     Enabled = (Type = 0);
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Enabled = (Type = 0);
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Per Unit";"Per Unit")
+                field("Per Unit"; "Per Unit")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fixed Quantity";"Fixed Quantity")
+                field("Fixed Quantity"; "Fixed Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Use Unit Price";"Use Unit Price")
+                field("Use Unit Price"; "Use Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount %";"Discount %")
+                field("Discount %"; "Discount %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Comment Enabled";"Comment Enabled")
+                field("Comment Enabled"; "Comment Enabled")
                 {
+                    ApplicationArea = All;
                 }
-                field("Before Insert Function";"Before Insert Function")
+                field("Before Insert Function"; "Before Insert Function")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -67,8 +80,9 @@ page 6151127 "NpIa Item AddOn Subform"
                         //+NPR5.48 [334922]
                     end;
                 }
-                field("Before Insert Codeunit ID";"Before Insert Codeunit ID")
+                field("Before Insert Codeunit ID"; "Before Insert Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
 
                     trigger OnValidate()
@@ -78,8 +92,9 @@ page 6151127 "NpIa Item AddOn Subform"
                         //+NPR5.48 [334922]
                     end;
                 }
-                field("Before Insert Codeunit Name";"Before Insert Codeunit Name")
+                field("Before Insert Codeunit Name"; "Before Insert Codeunit Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
@@ -98,8 +113,8 @@ page 6151127 "NpIa Item AddOn Subform"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NpIa Item AddOn Line Options";
-                RunPageLink = "AddOn No."=FIELD("AddOn No."),
-                              "AddOn Line No."=FIELD("Line No.");
+                RunPageLink = "AddOn No." = FIELD("AddOn No."),
+                              "AddOn Line No." = FIELD("Line No.");
                 ShortCutKey = 'Ctrl+F7';
                 Visible = (Type = 1);
             }
@@ -117,7 +132,7 @@ page 6151127 "NpIa Item AddOn Subform"
                     Handled: Boolean;
                 begin
                     //-NPR5.48 [334922]
-                    NpIaItemAddOnMgt.RunBeforeInsertSetup(Rec,Handled);
+                    NpIaItemAddOnMgt.RunBeforeInsertSetup(Rec, Handled);
                     //+NPR5.48 [334922]
                 end;
             }
@@ -140,7 +155,7 @@ page 6151127 "NpIa Item AddOn Subform"
     begin
         //-NPR5.48 [334922]
         HasBeforeInsertSetup := false;
-        NpIaItemAddOnMgt.HasBeforeInsertSetup(Rec,HasBeforeInsertSetup);
+        NpIaItemAddOnMgt.HasBeforeInsertSetup(Rec, HasBeforeInsertSetup);
         //+NPR5.48 [334922]
     end;
 }

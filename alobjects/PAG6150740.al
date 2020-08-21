@@ -4,7 +4,7 @@ page 6150740 "POS Admin. Template Card"
 
     Caption = 'POS Administrative Template Card';
     DataCaptionExpression = GetName();
-    DataCaptionFields = Id,Name;
+    DataCaptionFields = Id, Name;
     PageType = Card;
     SourceTable = "POS Administrative Template";
 
@@ -14,53 +14,62 @@ page 6150740 "POS Admin. Template Card"
         {
             group(General)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                     Importance = Additional;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update();
                     end;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Persist on Client";"Persist on Client")
+                field("Persist on Client"; "Persist on Client")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(MainMenu)
             {
                 Caption = 'Main Menu';
-                field("Role Center";"Role Center")
+                field("Role Center"; "Role Center")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         SetControlStatuses();
                     end;
                 }
-                field("Role Center Password";"Role Center Password")
+                field("Role Center Password"; "Role Center Password")
                 {
+                    ApplicationArea = All;
                     Editable = RoleCenterPasswordEditable;
                 }
-                field(Configuration;Configuration)
+                field(Configuration; Configuration)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         SetControlStatuses();
                     end;
                 }
-                field("Configuration Password";"Configuration Password")
+                field("Configuration Password"; "Configuration Password")
                 {
+                    ApplicationArea = All;
                     Editable = ConfigurationPasswordEditable;
                 }
             }
@@ -79,7 +88,7 @@ page 6150740 "POS Admin. Template Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Admin. Template Scopes";
-                RunPageLink = "POS Admin. Template Id"=FIELD(Id);
+                RunPageLink = "POS Admin. Template Id" = FIELD(Id);
             }
         }
     }
@@ -97,9 +106,9 @@ page 6150740 "POS Admin. Template Card"
     local procedure GetName(): Text
     begin
         if Name <> '' then
-          exit(Name)
+            exit(Name)
         else
-          exit(StrSubstNo(Text001,Id));
+            exit(StrSubstNo(Text001, Id));
     end;
 
     local procedure SetControlStatuses()

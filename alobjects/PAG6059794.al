@@ -19,14 +19,17 @@ page 6059794 "E-mail Template Filters"
         {
             repeater(Group)
             {
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

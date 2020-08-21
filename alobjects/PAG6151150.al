@@ -18,33 +18,37 @@ page 6151150 "Customer GDPR Setup"
         {
             group(General)
             {
-                field("Anonymize After";"Anonymize After")
+                field("Anonymize After"; "Anonymize After")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer Posting Group Filter";"Customer Posting Group Filter")
+                field("Customer Posting Group Filter"; "Customer Posting Group Filter")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.53 [358656]
-                        if PAGE.RunModal(0,CustPostingGrp) = ACTION::LookupOK then
-                          "Customer Posting Group Filter" := CustPostingGrp.Code;
+                        if PAGE.RunModal(0, CustPostingGrp) = ACTION::LookupOK then
+                            "Customer Posting Group Filter" := CustPostingGrp.Code;
                         //+NPR5.53 [358656]
                     end;
                 }
-                field("Gen. Bus. Posting Group Filter";"Gen. Bus. Posting Group Filter")
+                field("Gen. Bus. Posting Group Filter"; "Gen. Bus. Posting Group Filter")
                 {
+                    ApplicationArea = All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.53 [358656]
-                        if PAGE.RunModal(0,GenBusPostingGrp) = ACTION::LookupOK then
-                         "Gen. Bus. Posting Group Filter" := GenBusPostingGrp.Code;
+                        if PAGE.RunModal(0, GenBusPostingGrp) = ACTION::LookupOK then
+                            "Gen. Bus. Posting Group Filter" := GenBusPostingGrp.Code;
                         //+NPR5.53 [358656]
                     end;
                 }
-                field("No of Customers";"No of Customers")
+                field("No of Customers"; "No of Customers")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -80,8 +84,8 @@ page 6151150 "Customer GDPR Setup"
 
                     CustToAnonymize.Reset;
                     if CustToAnonymize.FindFirst then
-                      if not Confirm(Text000,false) then
-                        exit;
+                        if not Confirm(Text000, false) then
+                            exit;
 
 
                     CustToAnonymize.Reset;
@@ -91,80 +95,80 @@ page 6151150 "Customer GDPR Setup"
                     if GDPRSetup.Get then;
 
                     DateFormulaTxt := '-' + Format(GDPRSetup."Anonymize After");
-                    Evaluate(VarPeriod,DateFormulaTxt);
+                    Evaluate(VarPeriod, DateFormulaTxt);
 
 
                     VarEntryNo := 1;
                     Window.Open('Customer #1##################');
                     Customer.Reset;
-                    Customer.SetRange(Customer.Anonymized,false);
-                    Customer.SetFilter(Customer."Customer Posting Group",GDPRSetup."Customer Posting Group Filter");
-                    Customer.SetFilter(Customer."Gen. Bus. Posting Group",GDPRSetup."Gen. Bus. Posting Group Filter");
+                    Customer.SetRange(Customer.Anonymized, false);
+                    Customer.SetFilter(Customer."Customer Posting Group", GDPRSetup."Customer Posting Group Filter");
+                    Customer.SetFilter(Customer."Gen. Bus. Posting Group", GDPRSetup."Gen. Bus. Posting Group Filter");
                     //-NPR5.54 [358656]
-                    Customer.SetFilter("Last Date Modified",'<>%1',0D);
+                    Customer.SetFilter("Last Date Modified", '<>%1', 0D);
                     //+NPR5.54 [358656]
                     if Customer.FindSet then
-                      repeat
-                        Window.Update(1,Customer."No.");
+                        repeat
+                            Window.Update(1, Customer."No.");
 
-                        //-NPR5.54 [358656]
-                        //IF (TODAY - Customer."Last Date Modified") >= (TODAY - CALCDATE(VarPeriod,TODAY)) THEN BEGIN
-                        NoTrans := true;
+                            //-NPR5.54 [358656]
+                            //IF (TODAY - Customer."Last Date Modified") >= (TODAY - CALCDATE(VarPeriod,TODAY)) THEN BEGIN
+                            NoTrans := true;
 
-                        CLE.Reset;
-                        CLE.SetCurrentKey("Customer No.","Posting Date","Currency Code");
-                        CLE.SetRange("Customer No.",Customer."No.");
-                        NoTrans := CLE.FindFirst;
-
-
-                        if NoTrans then begin
-                          ILE.Reset;
-                          ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
-                          ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
-                          ILE.SetRange(ILE."Source No.",Customer."No.");
-                          NoTrans := ILE.FindFirst;
-                        end;
+                            CLE.Reset;
+                            CLE.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
+                            CLE.SetRange("Customer No.", Customer."No.");
+                            NoTrans := CLE.FindFirst;
 
 
-                        if NoTrans then begin
-                          if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod,Today)) then begin
-                            CustToAnonymize.Init;
-                            CustToAnonymize."Entry No" := VarEntryNo;
-                            CustToAnonymize."Customer No" := Customer."No.";
-                            CustToAnonymize."Customer Name" := Customer.Name;
-                            CustToAnonymize.Insert;
-                            VarEntryNo += 1;
-                          end;
-                        end else begin
-                        //+NPR5.54 [358656]
+                            if NoTrans then begin
+                                ILE.Reset;
+                                ILE.SetCurrentKey("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
+                                ILE.SetRange(ILE."Source Type", ILE."Source Type"::Customer);
+                                ILE.SetRange(ILE."Source No.", Customer."No.");
+                                NoTrans := ILE.FindFirst;
+                            end;
 
-                          NoCLE := false;
-                          NoILE := false;
-                          CLE.Reset;
-                          CLE.SetCurrentKey("Customer No.","Posting Date","Currency Code");
-                          CLE.SetRange("Customer No.",Customer."No.");
-                          CLE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
-                          if not CLE.FindFirst then
-                            NoCLE := true;
 
-                          ILE.Reset;
-                          ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
-                          ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
-                          ILE.SetRange(ILE."Source No.",Customer."No.");
-                          ILE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
-                          if not ILE.FindFirst then
-                            NoILE := true;
+                            if NoTrans then begin
+                                if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod, Today)) then begin
+                                    CustToAnonymize.Init;
+                                    CustToAnonymize."Entry No" := VarEntryNo;
+                                    CustToAnonymize."Customer No" := Customer."No.";
+                                    CustToAnonymize."Customer Name" := Customer.Name;
+                                    CustToAnonymize.Insert;
+                                    VarEntryNo += 1;
+                                end;
+                            end else begin
+                                //+NPR5.54 [358656]
 
-                          if NoILE and NoCLE then begin
-                            CustToAnonymize.Init;
-                            CustToAnonymize."Entry No" := VarEntryNo;
-                            CustToAnonymize."Customer No" := Customer."No.";
-                            CustToAnonymize."Customer Name" := Customer.Name;
-                            CustToAnonymize.Insert;
-                            VarEntryNo += 1;
-                          end;
-                        end;
-                      until Customer.Next =0;
+                                NoCLE := false;
+                                NoILE := false;
+                                CLE.Reset;
+                                CLE.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
+                                CLE.SetRange("Customer No.", Customer."No.");
+                                CLE.SetFilter("Posting Date", '>%1', CalcDate(VarPeriod, Today));
+                                if not CLE.FindFirst then
+                                    NoCLE := true;
+
+                                ILE.Reset;
+                                ILE.SetCurrentKey("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
+                                ILE.SetRange(ILE."Source Type", ILE."Source Type"::Customer);
+                                ILE.SetRange(ILE."Source No.", Customer."No.");
+                                ILE.SetFilter("Posting Date", '>%1', CalcDate(VarPeriod, Today));
+                                if not ILE.FindFirst then
+                                    NoILE := true;
+
+                                if NoILE and NoCLE then begin
+                                    CustToAnonymize.Init;
+                                    CustToAnonymize."Entry No" := VarEntryNo;
+                                    CustToAnonymize."Customer No" := Customer."No.";
+                                    CustToAnonymize."Customer Name" := Customer.Name;
+                                    CustToAnonymize.Insert;
+                                    VarEntryNo += 1;
+                                end;
+                            end;
+                        until Customer.Next = 0;
                     Window.Close;
                     Message('Completed');
                 end;
@@ -189,8 +193,8 @@ page 6151150 "Customer GDPR Setup"
         //-NPR5.54 [358656]
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
         //-NPR5.54 [358656]
     end;

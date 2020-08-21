@@ -15,22 +15,26 @@ page 6150622 "POS Payment Bin Eject Params"
         {
             repeater(Group)
             {
-                field(ParameterName;ParameterName)
+                field(ParameterName; ParameterName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Name';
                     Editable = false;
                 }
-                field(ParameterDescription;ParameterDescription)
+                field(ParameterDescription; ParameterDescription)
                 {
+                    ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(ParameterValue;ParameterValue)
+                field(ParameterValue; ParameterValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Value';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -72,7 +76,7 @@ page 6150622 "POS Payment Bin Eject Params"
         Clear(ParameterName);
         OnGetParameterNameCaption(Rec, ParameterName);
         if ParameterName = '' then
-          ParameterName := Name;
+            ParameterName := Name;
     end;
 
     local procedure SetParameterDescription()
@@ -89,17 +93,17 @@ page 6150622 "POS Payment Bin Eject Params"
     begin
         Clear(ParameterValue);
         if "Data Type" <> "Data Type"::Option then begin
-          ParameterValue := Value;
-          exit;
+            ParameterValue := Value;
+            exit;
         end;
 
         Evaluate(Ordinal, Value);
 
         OnGetParameterOptionStringCaption(Rec, OptionStringCaption);
         if (OptionStringCaption <> '') then
-          TrySelectStr(Ordinal, OptionStringCaption, OptionCaption)
+            TrySelectStr(Ordinal, OptionStringCaption, OptionCaption)
         else
-          TrySelectStr(Ordinal, OptionString, OptionCaption);
+            TrySelectStr(Ordinal, OptionString, OptionCaption);
 
         ParameterValue := OptionCaption;
     end;

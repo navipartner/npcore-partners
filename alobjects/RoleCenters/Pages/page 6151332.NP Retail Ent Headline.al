@@ -29,6 +29,7 @@ page 6151332 "NP Retail Ent Headline"
                 ShowCaption = false;
                 field("Issued Tickets"; IssuedTicketText)
                 {
+                    ApplicationArea = All;
 
                     Editable = false;
                 }
@@ -38,6 +39,7 @@ page 6151332 "NP Retail Ent Headline"
                 ShowCaption = false;
                 field("Ticket Admissions"; TicketAdmission)
                 {
+                    ApplicationArea = All;
 
                     Editable = false;
                 }
@@ -47,6 +49,7 @@ page 6151332 "NP Retail Ent Headline"
                 ShowCaption = false;
                 field(Members; MembersCreated)
                 {
+                    ApplicationArea = All;
 
                     Editable = false;
                 }

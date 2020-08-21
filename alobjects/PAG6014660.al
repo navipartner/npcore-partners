@@ -13,8 +13,9 @@ page 6014660 "Close Navision"
             group(Control6150613)
             {
                 ShowCaption = false;
-                field(errorMessage;errorMessage)
+                field(errorMessage; errorMessage)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     MultiLine = true;
                     Style = StrongAccent;

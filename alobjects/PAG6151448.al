@@ -19,23 +19,29 @@ page 6151448 "Magento Payment Mapping"
         {
             repeater(Group)
             {
-                field("External Payment Method Code";"External Payment Method Code")
+                field("External Payment Method Code"; "External Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("External Payment Type";"External Payment Type")
+                field("External Payment Type"; "External Payment Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Method Code";"Payment Method Code")
+                field("Payment Method Code"; "Payment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Adjust Payment Amount";"Allow Adjust Payment Amount")
+                field("Allow Adjust Payment Amount"; "Allow Adjust Payment Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Payment Gateway Code";"Payment Gateway Code")
+                field("Payment Gateway Code"; "Payment Gateway Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Captured Externally";"Captured Externally")
+                field("Captured Externally"; "Captured Externally")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

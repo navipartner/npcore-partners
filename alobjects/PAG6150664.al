@@ -19,35 +19,45 @@ page 6150664 "NPRE Seating List"
         {
             repeater(Group)
             {
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Seating Location";"Seating Location")
+                field("Seating Location"; "Seating Location")
                 {
+                    ApplicationArea = All;
                 }
-                field(Capacity;Capacity)
+                field(Capacity; Capacity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Fixed Capasity";"Fixed Capasity")
+                field("Fixed Capasity"; "Fixed Capasity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Waiter Pad FF";"Current Waiter Pad FF")
+                field("Current Waiter Pad FF"; "Current Waiter Pad FF")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Waiter Pad Description";"Current Waiter Pad Description")
+                field("Current Waiter Pad Description"; "Current Waiter Pad Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Multiple Waiter Pad FF";"Multiple Waiter Pad FF")
+                field("Multiple Waiter Pad FF"; "Multiple Waiter Pad FF")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -69,13 +79,13 @@ page 6150664 "NPRE Seating List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID"=CONST(6150665),
-                                      "No."=FIELD(Code);
+                        RunPageLink = "Table ID" = CONST(6150665),
+                                      "No." = FIELD(Code);
                         ShortCutKey = 'Shift+Ctrl+D';
                     }
                     action("Dimensions-&Multiple")
                     {
-                        AccessByPermission = TableData Dimension=R;
+                        AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
 
@@ -86,7 +96,7 @@ page 6150664 "NPRE Seating List"
                         begin
                             //-NPR5.53 [380609]
                             CurrPage.SetSelectionFilter(NPRESeating);
-                            DefaultDimMultiple.SetMultiRecord(NPRESeating,FieldNo(Code));
+                            DefaultDimMultiple.SetMultiRecord(NPRESeating, FieldNo(Code));
                             DefaultDimMultiple.RunModal;
                             //-NPR5.53 [380609]
                         end;

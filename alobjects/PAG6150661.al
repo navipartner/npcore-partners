@@ -20,6 +20,7 @@ page 6150661 "NPRE Waiter Pad Subform"
             {
                 field(LineIsMarked; LineIsMarked)
                 {
+                    ApplicationArea = All;
                     Caption = 'Select';
 
                     trigger OnValidate()
@@ -29,154 +30,186 @@ page 6150661 "NPRE Waiter Pad Subform"
                 }
                 field("Waiter Pad No."; "Waiter Pad No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Start Date"; "Start Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Billed Quantity"; "Billed Quantity")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Sale Type"; "Sale Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
                 field("Order No. from Web"; "Order No. from Web")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Order Line No. from Web"; "Order Line No. from Web")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Discount Type"; "Discount Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Discount Code"; "Discount Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Allow Invoice Discount"; "Allow Invoice Discount")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Allow Line Discount"; "Allow Line Discount")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Discount %"; "Discount %")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Invoice Discount Amount"; "Invoice Discount Amount")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Unit of Measure Code"; "Unit of Measure Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Amount Excl. VAT"; "Amount Excl. VAT")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Amount Incl. VAT"; "Amount Incl. VAT")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Meal Flow"; "Meal Flow")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Meal Flow Description"; "Meal Flow Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field("Line Status"; "Line Status")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Line Status Description"; "Line Status Description")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
                 field(AssignedFlowStatuses; AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
+                    ApplicationArea = All;
                     Caption = 'Serving Steps';
                     Editable = false;
 
@@ -187,6 +220,7 @@ page 6150661 "NPRE Waiter Pad Subform"
                 }
                 field(AssignedPrintCategories; AssignedPrintCategoriesAsString())
                 {
+                    ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = false;
@@ -198,9 +232,11 @@ page 6150661 "NPRE Waiter Pad Subform"
                 }
                 field("Kitchen Order Sent"; "Kitchen Order Sent")
                 {
+                    ApplicationArea = All;
                 }
                 field("Serving Requested"; "Serving Requested")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

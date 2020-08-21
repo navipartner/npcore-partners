@@ -13,8 +13,9 @@ page 6150737 "Available POS Keybinds"
         {
             repeater(Group)
             {
-                field("Key Name";"Key Name")
+                field("Key Name"; "Key Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

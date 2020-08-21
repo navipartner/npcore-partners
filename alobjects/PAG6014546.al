@@ -16,19 +16,23 @@ page 6014546 "Dim. Select.-Multiple w.Filter"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Selected;Selected)
+                field(Selected; Selected)
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Dimension Value Filter";"Dimension Value Filter")
+                field("Dimension Value Filter"; "Dimension Value Filter")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -42,21 +46,21 @@ page 6014546 "Dim. Select.-Multiple w.Filter"
     begin
         TheDimSelectionBuf.DeleteAll;
         if Find('-') then
-          repeat
-            TheDimSelectionBuf := Rec;
-            TheDimSelectionBuf.Insert;
-          until Next = 0;
+            repeat
+                TheDimSelectionBuf := Rec;
+                TheDimSelectionBuf.Insert;
+            until Next = 0;
     end;
 
-    procedure InsertDimSelBuf(NewSelected: Boolean;NewCode: Text[30];NewDescription: Text[30];NewDimValueFilter: Text[250])
+    procedure InsertDimSelBuf(NewSelected: Boolean; NewCode: Text[30]; NewDescription: Text[30]; NewDimValueFilter: Text[250])
     var
         Dim: Record Dimension;
         GLAcc: Record "G/L Account";
         BusinessUnit: Record "Business Unit";
     begin
         if NewDescription = '' then
-          if Dim.Get(NewCode) then
-            NewDescription := Dim.GetMLName(GlobalLanguage);
+            if Dim.Get(NewCode) then
+                NewDescription := Dim.GetMLName(GlobalLanguage);
 
         Init;
         Selected := NewSelected;
@@ -64,10 +68,10 @@ page 6014546 "Dim. Select.-Multiple w.Filter"
         Description := NewDescription;
         "Dimension Value Filter" := NewDimValueFilter;
         case Code of
-          GLAcc.TableCaption:
-            "Filter Lookup Table No." := DATABASE::"G/L Account";
-          BusinessUnit.TableCaption:
-            "Filter Lookup Table No." := DATABASE::"Business Unit";
+            GLAcc.TableCaption:
+                "Filter Lookup Table No." := DATABASE::"G/L Account";
+            BusinessUnit.TableCaption:
+                "Filter Lookup Table No." := DATABASE::"Business Unit";
         end;
         Insert;
     end;

@@ -70,416 +70,474 @@ page 6014511 "Retail Item List"
             {
                 Editable = false;
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field("Created From Nonstock Item";"Created From Nonstock Item")
+                field("Created From Nonstock Item"; "Created From Nonstock Item")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Base Unit of Measure";"Base Unit of Measure")
+                field("Base Unit of Measure"; "Base Unit of Measure")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shelf No.";"Shelf No.")
+                field("Shelf No."; "Shelf No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Costing Method";"Costing Method")
+                field("Costing Method"; "Costing Method")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Standard Cost";"Standard Cost")
+                field("Standard Cost"; "Standard Cost")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Unit Cost";"Unit Cost")
+                field("Unit Cost"; "Unit Cost")
                 {
+                    ApplicationArea = All;
                 }
-                field("Last Direct Cost";"Last Direct Cost")
+                field("Last Direct Cost"; "Last Direct Cost")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Price/Profit Calculation";"Price/Profit Calculation")
+                field("Price/Profit Calculation"; "Price/Profit Calculation")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Group";"Item Group")
+                field("Item Group"; "Item Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(ItemGroupDesc;ItemGroupDesc)
+                field(ItemGroupDesc; ItemGroupDesc)
                 {
+                    ApplicationArea = All;
                     Caption = 'Item Group Description';
                 }
-                field("Ticket Type";"Ticket Type")
+                field("Ticket Type"; "Ticket Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Magento Item";"Magento Item")
+                field("Magento Item"; "Magento Item")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Status";"Item Status")
+                field("Item Status"; "Item Status")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit List Price";"Unit List Price")
+                field("Unit List Price"; "Unit List Price")
                 {
+                    ApplicationArea = All;
                 }
-                field("Inventory Posting Group";"Inventory Posting Group")
+                field("Inventory Posting Group"; "Inventory Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                 }
-                field(ItemAvlByLocation;ItemAvlByLocation)
+                field(ItemAvlByLocation; ItemAvlByLocation)
                 {
+                    ApplicationArea = All;
                     Caption = 'Inv availability by location';
-                    DecimalPlaces = 2:2;
+                    DecimalPlaces = 2 : 2;
 
                     trigger OnDrillDown()
                     begin
                         //-NPR5.55 [393483]
                         ItemFilter.Reset;
-                        ItemFilter.SetRange("No.","No.");
+                        ItemFilter.SetRange("No.", "No.");
                         //-NPR5.55 [418943]
                         if "Global Dimension 1 Filter" <> '' then
-                          ItemFilter.SetRange("Global Dimension 1 Filter","Global Dimension 1 Filter");
+                            ItemFilter.SetRange("Global Dimension 1 Filter", "Global Dimension 1 Filter");
                         if "Global Dimension 2 Filter" <> '' then
-                          ItemFilter.SetRange("Global Dimension 2 Filter","Global Dimension 2 Filter");
-                        if "Location Filter" <>  '' then
-                          ItemFilter.SetRange("Location Filter","Location Filter");
-                        if "Drop Shipment Filter"  then
-                          ItemFilter.SetRange("Drop Shipment Filter","Drop Shipment Filter");
-                        if "Variant Filter" <>  '' then
-                          ItemFilter.SetRange("Variant Filter","Variant Filter");
+                            ItemFilter.SetRange("Global Dimension 2 Filter", "Global Dimension 2 Filter");
+                        if "Location Filter" <> '' then
+                            ItemFilter.SetRange("Location Filter", "Location Filter");
+                        if "Drop Shipment Filter" then
+                            ItemFilter.SetRange("Drop Shipment Filter", "Drop Shipment Filter");
+                        if "Variant Filter" <> '' then
+                            ItemFilter.SetRange("Variant Filter", "Variant Filter");
                         //+NPR5.55 [418943]
-                        PAGE.Run(PAGE::"Item Availability by Location",ItemFilter);
+                        PAGE.Run(PAGE::"Item Availability by Location", ItemFilter);
                         //+NPR5.55 [393483]
                     end;
                 }
-                field("Gen. Prod. Posting Group";"Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("VAT Prod. Posting Group";"VAT Prod. Posting Group")
+                field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Disc. Group";"Item Disc. Group")
+                field("Item Disc. Group"; "Item Disc. Group")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Vendor No.";"Vendor No.")
+                field("Vendor No."; "Vendor No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Vendor Item No.";"Vendor Item No.")
+                field("Vendor Item No."; "Vendor Item No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Label Barcode";"Label Barcode")
+                field("Label Barcode"; "Label Barcode")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Season;Season)
+                field(Season; Season)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Brand";"Item Brand")
+                field("Item Brand"; "Item Brand")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Tariff No.";"Tariff No.")
+                field("Tariff No."; "Tariff No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Search Description";"Search Description")
+                field("Search Description"; "Search Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Overhead Rate";"Overhead Rate")
+                field("Overhead Rate"; "Overhead Rate")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Indirect Cost %";"Indirect Cost %")
+                field("Indirect Cost %"; "Indirect Cost %")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Category Code";"Item Category Code")
+                field("Item Category Code"; "Item Category Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Sales Unit of Measure";"Sales Unit of Measure")
+                field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Replenishment System";"Replenishment System")
+                field("Replenishment System"; "Replenishment System")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Purch. Unit of Measure";"Purch. Unit of Measure")
+                field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Lead Time Calculation";"Lead Time Calculation")
+                field("Lead Time Calculation"; "Lead Time Calculation")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Manufacturing Policy";"Manufacturing Policy")
+                field("Manufacturing Policy"; "Manufacturing Policy")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Flushing Method";"Flushing Method")
+                field("Flushing Method"; "Flushing Method")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Assembly Policy";"Assembly Policy")
+                field("Assembly Policy"; "Assembly Policy")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Tracking Code";"Item Tracking Code")
+                field("Item Tracking Code"; "Item Tracking Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Units per Parcel";"Units per Parcel")
+                field("Units per Parcel"; "Units per Parcel")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
+                    ApplicationArea = All;
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
         }
         area(factboxes)
         {
-            part(Control6150628;"NP Attributes FactBox")
+            part(Control6150628; "NP Attributes FactBox")
             {
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
             }
-            part("Item Availability FactBox";"NPR Item Availability FactBox")
+            part("Item Availability FactBox"; "NPR Item Availability FactBox")
             {
                 Caption = 'Item Availability FactBox';
-                SubPageLink = "No."=FIELD("No."),
-                              "Date Filter"=FIELD("Date Filter"),
-                              "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Location Filter"=FIELD("Location Filter"),
-                              "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                              "Bin Filter"=FIELD("Bin Filter"),
-                              "Variant Filter"=FIELD("Variant Filter"),
-                              "Lot No. Filter"=FIELD("Lot No. Filter"),
-                              "Serial No. Filter"=FIELD("Serial No. Filter");
+                SubPageLink = "No." = FIELD("No."),
+                              "Date Filter" = FIELD("Date Filter"),
+                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Location Filter" = FIELD("Location Filter"),
+                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                              "Bin Filter" = FIELD("Bin Filter"),
+                              "Variant Filter" = FIELD("Variant Filter"),
+                              "Lot No. Filter" = FIELD("Lot No. Filter"),
+                              "Serial No. Filter" = FIELD("Serial No. Filter");
             }
-            part(Control1901314507;"Item Invoicing FactBox")
+            part(Control1901314507; "Item Invoicing FactBox")
             {
-                SubPageLink = "No."=FIELD("No."),
-                              "Date Filter"=FIELD("Date Filter"),
-                              "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Location Filter"=FIELD("Location Filter"),
-                              "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                              "Bin Filter"=FIELD("Bin Filter"),
-                              "Variant Filter"=FIELD("Variant Filter"),
-                              "Lot No. Filter"=FIELD("Lot No. Filter"),
-                              "Serial No. Filter"=FIELD("Serial No. Filter");
+                SubPageLink = "No." = FIELD("No."),
+                              "Date Filter" = FIELD("Date Filter"),
+                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Location Filter" = FIELD("Location Filter"),
+                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                              "Bin Filter" = FIELD("Bin Filter"),
+                              "Variant Filter" = FIELD("Variant Filter"),
+                              "Lot No. Filter" = FIELD("Lot No. Filter"),
+                              "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = true;
             }
-            part(Control1903326807;"Item Replenishment FactBox")
+            part(Control1903326807; "Item Replenishment FactBox")
             {
-                SubPageLink = "No."=FIELD("No."),
-                              "Date Filter"=FIELD("Date Filter"),
-                              "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Location Filter"=FIELD("Location Filter"),
-                              "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                              "Bin Filter"=FIELD("Bin Filter"),
-                              "Variant Filter"=FIELD("Variant Filter"),
-                              "Lot No. Filter"=FIELD("Lot No. Filter"),
-                              "Serial No. Filter"=FIELD("Serial No. Filter");
+                SubPageLink = "No." = FIELD("No."),
+                              "Date Filter" = FIELD("Date Filter"),
+                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Location Filter" = FIELD("Location Filter"),
+                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                              "Bin Filter" = FIELD("Bin Filter"),
+                              "Variant Filter" = FIELD("Variant Filter"),
+                              "Lot No. Filter" = FIELD("Lot No. Filter"),
+                              "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = false;
             }
-            part(Control1906840407;"Item Planning FactBox")
+            part(Control1906840407; "Item Planning FactBox")
             {
-                SubPageLink = "No."=FIELD("No."),
-                              "Date Filter"=FIELD("Date Filter"),
-                              "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Location Filter"=FIELD("Location Filter"),
-                              "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                              "Bin Filter"=FIELD("Bin Filter"),
-                              "Variant Filter"=FIELD("Variant Filter"),
-                              "Lot No. Filter"=FIELD("Lot No. Filter"),
-                              "Serial No. Filter"=FIELD("Serial No. Filter");
+                SubPageLink = "No." = FIELD("No."),
+                              "Date Filter" = FIELD("Date Filter"),
+                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Location Filter" = FIELD("Location Filter"),
+                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                              "Bin Filter" = FIELD("Bin Filter"),
+                              "Variant Filter" = FIELD("Variant Filter"),
+                              "Lot No. Filter" = FIELD("Lot No. Filter"),
+                              "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = true;
             }
-            part(Control1901796907;"Item Warehouse FactBox")
+            part(Control1901796907; "Item Warehouse FactBox")
             {
-                SubPageLink = "No."=FIELD("No."),
-                              "Date Filter"=FIELD("Date Filter"),
-                              "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter"=FIELD("Global Dimension 1 Filter"),
-                              "Location Filter"=FIELD("Location Filter"),
-                              "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                              "Bin Filter"=FIELD("Bin Filter"),
-                              "Variant Filter"=FIELD("Variant Filter"),
-                              "Lot No. Filter"=FIELD("Lot No. Filter"),
-                              "Serial No. Filter"=FIELD("Serial No. Filter");
+                SubPageLink = "No." = FIELD("No."),
+                              "Date Filter" = FIELD("Date Filter"),
+                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = FIELD("Global Dimension 1 Filter"),
+                              "Location Filter" = FIELD("Location Filter"),
+                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                              "Bin Filter" = FIELD("Bin Filter"),
+                              "Variant Filter" = FIELD("Variant Filter"),
+                              "Lot No. Filter" = FIELD("Lot No. Filter"),
+                              "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = false;
             }
-            part("Discount FactBox";"Discount FactBox")
+            part("Discount FactBox"; "Discount FactBox")
             {
                 Caption = 'Discounts';
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
             }
-            part(ItemAttributesFactBox;"Item Attributes Factbox")
+            part(ItemAttributesFactBox; "Item Attributes Factbox")
             {
-                ApplicationArea = Basic,Suite;
+                ApplicationArea = Basic, Suite;
             }
-            systempart(Control1900383207;Links)
-            {
-                Visible = true;
-            }
-            systempart(Control1905767507;Notes)
+            systempart(Control1900383207; Links)
             {
                 Visible = true;
             }
-            part(Picture;"Magento Item Picture Factbox")
+            systempart(Control1905767507; Notes)
+            {
+                Visible = true;
+            }
+            part(Picture; "Magento Item Picture Factbox")
             {
                 Caption = 'Picture';
                 ShowFilter = false;
-                SubPageLink = "No."=FIELD("No.");
+                SubPageLink = "No." = FIELD("No.");
                 Visible = MagentoEnabled;
             }
         }
@@ -517,7 +575,7 @@ page 6014511 "Retail Item List"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByEvent);
+                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent);
                         end;
                     }
                     action(Period)
@@ -525,24 +583,24 @@ page 6014511 "Retail Item List"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action(Variant)
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
                         RunObject = Page "Item Availability by Variant";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action(Location)
                     {
@@ -552,12 +610,12 @@ page 6014511 "Retail Item List"
                         PromotedCategory = Process;
                         PromotedIsBig = true;
                         RunObject = Page "Item Availability by Location";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action("BOM Level")
                     {
@@ -566,7 +624,7 @@ page 6014511 "Retail Item List"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByBOM);
+                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM);
                         end;
                     }
                     action(Timeline)
@@ -605,11 +663,11 @@ page 6014511 "Retail Item List"
                     Caption = '&Units of Measure';
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action(Attributes)
                 {
-                    AccessByPermission = TableData "Item Attribute"=R;
+                    AccessByPermission = TableData "Item Attribute" = R;
                     ApplicationArea = Advanced;
                     Caption = 'Attributes';
                     Image = Category;
@@ -621,7 +679,7 @@ page 6014511 "Retail Item List"
                     trigger OnAction()
                     begin
                         //-#361229 [361229]
-                        PAGE.RunModal(PAGE::"Item Attribute Value Editor",Rec);
+                        PAGE.RunModal(PAGE::"Item Attribute Value Editor", Rec);
                         CurrPage.SaveRecord;
                         CurrPage.ItemAttributesFactBox.PAGE.LoadItemAttributesData("No.");
                         //+#361229 [361229]
@@ -632,7 +690,7 @@ page 6014511 "Retail Item List"
                     Caption = 'Va&riants';
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 group(Dimensions)
                 {
@@ -643,8 +701,8 @@ page 6014511 "Retail Item List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID"=CONST(27),
-                                      "No."=FIELD("No.");
+                        RunPageLink = "Table ID" = CONST(27),
+                                      "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
                     }
                     action("Dimensions-&Multiple")
@@ -660,7 +718,7 @@ page 6014511 "Retail Item List"
                             CurrPage.SetSelectionFilter(Item);
                             //-NPR5.50 [353381]
                             //DefaultDimMultiple.SetMultiItem(Item);
-                            DefaultDimMultiple.SetMultiRecord(Item,Item.FieldNo("No. 2"));
+                            DefaultDimMultiple.SetMultiRecord(Item, Item.FieldNo("No. 2"));
                             //+NPR5.50 [353381]
                             DefaultDimMultiple.RunModal;
                         end;
@@ -671,53 +729,53 @@ page 6014511 "Retail Item List"
                     Caption = 'Substituti&ons';
                     Image = ItemSubstitution;
                     RunObject = Page "Item Substitution Entry";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
                 }
                 action("Cross Re&ferences")
                 {
                     Caption = 'Cross Re&ferences';
                     Image = Change;
                     RunObject = Page "Item Cross Reference Entries";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action("E&xtended Texts")
                 {
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name"=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Table Name","No.","Language Code","All Language Codes","Starting Date","Ending Date");
+                    RunPageLink = "Table Name" = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                 }
                 action(Translations)
                 {
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Translations";
-                    RunPageLink = "Item No."=FIELD("No."),
-                                  "Variant Code"=CONST('');
+                    RunPageLink = "Item No." = FIELD("No."),
+                                  "Variant Code" = CONST('');
                 }
                 action("&Picture")
                 {
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Item Picture";
-                    RunPageLink = "No."=FIELD("No."),
-                                  "Date Filter"=FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                  "Location Filter"=FIELD("Location Filter"),
-                                  "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                  "Variant Filter"=FIELD("Variant Filter");
+                    RunPageLink = "No." = FIELD("No."),
+                                  "Date Filter" = FIELD("Date Filter"),
+                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                  "Location Filter" = FIELD("Location Filter"),
+                                  "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                  "Variant Filter" = FIELD("Variant Filter");
                 }
                 action(Identifiers)
                 {
                     Caption = 'Identifiers';
                     Image = BarCode;
                     RunObject = Page "Item Identifiers";
-                    RunPageLink = "Item No."=FIELD("No.");
-                    RunPageView = SORTING("Item No.","Variant Code","Unit of Measure Code");
+                    RunPageLink = "Item No." = FIELD("No.");
+                    RunPageView = SORTING("Item No.", "Variant Code", "Unit of Measure Code");
                 }
             }
             group("Assembly/Production")
@@ -759,16 +817,16 @@ page 6014511 "Retail Item List"
                         Caption = 'Assembly BOM';
                         Image = BOM;
                         RunObject = Page "Assembly BOM";
-                        RunPageLink = "Parent Item No."=FIELD("No.");
+                        RunPageLink = "Parent Item No." = FIELD("No.");
                     }
                     action("Where-Used")
                     {
                         Caption = 'Where-Used';
                         Image = Track;
                         RunObject = Page "Where-Used List";
-                        RunPageLink = Type=CONST(Item),
-                                      "No."=FIELD("No.");
-                        RunPageView = SORTING(Type,"No.");
+                        RunPageLink = Type = CONST(Item),
+                                      "No." = FIELD("No.");
+                        RunPageView = SORTING(Type, "No.");
                     }
                     action("Calc. Stan&dard Cost")
                     {
@@ -777,7 +835,7 @@ page 6014511 "Retail Item List"
 
                         trigger OnAction()
                         begin
-                            CalculateStdCost.CalcItem("No.",true);
+                            CalculateStdCost.CalcItem("No.", true);
                         end;
                     }
                     action("Calc. Unit Price")
@@ -800,7 +858,7 @@ page 6014511 "Retail Item List"
                         Caption = 'Production BOM';
                         Image = BOM;
                         RunObject = Page "Production BOM";
-                        RunPageLink = "No."=FIELD("No.");
+                        RunPageLink = "No." = FIELD("No.");
                     }
                     action(Action29)
                     {
@@ -811,7 +869,7 @@ page 6014511 "Retail Item List"
                         var
                             ProdBOMWhereUsed: Page "Prod. BOM Where-Used";
                         begin
-                            ProdBOMWhereUsed.SetItem(Rec,WorkDate);
+                            ProdBOMWhereUsed.SetItem(Rec, WorkDate);
                             ProdBOMWhereUsed.RunModal;
                         end;
                     }
@@ -822,7 +880,7 @@ page 6014511 "Retail Item List"
 
                         trigger OnAction()
                         begin
-                            CalculateStdCost.CalcItem("No.",false);
+                            CalculateStdCost.CalcItem("No.", false);
                         end;
                     }
                 }
@@ -843,7 +901,7 @@ page 6014511 "Retail Item List"
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                         ShortCutKey = 'Ctrl+F7';
                     }
@@ -852,16 +910,16 @@ page 6014511 "Retail Item List"
                         Caption = '&Reservation Entries';
                         Image = ReservationLedger;
                         RunObject = Page "Reservation Entries";
-                        RunPageLink = "Reservation Status"=CONST(Reservation),
-                                      "Item No."=FIELD("No.");
-                        RunPageView = SORTING("Item No.","Variant Code","Location Code","Reservation Status");
+                        RunPageLink = "Reservation Status" = CONST(Reservation),
+                                      "Item No." = FIELD("No.");
+                        RunPageView = SORTING("Item No.", "Variant Code", "Location Code", "Reservation Status");
                     }
                     action("&Phys. Inventory Ledger Entries")
                     {
                         Caption = '&Phys. Inventory Ledger Entries';
                         Image = PhysicalInventoryLedger;
                         RunObject = Page "Phys. Inventory Ledger Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                     }
                     action("&Value Entries")
@@ -869,7 +927,7 @@ page 6014511 "Retail Item List"
                         Caption = '&Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                     }
                     action("Item &Tracking Entries")
@@ -891,8 +949,8 @@ page 6014511 "Retail Item List"
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
-                        RunPageView = SORTING("Item No.","Bin Code","Location Code","Variant Code","Unit of Measure Code","Lot No.","Serial No.","Entry Type",Dedicated);
+                        RunPageLink = "Item No." = FIELD("No.");
+                        RunPageView = SORTING("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated);
                     }
                     action(POSSalesEntries)
                     {
@@ -904,7 +962,7 @@ page 6014511 "Retail Item List"
                         Caption = 'Retail Price Log Entries';
                         Image = Log;
                         RunObject = Page "Retail Price Log Entries";
-                        RunPageLink = "Item No."=FIELD("No.");
+                        RunPageLink = "Item No." = FIELD("No.");
                     }
                 }
                 group(Statistics)
@@ -932,25 +990,25 @@ page 6014511 "Retail Item List"
                         Caption = 'Entry Statistics';
                         Image = EntryStatistics;
                         RunObject = Page "Item Entry Statistics";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Date Filter"=FIELD("Date Filter"),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Date Filter" = FIELD("Date Filter"),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                     action("T&urnover")
                     {
                         Caption = 'T&urnover';
                         Image = Turnover;
                         RunObject = Page "Item Turnover";
-                        RunPageLink = "No."=FIELD("No."),
-                                      "Global Dimension 1 Filter"=FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter"=FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter"=FIELD("Location Filter"),
-                                      "Drop Shipment Filter"=FIELD("Drop Shipment Filter"),
-                                      "Variant Filter"=FIELD("Variant Filter");
+                        RunPageLink = "No." = FIELD("No."),
+                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
+                                      "Location Filter" = FIELD("Location Filter"),
+                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
+                                      "Variant Filter" = FIELD("Variant Filter");
                     }
                 }
                 action("Co&mments")
@@ -958,8 +1016,8 @@ page 6014511 "Retail Item List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name"=CONST(Item),
-                                  "No."=FIELD("No.");
+                    RunPageLink = "Table Name" = CONST(Item),
+                                  "No." = FIELD("No.");
                 }
             }
             group("S&ales")
@@ -971,7 +1029,7 @@ page 6014511 "Retail Item List"
                     Caption = 'Prices';
                     Image = Price;
                     RunObject = Page "Sales Prices";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action("Line Discounts")
@@ -979,42 +1037,42 @@ page 6014511 "Retail Item List"
                     Caption = 'Line Discounts';
                     Image = LineDiscount;
                     RunObject = Page "Sales Line Discounts";
-                    RunPageLink = Type=CONST(Item),
-                                  Code=FIELD("No.");
-                    RunPageView = SORTING(Type,Code);
+                    RunPageLink = Type = CONST(Item),
+                                  Code = FIELD("No.");
+                    RunPageView = SORTING(Type, Code);
                 }
                 action("Prepa&yment Percentages")
                 {
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action(Orders)
                 {
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Sales Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action("Returns Orders")
                 {
                     Caption = 'Returns Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Sales Return Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action("Recommended Items")
                 {
                     Caption = 'Recommended Items';
                     Image = SuggestLines;
                     RunObject = Page "MCS Recommendations Lines";
-                    RunPageLink = "Seed Item No."=FIELD("No."),
-                                  "Table No."=CONST(27);
+                    RunPageLink = "Seed Item No." = FIELD("No."),
+                                  "Table No." = CONST(27);
                 }
             }
             group("&Purchases")
@@ -1026,7 +1084,7 @@ page 6014511 "Retail Item List"
                     Caption = 'Ven&dors';
                     Image = Vendor;
                     RunObject = Page "Item Vendor Catalog";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action(Action39)
@@ -1034,7 +1092,7 @@ page 6014511 "Retail Item List"
                     Caption = 'Prices';
                     Image = Price;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action(Action42)
@@ -1042,7 +1100,7 @@ page 6014511 "Retail Item List"
                     Caption = 'Line Discounts';
                     Image = LineDiscount;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action(Action125)
@@ -1050,25 +1108,25 @@ page 6014511 "Retail Item List"
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                 }
                 action(Action40)
                 {
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Purchase Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action("Return Orders")
                 {
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Purchase Return Orders";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
-                    RunPageView = SORTING("Document Type",Type,"No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
+                    RunPageView = SORTING("Document Type", Type, "No.");
                 }
                 action("Nonstoc&k Items")
                 {
@@ -1086,7 +1144,7 @@ page 6014511 "Retail Item List"
                     Caption = '&Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Item Bin Contents";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action("Stockkeepin&g Units")
@@ -1094,7 +1152,7 @@ page 6014511 "Retail Item List"
                     Caption = 'Stockkeepin&g Units';
                     Image = SKU;
                     RunObject = Page "Stockkeeping Unit List";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
             }
@@ -1107,7 +1165,7 @@ page 6014511 "Retail Item List"
                     Caption = 'Ser&vice Items';
                     Image = ServiceItem;
                     RunObject = Page "Service Items";
-                    RunPageLink = "Item No."=FIELD("No.");
+                    RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
                 }
                 action(Troubleshooting)
@@ -1127,8 +1185,8 @@ page 6014511 "Retail Item List"
                     Caption = 'Troubleshooting Setup';
                     Image = Troubleshoot;
                     RunObject = Page "Troubleshooting Setup";
-                    RunPageLink = Type=CONST(Item),
-                                  "No."=FIELD("No.");
+                    RunPageLink = Type = CONST(Item),
+                                  "No." = FIELD("No.");
                 }
             }
             group(Resources)
@@ -1144,8 +1202,8 @@ page 6014511 "Retail Item List"
                         Caption = 'Resource &Skills';
                         Image = ResourceSkills;
                         RunObject = Page "Resource Skills";
-                        RunPageLink = Type=CONST(Item),
-                                      "No."=FIELD("No.");
+                        RunPageLink = Type = CONST(Item),
+                                      "No." = FIELD("No.");
                     }
                     action("Skilled R&esources")
                     {
@@ -1157,7 +1215,7 @@ page 6014511 "Retail Item List"
                             ResourceSkill: Record "Resource Skill";
                         begin
                             Clear(SkilledResourceList);
-                            SkilledResourceList.Initialize(ResourceSkill.Type::Item,"No.",Description);
+                            SkilledResourceList.Initialize(ResourceSkill.Type::Item, "No.", Description);
                             SkilledResourceList.RunModal;
                         end;
                     }
@@ -1205,9 +1263,9 @@ page 6014511 "Retail Item List"
                         //-MAG1.21
                         MagentoItemMgt.SetupMultiStoreData(Rec);
                         MagentoStoreItem.FilterGroup(0);
-                        MagentoStoreItem.SetRange("Item No.","No.");
+                        MagentoStoreItem.SetRange("Item No.", "No.");
                         MagentoStoreItem.FilterGroup(2);
-                        PAGE.Run(PAGE::"Magento Store Items",MagentoStoreItem);
+                        PAGE.Run(PAGE::"Magento Store Items", MagentoStoreItem);
                         //+MAG1.21
                     end;
                 }
@@ -1225,8 +1283,8 @@ page 6014511 "Retail Item List"
                         MagentoDisplayConfig: Record "Magento Display Config";
                     begin
                         //-MAG1.21
-                        MagentoDisplayConfig.SetRange(MagentoDisplayConfig."No.","No.");
-                        MagentoDisplayConfig.SetRange(Type,MagentoDisplayConfig.Type::Item);
+                        MagentoDisplayConfig.SetRange(MagentoDisplayConfig."No.", "No.");
+                        MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Item);
                         MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                         MagentoDisplayConfigPage.Run;
                         //+MAG1.21
@@ -1249,8 +1307,8 @@ page 6014511 "Retail Item List"
                     var
                         Item: Record Item;
                     begin
-                        Item.SetRange("No.","No.");
-                        REPORT.RunModal(REPORT::"Create Stockkeeping Unit",true,false,Item);
+                        Item.SetRange("No.", "No.");
+                        REPORT.RunModal(REPORT::"Create Stockkeeping Unit", true, false, Item);
                     end;
                 }
                 action("C&alculate Counting Period")
@@ -1317,7 +1375,7 @@ page 6014511 "Retail Item List"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Prices";
-                RunPageLink = "Item No."=FIELD("No.");
+                RunPageLink = "Item No." = FIELD("No.");
                 RunPageView = SORTING("Item No.");
             }
             action(PageSalesLineDiscounts2)
@@ -1328,9 +1386,9 @@ page 6014511 "Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "Sales Line Discounts";
-                RunPageLink = Type=CONST(Item),
-                              Code=FIELD("No.");
-                RunPageView = SORTING(Type,Code);
+                RunPageLink = Type = CONST(Item),
+                              Code = FIELD("No.");
+                RunPageView = SORTING(Type, Code);
             }
             action("Requisition Worksheet")
             {
@@ -1400,16 +1458,16 @@ page 6014511 "Retail Item List"
                 begin
                     //-NPR4.15
                     Clear(InputDialog);
-                    InputDialog.SetInput(1,Validering,Text001);
+                    InputDialog.SetInput(1, Validering, Text001);
                     InputDialog.LookupMode(true);
                     if InputDialog.RunModal <> ACTION::LookupOK then
-                      exit;
-                    InputDialog.InputText(1,Validering);
+                        exit;
+                    InputDialog.InputText(1, Validering);
 
                     //-NPR5.29 [259398]
                     if BarcodeLibrary.TranslateBarcodeToItemVariant(Validering, ItemNo, VariantCode, ResolvingTable, true) then begin
-                      Get(ItemNo);
-                      exit;
+                        Get(ItemNo);
+                        exit;
                     end;
 
                     Error(Error_NoBarcodeMatch, Validering);
@@ -1447,17 +1505,17 @@ page 6014511 "Retail Item List"
                 begin
                     //-NPR5.34
                     Clear(InputDialog);
-                    InputDialog.SetInput(1,Validering,Text001);
+                    InputDialog.SetInput(1, Validering, Text001);
                     InputDialog.LookupMode(true);
                     if InputDialog.RunModal <> ACTION::LookupOK then
-                      exit;
-                    InputDialog.InputText(1,Validering);
+                        exit;
+                    InputDialog.InputText(1, Validering);
 
                     if not NPRAttItemSearch.SearchTextAttribute(Validering, '', Rec) then begin
-                      Rec.MarkedOnly(false);
-                      Error(Error_NoBarcodeMatch, Validering);
+                        Rec.MarkedOnly(false);
+                        Error(Error_NoBarcodeMatch, Validering);
                     end else begin
-                      Rec.MarkedOnly(true);
+                        Rec.MarkedOnly(true);
                     end;
 
 
@@ -1480,9 +1538,9 @@ page 6014511 "Retail Item List"
                 begin
                     //-NPR5.37 [293180]
                     if not NPRAttributeMgt.SetAttributeFilter(NPRAttributeValueSet) then
-                      exit;
+                        exit;
 
-                    SetView(NPRAttributeMgt.GetAttributeFilterView(NPRAttributeValueSet,Rec));
+                    SetView(NPRAttributeMgt.GetAttributeFilterView(NPRAttributeValueSet, Rec));
                     //+NPR5.37 [293180]
                 end;
             }
@@ -1821,22 +1879,22 @@ page 6014511 "Retail Item List"
     begin
 
         //-NPR4.11
-        NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Item, "No.");
-        NPRAttrEditable := CurrPage.Editable ();
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, "No.");
+        NPRAttrEditable := CurrPage.Editable();
         //+NPR4.11
         //-NPR5.38
         ItemGroupDesc := '';
         if ItemGroup.Get("Item Group") then
-          ItemGroupDesc  := ItemGroup.Description;
+            ItemGroupDesc := ItemGroup.Description;
         //+NPR5.38
 
 
         //-NPR5.55 [393483]
         ItemFilter.Reset;
-        ItemFilter.SetRange("No.",Rec."No.");
+        ItemFilter.SetRange("No.", Rec."No.");
         if ItemFilter.FindFirst then begin
-          ItemFilter.CalcFields(Inventory);
-          ItemAvlByLocation := ItemFilter.Inventory;
+            ItemFilter.CalcFields(Inventory);
+            ItemAvlByLocation := ItemFilter.Inventory;
         end;
         //+NPR5.55 [393483]
     end;
@@ -1847,7 +1905,7 @@ page 6014511 "Retail Item List"
     begin
 
         //-NPR4.11
-        NPRAttrManagement.GetAttributeVisibility (DATABASE::Item, NPRAttrVisibleArray);
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::Item, NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
         NPRAttrVisible03 := NPRAttrVisibleArray[3];
@@ -1874,10 +1932,10 @@ page 6014511 "Retail Item List"
         CalculateStdCost: Codeunit "Calculate Standard Cost";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         SearchItem: Text;
-        NPRAttrTextArray: array [40] of Text[250];
+        NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -1930,7 +1988,7 @@ page 6014511 "Retail Item List"
     begin
         //-MAG1.21
         if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
-          exit;
+            exit;
         MagentoEnabled := true;
         MagentoEnabledMultistore := MagentoSetup."Multistore Enabled";
         MagentoEnabledDisplayConfig := MagentoSetup."Customers Enabled";
@@ -1940,21 +1998,21 @@ page 6014511 "Retail Item List"
     procedure SetVendorNo(VendorNo: Code[20])
     begin
         //-NPR5.31 [272843]
-        SetFilter("Vendor No.",VendorNo);
+        SetFilter("Vendor No.", VendorNo);
         //+NPR5.31 [272843]
     end;
 
     procedure SetVariantCode(VariantCode: Code[20])
     begin
         //-NPR5.31 [272843]
-        SetFilter("Variant Filter","Variant Filter");
+        SetFilter("Variant Filter", "Variant Filter");
         //+NPR5.31 [272843]
     end;
 
     procedure SetLocationCode(LocationCode: Code[20])
     begin
         //-NPR5.31 [272843]
-        SetFilter("Location Filter",LocationCode);
+        SetFilter("Location Filter", LocationCode);
         //+NPR5.31 [272843]
     end;
 
@@ -1962,12 +2020,12 @@ page 6014511 "Retail Item List"
     begin
         //-NPR5.38 [298368]
         case OptBlocked of
-          OptBlocked::All:
-            SetRange(Blocked);
-          OptBlocked::OnlyBlocked:
-            SetRange(Blocked,true);
-          OptBlocked::OnlyUnblocked:
-            SetRange(Blocked,false);
+            OptBlocked::All:
+                SetRange(Blocked);
+            OptBlocked::OnlyBlocked:
+                SetRange(Blocked, true);
+            OptBlocked::OnlyUnblocked:
+                SetRange(Blocked, false);
         end;
         //+NPR5.38 [298368]
     end;

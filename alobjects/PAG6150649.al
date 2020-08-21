@@ -13,14 +13,17 @@ page 6150649 "POS Entity Groups"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Sorting;Sorting)
+                field(Sorting; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -34,8 +37,8 @@ page 6150649 "POS Entity Groups"
     var
         "Field": Record "Field";
     begin
-        if Field.Get("Table ID","Field No.") then
-          exit(Field."Field Caption");
+        if Field.Get("Table ID", "Field No.") then
+            exit(Field."Field Caption");
     end;
 }
 

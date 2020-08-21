@@ -20,15 +20,19 @@ page 6014659 "Web Client Dependencies"
             {
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("BLOB.HASVALUE"; BLOB.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'BLOB Imported';
                 }
             }

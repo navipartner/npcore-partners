@@ -13,11 +13,13 @@ page 6151521 "Nc Trigger Setup"
         {
             group(General)
             {
-                field("Task Template Name";"Task Template Name")
+                field("Task Template Name"; "Task Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Batch Name";"Task Batch Name")
+                field("Task Batch Name"; "Task Batch Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

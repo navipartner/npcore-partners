@@ -17,27 +17,34 @@ page 6059796 "E-mail Log"
         {
             repeater(Group)
             {
-                field("Recipient E-mail";"Recipient E-mail")
+                field("Recipient E-mail"; "Recipient E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("From E-mail";"From E-mail")
+                field("From E-mail"; "From E-mail")
                 {
+                    ApplicationArea = All;
                 }
-                field("E-mail subject";"E-mail subject")
+                field("E-mail subject"; "E-mail subject")
                 {
+                    ApplicationArea = All;
                 }
-                field(Filename;Filename)
+                field(Filename; Filename)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Sent Date";"Sent Date")
+                field("Sent Date"; "Sent Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sent Time";"Sent Time")
+                field("Sent Time"; "Sent Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sent Username";"Sent Username")
+                field("Sent Username"; "Sent Username")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

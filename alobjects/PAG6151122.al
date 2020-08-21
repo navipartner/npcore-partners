@@ -13,23 +13,29 @@ page 6151122 "GDPR Agreement Versions"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(URL;URL)
+                field(URL; URL)
                 {
+                    ApplicationArea = All;
                 }
-                field("Activation Date";"Activation Date")
+                field("Activation Date"; "Activation Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Anonymize After";"Anonymize After")
+                field("Anonymize After"; "Anonymize After")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

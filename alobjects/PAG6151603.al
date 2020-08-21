@@ -21,17 +21,21 @@ page 6151603 "NpDc Valid Time Intervals"
                     ShowCaption = false;
                     repeater(Group)
                     {
-                        field("Start Time";"Start Time")
+                        field("Start Time"; "Start Time")
                         {
+                            ApplicationArea = All;
                         }
-                        field("End Time";"End Time")
+                        field("End Time"; "End Time")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Period Type";"Period Type")
+                        field("Period Type"; "Period Type")
                         {
+                            ApplicationArea = All;
                         }
-                        field("Period Description";"Period Description")
+                        field("Period Description"; "Period Description")
                         {
+                            ApplicationArea = All;
                             Editable = false;
                         }
                     }
@@ -43,26 +47,33 @@ page 6151603 "NpDc Valid Time Intervals"
                     {
                         ShowCaption = false;
                         Visible = ("Period Type" = 1);
-                        field(Monday;Monday)
+                        field(Monday; Monday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Tuesday;Tuesday)
+                        field(Tuesday; Tuesday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Wednesday;Wednesday)
+                        field(Wednesday; Wednesday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Thursday;Thursday)
+                        field(Thursday; Thursday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Friday;Friday)
+                        field(Friday; Friday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Saturday;Saturday)
+                        field(Saturday; Saturday)
                         {
+                            ApplicationArea = All;
                         }
-                        field(Sunday;Sunday)
+                        field(Sunday; Sunday)
                         {
+                            ApplicationArea = All;
                         }
                     }
                 }

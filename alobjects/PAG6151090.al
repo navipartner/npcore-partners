@@ -15,12 +15,15 @@ page 6151090 "Nc RapidConnect Setup Card"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("Package Code"; "Package Code")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                     ShowMandatory = true;
                 }
@@ -33,14 +36,17 @@ page 6151090 "Nc RapidConnect Setup Card"
                     ShowCaption = false;
                     field("Export Enabled"; "Export Enabled")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Task Processor Code"; "Task Processor Code")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Export File Type"; "Export File Type")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6151414)
@@ -61,47 +67,60 @@ page 6151090 "Nc RapidConnect Setup Card"
                 Caption = 'Import';
                 field("Import Enabled"; "Import Enabled")
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
                 field("Import Type"; "Import Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Validate Package"; "Validate Package")
                 {
+                    ApplicationArea = All;
                 }
                 field("Apply Package"; "Apply Package")
                 {
+                    ApplicationArea = All;
                 }
                 field("Disable Data Log on Import"; "Disable Data Log on Import")
                 {
+                    ApplicationArea = All;
                 }
                 group("Download from")
                 {
                     Caption = 'Download from';
                     field("Ftp Host"; "Ftp Host")
                     {
+                        ApplicationArea = All;
                         Importance = Promoted;
                     }
                     field("Ftp Port"; "Ftp Port")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ftp User"; "Ftp User")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ftp Password"; "Ftp Password")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ftp Passive"; "Ftp Passive")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ftp Binary"; "Ftp Binary")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ftp Path"; "Ftp Path")
                     {
+                        ApplicationArea = All;
                     }
                     field("Ftp Backup Path"; "Ftp Backup Path")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }

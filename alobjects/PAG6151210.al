@@ -14,31 +14,37 @@ page 6151210 "NpCs Store Inventory Buffer"
         {
             repeater(Group)
             {
-                field(Sku;Sku)
+                field(Sku; Sku)
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
+                    ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = "In Stock";
                 }
-                field("In Stock";"In Stock")
+                field("In Stock"; "In Stock")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -50,7 +56,7 @@ page 6151210 "NpCs Store Inventory Buffer"
 
     procedure SetSourceTable(var NpCsStoreInventoryBuffer: Record "NpCs Store Inventory Buffer" temporary)
     begin
-        Rec.Copy(NpCsStoreInventoryBuffer,true);
+        Rec.Copy(NpCsStoreInventoryBuffer, true);
     end;
 }
 

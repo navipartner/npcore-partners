@@ -18,144 +18,183 @@ page 6184490 "Pepper Configuration Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field("Recovery Retry Attempts";"Recovery Retry Attempts")
+                field("Recovery Retry Attempts"; "Recovery Retry Attempts")
                 {
+                    ApplicationArea = All;
                 }
-                field(Mode;Mode)
+                field(Mode; Mode)
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update;
                     end;
                 }
-                field("Header and Footer Handling";"Header and Footer Handling")
+                field("Header and Footer Handling"; "Header and Footer Handling")
                 {
+                    ApplicationArea = All;
                 }
-                field(License;HasLicense)
+                field(License; HasLicense)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Additional Parameters";HasAdditionalParameters)
+                field("Additional Parameters"; HasAdditionalParameters)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Default POS Timeout (Seconds)";"Default POS Timeout (Seconds)")
+                field("Default POS Timeout (Seconds)"; "Default POS Timeout (Seconds)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Show Detailed Error Messages";"Show Detailed Error Messages")
+                field("Show Detailed Error Messages"; "Show Detailed Error Messages")
                 {
+                    ApplicationArea = All;
                 }
-                field("Offline mode";"Offline mode")
+                field("Offline mode"; "Offline mode")
                 {
+                    ApplicationArea = All;
                 }
-                field("Min. Length Authorisation No.";"Min. Length Authorisation No.")
+                field("Min. Length Authorisation No."; "Min. Length Authorisation No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Max. Length Authorisation No.";"Max. Length Authorisation No.")
+                field("Max. Length Authorisation No."; "Max. Length Authorisation No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Customer ID";"Customer ID")
+                field("Customer ID"; "Customer ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("License ID";"License ID")
+                field("License ID"; "License ID")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Logging)
             {
-                field("Logging Target";"Logging Target")
+                field("Logging Target"; "Logging Target")
                 {
+                    ApplicationArea = All;
                 }
-                field("Logging Level";"Logging Level")
+                field("Logging Level"; "Logging Level")
                 {
+                    ApplicationArea = All;
                 }
-                field("Logging Max. File Size (MB)";"Logging Max. File Size (MB)")
+                field("Logging Max. File Size (MB)"; "Logging Max. File Size (MB)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Logging Directory";"Logging Directory")
+                field("Logging Directory"; "Logging Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Logging Archive Directory";"Logging Archive Directory")
+                field("Logging Archive Directory"; "Logging Archive Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Logging Archive Max. Age Days";"Logging Archive Max. Age Days")
+                field("Logging Archive Max. Age Days"; "Logging Archive Max. Age Days")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Files)
             {
-                field("Card Type File Full Path";"Card Type File Full Path")
+                field("Card Type File Full Path"; "Card Type File Full Path")
                 {
+                    ApplicationArea = All;
                 }
-                field("License File Full Path";"License File Full Path")
+                field("License File Full Path"; "License File Full Path")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Directories)
             {
-                field("Ticket Directory";"Ticket Directory")
+                field("Ticket Directory"; "Ticket Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Journal Directory";"Journal Directory")
+                field("Journal Directory"; "Journal Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Matchbox Directory";"Matchbox Directory")
+                field("Matchbox Directory"; "Matchbox Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Messages Directory";"Messages Directory")
+                field("Messages Directory"; "Messages Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Persistance Directory";"Persistance Directory")
+                field("Persistance Directory"; "Persistance Directory")
                 {
+                    ApplicationArea = All;
                 }
-                field("Working Directory";"Working Directory")
+                field("Working Directory"; "Working Directory")
                 {
+                    ApplicationArea = All;
                 }
             }
             group("Transaction Types")
             {
-                field(Open;"Transaction Type Open Code")
+                field(Open; "Transaction Type Open Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Payment;"Transaction Type Payment Code")
+                field(Payment; "Transaction Type Payment Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Close;"Transaction Type Close Code")
+                field(Close; "Transaction Type Close Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Refund;"Transaction Type Refund Code")
+                field(Refund; "Transaction Type Refund Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Recover;"Transaction Type Recover Code")
+                field(Recover; "Transaction Type Recover Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Type Auxilary Code";"Transaction Type Auxilary Code")
+                field("Transaction Type Auxilary Code"; "Transaction Type Auxilary Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Type Install Code";"Transaction Type Install Code")
+                field("Transaction Type Install Code"; "Transaction Type Install Code")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Closing)
             {
-                field("End of Day on Close";"End of Day on Close")
+                field("End of Day on Close"; "End of Day on Close")
                 {
+                    ApplicationArea = All;
                 }
-                field("Unload Library on Close";"Unload Library on Close")
+                field("Unload Library on Close"; "Unload Library on Close")
                 {
+                    ApplicationArea = All;
                 }
-                field("End of Day Receipt Mandatory";"End of Day Receipt Mandatory")
+                field("End of Day Receipt Mandatory"; "End of Day Receipt Mandatory")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -170,7 +209,7 @@ page 6184490 "Pepper Configuration Card"
                 Caption = 'Instances';
                 Image = Server;
                 RunObject = Page "Pepper Instances";
-                RunPageLink = "Configuration Code"=FIELD(Code);
+                RunPageLink = "Configuration Code" = FIELD(Code);
                 RunPageView = SORTING(ID)
                               ORDER(Ascending);
             }
@@ -313,7 +352,7 @@ page 6184490 "Pepper Configuration Card"
 
     local procedure UpdateBLOBCheck()
     begin
-        CalcFields("License File","Additional Parameters");
+        CalcFields("License File", "Additional Parameters");
         HasLicense := "License File".HasValue;
         HasAdditionalParameters := "Additional Parameters".HasValue;
     end;

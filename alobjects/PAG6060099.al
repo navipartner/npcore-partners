@@ -15,40 +15,48 @@ page 6060099 "Ean Box Parameters"
         {
             repeater(Group)
             {
-                field("Event Code";"Event Code")
+                field("Event Code"; "Event Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Action Code";"Action Code")
+                field("Action Code"; "Action Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Style = Subordinate;
                     StyleExpr = "Non Editable";
                 }
-                field("Ean Box Value";"Ean Box Value")
+                field("Ean Box Value"; "Ean Box Value")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Non Editable";"Non Editable")
+                field("Non Editable"; "Non Editable")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                 }
-                field("Data Type";"Data Type")
+                field("Data Type"; "Data Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Value;Value)
+                field(Value; Value)
                 {
+                    ApplicationArea = All;
                     Enabled = (NOT "Ean Box Value") AND (NOT "Non Editable");
                     HideValue = "Ean Box Value";
                     Style = Subordinate;
                     StyleExpr = "Non Editable";
                 }
-                field(OptionValueInteger;OptionValueInteger)
+                field(OptionValueInteger; OptionValueInteger)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

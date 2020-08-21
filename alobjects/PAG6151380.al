@@ -13,44 +13,57 @@ page 6151380 "CS Stock-Take Handling"
         {
             repeater(Group)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Barcode;Barcode)
+                field(Barcode; Barcode)
                 {
+                    ApplicationArea = All;
                 }
-                field(Qty;Qty)
+                field(Qty; Qty)
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock-Take Config Code";"Stock-Take Config Code")
+                field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Worksheet Name";"Worksheet Name")
+                field("Worksheet Name"; "Worksheet Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shelf  No.";"Shelf  No.")
+                field("Shelf  No."; "Shelf  No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Handled;Handled)
+                field(Handled; Handled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Transferred to Worksheet";"Transferred to Worksheet")
+                field("Transferred to Worksheet"; "Transferred to Worksheet")
                 {
+                    ApplicationArea = All;
                 }
-                field(Created;Created)
+                field(Created; Created)
                 {
+                    ApplicationArea = All;
                 }
-                field("Created By";"Created By")
+                field("Created By"; "Created By")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

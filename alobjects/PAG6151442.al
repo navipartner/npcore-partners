@@ -13,20 +13,25 @@ page 6151442 "Magento Contact Shpt. Methods"
         {
             repeater(Group)
             {
-                field("External Shipment Method Code";"External Shipment Method Code")
+                field("External Shipment Method Code"; "External Shipment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipment Method Code";"Shipment Method Code")
+                field("Shipment Method Code"; "Shipment Method Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Agent Code";"Shipping Agent Code")
+                field("Shipping Agent Code"; "Shipping Agent Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipping Agent Service Code";"Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Shipment Fee Account No.";"Shipment Fee Account No.")
+                field("Shipment Fee Account No."; "Shipment Fee Account No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

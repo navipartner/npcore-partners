@@ -12,14 +12,17 @@ page 6184881 "FTP Overview"
         {
             repeater(Group)
             {
-                field("Host Code";"Host Code")
+                field("Host Code"; "Host Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("File Name";"File Name")
+                field("File Name"; "File Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

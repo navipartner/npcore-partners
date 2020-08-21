@@ -29,69 +29,89 @@ page 6060120 "TM Ticket Admissions"
             {
                 field("Admission Code"; "Admission Code")
                 {
+                    ApplicationArea = All;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field("Location Admission Code"; "Location Admission Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Capacity Limits By"; "Capacity Limits By")
                 {
+                    ApplicationArea = All;
                 }
                 field("Default Schedule"; "Default Schedule")
                 {
+                    ApplicationArea = All;
                 }
                 field("Prebook Is Required"; "Prebook Is Required")
                 {
+                    ApplicationArea = All;
                 }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
+                    ApplicationArea = All;
                 }
                 field("Reserved For Web"; "Reserved For Web")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Reserved For Members"; "Reserved For Members")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Capacity Control"; "Capacity Control")
                 {
+                    ApplicationArea = All;
                 }
                 field("Prebook From"; "Prebook From")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ticketholder Notification Type"; "Ticketholder Notification Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Stakeholder (E-Mail/Phone No.)"; "Stakeholder (E-Mail/Phone No.)")
                 {
+                    ApplicationArea = All;
                 }
                 field("Dependent Admission Code"; "Dependent Admission Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Dependency Type"; "Dependency Type")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Dependency Timeframe"; "Dependency Timeframe")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("POS Schedule Selection Date F."; "POS Schedule Selection Date F.")
                 {
+                    ApplicationArea = All;
                 }
                 field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeAdmissionTemp))
                 {
+                    ApplicationArea = All;
                     Caption = 'Admission Customized Calendar';
                     Editable = false;
 
@@ -104,9 +124,11 @@ page 6060120 "TM Ticket Admissions"
                 }
                 field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTicketTemp))
                 {
+                    ApplicationArea = All;
                     Caption = 'Ticket Customized Calendar';
                     Editable = false;
 
@@ -119,10 +141,12 @@ page 6060120 "TM Ticket Admissions"
                 }
                 field("eTicket Type Code"; "eTicket Type Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
                 field("Waiting List Setup Code"; "Waiting List Setup Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -224,8 +248,8 @@ page 6060120 "TM Ticket Admissions"
                 begin
 
                     //-TM1.48 [409741]
-                    AdmissionForecastMatrix.SetInitialAdmissionCode (Rec."Admission Code");
-                    AdmissionForecastMatrix.Run ();
+                    AdmissionForecastMatrix.SetInitialAdmissionCode(Rec."Admission Code");
+                    AdmissionForecastMatrix.Run();
                     //+TM1.48 [409741]
                 end;
             }

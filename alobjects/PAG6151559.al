@@ -24,27 +24,33 @@ page 6151559 "NpXml Template Trigger List"
             {
                 IndentationColumn = Level;
                 IndentationControls = "Table Name";
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                 }
-                field("Table Name";"Table Name")
+                field("Table Name"; "Table Name")
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                 }
-                field("Insert Trigger";"Insert Trigger")
+                field("Insert Trigger"; "Insert Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field("Modify Trigger";"Modify Trigger")
+                field("Modify Trigger"; "Modify Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Trigger";"Delete Trigger")
+                field("Delete Trigger"; "Delete Trigger")
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                 }
@@ -72,8 +78,8 @@ page 6151559 "NpXml Template Trigger List"
         NpXmlTemplateTriggerLinks: Record "NpXml Template Trigger Link";
     begin
         //-NC1.21
-        NpXmlTemplateTriggerLinks.SetRange("Xml Template Code","Xml Template Code");
-        NpXmlTemplateTriggerLinks.SetRange("Xml Template Trigger Line No.","Line No.");
+        NpXmlTemplateTriggerLinks.SetRange("Xml Template Code", "Xml Template Code");
+        NpXmlTemplateTriggerLinks.SetRange("Xml Template Trigger Line No.", "Line No.");
         HasNoLinks := ("Parent Table No." <> "Table No.") and NpXmlTemplateTriggerLinks.IsEmpty;
         //+NC1.21
     end;

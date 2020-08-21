@@ -13,48 +13,61 @@ page 6014481 "Retail Report Selection List"
         {
             repeater(Group)
             {
-                field("Report Type";"Report Type")
+                field("Report Type"; "Report Type")
                 {
+                    ApplicationArea = All;
                 }
-                field(Sequence;Sequence)
+                field(Sequence; Sequence)
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Report Name";"Report Name")
+                field("Report Name"; "Report Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("XML Port ID";"XML Port ID")
+                field("XML Port ID"; "XML Port ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("XML Port Name";"XML Port Name")
+                field("XML Port Name"; "XML Port Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Codeunit ID";"Codeunit ID")
+                field("Codeunit ID"; "Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Codeunit Name";"Codeunit Name")
+                field("Codeunit Name"; "Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Print Template";"Print Template")
+                field("Print Template"; "Print Template")
                 {
+                    ApplicationArea = All;
                     Width = 20;
                 }
-                field("Filter Object ID";"Filter Object ID")
+                field("Filter Object ID"; "Filter Object ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Record Filter";"Record Filter")
+                field("Record Filter"; "Record Filter")
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                 }
-                field(Optional;Optional)
+                field(Optional; Optional)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

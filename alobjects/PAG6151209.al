@@ -13,14 +13,17 @@ page 6151209 "NpCs Store Card POS Relations"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

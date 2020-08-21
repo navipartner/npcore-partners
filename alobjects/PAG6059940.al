@@ -16,24 +16,30 @@ page 6059940 "SMS Template List"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table Caption";"Table Caption")
+                field("Table Caption"; "Table Caption")
                 {
+                    ApplicationArea = All;
                 }
-                field("""Table Filters"".HASVALUE";"Table Filters".HasValue)
+                field("""Table Filters"".HASVALUE"; "Table Filters".HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Filters on Table';
                 }
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

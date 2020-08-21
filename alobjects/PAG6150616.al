@@ -25,45 +25,57 @@ page 6150616 "POS Unit List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Ean Box Sales Setup";"Ean Box Sales Setup")
+                field("Ean Box Sales Setup"; "Ean Box Sales Setup")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Sales Workflow Set";"POS Sales Workflow Set")
+                field("POS Sales Workflow Set"; "POS Sales Workflow Set")
                 {
+                    ApplicationArea = All;
                 }
-                field("Item Price Codeunit ID";"Item Price Codeunit ID")
+                field("Item Price Codeunit ID"; "Item Price Codeunit ID")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Price Codeunit Name";"Item Price Codeunit Name")
+                field("Item Price Codeunit Name"; "Item Price Codeunit Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Item Price Function";"Item Price Function")
+                field("Item Price Function"; "Item Price Function")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("POS Type";"POS Type")
+                field("POS Type"; "POS Type")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -85,13 +97,13 @@ page 6150616 "POS Unit List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID"=CONST(6150615),
-                                      "No."=FIELD("No.");
+                        RunPageLink = "Table ID" = CONST(6150615),
+                                      "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
                     }
                     action("Dimensions-&Multiple")
                     {
-                        AccessByPermission = TableData Dimension=R;
+                        AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
 
@@ -102,7 +114,7 @@ page 6150616 "POS Unit List"
                         begin
                             //-NPR5.53 [371956]
                             CurrPage.SetSelectionFilter(POSUnit);
-                            DefaultDimMultiple.SetMultiRecord(POSUnit,FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(POSUnit, FieldNo("No."));
                             DefaultDimMultiple.RunModal;
                             //-NPR5.53 [371956]
                         end;
@@ -122,7 +134,7 @@ page 6150616 "POS Unit List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Period Register List";
-                    RunPageLink = "POS Unit No."=FIELD("No.");
+                    RunPageLink = "POS Unit No." = FIELD("No.");
                 }
                 action("POS Entries")
                 {
@@ -132,14 +144,14 @@ page 6150616 "POS Unit List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Entry List";
-                    RunPageLink = "POS Unit No."=FIELD("No.");
+                    RunPageLink = "POS Unit No." = FIELD("No.");
                 }
                 action("POS Unit Bins")
                 {
                     Caption = 'POS Unit Bins';
                     Image = List;
                     RunObject = Page "POS Unit to Bin Relation";
-                    RunPageLink = "POS Unit No."=FIELD("No.");
+                    RunPageLink = "POS Unit No." = FIELD("No.");
                 }
                 action(Workshifts)
                 {
@@ -150,7 +162,7 @@ page 6150616 "POS Unit List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "POS Workshift Checkpoints";
-                    RunPageLink = "POS Unit No."=FIELD("No.");
+                    RunPageLink = "POS Unit No." = FIELD("No.");
                 }
             }
         }
@@ -166,7 +178,7 @@ page 6150616 "POS Unit List"
 
                 trigger OnAction()
                 begin
-                    CreateCheckpointWorker (true, true, "No.");
+                    CreateCheckpointWorker(true, true, "No.");
                 end;
             }
         }
@@ -176,18 +188,19 @@ page 6150616 "POS Unit List"
     var
         NPRetailSetup: Record "NP Retail Setup";
     begin
-        if not (NPRetailSetup.Get ())
-          then exit;
+        if not (NPRetailSetup.Get())
+          then
+            exit;
 
         if (NPRetailSetup."Advanced POS Entries Activated") then
-          CreateCheckpointWorker (NPRetailSetup."Advanced Posting Activated", false, UnitNo);
+            CreateCheckpointWorker(NPRetailSetup."Advanced Posting Activated", false, UnitNo);
     end;
 
-    local procedure CreateCheckpointWorker(UsePosEntry: Boolean;WithPosting: Boolean;UnitNo: Code[20])
+    local procedure CreateCheckpointWorker(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[20])
     var
         POSCheckpointMgr: Codeunit "POS Workshift Checkpoint";
     begin
-        POSCheckpointMgr.CloseWorkshift (UsePosEntry, WithPosting, "No.");
+        POSCheckpointMgr.CloseWorkshift(UsePosEntry, WithPosting, "No.");
     end;
 }
 

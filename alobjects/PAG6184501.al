@@ -14,48 +14,57 @@ page 6184501 "CleanCash Error List"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field(Date;Date)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field(Time;Time)
+                field(Time; Time)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field("Object No.";"Object No.")
+                field("Object No."; "Object No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field("Object Name";"Object Name")
+                field("Object Name"; "Object Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field(EventResponse;EventResponse)
+                field(EventResponse; EventResponse)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field("Enum Type";"Enum Type")
+                field("Enum Type"; "Enum Type")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }
-                field("Error Text";"Error Text")
+                field("Error Text"; "Error Text")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
                 }

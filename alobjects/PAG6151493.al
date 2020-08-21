@@ -14,40 +14,49 @@ page 6151493 "Raptor Actions"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field("Raptor Module Code";"Raptor Module Code")
+                field("Raptor Module Code"; "Raptor Module Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Raptor Module API Req. String";"Raptor Module API Req. String")
+                field("Raptor Module API Req. String"; "Raptor Module API Req. String")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Data Type Description";"Data Type Description")
+                field("Data Type Description"; "Data Type Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Number of Entries to Return";"Number of Entries to Return")
+                field("Number of Entries to Return"; "Number of Entries to Return")
                 {
+                    ApplicationArea = All;
                 }
-                field(Comment;Comment)
+                field(Comment; Comment)
                 {
+                    ApplicationArea = All;
                 }
-                field("User Identifier Param. Name";"User Identifier Param. Name")
+                field("User Identifier Param. Name"; "User Identifier Param. Name")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Show Date-Time Created";"Show Date-Time Created")
+                field("Show Date-Time Created"; "Show Date-Time Created")
                 {
+                    ApplicationArea = All;
                 }
-                field("Show Priority";"Show Priority")
+                field("Show Priority"; "Show Priority")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014407;Notes)
+            systempart(Control6014407; Notes)
             {
             }
         }
@@ -69,7 +78,7 @@ page 6151493 "Raptor Actions"
                 var
                     RaptorManagement: Codeunit "Raptor Management";
                 begin
-                    RaptorManagement.InitializeDefaultActions(true,false);
+                    RaptorManagement.InitializeDefaultActions(true, false);
                 end;
             }
         }

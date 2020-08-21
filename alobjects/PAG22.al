@@ -1,4 +1,4 @@
-pageextension 6014426 pageextension6014426 extends "Customer List" 
+pageextension 6014426 pageextension6014426 extends "Customer List"
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // PN1.08/TTH/10122015 CASE 229069 Added Customer Statement Sending
@@ -23,13 +23,16 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
         {
             field("E-Mail"; "E-Mail")
             {
+                ApplicationArea = All;
             }
             field(Address; Address)
             {
+                ApplicationArea = All;
                 Visible = false;
             }
             field("Address 2"; "Address 2")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
@@ -37,6 +40,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
         {
             field(City; City)
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
@@ -44,10 +48,12 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
         {
             field("Global Dimension 1 Code"; "Global Dimension 1 Code")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
             field("Global Dimension 2 Code"; "Global Dimension 2 Code")
             {
+                ApplicationArea = All;
                 Visible = false;
             }
         }
@@ -55,6 +61,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
         {
             field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
@@ -66,6 +73,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
@@ -77,6 +85,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
@@ -88,6 +97,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
@@ -99,6 +109,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
@@ -110,6 +121,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_06; NPRAttrTextArray[6])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,6,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible06;
@@ -121,6 +133,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_07; NPRAttrTextArray[7])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,7,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible07;
@@ -132,6 +145,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_08; NPRAttrTextArray[8])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,8,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible08;
@@ -143,6 +157,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_09; NPRAttrTextArray[9])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,9,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible09;
@@ -154,6 +169,7 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
             }
             field(NPRAttrTextArray_10; NPRAttrTextArray[10])
             {
+                ApplicationArea = All;
                 CaptionClass = '6014555,18,10,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible10;
@@ -237,11 +253,11 @@ pageextension 6014426 pageextension6014426 extends "Customer List"
                     //Cust.TESTFIELD(Anonymized,FALSE);
                     //IF (GDPRManagement.DoAnonymization(Cust."No.",ReasonText)) THEN
 
-                    Rec.TestField(Anonymized,false);
+                    Rec.TestField(Anonymized, false);
                     Clear(GDPRManagement);
                     Clear(ReasonText);
-                    if (GDPRManagement.DoAnonymization(Rec."No.",ReasonText)) then
-                    //+NPR5.55 [388813]
+                    if (GDPRManagement.DoAnonymization(Rec."No.", ReasonText)) then
+                        //+NPR5.55 [388813]
                         if (not Confirm(Text000, false)) then
                             Error('');
 

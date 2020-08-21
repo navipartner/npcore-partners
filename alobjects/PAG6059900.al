@@ -13,35 +13,45 @@ page 6059900 "Task Template"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Test Report ID";"Test Report ID")
+                field("Test Report ID"; "Test Report ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Page ID";"Page ID")
+                field("Page ID"; "Page ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mail From Address";"Mail From Address")
+                field("Mail From Address"; "Mail From Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mail From Name";"Mail From Name")
+                field("Mail From Name"; "Mail From Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Worker Group";"Task Worker Group")
+                field("Task Worker Group"; "Task Worker Group")
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Test Report Name";"Test Report Name")
+                field("Test Report Name"; "Test Report Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Page Name";"Page Name")
+                field("Page Name"; "Page Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -60,7 +70,7 @@ page 6059900 "Task Template"
                     Caption = 'Batches';
                     Image = Description;
                     RunObject = Page "Task Batch";
-                    RunPageLink = "Journal Template Name"=FIELD(Name);
+                    RunPageLink = "Journal Template Name" = FIELD(Name);
                 }
             }
         }

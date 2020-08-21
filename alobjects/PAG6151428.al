@@ -15,8 +15,9 @@ page 6151428 "Magento Item Custom Options"
     {
         area(content)
         {
-            field("Item No.";"Item No.")
+            field("Item No."; "Item No.")
             {
+                ApplicationArea = All;
                 Caption = 'Item No.';
             }
             group("Custom Options")
@@ -25,40 +26,49 @@ page 6151428 "Magento Item Custom Options"
                 repeater(Control6150615)
                 {
                     ShowCaption = false;
-                    field(Enabled;Enabled)
+                    field(Enabled; Enabled)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Custom Option No.";"Custom Option No.")
+                    field("Custom Option No."; "Custom Option No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Type;Type)
+                    field(Type; Type)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Required;Required)
+                    field(Required; Required)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Max Length";"Max Length")
+                    field("Max Length"; "Max Length")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Position;Position)
+                    field(Position; Position)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Price;Price)
+                    field(Price; Price)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Price Type";"Price Type")
+                    field("Price Type"; "Price Type")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
-            part(OptionValues;"Magento Item Custom Opt. Value")
+            part(OptionValues; "Magento Item Custom Opt. Value")
             {
                 Caption = 'Values';
-                SubPageLink = "Item No."=FIELD("Item No."),
-                              "Custom Option No."=FIELD("Custom Option No.");
+                SubPageLink = "Item No." = FIELD("Item No."),
+                              "Custom Option No." = FIELD("Custom Option No.");
             }
         }
     }
@@ -69,7 +79,7 @@ page 6151428 "Magento Item Custom Options"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.OptionValues.PAGE.SetSourceTable("Item No.","Custom Option No.");
+        CurrPage.OptionValues.PAGE.SetSourceTable("Item No.", "Custom Option No.");
     end;
 
     trigger OnAfterGetRecord()
@@ -97,15 +107,15 @@ page 6151428 "Magento Item Custom Options"
         ItemCustomOption: Record "Magento Item Custom Option";
     begin
         if not Enabled then begin
-          if ItemCustomOption.Get("Item No.","Custom Option No.") then
-            ItemCustomOption.Delete(true);
-          exit;
+            if ItemCustomOption.Get("Item No.", "Custom Option No.") then
+                ItemCustomOption.Delete(true);
+            exit;
         end;
 
-        if ItemCustomOption.Get("Item No.","Custom Option No.") then begin
-          ItemCustomOption.TransferFields(Rec);
-          ItemCustomOption.Modify(true);
-          exit;
+        if ItemCustomOption.Get("Item No.", "Custom Option No.") then begin
+            ItemCustomOption.TransferFields(Rec);
+            ItemCustomOption.Modify(true);
+            exit;
         end;
 
         ItemCustomOption.Init;
@@ -120,7 +130,7 @@ page 6151428 "Magento Item Custom Options"
 
     procedure SetEnabledFilter()
     begin
-        SetRange(Enabled,true);
+        SetRange(Enabled, true);
     end;
 
     procedure SetSourceTable()
@@ -131,32 +141,32 @@ page 6151428 "Magento Item Custom Options"
         RecRef: RecordRef;
     begin
         if ItemNo = '' then
-          exit;
+            exit;
 
         RecRef.GetTable(Rec);
         if not RecRef.IsTemporary then
-          exit;
+            exit;
         RecRef.Close;
 
         DeleteAll;
 
         if not Item.Get(ItemNo) then
-          exit;
+            exit;
 
         if not CustomOption.FindSet then
-          exit;
+            exit;
 
 
         repeat
-          Init;
-          if ItemCustomOption.Get(ItemNo,CustomOption."No.") then
-            Rec := ItemCustomOption
-          else begin
-            "Item No." := ItemNo;
-            "Custom Option No." := CustomOption."No.";
-            Enabled := false;
-          end;
-          Insert;
+            Init;
+            if ItemCustomOption.Get(ItemNo, CustomOption."No.") then
+                Rec := ItemCustomOption
+            else begin
+                "Item No." := ItemNo;
+                "Custom Option No." := CustomOption."No.";
+                Enabled := false;
+            end;
+            Insert;
         until CustomOption.Next = 0;
 
         FindFirst;
@@ -169,14 +179,14 @@ page 6151428 "Magento Item Custom Options"
         EnabledForeColor := 0;
         PriceForeColor := 0;
 
-        if not (Type in [Type::SelectDropDown,Type::SelectRadioButtons,Type::SelectCheckbox,Type::SelectMultiple]) then
-          exit;
+        if not (Type in [Type::SelectDropDown, Type::SelectRadioButtons, Type::SelectCheckbox, Type::SelectMultiple]) then
+            exit;
 
         CalcFields("Enabled Option Values");
 
         PriceForeColor := 10061943; //Light Slate Gray 119-136-153
         if Enabled and ("Enabled Option Values" <= 0) then
-          EnabledForeColor := 17919;  //Orange Red 255-69-0
+            EnabledForeColor := 17919;  //Orange Red 255-69-0
     end;
 }
 

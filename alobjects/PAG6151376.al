@@ -17,41 +17,53 @@ page 6151376 "CS UI Subform"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Area";Area)
+                field("Area"; Area)
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Type";"Field Type")
+                field("Field Type"; "Field Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Length";"Field Length")
+                field("Field Length"; "Field Length")
                 {
+                    ApplicationArea = All;
                 }
-                field(Text;Text)
+                field(Text; Text)
                 {
+                    ApplicationArea = All;
                 }
-                field(Placeholder;Placeholder)
+                field(Placeholder; Placeholder)
                 {
+                    ApplicationArea = All;
                 }
-                field("Default Value";"Default Value")
+                field("Default Value"; "Default Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Format Value";"Format Value")
+                field("Format Value"; "Format Value")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Data Type";"Field Data Type")
+                field("Field Data Type"; "Field Data Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("First Responder";"First Responder")
+                field("First Responder"; "First Responder")
                 {
+                    ApplicationArea = All;
                 }
-                field("Call UI";"Call UI")
+                field("Call UI"; "Call UI")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

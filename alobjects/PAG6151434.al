@@ -25,11 +25,13 @@ page 6151434 "Magento Attribute Sets"
                     repeater(Control6150613)
                     {
                         ShowCaption = false;
-                        field(Description;Description)
+                        field(Description; Description)
                         {
+                            ApplicationArea = All;
                         }
-                        field("Used by Items";"Used by Items")
+                        field("Used by Items"; "Used by Items")
                         {
+                            ApplicationArea = All;
 
                             trigger OnDrillDown()
                             begin
@@ -39,28 +41,29 @@ page 6151434 "Magento Attribute Sets"
                             end;
                         }
                     }
-                    field(WidthControl;'')
+                    field(WidthControl; '')
                     {
+                        ApplicationArea = All;
                         Caption = '                                                                                                                                                             ';
                     }
                 }
                 group(Control6151400)
                 {
                     ShowCaption = false;
-                    part(Control6151401;"Magento Attribute Group")
+                    part(Control6151401; "Magento Attribute Group")
                     {
-                        SubPageLink = "Attribute Set ID"=FIELD("Attribute Set ID");
+                        SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID");
                     }
                 }
                 group(Control6150619)
                 {
                     ShowCaption = false;
-                    part(Attributes;"Magento Attribute Set Values")
+                    part(Attributes; "Magento Attribute Set Values")
                     {
                         Caption = 'Attributes';
                         Provider = Control6151401;
-                        SubPageLink = "Attribute Set ID"=FIELD("Attribute Set ID"),
-                                      "Attribute Group ID"=FIELD("Attribute Group ID");
+                        SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID"),
+                                      "Attribute Group ID" = FIELD("Attribute Group ID");
                     }
                 }
             }
@@ -84,14 +87,14 @@ page 6151434 "Magento Attribute Sets"
     begin
         //-MAG1.02
         TempItem.DeleteAll;
-        Item.SetRange("Attribute Set ID","Attribute Set ID");
+        Item.SetRange("Attribute Set ID", "Attribute Set ID");
         if Item.FindSet then
-          repeat
-            TempItem.Init;
-            TempItem := Item;
-            TempItem.Insert;
-          until Item.Next = 0;
-        PAGE.Run(PAGE::"Retail Item List",TempItem);
+            repeat
+                TempItem.Init;
+                TempItem := Item;
+                TempItem.Insert;
+            until Item.Next = 0;
+        PAGE.Run(PAGE::"Retail Item List", TempItem);
         //+MAG1.02
     end;
 }

@@ -16,17 +16,21 @@ page 6151458 "Magento Attribute Group List"
         {
             repeater(Group)
             {
-                field("Attribute Group ID";"Attribute Group ID")
+                field("Attribute Group ID"; "Attribute Group ID")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute Set ID";"Attribute Set ID")
+                field("Attribute Set ID"; "Attribute Set ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sort Order";"Sort Order")
+                field("Sort Order"; "Sort Order")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

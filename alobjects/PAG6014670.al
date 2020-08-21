@@ -18,24 +18,27 @@ page 6014670 "Dependency Management Setup"
                 group(Configuration)
                 {
                     Caption = 'Configuration';
-                    field("OData URL";"OData URL")
+                    field("OData URL"; "OData URL")
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
                             InvalidateManagedDependencies();
                         end;
                     }
-                    field(Username;Username)
+                    field(Username; Username)
                     {
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
                             InvalidateManagedDependencies();
                         end;
                     }
-                    field(ManagedDependencyPassword;ManagedDependencyPassword)
+                    field(ManagedDependencyPassword; ManagedDependencyPassword)
                     {
+                        ApplicationArea = All;
                         Editable = PasswordEditable;
                         ExtendedDatatype = Masked;
 
@@ -46,26 +49,31 @@ page 6014670 "Dependency Management Setup"
                             CurrPage.SaveRecord();
                         end;
                     }
-                    field(Configured;Configured)
+                    field(Configured; Configured)
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Disable Deployment";"Disable Deployment")
+                    field("Disable Deployment"; "Disable Deployment")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Filtering)
                 {
                     Caption = 'Filtering';
-                    field("Accept Statuses";"Accept Statuses")
+                    field("Accept Statuses"; "Accept Statuses")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Tag Filter";"Tag Filter")
+                    field("Tag Filter"; "Tag Filter")
                     {
+                        ApplicationArea = All;
                         Caption = 'Tag Filter (Comma Separated)';
                     }
-                    field("Tag Filter Comparison Operator";"Tag Filter Comparison Operator")
+                    field("Tag Filter Comparison Operator"; "Tag Filter Comparison Operator")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -129,7 +137,7 @@ page 6014670 "Dependency Management Setup"
     trigger OnAfterGetRecord()
     begin
         if Password.HasValue then
-          ManagedDependencyPassword := GetManagedDependencyPassword();
+            ManagedDependencyPassword := GetManagedDependencyPassword();
         PasswordEditable := CurrPage.Editable;
     end;
 
@@ -137,8 +145,8 @@ page 6014670 "Dependency Management Setup"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 

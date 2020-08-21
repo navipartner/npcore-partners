@@ -14,68 +14,87 @@ page 6151167 "NpGp POS Sales Entries"
         {
             repeater(Group)
             {
-                field("POS Store Code";"POS Store Code")
+                field("POS Store Code"; "POS Store Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("POS Unit No.";"POS Unit No.")
+                field("POS Unit No."; "POS Unit No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Document No.";"Document No.")
+                field("Document No."; "Document No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Date";"Posting Date")
+                field("Posting Date"; "Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fiscal No.";"Fiscal No.")
+                field("Fiscal No."; "Fiscal No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Code";"Currency Code")
+                field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Currency Factor";"Currency Factor")
+                field("Currency Factor"; "Currency Factor")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Amount";"Sales Amount")
+                field("Sales Amount"; "Sales Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount Amount";"Discount Amount")
+                field("Discount Amount"; "Discount Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Quantity";"Sales Quantity")
+                field("Sales Quantity"; "Sales Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Return Sales Quantity";"Return Sales Quantity")
+                field("Return Sales Quantity"; "Return Sales Quantity")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount";"Total Amount")
+                field("Total Amount"; "Total Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Tax Amount";"Total Tax Amount")
+                field("Total Tax Amount"; "Total Tax Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Total Amount Incl. Tax";"Total Amount Incl. Tax")
+                field("Total Amount Incl. Tax"; "Total Amount Incl. Tax")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Time";"Entry Time")
+                field("Entry Time"; "Entry Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Entry Type";"Entry Type")
+                field("Entry Type"; "Entry Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Retail ID";"Retail ID")
+                field("Retail ID"; "Retail ID")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part("POS Sales Lines";"NpGp POS Sales Entry Subpage")
+            part("POS Sales Lines"; "NpGp POS Sales Entry Subpage")
             {
                 Caption = 'POS Sales Lines';
-                SubPageLink = "POS Entry No."=FIELD("Entry No.");
+                SubPageLink = "POS Entry No." = FIELD("Entry No.");
             }
         }
     }

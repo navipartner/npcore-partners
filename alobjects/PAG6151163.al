@@ -12,29 +12,37 @@ page 6151163 "MM Loyalty Alter Membership"
         {
             repeater(Group)
             {
-                field("Loyalty Code";"Loyalty Code")
+                field("Loyalty Code"; "Loyalty Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("From Membership Code";"From Membership Code")
+                field("From Membership Code"; "From Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Change Direction";"Change Direction")
+                field("Change Direction"; "Change Direction")
                 {
+                    ApplicationArea = All;
                 }
-                field("To Membership Code";"To Membership Code")
+                field("To Membership Code"; "To Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Points Threshold";"Points Threshold")
+                field("Points Threshold"; "Points Threshold")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Item No.";"Sales Item No.")
+                field("Sales Item No."; "Sales Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

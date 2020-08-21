@@ -14,88 +14,113 @@ page 6014647 "Tax Free GB I2 Parameters"
             {
                 group(General)
                 {
-                    field("Shop ID";"Shop ID")
+                    field("Shop ID"; "Shop ID")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Desk ID";"Desk ID")
+                    field("Desk ID"; "Desk ID")
                     {
+                        ApplicationArea = All;
                     }
-                    field(Username;Username)
+                    field(Username; Username)
                     {
+                        ApplicationArea = All;
                     }
-                    field(Password;Password)
+                    field(Password; Password)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Consolidation Allowed";"Consolidation Allowed")
+                    field("Consolidation Allowed"; "Consolidation Allowed")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Consolidation Separate Limits";"Consolidation Separate Limits")
+                    field("Consolidation Separate Limits"; "Consolidation Separate Limits")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Voucher Issue Date Limit";"Voucher Issue Date Limit")
+                    field("Voucher Issue Date Limit"; "Voucher Issue Date Limit")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Services Eligible";"Services Eligible")
+                    field("Services Eligible"; "Services Eligible")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Count Zero VAT Goods For Limit";"Count Zero VAT Goods For Limit")
+                    field("Count Zero VAT Goods For Limit"; "Count Zero VAT Goods For Limit")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group("Dialog ")
                 {
-                    field("(Dialog) Passport Number";"(Dialog) Passport Number")
+                    field("(Dialog) Passport Number"; "(Dialog) Passport Number")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) First Name";"(Dialog) First Name")
+                    field("(Dialog) First Name"; "(Dialog) First Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Last Name";"(Dialog) Last Name")
+                    field("(Dialog) Last Name"; "(Dialog) Last Name")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Street";"(Dialog) Street")
+                    field("(Dialog) Street"; "(Dialog) Street")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Postal Code";"(Dialog) Postal Code")
+                    field("(Dialog) Postal Code"; "(Dialog) Postal Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Town";"(Dialog) Town")
+                    field("(Dialog) Town"; "(Dialog) Town")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Country Code";"(Dialog) Country Code")
+                    field("(Dialog) Country Code"; "(Dialog) Country Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Email";"(Dialog) Email")
+                    field("(Dialog) Email"; "(Dialog) Email")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Mobile No.";"(Dialog) Mobile No.")
+                    field("(Dialog) Mobile No."; "(Dialog) Mobile No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Passport Country Code";"(Dialog) Passport Country Code")
+                    field("(Dialog) Passport Country Code"; "(Dialog) Passport Country Code")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Date Of Birth";"(Dialog) Date Of Birth")
+                    field("(Dialog) Date Of Birth"; "(Dialog) Date Of Birth")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Departure Date";"(Dialog) Departure Date")
+                    field("(Dialog) Departure Date"; "(Dialog) Departure Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Arrival Date";"(Dialog) Arrival Date")
+                    field("(Dialog) Arrival Date"; "(Dialog) Arrival Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("(Dialog) Dest. Country Code";"(Dialog) Dest. Country Code")
+                    field("(Dialog) Dest. Country Code"; "(Dialog) Dest. Country Code")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
             group(Automatic)
             {
                 Editable = false;
-                field("Shop Country Code";"Shop Country Code")
+                field("Shop Country Code"; "Shop Country Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Date Last Auto Configured";"Date Last Auto Configured")
+                field("Date Last Auto Configured"; "Date Last Auto Configured")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -113,7 +138,7 @@ page 6014647 "Tax Free GB I2 Parameters"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Tax Free GB I2 Service List";
-                RunPageLink = "Tax Free Unit"=FIELD("Tax Free Unit");
+                RunPageLink = "Tax Free Unit" = FIELD("Tax Free Unit");
             }
         }
     }

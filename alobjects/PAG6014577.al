@@ -17,20 +17,25 @@ page 6014577 "Tax Free GB I2 Service List"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field("Service ID";"Service ID")
+                field("Service ID"; "Service ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Minimum Purchase Amount";"Minimum Purchase Amount")
+                field("Minimum Purchase Amount"; "Minimum Purchase Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Maximum Purchase Amount";"Maximum Purchase Amount")
+                field("Maximum Purchase Amount"; "Maximum Purchase Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Void Limit In Days";"Void Limit In Days")
+                field("Void Limit In Days"; "Void Limit In Days")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

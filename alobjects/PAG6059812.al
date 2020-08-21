@@ -31,16 +31,19 @@ page 6059812 "Retail Activities"
                 ShowCaption = false;
                 field("Sales Orders"; "Sales Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     Image = "None";
                 }
                 field("Daily Sales Orders"; "Daily Sales Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     Image = "None";
                 }
                 field("Import Pending"; "Import Pending")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Nc Import List";
                     Image = "None";
                 }
@@ -66,15 +69,18 @@ page 6059812 "Retail Activities"
                 ShowCaption = false;
                 field("Pending Inc. Documents"; "Pending Inc. Documents")
                 {
+                    ApplicationArea = All;
                     Image = "None";
                 }
                 field("Processed Error Tasks"; "Processed Error Tasks")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Nc Task List";
                     Image = "None";
                 }
                 field("Failed Webshop Payments"; "Failed Webshop Payments")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Magento Payment Line List";
                     Image = "None";
                 }
@@ -85,24 +91,28 @@ page 6059812 "Retail Activities"
                 Visible = false;
                 field("Sales Quotes"; "Sales Quotes")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Quotes";
                     Image = "None";
                     Visible = false;
                 }
                 field("Sales Return Orders"; "Sales Return Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Return Order List";
                     Image = "None";
                     Visible = false;
                 }
                 field("Magento Orders"; "Magento Orders")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     Image = "None";
                     Visible = false;
                 }
                 field("Daily Sales Invoices"; "Daily Sales Invoices")
                 {
+                    ApplicationArea = All;
                     Caption = 'Daily Sales Invoices';
                     DrillDownPageID = "Posted Sales Invoices";
                     Image = "None";
@@ -110,6 +120,7 @@ page 6059812 "Retail Activities"
                 }
                 field("Tasks Unprocessed"; "Tasks Unprocessed")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Nc Task List";
                     Image = "None";
                     Visible = false;

@@ -23,59 +23,72 @@ page 6151375 "CS UI"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Form Type";"Form Type")
+                field("Form Type"; "Form Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Expand Summary Items";"Expand Summary Items")
+                field("Expand Summary Items"; "Expand Summary Items")
                 {
+                    ApplicationArea = All;
                 }
-                field("Hid Fulfilled Lines";"Hid Fulfilled Lines")
+                field("Hid Fulfilled Lines"; "Hid Fulfilled Lines")
                 {
+                    ApplicationArea = All;
                 }
-                field("Set defaults from last record";"Set defaults from last record")
+                field("Set defaults from last record"; "Set defaults from last record")
                 {
+                    ApplicationArea = All;
                 }
-                field("Posting Type";"Posting Type")
+                field("Posting Type"; "Posting Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Update Posting Date";"Update Posting Date")
+                field("Update Posting Date"; "Update Posting Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("No. of Records in List";"No. of Records in List")
+                field("No. of Records in List"; "No. of Records in List")
                 {
+                    ApplicationArea = All;
                 }
-                field("Handling Codeunit";"Handling Codeunit")
+                field("Handling Codeunit"; "Handling Codeunit")
                 {
+                    ApplicationArea = All;
                     LookupPageID = Objects;
                 }
-                field("Next UI";"Next UI")
+                field("Next UI"; "Next UI")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start UI";"Start UI")
+                field("Start UI"; "Start UI")
                 {
+                    ApplicationArea = All;
                 }
-                field("Warehouse Type";"Warehouse Type")
+                field("Warehouse Type"; "Warehouse Type")
                 {
+                    ApplicationArea = All;
                 }
             }
-            part(Control9;"CS UI Subform")
+            part(Control9; "CS UI Subform")
             {
-                SubPageLink = "UI Code"=FIELD(Code);
+                SubPageLink = "UI Code" = FIELD(Code);
             }
         }
         area(factboxes)
         {
-            systempart(Control1900383207;Links)
+            systempart(Control1900383207; Links)
             {
                 Visible = false;
             }
-            systempart(Control1905767507;Notes)
+            systempart(Control1905767507; Notes)
             {
                 Visible = false;
             }
@@ -95,7 +108,7 @@ page 6151375 "CS UI"
                     Caption = '&Functions';
                     Image = "Action";
                     RunObject = Page "CS UI Functions";
-                    RunPageLink = "UI Code"=FIELD(Code);
+                    RunPageLink = "UI Code" = FIELD(Code);
                 }
                 action("Reset Field Defaults")
                 {

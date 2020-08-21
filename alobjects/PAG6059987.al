@@ -11,12 +11,14 @@ page 6059987 "Discount Activities"
             cuegroup(Control6150614)
             {
                 ShowCaption = false;
-                field("Mixed Discounts Active";"Mixed Discounts Active")
+                field("Mixed Discounts Active"; "Mixed Discounts Active")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Mixed Discount List";
                 }
-                field("Period Discounts Active";"Period Discounts Active")
+                field("Period Discounts Active"; "Period Discounts Active")
                 {
+                    ApplicationArea = All;
                     DrillDownPageID = "Campaign Discount List";
                 }
 
@@ -47,12 +49,12 @@ page 6059987 "Discount Activities"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
 
-        SetFilter("Start Date Filter",'<=%1',Today);
-        SetFilter("End Date Filter",'>=%1',Today);
+        SetFilter("Start Date Filter", '<=%1', Today);
+        SetFilter("End Date Filter", '>=%1', Today);
     end;
 }
 

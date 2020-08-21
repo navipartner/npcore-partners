@@ -10,34 +10,41 @@ page 6059935 Hotkeys
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Hotkey;Hotkey)
+                field(Hotkey; Hotkey)
                 {
+                    ApplicationArea = All;
                 }
-                field("Hotkey Action";"Hotkey Action")
+                field("Hotkey Action"; "Hotkey Action")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
                         ApplicationPathEnabled := "Hotkey Action" = "Hotkey Action"::Application;
-                        ObjectFieldsEnabled    := "Hotkey Action" = "Hotkey Action"::Object;
+                        ObjectFieldsEnabled := "Hotkey Action" = "Hotkey Action"::Object;
                     end;
                 }
-                field("Object Type";"Object Type")
+                field("Object Type"; "Object Type")
                 {
+                    ApplicationArea = All;
                     Enabled = ObjectFieldsEnabled;
                 }
-                field("Object ID";"Object ID")
+                field("Object ID"; "Object ID")
                 {
+                    ApplicationArea = All;
                     Enabled = ObjectFieldsEnabled;
                 }
-                field("Application Path";"Application Path")
+                field("Application Path"; "Application Path")
                 {
+                    ApplicationArea = All;
                     Enabled = ApplicationPathEnabled;
                 }
             }
@@ -51,7 +58,7 @@ page 6059935 Hotkeys
     trigger OnAfterGetRecord()
     begin
         ApplicationPathEnabled := "Hotkey Action" = "Hotkey Action"::Application;
-        ObjectFieldsEnabled    := "Hotkey Action" = "Hotkey Action"::Object;
+        ObjectFieldsEnabled := "Hotkey Action" = "Hotkey Action"::Object;
     end;
 
     var

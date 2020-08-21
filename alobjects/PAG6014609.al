@@ -13,18 +13,22 @@ page 6014609 "NPR Attribute Value Lookup"
         {
             repeater(Group)
             {
-                field("Attribute Code";"Attribute Code")
+                field("Attribute Code"; "Attribute Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Attribute Value Code";"Attribute Value Code")
+                field("Attribute Value Code"; "Attribute Value Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute Value Name";"Attribute Value Name")
+                field("Attribute Value Name"; "Attribute Value Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Attribute Value Description";"Attribute Value Description")
+                field("Attribute Value Description"; "Attribute Value Description")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

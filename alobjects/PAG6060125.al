@@ -28,68 +28,89 @@ page 6060125 "MM Membership Sales Setup"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Business Flow Type";"Business Flow Type")
+                field("Business Flow Type"; "Business Flow Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
+                    ApplicationArea = All;
                 }
-                field("Blocked At";"Blocked At")
+                field("Blocked At"; "Blocked At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From Base";"Valid From Base")
+                field("Valid From Base"; "Valid From Base")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Cut-Off Date Calculation";"Sales Cut-Off Date Calculation")
+                field("Sales Cut-Off Date Calculation"; "Sales Cut-Off Date Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid From Date Calculation";"Valid From Date Calculation")
+                field("Valid From Date Calculation"; "Valid From Date Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Valid Until Calculation";"Valid Until Calculation")
+                field("Valid Until Calculation"; "Valid Until Calculation")
                 {
+                    ApplicationArea = All;
                 }
-                field("Duration Formula";"Duration Formula")
+                field("Duration Formula"; "Duration Formula")
                 {
+                    ApplicationArea = All;
                 }
-                field("Suggested Membercount In Sales";"Suggested Membercount In Sales")
+                field("Suggested Membercount In Sales"; "Suggested Membercount In Sales")
                 {
+                    ApplicationArea = All;
                 }
-                field("Assign Loyalty Points On Sale";"Assign Loyalty Points On Sale")
+                field("Assign Loyalty Points On Sale"; "Assign Loyalty Points On Sale")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto-Renew To";"Auto-Renew To")
+                field("Auto-Renew To"; "Auto-Renew To")
                 {
+                    ApplicationArea = All;
                 }
-                field("Auto-Admit Member On Sale";"Auto-Admit Member On Sale")
+                field("Auto-Admit Member On Sale"; "Auto-Admit Member On Sale")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Card Type Selection";"Member Card Type Selection")
+                field("Member Card Type Selection"; "Member Card Type Selection")
                 {
+                    ApplicationArea = All;
                 }
-                field("Member Card Type";"Member Card Type")
+                field("Member Card Type"; "Member Card Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Magento M2 Membership Sign-up";"Magento M2 Membership Sign-up")
+                field("Magento M2 Membership Sign-up"; "Magento M2 Membership Sign-up")
                 {
+                    ApplicationArea = All;
                 }
-                field("Age Constraint Type";"Age Constraint Type")
+                field("Age Constraint Type"; "Age Constraint Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Age Constraint (Years)";"Age Constraint (Years)")
+                field("Age Constraint (Years)"; "Age Constraint (Years)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Requires Guardian";"Requires Guardian")
+                field("Requires Guardian"; "Requires Guardian")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -109,7 +130,7 @@ page 6060125 "MM Membership Sales Setup"
 
                 trigger OnAction()
                 begin
-                    CreateMembership (Rec);
+                    CreateMembership(Rec);
                 end;
             }
             separator(Separator6150632)
@@ -132,10 +153,10 @@ page 6060125 "MM Membership Sales Setup"
                     MemberInfoCapture: Record "MM Member Info Capture";
                 begin
 
-                    MemberInfoCapture.SetFilter ("Originates From File Import", '=%1', true);
-                    MemberInfoCapturePage.SetTableView (MemberInfoCapture);
-                    MemberInfoCapturePage.SetShowImportAction ();
-                    MemberInfoCapturePage.Run ();
+                    MemberInfoCapture.SetFilter("Originates From File Import", '=%1', true);
+                    MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+                    MemberInfoCapturePage.SetShowImportAction();
+                    MemberInfoCapturePage.Run();
                 end;
             }
         }
@@ -158,7 +179,7 @@ page 6060125 "MM Membership Sales Setup"
                 Caption = 'Memberships';
                 Image = List;
                 RunObject = Page "MM Memberships";
-                RunPageLink = "Membership Code"=FIELD("Membership Code");
+                RunPageLink = "Membership Code" = FIELD("Membership Code");
             }
             action("Community Setup")
             {
@@ -173,7 +194,7 @@ page 6060125 "MM Membership Sales Setup"
     begin
 
         //-+MM1.18 [266769]
-        Rec.SetFilter (Blocked, '=%1', false);
+        Rec.SetFilter(Blocked, '=%1', false);
     end;
 
     procedure CreateMembership(MembershipSalesSetup: Record "MM Membership Sales Setup")
@@ -192,52 +213,52 @@ page 6060125 "MM Membership Sales Setup"
     begin
 
         //-MM1.40 [363147] Function refactored to use parameter record instance instead of Rec; previous comments /  versions removed
-        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
-        MemberCommunity.Get (MembershipSetup."Community Code");
-        MemberCommunity.CalcFields ("Foreign Membership");
-        MemberCommunity.TestField ("Foreign Membership", false);
+        MemberCommunity.Get(MembershipSetup."Community Code");
+        MemberCommunity.CalcFields("Foreign Membership");
+        MemberCommunity.TestField("Foreign Membership", false);
 
-        MemberInfoCapture.Init ();
+        MemberInfoCapture.Init();
         MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
-        MemberInfoCapture.Insert ();
+        MemberInfoCapture.Insert();
 
-        MemberInfoCapturePage.SetRecord (MemberInfoCapture);
-        MemberInfoCapture.SetFilter ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
-        MemberInfoCapturePage.SetTableView (MemberInfoCapture);
-        Commit ();
+        MemberInfoCapturePage.SetRecord(MemberInfoCapture);
+        MemberInfoCapture.SetFilter("Entry No.", '=%1', MemberInfoCapture."Entry No.");
+        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+        Commit();
 
-        MemberInfoCapturePage.LookupMode (true);
-        PageAction := MemberInfoCapturePage.RunModal ();
+        MemberInfoCapturePage.LookupMode(true);
+        PageAction := MemberInfoCapturePage.RunModal();
 
         if (PageAction = ACTION::LookupOK) then begin
-          MemberInfoCapturePage.GetRecord (MemberInfoCapture);
+            MemberInfoCapturePage.GetRecord(MemberInfoCapture);
 
-          case MembershipSalesSetup."Business Flow Type" of
+            case MembershipSalesSetup."Business Flow Type" of
 
-            MembershipSalesSetup."Business Flow Type"::MEMBERSHIP :
-              begin
-                MembershipEntryNo := MembershipManagement.CreateMembershipAll (MembershipSalesSetup, MemberInfoCapture, true);
-                Membership.Get (MembershipEntryNo);
-                MembershipPage.SetRecord (Membership);
-                MembershipPage.Run ();
-              end;
+                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
+                    begin
+                        MembershipEntryNo := MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
+                        Membership.Get(MembershipEntryNo);
+                        MembershipPage.SetRecord(Membership);
+                        MembershipPage.Run();
+                    end;
 
-            MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER :
-              MembershipManagement.AddMemberAndCard (true, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
+                MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
+                    MembershipManagement.AddMemberAndCard(true, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
 
-            MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER :
-              MembershipManagement.AddAnonymousMember (MemberInfoCapture, MemberInfoCapture.Quantity);
+                MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
+                    MembershipManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
 
-            MembershipSalesSetup."Business Flow Type"::REPLACE_CARD :
-              begin
-                MembershipManagement.BlockMemberCard (MembershipManagement.GetCardEntryNoFromExtCardNo (MemberInfoCapture."Replace External Card No."), true);
-                MembershipManagement.IssueMemberCard (true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-              end;
+                MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
+                    begin
+                        MembershipManagement.BlockMemberCard(MembershipManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
+                        MembershipManagement.IssueMemberCard(true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                    end;
 
-            MembershipSalesSetup."Business Flow Type"::ADD_CARD :
-              MembershipManagement.IssueMemberCard (true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-          end;
+                MembershipSalesSetup."Business Flow Type"::ADD_CARD:
+                    MembershipManagement.IssueMemberCard(true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+            end;
         end;
         //+MM1.40 [363147]
     end;

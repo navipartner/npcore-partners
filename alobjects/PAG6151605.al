@@ -14,29 +14,36 @@ page 6151605 "NpDc Issue On-Sale Subform"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Variant Code";"Variant Code")
+                field("Variant Code"; "Variant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lot Quantity";"Lot Quantity")
+                field("Lot Quantity"; "Lot Quantity")
                 {
+                    ApplicationArea = All;
                     Visible = LotQtyVisible;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Profit %";"Profit %")
+                field("Profit %"; "Profit %")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

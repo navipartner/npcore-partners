@@ -13,17 +13,21 @@ page 6150905 "HC Payment Types Posting Setup"
         {
             repeater(Group)
             {
-                field("BC Payment Type POS No.";"BC Payment Type POS No.")
+                field("BC Payment Type POS No."; "BC Payment Type POS No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("BC Register No.";"BC Register No.")
+                field("BC Register No."; "BC Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("G/L Account No.";"G/L Account No.")
+                field("G/L Account No."; "G/L Account No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Bank Account No.";"Bank Account No.")
+                field("Bank Account No."; "Bank Account No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

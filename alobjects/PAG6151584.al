@@ -16,15 +16,18 @@ page 6151584 "Event Exch. Int. Email Summary"
             {
                 IndentationColumn = Indentation;
                 ShowAsTree = true;
-                field("Exchange Item";"Exchange Item")
+                field("Exchange Item"; "Exchange Item")
                 {
+                    ApplicationArea = All;
                     StyleExpr = ColorStyle;
                 }
-                field("E-mail Account";"E-mail Account")
+                field("E-mail Account"; "E-mail Account")
                 {
+                    ApplicationArea = All;
                 }
-                field(Source;Source)
+                field(Source; Source)
                 {
+                    ApplicationArea = All;
                     StyleExpr = ColorStyle;
                 }
             }
@@ -37,7 +40,7 @@ page 6151584 "Event Exch. Int. Email Summary"
 
     trigger OnAfterGetRecord()
     begin
-        EventEWSMgt.ExchIntSummaryApplyStyleExpr(Rec,ColorStyle);
+        EventEWSMgt.ExchIntSummaryApplyStyleExpr(Rec, ColorStyle);
     end;
 
     var

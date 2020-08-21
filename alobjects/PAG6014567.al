@@ -14,15 +14,18 @@ page 6014567 "Retail Logo Factbox"
     {
         area(content)
         {
-            field(Logo;Logo)
+            field(Logo; Logo)
             {
+                ApplicationArea = All;
                 ShowCaption = false;
             }
-            field(Width;Width)
+            field(Width; Width)
             {
+                ApplicationArea = All;
             }
-            field(Height;Height)
+            field(Height; Height)
             {
+                ApplicationArea = All;
             }
         }
     }

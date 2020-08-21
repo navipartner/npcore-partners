@@ -15,44 +15,57 @@ page 6014564 "Warranty Cat. Lines"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Label No.";"Label No.")
+                field("Label No."; "Label No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Lock Code";"Lock Code")
+                field("Lock Code"; "Lock Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No.";"Serial No.")
+                field("Serial No."; "Serial No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(InsuranceType;InsuranceType)
+                field(InsuranceType; InsuranceType)
                 {
+                    ApplicationArea = All;
                 }
-                field("Insurance send";"Insurance send")
+                field("Insurance send"; "Insurance send")
                 {
+                    ApplicationArea = All;
                 }
-                field("Serial No. not Created";"Serial No. not Created")
+                field("Serial No. not Created"; "Serial No. not Created")
                 {
+                    ApplicationArea = All;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
+                    ApplicationArea = All;
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
+                    ApplicationArea = All;
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount incl. VAT";"Amount incl. VAT")
+                field("Amount incl. VAT"; "Amount incl. VAT")
                 {
+                    ApplicationArea = All;
                 }
-                field("Discount %";"Discount %")
+                field("Discount %"; "Discount %")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

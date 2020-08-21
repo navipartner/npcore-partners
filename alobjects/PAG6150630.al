@@ -15,46 +15,59 @@ page 6150630 "POS Tax Checkpoint"
         {
             repeater(Group)
             {
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Tax Area Code";"Tax Area Code")
+                field("Tax Area Code"; "Tax Area Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Jurisdiction Code";"Tax Jurisdiction Code")
+                field("Tax Jurisdiction Code"; "Tax Jurisdiction Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Group Code";"Tax Group Code")
+                field("Tax Group Code"; "Tax Group Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("VAT Identifier";"VAT Identifier")
+                field("VAT Identifier"; "VAT Identifier")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Calculation Type";"Tax Calculation Type")
+                field("Tax Calculation Type"; "Tax Calculation Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Type";"Tax Type")
+                field("Tax Type"; "Tax Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax %";"Tax %")
+                field("Tax %"; "Tax %")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Base Amount";"Tax Base Amount")
+                field("Tax Base Amount"; "Tax Base Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Tax Amount";"Tax Amount")
+                field("Tax Amount"; "Tax Amount")
                 {
+                    ApplicationArea = All;
                 }
-                field("Amount Including Tax";"Amount Including Tax")
+                field("Amount Including Tax"; "Amount Including Tax")
                 {
+                    ApplicationArea = All;
                 }
-                field("Line Amount";"Line Amount")
+                field("Line Amount"; "Line Amount")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Workshift Checkpoint Entry No.";"Workshift Checkpoint Entry No.")
+                field("Workshift Checkpoint Entry No."; "Workshift Checkpoint Entry No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

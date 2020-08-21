@@ -16,28 +16,35 @@ page 6060098 "Ean Box Setup Events"
         {
             repeater(Group)
             {
-                field("Event Code";"Event Code")
+                field("Event Code"; "Event Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Module Name";"Module Name")
+                field("Module Name"; "Module Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Event Description";"Event Description")
+                field("Event Description"; "Event Description")
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
-                field(Priority;Priority)
+                field(Priority; Priority)
                 {
+                    ApplicationArea = All;
                 }
-                field("Action Code";"Action Code")
+                field("Action Code"; "Action Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Action Description";"Action Description")
+                field("Action Description"; "Action Description")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -59,9 +66,9 @@ page 6060098 "Ean Box Setup Events"
                     EanBoxSetupMgt: Codeunit "Ean Box Setup Mgt.";
                 begin
                     EanBoxSetupMgt.InitEanBoxSetupEventParameters(Rec);
-                    EanBoxParameter.SetRange("Setup Code","Setup Code");
-                    EanBoxParameter.SetRange("Event Code","Event Code");
-                    PAGE.Run(0,EanBoxParameter);
+                    EanBoxParameter.SetRange("Setup Code", "Setup Code");
+                    EanBoxParameter.SetRange("Event Code", "Event Code");
+                    PAGE.Run(0, EanBoxParameter);
                 end;
             }
         }

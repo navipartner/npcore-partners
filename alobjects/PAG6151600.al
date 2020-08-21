@@ -20,39 +20,46 @@ page 6151600 "NpDc Arch. Coupon Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("No.";"No.")
+                    field("No."; "No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Coupon Type";"Coupon Type")
+                    field("Coupon Type"; "Coupon Type")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field(Description;Description)
+                    field(Description; Description)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Discount Type";"Discount Type")
+                    field("Discount Type"; "Discount Type")
                     {
+                        ApplicationArea = All;
                     }
                     group(Control6014432)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type"=0);
-                        field("Discount Amount";"Discount Amount")
+                        Visible = ("Discount Type" = 0);
+                        field("Discount Amount"; "Discount Amount")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                         }
                     }
                     group(Control6014430)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type"=1);
-                        field("Discount %";"Discount %")
+                        Visible = ("Discount Type" = 1);
+                        field("Discount %"; "Discount %")
                         {
+                            ApplicationArea = All;
                             ShowMandatory = true;
                         }
-                        field("Max. Discount Amount";"Max. Discount Amount")
+                        field("Max. Discount Amount"; "Max. Discount Amount")
                         {
+                            ApplicationArea = All;
                             ToolTip = 'Max. Discount Amount per Sale';
                         }
                     }
@@ -60,11 +67,13 @@ page 6151600 "NpDc Arch. Coupon Card"
                 group(Control6014427)
                 {
                     ShowCaption = false;
-                    field(Open;Open)
+                    field(Open; Open)
                     {
+                        ApplicationArea = All;
                     }
-                    field("Remaining Quantity";"Remaining Quantity")
+                    field("Remaining Quantity"; "Remaining Quantity")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -74,23 +83,27 @@ page 6151600 "NpDc Arch. Coupon Card"
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Issue Coupon Module";"Issue Coupon Module")
+                    field("Issue Coupon Module"; "Issue Coupon Module")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
                 group(Control6014435)
                 {
                     ShowCaption = false;
-                    field("Reference No.";"Reference No.")
+                    field("Reference No."; "Reference No.")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
-                    field("Customer No.";"Customer No.")
+                    field("Customer No."; "Customer No.")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Print Template Code";"Print Template Code")
+                    field("Print Template Code"; "Print Template Code")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -100,19 +113,22 @@ page 6151600 "NpDc Arch. Coupon Card"
                 group(Control6014416)
                 {
                     ShowCaption = false;
-                    field("Validate Coupon Module";"Validate Coupon Module")
+                    field("Validate Coupon Module"; "Validate Coupon Module")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
                 group(Control6014418)
                 {
                     ShowCaption = false;
-                    field("Starting Date";"Starting Date")
+                    field("Starting Date"; "Starting Date")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Ending Date";"Ending Date")
+                    field("Ending Date"; "Ending Date")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -122,16 +138,18 @@ page 6151600 "NpDc Arch. Coupon Card"
                 group(Control6014414)
                 {
                     ShowCaption = false;
-                    field("Apply Discount Module";"Apply Discount Module")
+                    field("Apply Discount Module"; "Apply Discount Module")
                     {
+                        ApplicationArea = All;
                         Editable = false;
                     }
                 }
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Max Use per Sale";"Max Use per Sale")
+                    field("Max Use per Sale"; "Max Use per Sale")
                     {
+                        ApplicationArea = All;
                     }
                 }
                 group(Control6014415)
@@ -151,7 +169,7 @@ page 6151600 "NpDc Arch. Coupon Card"
                 Caption = 'Archived Coupon Entries';
                 Image = Entries;
                 RunObject = Page "NpDc Arch. Coupon Entries";
-                RunPageLink = "Arch. Coupon No."=FIELD("No.");
+                RunPageLink = "Arch. Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
             }
         }

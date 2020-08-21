@@ -18,12 +18,15 @@ page 6150681 "NPRE Item Routing Profiles"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
                 field(AssignedFlowStatuses; AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
+                    ApplicationArea = All;
                     Caption = 'Serving Steps';
                     Editable = false;
 
@@ -34,6 +37,7 @@ page 6150681 "NPRE Item Routing Profiles"
                 }
                 field(AssignedPrintCategories; AssignedPrintCategoriesAsString())
                 {
+                    ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
 

@@ -9,7 +9,7 @@ page 6151020 "NpRv Sales Line References"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NpRv Sales Line Reference";
-    SourceTableView = SORTING("Sales Line Id","Voucher No.","Reference No.");
+    SourceTableView = SORTING("Sales Line Id", "Voucher No.", "Reference No.");
 
     layout
     {
@@ -17,8 +17,9 @@ page 6151020 "NpRv Sales Line References"
         {
             repeater(Group)
             {
-                field("Reference No.";"Reference No.")
+                field("Reference No."; "Reference No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -57,12 +58,12 @@ page 6151020 "NpRv Sales Line References"
     begin
         RefNoQty := Count;
         if Quantity = RefNoQty then
-          exit(true);
+            exit(true);
 
-        exit(Confirm(Text000,true,Quantity,RefNoQty));
+        exit(Confirm(Text000, true, Quantity, RefNoQty));
     end;
 
-    procedure SetNpRvSalesLine(NewNpRvSalesLine: Record "NpRv Sales Line";NewQuantity: Decimal)
+    procedure SetNpRvSalesLine(NewNpRvSalesLine: Record "NpRv Sales Line"; NewQuantity: Decimal)
     begin
         NpRvSalesLine := NewNpRvSalesLine;
         Quantity := NewQuantity;
@@ -73,7 +74,7 @@ page 6151020 "NpRv Sales Line References"
         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
     begin
         FilterGroup(2);
-        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine,Rec);
+        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, Rec);
         FilterGroup(0);
 
         if VoucherType.Get(NpRvSalesLine."Voucher Type") then;

@@ -14,26 +14,33 @@ page 6014665 "Stock-Take Configurations"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Inventory Calc. Date";"Inventory Calc. Date")
+                field("Inventory Calc. Date"; "Inventory Calc. Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Stock-Take Template Code";"Stock-Take Template Code")
+                field("Stock-Take Template Code"; "Stock-Take Template Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow User Modification";"Allow User Modification")
+                field("Allow User Modification"; "Allow User Modification")
                 {
+                    ApplicationArea = All;
                 }
-                field("Allow Unit Cost Change";"Allow Unit Cost Change")
+                field("Allow Unit Cost Change"; "Allow Unit Cost Change")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -53,8 +60,8 @@ page 6014665 "Stock-Take Configurations"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID"=CONST(6014665),
-                              "No."=FIELD(Code);
+                RunPageLink = "Table ID" = CONST(6014665),
+                              "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
 
                 trigger OnAction()
@@ -70,7 +77,7 @@ page 6014665 "Stock-Take Configurations"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Stock-Take Configuration Card";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F5';
             }
             action("&Worksheets")
@@ -78,7 +85,7 @@ page 6014665 "Stock-Take Configurations"
                 Caption = '&Worksheets';
                 Image = Worksheet2;
                 RunObject = Page "Stock-Take Worksheet";
-                RunPageLink = "Stock-Take Config Code"=FIELD(Code);
+                RunPageLink = "Stock-Take Config Code" = FIELD(Code);
             }
             action(Integration)
             {

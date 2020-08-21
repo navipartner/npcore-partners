@@ -13,17 +13,20 @@ page 6059790 "Pdf2Nav Posting Setup"
         {
             group(General)
             {
-                field("Post and Send";"Post and Send")
+                field("Post and Send"; "Post and Send")
                 {
+                    ApplicationArea = All;
                 }
                 group("When posting with Pdf2Nav:")
                 {
                     Caption = 'When posting with Pdf2Nav:';
-                    field("Always Print Ship";"Always Print Ship")
+                    field("Always Print Ship"; "Always Print Ship")
                     {
+                        ApplicationArea = All;
                     }
-                    field("Always Print Receive";"Always Print Receive")
+                    field("Always Print Receive"; "Always Print Receive")
                     {
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -38,7 +41,7 @@ page 6059790 "Pdf2Nav Posting Setup"
     begin
         Reset;
         if not Get then
-          Insert;
+            Insert;
     end;
 }
 

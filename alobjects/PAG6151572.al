@@ -18,33 +18,43 @@ page 6151572 "AF Test Services"
                 Caption = 'Spire Barcode';
                 field(Value; Value)
                 {
+                    ApplicationArea = All;
                 }
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
                 field("Show Checksum"; "Show Checksum")
                 {
+                    ApplicationArea = All;
                 }
                 field("Barcode Height"; "Barcode Height")
                 {
+                    ApplicationArea = All;
                 }
                 field("Barcode Size"; "Barcode Size")
                 {
+                    ApplicationArea = All;
                 }
                 field("Include Text"; "Include Text")
                 {
+                    ApplicationArea = All;
                 }
                 field(Border; Border)
                 {
+                    ApplicationArea = All;
                 }
                 field("Reverse Colors"; "Reverse Colors")
                 {
+                    ApplicationArea = All;
                 }
                 field("Image Type"; "Image Type")
                 {
+                    ApplicationArea = All;
                 }
                 field(Image; Image)
                 {
+                    ApplicationArea = All;
                 }
             }
             group("MSG Service")
@@ -52,14 +62,17 @@ page 6151572 "AF Test Services"
                 Caption = 'MSG Service';
                 field(MSGSender; MSGSender)
                 {
+                    ApplicationArea = All;
                     Caption = 'Sender';
                 }
                 field(MSGPhoneNumber; MSGPhoneNumber)
                 {
+                    ApplicationArea = All;
                     Caption = 'Phone Number';
                 }
                 field(MSGInvoiceNo; MSGInvoiceNo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Invoice No.';
                     TableRelation = "Sales Invoice Header";
                 }

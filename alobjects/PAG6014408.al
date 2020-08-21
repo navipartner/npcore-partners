@@ -10,7 +10,7 @@ page 6014408 "Credit card transaction list"
     Editable = false;
     PageType = List;
     SourceTable = "EFT Receipt";
-    SourceTableView = WHERE(Type=FILTER(0|3|10));
+    SourceTableView = WHERE(Type = FILTER(0 | 3 | 10));
 
     layout
     {
@@ -18,29 +18,37 @@ page 6014408 "Credit card transaction list"
         {
             repeater(Group)
             {
-                field(Date;Date)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                 }
-                field(Text;Text)
+                field(Text; Text)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Time";"Transaction Time")
+                field("Transaction Time"; "Transaction Time")
                 {
+                    ApplicationArea = All;
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket No.";"Sales Ticket No.")
+                field("Sales Ticket No."; "Sales Ticket No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Sales Ticket amount";"Sales Ticket amount")
+                field("Sales Ticket amount"; "Sales Ticket amount")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -65,7 +73,7 @@ page 6014408 "Credit card transaction list"
 
                         trans.SetRange(trans."Register No.", "Register No.");
                         trans.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                        trans.SetRange(Type,0);
+                        trans.SetRange(Type, 0);
                         //-NPR5.46 [290734]
                         //trans.PrintTerminalReceipt(FALSE);
                         trans.PrintTerminalReceipt();

@@ -18,12 +18,14 @@ page 6014500 "Dynamic Module Settings"
             {
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Caption = 'Setting Name';
                     Style = Strong;
                     StyleExpr = "Setting ID" = 0;
                 }
                 field("Formatted Value"; "Formatted Value")
                 {
+                    ApplicationArea = All;
                     Caption = 'Setting Value';
 
                     trigger OnAssistEdit()

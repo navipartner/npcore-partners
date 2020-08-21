@@ -16,28 +16,32 @@ page 6150685 "NPRE Kitchen Stations"
         {
             repeater(Group)
             {
-                field("Restaurant Code";"Restaurant Code")
+                field("Restaurant Code"; "Restaurant Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Description 2";"Description 2")
+                field("Description 2"; "Description 2")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014407;Notes)
+            systempart(Control6014407; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014408;Links)
+            systempart(Control6014408; Links)
             {
                 Visible = false;
             }
@@ -53,8 +57,8 @@ page 6150685 "NPRE Kitchen Stations"
                 Caption = 'Station Selection Setup';
                 Image = Troubleshoot;
                 RunObject = Page "NPRE Kitchen Station Selection";
-                RunPageLink = "Restaurant Code"=FIELD("Restaurant Code"),
-                              "Kitchen Station"=FIELD(Code);
+                RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
+                              "Kitchen Station" = FIELD(Code);
             }
             action(ShowKitchenRequests)
             {

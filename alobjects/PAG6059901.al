@@ -13,35 +13,45 @@ page 6059901 "Task Batch"
         {
             repeater(Group)
             {
-                field("Journal Template Name";"Journal Template Name")
+                field("Journal Template Name"; "Journal Template Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Task Worker Group";"Task Worker Group")
+                field("Task Worker Group"; "Task Worker Group")
                 {
+                    ApplicationArea = All;
                 }
-                field("Common Companies";"Common Companies")
+                field("Common Companies"; "Common Companies")
                 {
+                    ApplicationArea = All;
                 }
-                field("Master Company";"Master Company")
+                field("Master Company"; "Master Company")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mail From Address";"Mail From Address")
+                field("Mail From Address"; "Mail From Address")
                 {
+                    ApplicationArea = All;
                 }
-                field("Mail From Name";"Mail From Name")
+                field("Mail From Name"; "Mail From Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Type";"Template Type")
+                field("Template Type"; "Template Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Delete Log After";"Delete Log After")
+                field("Delete Log After"; "Delete Log After")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

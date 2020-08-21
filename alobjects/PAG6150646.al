@@ -12,28 +12,34 @@ page 6150646 "POS Info Lookup"
             repeater(Group)
             {
                 Caption = 'Group';
-                field("Field 1";"Field 1")
+                field("Field 1"; "Field 1")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Field1Caption;
                 }
-                field("Field 2";"Field 2")
+                field("Field 2"; "Field 2")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Field2Caption;
                 }
-                field("Field 3";"Field 3")
+                field("Field 3"; "Field 3")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Field3Caption;
                 }
-                field("Field 4";"Field 4")
+                field("Field 4"; "Field 4")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Field4Caption;
                 }
-                field("Field 5";"Field 5")
+                field("Field 5"; "Field 5")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Field5Caption;
                 }
-                field("Field 6";"Field 6")
+                field("Field 6"; "Field 6")
                 {
+                    ApplicationArea = All;
                     CaptionClass = Field6Caption;
                 }
             }
@@ -47,9 +53,9 @@ page 6150646 "POS Info Lookup"
     trigger OnOpenPage()
     begin
         if POSInfo."Input Type" = POSInfo."Input Type"::Table then
-          LoadTable;
+            LoadTable;
         if POSInfo."Input Type" = POSInfo."Input Type"::SubCode then
-          LoadSubcodes;
+            LoadSubcodes;
 
         CurrPage.Update;
     end;
@@ -75,78 +81,85 @@ page 6150646 "POS Info Lookup"
         RecRef: RecordRef;
         FieldRef: FieldRef;
         EntryNo: Integer;
-        FieldMappingARR: array [6] of Integer;
+        FieldMappingARR: array[6] of Integer;
     begin
         EntryNo := 1;
         Clear(FieldMappingARR);
-        POSInfoLookupSetup.SetRange("POS Info Code",POSInfo.Code);
+        POSInfoLookupSetup.SetRange("POS Info Code", POSInfo.Code);
         if POSInfo."Table No." = 0 then
-          Error('error');
+            Error('error');
 
         if not POSInfoLookupSetup.FindFirst then
-          Error('Error');
+            Error('Error');
         repeat
-          case POSInfoLookupSetup."Map To" of
-            POSInfoLookupSetup."Map To"::"Field 1" : begin
-              FieldMappingARR[1] := POSInfoLookupSetup."Field No.";
+            case POSInfoLookupSetup."Map To" of
+                POSInfoLookupSetup."Map To"::"Field 1":
+                    begin
+                        FieldMappingARR[1] := POSInfoLookupSetup."Field No.";
+                    end;
+                POSInfoLookupSetup."Map To"::"Field 2":
+                    begin
+                        FieldMappingARR[2] := POSInfoLookupSetup."Field No.";
+                    end;
+                POSInfoLookupSetup."Map To"::"Field 3":
+                    begin
+                        FieldMappingARR[3] := POSInfoLookupSetup."Field No.";
+                    end;
+                POSInfoLookupSetup."Map To"::"Field 4":
+                    begin
+                        FieldMappingARR[4] := POSInfoLookupSetup."Field No.";
+                    end;
+                POSInfoLookupSetup."Map To"::"Field 5":
+                    begin
+                        FieldMappingARR[5] := POSInfoLookupSetup."Field No.";
+                    end;
+                POSInfoLookupSetup."Map To"::"Field 6":
+                    begin
+                        FieldMappingARR[6] := POSInfoLookupSetup."Field No.";
+                    end;
             end;
-            POSInfoLookupSetup."Map To"::"Field 2" : begin
-              FieldMappingARR[2] := POSInfoLookupSetup."Field No.";
-            end;
-            POSInfoLookupSetup."Map To"::"Field 3" : begin
-              FieldMappingARR[3] := POSInfoLookupSetup."Field No.";
-            end;
-            POSInfoLookupSetup."Map To"::"Field 4" : begin
-              FieldMappingARR[4] := POSInfoLookupSetup."Field No.";
-            end;
-            POSInfoLookupSetup."Map To"::"Field 5" : begin
-              FieldMappingARR[5] := POSInfoLookupSetup."Field No.";
-            end;
-            POSInfoLookupSetup."Map To"::"Field 6" : begin
-              FieldMappingARR[6] := POSInfoLookupSetup."Field No.";
-            end;
-          end;
         until POSInfoLookupSetup.Next = 0;
 
         RecRef.Open(POSInfo."Table No.");
-        if RecRef.FindFirst then repeat
-          Rec.Init;
-          Rec."Entry No." := EntryNo;
-          EntryNo := EntryNo + 1;
-          Rec."Table No." := 0; //Function to create a combined key
-          if FieldMappingARR[1] <> 0 then begin
-            Rec."Field 1" := Format(RecRef.Field(FieldMappingARR[1]).Value);
-            FieldRef := RecRef.Field(FieldMappingARR[1]);
-            Field1Caption := FieldRef.Caption;
-          end;
-          if FieldMappingARR[2] <> 0 then begin
-            Rec."Field 2" := Format(RecRef.Field(FieldMappingARR[2]).Value);
-            FieldRef := RecRef.Field(FieldMappingARR[2]);
-            Field2Caption := FieldRef.Caption;
-          end;
-          if FieldMappingARR[3] <> 0 then begin
-            Rec."Field 3" := Format(RecRef.Field(FieldMappingARR[3]).Value);
-            FieldRef := RecRef.Field(FieldMappingARR[3]);
-            Field3Caption := FieldRef.Caption;
-          end;
-          if FieldMappingARR[4] <> 0 then begin
-            Rec."Field 4" := Format(RecRef.Field(FieldMappingARR[4]).Value);
-            FieldRef := RecRef.Field(FieldMappingARR[4]);
-            Field4Caption := FieldRef.Caption;
-          end;
-          if FieldMappingARR[5] <> 0 then begin
-            Rec."Field 5" := Format(RecRef.Field(FieldMappingARR[5]).Value);
-            FieldRef := RecRef.Field(FieldMappingARR[5]);
-            Field5Caption := FieldRef.Caption;
-          end;
-          if FieldMappingARR[6] <> 0 then begin
-            Rec."Field 6" := Format(RecRef.Field(FieldMappingARR[6]).Value);
-            FieldRef := RecRef.Field(FieldMappingARR[6]);
-            Field6Caption := FieldRef.Caption;
-          end;
-          Rec.RecID := RecRef.RecordId;
-          Rec.Insert;
-        until RecRef.Next = 0;
+        if RecRef.FindFirst then
+            repeat
+                Rec.Init;
+                Rec."Entry No." := EntryNo;
+                EntryNo := EntryNo + 1;
+                Rec."Table No." := 0; //Function to create a combined key
+                if FieldMappingARR[1] <> 0 then begin
+                    Rec."Field 1" := Format(RecRef.Field(FieldMappingARR[1]).Value);
+                    FieldRef := RecRef.Field(FieldMappingARR[1]);
+                    Field1Caption := FieldRef.Caption;
+                end;
+                if FieldMappingARR[2] <> 0 then begin
+                    Rec."Field 2" := Format(RecRef.Field(FieldMappingARR[2]).Value);
+                    FieldRef := RecRef.Field(FieldMappingARR[2]);
+                    Field2Caption := FieldRef.Caption;
+                end;
+                if FieldMappingARR[3] <> 0 then begin
+                    Rec."Field 3" := Format(RecRef.Field(FieldMappingARR[3]).Value);
+                    FieldRef := RecRef.Field(FieldMappingARR[3]);
+                    Field3Caption := FieldRef.Caption;
+                end;
+                if FieldMappingARR[4] <> 0 then begin
+                    Rec."Field 4" := Format(RecRef.Field(FieldMappingARR[4]).Value);
+                    FieldRef := RecRef.Field(FieldMappingARR[4]);
+                    Field4Caption := FieldRef.Caption;
+                end;
+                if FieldMappingARR[5] <> 0 then begin
+                    Rec."Field 5" := Format(RecRef.Field(FieldMappingARR[5]).Value);
+                    FieldRef := RecRef.Field(FieldMappingARR[5]);
+                    Field5Caption := FieldRef.Caption;
+                end;
+                if FieldMappingARR[6] <> 0 then begin
+                    Rec."Field 6" := Format(RecRef.Field(FieldMappingARR[6]).Value);
+                    FieldRef := RecRef.Field(FieldMappingARR[6]);
+                    Field6Caption := FieldRef.Caption;
+                end;
+                Rec.RecID := RecRef.RecordId;
+                Rec.Insert;
+            until RecRef.Next = 0;
     end;
 
     local procedure LoadSubcodes()
@@ -156,18 +169,18 @@ page 6150646 "POS Info Lookup"
     begin
         EntryNo := 1;
         POSInfoSubcode.Reset;
-        POSInfoSubcode.SetRange(Code,POSInfo.Code);
+        POSInfoSubcode.SetRange(Code, POSInfo.Code);
         if not POSInfoSubcode.FindFirst then
-          Error(ErrText001,POSInfo.Code);
+            Error(ErrText001, POSInfo.Code);
         repeat
-          Rec.Init;
-          Rec."Entry No." := EntryNo;
-          EntryNo := EntryNo + 1;
-          Rec."Field 1" := POSInfoSubcode.Subcode;
-          Field1Caption := POSInfoSubcode.Subcode;
-          Rec."Field 2" := POSInfoSubcode.Description;
-          Field2Caption := POSInfoSubcode.Description;
-          Rec.Insert;
+            Rec.Init;
+            Rec."Entry No." := EntryNo;
+            EntryNo := EntryNo + 1;
+            Rec."Field 1" := POSInfoSubcode.Subcode;
+            Field1Caption := POSInfoSubcode.Subcode;
+            Rec."Field 2" := POSInfoSubcode.Description;
+            Field2Caption := POSInfoSubcode.Description;
+            Rec.Insert;
 
         until POSInfoSubcode.Next = 0;
     end;

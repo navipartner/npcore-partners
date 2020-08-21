@@ -14,26 +14,32 @@ page 6151563 "NpXml Template Change History"
         {
             repeater(Group)
             {
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                     Importance = Promoted;
                 }
-                field("Version Description";"Version Description")
+                field("Version Description"; "Version Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Template Version No.";"Template Version No.")
+                field("Template Version No."; "Template Version No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Event Type";"Event Type")
+                field("Event Type"; "Event Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Changed by";"Changed by")
+                field("Changed by"; "Changed by")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Change at";"Change at")
+                field("Change at"; "Change at")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
             }

@@ -15,14 +15,17 @@ page 6184473 "EFT Transaction Log Factbox"
         {
             repeater(Group)
             {
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Logged At";"Logged At")
+                field("Logged At"; "Logged At")
                 {
+                    ApplicationArea = All;
                 }
-                field("Log.HASVALUE";Log.HasValue)
+                field("Log.HASVALUE"; Log.HasValue)
                 {
+                    ApplicationArea = All;
                     Caption = 'Has Log File';
                 }
             }
@@ -47,7 +50,7 @@ page 6184473 "EFT Transaction Log Factbox"
                     FileName: Text;
                 begin
                     if not Log.HasValue then
-                      exit;
+                        exit;
                     CalcFields(Log);
                     Log.CreateInStream(InStream);
                     FileName := StrSubstNo('EFT_Log_%1_%2', "Transaction Entry No.", "Log Entry No.");

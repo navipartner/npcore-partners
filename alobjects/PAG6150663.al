@@ -17,41 +17,52 @@ page 6150663 "NPRE Waiter Pad List"
         {
             repeater(Group)
             {
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Date";"Start Date")
+                field("Start Date"; "Start Date")
                 {
+                    ApplicationArea = All;
                 }
-                field("Start Time";"Start Time")
+                field("Start Time"; "Start Time")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Seating Description";"Current Seating Description")
+                field("Current Seating Description"; "Current Seating Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Current Seating FF";"Current Seating FF")
+                field("Current Seating FF"; "Current Seating FF")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Multiple Seating FF";"Multiple Seating FF")
+                field("Multiple Seating FF"; "Multiple Seating FF")
                 {
+                    ApplicationArea = All;
                 }
-                field("Pre-receipt Printed";"Pre-receipt Printed")
+                field("Pre-receipt Printed"; "Pre-receipt Printed")
                 {
+                    ApplicationArea = All;
                 }
-                field(Closed;Closed)
+                field(Closed; Closed)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Close Date";"Close Date")
+                field("Close Date"; "Close Date")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Close Time";"Close Time")
+                field("Close Time"; "Close Time")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
             }

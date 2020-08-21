@@ -15,21 +15,23 @@ page 6150694 "NPRE Service Flow Profiles"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control6014405;Notes)
+            systempart(Control6014405; Notes)
             {
                 Visible = false;
             }
-            systempart(Control6014406;Links)
+            systempart(Control6014406; Links)
             {
                 Visible = false;
             }

@@ -7,6 +7,7 @@ pageextension 6014477 pageextension6014477 extends "Resource Groups"
         {
             field("E-Mail";"E-Mail")
             {
+                ApplicationArea = All;
             }
         }
     }

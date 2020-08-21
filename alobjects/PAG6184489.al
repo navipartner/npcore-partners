@@ -16,29 +16,37 @@ page 6184489 "Pepper EFT Result Codes"
         {
             repeater(Group)
             {
-                field("Integration Type";"Integration Type")
+                field("Integration Type"; "Integration Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Type Code";"Transaction Type Code")
+                field("Transaction Type Code"; "Transaction Type Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Transaction Subtype Code";"Transaction Subtype Code")
+                field("Transaction Subtype Code"; "Transaction Subtype Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Successful;Successful)
+                field(Successful; Successful)
                 {
+                    ApplicationArea = All;
                 }
-                field("Long Description";"Long Description")
+                field("Long Description"; "Long Description")
                 {
+                    ApplicationArea = All;
                 }
-                field("Open Terminal and Retry";"Open Terminal and Retry")
+                field("Open Terminal and Retry"; "Open Terminal and Retry")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

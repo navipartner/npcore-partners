@@ -15,14 +15,17 @@ page 6150713 "POS Stargate Packages"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
-                field(Version;Version)
+                field(Version; Version)
                 {
+                    ApplicationArea = All;
                 }
-                field(Control6150619;Methods)
+                field(Control6150619; Methods)
                 {
+                    ApplicationArea = All;
                     ShowCaption = false;
                 }
             }
@@ -65,10 +68,11 @@ page 6150713 "POS Stargate Packages"
                     CurrPage.SetSelectionFilter(Rec2);
                     JArray := JArray.JArray();
 
-                    if Rec2.FindSet then repeat
-                      StargatePackageMethods.SetRange("Package Name", Rec2.Name);
-                      ManagedDepMgt.RecordToJArray(StargatePackageMethods, JArray);
-                    until Rec2.Next = 0;
+                    if Rec2.FindSet then
+                        repeat
+                            StargatePackageMethods.SetRange("Package Name", Rec2.Name);
+                            ManagedDepMgt.RecordToJArray(StargatePackageMethods, JArray);
+                        until Rec2.Next = 0;
                     ManagedDepMgt.RecordToJArray(Rec2, JArray);
                     ManagedDepMgt.ExportManifest(Rec2, JArray, 1);
                     //+NPR5.32.10 [265454]
@@ -85,7 +89,7 @@ page 6150713 "POS Stargate Packages"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Stargate Package Method";
-                RunPageLink = "Package Name"=FIELD(Name);
+                RunPageLink = "Package Name" = FIELD(Name);
             }
         }
     }
@@ -113,28 +117,30 @@ page 6150713 "POS Stargate Packages"
         OutStream: OutStream;
         FileContent: Text;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001,'','Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json');
+        FilePath := FileMgt.OpenFileDialog(Text001, '', 'Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json');
         if String.IsNullOrWhiteSpace(FilePath) then
-          exit;
+            exit;
 
         //Package := Package.FromJsonString(IOFile.ReadAllText(FilePath));
         FileContent := IOFile.ReadAllText(FilePath);
         Package := Package.FromJsonString(FileContent);
 
         if StargatePackage.Get(Package.Name) then begin
-          case true of
-            Package.Version > StargatePackage.Version: begin
-              WhichIs := Text003;
-              DefaultYes := true;
+            case true of
+                Package.Version > StargatePackage.Version:
+                    begin
+                        WhichIs := Text003;
+                        DefaultYes := true;
+                    end;
+                Package.Version < StargatePackage.Version:
+                    WhichIs := Text004;
+                else
+                    WhichIs := Text005;
             end;
-            Package.Version < StargatePackage.Version: WhichIs := Text004;
-            else
-              WhichIs := Text005;
-          end;
-          if not Confirm(Text002,DefaultYes,Package.Name,StargatePackage.Version,Package.Version,WhichIs) then
-            exit;
+            if not Confirm(Text002, DefaultYes, Package.Name, StargatePackage.Version, Package.Version, WhichIs) then
+                exit;
 
-          StargatePackage.Delete(false);
+            StargatePackage.Delete(false);
         end;
 
         Rec.Init;
@@ -145,12 +151,12 @@ page 6150713 "POS Stargate Packages"
         OutStream.Write(FileContent);
         Rec.Insert();
 
-        PackageMethod.SetRange("Method Name",Package.Name);
+        PackageMethod.SetRange("Method Name", Package.Name);
         PackageMethod.DeleteAll(false);
         foreach Method in Package.Methods do begin
-          PackageMethod."Method Name" := Method;
-          PackageMethod."Package Name" := Package.Name;
-          if not PackageMethod.Insert(false) then;
+            PackageMethod."Method Name" := Method;
+            PackageMethod."Package Name" := Package.Name;
+            if not PackageMethod.Insert(false) then;
         end;
 
         CurrPage.Update(false);

@@ -28,17 +28,21 @@ page 6014434 "Payment Type - List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Processing Type";"Processing Type")
+                field("Processing Type"; "Processing Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("G/L Account No.";"G/L Account No.")
+                field("G/L Account No."; "G/L Account No.")
                 {
+                    ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
@@ -46,29 +50,36 @@ page 6014434 "Payment Type - List"
                         OpdaterFinKtoNavn("G/L Account No.");
                     end;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
+                    ApplicationArea = All;
                 }
-                field(Prefix;Prefix)
+                field(Prefix; Prefix)
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Cost Account No.";"Cost Account No.")
+                field("Cost Account No."; "Cost Account No.")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
                 }
-                field("Fee G/L Acc. No.";"Fee G/L Acc. No.")
+                field("Fee G/L Acc. No."; "Fee G/L Acc. No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fee Pct.";"Fee Pct.")
+                field("Fee Pct."; "Fee Pct.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Fee Item No.";"Fee Item No.")
+                field("Fee Item No."; "Fee Item No.")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -87,14 +98,14 @@ page 6014434 "Payment Type - List"
         FinKtoRec: Record "G/L Account";
     begin
         if FinKtoRec.Get(KtnNr) then begin
-          Kontonr := KtnNr;
-          KontoNavn := FinKtoRec.Name;
+            Kontonr := KtnNr;
+            KontoNavn := FinKtoRec.Name;
         end else begin
-          Kontonr := '';
-          KontoNavn := '';
+            Kontonr := '';
+            KontoNavn := '';
         end;
         //CurrForm.UPDATE;
-         CurrPage.Update;
+        CurrPage.Update;
     end;
 
     procedure GetItemNo(var BetalingsValg: Record "Payment Type POS")
@@ -121,7 +132,7 @@ page 6014434 "Payment Type - List"
 
     end;
 
-    procedure maxTable(thisWidth: Integer;thisHeight: Integer)
+    procedure maxTable(thisWidth: Integer; thisHeight: Integer)
     begin
         //CurrForm.tableBetValg.WIDTH  := thisWidth;
         //CurrForm.tableBetValg.HEIGHT := thisHeight;

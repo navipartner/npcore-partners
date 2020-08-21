@@ -13,65 +13,84 @@ page 6014672 "Lookup Template Lines"
         {
             repeater(Group)
             {
-                field("Row No.";"Row No.")
+                field("Row No."; "Row No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Col No.";"Col No.")
+                field("Col No."; "Col No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field No.";"Field No.")
+                field("Field No."; "Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Field Name";"Field Name")
+                field("Field Name"; "Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field(Class;Class)
+                field(Class; Class)
                 {
+                    ApplicationArea = All;
                 }
-                field("Caption Type";"Caption Type")
+                field("Caption Type"; "Caption Type")
                 {
+                    ApplicationArea = All;
                 }
-                field("Caption Text";"Caption Text")
+                field("Caption Text"; "Caption Text")
                 {
+                    ApplicationArea = All;
                     Enabled = "Caption Type" = 0;
                 }
-                field("Caption Table No.";"Caption Table No.")
+                field("Caption Table No."; "Caption Table No.")
                 {
+                    ApplicationArea = All;
                     Enabled = ("Caption Type" = 1) OR ("Caption Type" = 2);
                 }
-                field("Caption Table Name";"Caption Table Name")
+                field("Caption Table Name"; "Caption Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Caption Field No.";"Caption Field No.")
+                field("Caption Field No."; "Caption Field No.")
                 {
+                    ApplicationArea = All;
                     Enabled = ("Caption Type" = 1) OR ("Caption Type" = 2);
                 }
-                field("Caption Field Name";"Caption Field Name")
+                field("Caption Field Name"; "Caption Field Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Related Table No.";"Related Table No.")
+                field("Related Table No."; "Related Table No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Related Table Name";"Related Table Name")
+                field("Related Table Name"; "Related Table Name")
                 {
+                    ApplicationArea = All;
                 }
-                field("Related Field No.";"Related Field No.")
+                field("Related Field No."; "Related Field No.")
                 {
+                    ApplicationArea = All;
                 }
-                field("Text Align";"Text Align")
+                field("Text Align"; "Text Align")
                 {
+                    ApplicationArea = All;
                 }
-                field("Font Size (pt)";"Font Size (pt)")
+                field("Font Size (pt)"; "Font Size (pt)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Width (CSS)";"Width (CSS)")
+                field("Width (CSS)"; "Width (CSS)")
                 {
+                    ApplicationArea = All;
                 }
-                field("Number Format";"Number Format")
+                field("Number Format"; "Number Format")
                 {
+                    ApplicationArea = All;
                 }
-                field(Searchable;Searchable)
+                field(Searchable; Searchable)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

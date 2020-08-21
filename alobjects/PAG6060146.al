@@ -14,32 +14,41 @@ page 6060146 "MM Foreign Membership Setup"
         {
             repeater(Group)
             {
-                field("Community Code";"Community Code")
+                field("Community Code"; "Community Code")
                 {
+                    ApplicationArea = All;
                 }
-                field("Manager Code";"Manager Code")
+                field("Manager Code"; "Manager Code")
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Invokation Priority";"Invokation Priority")
+                field("Invokation Priority"; "Invokation Priority")
                 {
+                    ApplicationArea = All;
                 }
-                field(Disabled;Disabled)
+                field(Disabled; Disabled)
                 {
+                    ApplicationArea = All;
                 }
-                field("Append Local Prefix";"Append Local Prefix")
+                field("Append Local Prefix"; "Append Local Prefix")
                 {
+                    ApplicationArea = All;
                 }
-                field("Remove Local Prefix";"Remove Local Prefix")
+                field("Remove Local Prefix"; "Remove Local Prefix")
                 {
+                    ApplicationArea = All;
                 }
-                field("Append Local Suffix";"Append Local Suffix")
+                field("Append Local Suffix"; "Append Local Suffix")
                 {
+                    ApplicationArea = All;
                 }
-                field("Remove Local Suffix";"Remove Local Suffix")
+                field("Remove Local Suffix"; "Remove Local Suffix")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -59,7 +68,7 @@ page 6060146 "MM Foreign Membership Setup"
 
                 trigger OnAction()
                 begin
-                    ShowSetup ();
+                    ShowSetup();
                 end;
             }
             action("Show Dashboard")
@@ -74,7 +83,7 @@ page 6060146 "MM Foreign Membership Setup"
                 trigger OnAction()
                 begin
 
-                    ShowDashboard ();
+                    ShowDashboard();
                 end;
             }
         }
@@ -83,14 +92,14 @@ page 6060146 "MM Foreign Membership Setup"
     trigger OnInit()
     begin
 
-        ForeignMembershipMgr.RediscoverNewManagers ();
+        ForeignMembershipMgr.RediscoverNewManagers();
     end;
 
     trigger OnOpenPage()
     begin
 
-        if (Rec.GetFilter ("Community Code") = '') then
-          Rec.SetFilter ("Community Code", '<>%1', '');
+        if (Rec.GetFilter("Community Code") = '') then
+            Rec.SetFilter("Community Code", '<>%1', '');
     end;
 
     var
@@ -101,13 +110,13 @@ page 6060146 "MM Foreign Membership Setup"
         ForeignMembershipMgr: Codeunit "MM Foreign Membership Mgr.";
     begin
 
-        ForeignMembershipMgr.ShowSetup (Rec);
+        ForeignMembershipMgr.ShowSetup(Rec);
     end;
 
     local procedure ShowDashboard()
     begin
 
-        ForeignMembershipMgr.ShowDashboard (Rec);
+        ForeignMembershipMgr.ShowDashboard(Rec);
     end;
 }
 

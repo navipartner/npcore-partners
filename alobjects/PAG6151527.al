@@ -16,33 +16,41 @@ page 6151527 "Nc Endpoint File Card"
         {
             group(General)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Enabled;Enabled)
+                field(Enabled; Enabled)
                 {
+                    ApplicationArea = All;
                 }
             }
             group(File)
             {
-                field(Path;Path)
+                field(Path; Path)
                 {
+                    ApplicationArea = All;
                 }
-                field("Client Path";"Client Path")
+                field("Client Path"; "Client Path")
                 {
+                    ApplicationArea = All;
                     ToolTip = 'Client Path can only be used with Manual Export';
                 }
-                field(Filename;Filename)
+                field(Filename; Filename)
                 {
+                    ApplicationArea = All;
                 }
-                field("Handle Exiting File";"Handle Exiting File")
+                field("Handle Exiting File"; "Handle Exiting File")
                 {
+                    ApplicationArea = All;
                 }
-                field("File Encoding";"File Encoding")
+                field("File Encoding"; "File Encoding")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

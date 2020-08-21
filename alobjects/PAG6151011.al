@@ -13,20 +13,25 @@ page 6151011 "NpRv Voucher Modules"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                 }
-                field("Code";Code)
+                field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Codeunit ID";"Event Codeunit ID")
+                field("Event Codeunit ID"; "Event Codeunit ID")
                 {
+                    ApplicationArea = All;
                 }
-                field("Event Codeunit Name";"Event Codeunit Name")
+                field("Event Codeunit Name"; "Event Codeunit Name")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

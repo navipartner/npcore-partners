@@ -13,20 +13,24 @@ page 6060163 "Event Attribute Row Values"
         {
             repeater(Group)
             {
-                field("Line No.";"Line No.")
+                field("Line No."; "Line No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Visible = FormulaLookupMode;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
+                    ApplicationArea = All;
                     Visible = NOT FormulaLookupMode;
                 }
-                field(Formula;Formula)
+                field(Formula; Formula)
                 {
+                    ApplicationArea = All;
                     AssistEdit = true;
                     Visible = NOT FormulaLookupMode;
 
@@ -35,8 +39,9 @@ page 6060163 "Event Attribute Row Values"
                         FormulaAssistEdit();
                     end;
                 }
-                field(Promote;Promote)
+                field(Promote; Promote)
                 {
+                    ApplicationArea = All;
                     Visible = NOT FormulaLookupMode;
                 }
             }

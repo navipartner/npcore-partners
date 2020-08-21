@@ -24,8 +24,9 @@ page 6014476 "Retail Document List"
             group(Control6150658)
             {
                 ShowCaption = false;
-                field(TypeFilter;TypeFilter)
+                field(TypeFilter; TypeFilter)
                 {
+                    ApplicationArea = All;
                     Caption = 'Document Type';
 
                     trigger OnValidate()
@@ -36,199 +37,236 @@ page 6014476 "Retail Document List"
             }
             repeater(Group)
             {
-                field("Customer No.";"Customer No.")
+                field("Customer No."; "Customer No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("First Name";"First Name")
+                field("First Name"; "First Name")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Ship-to Name";"Ship-to Name")
+                field("Ship-to Name"; "Ship-to Name")
                 {
-                    Editable = false;
-                    Importance = Additional;
-                    Visible = false;
-                }
-                field("Document Date";"Document Date")
-                {
-                    Editable = false;
-                }
-                field(Status;Status)
-                {
-                    Editable = false;
-                }
-                field(Cashed;Cashed)
-                {
-                    Editable = false;
-                }
-                field("Vendor Index";"Vendor Index")
-                {
-                    Editable = false;
-                }
-                field(Address;Address)
-                {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Address 2";"Address 2")
+                field("Document Date"; "Document Date")
                 {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field(Status; Status)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field(Cashed; Cashed)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field("Vendor Index"; "Vendor Index")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field(Address; Address)
+                {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field(City;City)
+                field("Address 2"; "Address 2")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field(ID;ID)
+                field(City; City)
                 {
-                    Editable = false;
-                }
-                field(Date;Date)
-                {
-                    Editable = false;
-                }
-                field("Salesperson Code";"Salesperson Code")
-                {
-                    Editable = false;
-                    Visible = false;
-                }
-                field("Post Code";"Post Code")
-                {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field(Deposit;Deposit)
+                field(ID; ID)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field(Amount;Amount)
+                field(Date; Date)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                 }
-                field("Time of Day";"Time of Day")
+                field("Salesperson Code"; "Salesperson Code")
                 {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Visible = false;
+                }
+                field("Post Code"; "Post Code")
+                {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Rent Salesperson";"Rent Salesperson")
+                field(Deposit; Deposit)
                 {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field(Amount; Amount)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field("Time of Day"; "Time of Day")
+                {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Rent Register";"Rent Register")
+                field("Rent Salesperson"; "Rent Salesperson")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Rent Sales Ticket";"Rent Sales Ticket")
+                field("Rent Register"; "Rent Register")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Date";"Return Date")
+                field("Rent Sales Ticket"; "Rent Sales Ticket")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Time";"Return Time")
+                field("Return Date"; "Return Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Salesperson";"Return Salesperson")
+                field("Return Time"; "Return Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Register";"Return Register")
+                field("Return Salesperson"; "Return Salesperson")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Sales Ticket";"Return Sales Ticket")
+                field("Return Register"; "Return Register")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
+                field("Return Sales Ticket"; "Return Sales Ticket")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Department";"Return Department")
+                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field(Phone;Phone)
+                field("Return Department"; "Return Department")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field(Mobile;Mobile)
+                field(Phone; Phone)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Date 2";"Return Date 2")
+                field(Mobile; Mobile)
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Return Time 2";"Return Time 2")
+                field("Return Date 2"; "Return Date 2")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Rent Date";"Rent Date")
+                field("Return Time 2"; "Return Time 2")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Rent Time";"Rent Time")
+                field("Rent Date"; "Rent Date")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field("No. Series";"No. Series")
+                field("Rent Time"; "Rent Time")
                 {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
                 }
-                field(Comment;Comment)
+                field("No. Series"; "No. Series")
                 {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Importance = Additional;
+                    Visible = false;
+                }
+                field(Comment; Comment)
+                {
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
@@ -237,10 +275,10 @@ page 6014476 "Retail Document List"
             grid(Control6150652)
             {
                 ShowCaption = false;
-                part(Control6150651;"Retail Document Lines")
+                part(Control6150651; "Retail Document Lines")
                 {
-                    SubPageLink = "Document Type"=FIELD("Document Type"),
-                                  "Document No."=FIELD("No.");
+                    SubPageLink = "Document Type" = FIELD("Document Type"),
+                                  "Document No." = FIELD("No.");
                     Visible = false;
                 }
             }
@@ -259,10 +297,10 @@ page 6014476 "Retail Document List"
                 trigger OnAction()
                 begin
 
-                    if GetFilter( Cashed ) = Text10600000 then begin
-                      SetRange( Cashed, true );
+                    if GetFilter(Cashed) = Text10600000 then begin
+                        SetRange(Cashed, true);
                     end else begin
-                      SetRange( Cashed, false );
+                        SetRange(Cashed, false);
                     end;
                 end;
             }
@@ -274,7 +312,7 @@ page 6014476 "Retail Document List"
                 trigger OnAction()
                 begin
 
-                    SetRange( Cashed );
+                    SetRange(Cashed);
                 end;
             }
         }
@@ -292,19 +330,23 @@ page 6014476 "Retail Document List"
         if Find('-') then;
 
         if (GetFilter("Document Type") <> '') then
-          if  (GetRangeMin("Document Type") =  GetRangeMax("Document Type")) then
-            TypeFilter := GetRangeMin("Document Type");
+            if (GetRangeMin("Document Type") = GetRangeMax("Document Type")) then
+                TypeFilter := GetRangeMin("Document Type");
 
 
         i := "Document Type";
 
-        CurrPage.Caption(SelectStr(i+1,Text10600001));
+        CurrPage.Caption(SelectStr(i + 1, Text10600001));
 
         case "Document Type" of
-          "Document Type"::"Selection Contract" :       ;
-          "Document Type"::"Retail Order" :;
-          "Document Type"::Wish :;
-          "Document Type"::Customization :;
+            "Document Type"::"Selection Contract":
+                ;
+            "Document Type"::"Retail Order":
+                ;
+            "Document Type"::Wish:
+                ;
+            "Document Type"::Customization:
+                ;
         end;
     end;
 
@@ -324,7 +366,7 @@ page 6014476 "Retail Document List"
 
     procedure SetTypeFilter()
     begin
-        SetRange("Document Type",TypeFilter);
+        SetRange("Document Type", TypeFilter);
         CurrPage.Update(false);
         CurrPage.Caption(Format(TypeFilter))
     end;

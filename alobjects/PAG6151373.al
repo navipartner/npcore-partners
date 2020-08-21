@@ -14,35 +14,43 @@ page 6151373 "CS Communication Log Card"
         {
             group(General)
             {
-                field(Id;Id)
+                field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Start";"Request Start")
+                field("Request Start"; "Request Start")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request End";"Request End")
+                field("Request End"; "Request End")
                 {
+                    ApplicationArea = All;
                 }
-                field("Request Function";"Request Function")
+                field("Request Function"; "Request Function")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Request";"Internal Request")
+                field("Internal Request"; "Internal Request")
                 {
+                    ApplicationArea = All;
                 }
-                field("Internal Log No.";"Internal Log No.")
+                field("Internal Log No."; "Internal Log No.")
                 {
+                    ApplicationArea = All;
                 }
             }
             group(Data)
             {
                 Caption = 'Data';
-                field(RequestData;RequestData)
+                field(RequestData; RequestData)
                 {
+                    ApplicationArea = All;
                     MultiLine = true;
                     ShowCaption = false;
                 }
-                field(ResponseData;ResponseData)
+                field(ResponseData; ResponseData)
                 {
+                    ApplicationArea = All;
                     MultiLine = true;
                     ShowCaption = false;
                 }
@@ -68,7 +76,7 @@ page 6151373 "CS Communication Log Card"
                     var
                         CSHelperFunctions: Codeunit "CS Helper Functions";
                     begin
-                        CSHelperFunctions.InternalRequest(RequestData,true,Id);
+                        CSHelperFunctions.InternalRequest(RequestData, true, Id);
                     end;
                 }
             }
@@ -77,20 +85,20 @@ page 6151373 "CS Communication Log Card"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Request Data","Response Data");
+        CalcFields("Request Data", "Response Data");
 
         if not "Request Data".HasValue then
-          RequestData := ''
+            RequestData := ''
         else begin
-          "Request Data".CreateInStream(IStream);
-          IStream.Read(RequestData,MaxStrLen(RequestData));
+            "Request Data".CreateInStream(IStream);
+            IStream.Read(RequestData, MaxStrLen(RequestData));
         end;
 
         if not "Response Data".HasValue then
-          ResponseData := ''
+            ResponseData := ''
         else begin
-          "Response Data".CreateInStream(IStream);
-          IStream.Read(ResponseData,MaxStrLen(RequestData));
+            "Response Data".CreateInStream(IStream);
+            IStream.Read(ResponseData, MaxStrLen(RequestData));
         end;
     end;
 
