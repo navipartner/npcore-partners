@@ -27,34 +27,34 @@ page 6014405 "Register List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
                 }
-                field("Global Dimension 1 Code";"Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                 }
-                field("Global Dimension 2 Code";"Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                 }
-                field("Location Code";"Location Code")
+                field("Location Code"; "Location Code")
                 {
                 }
-                field("Opening Cash";"Opening Cash")
+                field("Opening Cash"; "Opening Cash")
                 {
                 }
-                field("Closing Cash";"Closing Cash")
+                field("Closing Cash"; "Closing Cash")
                 {
                 }
-                field(Balanced;Balanced)
+                field(Balanced; Balanced)
                 {
                 }
-                field("Customer Display";"Customer Display")
+                field("Customer Display"; "Customer Display")
                 {
                 }
             }
@@ -108,21 +108,21 @@ page 6014405 "Register List"
                     Caption = 'CashKeeper Setup';
                     Image = Add;
                     RunObject = Page "CashKeeper Setup";
-                    RunPageLink = "Register No."=FIELD("Register No.");
+                    RunPageLink = "Register No." = FIELD("Register No.");
                 }
                 action("2nd Display Setup")
                 {
                     Caption = '2nd Display Setup';
-                    Image = add;
+                    Image = Add;
                     RunObject = Page "Display Setup";
-                    RunPageLink = "Register No."=FIELD("Register No.");
+                    RunPageLink = "Register No." = FIELD("Register No.");
                 }
                 action("mPos Setup")
                 {
                     Caption = 'mPos Setup';
-                    Image = add;
+                    Image = Add;
                     RunObject = Page "MPOS App Setup Card";
-                    RunPageLink = "Register No."=FIELD("Register No.");
+                    RunPageLink = "Register No." = FIELD("Register No.");
                 }
             }
         }
@@ -137,14 +137,15 @@ page 6014405 "Register List"
     begin
 
         CurrPage.SetSelectionFilter(Rec);
-        if Find('-') then repeat
-          record.Init;
-          record := Rec;
-          //-NPR4.21
-          RetailTableCode.RegisterCheckNo(record."Register No.");
-          //+NPR4.21
-          record.Insert;
-        until Next = 0;
+        if Find('-') then
+            repeat
+                record.Init;
+                record := Rec;
+                //-NPR4.21
+                RetailTableCode.RegisterCheckNo(record."Register No.");
+                //+NPR4.21
+                record.Insert;
+            until Next = 0;
 
         MarkedOnly(false);
     end;
