@@ -64,42 +64,42 @@ page 6014557 "POS - Sales Person Role Center"
             group(Control6150641)
             {
                 ShowCaption = false;
-                part(Control6150638;"Discount Activities")
+                part(Control6150638; "Discount Activities")
                 {
                     Visible = false;
                 }
-                part(Control6150616;"Retail Activities")
+                part(Control6150616; "Retail Activities")
                 {
                 }
-                part(Control6150617;"Retail Sales Chart")
+                part(Control6150617; "Retail Sales Chart")
                 {
                 }
-                part(Control6014405;"RSS Reader Activities")
+                part(Control6014405; "RSS Reader Activities")
                 {
                     Visible = false;
                 }
-                part(Control6014403;"Retail Sales Chart by Shop")
+                part(Control6014403; "Retail Sales Chart by Shop")
                 {
                 }
             }
             group(Control6151405)
             {
                 ShowCaption = false;
-                part(Control1;"Power BI Report Spinner Part")
+                part(Control1; "Power BI Report Spinner Part")
                 {
-                    ApplicationArea = Basic,Suite;
+                    ApplicationArea = Basic, Suite;
                 }
-                part(Control6150615;"Retail Top 10 Customers")
+                part(Control6150615; "Retail Top 10 Customers")
                 {
                     Visible = false;
                 }
-                part(Control6150614;"Retail 10 Items by Qty.")
+                part(Control6150614; "Retail 10 Items by Qty.")
                 {
                 }
-                part(Control6150613;"Retail Top 10 Salesperson")
+                part(Control6150613; "Retail Top 10 Salesperson")
                 {
                 }
-                part("<Retail Top 10 Salesperson>";"My Reports")
+                part("<Retail Top 10 Salesperson>"; "My Reports")
                 {
                 }
             }
@@ -286,7 +286,7 @@ page 6014557 "POS - Sales Person Role Center"
                 action("Sale Report")
                 {
                     Caption = 'Sale Report';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Sale Time Report";
                 }
                 separator(Separator6014423)
@@ -295,13 +295,13 @@ page 6014557 "POS - Sales Person Role Center"
                 action("Sales Person Top 20")
                 {
                     Caption = 'Sales Person Top 20';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Sales Person Top 20";
                 }
                 action("Salesperson/Item Group Top")
                 {
                     Caption = 'Salesperson/Item Group Top';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Salesperson/Item Group Top";
                 }
                 separator(Separator6014432)
@@ -310,7 +310,7 @@ page 6014557 "POS - Sales Person Role Center"
                 action("Item Wise Sales Figures")
                 {
                     Caption = 'Item Wise Sales Figures';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Item Wise Sales Figures";
                 }
                 separator(Separator6014462)
@@ -319,7 +319,7 @@ page 6014557 "POS - Sales Person Role Center"
                 action("Discount Statistics")
                 {
                     Caption = 'Discount Statistics';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Discount Statistics";
                 }
             }
@@ -329,19 +329,19 @@ page 6014557 "POS - Sales Person Role Center"
                 action("Item Sales Statistics")
                 {
                     Caption = 'Item Sales Statistics';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Item Sales Statistics/Provider";
                 }
                 action("Top 10 List")
                 {
                     Caption = 'Top 10 List';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Inventory - Top 10 List";
                 }
                 action("Low Sales")
                 {
                     Caption = 'Low Sales';
-                    Image = report2;
+                    Image = Report2;
                     RunObject = Report "Items With Low Sales";
                 }
             }
@@ -449,22 +449,22 @@ page 6014557 "POS - Sales Person Role Center"
                 {
                     Caption = 'Item Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST(Item),
-                                        Recurring=CONST(false));
+                    RunPageView = WHERE("Template Type" = CONST(Item),
+                                        Recurring = CONST(false));
                 }
                 action("Physical Inventory Journals")
                 {
                     Caption = 'Physical Inventory Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST("Phys. Inventory"),
-                                        Recurring=CONST(false));
+                    RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
+                                        Recurring = CONST(false));
                 }
                 action("Revaluation Journals")
                 {
                     Caption = 'Revaluation Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST(Revaluation),
-                                        Recurring=CONST(false));
+                    RunPageView = WHERE("Template Type" = CONST(Revaluation),
+                                        Recurring = CONST(false));
                 }
                 action("Retail Journal List")
                 {
@@ -486,7 +486,7 @@ page 6014557 "POS - Sales Person Role Center"
                 {
                     Caption = 'Items';
                     RunObject = Page "Retail Item List";
-                    RunPageView = WHERE("Magento Item"=CONST(true));
+                    RunPageView = WHERE("Magento Item" = CONST(true));
                 }
                 action("Item Groups")
                 {
@@ -664,44 +664,44 @@ page 6014557 "POS - Sales Person Role Center"
                 {
                     Caption = 'Resource Journals';
                     RunObject = Page "Resource Jnl. Batches";
-                    RunPageView = WHERE(Recurring=CONST(false));
+                    RunPageView = WHERE(Recurring = CONST(false));
                 }
                 action("FA Journals")
                 {
                     Caption = 'FA Journals';
                     RunObject = Page "FA Journal Batches";
-                    RunPageView = WHERE(Recurring=CONST(false));
+                    RunPageView = WHERE(Recurring = CONST(false));
                 }
                 action("Cash Receipt Journals")
                 {
                     Caption = 'Cash Receipt Journals';
                     Image = Journals;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST("Cash Receipts"),
-                                        Recurring=CONST(false));
+                    RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
+                                        Recurring = CONST(false));
                 }
                 action("Payment Journals")
                 {
                     Caption = 'Payment Journals';
                     Image = Journals;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST(Payments),
-                                        Recurring=CONST(false));
+                    RunPageView = WHERE("Template Type" = CONST(Payments),
+                                        Recurring = CONST(false));
                 }
                 action("General Journals")
                 {
                     Caption = 'General Journals';
                     Image = Journal;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST(General),
-                                        Recurring=CONST(false));
+                    RunPageView = WHERE("Template Type" = CONST(General),
+                                        Recurring = CONST(false));
                 }
                 action("Recurring Journals")
                 {
                     Caption = 'Recurring Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type"=CONST(General),
-                                        Recurring=CONST(true));
+                    RunPageView = WHERE("Template Type" = CONST(General),
+                                        Recurring = CONST(true));
                 }
             }
             group(ActionGroup6014529)
