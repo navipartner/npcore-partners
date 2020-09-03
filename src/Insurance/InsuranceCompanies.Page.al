@@ -1,0 +1,26 @@
+page 6014538 "NPR Insurance Companies"
+{
+    Caption = 'Insurance - Companies';
+    PageType = List;
+    SourceTable = "NPR Insurance Companies";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Control6150614)
+            {
+                ShowCaption = false;
+                field("Code"; Code)
+                {
+                    ApplicationArea = All;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+}
+

@@ -1,0 +1,80 @@
+table 6151430 "NPR Magento Item Attr."
+{
+    // MAG1.00/MH/20150201  CASE 199932 Refactored Object from Web Integration.
+    // MAG1.04/MH/20150206  CASE 199932 Table Changes:
+    //                                 - Added field 1010 Selected
+    //                                 - Added field 300 Enabled
+    //                                 - Changed field 200 Configurable from flowfield to normal
+    // MAG1.21/MHA/20151120 CASE 227734 Field 300 Enabled deleted
+    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
+    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
+    // MAG2.18/JDH /20181210 CASE 334163 Added Caption to field Attribute Group ID
+
+    Caption = 'Magento Item Attribute';
+    DataClassification = CustomerContent;
+    LookupPageID = "NPR Magento Item Attr.";
+
+    fields
+    {
+        field(1; "Item No."; Code[20])
+        {
+            Caption = 'Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item;
+        }
+        field(5; "Variant Code"; Code[10])
+        {
+            Caption = 'Variant Code';
+            DataClassification = CustomerContent;
+        }
+        field(10; "Attribute Set ID"; Integer)
+        {
+            Caption = 'Attribute Set ID';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Magento Attribute Set";
+        }
+        field(15; "Attribute ID"; Integer)
+        {
+            Caption = 'Attribute ID';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Magento Attribute";
+        }
+        field(1000; "Attribute Description"; Text[50])
+        {
+            CalcFormula = Lookup ("NPR Magento Attribute".Description WHERE("Attribute ID" = FIELD("Attribute ID")));
+            Caption = 'Attribute';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(1010; Selected; Boolean)
+        {
+            CalcFormula = Max ("NPR Magento Item Attr. Value".Selected WHERE("Attribute ID" = FIELD("Attribute ID"),
+                                                                             "Item No." = FIELD("Item No."),
+                                                                             "Variant Code" = FIELD("Variant Code")));
+            Caption = 'Selected';
+            Description = 'MAG1.04';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(1020; "Attribute Group ID"; Integer)
+        {
+            CalcFormula = Lookup ("NPR Magento Attr. Set Value"."Attribute Group ID" WHERE("Attribute Set ID" = FIELD("Attribute Set ID"),
+                                                                                           "Attribute ID" = FIELD("Attribute ID")));
+            Caption = 'Attribute Group ID';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+    }
+
+    keys
+    {
+        key(Key1; "Attribute Set ID", "Attribute ID", "Item No.", "Variant Code")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+}
+

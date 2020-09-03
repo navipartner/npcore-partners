@@ -1,0 +1,169 @@
+codeunit 6150669 "NPR NPRE POSAction: Show Wa."
+{
+    // NPR5.45/MHA /20180827 CASE 318369 Object created
+    // NPR5.50/TJ  /20190530 CASE 346384 New parameter added
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (filter seatings by restaurant)
+
+
+    trigger OnRun()
+    begin
+    end;
+
+    var
+        Text000: Label 'This is a built in function for handling move between pos and waiter pad.';
+
+    local procedure ActionCode(): Text
+    begin
+        exit('SHOW_WAITER_PAD');
+    end;
+
+    local procedure ActionVersion(): Text
+    begin
+        //-NPR5.50 [346384]
+        //EXIT ('1.0');
+        exit('1.1');
+        //+NPR5.50 [346384]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    begin
+        with Sender do begin
+            if DiscoverAction(
+              ActionCode(),
+              Text000,
+              ActionVersion(),
+              Type::Generic,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                //-NPR5.55 [414938]
+                RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
+                //+NPR5.55 [414938]
+                RegisterWorkflowStep('seatingInput',
+                  'if (param.FixedSeatingCode) {' +
+                  '  context.seatingCode = param.FixedSeatingCode;' +
+                  '  respond();' +
+                  '} else {' +
+                  '  switch(param.InputType + "") {' +
+                  '    case "0":' +
+                  '      stringpad(labels["InputTypeLabel"]).respond("seatingCode");' +
+                  '      break;' +
+                  '    case "1":' +
+                  '      intpad(labels["InputTypeLabel"]).respond("seatingCode");' +
+                  '      break;' +
+                  '    case "2":' +
+                  '      respond();' +
+                  '      break;' +
+                  '  }' +
+                  '}'
+                );
+                RegisterWorkflowStep('selectWaiterPad',
+                  'if (context.seatingCode) {' +
+                  '  respond();' +
+                  '}'
+                );
+                RegisterWorkflowStep('showWaiterPad',
+                  'if (context.waiterPadNo) {' +
+                  '  respond();' +
+                  '}'
+                );
+                RegisterWorkflow(false);
+
+                RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
+                RegisterTextParameter('FixedSeatingCode', '');
+                RegisterTextParameter('SeatingFilter', '');
+                RegisterTextParameter('LocationFilter', '');
+                //-NPR5.50 [346384]
+                RegisterBooleanParameter('ShowOnlyActiveWaiPad', false);
+                //+NPR5.50 [346384]
+            end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    var
+        NPRESeating: Record "NPR NPRE Seating";
+    begin
+        Captions.AddActionCaption(ActionCode(), 'InputTypeLabel', NPRESeating.TableCaption);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    var
+        JSON: Codeunit "NPR POS JSON Management";
+    begin
+        if not Action.IsThisAction(ActionCode) then
+            exit;
+
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        case WorkflowStep of
+            //-NPR5.55 [414938]
+            'addPresetValuesToContext':
+                OnActionAddPresetValuesToContext(JSON, FrontEnd, POSSession);
+            //+NPR5.55 [414938]
+            'seatingInput':
+                OnActionSeatingInput(JSON, FrontEnd);
+            'selectWaiterPad':
+                OnActionSelectWaiterPad(JSON, FrontEnd);
+            'showWaiterPad':
+                OnActionShowWaiterPad(JSON);
+        end;
+
+        Handled := true;
+    end;
+
+    local procedure OnActionSeatingInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        NPRESeating: Record "NPR NPRE Seating";
+        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
+
+        JSON.SetContext('seatingCode', NPRESeating.Code);
+
+        FrontEnd.SetActionContext(ActionCode(), JSON);
+    end;
+
+    local procedure OnActionSelectWaiterPad(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
+        NPRESeating: Record "NPR NPRE Seating";
+        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
+        if not NPREWaiterPadPOSMgt.SelectWaiterPad(NPRESeating, NPREWaiterPad) then
+            exit;
+
+        JSON.SetContext('waiterPadNo', NPREWaiterPad."No.");
+
+        FrontEnd.SetActionContext(ActionCode(), JSON);
+    end;
+
+    local procedure OnActionShowWaiterPad(JSON: Codeunit "NPR POS JSON Management")
+    var
+        NPRESeating: Record "NPR NPRE Seating";
+        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
+        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        WaiterPadNo: Code[20];
+    begin
+        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
+        JSON.SetScope('/', true);
+        WaiterPadNo := JSON.GetString('waiterPadNo', true);
+        NPREWaiterPad.Get(WaiterPadNo);
+
+        NPREWaiterPadPOSMgt.UIShowWaiterPad(NPREWaiterPad);
+    end;
+
+    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
+    var
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        //-NPR5.55 [414938]
+        POSSession.GetSetup(POSSetup);
+        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
+        FrontEnd.SetActionContext(ActionCode(), JSON);
+        //+NPR5.55 [414938]
+    end;
+}
+

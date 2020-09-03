@@ -1,0 +1,86 @@
+codeunit 6014598 "NPR POS End Sale: Dim.SaleStat"
+{
+    // NPR5.38/ANEN/20171228 CASE 298185 Functions to register stat on dimension in trans.
+    // NPR5.40/TSA /20180126 CASE 303399 Using setup to dictate which action to run on view change
+    // NPR5.40/TSA /20180305 CASE 303399 Refactored because action parameter storage has changed
+    // NPR5.40/VB  /20180307 CASE 306347 Refactored retrieval of POS Action
+    // NPR5.54/TSA /20200220 CASE 391850 Handled the POSSetup per unit
+
+
+    [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnBeforeChangeToPaymentView', '', true, true)]
+    local procedure CU_CodeunitPOSFrontEndManagement_OnBeforeChangeToPaymentView(var Sender: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
+    var
+        POSAction: Record "NPR POS Action";
+        POSSetup: Record "NPR POS Setup";
+        POSParameterValue: Record "NPR POS Parameter Value";
+        Setup: Codeunit "NPR POS Setup";
+    begin
+        //-NPR5.40 [303399]
+
+        //-NPR5.54 [391850]
+        // POSSetup.GET ();
+        POSSession.GetSetup(Setup);
+        Setup.GetNamedActionSetup(POSSetup);
+        //+NPR5.54 [391850]
+
+        if (POSSetup."OnBeforePaymentView Action" <> '') then begin
+            //-NPR5.40 [306347]
+            //  POSAction.GET (POSSetup."OnBeforePaymentView Action");
+            if not POSSession.RetrieveSessionAction(POSSetup."OnBeforePaymentView Action", POSAction) then
+                POSAction.Get(POSSetup."OnBeforePaymentView Action");
+            //+NPR5.40 [306347]
+
+            POSParameterValue.FilterParameters(POSSetup.RecordId, POSSetup.FieldNo("OnBeforePaymentView Action"));
+
+            if (POSParameterValue.FindSet()) then begin
+                repeat
+
+                    case POSParameterValue."Data Type" of
+                        POSParameterValue."Data Type"::Boolean:
+                            POSAction.SetWorkflowInvocationParameter(POSParameterValue.Name, ToBoolean(POSParameterValue.Value), Sender);
+                        POSParameterValue."Data Type"::Decimal:
+                            POSAction.SetWorkflowInvocationParameter(POSParameterValue.Name, ToDecimal(POSParameterValue.Value), Sender);
+                        POSParameterValue."Data Type"::Integer:
+                            POSAction.SetWorkflowInvocationParameter(POSParameterValue.Name, ToInteger(POSParameterValue.Value), Sender);
+                        POSParameterValue."Data Type"::Option:
+                            POSAction.SetWorkflowInvocationParameter(POSParameterValue.Name, ToOption(POSParameterValue), Sender);
+                        else
+                            POSAction.SetWorkflowInvocationParameter(POSParameterValue.Name, POSParameterValue.Value, Sender);
+                    end;
+
+                until (POSParameterValue.Next() = 0);
+
+            end;
+
+            Sender.InvokeWorkflow(POSAction);
+        end;
+        //+NPR5.40 [303399]
+    end;
+
+    local procedure ToInteger(TextValue: Text) IntegerValue: Integer
+    begin
+        Evaluate(IntegerValue, TextValue, 9);
+    end;
+
+    local procedure ToDecimal(TextValue: Text) DecimalValue: Decimal
+    begin
+        Evaluate(DecimalValue, TextValue, 9);
+    end;
+
+    local procedure ToBoolean(TextValue: Text) BooleanValue: Boolean
+    begin
+        BooleanValue := UpperCase(TextValue) = 'TRUE';
+    end;
+
+    local procedure ToOption(POSParameterValue: Record "NPR POS Parameter Value" temporary) OptionValue: Integer
+    var
+        POSActionParameter: Record "NPR POS Action Parameter";
+    begin
+
+        if (not POSActionParameter.Get(POSParameterValue."Action Code", POSParameterValue.Name)) then
+            exit(-1);
+
+        OptionValue := POSActionParameter.GetOptionInt(POSParameterValue.Value);
+    end;
+}
+

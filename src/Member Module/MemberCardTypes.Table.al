@@ -1,0 +1,173 @@
+table 6059771 "NPR Member Card Types"
+{
+    // NPR5.31/TSA/20170503  CASE 274589 changed field 25 Point Account from length 10 to 20
+
+    Caption = 'Point Card';
+    DataCaptionFields = "Code";
+    LookupPageID = "NPR Member Card Types";
+
+    fields
+    {
+        field(1; "Code"; Code[20])
+        {
+            Caption = 'Code';
+            NotBlank = true;
+        }
+        field(2; Description; Text[30])
+        {
+            Caption = 'Description';
+        }
+        field(3; "Card No. Series"; Code[10])
+        {
+            Caption = 'Card No. Series';
+            Description = 'Nummerserie til point kort';
+            TableRelation = "No. Series";
+        }
+        field(4; "EAN Prefix"; Code[10])
+        {
+            Caption = 'EAN Prefix';
+        }
+        field(5; "Expiration Calculation"; DateFormula)
+        {
+            Caption = 'Expiration Calculation';
+        }
+        field(6; "Card Code Eqauls Customer Code"; Boolean)
+        {
+            Caption = 'Card Code Eqauls Customer Code';
+        }
+        field(7; "Card Code Length"; Integer)
+        {
+            Caption = 'Card Code Length';
+        }
+        field(10; "Calc Excluding VAT"; Boolean)
+        {
+            Caption = 'Calc. Excluding VAT';
+        }
+        field(20; "Payment Method Code"; Code[20])
+        {
+            Caption = 'Payment Method Code';
+            TableRelation = "Payment Method";
+        }
+        field(25; "Point Account"; Code[20])
+        {
+            Caption = 'Point Account';
+            TableRelation = "G/L Account";
+        }
+        field(30; "Post Point Earnings"; Boolean)
+        {
+            Caption = 'Post Point Earnings';
+            InitValue = true;
+        }
+        field(50; "Card Expiration Formula"; DateFormula)
+        {
+            Caption = 'Card Expiration Formula';
+        }
+        field(55; "Customer Template"; Code[10])
+        {
+            Caption = 'Customer Template';
+            TableRelation = "Customer Template";
+        }
+        field(60; "Member Name Required"; Boolean)
+        {
+            Caption = 'Member Name Mandatory';
+            InitValue = true;
+        }
+        field(61; "Member Address Required"; Boolean)
+        {
+            Caption = 'Member Address Mandatory';
+        }
+        field(62; "Member Phone Required"; Boolean)
+        {
+            Caption = 'Member Phone Mandatory';
+        }
+        field(63; "Member E-Mail Required"; Boolean)
+        {
+            Caption = 'Member E-Mail Mandatory';
+            InitValue = true;
+        }
+        field(100; "Sync Points To Company"; Text[50])
+        {
+            Caption = 'Sync Points To Company';
+            TableRelation = Company;
+        }
+        field(101; "Sync Cards To Company"; Text[50])
+        {
+            Caption = 'Sync Cards To Company';
+            TableRelation = Company;
+        }
+        field(102; "Sync Loyalty Cust. To Company"; Text[50])
+        {
+            Caption = 'Sync Loyalty Cust. To Company';
+            TableRelation = Company;
+        }
+        field(200; "Card Action 1 Codeunit"; Integer)
+        {
+            Caption = 'Card Action 1 Codeunit';
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+        }
+        field(201; "Card Action 1 Parameter"; Code[20])
+        {
+            Caption = 'Card Action 1 Parameter';
+        }
+        field(202; "Card Action 1 Description"; Text[30])
+        {
+            Caption = 'Card Action 1 Description';
+        }
+        field(203; "Card Action 2 Codeunit"; Integer)
+        {
+            Caption = 'Card Action 2 Codeunit';
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+        }
+        field(204; "Card Action 2 Parameter"; Code[20])
+        {
+            Caption = 'Card Action 2 Parameter';
+        }
+        field(205; "Card Action 2 Description"; Text[30])
+        {
+            Caption = 'Card Action 2 Description';
+        }
+        field(206; "Card Action 3 Codeunit"; Integer)
+        {
+            Caption = 'Card Action 3 Codeunit';
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+        }
+        field(207; "Card Action 3 Parameter"; Code[20])
+        {
+            Caption = 'Card Action 3 Parameter';
+        }
+        field(208; "Card Action 3 Description"; Text[30])
+        {
+            Caption = 'Card Action 3 Description';
+        }
+    }
+
+    keys
+    {
+        key(Key1; "Code")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    trigger OnDelete()
+    var
+        PointCardIssuedCards: Record "NPR Member Card Issued Cards";
+        txtCannotDelete: Label 'You are not allowed to delete the card type %1, since issued cards wtih this type exists.';
+    begin
+        PointCardIssuedCards.SetRange("Card Type", Code);
+        if PointCardIssuedCards.Find('-') then
+            Error(txtCannotDelete, Code);
+    end;
+
+    trigger OnInsert()
+    begin
+        TestField(Code);
+    end;
+
+    var
+        noSeriesManagement: Codeunit NoSeriesManagement;
+}
+

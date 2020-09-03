@@ -1,0 +1,173 @@
+page 6184491 "NPR Pepper Config. List"
+{
+    // NPR5.20\BR\20160316  CASE 231481 Object Created
+
+    Caption = 'Pepper Configuration List';
+    CardPageID = "NPR Pepper Config. Card";
+    Editable = false;
+    PageType = List;
+    SourceTable = "NPR Pepper Config.";
+    UsageCategory = Administration;
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field("Code"; Code)
+                {
+                    ApplicationArea = All;
+                }
+                field(Description; Description)
+                {
+                    ApplicationArea = All;
+                }
+                field(Version; Version)
+                {
+                    ApplicationArea = All;
+                }
+                field(Mode; Mode)
+                {
+                    ApplicationArea = All;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(navigation)
+        {
+            action(Instances)
+            {
+                Caption = 'Instances';
+                Image = Server;
+                RunObject = Page "NPR Pepper Instances";
+                RunPageLink = "Configuration Code" = FIELD(Code);
+                RunPageView = SORTING(ID)
+                              ORDER(Ascending);
+            }
+        }
+        area(processing)
+        {
+            group(Import)
+            {
+                Caption = 'Import';
+                action(ImportLicense)
+                {
+                    Caption = 'License';
+                    Image = ImportCodes;
+
+                    trigger OnAction()
+                    begin
+                        UploadFile(0);
+                    end;
+                }
+                action(ImportAdditionalParameters)
+                {
+                    Caption = 'Additional Parameters';
+                    Image = Import;
+
+                    trigger OnAction()
+                    begin
+                        UploadFile(1);
+                    end;
+                }
+            }
+            group(Show)
+            {
+                Caption = 'Show';
+                action(ShowLicense)
+                {
+                    Caption = 'License';
+                    Image = ElectronicNumber;
+
+                    trigger OnAction()
+                    begin
+                        ShowFile(0);
+                    end;
+                }
+                action(ShowConfigXML)
+                {
+                    Caption = 'Configuration XML';
+                    Image = CreateXMLFile;
+
+                    trigger OnAction()
+                    begin
+                        ShowFile(1);
+                    end;
+                }
+                action(ShowAdditionalParameters)
+                {
+                    Caption = 'Additional Parameters';
+                    Image = ElectronicDoc;
+
+                    trigger OnAction()
+                    begin
+                        ShowFile(2);
+                    end;
+                }
+            }
+            group("Delete")
+            {
+                Caption = 'Delete';
+                action(DeleteLicense)
+                {
+                    Caption = 'License';
+                    Image = DeleteQtyToHandle;
+
+                    trigger OnAction()
+                    begin
+                        ClearFile(0);
+                    end;
+                }
+                action("DeleteAdditional Parameters")
+                {
+                    Caption = 'Additional parameters';
+                    Image = DeleteXML;
+
+                    trigger OnAction()
+                    begin
+                        ClearFile(1);
+                    end;
+                }
+            }
+            group(Export)
+            {
+                Caption = 'Export';
+                action(ExportLicense)
+                {
+                    Caption = 'License';
+                    Image = Export;
+
+                    trigger OnAction()
+                    begin
+                        ExportFile(0);
+                    end;
+                }
+                action(ExportConfig)
+                {
+                    Caption = 'Configuration XML';
+                    Image = ExportElectronicDocument;
+
+                    trigger OnAction()
+                    begin
+                        ExportFile(1);
+                    end;
+                }
+                action(ExportAddtionalParameters)
+                {
+                    Caption = 'Additional Parameters';
+                    Image = TransmitElectronicDoc;
+
+                    trigger OnAction()
+                    begin
+                        ExportFile(2);
+                    end;
+                }
+            }
+        }
+    }
+}
+
