@@ -12,7 +12,6 @@ resources:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
-    ref: 'refs/heads/master'  
 
 pool:
   name: NP Deployment
@@ -29,7 +28,8 @@ jobs:
 - template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
   parameters:
     timeoutInMinutes: 720
-    containerImageName: mcr.microsoft.com/businesscentral/onprem:2004-w1-ltsc2019
+    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
+    artifactURL: https://bcartifacts.azureedge.net/onprem/16.4.14693.15090/w1
     containerName: Build-$(Build.BuildId)
     serverInstanceName: BC
     containerAdminUsername: admin
