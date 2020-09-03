@@ -1,0 +1,247 @@
+page 6150615 "NPR POS Store Card"
+{
+    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
+    // NPR5.30/AP/20170207 CASE 265509 Added new fields for Geolocation. Re-arranged layout to align more with std.
+    // NPR5.31/AP/20170419 CASE 272321 Added new fields for "Store Size", "Opening Date", "Store Group Code", "Store Category Code" and "Store Locality Code"
+    // NPR5.36/BR/20170810 CASE 277096 Added Navigate Actions
+    // NPR5.36/BR/20170914 CASE 289641 Added field VAT Customer No.
+    // NPR5.38/BR/20171214  CASE 299888 Changed ENU Caption from POS Ledger Register to POS Period Register
+    // NPR5.38/BR/20180125 CASE 302803 Added fields Posting Compression, POS Period Register No. Series
+    // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
+    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
+    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
+
+    Caption = 'POS Store Card';
+    RefreshOnActivate = true;
+    SourceTable = "NPR POS Store";
+
+    layout
+    {
+        area(content)
+        {
+            group(General)
+            {
+                Caption = 'General';
+                field("Code"; Code)
+                {
+                    ApplicationArea = All;
+                }
+                field(Name; Name)
+                {
+                    ApplicationArea = All;
+                }
+                field("Name 2"; "Name 2")
+                {
+                    ApplicationArea = All;
+                }
+                field(Address; Address)
+                {
+                    ApplicationArea = All;
+                }
+                field("Address 2"; "Address 2")
+                {
+                    ApplicationArea = All;
+                }
+                field("Post Code"; "Post Code")
+                {
+                    ApplicationArea = All;
+                }
+                field(City; City)
+                {
+                    ApplicationArea = All;
+                }
+                field(Contact; Contact)
+                {
+                    ApplicationArea = All;
+                }
+                field(County; County)
+                {
+                    ApplicationArea = All;
+                }
+                field("Country/Region Code"; "Country/Region Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Location Code"; "Location Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Language Code"; "Language Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("VAT Registration No."; "VAT Registration No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Registration No."; "Registration No.")
+                {
+                    ApplicationArea = All;
+                }
+            }
+            group(Communication)
+            {
+                Caption = 'Communication';
+                field("Phone No."; "Phone No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Fax No."; "Fax No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("E-Mail"; "E-Mail")
+                {
+                    ApplicationArea = All;
+                }
+                field("Home Page"; "Home Page")
+                {
+                    ApplicationArea = All;
+                }
+            }
+            group(Posting)
+            {
+                Caption = 'Posting';
+                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
+                {
+                    ApplicationArea = All;
+                }
+                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
+                {
+                    ApplicationArea = All;
+                }
+                field("VAT Customer No."; "VAT Customer No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Default POS Posting Setup"; "Default POS Posting Setup")
+                {
+                    ApplicationArea = All;
+                }
+                field("Tax Area Code"; "Tax Area Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Tax Liable"; "Tax Liable")
+                {
+                    ApplicationArea = All;
+                }
+                field("Posting Compression"; "Posting Compression")
+                {
+                    ApplicationArea = All;
+                }
+                field("POS Period Register No. Series"; "POS Period Register No. Series")
+                {
+                    ApplicationArea = All;
+                }
+            }
+            group(Profiles)
+            {
+                Caption = 'Profiles';
+                field("POS Restaurant Profile"; "POS Restaurant Profile")
+                {
+                    ApplicationArea = All;
+                }
+            }
+            group(Reporting)
+            {
+                Caption = 'Reporting';
+                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Store Group Code"; "Store Group Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Store Category Code"; "Store Category Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Store Locality Code"; "Store Locality Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Store Size"; "Store Size")
+                {
+                    ApplicationArea = All;
+                }
+                field("Opening Date"; "Opening Date")
+                {
+                    ApplicationArea = All;
+                }
+                field("Geolocation Latitude"; "Geolocation Latitude")
+                {
+                    ApplicationArea = All;
+                }
+                field("Geolocation Longitude"; "Geolocation Longitude")
+                {
+                    ApplicationArea = All;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(navigation)
+        {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID" = CONST(6150614),
+                              "No." = FIELD(Code);
+                ShortCutKey = 'Shift+Ctrl+D';
+            }
+            action("POS Unit List")
+            {
+                Caption = 'POS Unit List';
+                Image = List;
+                RunObject = Page "NPR POS Unit List";
+            }
+            action("NP Retail Setup")
+            {
+                Caption = 'NP Retail Setup';
+                Image = Setup;
+                RunObject = Page "NPR NP Retail Setup";
+            }
+            action("POS Posting Setup")
+            {
+                Caption = 'POS Posting Setup';
+                Image = GeneralPostingSetup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPR POS Posting Setup";
+                RunPageLink = "POS Store Code" = FIELD(Code);
+            }
+            action("POS Period Registers")
+            {
+                Caption = 'POS Period Registers';
+                Image = Register;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPR POS Period Register List";
+                RunPageLink = "POS Store Code" = FIELD(Code);
+            }
+            action("POS Entries")
+            {
+                Caption = 'POS Entries';
+                Image = LedgerEntries;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPR POS Entry List";
+                RunPageLink = "POS Store Code" = FIELD(Code);
+            }
+        }
+    }
+}
+

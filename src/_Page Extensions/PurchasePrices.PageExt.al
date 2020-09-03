@@ -1,0 +1,25 @@
+pageextension 6014476 "NPR Purchase Prices" extends "Purchase Prices"
+{
+    // VRT1.00/JDH/20150304 CASE 271133 Show Variety Matrix
+    // NPR5.31/NPKNAV/20170502  CASE 271133 Transport NPR5.31 - 2 May 2017
+    actions
+    {
+        addafter(CopyPrices)
+        {
+            group("NPR Variants")
+            {
+                Caption = 'Variants';
+                action("NPR Variety")
+                {
+                    Caption = 'Variety';
+                    Image = ItemVariant;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ShortCutKey = 'Ctrl+Alt+V';
+                }
+            }
+        }
+    }
+}
+

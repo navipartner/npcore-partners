@@ -1,0 +1,21 @@
+tableextension 6014451 "NPR Purchase Price" extends "Purchase Price"
+{
+    // VRT1.00/JDH/20170502 CASE 271133 Added Variety Fields for grouping
+    // NPR5.31/NPKNAV/20170502  CASE 271133 Transport NPR5.31 - 2 May 2017
+    fields
+    {
+        field(6059970; "NPR Is Master"; Boolean)
+        {
+            Caption = 'Is Master';
+            DataClassification = CustomerContent;
+            Description = 'VRT1.00';
+        }
+        field(6059972; "NPR Master Record Reference"; Text[250])
+        {
+            Caption = 'Master Record Reference';
+            DataClassification = CustomerContent;
+            Description = 'VRT1.00';
+        }
+    }
+}
+

@@ -1,0 +1,132 @@
+codeunit 6151511 "NPR Nc Import Processor"
+{
+    // NPR5.55/MHA /20200604  CASE 408100 Object created - Processes Nc Import
+
+    TableNo = "NPR Nc Import Entry";
+
+    trigger OnRun()
+    begin
+        if Rec.HasActiveImport() then
+            exit;
+
+        if Rec."Earliest Import Datetime" > CurrentDateTime then
+            Sleep(Rec."Earliest Import Datetime" - CurrentDateTime);
+
+        ProcessImportEntry(Rec);
+    end;
+
+    procedure ProcessImportEntry(var NcImportEntry: Record "NPR Nc Import Entry") Success: Boolean
+    var
+        DataLogMgt: Codeunit "NPR Data Log Management";
+    begin
+        MarkAsStarted(NcImportEntry);
+
+        Success := CODEUNIT.Run(CODEUNIT::"NPR Nc Import Mgt.", NcImportEntry);
+        DataLogMgt.DisableDataLog(false);
+
+        MarkAsCompleted(Success, NcImportEntry);
+
+        if Success then
+            exit;
+
+        ScheduleRetry(NcImportEntry);
+    end;
+
+    local procedure MarkAsStarted(var NcImportEntry: Record "NPR Nc Import Entry")
+    begin
+        ClearLastError;
+        NcImportEntry.LockTable;
+        NcImportEntry.Get(NcImportEntry."Entry No.");
+        Clear(NcImportEntry."Last Error Message");
+        NcImportEntry.Imported := false;
+        NcImportEntry."Runtime Error" := true;
+        NcImportEntry."Error Message" := '';
+        NcImportEntry."Import Started at" := CurrentDateTime;
+        NcImportEntry."Import Duration" := 0;
+        NcImportEntry."Import Completed at" := 0DT;
+        NcImportEntry."Import Count" += 1;
+        NcImportEntry."Import Started by" := UserId;
+        NcImportEntry."Server Instance Id" := ServiceInstanceId;
+        NcImportEntry."Session Id" := SessionId;
+        NcImportEntry.Modify(true);
+        Commit;
+    end;
+
+    local procedure MarkAsCompleted(Success: Boolean; var NcImportEntry: Record "NPR Nc Import Entry")
+    var
+        NcImportType: Record "NPR Nc Import Type";
+        NcImportMgt: Codeunit "NPR Nc Import Mgt.";
+        OutStr: OutStream;
+        LastErrorText: Text;
+    begin
+        NcImportEntry.LockTable;
+        NcImportEntry.Get(NcImportEntry."Entry No.");
+        NcImportEntry."Import Completed at" := CurrentDateTime;
+        if NcImportEntry."Import Started at" <> 0DT then
+            NcImportEntry."Import Duration" := (NcImportEntry."Import Completed at" - NcImportEntry."Import Started at") / 1000;
+        NcImportEntry."Server Instance Id" := 0;
+        NcImportEntry."Session Id" := 0;
+        NcImportEntry.Imported := Success;
+        NcImportEntry."Runtime Error" := not Success;
+        LastErrorText := GetLastErrorText;
+        if LastErrorText <> '' then begin
+            NcImportEntry."Error Message" := CopyStr(LastErrorText, 1, MaxStrLen(NcImportEntry."Error Message"));
+            NcImportEntry."Last Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+            OutStr.WriteText(LastErrorText);
+        end;
+        NcImportEntry.Modify(true);
+        Commit;
+
+        if Success then
+            exit;
+
+        ClearLastError;
+        if not NcImportType.Get(NcImportEntry."Import Type") then
+            exit;
+        if NcImportType."Send e-mail on Error" then begin
+            if NcImportMgt.SendErrorMail(NcImportEntry) then begin
+                NcImportEntry.LockTable;
+                NcImportEntry.Get(NcImportEntry."Entry No.");
+                NcImportEntry."Last Error E-mail Sent at" := CurrentDateTime;
+                NcImportEntry."Last Error E-mail Sent to" := NcImportType."E-mail address on Error";
+                NcImportEntry.Modify(true);
+                Commit;
+            end;
+        end;
+    end;
+
+    procedure ScheduleRetry(var NcImportEntry: Record "NPR Nc Import Entry")
+    var
+        NcImportType: Record "NPR Nc Import Type";
+    begin
+        if not NcImportType.Get(NcImportEntry."Import Type") then
+            exit;
+        if NcImportType."Max. Retry Count" <= 0 then
+            exit;
+        if NcImportType."Max. Retry Count" < NcImportEntry."Import Count" then
+            exit;
+
+        if NcImportType."Delay between Retries" > 0 then begin
+            NcImportEntry.LockTable;
+            NcImportEntry.Get(NcImportEntry."Entry No.");
+            NcImportEntry."Earliest Import Datetime" := CurrentDateTime + NcImportType."Delay between Retries";
+            NcImportEntry.Modify(true);
+            Commit;
+        end;
+
+        ScheduleImport(NcImportEntry);
+    end;
+
+    procedure ScheduleImport(var NcImportEntry: Record "NPR Nc Import Entry")
+    var
+        SessionId: Integer;
+    begin
+        SESSION.StartSession(SessionId, CurrCodeunitId, CompanyName, NcImportEntry);
+    end;
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        exit(CODEUNIT::"NPR Nc Import Processor");
+    end;
+}
+

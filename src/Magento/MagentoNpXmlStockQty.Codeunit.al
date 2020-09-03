@@ -1,0 +1,34 @@
+codeunit 6151451 "NPR Magento NpXml Stock Qty"
+{
+    // MAG1.16/TS/20150507  CASE 213379 Object created - Custom Values for NpXml
+    // MAG1.22/MHA/20160427 CASE 232405 Removed unused variables in GetStockQty()
+    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
+    // MAG2.09/MHA /20180105  CASE 301053 Removed redundant CASE 'boolean' in SetRecRefCalcFieldFilter()
+    // MAG2.26/MHA /20200430  CASE 402486 Updated Stock Calculation function
+
+    TableNo = "NPR NpXml Custom Val. Buffer";
+
+    trigger OnRun()
+    var
+        NpXmlElement: Record "NPR NpXml Element";
+        MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
+        RecRef: RecordRef;
+        OutStr: OutStream;
+        CustomValue: Text;
+    begin
+        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+            exit;
+        Clear(RecRef);
+        RecRef.Open("Table No.");
+        RecRef.SetPosition("Record Position");
+
+        //-MAG2.26 [402486]
+        CustomValue := Format(MagentoItemMgt.GetStockQty2(RecRef), 0, 9);
+        //+MAG2.26 [402486]
+
+        Value.CreateOutStream(OutStr);
+        OutStr.WriteText(CustomValue);
+        Modify;
+    end;
+}
+

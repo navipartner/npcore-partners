@@ -1,0 +1,34 @@
+page 6151197 "NPR NpCs Workflows"
+{
+    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+
+    Caption = 'Collect Workflows';
+    CardPageID = "NPR NpCs Workflow Card";
+    Editable = false;
+    PageType = List;
+    SourceTable = "NPR NpCs Workflow";
+    UsageCategory = Administration;
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field("Code"; Code)
+                {
+                    ApplicationArea = All;
+                }
+                field(Description; Description)
+                {
+                    ApplicationArea = All;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+}
+

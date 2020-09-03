@@ -34,7 +34,7 @@
   ],
   "contextSensitiveHelpUrl": "https://support.navipartner.com/",
   "showMyCode": true,
-  "runtime": "5.0",
+  "runtime": "5.2",
   "target": "OnPrem",
   "features": [ "TranslationFile" ]
 }
