@@ -1,9 +1,10 @@
-# F8 to run
+Invoke-Expression "& { $(Invoke-RestMethod https://aka.ms/install-artifacts-credprovider.ps1) } -AddNetfx"
 
-# If the command fails with HTTP 401 unauthorized, make sure you have Azure Credential Provider installed locally.
-# Download and run installcredprovider.ps1 from below:
-# https://github.com/microsoft/artifacts-credprovider#setup
-
-# Remember that VSCode has to be restarted after dependencies have been downloaded. This is an AL extension limitation.
-
-dotnet restore NPCore.csproj --configfile nuget.config --packages .netpackages\ --interactive
+if (-not [System.IO.File]::Exists('.\.netpackages\nuget.exe')) {
+  if (-not [System.IO.Directory]::Exists('.\.netpackages')) {
+    [System.IO.Directory]::CreateDirectory('.\.netpackages')
+  }
+  Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile '.\.netpackages\nuget.exe'
+}
+    
+.\.netpackages\nuget.exe restore packages.config -PackagesDirectory .\.netpackages
