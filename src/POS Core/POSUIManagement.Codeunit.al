@@ -772,6 +772,8 @@ codeunit 6150702 "NPR POS UI Management"
         Setup.Action_AdminMenu(Action, POSSession);
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
         //+NPR5.55 [400734]
+
+        OnConfigureReusableWorkflows(POSSession, Setup);
     end;
 
     procedure ConfigureReusableWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; Source: Text; FieldNumber: Integer)
@@ -839,6 +841,9 @@ codeunit 6150702 "NPR POS UI Management"
         //-NPR5.55 [400734]
 
         Options.Add('nprVersion', GetNPRVersion());
+
+        OnSetOptions(Setup, Options);
+
         FrontEnd.SetOptions(Options);
     end;
 
@@ -944,10 +949,19 @@ codeunit 6150702 "NPR POS UI Management"
     var
         POSUnit: Record "NPR POS Unit";
     begin
-
         //-NPR5.54 [392247]
         POSSetup.GetPOSUnit(POSUnit);
         exit(POSUnit."POS Type");
         //+NPR5.54 [392247]
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnConfigureReusableWorkflows(POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetOptions(Setup: Codeunit "NPR POS Setup"; var Options: DotNet NPRNetDictionary_Of_T_U)
+    begin
     end;
 }
