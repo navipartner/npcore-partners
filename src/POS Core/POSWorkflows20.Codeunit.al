@@ -33,31 +33,26 @@ codeunit 6150733 "NPR POS Workflows 2.0"
 
     local procedure RetrieveActionContext(Context: JsonObject; var ActionCode: Text; var WorkflowId: Integer; var WorkflowStep: Text; var ActionId: Integer; var ActionContext: JsonObject)
     var
-        ContextArray: JsonArray;
         JToken: JsonToken;
         JValue: JsonValue;
-        NetConvHelper: Variant;
     begin
-        NetConvHelper := Context;
-        ContextArray := NetConvHelper;
-
-        ContextArray.Get(0, JToken);
+        Context.Get('name', JToken);
         JValue := JToken.AsValue();
         ActionCode := JValue.AsText();
 
-        ContextArray.Get(1, JToken);
+        Context.Get('step', JToken);
         JValue := JToken.AsValue();
         WorkflowStep := JValue.AsText();
 
-        ContextArray.Get(2, JToken);
+        Context.Get('id', JToken);
         JValue := JToken.AsValue();
         WorkflowId := JValue.AsInteger();
 
-        ContextArray.Get(3, JToken);
+        Context.Get('actionId', JToken);
         JValue := JToken.AsValue();
         ActionId := JValue.AsInteger();
 
-        ContextArray.Get(4, JToken);
+        Context.Get('context', JToken);
         ActionContext := JToken.AsObject();
     end;
 
