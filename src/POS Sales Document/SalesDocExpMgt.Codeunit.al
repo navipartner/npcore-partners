@@ -1867,9 +1867,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                 if AuditRoll.Offline then
                     AuditRoll.Posted := false;
 
-                if (AuditRoll.Type = AuditRoll.Type::Item) then
-                    TicketManagement.IssueTicketsFromAuditRoll(AuditRoll);
-
                 //-NPR5.51 [358582]
                 RetailFormCode.OnBeforeAuditRoleLineInsertEvent(Sale, SaleLinePOS, AuditRoll);
                 //+NPR5.51 [358582]
