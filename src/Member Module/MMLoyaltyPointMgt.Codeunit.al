@@ -1,43 +1,5 @@
 codeunit 6060139 "NPR MM Loyalty Point Mgt."
 {
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System Setup
-    // MM1.22/TSA /20170731 CASE 285403 Integrate with Coupons, RedeemPointsCoupon(), GetCouponToRedeem()
-    // MM1.22/TSA /20170808 CASE 285403 Added Subscriber OnAfterInsertMembershipEntry()
-    // MM1.23/TSA /20171006 CASE 257011 Added the default Amount Factor and Point Rate calculations (was implicitly 1)
-    // MM1.23/TSA /20171010 CASE 257011 Added functions to set points for a membership
-    // MM1.24/TSA /20171205 CASE 297852 Added a check on blocked memberships
-    // MM1.24/TSA /20171205 CASE 297852 Added auto-loyalty points for membership alterations
-    // MM1.25/TSA /20171220 CASE 300685 cancel and regret dont reverse points on a new transaction
-    // MM1.25/TSA /20180109 CASE 301612 Function SynchronizePointsAbsolute() ignored parameter ReferenceDate
-    // MM1.25.01/TSA /20180123 CASE 300685 Regretting a new entry will leave the memberhship not active before returning the points
-    // MM1.26/TSA /20180219 CASE 300685 Versioning
-    // MM1.26/TSA /20171006 CASE 257011 AmountBase should not include point rate in calculation
-    // MM1.28/TSA /20180425 CASE 307048 Refactored GetCouponToRedeem to handle new settings
-    // MM1.29/TSA /20180518 CASE 314131 Added ManualExpirePoints function
-    // MM1.29/TSA /20180518 CASE 314131 Added update wallet when NP Pass is activated
-    // MM1.29.02/TSA/20180529 CASE 317673 Minor fixes, found during testing
-    // MM1.32/TSA /20180711 CASE 318132 Wallet update optimization
-    // MM1.32/TSA /20180712 CASE 321176 User Select for Coupon.
-    // MM1.33/TSA /20180813 CASE 324660 Points handling in by OnFinishSale workflowstep
-    // MM1.36/TSA /20181128 CASE 337873 "Awarded Points" did not consider sales quantity
-    // MM1.36/TSA /20181128 CASE 337873 Refactored CreatePointEntryFromValueEntry() to due to duplicate points assigment when having multiple memberships on same sales order
-    // MM1.37/TSA /20190226 CASE 343053 Expire loyalty points, some restructuring
-    // MM1.37/TSA /20190227 CASE 343053 Cleaned / Removed green code
-    // MM1.40/TSA /20190731 CASE 361664 Added Loyalty point based upgrade functionality
-    // MM1.40/TSA /20190813 CASE 343352 Points on web. Refactored GetCouponToRedeem() -> GetCouponToRedeemPOS() added GetCouponToRedeemWS(), GetEligibleCouponsToRedeemWorker()
-    // MM1.41/TSA /20191001 CASE 371095 Previous Period point threshold calculation, added CalculateSpendablePoints()
-    // MM1.41/TSA /20191018 CASE 372777 Changed posting date for points earn base on membership alterations
-    // MM1.42/TSA /20191024 CASE 374403 UnRedeemPointsCoupon(), changed signature on IssueOneCoupon()
-    // MM1.42/TSA /20191125 CASE 367972 Incorrect amount as VAT base for the on after sale
-    // MM1.42/TSA /20191203 CASE 361664 Refactored the after points has changed code, added AfterMembershipPointsUpdate()
-    // MM1.43/TSA /20200203 CASE 388058 Fixed expire points bug and added expire for as-you-go option
-    // MM1.43/TSA /20200228 CASE 393569 Added a subscriber for return sales events
-    // MM1.44/TSA /20200420 CASE 400845 Added GetNextLoyaltyTier() as external function
-    // MM1.44/TSA /20200428 CASE 392469 Correction for expire fixed points
-    // MM1.44/TSA /20200428 CASE 405974 Calculation of spend period burn/redeem points
-    // MM1.45/TSA /20200629 CASE 411768 Calculation of Points Summary for fixed period bonus model
-
-
     trigger OnRun()
     var
         MyValueEntry: Record "Value Entry";
@@ -68,7 +30,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         if (ValueEntry."Document Type" = ValueEntry."Document Type"::" ") then begin
 
-            // POS entries could be handled by OnFinishSale workflow
             POSSalesWorkflowStep.SetFilter("Subscriber Function", '=%1', PointAssignmentStepName());
             if (POSSalesWorkflowStep.FindFirst()) then
                 if (POSSalesWorkflowStep.Enabled) then
@@ -158,10 +119,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             Quantity := 1;
 
         // Since customer no is not set on the regulare sales we need to forge a value entry on this type of sales to get our initial points
-        //-MM1.37 [343053]
-        // SimulateValueEntry (MembershipEntry."Valid From Date", MembershipEntry."Item No.", Quantity, Membership."Customer No.", MembershipEntry."Document No.", MembershipEntry.Amount, 0, LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY);
         SimulateValueEntry(
-          DT2Date(MembershipEntry."Created At"), //-+MM1.41 [372777] MembershipEntry."Valid From Date",
+          DT2Date(MembershipEntry."Created At"),
           '',
           MembershipEntry."Item No.",
           Quantity,
@@ -171,7 +130,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
           0,
           LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY
           );
-        //+MM1.37 [343053]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
@@ -192,7 +150,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
     local procedure PointAssignmentOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
-        AuditRoll: Record "NPR Audit Roll";
+        PosEntry: Record "NPR POS Entry";
+        PosEntrySalesLine: Record "NPR POS Sales Line";
     begin
 
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
@@ -202,35 +161,25 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             exit;
 
         // Calculate points and assign.
-        AuditRoll.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-        AuditRoll.SetFilter("Register No.", '=%1', SalePOS."Register No.");
-        AuditRoll.SetFilter(Type, '=%1', AuditRoll.Type::Item);
-
-        if (AuditRoll.FindSet()) then begin
-            repeat
-                //-MM1.37 [343053]
-                // SimulateValueEntry (AuditRoll."Sale Date", AuditRoll."No.", AuditRoll.Quantity * -1, AuditRoll."Customer No.", AuditRoll."Sales Ticket No.",
-                //  AuditRoll."Amount Including VAT", AuditRoll."Line Discount Amount", LoyaltyPostingSourceEnum::POS_ENDOFSALE);
-                SimulateValueEntry(
-                  AuditRoll."Sale Date",
-                  AuditRoll."Register No.",
-                  AuditRoll."No.",
-                  AuditRoll.Quantity * -1,
-                  AuditRoll."Customer No.",
-                  AuditRoll."Sales Ticket No.",
-
-                  //-MM1.42 [367972]
-                  // AuditRoll."Amount Including VAT",
-                  AuditRoll.Amount,
-                  //+MM1.42 [367972]
-
-                  AuditRoll."Line Discount Amount",
-                  LoyaltyPostingSourceEnum::POS_ENDOFSALE
-                );
-            //+MM1.37 [343053]
-
-            until (AuditRoll.Next() = 0);
-
+        PosEntry.SetFilter("Document No.", SalePOS."Sales Ticket No.");
+        if (PosEntry.FindFirst()) then begin
+            PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
+            PosEntrySalesLine.SetFilter(Type, '=%1', PosEntrySalesLine.Type::Item);
+            if (PosEntrySalesLine.FindSet()) then begin
+                repeat
+                    SimulateValueEntry(
+                        PosEntry."Document Date",
+                        PosEntry."POS Unit No.",
+                        PosEntrySalesLine."No.",
+                        PosEntrySalesLine.Quantity * -1,
+                        PosEntry."Customer No.",
+                        PosEntry."Document No.",
+                        PosEntrySalesLine."Amount Excl. VAT (LCY)",
+                        PosEntrySalesLine."Line Dsc. Amt. Excl. VAT (LCY)",
+                        LoyaltyPostingSourceEnum::POS_ENDOFSALE
+                    );
+                until (PosEntrySalesLine.next() = 0);
+            end;
         end;
     end;
 
@@ -246,18 +195,10 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         exit('PointAssignmentOnSale');
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure ErrorExit(var ReasonText: Text; ReasonMessage: Text): Boolean
     begin
-
-        //-MM1.40 [343352]
         ReasonText := ReasonMessage;
         exit(false);
-
-        //+MM1.40 [343352]
     end;
 
     local procedure SimulateValueEntry(PostingDate: Date; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; CustomerNo: Code[20]; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; DataSource: Option)
@@ -283,9 +224,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ValueEntry."Document No." := DocumentNo;
         ValueEntry."Valued Quantity" := Quantity;
 
-        //-MM1.37 [343053]
         ValueEntry."NPR Register No." := PosUnitNo;
-        //+MM1.37 [343053]
 
         ValueEntry."Sales Amount (Actual)" := Amount;
         ValueEntry."Discount Amount" := DiscountAmount;
@@ -300,7 +239,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         Item: Record Item;
     begin
 
-        //-MM1.44 [392469] For TEST Framework
         if (ItemNo = '') then
             exit;
 
@@ -320,7 +258,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
         CreatePointEntryFromValueEntry(ValueEntry, DataSource);
-        //+MM1.44 [392469]
+
     end;
 
     local procedure CreatePointEntryFromValueEntry(ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option): Boolean
@@ -405,12 +343,11 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipPointsEntry."Loyalty Code" := MembershipSetup."Loyalty Code";
         MembershipPointsEntry."Item No." := ValueEntry."Item No.";
         MembershipPointsEntry."Variant Code" := ValueEntry."Variant Code";
-        //-MM1.37 [343053]
+
         if (POSUnit.Get(ValueEntry."NPR Register No.")) then begin
             MembershipPointsEntry."POS Unit Code" := POSUnit."No.";
             MembershipPointsEntry."POS Store Code" := POSUnit."POS Store Code";
         end;
-        //+MM1.37 [343053]
 
         MembershipPointsEntry."Amount (LCY)" := CalculateBaseAmount(ValueEntry, (LoyaltySetup."Amount Base" = LoyaltySetup."Amount Base"::INCL_VAT));
         MembershipPointsEntry.Quantity := ValueEntry."Valued Quantity" * -1;
@@ -438,33 +375,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         if (MembershipPointsEntry.Insert()) then;
 
-        //-MM1.42 [361664]
-        //-MM1.40 [361664]
-        // // Check for upgrade
-        // UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", TRUE, UpgradeAlteration);
-        // DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", FALSE, DowngradeAlteration);
-        //
-        // IF (UpgradeAvailable AND NOT DowngradeAvailable) THEN
-        //  AlterMembership (Membership."Entry No.", UpgradeAlteration);
-        //
-        // IF (DowngradeAvailable AND NOT UpgradeAvailable) THEN
-        //  AlterMembership (Membership."Entry No.", DowngradeAlteration);
-        //
-        // //+MM1.40 [361664]
-        //
-        // IF (MembershipSetup."Enable NP Pass Integration") THEN BEGIN
-        //
-        //  MembershipRole.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
-        //  MembershipRole.SETFILTER (Blocked, '=%1', FALSE);
-        //  MembershipRole.SETFILTER ("Wallet Pass Id", '<>%1', '');
-        //  IF (NOT MembershipRole.ISEMPTY ()) THEN
-        //    MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
-        // END;
-
         AfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
-        //+MM1.42 [361664]
-
-
         exit(true);
     end;
 
@@ -481,9 +392,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             if (not GenProductPostingGroup.Get(ValueEntry."Gen. Prod. Posting Group")) then
                 exit(0);
 
-            //-MM1.42 [367972]
-            // VATPostingSetup.SETFILTER ("VAT Bus. Posting Group", '=%1', ValueEntry."Gen. Bus. Posting Group");
-            // VATPostingSetup.SETFILTER ("VAT Prod. Posting Group", '=%1', GenProductPostingGroup."Def. VAT Prod. Posting Group");
             if (not Item.Get(ValueEntry."Item No.")) then
                 exit(0);
 
@@ -491,7 +399,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             VATPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
             if (Customer.Get(ValueEntry."Source No.")) then
                 VATPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Customer."VAT Bus. Posting Group");
-            //+MM1.42 [367972]
 
             if (not VATPostingSetup.FindFirst()) then
                 exit(0);
@@ -516,10 +423,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         // Check Settings level Exclude
         if (AmountIsDiscounted) then
             if (not LoyaltySetup."Points On Discounted Sales") then begin
-                //-MM1.29.02 [317673]
                 AwardedAmount := 0;
                 AwardedPoints := 0;
-                //+MM1.29.02 [317673]
                 exit(RuleType::EXCLUDE);
             end;
 
@@ -580,28 +485,18 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
     procedure CalcultatePointsValidPeriod(LoyaltySetup: Record "NPR MM Loyalty Setup"; ReferenceDate: Date; var ValidFromDate: Date; var ValidUntilDate: Date)
     begin
 
-        //-MM1.37 [343053]
         if (ReferenceDate = 0D) then
             ReferenceDate := Today;
 
         ValidFromDate := 0D;
         ValidUntilDate := 0D;
-        //+MM1.37 [343053]
 
         case LoyaltySetup."Collection Period" of
             LoyaltySetup."Collection Period"::AS_YOU_GO:
                 begin
-                    //-MM1.43 [388058]
-                    // ValidFromDate := ReferenceDate;
-                    // IF (FORMAT (LoyaltySetup."Expire Uncollected After") <> '') THEN
-                    //   ValidUnitDate := CALCDATE (LoyaltySetup."Expire Uncollected After", ReferenceDate);
-
                     ValidUntilDate := ReferenceDate;
                     if (Format(LoyaltySetup."Expire Uncollected After") <> '') then
-                        //ValidFromDate := CALCDATE (LoyaltySetup."Expire Uncollected After", ReferenceDate);
-                        ValidFromDate := CalcDate('<+1D>', CalcDate(LoyaltySetup."Expire Uncollected After", ReferenceDate)); //-+MM1.45 [411768]
-                    //+MM1.43 [388058]
-
+                        ValidFromDate := CalcDate('<+1D>', CalcDate(LoyaltySetup."Expire Uncollected After", ReferenceDate));
                 end;
 
             LoyaltySetup."Collection Period"::FIXED:
@@ -628,7 +523,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ExpirePointsAt: Date;
     begin
 
-        //-MM1.37 [343053]
         ReasonText := '';
 
         with LoyaltySetup do begin
@@ -675,7 +569,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             ReasonText := 'OK';
 
         exit(not PeriodCalculationIssue);
-        //+MM1.37 [343053]
+
     end;
 
     local procedure CalculateCurrentExpiryDate(LoyaltySetup: Record "NPR MM Loyalty Setup"; var ExpirePointStart: Date; var ExpirePointEnd: Date; var ReasonText: Text): Boolean
@@ -685,7 +579,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         CollectionPeriodEnd: Date;
     begin
 
-        //-MM1.37 [343053]
         if (not LoyaltySetup."Expire Uncollected Points") then
             exit(false);
 
@@ -701,19 +594,15 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             if (CollectionPeriodEnd = 0D) then
                 Error(PERIOD_SETUP_ERROR);
 
-            //-MM1.44 [392469]
-            // ExpirePointsAt := CALCDATE (LoyaltySetup."Expire Uncollected After", CollectionPeriodEnd);
             ExpirePointStart := CalcDate('<+1D>', CollectionPeriodEnd);
             ExpirePointEnd := CalcDate(LoyaltySetup."Expire Uncollected After", CollectionPeriodEnd);
-            //+MM1.44 [392469]
 
             ReferenceDate := CalcDate('<-1D>', CollectionPeriodStart);
 
-        //UNTIL (ExpirePointsAt <= TODAY);
         until (ExpirePointEnd <= Today);
 
         exit(true);
-        //+MM1.37 [343053]
+
     end;
 
     local procedure ApplyRule(LoyaltyCode: Code[20]; RuleReference: Integer; AmountBase: Decimal; var AwardedAmount: Decimal; var AwardedPoints: Integer): Integer
@@ -761,16 +650,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         DowngradeAvailable: Boolean;
     begin
 
-        //-MM1.42 [361664]
-        // Note: MembershipPointsEntryNo is optional and is allowed to be unassigned
-
-        // Check for upgrade
-        //-MM1.44 [400845]
-        // UpgradeAvailable := EligibleForMembershipAlteration (MembershipEntryNo, TRUE, UpgradeAlteration);
-        // DowngradeAvailable := EligibleForMembershipAlteration (MembershipEntryNo, FALSE, DowngradeAlteration);
         UpgradeAvailable := EligibleForMembershipAlteration(MembershipEntryNo, true, false, UpgradeAlteration);
         DowngradeAvailable := EligibleForMembershipAlteration(MembershipEntryNo, false, false, DowngradeAlteration);
-        //+MM1.44 [400845]
 
         if (UpgradeAvailable and not DowngradeAvailable) then
             AlterMembership(MembershipEntryNo, UpgradeAlteration);
@@ -778,14 +659,12 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (DowngradeAvailable and not UpgradeAvailable) then
             AlterMembership(MembershipEntryNo, DowngradeAlteration);
 
-        // Wallet update
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
         if (not MembershipRole.IsEmpty()) then
             MemberNotification.CreateUpdateWalletNotification(MembershipEntryNo, 0, 0);
 
-        //+MM1.42 [361664]
     end;
 
     local procedure "--RulesSelection"()
@@ -913,44 +792,27 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         RedeemablePoints: Integer;
     begin
 
-        //-MM1.40 [343352]
         if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
-            //-MM1.42 [374403]
-            // CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, TmpLoyaltyPointsSetup."Points Threshold", 0);
             CouponNo := LoyaltyCouponMgr.IssueOneCoupon(TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, DocumentNo, PostingDate, TmpLoyaltyPointsSetup."Points Threshold", 0);
-        //+MM1.42 [374403]
 
         if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then begin
             Membership.Get(MembershipEntryNo);
 
-            //-MM1.41 [371095]
-            // Membership.CALCFIELDS ("Remaining Points");
-            //RedeemablePoints := CalculateAvailablePoints (MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, FALSE);
             RedeemablePoints := TmpLoyaltyPointsSetup."Points Threshold";
-            //+MM1.41 [371095]
 
             CouponAmount := SubTotal;
 
-            //-MM1.41 [371095]
-            // IF (Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) THEN
-            //   CouponAmount := Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate";
             if (RedeemablePoints * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) then
                 CouponAmount := RedeemablePoints * TmpLoyaltyPointsSetup."Point Rate";
-            //-MM1.41 [371095]
 
             PointsToRedeem := Round(CouponAmount / TmpLoyaltyPointsSetup."Point Rate", 1);
 
             if (CouponAmount >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") then
-                //-MM1.42 [374403]
-                //CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, PointsToRedeem, CouponAmount);
                 CouponNo := LoyaltyCouponMgr.IssueOneCoupon(TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, DocumentNo, PostingDate, PointsToRedeem, CouponAmount);
-            //+MM1.42 [374403]
-
 
             // IF (USERID = 'TSA') THEN MESSAGE ('Coupon Amount %1, SubTotal %2, Points(redeemable) %3,  Points(redeemed) %4, Rate %5', CouponAmount, SubTotal, RedeemablePoints, PointsToRedeem, TmpLoyaltyPointsSetup."Point Rate");
 
         end;
-        //+MM1.40 [343352]
     end;
 
     procedure RedeemPointsCoupon(MembershipEntryNo: Integer; DocumentNo: Code[20]; DocumentDate: Date; CouponNo: Code[20]; PointsToDeduct: Integer)
@@ -991,7 +853,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
     begin
 
-        //-MM1.42 [374403]
         if (CouponNo = '') then
             exit;
 
@@ -1018,7 +879,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         MembershipPointsEntry.Insert;
         exit(true);
-        //+MM1.42 [374403]
     end;
 
     procedure GetCouponToRedeemPOS(MembershipEntryNo: Integer; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; SubTotal: Decimal): Boolean
@@ -1032,7 +892,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ReasonText: Text;
     begin
 
-        //-MM1.40 [343352] Refactored from GetCouponToRedeem ()
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         MembershipSetup.TestField("Loyalty Code");
@@ -1056,7 +915,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
 
         exit(not TmpLoyaltyPointsSetup.IsEmpty());
-        //+MM1.40 [343352]
     end;
 
     procedure GetCouponToRedeemWS(MembershipEntryNo: Integer; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; SubTotal: Decimal; var ReasonText: Text): Boolean
@@ -1068,7 +926,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         AvailablePoints: Integer;
     begin
 
-        //-MM1.40 [343352]
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         MembershipSetup.TestField("Loyalty Code");
@@ -1078,7 +935,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             exit(false);
 
         exit(not TmpLoyaltyPointsSetup.IsEmpty());
-        //+MM1.40 [343352]
     end;
 
     local procedure GetEligibleCouponsToRedeemWorker(MembershipEntryNo: Integer; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; SubTotal: Decimal; var PointsToSpend: Integer; var ReasonText: Text): Boolean
@@ -1097,8 +953,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ThresholdPoints: Integer;
     begin
 
-        //-MM1.40 [343352] Refactored from GetCouponToRedeem ()
-        //-MM1.41 [371095] Refactored again to separate threshold points from spending points
         Clear(TmpLoyaltyPointsSetup);
 
         Membership.Get(MembershipEntryNo);
@@ -1109,25 +963,23 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             case ("Voucher Point Source") of
                 "Voucher Point Source"::PREVIOUS_PERIOD:
                     begin
-                        ThresholdPoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, Today, true); //-+MM1.45 [411768]
-                        PointsToSpend := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, Today, false); //-+MM1.45 [411768]
+                        ThresholdPoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, Today, true);
+                        PointsToSpend := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, Today, false);
                     end;
 
                 "Voucher Point Source"::UNCOLLECTED:
                     begin
-                        ThresholdPoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, true); //-+MM1.45 [411768]
-                        PointsToSpend := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false); //-+MM1.45 [411768]
+                        ThresholdPoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, true);
+                        PointsToSpend := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false);
                     end;
             end;
 
         if (ThresholdPoints < LoyaltySetup."Voucher Point Threshold") then
-            // ERROR (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold");
             exit(ErrorExit(ReasonText, StrSubstNo(NO_COUPON_AVAILABLE, ThresholdPoints, LoyaltySetup."Voucher Point Threshold")));
 
         LoyaltyPointsSetup.SetFilter(Code, '=%1', LoyaltySetup.Code);
         LoyaltyPointsSetup.SetFilter("Points Threshold", '%1..%2', 0, Abs(ThresholdPoints));
         if (LoyaltyPointsSetup.IsEmpty()) then
-            // ERROR (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold");
             exit(ErrorExit(ReasonText, StrSubstNo(NO_COUPON_AVAILABLE, ThresholdPoints, LoyaltySetup."Voucher Point Threshold")));
 
         LoyaltyPointsSetup.Reset();
@@ -1267,8 +1119,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
 
         exit(not TmpLoyaltyPointsSetup.IsEmpty());
-        //+MM1.41 [371095]
-        //+MM1.40 [343352]
     end;
 
     local procedure DoLookupCoupon(LookupCaption: Text; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary) LineNo: Integer
@@ -1310,8 +1160,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                 ReferenceDate,
                 ReferenceDate,
                 DocumentNo,
-                '') //-+MM1.43 [393569] Description
-
+                '')
               );
     end;
 
@@ -1326,9 +1175,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         MembershipSetup.TestField("Loyalty Code");
-        //-MM1.37 [343053]
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
-        //+MM1.37 [343053]
 
         MembershipPointsEntry."Entry No." := 0;
 
@@ -1336,11 +1183,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipPointsEntry.Adjustment := true;
         MembershipPointsEntry."Document No." := DocumentNo;
 
-        //-MM1.37 [343053]
-        //MembershipPointsEntry."Posting Date" := ReferenceDate;
         MembershipPointsEntry."Posting Date" := PostingDate;
         CalcultatePointsValidPeriod(LoyaltySetup, ReferenceDate, MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
-        //+MM1.37 [343053]
 
         MembershipPointsEntry."Membership Entry No." := MembershipEntryNo;
         MembershipPointsEntry."Customer No." := Membership."Customer No.";
@@ -1354,35 +1198,11 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             MembershipPointsEntry."Awarded Points" := Points;
 
         MembershipPointsEntry.Quantity := 1;
-        //-MM1.43 [393569]
         MembershipPointsEntry.Description := Description;
-        //-MM1.43 [393569]
 
         MembershipPointsEntry.Insert;
 
-        //-MM1.42 [361664]
-        // //-MM1.40 [361664]
-        // // Check for upgrade
-        // UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", TRUE, UpgradeAlteration);
-        // DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", FALSE, DowngradeAlteration);
-        //
-        // IF (UpgradeAvailable AND NOT DowngradeAvailable) THEN
-        //  AlterMembership (Membership."Entry No.", UpgradeAlteration);
-        //
-        // IF (DowngradeAvailable AND NOT UpgradeAvailable) THEN
-        //  AlterMembership (Membership."Entry No.", DowngradeAlteration);
-        //
-        // IF (MembershipSetup."Enable NP Pass Integration") THEN BEGIN
-        //  MembershipRole.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
-        //  MembershipRole.SETFILTER (Blocked, '=%1', FALSE);
-        //  MembershipRole.SETFILTER ("Wallet Pass Id", '<>%1', '');
-        //  IF (NOT MembershipRole.ISEMPTY ()) THEN
-        //    MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
-        // END;
-        // //+MM1.40 [361664]
-
         AfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
-        //+MM1.42 [361664]
 
         exit(MembershipPointsEntry."Entry No.");
     end;
@@ -1412,10 +1232,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
-        //-MM1.44 [392469]
-        //AdjustPointsAbsoluteWorker (MembershipEntryNo, MembershipPointsEntry."Entry Type"::SALE, ABS(Points), ABS("Amount (LCY)"), TODAY, ReceiptNo);
         exit(AdjustPointsAbsoluteWorker(MembershipEntryNo, MembershipPointsEntry."Entry Type"::SALE, Abs(Points), Abs("Amount (LCY)"), Today, ReceiptNo));
-        //+MM1.44 [392469]
     end;
 
     procedure ManualAddRefundPoints(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; Description: Text[50]) EntryNo: Integer
@@ -1427,10 +1244,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
-        //-MM1.44 [392469]
-        // AdjustPointsAbsoluteWorker (MembershipEntryNo, MembershipPointsEntry."Entry Type"::REFUND, -1 * ABS(Points), -1 * ABS ("Amount (LCY)"), TODAY, ReceiptNo);
         exit(AdjustPointsAbsoluteWorker(MembershipEntryNo, MembershipPointsEntry."Entry Type"::REFUND, -1 * Abs(Points), -1 * Abs("Amount (LCY)"), Today, ReceiptNo));
-        //+MM1.44 [392469]
+
     end;
 
     procedure ManualRedeemPointsWithdraw(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; Description: Text[50]) EntryNo: Integer
@@ -1442,10 +1257,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
-        //-MM1.44 [392469]
-        //AdjustPointsAbsoluteWorker (MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_WITHDRAW, -1 * ABS (Points), -1 * ABS ("Amount (LCY)"), TODAY, ReceiptNo);
         exit(AdjustPointsAbsoluteWorker(MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_WITHDRAW, -1 * Abs(Points), -1 * Abs("Amount (LCY)"), Today, ReceiptNo));
-        //+MM1.44 [392469]
+
     end;
 
     procedure ManualRedeemPointsDeposit(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; Description: Text[50]) EntryNo: Integer
@@ -1457,10 +1270,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
-        //-MM1.44 [392469]
-        //AdjustPointsAbsoluteWorker (MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_DEPOSIT, ABS (Points), ABS ("Amount (LCY)"), TODAY, ReceiptNo);
         exit(AdjustPointsAbsoluteWorker(MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_DEPOSIT, Abs(Points), Abs("Amount (LCY)"), Today, ReceiptNo));
-        //+MM1.44 [392469]
+
     end;
 
     procedure ManualRedeemPointsDeposit2(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; TransactionDate: Date; PostingDate: Date; Description: Text[50]) EntryNo: Integer
@@ -1472,10 +1283,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
-        //-MM1.44 [392469]
-        //AdjustPointsAbsoluteWorker2 (MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_DEPOSIT, ABS (Points), ABS ("Amount (LCY)"), TransactionDate, PostingDate, ReceiptNo, Description);
         exit(AdjustPointsAbsoluteWorker2(MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_DEPOSIT, Abs(Points), Abs("Amount (LCY)"), TransactionDate, PostingDate, ReceiptNo, Description));
-        //+MM1.44 [392469]
+
     end;
 
     procedure ManualExpirePoints(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; Description: Text[50]) EntryNo: Integer
@@ -1487,10 +1296,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
-        //-MM1.44 [392469]
-        // AdjustPointsAbsoluteWorker (MembershipEntryNo, MembershipPointsEntry."Entry Type"::EXPIRED, -1 * ABS (Points), -1 * ABS ("Amount (LCY)"), TODAY, ReceiptNo);
         exit(AdjustPointsAbsoluteWorker(MembershipEntryNo, MembershipPointsEntry."Entry Type"::EXPIRED, -1 * Abs(Points), -1 * Abs("Amount (LCY)"), Today, ReceiptNo));
-        //+MM1.44 [392469]
+
     end;
 
     procedure ExpireFixedPeriodPoints(LoyaltyCode: Code[20])
@@ -1513,8 +1320,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ReasonText: Text;
         TotalRedeemedPoints: Integer;
     begin
-
-        //-+MM1.44 [392469] REFACTORED
 
         LoyaltySetup.Get(LoyaltyCode);
         LoyaltySetup.TestField("Expire Uncollected Points");
@@ -1539,20 +1344,15 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
 
         if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) then begin
-            //-MM1.44 [392469]
-            //ExpireAtDate := CALCDATE (LoyaltySetup."Expire Uncollected After", TODAY);
-            //CollectionPeriodStart := ExpireAtDate;
-            //CollectionPeriodEnd := ExpireAtDate;
             ExpirePeriodStart := 0D;
             ExpirePeriodEnd := CalcDate(LoyaltySetup."Expire Uncollected After", Today);
             CollectionPeriodStart := ExpirePeriodEnd;
             CollectionPeriodEnd := ExpirePeriodEnd;
-            //+MM1.44 [392469]
 
             if (not Confirm(CONFIRM_EXPIRE_POINTS, true, CollectionPeriodEnd, Today)) then
                 Error('');
         end;
-        //+MM1.43 [388058]
+
 
         MembershipSetup.SetFilter("Loyalty Code", '=%1', LoyaltyCode);
         if (MembershipSetup.FindSet()) then begin
@@ -1572,20 +1372,10 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                         if (GuiAllowed) then
                             Window.Update(2, Round(10000 / RecordCount * ProgressCount, 1));
 
-                        //-MM1.45 [411768]
-                        //  PointsToExpire := CalculateExpirePointsWorker (Membership, CollectionPeriodStart, CollectionPeriodEnd, ExpirePeriodEnd);
-                        //  IF (PointsToExpire <> 0) THEN
-                        //    //AdjustPointsAbsoluteWorker2 (Membership."Entry No.", MembershipPointsEntry."Entry Type"::EXPIRED, -1 * PointsToExpire, 0,
-                        //    //                             CollectionPeriodEnd, TODAY, STRSUBSTNO ('EXP-%1', FORMAT (TODAY, 0, 9)), 'Points Expiry'); //-+MM1.43 [393569]
-                        //
-                        //    AdjustPointsAbsoluteWorker2 (Membership."Entry No.", MembershipPointsEntry."Entry Type"::EXPIRED, -1 * PointsToExpire, 0,
-                        //                                 CollectionPeriodEnd, 310520D, STRSUBSTNO ('EXP-%1', FORMAT (TODAY, 0, 9)), 'Points Expiry'); //-+MM1.43 [393569]
-
                         ExpirePointsPerPeriodWorker(LoyaltySetup, Membership);
 
                         if ((ProgressCount mod 50) = 0) then
                             Commit();
-                        //+MM1.45 [411768]
 
                         ProgressCount += 1;
 
@@ -1598,7 +1388,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         end;
 
-        //+MM1.37 [343053]
     end;
 
     procedure ExpirePointsPerPeriodWorker(LoyaltySetup: Record "NPR MM Loyalty Setup"; Membership: Record "NPR MM Membership")
@@ -1623,7 +1412,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         TotalRedeemedPoints: Integer;
     begin
 
-        //-MM1.45 [411768]
         if (not LoyaltySetup."Expire Uncollected Points") then
             exit;
 
@@ -1646,7 +1434,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                                                  StrSubstNo('EXP-%1', Format(Today, 0, 9)), 'Points Expiry');
         end;
 
-        //+MM1.45 [411768]
     end;
 
     local procedure CalculateExpirePointsToDateWorker(var Membership: Record "NPR MM Membership"; EarnPeriodStart: Date; EarnPeriodEnd: Date; BurnPeriodEnd: Date) PointsToExpire: Integer
@@ -1656,7 +1443,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         TotalRedeemedPoints: Integer;
     begin
 
-        //-#401839 [401839]
         Membership.SetFilter("Date Filter", '..%1', Today);
         Membership.CalcFields("Expired Points");
         TotalExpiredPoints := Membership."Expired Points";
@@ -1670,7 +1456,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         PeriodPoints := Membership."Remaining Points";
 
         PointsToExpire := PeriodPoints + TotalExpiredPoints + TotalRedeemedPoints;
-        //+#401839 [401839]
     end;
 
     local procedure "--Membership Elegibility and Upgrade"()
@@ -1679,11 +1464,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
     procedure GetNextLoyaltyTier(MembershipEntryNo: Integer; Upgrade: Boolean; var LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members."): Boolean
     begin
-
-        //-MM1.44 [400845]
         exit(
           EligibleForMembershipAlteration(MembershipEntryNo, Upgrade, true, LoyaltyAlterMembership));
-        //+MM1.44 [400845]
     end;
 
     local procedure EligibleForMembershipAlteration(MembershipEntryNo: Integer; Upgrade: Boolean; GetNextTier: Boolean; var LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members."): Boolean
@@ -1695,7 +1477,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         AvailablePoints: Integer;
     begin
 
-        //-MM1.40 [361664]
         if (not Membership.Get(MembershipEntryNo)) then
             exit(false);
 
@@ -1717,9 +1498,9 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         case LoyaltySetup."Auto Upgrade Point Source" of
             LoyaltySetup."Auto Upgrade Point Source"::PREVIOUS_PERIOD:
-                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, Today, false); //-+MM1.45 [411768]
+                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, Today, false);
             LoyaltySetup."Auto Upgrade Point Source"::UNCOLLECTED:
-                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false); //-+MM1.45 [411768]
+                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false);
             else
                 exit(false);
         end;
@@ -1729,7 +1510,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         LoyaltyAlterMembership.SetFilter("From Membership Code", '=%1', Membership."Membership Code");
         LoyaltyAlterMembership.SetFilter(Blocked, '=%1', false);
 
-        //-MM1.44 [400845]
         if (GetNextTier) then begin
             case Upgrade of
                 true:
@@ -1747,7 +1527,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                     end;
             end;
         end;
-        //+MM1.44 [400845]
 
         case Upgrade of
             true:
@@ -1768,7 +1547,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
 
         exit(true);
-        //+MM1.40 [361664]
     end;
 
     local procedure AlterMembership(MembershipEntryNo: Integer; LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members."): Boolean
@@ -1780,8 +1558,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
     begin
-
-        //-MM1.40 [361664]
 
         MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
@@ -1802,7 +1578,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         exit(MembershipManagement.UpgradeMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price"));
 
-        //+MM1.40 [361664]
     end;
 
     local procedure CalculateAvailablePoints(MembershipEntryNo: Integer; CalculationOption: Option; ReferenceDate: Date; ForThreshold: Boolean) AvailablePoints: Integer
@@ -1824,8 +1599,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ExpirePeriodStart: Date;
         ExpirePeriodEnd: Date;
     begin
-        //-MM1.45 [411768] refactored Changed signature - added reference date, initial value TODAY
-        //-+MM1.44 [392469] REFACTORDED
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
@@ -1877,7 +1650,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
 
         exit(AvailablePoints);
-        //+MM1.45 [411768]
 
         //IF (USERID = 'TSA') THEN MESSAGE ('Available points %1, redeemed %2, expired %3, thresholdcalculation %4', AvailablePoints, RedeemedPoints, ExpiredPoints, ForThreshold);
     end;
@@ -1888,10 +1660,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipSetup: Record "NPR MM Membership Setup";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
     begin
-
-        //-MM1.45 [411768]
         exit(CalculateRedeemablePointsRelativePeriod(MembershipEntryNo, 0));
-        //+MM1.45 [411768]
     end;
 
     procedure CalculateRedeemablePointsRelativePeriod(MembershipEntryNo: Integer; RelativePeriodNo: Integer) RedeemablePoints: Integer
@@ -1902,8 +1671,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         PeriodStart: Date;
         PeriodEnd: Date;
     begin
-
-        //-MM1.45 [411768]
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
@@ -1917,18 +1684,11 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                 "Voucher Point Source"::UNCOLLECTED:
                     RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false);
             end;
-
-        //+MM1.45 [411768]
     end;
 
     procedure CalculateEarnedPointsCurrentPeriod(MembershipEntryNo: Integer) RedeemablePoints: Integer
     begin
-
-        //-MM1.45 [411768]
-
         exit(CalculateEarnedPointsRelativePeriod(MembershipEntryNo, 0));
-
-        //+#405974 [405974]
     end;
 
     procedure CalculateEarnedPointsRelativePeriod(MembershipEntryNo: Integer; RelativePeriodNo: Integer) RedeemablePoints: Integer
@@ -1940,7 +1700,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         PeriodEnd: Date;
     begin
 
-        //-#405974 [405974]
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
@@ -1955,7 +1714,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                     RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, true);
             end;
 
-        //+#405974 [405974]
     end;
 
     procedure CalculateSpendPeriod(MembershipEntryNo: Integer; ReferenceDate: Date; var SpendPeriodStart: Date; var SpendPeriodEnd: Date): Boolean
@@ -1966,7 +1724,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ReasonText: Text;
     begin
 
-        //-#405974 [405974]
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
@@ -1991,7 +1748,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (LoyaltySetup."Expire Uncollected Points") then
             SpendPeriodEnd := CalcDate(LoyaltySetup."Expire Uncollected After", SpendPeriodStart);
 
-        //+#405974 [405974]
     end;
 
     procedure CalculatePeriodPointsSummary(MembershipEntryNo: Integer; var TmpMembershipPointsSummary: Record "NPR MM Members. Points Summary" temporary)
@@ -2004,7 +1760,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ReasonText: Text;
     begin
 
-        //-MM1.45 [411768]
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
@@ -2034,9 +1789,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             until ((TmpMembershipPointsSummary."Points Expired" = 0) and (TmpMembershipPointsSummary."Points Remaining" = 0) and (TmpMembershipPointsSummary."Points Earned" = 0));
             TmpMembershipPointsSummary.Delete();
         end;
-
-
-        //+MM1.45 [411768]
     end;
 
     procedure CalculateFixedPeriodPointsTransaction(LoyaltySetup: Record "NPR MM Loyalty Setup"; Membership: Record "NPR MM Membership"; RelativePeriod: Integer; var TmpMembershipPointsSummary: Record "NPR MM Members. Points Summary" temporary)
@@ -2045,13 +1797,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ReasonText: Text;
     begin
 
-        //-MM1.45 [411768]
-        // Period  0 is current earn period
-        // Period -1 is previous earn period
-        // etc
         GetRelativePeriodToday(LoyaltySetup, RelativePeriod, TmpMembershipPointsSummary."Earn Period Start", TmpMembershipPointsSummary."Earn Period End");
 
-        // primary key
         TmpMembershipPointsSummary."Membership Entry No." := Membership."Entry No.";
         TmpMembershipPointsSummary."Relative Period" := RelativePeriod;
 
@@ -2091,15 +1838,12 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
 
         TmpMembershipPointsSummary.Insert();
-        //+MM1.45 [411768]
+
     end;
 
     local procedure GetRelativePeriodToday(LoyaltySetup: Record "NPR MM Loyalty Setup"; RelativePeriodNo: Integer; var PeriodStart: Date; var PeriodEnd: Date)
     begin
-
-        //-MM1.45 [411768]
         GetRelativePeriodRefDate(LoyaltySetup, RelativePeriodNo, Today, PeriodStart, PeriodEnd);
-        //+MM1.45 [411768]
     end;
 
     local procedure GetRelativePeriodRefDate(LoyaltySetup: Record "NPR MM Loyalty Setup"; RelativePeriodNo: Integer; ReferenceDate: Date; var PeriodStart: Date; var PeriodEnd: Date)
@@ -2107,7 +1851,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         Period: Integer;
     begin
 
-        //-MM1.45 [411768]
         CalcultatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
 
         for Period := 1 to Abs(RelativePeriodNo) do begin
@@ -2118,11 +1861,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
             CalcultatePointsValidPeriod(LoyaltySetup, ReferenceDate, PeriodStart, PeriodEnd);
         end;
-        //+MM1.45 [411768]
-    end;
-
-    local procedure "----"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertRmaEntry', '', true, true)]
@@ -2138,7 +1876,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         Desc: Text;
     begin
 
-        //-MM1.43 [393569]
         // Quickly check if the items is fully returned, if so continue with rest of the order
         POSRMALine.CalcFields("FF Total Qty Returned", "FF Total Qty Sold");
         if ((POSRMALine."FF Total Qty Sold" + POSRMALine."FF Total Qty Returned") <> 0) then
@@ -2177,14 +1914,10 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         repeat
             // Unredeem all coupon for sales
-            //-MM1.45 [411768]
-            // UnRedeemPointsCoupon (MembershipPointsEntry."Entry No.", POSRMALine."Return Ticket No.", TODAY, MembershipPointsEntry."Redeem Reference No.");
             UnRedeemPointsCoupon(MembershipPointsEntry."Entry No.", POSRMALine."Return Ticket No.", MembershipPointsEntry."Posting Date", MembershipPointsEntry."Redeem Reference No.");
-        //+MM1.45 [411768]
 
         until (MembershipPointsEntry.Next() = 0);
 
-        //-MM1.43 [393569]
     end;
 }
 

@@ -1,73 +1,5 @@
 codeunit 6060131 "NPR MM Member Retail Integr."
 {
-    // MM1.01/TSA/20151222 CASE 230149 NaviPartner Member Management
-    // MM1.02/TSA/20151228 CASE 229980 Print function
-    // TM1.03/TSA/20160113 CASE 231260 Changed signature on the CreateAccessEntry function
-    // MM1.04/TSA/20160115 CASE 231978 General Enhancements
-    // MM1.05/TSA/20160121 CASE 232485 Wrapper function accces the member no from card no
-    // MM1.05/TSA/20160122 CASE 232485 New functions for POS to create members
-    // MM1.07/TSA/20160202 CASE 233246 Handling memberships with cardinality > 1
-    // MM1.09/TSA/20160226 CASE 235685 REwork of MM_SCAN_CARD in Touch Sales POS
-    // MM1.09/TSA/20160229 CASE 235805 Added support for Sales Context
-    // MM1.09/TSA/20160229 CASE 235812 Member Receipt Printing
-    // MM1.10/TSA/20160321 CASE 237393 Cancel Membership
-    // MM1.10/TSA/20160321 CASE 234209 Show member details on membercard scan
-    // MM1.11/TSA/20160422 CASE 233824 Changeing memberships
-    // MM1.14/TSA/20150504 CASE 240749 Adapting to NAV 2016 changes for report printing
-    // MM1.15/TSA/20160615 CASE 244443 General Bug fix Capture Audit Roll Description on posting
-    // MM1.15/TSA/20160817 CASE 244443 General Bug fix Changing signature on AddMemberAndCard function
-    // TM1.16/TSA/20160816 CASE 245004 Transport TM1.16 - 19 July 2016
-    // MM1.16/TSA/20160908 CASE 251175 Adding support for facial recognition
-    // MM1.16/TSA/20160913  CASE 252216 Signature change on search function
-    // MM1.17/TSA/20161121  CASE 259001 Member number not set on member issued ticket
-    // MM1.17/TSA/20161208  CASE 259671 Extended functionality for handling the start date of membership, signature change on IsMembershipActive and POS_ValidateMemberCardNo
-    // MM1.17/TSA/20161208  CASE 259671 Extended functionality, relocated function TranslateBarcodeToItemVariant from web service codeunit
-    // MM1.17/TSA/20161227  CASE 262040 Handlind Suggested Membercount In Sales
-    // MM1.17/TSA/20161227  CASE 262040 Signature Change on AddMemberAndCard
-    // MM1.17/TSA/20161228  CASE 261216 Handling of creation of different membership entities
-    // MM1.17/TSA/20161229  CASE 261216 Signature Change on IssueNewMemberCard
-    // MM1.17/TSA/20170127  CASE 264681 Print of multiple memberships sales receipts
-    // TM1.19/TSA/20170215  CASE 266372 New function PromptForMemberGuestArrival
-    // MM1.19/TSA/20170327  CASE 270308 Added auto print of new card
-    // MM1.19/TSA/20170421  CASE 271971 MemberInfoCapture.SETCURRENTKEY ("Receipt No.", "Line No.");
-    // MM1.19/TSA/20170504  CASE 274890 Debit Sales support - implemented OnAfterDebitSalePostSubscriver() and OnBeforeAuditRollDebitSaleLineInsertSubscriber()
-    // NPR5.34/TSA/20170512  CASE 267611 Signature change to TicketRetailManagement.IssueTicket() in function PromptForMemberGuestArrival
-    // MM1.19/TSA/20170518  CASE 276779 Membership ActivateMembership and error if not active
-    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
-    // NPR5.34/TSA /20170720 CASE 284248 Changed External Order No to become member no for internal tickets, SetReservationRequestExtraInfo
-    // NPR5.34/TSA /20170721 CASE 284653 Added POS_CheckLimitMemberCardArrival in PrePush_MemberArrival();
-    // MM1.22/TSA /20170809 CASE 276102 Added a commit before the runmodal
-    // MM1.22/TSA /20170816 CASE 287080 Added handling of ADD_ANONYMOUS_MEMBER in IssueMembershipFromAuditRolePosting()
-    // MM1.23/TSA /20171004 CASE 257011 Added Anonymous member exception in POS_ValidateMemberCardNo
-    // MM1.23/TSA /20171011 CASE 257011 Added supporting functions for MM POS Sales Info
-    // MM1.24/TSA /20171129 CASE 298110 Delete of PreEmptive Membership created during Membership Sales as part of cancel sales
-    // MM1.25/TSA /20180115 CASE 299537 Added Offline printing option
-    // MM1.25/TSA /20180118 CASE 300256 Member Card local or foreign ?
-    // MM1.26/TSA /20180124 CASE 299690 Changed POSMemberCard to include membershipentryno
-    // MM1.26/MHA /20180202 CASE 302779 Added OnFinishSale POS Workflow
-    // MM1.26/TSA /20180209 CASE 305011 Bug when printing member card from sales receipt
-    // MM1.26/MMV /20180215 CASE 294655 Item insert performance optimization
-    // MM1.29/TSA /20180517 CASE 315777 Changed workflow step discovery process to support auto-added steps not enabled by default.
-    // MM1.30/TSA /20180531 CASE 316450 Adding support to auto swipe a member on create
-    // MM1.30/TSA /20180615 CASE 319243 Housecleaning - removing unused variables
-    // MM1.32/TSA /20180710 CASE 319477 Better clean-up when membership triggering is in a workflow with a pre-commited sales line
-    // MM1.32/TSA /20180711 CASE 318132 Wrapped the EndOfSales print in a worker function, renamed the function
-    // MM1.32/TSA /20180723 CASE 319845 Fixed dialog cardinality issue
-    // MM1.32/TSA /20180724 CASE 320446 Added Description 2
-    // MM1.33/TSA /20180809 CASE 324413 Handling long external card numbers
-    // MM1.33/TSA /20180816 CASE 325198 Replace Card flow does not require a membership code on membership sales setup
-    // MM1.36/TSA /20181112 CASE 335828 Adding a worker function on POS_ValidateMemberCardNo, to have different behaviours from different invokers
-    // MM1.36/TSA /20190125 CASE 307440 Refactored functions
-    // MM1.36.01/TSA /20190130 CASE 344400 A multi-member membersship sales only printed first member card
-    // MM1.40/TSA /20190611 CASE 357360 Adding remote create of memberships: RemoteCreateMembership(), RemoteAddMember(), IsForeignMembership()
-    // MM1.40/TSA /20190614 CASE 358685 Changed subscriber for membership activation that are invoiced to customer
-    // MM1.40/TSA /20190730 CASE 360275 Added AdmitMembersOnEndOfSalesWorker(), removed AdmittMembersOnCreateMembership(), corrected spelling of "admit"
-    // MM1.40/TSA /20190830 CASE 360242 Added a confirm when printing membercard that is blocked
-    // MM1.41/TSA /20190910 CASE 368136 Discontinuing old code
-    // MM1.44/TSA /20200514 CASE 401199 Changed caption for ADMIT_MEMBERS
-    // MM1.44/TSA /20200519 CASE 405500 Account Print did not support template option for printing
-    // MM1.45/TSA /20200729 CASE 416671 Signature change on POS_CheckLimitMemberCardArrival()
-
 
     var
         MEMBER_MANAGEMENT: Label 'Member Services';
@@ -114,10 +46,8 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         FormatedForeignCardNumber: Text[50];
     begin
 
-        //-MM1.36 [335828]
         exit(
           POS_ValidateMemberCardNoWorker(FailWithError, AllowVerboseMode, InputMode, ActivateMembership, ExternalMemberCardNo, false));
-        //+MM1.36 [335828]
     end;
 
     procedure POS_ShowMemberCard(InputMode: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]): Boolean
@@ -830,24 +760,25 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         exit(PageAction = ACTION::LookupOK);
     end;
 
-    procedure IssueMembershipFromAuditRolePosting(AuditRoll: Record "NPR Audit Roll")
+    [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, true)]
+    local procedure IssueMembersFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
+        Message('Member Module: OnAfterInsertPOSSalesLine');
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
-        MemberInfoCapture.SetFilter("Receipt No.", '=%1', AuditRoll."Sales Ticket No.");
-        MemberInfoCapture.SetFilter("Line No.", '=%1', AuditRoll."Line No.");
+        MemberInfoCapture.SetFilter("Receipt No.", '=%1', POSEntry."Document No.");
+        MemberInfoCapture.SetFilter("Line No.", '=%1', POSSalesLine."Line No.");
         if (not MemberInfoCapture.FindSet()) then
             exit;
 
-        if (AuditRoll."No." <> MemberInfoCapture."Item No.") then
+        if (POSSalesLine."No." <> MemberInfoCapture."Item No.") then
             exit;
 
-        //-MM1.36 [307440] Refactored, code moved to worker function
-        with AuditRoll do
-            IssueMembershipFromEndOfSaleWorker("Sales Ticket No.", "Line No.", "Sale Date", "Unit Price", Amount, "Amount Including VAT", Description, Quantity);
-        //+MM1.36 [307440]
+        IssueMembershipFromEndOfSaleWorker(POSEntry."Document No.",
+            POSSalesLine."Line No.", POSEntry."Document Date",
+            POSSalesLine."Unit Price", POSSalesLine."Amount Excl. VAT", POSSalesLine."Amount Incl. VAT", POSSalesLine.Description, POSSalesLine.Quantity);
     end;
 
     local procedure IssueMembershipFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; SalesDate: Date; UnitPrice: Decimal; Amount_LCY: Decimal; AmountInclVat_LCY: Decimal; Description: Text; Quantity: Decimal)
@@ -1284,27 +1215,20 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
     local procedure PrintMembershipsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSEntry: Record "NPR POS Entry";
     begin
-
-        // Transcendence "POS Sale".OnFinishSale() Publisher
-        //
-        //
 
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'PrintMembershipsOnSale' then
             exit;
 
-        AuditRoll.SetRange("Register No.", SalePOS."Register No.");
-        AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if not AuditRoll.FindFirst then
+        POSEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");
+        if (POSEntry.isempty()) then
             exit;
 
-        //-MM1.32 [318132]
-        //PrintMembershipSalesReceipt(AuditRoll."Sales Ticket No.");
-        PrintMembershipOnEndOfSalesWorker(AuditRoll."Sales Ticket No.", false);
-        //-MM1.32 [318132]
+        PrintMembershipOnEndOfSalesWorker(SalePOS."Sales Ticket No.", false);
+
     end;
 
     procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean
@@ -1373,32 +1297,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     local procedure OnAfterDebitSalePostSubscriber(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean; WriteInAuditRoll: Boolean)
     begin
 
-        // Publisher Standard
-        // CU 6014407 "Retail Sales Doc. Mgt.".OnAfterDebitSalePostEvent ()
-        //
-
-        //-MM1.32 [318132]
-        // IF (SalePOS."Sales Ticket No." <> '') THEN
-        //  PrintMembershipSalesReceipt (SalePOS."Sales Ticket No.");
-
         if (SalePOS."Sales Ticket No." = '') then
             exit;
 
         PrintMembershipOnEndOfSalesWorker(SalePOS."Sales Ticket No.", false);
-        //-MM1.32 [318132]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014435, 'OnBeforeAuditRoleLineInsertEvent', '', true, true)]
-    local procedure OnBeforeAuditRollDebitSaleLineInsertSubscriber(var Sender: Codeunit "NPR Retail Form Code"; var SalePOS: Record "NPR Sale POS"; var SaleLinePos: Record "NPR Sale Line POS"; var AuditRole: Record "NPR Audit Roll")
-    begin
-
-        //-MM1.40 [358685]
-        if AuditRole."Sale Type" <> AuditRole."Sale Type"::"Debit Sale" then
-            exit;
-        //+MM1.40 [358685]
-
-        if (AuditRole.Type = AuditRole.Type::Item) then
-            IssueMembershipFromAuditRolePosting(AuditRole);
-    end;
 }
 

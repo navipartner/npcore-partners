@@ -1,91 +1,6 @@
 codeunit 6059784 "NPR TM Ticket Management"
 {
-    // NPR4.16/TSA/20150804 CASE 219658 - New Ticket Module, existing functions refactored, new functions added
-    // NPR4.16/MMV/20150819 CASE 217433 - Added support for LinePrintMgt print method to PrintTicket()
-    // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
-    // TM1.01/TSA/20151222  CASE 230152 Scopechange on functions
-    // TM1.02/TSA/20160105  CASE 230873 Fixed the pritning function
-    // TM1.03/TSA/20160113  CASE 231260 Added "Admission Registration" option for singel group ticket
-    // TM1.04/TSA/20160114 CASE 231834 Added the GetDefaulAdmissionCode function
-    // TM80.1.06/TSA/20160119  CASE 232301 Added protection for wrongly typed AuditRole line. Type==Item could be comment,
-    // TM80.1.06/TSA/20160121  CASE 232301 Added Serial No. transfer from Audit Role
-    // TM1.07/TSA/20160125  CASE 232495 Activation in POS must only activate default admission object
-    // TM1.08/TSA/20160212 CASE 234604 Admission Schedule not picked up from XML
-    // TM1.08/TSA/20160262  CASE 232262 Dependant admission objects
-    // TM1.09/TSA/20160229  CASE 235795 Default Schedule option on Admission Code
-    // TM1.09/TSA/20160301  CASE 235860 Sell event tickets in POS
-    // TM1.09/TSA/20160321  CASE 237374 tickets with return sales
-    // TM1.11/BR/20160331  CASE 237850 change finding of Schedule Entry,multiply by BOM qty
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.13.01/TSA/20160505  CASE Added report.run codeunit wrapper for smoother 2016 transition
-    // TM1.15/TSA/20160513  CASE 240864 Cancel Ticket, refactoring of validate arrival
-    // TM1.15/TSA/20160525  CASE 242414 Only first ticket being actived
-    // TM1.16/TSA/20160627  CASE 245455 Added check that the selected schedule date entry is withing the ticket valid from-to date
-    // TM1.17/TSA/20161019  CASE 255556 Added support for multiple different printouts from same sales
-    // TM1.17/TSA/20161025  CASE 256205 Refactored GetMaxCapacity function to alose handle max capacity override on AdmSchEntry
-    // TM1.17/TSA/20161025  CASE 256152 Conform to OMA Guidelines
-    // TM1.19/TSA/20170103  CASE 250631 Added the Cancel entry event if there was no entry to close - as when it is refunded with no admission
-    // TM1.20/TSA/20170321  CASE 270164 Events without pre-book required, failed to recognize the request for a specific timeslot and use the current slot instead
-    // TM1.20/TSA/20170320  CASE 269171 New function - ChangeConfirmedTicketQuantity
-    // TM1.21/TSA/20170418  CASE 272421 New function - IsIdentifierTicketNumber - subscriber of Codeunit Identifier Dissociation
-    // TM1.21/TSA/20170508  CASE 271405 Schedule Entries can now own its open/close status will be lost on force generate from RTC page
-    // TM1.21/TSA/20170515  CASE 267611 Reducing the number of times a scedule is (re)generated.
-    // TM1.22/TSA/20170526  CASE 278142 Changed function to CreatePaymentEntry to invoke CreatePaymentEntryType with type PAYMENT
-    // TM1.22/TSA/20170526  CASE 278142 Changed VerifyTicketReference to accept the new payment types
-    // TM1.22/TSA/20170608  CASE 279248 Breaking up many tickets to individual print-jobs performs better
-    // TM1.23/TSA /20170719 CASE 284248 Changed the error message when MISSING_PAYMENT
-    // TM1.23/TSA /20170724 CASE 284798 Corrected Spelling for subscriber function IdentifyThisCodePublisher
-    // TM1.24/TSA /20170824 CASE 287582 Payments always close the initial entry
-    // TM1.24/TSA /20170906 CASE 287582 Added a check to dissallow assigning a historical schedule entry on ticket create
-    // TM1.25/TSA /20171024 CASE 294389 A problem with selecting the Nable schedule for reservation entries and having grace period
-    // TM1.26/TSA /20171101 CASE 285601 "Printed Date" set when ticket is printed
-    // TM1.26/TSA /20171120 CASE 293916 Refactor of RegisterCancel_Worker()
-    // TM1.26/TSA /20171120 CASE 296731 Refactor of RegisterCancel_Worker()
-    // TM1.26/TSA /20171122 CASE 297301 Full refactor of GetAdmScheduleEntry()
-    // TM1.27/TSA /20171207 CASE 296731 Closed reservation entry on revoke
-    // TM1.27/TSA /20171211 CASE 269456 Added support for Template Printing
-    // TM1.28/TSA /20180130 CASE 301222 Added function CheckIfConsumed and ConsumeItem
-    // TM1.28/MHA /20180202 CASE 302779 Added OnFinishSale POS Workflow
-    // TM1.28/TSA /20180220 CASE 305707 Added Base Calander for ticket, defines invalid / closed days.
-    // TM1.28/MMV /20180222 CASE 304639 Added OnFinishDebitSale POS Workflow
-    // TM1.29/TSA /20180312 CASE 307885 Revoke reservation entry must be closed.
-    // TM1.29/TSA /20180314 CASE 307440 Added function IssueTicketsFromToken
-    // TM1.29/TSA /20180315 CASE 308299 I18 hardcoded date
-    // TM1.29/TSA /20180327 CASE 307113 Added publishers
-    // TM1.30/TSA /20180424 CASE 310947 Reworked the RegisterCancel_Worker() function
-    // TM1.31/TSA /20180517 CASE 315779 Changed workflow step discovery process to support auto-added steps not enabled by default.
-    // TM1.35/TSA /20180723 CASE 322658 SetCurrentKey
-    // TM1.36/TSA /20180801 CASE 316463 Added a "Rescan within" function to handle mother with kids that escape during entry through speed gate
-    // TM1.36/MHA /20180814  CASE 319706 Deleted function IsIdentifierTicketNumber()
-    // TM1.37/TSA /20180910 CASE 327324 Handling "Event Arrival Until Time" and "Event Arrival Start Time"
-    // TM1.37/MMV /20180911 CASE 304693 Reverted functions not ready for release in (20180222 CASE 304639)
-    // TM1.38/TSA /20181014 CASE 332109 Added eTicket functionality
-    // TM1.39/TSA /20190122 CASE 340984 Sort on date due to unexpected order of schedule entries
-    // TM1.40/TSA /20190327 CASE 350287 Revoking ticket marks admission as closed (and thus restores capacity)
-    // TM1.41/TSA /20190501 CASE 352873 Handling of external number correctly in postpaid tickets
-    // TM1.42/TSA /20190826 CASE 340984 Changed sort order for next_available
-    // TM1.43/TSA /20190904 CASE 357359 Ticketing, changed RegisterDefaultAdmissionArrivalOnPosSales() to local
-    // TM1.43/TSA /20190910 CASE 368043 Refactored "External Item Code"
-    // TM1.45/TSA /20191107 CASE 374620 Added OnDetailedTicketEvent() publisher
-    // TM1.45/TSA /20191121 CASE 378339 Added ValidateAdmSchEntryForSales()
-    // TM1.45/TSA /20191127 CASE 379766 Deligates ticket activation method to Ticket BOM
-    // TM1.45/TSA /20191202 CASE 357359 Tickets
-    // TM1.45/TSA /20191204 CASE 380754 Waiting list adoption
-    // TM1.45/TSA /20200116 CASE 385922 refactored CheckAdmissionCapacityExceeded() to also check for concurrent capacity
-    // TM1.46/TSA /20200127 CASE 387138 DiyPrint URL via mail
-    // TM1.46/TSA /20200214 CASE 391018 Fixed a problem with admission capacity controll NONE
-    // TM1.47/TSA /20200611 CASE 408958 Fixed date range include same day
-    // TM1.48/TSA /20200626 CASE 411704 Renamed GetMaxCapacity() to GetAdmissionCapacity(), added GetTicketCapacity()
-    // TM1.48/TSA /20200629 CASE 411704 Renamed CheckTicketCapacityExceeded() to CheckTicketConstraintsExceeded()
-    // TM1.48/TSA /20200629 CASE 411704 Renamed CheckAdmissionCapacityExceeded() to CheckTicketAdmissionCapacityExceeded()
-    // TM1.48/TSA /20200629 CASE 411704 Added Ticket record as parameter to CheckReservationCapacityExceeded()
-    // TM1.48/TSA /20200716 CASE 415186 Implement Navigate for tickets
-
-
     trigger OnRun()
-    var
-        Item: Record Item;
-        GIUDText: Text[100];
     begin
     end;
 
@@ -174,90 +89,15 @@ codeunit 6059784 "NPR TM Ticket Management"
         NO_DEFAULT_SCHEDULE: Label 'The ticket request did not specify a valid timeslot for admission %1 and the ticket rule is to get the default schedule. But there are currently no timeslots that matches %2 "%3".';
         WORKFLOW_DESC: Label 'Print Ticket';
 
-    local procedure IssueTickets(var ItemJournalLine: Record "Item Journal Line")
-    var
-        Item: Record Item;
-        TicketType: Record "NPR TM Ticket Type";
-        Ticket: Record "NPR TM Ticket";
-        TicketNo: Integer;
-        TicketQty: Integer;
-    begin
-        //DELETE THIS FUNCTION
-        if ItemJournalLine."Entry Type" <> ItemJournalLine."Entry Type"::Sale then exit;
-
-        Item.Get(ItemJournalLine."Item No.");
-
-        TicketQty := ItemJournalLine.Quantity;
-
-        if TicketType.Get(Item."NPR Ticket Type") and TicketType."Is Ticket" then begin
-            for TicketNo := 1 to TicketQty do begin
-                Ticket.Init;
-                Ticket."No." := '';
-                Ticket."No. Series" := TicketType."No. Series";
-                Ticket."Ticket Type Code" := TicketType.Code;
-                Ticket."Item No." := ItemJournalLine."Item No.";
-                Ticket."Variant Code" := ItemJournalLine."Variant Code";
-                Ticket."Customer No." := ItemJournalLine."Source No.";
-                Ticket."Sales Receipt No." := ItemJournalLine."Source Code";
-                Ticket."Sales Header No." := ItemJournalLine."Document No.";
-                // Ticket.INSERT(TRUE);
-            end;
-        end;
-    end;
-
-    local procedure IssueTicketsFromSales(var Salesline: Record "Sales Line")
-    var
-        Item: Record Item;
-        TicketType: Record "NPR TM Ticket Type";
-        Ticket: Record "NPR TM Ticket";
-        TicketNo: Integer;
-        TicketQty: Integer;
-        SalesHeader: Record "Sales Header";
-    begin
-        //DELETE THIS FUNCTION
-        TicketQty := Salesline."Qty. to Ship";
-
-        if Salesline.Type <> Salesline.Type::Item then exit;
-        //-NPR4.16
-        SalesHeader.Get(Salesline."Document Type", Salesline."Document No.");
-        //+NPR4.16
-
-        Item.Get(Salesline."No.");
-
-        if TicketType.Get(Item."NPR Ticket Type") and TicketType."Is Ticket" then begin
-            for TicketNo := 1 to TicketQty do begin
-                Ticket.Init;
-                Ticket."No." := '';
-                Ticket."No. Series" := TicketType."No. Series";
-                Ticket."Ticket Type Code" := TicketType.Code;
-                Ticket."Item No." := Salesline."No.";
-                Ticket."Variant Code" := Salesline."Variant Code";
-                Ticket."Customer No." := Salesline."Sell-to Customer No.";
-                Ticket."Sales Header Type" := Salesline."Document Type";
-                Ticket."Sales Header No." := Salesline."Document No.";
-                Ticket."Line No." := Salesline."Line No.";
-                //-NPR4.16
-                Ticket."Sales Receipt No." := SalesHeader."NPR Sales Ticket No.";
-                //+NPR4.16
-                // Ticket.INSERT(TRUE);
-            end;
-        end;
-    end;
-
-    procedure IssueTicketsFromAuditRoll(var Auditroll: Record "NPR Audit Roll")
+    [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, true)]
+    local procedure IssueTicketsFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
     var
         Token: Text[100];
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketType: Record "NPR TM Ticket Type";
-        TicketNo: Code[20];
-        Ticket: Record "NPR TM Ticket";
-        ResponseMessage: Text;
     begin
-
-        if (not (GetReceiptRequestToken(Auditroll."Sales Ticket No.", Auditroll."Line No.", Token))) then
+        if (not (GetReceiptRequestToken(POSEntry."Document No.", POSSalesLine."Line No.", Token))) then
             exit;
 
-        IssueTicketsFromToken(Token, Auditroll."Sales Ticket No.", Auditroll."Line No.");
+        IssueTicketsFromToken(Token, POSEntry."Document No.", POSSalesLine."Line No.");
     end;
 
     procedure IssueTicketsFromToken(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer)
@@ -330,30 +170,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
     end;
 
-    procedure "--Prints--"()
-    begin
-    end;
-
-    local procedure PrintTicketFromSalesHeader(var SalesHeader: Record "Sales Header")
-    var
-        Ticket: Record "NPR TM Ticket";
-    begin
-
-        Ticket.SetCurrentKey("Sales Header Type", "Sales Header No.");
-        Ticket.SetRange("Sales Header Type", SalesHeader."Document Type");
-        Ticket.SetRange("Sales Header No.", SalesHeader."No.");
-
-        //-TM1.27 [269456]
-        //IF Ticket.FINDSET THEN
-        //  IF (PrintSingleTicket(Ticket)) THEN ;
-        if (Ticket.FindSet()) then begin
-            repeat
-                if (PrintSingleTicket(Ticket)) then;
-            until (Ticket.Next() = 0);
-        end;
-        //+TM1.27 [269456]
-    end;
-
     procedure PrintTicketFromSalesTicketNo(SalesTicketNo: Code[20])
     var
         Ticket: Record "NPR TM Ticket";
@@ -375,11 +191,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         Ticket.FindSet();
         repeat
 
-            //-TM1.38 [332109]
-            // Ticket2.SETFILTER ("No.", '=%1', Ticket."No.");
-            // Ticket2.GET (Ticket."No.");
-            // IF (PrintSingleTicket (Ticket2)) THEN ;
-
             PrintTicket := true;
 
             if (TicketRequestManager.IsETicket(Ticket."No.")) then begin
@@ -393,7 +204,6 @@ codeunit 6059784 "NPR TM Ticket Management"
                 end;
             end;
 
-            //-TM90.1.46 [387138]
             if (TicketDIYTicketPrint.CheckPublishTicketUrl(Ticket."No.")) then begin
                 TicketSetup.Get();
 
@@ -410,14 +220,12 @@ codeunit 6059784 "NPR TM Ticket Management"
                 end;
 
             end;
-            //+TM90.1.46 [387138]
 
             if (PrintTicket) then begin
                 Ticket2.SetFilter("No.", '=%1', Ticket."No.");
                 Ticket2.Get(Ticket."No.");
                 if (PrintSingleTicket(Ticket2)) then;
             end;
-        //+TM1.38 [332109]
 
         until (Ticket.Next() = 0);
     end;
@@ -477,10 +285,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         end;
     end;
 
-    local procedure "--- OnFinishSale Workflow"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -496,25 +300,18 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     local procedure CurrCodeunitId(): Integer
     begin
-
         exit(CODEUNIT::"NPR TM Ticket Management");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
     local procedure PrintTicketsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
-        //-#302779 [302779]
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'PrintTicketsOnSale' then
             exit;
 
         PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
-        //+#302779 [302779]
-    end;
-
-    local procedure "--External_API"()
-    begin
     end;
 
     procedure ValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: BigInteger; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
@@ -531,7 +328,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketAccessEntryNo: BigInteger;
     begin
 
-        // Refactored
         ResponseMessage := '';//SUCCESS;
 
         if (not GetTicket(TicketIdentifierType, TicketIdentifier, Ticket)) then
@@ -561,13 +357,10 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (CheckTicketConstraintsExceeded(FailWithError, TicketAccessEntryNo, ResponseMessage)) then
             exit(RaiseError(FailWithError, ResponseMessage, ResponseMessage, ''));
 
-        //IF (CheckAdmissionCapacityExceeded (FailWithError, AdmissionScheduleEntryNo, ResponseMessage)) THEN
-        //MessageNumber := CheckAdmissionCapacityExceeded (FailWithError, AdmissionScheduleEntryNo, ResponseMessage);
-        MessageNumber := CheckTicketAdmissionCapacityExceeded(FailWithError, Ticket, AdmissionScheduleEntryNo, ResponseMessage); //-+TM1.48 [411704]
+        MessageNumber := CheckTicketAdmissionCapacityExceeded(FailWithError, Ticket, AdmissionScheduleEntryNo, ResponseMessage);
         if (MessageNumber <> 0) then
             exit(RaiseError(FailWithError, ResponseMessage, ResponseMessage, ''));
 
-        // Ticket was valid for entry and admission is recorded.
         exit(0);
     end;
 

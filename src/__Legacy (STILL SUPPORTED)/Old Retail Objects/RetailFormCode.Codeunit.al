@@ -787,23 +787,6 @@ codeunit 6014435 "NPR Retail Form Code"
                     //PointCardHandling.DebitCard(Revisionsrulle);
                     //+NPR70.00.01.11
 
-
-                    //-TM80.1.00
-                    /*---------------------------------------------------------------------------------------------*/
-                    /* Confirm Access Tickets                                                                      */
-                    /*---------------------------------------------------------------------------------------------*/
-                    if (Revisionsrulle.Type = Revisionsrulle.Type::Item) then
-                        Ticketmanagement.IssueTicketsFromAuditRoll(Revisionsrulle);
-                    //+TM80.1.00
-
-                    //-MM80.1.05
-                    /*---------------------------------------------------------------------------------------------*/
-                    /* Confirm Membership                                                                          */
-                    /*---------------------------------------------------------------------------------------------*/
-                    if (Revisionsrulle.Type = Revisionsrulle.Type::Item) then
-                        MemberRetailIntegration.IssueMembershipFromAuditRolePosting(Revisionsrulle);
-
-                    //+MM80.1.05
                     /*---------------------------------------------------------------------------------------------*/
                     /* GIFT VOUCHER */
                     /*---------------------------------------------------------------------------------------------*/

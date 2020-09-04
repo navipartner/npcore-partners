@@ -1,15 +1,5 @@
 codeunit 6014571 "NPR TM Report - Ticket"
 {
-    // NPR4.16/MMV/20150812 CASE 217433 Changed object from print reservation 12 to 'Report - Ticket'.
-    // TM1.03/TSA/20160113 CASE 231260 This will be the default ticket, added quantity for group tickets.
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // #248514/TJ/20161005 CASE 248514 Using actual unit price from audit roll
-    // TM1.17/TSA/20161019  CASE 255556 Restructured, Added support for suppressing printout when printing multiple tickets
-    // TM1.18/MMV /20170118 CASE 245881 Changed barcode from code39 to code128
-    // #264219/JLK /20170126  CASE 264219 Changed Barcode Print to External Ticket No.
-    // TM1.21/TSA/20170525  CASE 278049 Fixing issues report by OMA - Removing global variable ticket
-    // TM1.22/TSA/20170525  CASE 278049 Fixing issues report by OMA - House cleaning
-
     TableNo = "NPR TM Ticket";
 
     trigger OnRun()
@@ -42,8 +32,9 @@ codeunit 6014571 "NPR TM Report - Ticket"
         Item: Record Item;
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Admission: Record "NPR TM Admission";
-        AuditRoll: Record "NPR Audit Roll";
         TMTicketType: Record "NPR TM Ticket Type";
+        PosEntry: Record "NPR POS Entry";
+        PosEntrySalesLine: Record "NPR POS Sales Line";
     begin
         Printer.SetFont('Control');
         Printer.AddLine('h');
@@ -55,19 +46,26 @@ codeunit 6014571 "NPR TM Report - Ticket"
         Printer.AddLine(' ');
 
         Printer.SetBold(true);
+
         if Ticket."Item No." <> '' then begin
             Item.Get(Ticket."Item No.");
             Printer.AddTextField(1, 0, '   ' + Item.Description);
 
-            AuditRoll.SetRange("Sales Ticket No.", Ticket."Sales Receipt No.");
-            AuditRoll.SetRange("Line No.", Ticket."Line No.");
-            if AuditRoll.FindFirst and (AuditRoll.Quantity <> 0) then
-                Printer.AddTextField(2, 2, Format(AuditRoll."Amount Including VAT" / AuditRoll.Quantity))
-            else
-
-                if Item."Unit Price" <> 0 then begin
-                    Printer.AddTextField(2, 2, Format(Item."Unit Price"));
+            PosEntry.SetFilter("Document No.", Ticket."Sales Receipt No.");
+            if (PosEntry.FindFirst()) then begin
+                PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
+                PosEntrySalesLine.SetFilter("Line No.", '=%1', Ticket."Line No.");
+                if (PosEntrySalesLine.FindFirst()) then begin
+                    Printer.AddTextField(2, 2, Format(PosEntrySalesLine."Amount Incl. VAT" / PosEntrySalesLine.Quantity))
+                end else begin
+                    if Item."Unit Price" <> 0 then
+                        Printer.AddTextField(2, 2, Format(Item."Unit Price"));
                 end;
+
+            end else begin
+                if Item."Unit Price" <> 0 then
+                    Printer.AddTextField(2, 2, Format(Item."Unit Price"));
+            end;
 
         end else begin
             Printer.AddTextField(1, 0, '   ' + Ticket."Ticket Type Code");
