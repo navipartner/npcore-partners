@@ -1,6 +1,6 @@
 controladdin "NPR Bridge"
 {
-    Scripts = 'src/_Control Addins/Bridge/Scripts/bridge.js';
+    Scripts = 'src/_ControlAddins/Bridge/Scripts/bridge.js';
 
     RequestedHeight = 1;
     RequestedWidth = 1;
