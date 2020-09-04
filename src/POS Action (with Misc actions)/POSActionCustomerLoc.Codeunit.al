@@ -5,6 +5,7 @@ codeunit 6150790 "NPR POS Action: Customer Loc."
     //                                   Upversioned action to 1.3.
     // NPR5.38/BR  /20180118 CASE 302761 Disable Audit Roll Creation for "Create POS Enties Only"
     // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
+    // #381848/VB  /20200526 CASE 381848  Refactoring the LocationExport function (replacing FrontEnd.SetView call with FrontEnd.SaleView call)
 
     Permissions = TableData "NPR Audit Roll" = rimd;
 
@@ -95,7 +96,7 @@ codeunit 6150790 "NPR POS Action: Customer Loc."
             POSSession.StartTransaction();
             //-NPR5.31 [264112]
             POSSession.GetSetup(POSSetup);
-            FrontEnd.SetView(ViewType.Sale, POSSetup);
+            FrontEnd.SaleView(POSSetup);
             //+NPR5.31 [264112]
         end;
     end;

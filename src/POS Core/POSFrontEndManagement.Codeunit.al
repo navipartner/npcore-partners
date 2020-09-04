@@ -22,9 +22,11 @@ codeunit 6150704 "NPR POS Front End Management"
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
     // NPR5.50/MHA /20190206 CASE 343617 Added OnAfterLogin Workflow
     // NPR5.50/VB  /20181223 CASE 338666 Supporting Workflows 2.0
-    // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
-    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
+    // NPR5.51/VB  /20190719 CASE 352582 POS Administrative Templates feature
+    // NPR5.53/VB  /20190917 CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
     // NPR5.54/MMV /20200305 CASE 364340 Added mock constructor.
+    // #381848/VB  /20200522 CASE 381848 Added support for Restaurant view.
+    //                                   Refactored function SetView to local, and to accept Option instead of DotNet
 
 
     var
@@ -285,37 +287,44 @@ codeunit 6150704 "NPR POS Front End Management"
 
     procedure LoginView(Setup: Codeunit "NPR POS Setup")
     var
-        ViewType: DotNet NPRNetViewType0;
+        POSDefaultView: Record "NPR POS Default View";
     begin
-        SetView(ViewType.Login, Setup);
+        SetView(POSDefaultView.Type::Login, Setup);
     end;
 
     procedure SaleView(Setup: Codeunit "NPR POS Setup")
     var
-        ViewType: DotNet NPRNetViewType0;
+        POSDefaultView: Record "NPR POS Default View";
     begin
-        SetView(ViewType.Sale, Setup);
+        SetView(POSDefaultView.Type::Sale, Setup);
     end;
 
     procedure PaymentView(Setup: Codeunit "NPR POS Setup")
     var
-        ViewType: DotNet NPRNetViewType0;
+        POSDefaultView: Record "NPR POS Default View";
     begin
-        SetView(ViewType.Payment, Setup);
+        SetView(POSDefaultView.Type::Payment, Setup);
     end;
 
     procedure BalancingView(Setup: Codeunit "NPR POS Setup")
     var
-        ViewType: DotNet NPRNetViewType0;
+        POSDefaultView: Record "NPR POS Default View";
     begin
-        SetView(ViewType.BalanceRegister, Setup);
+        SetView(POSDefaultView.Type::Balance, Setup);
     end;
 
     procedure LockedView(Setup: Codeunit "NPR POS Setup")
     var
-        ViewType: DotNet NPRNetViewType0;
+        POSDefaultView: Record "NPR POS Default View";
     begin
-        SetView(ViewType.Locked, Setup);
+        SetView(POSDefaultView.Type::Locked, Setup);
+    end;
+
+    procedure RestaurantView(Setup: Codeunit "NPR POS Setup")
+    var
+        POSDefaultView: Record "NPR POS Default View";
+    begin
+        SetView(POSDefaultView.Type::Restaurant, Setup);
     end;
 
     local procedure "---Front-End Methods---"()
@@ -981,7 +990,7 @@ codeunit 6150704 "NPR POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-    procedure SetView(ViewType: DotNet NPRNetViewType0; Setup: Codeunit "NPR POS Setup")
+    procedure SetView(ViewType: Option; Setup: Codeunit "NPR POS Setup")
     var
         POSView: Record "NPR POS View";
         DefaultView: Record "NPR POS Default View";
@@ -997,35 +1006,39 @@ codeunit 6150704 "NPR POS Front End Management"
         KnownView: Boolean;
     begin
         MakeSureFrameworkIsAvailable(true);
-        case true of
-            ViewType.Equals(ViewType.Login):
+        case ViewType of
+            DefaultView.Type::Login:
                 begin
                     Request := Request.Login();
                     DefaultView.Type := DefaultView.Type::Login;
                 end;
-            ViewType.Equals(ViewType.Sale):
+            DefaultView.Type::Sale:
                 begin
                     Request := Request.Sale();
                     DefaultView.Type := DefaultView.Type::Sale;
                 end;
-            ViewType.Equals(ViewType.Payment):
+            DefaultView.Type::Payment:
                 begin
                     Request := Request.Payment();
                     DefaultView.Type := DefaultView.Type::Payment;
                 end;
-            ViewType.Equals(ViewType.BalanceRegister):
+            DefaultView.Type::Balance:
                 begin
                     Request := Request.BalanceRegister();
                     DefaultView.Type := DefaultView.Type::Balance;
                 end;
-            //-NPR5.37 [293905]
-            ViewType.Equals(ViewType.Locked):
+            DefaultView.Type::Locked:
                 begin
                     Request := Request.Login();
                     Request.View.Type := 11;
                     DefaultView.Type := DefaultView.Type::Locked;
                 end;
-        //+NPR5.37 [293905]
+            DefaultView.Type::Restaurant:
+                begin
+                    Request := Request.Login();
+                    Request.View.Type := 12;
+                    DefaultView.Type := DefaultView.Type::Restaurant;
+                end;
         end;
 
         if IsNull(Request) then
@@ -1034,23 +1047,22 @@ codeunit 6150704 "NPR POS Front End Management"
         //-NPR5.49 [343617]
         POSSession.GetCurrentView(CurrView);
         //+NPR5.49 [343617]
-        case true of
-            ViewType.Equals(ViewType.Login):
+        case ViewType of
+            DefaultView.Type::Login:
                 OnBeforeChangeToLoginView(POSSession);
-            //-NPR5.49 [343617]
-            //ViewType.Equals(ViewType.Sale)           : OnBeforeChangeToSaleView (POSSession);
-            ViewType.Equals(ViewType.Sale):
+            DefaultView.Type::Sale:
                 begin
                     if CurrView.Type.Equals(CurrViewType.Login) then
                         POSViewChangeWorkflowMgt.InvokeOnAfterLoginWorkflow(POSSession);
 
                     OnBeforeChangeToSaleView(POSSession);
                 end;
-            //+NPR5.49 [343617]
-            ViewType.Equals(ViewType.Payment):
+            DefaultView.Type::Payment:
                 OnBeforeChangeToPaymentView(POSSession);
-            ViewType.Equals(ViewType.BalanceRegister):
+            DefaultView.Type::Balance:
                 OnBeforeChangeToBalanceRegisterView(POSSession);
+            DefaultView.Type::Restaurant:
+                OnBeforeChangeToRestaurantView(POSSession);
         end;
 
         if POSView.FindViewByType(
@@ -1283,27 +1295,32 @@ codeunit 6150704 "NPR POS Front End Management"
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeChangeToLoginView(POSSession: Codeunit "NPR POS Session")
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeChangeToSaleView(POSSession: Codeunit "NPR POS Session")
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeChangeToPaymentView(POSSession: Codeunit "NPR POS Session")
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeChangeToBalanceRegisterView(POSSession: Codeunit "NPR POS Session")
     begin
     end;
 
-    [BusinessEvent(TRUE)]
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeChangeToRestaurantView(POSSession: Codeunit "NPR POS Session")
+    begin
+    end;
+
+    [BusinessEvent(true)]
     local procedure OnRequestSecureMethodsClientPasswordsRegistration()
     begin
     end;
