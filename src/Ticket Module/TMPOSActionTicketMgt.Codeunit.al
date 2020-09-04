@@ -1,40 +1,5 @@
 codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 {
-    // NPR5.30/TSA/20161213  CASE 260816 Initial version for Transcendence compliance
-    // NPR5.32/TSA/20170320  CASE 269171 Support for changing a confirm tickets qty (down)
-    // NPR5.32/TSA/20170323  CASE 269171 Partial Refund
-    // TM1.21/TSA/20170511  CASE 267611 Changes to AquireTicketAdmissionSchedule to allow quantity change from dialog
-    // NPR5.32.10/TSA/20170616  CASE 250631 Return sales limits
-    // NPR5.32.10/TSA/20170616  CASE 279495 Fixed the scan if ticket number from EAN box and it was due the option value "default" was not handled in javascript WF.
-    // TM1.23/TSA /20170717 CASE 284248 Added action "Pick-up Ticket Reservation"
-    // TM1.23/TSA /20170726 CASE 285079 Added LockResource () to eliminate deadlock
-    // TM1.28/TSA /20180129 CASE 301222 Added ConvertToMembership function
-    // TM1.30/TSA /20180427 CASE 313196 Sloppy filter when returning ticket, not testing for a blank value
-    // TM1.31/TSA /20180515 CASE 306040 OnBeforeSetQuantity changed to handle change qty when you scan a sale ticket on return sales
-    // TM1.34/MHA /20180619  CASE 319425 Added OnAfterInsertSaleLine POS Sales Workflow
-    // TM1.35/TSA/20180725  CASE 323330 Transport TM1.35 - 25 July 2018
-    // TM1.36/MHA /20180817  CASE 326753 Added Ean Box Event Handler functions
-    // TM1.36/TSA /20180817 CASE 325345 UpdateAmounts() called explicitly
-    // TM1.36/TSA /20180817 CASE 325345 Checking if this ticket exists in the processing list when revoking
-    // TM1.38/TSA /20181025 CASE 333413 Add qty limits
-    // TM1.38/TSA /20181025 CASE 333705 Variants and revoke
-    // TM1.38/TSA /20181109 CASE 335653 Signature change on POS_CreateRevokeRequest
-    // TM1.39/TSA /20190124 CASE 343585 Check for blank receipt number for prepaid/postpaid tickets
-    // TM1.40/MHA /20190328  CASE 350434 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
-    // TM1.41/TSA /20190509 CASE 353981 Schedule based pricing
-    // TM1.41/TSA /20190527 CASE 356057 Revoke Ticket also sets the original sales ticket as a reference in return sales fields
-    // TM1.42/TSA /20190826 CASE 357359 Seating UI
-    // TM1.43/TSA /20190902 CASE 357359 Seating UI
-    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
-    // TM1.45/TSA /20191025 CASE 374463 Playing with WF20
-    // TM1.45/TSA /20191112 CASE 322432 Signature Change
-    // TM1.45/TSA /20191203 CASE 380754 Signature Change
-    // TM1.46/TSA /20200129 CASE 387138 Signature change AquireTicketParticipant()
-    // TM1.47/TSA /20200424 CASE 401800 Unattended mode will not allow more than 100 tickets per line
-    // TM1.47/TSA /20200514 CASE 356582 New parameter for ticket arrival to inlcude print capability
-    // TM1.47/TSA /20200603 CASE 408018 Register Departure of ticket
-
-
     trigger OnRun()
     begin
     end;
@@ -951,12 +916,13 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        AuditRoll: Record "NPR Audit Roll";
         TicketAccessEntryNo: BigInteger;
         Token: Text;
         ResponseMessage: Text;
         UnitPrice: Decimal;
         RevokeQuantity: Integer;
+        PosEntry: Record "NPR POS Entry";
+        PosEntrySalesLine: Record "NPR POS Sales Line";
     begin
 
         if (ExternalTicketNumber = '') then
@@ -969,28 +935,22 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         Ticket.Get(TicketAccessEntry."Ticket No.");
 
 
-        //-TM1.36 [325345]
-        //TicketReservationRequest.SETCURRENTKEY ("External Ticket Number");
         TicketReservationRequest.SetFilter("External Ticket Number", '=%1', Ticket."External Ticket No.");
         TicketReservationRequest.SetFilter("Revoke Ticket Request", '=%1', true);
         TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::CANCELED); // in progress
         if (TicketReservationRequest.FindFirst()) then
             Error(REVOKE_IN_PROGRESS, Ticket."External Ticket No.");
         TicketReservationRequest.Reset;
-        //+TM1.36 [325345]
-
 
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
         SaleLinePOS."No." := Ticket."Item No.";
-        SaleLinePOS."Variant Code" := Ticket."Variant Code"; //-+TM1.38 [333705]
-        SaleLinePOS.Quantity := -1; //-+NPR5.32.10 [250631] Only one ticket should be returned (request could have many tickets)
+        SaleLinePOS."Variant Code" := Ticket."Variant Code";
+        SaleLinePOS.Quantity := -1;
 
-        //-TM1.41 [356057]
         SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
         SaleLinePOS."Return Sale Line No." := Ticket."Line No.";
-        //+TM1.41 [356057]
 
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.RefreshCurrent();
@@ -998,28 +958,20 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 
         UnitPrice := SaleLinePOS."Unit Price";
 
-        //-TM1.39 [343585]
-        // AuditRoll.SETFILTER ("Sales Ticket No.", '=%1', TicketReservationRequest."Receipt No.");
-        // AuditRoll.SETFILTER ("Line No.", '=%1', TicketReservationRequest."Line No.");
-        // IF (AuditRoll.FINDFIRST ()) THEN
-        //  UnitPrice := AuditRoll."Unit Price";
         if (TicketReservationRequest."Receipt No." <> '') then begin
-            AuditRoll.SetFilter("Sales Ticket No.", '=%1', TicketReservationRequest."Receipt No.");
-            AuditRoll.SetFilter("Line No.", '=%1', TicketReservationRequest."Line No.");
-            if (AuditRoll.FindFirst()) then
-                UnitPrice := AuditRoll."Unit Price";
-        end;
-        //+TM1.39 [343585]
+            PosEntry.SetFilter("Document No.", TicketReservationRequest."Receipt No.");
+            if (PosEntry.FindFirst()) then begin
+                PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
+                PosEntrySalesLine.SetFilter("Line No.", '=%1', TicketReservationRequest."Line No.");
+                if (PosEntrySalesLine.FindFirst()) then
+                    UnitPrice := PosEntrySalesLine."Unit Price";
 
-        //-TM1.38 [335653]
-        //TicketRequestManager.POS_CreateRevokeRequest (Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice);
+            end;
+        end;
         TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity);
 
         POSSaleLine.SetQuantity(-1 * Abs(RevokeQuantity));
-        //+TM1.38 [335653]
-
         POSSaleLine.SetUnitPrice(UnitPrice);
-        //-NPR5.32 [269171]
 
         POSSession.RequestRefreshData();
     end;

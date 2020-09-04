@@ -1,18 +1,5 @@
 table 6059785 "NPR TM Ticket"
 {
-    // NPR4.16/TSA/20150807/CASE 219658 - Object touched
-    // NPR4.16/TSA/20151026/CASE 219658 - Renamed field 102 to External Ticket No. (USed to be Certificate Number)
-    //                                    Renamed field 105 To Ticket No. for Printing (used to be Web Barcode)
-    //                                    Renamed field  63 to Sales Receipt No. (used to be Sales Ticket No.)
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.01/TSA/2015122  CASE 230152 Renamed f100 and removed relation to old member card
-    // TM1.03/TSA20160113  CASE 231260 Made date fields editable from table
-    // TM1.04/TSA/20160115  CASE 231834 General Issues
-    // TM1.10/TSA/20160329  CASE 237661 Change Ticket Type Code length from 20 to 10
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.31/TSA /20180524 CASE 316500 Added index on field 70
-    // TM1.35/TSA /20180723 CASE 322658 Key optimization "External Member Card No."
-
     Caption = 'Tickets';
     DrillDownPageID = "NPR TM Ticket List";
     LookupPageID = "NPR TM Ticket List";
@@ -83,7 +70,6 @@ table 6059785 "NPR TM Ticket"
         field(59; "Source Code"; Code[20])
         {
             Caption = 'Source Code';
-            TableRelation = "NPR Audit Roll";
         }
         field(60; "Customer No."; Code[20])
         {

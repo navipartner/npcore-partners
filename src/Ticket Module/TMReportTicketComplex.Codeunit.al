@@ -1,10 +1,5 @@
 codeunit 6060122 "NPR TM Report - Ticket Complex"
 {
-    // TM1.18/TJ/20161005 CASE 248514 This is a copy of original codeunit 6014571 with extra features.
-    // TM1.18/MMV /20170118 CASE 245881 Changed barcode from code39 to code128
-    // #264219/JLK /20170126  CASE 264219 Changed Barcode Print to External Ticket No.
-    // TM1.21/TSA/20170525  CASE 278049 Fixing issues report by OMA, removed global variable Ticket
-
     TableNo = "NPR TM Ticket";
 
     trigger OnRun()
@@ -17,7 +12,6 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
         Printer.SetAutoLineBreak(true);
         Printer.SetThreeColumnDistribution(0.465, 0.35, 0.235);
 
-        //-TM1.17 [255556]
         if Ticket.FindSet then
             repeat
                 TicketType.Get(Ticket."Ticket Type Code");
@@ -25,7 +19,6 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
                     PrintOne(Ticket);
 
             until Ticket.Next = 0;
-        //+TM1.17 [255556]
     end;
 
     var
@@ -39,7 +32,8 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
         Item: Record Item;
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Admission: Record "NPR TM Admission";
-        AuditRoll: Record "NPR Audit Roll";
+        PosEntry: Record "NPR POS Entry";
+        PosEntrySalesLine: Record "NPR POS Sales Line";
         TMDetTickAccEntry: Record "NPR TM Det. Ticket AccessEntry";
         TMAdmSchEntry: Record "NPR TM Admis. Schedule Entry";
         AdmStartDate: array[10] of Date;
@@ -64,22 +58,27 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
             Item.Get(Ticket."Item No.");
             Printer.AddTextField(1, 0, '   ' + Item.Description);
 
-            //-#248514 [248514]
-            AuditRoll.SetRange("Sales Ticket No.", Ticket."Sales Receipt No.");
-            AuditRoll.SetRange("Line No.", Ticket."Line No.");
-            if AuditRoll.FindFirst and (AuditRoll.Quantity <> 0) then
-                Printer.AddTextField(2, 2, Format(AuditRoll."Amount Including VAT" / AuditRoll.Quantity))
-            else
-                //+#248514 [248514]
+            PosEntry.SetFilter("Document No.", Ticket."Sales Receipt No.");
+            if (PosEntry.FindFirst()) then begin
+                PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
+                PosEntrySalesLine.SetFilter("Line No.", '=%1', Ticket."Line No.");
+                if (PosEntrySalesLine.FindFirst()) then begin
+                    Printer.AddTextField(2, 2, Format(PosEntrySalesLine."Amount Incl. VAT" / PosEntrySalesLine.Quantity))
+                end else begin
+                    if Item."Unit Price" <> 0 then
+                        Printer.AddTextField(2, 2, Format(Item."Unit Price"));
+                end;
 
+            end else begin
                 if Item."Unit Price" <> 0 then
                     Printer.AddTextField(2, 2, Format(Item."Unit Price"));
+            end;
+
         end else
             Printer.AddTextField(1, 0, '   ' + Ticket."Ticket Type Code");
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
 
-        //-#248514 [248514]
         if TicketAccessEntry.FindSet then
             repeat
                 if Admission.Get(TicketAccessEntry."Admission Code") then begin
@@ -104,14 +103,12 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
                     end;
                 end;
             until TicketAccessEntry.Next = 0;
-        //+#248514 [248514]
 
         Printer.SetBold(false);
         Printer.AddLine(' ');
         Printer.AddTextField(1, 0, '   ' + Txt000001);
         Printer.SetBold(true);
 
-        //-#248514 [248514]
         Printer.NewLine();
         for i := 1 to ArrayLen(AdmissionCode) do begin
             if Admission.Get(AdmissionCode[i]) then begin
@@ -123,11 +120,9 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
                 Printer.NewLine();
             end;
         end;
-        //+#248514 [248514]
 
         Printer.SetBold(false);
 
-        //-#248514 [248514]
         for i := 1 to ArrayLen(AdmissionCode) do begin
             if (AdmStartTime[i] > 000000T) and Admission.Get(AdmissionCode[i]) then begin
                 if not TimeHeaderCreated then begin
@@ -144,23 +139,11 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
                 Printer.NewLine();
             end;
         end;
-        //+#248514 [248514]
 
         Printer.AddLine(' ');
-        //Printer.AddTextField(1,0,'   ' + Txt000003);
-        //Printer.AddTextField(2,2,FORMAT(Ticket."No."));
-        //Printer.AddLine(' ');
-
-        //Ticket text here
         Printer.AddLine(' ');
 
-        //-#245881 [245881]
-        //Printer.AddBarcode('Code39',Ticket."No.",4);
-        //-#264219
-        //Printer.AddBarcode('Code128',Ticket."No.",2);
         Printer.AddBarcode('Code128', Ticket."External Ticket No.", 2);
-        //+#264219
-        //+#245881 [245881]
         Printer.AddLine(' ');
 
         Printer.SetFont('Control');
