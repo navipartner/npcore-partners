@@ -18,8 +18,8 @@ table 6150711 "NPR POS Default View"
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Login,Sale,Payment,Balance,Locked';
-            OptionMembers = Login,Sale,Payment,Balance,Locked;
+            OptionCaption = 'Login,Sale,Payment,Balance,Locked,Restaurant';
+            OptionMembers = Login,Sale,Payment,Balance,Locked,Restaurant;
         }
         field(3; "Salesperson Filter"; Text[250])
         {
