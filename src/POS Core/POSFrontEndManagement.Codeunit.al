@@ -879,21 +879,30 @@ codeunit 6150704 "NPR POS Front End Management"
         //+NPR5.40 [306347]
     end;
 
-    procedure RequireResponse(ID: Integer; RequiredContent: Variant)
+    procedure RequireResponse(ID: Integer; RequiredContent: Text)
     var
         Request: DotNet NPRNetJsonRequest;
-        "Object": DotNet NPRNetObject;
     begin
         //-NPR5.50 [338666]
         MakeSureFrameworkIsAvailable(true);
         Request := Request.JsonRequest();
         Request.Method := 'RequireResponse';
         Request.Content.Add('id', ID);
-        if RequiredContent.IsDotNet then begin
-            Object := RequiredContent;
-            Request.Content.Add('value', Object);
-        end else
-            Request.Content.Add('value', RequiredContent);
+        Request.Content.Add('value', RequiredContent);
+        InvokeFrontEndAsync(Request);
+        //-NPR5.50 [338666]
+    end;
+
+    procedure RequireResponse(ID: Integer; RequiredContent: DotNet NPRNetWorkflowAction)
+    var
+        Request: DotNet NPRNetJsonRequest;
+    begin
+        //-NPR5.50 [338666]
+        MakeSureFrameworkIsAvailable(true);
+        Request := Request.JsonRequest();
+        Request.Method := 'RequireResponse';
+        Request.Content.Add('id', ID);
+        Request.Content.Add('value', RequiredContent);
         InvokeFrontEndAsync(Request);
         //-NPR5.50 [338666]
     end;
