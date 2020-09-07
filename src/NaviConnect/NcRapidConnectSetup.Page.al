@@ -60,6 +60,7 @@ page 6151091 "NPR Nc RapidConnect Setup"
                     Caption = 'Download Ftp';
                     Image = Delegate;
                     Visible = "Import Enabled";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

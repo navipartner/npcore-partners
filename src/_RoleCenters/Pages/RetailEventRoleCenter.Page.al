@@ -21,23 +21,29 @@ page 6151243 "NPR Retail Event Role Center"
          */
             part(Control6014402; "NPR Event Activities")
             {
+                                                                                                                                                                                  ApplicationArea=All;
             }
             part(Control6014413; "NPR Event Events by Attributes")
             {
+                ApplicationArea=All;
             }
 
 
             part(Control6014410; "NPR Event Next 10 Events")
             {
+                    ApplicationArea=All;
             }
             part(Control6014411; "NPR Event Notes")
             {
+                ApplicationArea=All;
             }
             part(Control6014412; "NPR Event Resource Overview")
             {
+                ApplicationArea=All;
             }
             systempart(Control6014417; MyNotes)
             {
+                ApplicationArea=All;
             }
 
         }
@@ -51,36 +57,43 @@ page 6151243 "NPR Retail Event Role Center"
             {
                 Caption = 'Event List';
                 RunObject = Page "NPR Event List";
+                ApplicationArea=All;
             }
             action(CustomerList)
             {
                 Caption = 'Customer List';
                 RunObject = Page "Customer List";
+                ApplicationArea=All;
             }
             action(PlanningLines)
             {
                 Caption = 'Planning Lines';
                 RunObject = Page "NPR Event Planning Line List";
+                ApplicationArea=All;
             }
             action(ResourceList)
             {
                 Caption = 'Resource List';
                 RunObject = Page "Resource List";
+                ApplicationArea=All;
             }
             action(AttributeTemplates)
             {
                 Caption = 'Attribute Templates';
                 RunObject = Page "NPR Event Attribute Templ.";
+                ApplicationArea=All;
             }
             action(ExchIntTemplates)
             {
                 Caption = 'Exch. Int. Templates';
                 RunObject = Page "NPR Event Exch. Int. Templates";
+                ApplicationArea=All;
             }
             action(ExchIntEmails)
             {
                 Caption = 'Exch. Int. E-mails';
                 RunObject = Page "NPR Event Exch. Int. E-Mails";
+                ApplicationArea=All;
             }
         }
     }

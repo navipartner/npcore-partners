@@ -60,6 +60,7 @@ page 6184488 "NPR Pepper EFT Trans. Types"
                 RunPageLink = "Transaction Type Code" = FIELD(Code);
                 RunPageView = SORTING("Transaction Type Code")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
     }

@@ -209,10 +209,12 @@ page 6151589 "NPR Event Task Lines"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }
@@ -233,6 +235,7 @@ page 6151589 "NPR Event Task Lines"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+P';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -260,6 +263,7 @@ page 6151589 "NPR Event Task Lines"
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'F7';
+                    ApplicationArea=All;
                 }
                 action("Job &Task Card")
                 {
@@ -269,6 +273,7 @@ page 6151589 "NPR Event Task Lines"
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'Shift+F7';
+                    ApplicationArea=All;
                 }
                 separator("-")
                 {
@@ -286,12 +291,14 @@ page 6151589 "NPR Event Task Lines"
                         RunPageLink = "Job No." = FIELD("Job No."),
                                       "Job Task No." = FIELD("Job Task No.");
                         ShortCutKey = 'Shift+Ctrl+D';
+                        ApplicationArea=All;
                     }
                     action("Dimensions-&Multiple")
                     {
                         AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -315,6 +322,7 @@ page 6151589 "NPR Event Task Lines"
                     Image = GetSourceDoc;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -336,6 +344,7 @@ page 6151589 "NPR Event Task Lines"
                     RunObject = Page "Job WIP Entries";
                     RunPageLink = "Job No." = FIELD("Job No.");
                     RunPageView = SORTING("Job No.", "Job Posting Group", "WIP Posting Date");
+                    ApplicationArea=All;
                 }
                 action("WIP &G/L Entries")
                 {
@@ -344,6 +353,7 @@ page 6151589 "NPR Event Task Lines"
                     RunObject = Page "Job WIP G/L Entries";
                     RunPageLink = "Job No." = FIELD("Job No.");
                     RunPageView = SORTING("Job No.");
+                    ApplicationArea=All;
                 }
             }
             group(History)
@@ -359,6 +369,7 @@ page 6151589 "NPR Event Task Lines"
                                   "Job Task No." = FIELD("Job Task No.");
                     RunPageView = SORTING("Job No.", "Job Task No.");
                     ShortCutKey = 'Ctrl+F7';
+                    ApplicationArea=All;
                 }
             }
         }
@@ -373,6 +384,7 @@ page 6151589 "NPR Event Task Lines"
                     Caption = 'Create &Sales Invoice';
                     Ellipsis = true;
                     Image = Invoice;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -403,6 +415,7 @@ page 6151589 "NPR Event Task Lines"
                     Image = Splitlines;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -426,6 +439,7 @@ page 6151589 "NPR Event Task Lines"
                     Caption = 'Change &Dates';
                     Ellipsis = true;
                     Image = ChangeDate;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -449,6 +463,7 @@ page 6151589 "NPR Event Task Lines"
                     Caption = 'I&ndent Job Tasks';
                     Image = Indent;
                     RunObject = Codeunit "Job Task-Indent";
+                    ApplicationArea=All;
                 }
                 group("&Copy")
                 {
@@ -461,6 +476,7 @@ page 6151589 "NPR Event Task Lines"
                         Image = CopyToTask;
                         Promoted = true;
                         PromotedCategory = Process;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -478,6 +494,7 @@ page 6151589 "NPR Event Task Lines"
                         Image = CopyFromTask;
                         Promoted = true;
                         PromotedCategory = Process;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -498,6 +515,7 @@ page 6151589 "NPR Event Task Lines"
                         Caption = '&Calculate WIP';
                         Ellipsis = true;
                         Image = CalculateWIP;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -515,6 +533,7 @@ page 6151589 "NPR Event Task Lines"
                         Ellipsis = true;
                         Image = PostOrder;
                         ShortCutKey = 'F9';
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -538,6 +557,7 @@ page 6151589 "NPR Event Task Lines"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Actual To Budget";
+                ApplicationArea=All;
             }
             action("Job Analysis")
             {
@@ -546,6 +566,7 @@ page 6151589 "NPR Event Task Lines"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Analysis";
+                ApplicationArea=All;
             }
             action("Job - Planning Lines")
             {
@@ -554,6 +575,7 @@ page 6151589 "NPR Event Task Lines"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job - Planning Lines";
+                ApplicationArea=All;
             }
             action("Job - Suggested Billing")
             {
@@ -562,6 +584,7 @@ page 6151589 "NPR Event Task Lines"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Suggested Billing";
+                ApplicationArea=All;
             }
             action("Jobs - Transaction Detail")
             {
@@ -571,6 +594,7 @@ page 6151589 "NPR Event Task Lines"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Job - Transaction Detail";
+                ApplicationArea=All;
             }
         }
     }

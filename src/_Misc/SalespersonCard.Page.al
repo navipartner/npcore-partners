@@ -123,6 +123,7 @@ page 6014428 "NPR Salesperson Card"
                 Image = List;
                 RunObject = Page "Salespersons/Purchasers";
                 ShortCutKey = 'F5';
+                ApplicationArea=All;
             }
             action("&Statistics")
             {
@@ -131,12 +132,14 @@ page 6014428 "NPR Salesperson Card"
                 RunObject = Page "Salesperson Statistics";
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'F9';
+                ApplicationArea=All;
             }
             action("Sales Person report")
             {
                 Caption = 'Sales Person report';
                 Image = SalesPerson;
                 ShortCutKey = 'Ctrl+F9';
+                ApplicationArea=All;
             }
             action(Kassekoder)
             {
@@ -147,11 +150,13 @@ page 6014428 "NPR Salesperson Card"
                               Type = CONST(SalesPerson);
                 RunPageView = SORTING(Type, Code, "Alt. No.");
                 ShortCutKey = 'Ctrl+A';
+                ApplicationArea=All;
             }
             action("Remove from staff Sale")
             {
                 Caption = 'Remove from Staff Sale';
                 Image = RemoveContacts;
+                ApplicationArea=All;
             }
         }
     }

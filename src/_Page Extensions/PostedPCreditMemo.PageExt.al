@@ -22,11 +22,13 @@ pageextension 6014414 "NPR Posted P.Credit Memo" extends "Posted Purchase Credit
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
+                    ApplicationArea=All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
+                    ApplicationArea=All;
                 }
             }
         }
@@ -38,6 +40,7 @@ pageextension 6014414 "NPR Posted P.Credit Memo" extends "Posted Purchase Credit
                 Image = DocInBrowser;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

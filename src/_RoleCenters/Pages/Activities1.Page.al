@@ -41,6 +41,7 @@ page 6151252 "NPR Activities 1"
             action("Action Items")
             {
                 Caption = 'Action Items';
+                ApplicationArea=All;
             }
         }
     }

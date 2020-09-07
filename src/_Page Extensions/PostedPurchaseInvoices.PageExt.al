@@ -11,6 +11,7 @@ pageextension 6014418 "NPR Posted Purchase Invoices" extends "Posted Purchase In
                 Image = DocInBrowser;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

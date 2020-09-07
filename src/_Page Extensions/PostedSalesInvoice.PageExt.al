@@ -71,11 +71,13 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
+                    ApplicationArea=All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
+                    ApplicationArea=All;
                 }
             }
             group("NPR DocExchFramework")
@@ -85,16 +87,19 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 {
                     Caption = 'Export';
                     Image = ExportFile;
+                    ApplicationArea=All;
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
+                    ApplicationArea=All;
                 }
             }
             action("NPR Consignor Label")
             {
                 Caption = 'Consignor Label';
+                ApplicationArea=All;
             }
         }
     }

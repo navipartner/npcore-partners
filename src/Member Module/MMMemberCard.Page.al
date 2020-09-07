@@ -148,12 +148,14 @@ page 6060136 "NPR MM Member Card"
             {
                 SubPageLink = "Member Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Member Entry No.", "Membership Entry No.");
+                ApplicationArea=All;
             }
             part(MemberCardsSubpage; "NPR MM Member Cards ListPart")
             {
                 SubPageLink = "Member Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Descending);
+                ApplicationArea=All;
             }
             group(Attributes)
             {
@@ -374,6 +376,7 @@ page 6060136 "NPR MM Member Card"
         {
             systempart(Control6150638; Notes)
             {
+                ApplicationArea=All;
             }
         }
     }
@@ -389,6 +392,7 @@ page 6060136 "NPR MM Member Card"
                 Image = PrintCheck;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -405,6 +409,7 @@ page 6060136 "NPR MM Member Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -426,6 +431,7 @@ page 6060136 "NPR MM Member Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -485,6 +491,7 @@ page 6060136 "NPR MM Member Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -500,6 +507,7 @@ page 6060136 "NPR MM Member Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -513,6 +521,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Member Anonymization';
                 Ellipsis = true;
                 Image = AbsenceCategory;
+                ApplicationArea=All;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
 
@@ -534,6 +543,7 @@ page 6060136 "NPR MM Member Card"
                 Image = Interaction;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -564,6 +574,7 @@ page 6060136 "NPR MM Member Card"
                 Image = Interaction;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -599,6 +610,7 @@ page 6060136 "NPR MM Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "External Member Card No." = FIELD("External Member No.");
+                ApplicationArea=All;
             }
             action("Preferred Communication Methods")
             {
@@ -610,6 +622,7 @@ page 6060136 "NPR MM Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
                 RunPageLink = "Member Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
             action("Member Notifications")
             {
@@ -619,6 +632,7 @@ page 6060136 "NPR MM Member Card"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Notific. Entry";
                 RunPageLink = "Member Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
             action("Arrival Log")
             {
@@ -630,6 +644,7 @@ page 6060136 "NPR MM Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Member No." = FIELD("External Member No.");
+                ApplicationArea=All;
             }
             group(History)
             {
@@ -642,6 +657,7 @@ page 6060136 "NPR MM Member Card"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -668,6 +684,7 @@ page 6060136 "NPR MM Member Card"
                     Image = ItemLedger;
                     Promoted = true;
                     PromotedCategory = Category4;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -695,6 +712,7 @@ page 6060136 "NPR MM Member Card"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'F7';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -724,6 +742,7 @@ page 6060136 "NPR MM Member Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -746,6 +765,7 @@ page 6060136 "NPR MM Member Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

@@ -102,6 +102,7 @@ page 6151017 "NPR NpRv Sales Lines"
             {
                 Caption = 'References';
                 Image = List;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

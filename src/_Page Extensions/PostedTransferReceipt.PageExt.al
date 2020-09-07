@@ -12,6 +12,7 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
                 Image = BinContent;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
             }
             action("NPR PriceLabel")
             {
@@ -20,6 +21,7 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
             }
         }
     }

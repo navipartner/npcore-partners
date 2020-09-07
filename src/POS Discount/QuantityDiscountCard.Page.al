@@ -82,6 +82,7 @@ page 6014466 "NPR Quantity Discount Card"
                 SubPageLink = "Item No." = FIELD("Item No."),
                               "Main no." = FIELD("Main No.");
                 Visible = ActionVisible;
+                ApplicationArea=All;
             }
         }
         area(factboxes)
@@ -89,6 +90,7 @@ page 6014466 "NPR Quantity Discount Card"
             part(Control6150634; "Item Invoicing FactBox")
             {
                 SubPageLink = "No." = FIELD("Item No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -105,6 +107,7 @@ page 6014466 "NPR Quantity Discount Card"
                 RunPageLink = "Table ID" = CONST(6014439),
                               "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -118,6 +121,7 @@ page 6014466 "NPR Quantity Discount Card"
                 Caption = 'List';
                 Image = List;
                 RunObject = Page "NPR Quantity Discount List";
+                ApplicationArea=All;
             }
             separator(Separator6150623)
             {
@@ -126,6 +130,7 @@ page 6014466 "NPR Quantity Discount Card"
             {
                 Caption = 'Send to Retail Journal';
                 Image = sendTo;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -163,6 +168,7 @@ page 6014466 "NPR Quantity Discount Card"
             {
                 Caption = 'Copy Multiple Price Discount';
                 Image = CopyDocument;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

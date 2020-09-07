@@ -61,6 +61,7 @@ page 6060046 "NPR Registered Item Worksh."
                 RunPageLink = "Registered Worksheet No." = FIELD("No.");
                 RunPageView = SORTING("Registered Worksheet No.", "Line No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
     }

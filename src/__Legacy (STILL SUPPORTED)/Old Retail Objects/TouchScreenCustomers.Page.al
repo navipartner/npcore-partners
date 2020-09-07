@@ -67,6 +67,7 @@ page 6014526 "NPR Touch Screen: Customers"
                 Image = NewCustomer;
                 Promoted = true;
                 PromotedCategory = New;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

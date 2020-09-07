@@ -45,6 +45,7 @@ page 6184485 "NPR Pepper Card Types"
                 RunPageLink = "Card Type Code" = FIELD(Code);
                 RunPageView = SORTING("Card Type Code", "Minimum Amount")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
     }

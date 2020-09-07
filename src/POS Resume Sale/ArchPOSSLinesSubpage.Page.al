@@ -64,6 +64,7 @@ page 6150745 "NPR Arch. POS S. Lines Subpage"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

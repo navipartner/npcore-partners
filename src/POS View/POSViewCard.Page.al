@@ -21,6 +21,7 @@ page 6150711 "NPR POS View Card"
             }
             usercontrol(Editor; "NPR JsonEditor")
             {
+                ApplicationArea=All;
                 trigger OnControlReady();
                 begin
                     CurrPage.Editor.Invoke('setJson', GetMarkup());

@@ -34,6 +34,7 @@ page 6151123 "NPR GDPR Agreement Card"
             part(Control6014404; "NPR GDPR Agreement Versions")
             {
                 SubPageLink = "No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -49,6 +50,7 @@ page 6151123 "NPR GDPR Agreement Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

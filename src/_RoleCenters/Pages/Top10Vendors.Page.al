@@ -89,6 +89,7 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Day)
                 {
                     Caption = 'Day';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -99,6 +100,7 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Week)
                 {
                     Caption = 'Week';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -109,6 +111,7 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Month)
                 {
                     Caption = 'Month';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -119,6 +122,7 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -129,6 +133,7 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Year)
                 {
                     Caption = 'Year';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

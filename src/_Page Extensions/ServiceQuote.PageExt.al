@@ -26,11 +26,13 @@ pageextension 6014469 "NPR Service Quote" extends "Service Quote"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
+                    ApplicationArea=All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
+                    ApplicationArea=All;
                 }
             }
         }

@@ -156,11 +156,13 @@ page 6151399 "NPR CS RFID Header Card"
                 }
                 field("Receiving Closed By"; "Receiving Closed By")
                 {
+                    ApplicationArea=All;
                 }
             }
             part(Control6014414; "NPR CS RFID Lines Subpage")
             {
                 SubPageLink = Id = FIELD(Id);
+                ApplicationArea=All;
             }
         }
     }
@@ -178,6 +180,7 @@ page 6151399 "NPR CS RFID Header Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR CS Transfer Handling Batch";
                 RunPageLink = "Rfid Header Id" = FIELD(Id);
+                ApplicationArea=All;
             }
             action("Delete Collected Tags")
             {
@@ -186,6 +189,7 @@ page 6151399 "NPR CS RFID Header Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -200,6 +204,7 @@ page 6151399 "NPR CS RFID Header Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ShowCreateSalesLines;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -214,6 +219,7 @@ page 6151399 "NPR CS RFID Header Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ShowCreateSalesLines;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -226,6 +232,7 @@ page 6151399 "NPR CS RFID Header Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

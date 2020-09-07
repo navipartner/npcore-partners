@@ -16,6 +16,7 @@ pageextension 6014488 "NPR Sales Quote Subform" extends "Sales Quote Subform"
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
+                ApplicationArea=All;
             }
         }
     }

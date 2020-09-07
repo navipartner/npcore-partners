@@ -118,14 +118,17 @@ report 6060111 "NPR Check Duplicate Cust."
                     field(CheckName; CheckName)
                     {
                         Caption = 'Name';
+                        ApplicationArea=All;
                     }
                     field(CheckAddr; CheckAddr)
                     {
                         Caption = 'Address';
+                        ApplicationArea=All;
                     }
                     field(CheckPhone; CheckPhone)
                     {
                         Caption = 'Phone No.';
+                        ApplicationArea=All;
                     }
                 }
             }

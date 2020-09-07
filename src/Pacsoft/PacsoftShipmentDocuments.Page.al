@@ -117,6 +117,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 Image = Card;
                 ShortCutKey = 'Shift+F5';
                 Visible = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -133,6 +134,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 Caption = 'Track''n''Trace';
                 Image = Track;
                 ShortCutKey = 'Ctrl+F9';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -144,6 +146,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 Caption = 'Send Document';
                 Image = SendTo;
                 ShortCutKey = 'F9';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -175,11 +178,13 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 Caption = 'Setup';
                 Image = Setup;
                 RunObject = Page "NPR Pacsoft Setup";
+                ApplicationArea=All;
             }
             action(PrintDocument)
             {
                 Caption = 'Print Document';
                 Image = PrintDocument;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

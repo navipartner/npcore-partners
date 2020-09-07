@@ -186,6 +186,7 @@ page 6014649 "NPR Generic Filter Page"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -199,6 +200,7 @@ page 6014649 "NPR Generic Filter Page"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -212,6 +214,7 @@ page 6014649 "NPR Generic Filter Page"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

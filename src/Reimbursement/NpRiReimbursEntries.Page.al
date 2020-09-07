@@ -128,6 +128,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Image = ApplyEntries;
                 Scope = Repeater;
                 ShortCutKey = 'Shift+F11';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -145,6 +146,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Ellipsis = true;
                 Image = UnApply;
                 Scope = Repeater;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -167,6 +169,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -182,6 +185,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 Scope = Repeater;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

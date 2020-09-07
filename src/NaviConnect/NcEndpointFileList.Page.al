@@ -54,6 +54,7 @@ page 6151526 "NPR Nc Endpoint File List"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

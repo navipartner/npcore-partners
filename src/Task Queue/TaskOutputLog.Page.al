@@ -62,6 +62,7 @@ page 6059911 "NPR Task Output Log"
             {
                 Caption = 'Show Document';
                 Image = ShowSelected;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

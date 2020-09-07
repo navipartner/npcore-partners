@@ -32,10 +32,12 @@ page 6151364 "NPR CS Wareh. Activity Setup"
             systempart(Control6014406; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }

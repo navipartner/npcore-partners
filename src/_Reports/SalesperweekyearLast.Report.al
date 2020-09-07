@@ -191,19 +191,23 @@ report 6014456 "NPR Sales per week year/Last"
                     field(Month; Month)
                     {
                         Caption = 'Month';
+                        ApplicationArea=All;
                     }
                     field(Year; Year)
                     {
                         Caption = 'Year';
+                        ApplicationArea=All;
                     }
                     field(Department; "Dimension Value".Code)
                     {
                         Caption = 'Department';
                         TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+                        ApplicationArea=All;
                     }
                     field(DateComparison; DateComparison)
                     {
                         Caption = 'Date Comparison';
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -214,6 +218,7 @@ report 6014456 "NPR Sales per week year/Last"
                     field(Nearest; Nearest)
                     {
                         Caption = 'Compare To Closest Week';
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -224,6 +229,7 @@ report 6014456 "NPR Sales per week year/Last"
                     field(Multiplier; Multiplier)
                     {
                         Caption = 'Multiply With';
+                        ApplicationArea=All;
                     }
                 }
             }

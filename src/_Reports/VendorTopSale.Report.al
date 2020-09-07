@@ -394,15 +394,18 @@ report 6014426 "NPR Vendor Top/Sale"
                 {
                     Caption = 'Show Type';
                     OptionCaption = 'Item Sales,,Gains,Margin';
+                    ApplicationArea=All;
                 }
                 field("Sorting"; Sorting)
                 {
                     Caption = 'Sorting';
                     OptionCaption = 'Show Biggest/Smallest Deb.';
+                    ApplicationArea=All;
                 }
                 field(ShowQty; ShowQty)
                 {
                     Caption = 'Show Quantity';
+                    ApplicationArea=All;
                 }
             }
         }

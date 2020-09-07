@@ -72,6 +72,7 @@ page 6151529 "NPR Nc Collector Card"
             part(Control6150625; "NPR Nc Collec. Filters")
             {
                 SubPageLink = "Collector Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }
@@ -86,6 +87,7 @@ page 6151529 "NPR Nc Collector Card"
                 Image = XMLFile;
                 RunObject = Page "NPR Nc Collection Lines";
                 RunPageLink = "Collector Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             action(Collections)
             {
@@ -93,6 +95,7 @@ page 6151529 "NPR Nc Collector Card"
                 Image = XMLFileGroup;
                 RunObject = Page "NPR Nc Collection List";
                 RunPageLink = "Collector Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -101,6 +104,7 @@ page 6151529 "NPR Nc Collector Card"
             {
                 Caption = 'Send all records as modify';
                 Image = BulletList;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

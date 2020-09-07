@@ -203,6 +203,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -218,6 +219,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -232,6 +234,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -250,6 +253,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }

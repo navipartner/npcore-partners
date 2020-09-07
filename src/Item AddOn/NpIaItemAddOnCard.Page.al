@@ -33,6 +33,7 @@ page 6151126 "NPR NpIa Item AddOn Card"
             part(Control6014405; "NPR NpIa Item AddOn Subform")
             {
                 SubPageLink = "AddOn No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }

@@ -53,6 +53,7 @@ page 6151434 "NPR Magento Attribute Sets"
                     part(Control6151401; "NPR Magento Attribute Group")
                     {
                         SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID");
+                        ApplicationArea=All;
                     }
                 }
                 group(Control6150619)
@@ -64,6 +65,7 @@ page 6151434 "NPR Magento Attribute Sets"
                         Provider = Control6151401;
                         SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID"),
                                       "Attribute Group ID" = FIELD("Attribute Group ID");
+                        ApplicationArea=All;
                     }
                 }
             }

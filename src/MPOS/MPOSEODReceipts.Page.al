@@ -52,6 +52,7 @@ page 6059962 "NPR MPOS EOD Receipts"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -73,6 +74,7 @@ page 6059962 "NPR MPOS EOD Receipts"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

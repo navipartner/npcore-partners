@@ -78,6 +78,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             action("NPR Consignor Label")
             {
                 Caption = 'Consignor Label';
+                ApplicationArea=All;
             }
             group("NPR PDF2NAV")
             {
@@ -86,11 +87,13 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
+                    ApplicationArea=All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
+                    ApplicationArea=All;
                 }
             }
             group("NPR Pacsoft")
@@ -99,10 +102,12 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 action("NPR CreatePacsoftDocument")
                 {
                     Caption = 'Create Pacsoft Shipment Document';
+                    ApplicationArea=All;
                 }
                 action("NPR PrintShipmentDocument")
                 {
                     Caption = 'Print Shipment Document';
+                    ApplicationArea=All;
                 }
             }
         }

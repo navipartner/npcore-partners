@@ -65,6 +65,7 @@ page 6150640 "NPR POS Info Card"
             {
                 Caption = 'POS Info Subform';
                 SubPageLink = Code = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }
@@ -77,6 +78,7 @@ page 6150640 "NPR POS Info Card"
             {
                 Caption = 'Field Mapping';
                 Image = "Action";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

@@ -57,6 +57,7 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
                 Caption = 'Or set total';
                 Image = Totals;
                 Promoted = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

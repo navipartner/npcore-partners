@@ -45,6 +45,7 @@ page 6060160 "NPR Event Attribute Templ."
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -63,6 +64,7 @@ page 6060160 "NPR Event Attribute Templ."
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Temp. Filters";
                 RunPageLink = "Template Name" = FIELD(Name);
+                ApplicationArea=All;
             }
         }
     }

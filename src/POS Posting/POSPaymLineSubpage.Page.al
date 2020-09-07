@@ -68,6 +68,7 @@ page 6150654 "NPR POS Paym. Line Subpage"
             {
                 Caption = 'Dimensions';
                 Image = Dimensions;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

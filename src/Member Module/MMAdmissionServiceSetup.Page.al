@@ -59,6 +59,7 @@ page 6060090 "NPR MM Admission Service Setup"
             {
                 Caption = 'Turnstiles';
                 ShowFilter = false;
+                ApplicationArea=All;
             }
         }
     }
@@ -77,6 +78,7 @@ page 6060090 "NPR MM Admission Service Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Codeunit "NPR MM Admission Service WS";
+                ApplicationArea=All;
             }
             action(Entries)
             {
@@ -85,6 +87,7 @@ page 6060090 "NPR MM Admission Service Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Admis. Service Entries";
+                ApplicationArea=All;
             }
         }
     }

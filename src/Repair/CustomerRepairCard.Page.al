@@ -390,6 +390,7 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     SubPageLink = "Customer Repair No." = FIELD("No."),
                                   Type = CONST(Fejlbeskrivelse);
+                    ApplicationArea=All;
                 }
             }
             group("Repair Description")
@@ -399,6 +400,7 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     SubPageLink = "Customer Repair No." = FIELD("No."),
                                   Type = CONST(Reparationsbeskrivelse);
+                    ApplicationArea=All;
                 }
             }
             group(Picture)
@@ -418,6 +420,7 @@ page 6014503 "NPR Customer Repair Card"
         {
             systempart(Control6014416; Notes)
             {
+                ApplicationArea=All;
             }
         }
     }
@@ -435,6 +438,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = BinContent;
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -462,6 +466,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = "Report";
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -505,6 +510,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = "Report";
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -547,6 +553,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = "Report";
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -589,6 +596,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = "Report";
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -630,6 +638,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = "Report";
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -678,6 +687,7 @@ page 6014503 "NPR Customer Repair Card"
                         Image = Import;
                         Promoted = true;
                         PromotedCategory = Category4;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -713,6 +723,7 @@ page 6014503 "NPR Customer Repair Card"
                         Image = Export;
                         Promoted = true;
                         PromotedCategory = Category4;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -741,6 +752,7 @@ page 6014503 "NPR Customer Repair Card"
                         Image = Delete;
                         Promoted = true;
                         PromotedCategory = Category4;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -762,6 +774,7 @@ page 6014503 "NPR Customer Repair Card"
                         Image = Export;
                         Promoted = true;
                         PromotedCategory = Category4;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -799,6 +812,7 @@ page 6014503 "NPR Customer Repair Card"
                     RunObject = Page "NPR Customer Repair List";
                     RunPageView = WHERE(Status = FILTER(<> Claimed));
                     ShortCutKey = 'F5';
+                    ApplicationArea=All;
                 }
                 action("Repair Closed/Claimed List")
                 {
@@ -807,6 +821,7 @@ page 6014503 "NPR Customer Repair Card"
                     RunObject = Page "NPR Customer Repair List";
                     RunPageView = WHERE(Status = FILTER(Claimed));
                     ShortCutKey = 'F5';
+                    ApplicationArea=All;
                 }
                 action("Finalize Repair")
                 {
@@ -814,6 +829,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = Close;
                     Promoted = true;
                     PromotedCategory = Category5;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -828,6 +844,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Post Items';
                     Image = Post;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -842,6 +859,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = Close;
                     Promoted = true;
                     PromotedCategory = Category5;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -861,6 +879,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = SendElectronicDocument;
                     Promoted = true;
                     PromotedCategory = Category5;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -877,6 +896,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Send Custom Sms';
                     Image = SendTo;
                     RunObject = Page "NPR Send SMS";
+                    ApplicationArea=All;
                 }
                 action("Create Invoice")
                 {
@@ -884,6 +904,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = CreateDocument;
                     Promoted = true;
                     PromotedCategory = Category5;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -896,6 +917,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = CreateDocument;
                     Promoted = true;
                     PromotedCategory = Category5;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -910,6 +932,7 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     Caption = 'Email Repair Offer';
                     Image = Email;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -940,6 +963,7 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     Caption = 'Email Repair Done';
                     Image = Email;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -970,6 +994,7 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     Caption = 'Email Repair Guarantee';
                     Image = Email;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1000,6 +1025,7 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     Caption = 'Email Customer Note';
                     Image = Email;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1033,6 +1059,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = '&Navigate';
                     Image = Navigate;
                     Promoted = false;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

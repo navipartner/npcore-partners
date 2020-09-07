@@ -69,6 +69,7 @@ page 6150651 "NPR POS Period Register List"
                 RunPageLink = "POS Period Register No." = FIELD("No.");
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
             action("Sales Lines")
             {
@@ -76,6 +77,7 @@ page 6150651 "NPR POS Period Register List"
                 Image = Sales;
                 RunObject = Page "NPR POS Sales Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
+                ApplicationArea=All;
             }
             action("Payment Lines")
             {
@@ -83,6 +85,7 @@ page 6150651 "NPR POS Period Register List"
                 Image = Payment;
                 RunObject = Page "NPR POS Payment Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
+                ApplicationArea=All;
             }
             action("Balancing Line")
             {
@@ -90,6 +93,7 @@ page 6150651 "NPR POS Period Register List"
                 Image = Balance;
                 RunObject = Page "NPR POS Balancing Line";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -101,6 +105,7 @@ page 6150651 "NPR POS Period Register List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -120,6 +125,7 @@ page 6150651 "NPR POS Period Register List"
             {
                 Caption = 'Preview Post Ledger Register';
                 Image = ViewPostedOrder;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -139,6 +145,7 @@ page 6150651 "NPR POS Period Register List"
             {
                 Caption = 'Compare Preview Ledger Register to Audit Roll Posting';
                 Image = CompareCOA;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -160,6 +167,7 @@ page 6150651 "NPR POS Period Register List"
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

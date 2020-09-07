@@ -65,6 +65,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Image = Setup;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -79,6 +80,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

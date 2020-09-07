@@ -68,6 +68,7 @@ page 6060084 "NPR MCS Recommendations Log"
                 Image = SuggestLines;
                 RunObject = Page "NPR MCS Recomm. Lines";
                 RunPageLink = "Log Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }

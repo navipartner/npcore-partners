@@ -178,6 +178,7 @@ page 6151208 "NPR NpCs Stores by Distance"
                 Caption = 'Inventory';
                 SubPageLink = "Store Code" = FIELD(Code);
                 Visible = ShowInventory;
+                ApplicationArea=All;
             }
         }
     }
@@ -193,6 +194,7 @@ page 6151208 "NPR NpCs Stores by Distance"
                 RunObject = Page "NPR NpCs Store Card";
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F7';
+                ApplicationArea=All;
             }
         }
     }

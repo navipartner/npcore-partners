@@ -107,6 +107,7 @@ page 6059769 "NPR NaviDocs Document List"
             {
                 Editable = false;
                 ShowFilter = false;
+                ApplicationArea=All;
             }
             part(NaviDocsAttachments; "NPR NaviDocs Entry Attachments")
             {
@@ -114,6 +115,7 @@ page 6059769 "NPR NaviDocs Document List"
                 SubPageLink = "NaviDocs Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("NaviDocs Entry No.", "Line No.");
                 Visible = ShowAttachmentSubpage;
+                ApplicationArea=All;
             }
         }
     }
@@ -134,6 +136,7 @@ page 6059769 "NPR NaviDocs Document List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -149,6 +152,7 @@ page 6059769 "NPR NaviDocs Document List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -168,6 +172,7 @@ page 6059769 "NPR NaviDocs Document List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+U';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -186,6 +191,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Promoted = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -201,6 +207,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Image = ChangeStatus;
                     Promoted = true;
                     PromotedCategory = Category6;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -215,6 +222,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Image = ChangeStatus;
                     Promoted = true;
                     PromotedCategory = Category6;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -229,6 +237,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Image = ChangeStatus;
                     Promoted = true;
                     PromotedCategory = Category6;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -248,6 +257,7 @@ page 6059769 "NPR NaviDocs Document List"
                 {
                     Caption = 'Change Handling Profile';
                     Image = SendToMultiple;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -269,6 +279,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Promoted = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Shift+F5';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -282,6 +293,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Promoted = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+F5';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -295,6 +307,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Promoted = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+M';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

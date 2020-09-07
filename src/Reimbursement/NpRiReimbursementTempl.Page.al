@@ -77,6 +77,7 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasDataCollectionFilters;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -93,6 +94,7 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasReimbursementParameters;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

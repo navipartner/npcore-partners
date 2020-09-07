@@ -47,6 +47,7 @@ page 6151195 "NPR NpCs Stores"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -62,6 +63,7 @@ page 6151195 "NPR NpCs Stores"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -77,6 +79,7 @@ page 6151195 "NPR NpCs Stores"
             {
                 Caption = 'Stores by Distance';
                 Image = List;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

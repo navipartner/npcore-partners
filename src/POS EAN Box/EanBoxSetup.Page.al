@@ -30,6 +30,7 @@ page 6060100 "NPR Ean Box Setup"
             part(Control6014402; "NPR Ean Box Setup Events")
             {
                 SubPageLink = "Setup Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

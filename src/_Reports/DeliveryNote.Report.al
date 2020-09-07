@@ -274,18 +274,23 @@ report 6014505 "NPR Delivery Note"
                     Caption = 'Letter Text';
                     field("LetterText[1]"; LetterText[1])
                     {
+                        ApplicationArea=All;
                     }
                     field("LetterText[2]"; LetterText[2])
                     {
+                        ApplicationArea=All;
                     }
                     field("LetterText[3]"; LetterText[3])
                     {
+                        ApplicationArea=All;
                     }
                     field("LetterText[4]"; LetterText[4])
                     {
+                        ApplicationArea=All;
                     }
                     field("LetterText[5]"; LetterText[5])
                     {
+                        ApplicationArea=All;
                     }
                 }
             }

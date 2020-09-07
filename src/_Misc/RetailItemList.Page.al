@@ -400,6 +400,7 @@ page 6014511 "NPR Retail Item List"
             part(Control6150628; "NPR NP Attributes FactBox")
             {
                 SubPageLink = "No." = FIELD("No.");
+                ApplicationArea=All;
             }
             part("Item Availability FactBox"; "NPR Item Availability FactBox")
             {
@@ -414,6 +415,7 @@ page 6014511 "NPR Retail Item List"
                               "Variant Filter" = FIELD("Variant Filter"),
                               "Lot No. Filter" = FIELD("Lot No. Filter"),
                               "Serial No. Filter" = FIELD("Serial No. Filter");
+                ApplicationArea=All;
             }
             part(Control1901314507; "Item Invoicing FactBox")
             {
@@ -428,6 +430,7 @@ page 6014511 "NPR Retail Item List"
                               "Lot No. Filter" = FIELD("Lot No. Filter"),
                               "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = true;
+                ApplicationArea=All;
             }
             part(Control1903326807; "Item Replenishment FactBox")
             {
@@ -442,6 +445,7 @@ page 6014511 "NPR Retail Item List"
                               "Lot No. Filter" = FIELD("Lot No. Filter"),
                               "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = false;
+                ApplicationArea=All;
             }
             part(Control1906840407; "Item Planning FactBox")
             {
@@ -456,6 +460,7 @@ page 6014511 "NPR Retail Item List"
                               "Lot No. Filter" = FIELD("Lot No. Filter"),
                               "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = true;
+                ApplicationArea=All;
             }
             part(Control1901796907; "Item Warehouse FactBox")
             {
@@ -470,11 +475,13 @@ page 6014511 "NPR Retail Item List"
                               "Lot No. Filter" = FIELD("Lot No. Filter"),
                               "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = false;
+                ApplicationArea=All;
             }
             part("Discount FactBox"; "NPR Discount FactBox")
             {
                 Caption = 'Discounts';
                 SubPageLink = "No." = FIELD("No.");
+                ApplicationArea=All;
             }
             part(ItemAttributesFactBox; "Item Attributes Factbox")
             {
@@ -483,10 +490,12 @@ page 6014511 "NPR Retail Item List"
             systempart(Control1900383207; Links)
             {
                 Visible = true;
+                ApplicationArea=All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = true;
+                ApplicationArea=All;
             }
             part(Picture; "NPR Magento Item Pict. Factbox")
             {
@@ -494,6 +503,7 @@ page 6014511 "NPR Retail Item List"
                 ShowFilter = false;
                 SubPageLink = "No." = FIELD("No.");
                 Visible = MagentoEnabled;
+                ApplicationArea=All;
             }
         }
     }
@@ -510,6 +520,7 @@ page 6014511 "NPR Retail Item List"
                 {
                     Caption = 'Items b&y Location';
                     Image = ItemAvailbyLoc;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -527,6 +538,7 @@ page 6014511 "NPR Retail Item List"
                     {
                         Caption = 'Event';
                         Image = "Event";
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -544,6 +556,7 @@ page 6014511 "NPR Retail Item List"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action("Variant")
                     {
@@ -556,6 +569,7 @@ page 6014511 "NPR Retail Item List"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action(Location)
                     {
@@ -571,11 +585,13 @@ page 6014511 "NPR Retail Item List"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action("BOM Level")
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -586,6 +602,7 @@ page 6014511 "NPR Retail Item List"
                     {
                         Caption = 'Timeline';
                         Image = Timeline;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -597,6 +614,7 @@ page 6014511 "NPR Retail Item List"
                         Caption = 'Retail Inventory Set';
                         Image = Intercompany;
                         Visible = RetailInventoryEnabled;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -619,6 +637,7 @@ page 6014511 "NPR Retail Item List"
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action(Attributes)
                 {
@@ -646,6 +665,7 @@ page 6014511 "NPR Retail Item List"
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 group(Dimensions)
                 {
@@ -659,11 +679,13 @@ page 6014511 "NPR Retail Item List"
                         RunPageLink = "Table ID" = CONST(27),
                                       "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
+                        ApplicationArea=All;
                     }
                     action("Dimensions-&Multiple")
                     {
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -686,6 +708,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Item Substitution Entry";
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("Cross Re&ferences")
                 {
@@ -693,6 +716,7 @@ page 6014511 "NPR Retail Item List"
                     Image = Change;
                     RunObject = Page "Item Cross Reference Entries";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("E&xtended Texts")
                 {
@@ -702,6 +726,7 @@ page 6014511 "NPR Retail Item List"
                     RunPageLink = "Table Name" = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    ApplicationArea=All;
                 }
                 action(Translations)
                 {
@@ -710,6 +735,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Item Translations";
                     RunPageLink = "Item No." = FIELD("No."),
                                   "Variant Code" = CONST('');
+                    ApplicationArea=All;
                 }
                 action("&Picture")
                 {
@@ -723,6 +749,7 @@ page 6014511 "NPR Retail Item List"
                                   "Location Filter" = FIELD("Location Filter"),
                                   "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                   "Variant Filter" = FIELD("Variant Filter");
+                    ApplicationArea=All;
                 }
                 action(Identifiers)
                 {
@@ -731,6 +758,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Item Identifiers";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.", "Variant Code", "Unit of Measure Code");
+                    ApplicationArea=All;
                 }
             }
             group("Assembly/Production")
@@ -741,6 +769,7 @@ page 6014511 "NPR Retail Item List"
                 {
                     Caption = 'Structure';
                     Image = Hierarchy;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -754,6 +783,7 @@ page 6014511 "NPR Retail Item List"
                 {
                     Caption = 'Cost Shares';
                     Image = CostBudget;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -773,6 +803,7 @@ page 6014511 "NPR Retail Item List"
                         Image = BOM;
                         RunObject = Page "Assembly BOM";
                         RunPageLink = "Parent Item No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                     action("Where-Used")
                     {
@@ -782,11 +813,13 @@ page 6014511 "NPR Retail Item List"
                         RunPageLink = Type = CONST(Item),
                                       "No." = FIELD("No.");
                         RunPageView = SORTING(Type, "No.");
+                        ApplicationArea=All;
                     }
                     action("Calc. Stan&dard Cost")
                     {
                         Caption = 'Calc. Stan&dard Cost';
                         Image = CalculateCost;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -797,6 +830,7 @@ page 6014511 "NPR Retail Item List"
                     {
                         Caption = 'Calc. Unit Price';
                         Image = SuggestItemPrice;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -814,11 +848,13 @@ page 6014511 "NPR Retail Item List"
                         Image = BOM;
                         RunObject = Page "Production BOM";
                         RunPageLink = "No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                     action(Action29)
                     {
                         Caption = 'Where-Used';
                         Image = "Where-Used";
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -832,6 +868,7 @@ page 6014511 "NPR Retail Item List"
                     {
                         Caption = 'Calc. Stan&dard Cost';
                         Image = CalculateCost;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -859,6 +896,7 @@ page 6014511 "NPR Retail Item List"
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                         ShortCutKey = 'Ctrl+F7';
+                        ApplicationArea=All;
                     }
                     action("&Reservation Entries")
                     {
@@ -868,6 +906,7 @@ page 6014511 "NPR Retail Item List"
                         RunPageLink = "Reservation Status" = CONST(Reservation),
                                       "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.", "Variant Code", "Location Code", "Reservation Status");
+                        ApplicationArea=All;
                     }
                     action("&Phys. Inventory Ledger Entries")
                     {
@@ -876,6 +915,7 @@ page 6014511 "NPR Retail Item List"
                         RunObject = Page "Phys. Inventory Ledger Entries";
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
+                        ApplicationArea=All;
                     }
                     action("&Value Entries")
                     {
@@ -884,11 +924,13 @@ page 6014511 "NPR Retail Item List"
                         RunObject = Page "Value Entries";
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
+                        ApplicationArea=All;
                     }
                     action("Item &Tracking Entries")
                     {
                         Caption = 'Item &Tracking Entries';
                         Image = ItemTrackingLedger;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -906,11 +948,13 @@ page 6014511 "NPR Retail Item List"
                         RunObject = Page "Warehouse Entries";
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated);
+                        ApplicationArea=All;
                     }
                     action(POSSalesEntries)
                     {
                         Caption = 'POS Sales Entries';
                         Image = Entries;
+                        ApplicationArea=All;
                     }
                     action(PriceLog)
                     {
@@ -918,6 +962,7 @@ page 6014511 "NPR Retail Item List"
                         Image = Log;
                         RunObject = Page "NPR Retail Price Log Entries";
                         RunPageLink = "Item No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                 }
                 group(Statistics)
@@ -931,6 +976,7 @@ page 6014511 "NPR Retail Item List"
                         Promoted = true;
                         PromotedCategory = Process;
                         ShortCutKey = 'F7';
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -952,6 +998,7 @@ page 6014511 "NPR Retail Item List"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action("T&urnover")
                     {
@@ -964,6 +1011,7 @@ page 6014511 "NPR Retail Item List"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                 }
                 action("Co&mments")
@@ -973,6 +1021,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Comment Sheet";
                     RunPageLink = "Table Name" = CONST(Item),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
             group("S&ales")
@@ -986,6 +1035,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Sales Prices";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action("Line Discounts")
                 {
@@ -995,6 +1045,7 @@ page 6014511 "NPR Retail Item List"
                     RunPageLink = Type = CONST(Item),
                                   Code = FIELD("No.");
                     RunPageView = SORTING(Type, Code);
+                    ApplicationArea=All;
                 }
                 action("Prepa&yment Percentages")
                 {
@@ -1002,6 +1053,7 @@ page 6014511 "NPR Retail Item List"
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action(Orders)
                 {
@@ -1011,6 +1063,7 @@ page 6014511 "NPR Retail Item List"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action("Returns Orders")
                 {
@@ -1020,6 +1073,7 @@ page 6014511 "NPR Retail Item List"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action("Recommended Items")
                 {
@@ -1028,6 +1082,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "NPR MCS Recomm. Lines";
                     RunPageLink = "Seed Item No." = FIELD("No."),
                                   "Table No." = CONST(27);
+                    ApplicationArea=All;
                 }
             }
             group("&Purchases")
@@ -1041,6 +1096,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Item Vendor Catalog";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action(Action39)
                 {
@@ -1049,6 +1105,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Purchase Prices";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action(Action42)
                 {
@@ -1057,6 +1114,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Purchase Line Discounts";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action(Action125)
                 {
@@ -1064,6 +1122,7 @@ page 6014511 "NPR Retail Item List"
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action(Action40)
                 {
@@ -1073,6 +1132,7 @@ page 6014511 "NPR Retail Item List"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action("Return Orders")
                 {
@@ -1082,12 +1142,14 @@ page 6014511 "NPR Retail Item List"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action("Nonstoc&k Items")
                 {
                     Caption = 'Nonstoc&k Items';
                     Image = NonStockItem;
                     RunObject = Page "Catalog Item List";
+                    ApplicationArea=All;
                 }
             }
             group(Warehouse)
@@ -1101,6 +1163,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Item Bin Contents";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action("Stockkeepin&g Units")
                 {
@@ -1109,6 +1172,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Stockkeeping Unit List";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
             }
             group(Service)
@@ -1122,11 +1186,13 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Service Items";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action(Troubleshooting)
                 {
                     Caption = 'Troubleshooting';
                     Image = Troubleshoot;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1142,6 +1208,7 @@ page 6014511 "NPR Retail Item List"
                     RunObject = Page "Troubleshooting Setup";
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
             group(Resources)
@@ -1159,11 +1226,13 @@ page 6014511 "NPR Retail Item List"
                         RunObject = Page "Resource Skills";
                         RunPageLink = Type = CONST(Item),
                                       "No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                     action("Skilled R&esources")
                     {
                         Caption = 'Skilled R&esources';
                         Image = ResourceSkills;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -1186,6 +1255,7 @@ page 6014511 "NPR Retail Item List"
                     Promoted = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1209,6 +1279,7 @@ page 6014511 "NPR Retail Item List"
                     Promoted = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledMultistore;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1231,6 +1302,7 @@ page 6014511 "NPR Retail Item List"
                     Promoted = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1257,6 +1329,7 @@ page 6014511 "NPR Retail Item List"
                 {
                     Caption = '&Create Stockkeeping Unit';
                     Image = CreateSKU;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1270,6 +1343,7 @@ page 6014511 "NPR Retail Item List"
                 {
                     Caption = 'C&alculate Counting Period';
                     Image = CalculateCalendar;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1289,6 +1363,7 @@ page 6014511 "NPR Retail Item List"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ShortCutKey = 'Ctrl+Alt+L';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1308,6 +1383,7 @@ page 6014511 "NPR Retail Item List"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ShortCutKey = 'Ctrl+Alt+L';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1332,6 +1408,7 @@ page 6014511 "NPR Retail Item List"
                 RunObject = Page "Sales Prices";
                 RunPageLink = "Item No." = FIELD("No.");
                 RunPageView = SORTING("Item No.");
+                ApplicationArea=All;
             }
             action(PageSalesLineDiscounts2)
             {
@@ -1344,6 +1421,7 @@ page 6014511 "NPR Retail Item List"
                 RunPageLink = Type = CONST(Item),
                               Code = FIELD("No.");
                 RunPageView = SORTING(Type, Code);
+                ApplicationArea=All;
             }
             action("Requisition Worksheet")
             {
@@ -1352,6 +1430,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Req. Worksheet";
+                ApplicationArea=All;
             }
             action("Item Journal")
             {
@@ -1360,6 +1439,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR Retail Item Journal";
+                ApplicationArea=All;
             }
             action("Item Reclassification Journal")
             {
@@ -1369,6 +1449,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "NPR Retail ItemReclass.Journal";
+                ApplicationArea=All;
             }
             action("Item Tracing")
             {
@@ -1378,6 +1459,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "Item Tracing";
+                ApplicationArea=All;
             }
             action("Adjust Item Cost/Price")
             {
@@ -1387,6 +1469,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Report "Adjust Item Costs/Prices";
+                ApplicationArea=All;
             }
             action("Adjust Cost - Item Entries")
             {
@@ -1395,12 +1478,14 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Report "Adjust Cost - Item Entries";
+                ApplicationArea=All;
             }
             action(SearchItem)
             {
                 Caption = 'Search Item';
                 Image = Find;
                 ShortCutKey = 'Shift+Ctrl+S';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -1451,6 +1536,7 @@ page 6014511 "NPR Retail Item List"
             {
                 Caption = 'Filter Search Items';
                 Image = "Filter";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -1485,6 +1571,7 @@ page 6014511 "NPR Retail Item List"
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -1510,6 +1597,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory - List";
+                ApplicationArea=All;
             }
             action("Item Register - Quantity")
             {
@@ -1519,6 +1607,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item Register - Quantity";
+                ApplicationArea=All;
             }
             action("Inventory - Transaction Detail")
             {
@@ -1528,6 +1617,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory - Transaction Detail";
+                ApplicationArea=All;
             }
             action("Inventory Availability")
             {
@@ -1536,6 +1626,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Inventory Availability";
+                ApplicationArea=All;
             }
             action(Status)
             {
@@ -1545,6 +1636,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report Status;
+                ApplicationArea=All;
             }
             action("Inventory - Availability Plan")
             {
@@ -1554,6 +1646,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory - Availability Plan";
+                ApplicationArea=All;
             }
             action("Inventory Order Details")
             {
@@ -1563,6 +1656,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory Order Details";
+                ApplicationArea=All;
             }
             action("Inventory Purchase Orders")
             {
@@ -1572,6 +1666,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory Purchase Orders";
+                ApplicationArea=All;
             }
             action("Inventory - Top 10 List")
             {
@@ -1580,6 +1675,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Inventory - Top 10 List";
+                ApplicationArea=All;
             }
             action("Inventory - Sales Statistics")
             {
@@ -1589,6 +1685,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory - Sales Statistics";
+                ApplicationArea=All;
             }
             action("Assemble to Order - Sales")
             {
@@ -1597,6 +1694,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Assemble to Order - Sales";
+                ApplicationArea=All;
             }
             action("Inventory - Customer Sales")
             {
@@ -1606,6 +1704,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory - Customer Sales";
+                ApplicationArea=All;
             }
             action("Inventory - Vendor Purchases")
             {
@@ -1615,6 +1714,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory - Vendor Purchases";
+                ApplicationArea=All;
             }
             action("Price List")
             {
@@ -1623,6 +1723,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Price List";
+                ApplicationArea=All;
             }
             action("Inventory Cost and Price List")
             {
@@ -1631,6 +1732,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Inventory Cost and Price List";
+                ApplicationArea=All;
             }
             action("Inventory - Reorders")
             {
@@ -1639,6 +1741,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Inventory - Reorders";
+                ApplicationArea=All;
             }
             action("Inventory - Sales Back Orders")
             {
@@ -1647,6 +1750,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Inventory - Sales Back Orders";
+                ApplicationArea=All;
             }
             action("Item/Vendor Catalog")
             {
@@ -1656,6 +1760,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item/Vendor Catalog";
+                ApplicationArea=All;
             }
             action("Inventory - Cost Variance")
             {
@@ -1665,6 +1770,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory - Cost Variance";
+                ApplicationArea=All;
             }
             action("Phys. Inventory List")
             {
@@ -1674,6 +1780,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Phys. Inventory List";
+                ApplicationArea=All;
             }
             action("Inventory Valuation")
             {
@@ -1682,6 +1789,7 @@ page 6014511 "NPR Retail Item List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Inventory Valuation";
+                ApplicationArea=All;
             }
             action("Nonstock Item Sales")
             {
@@ -1691,6 +1799,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Catalog Item Sales";
+                ApplicationArea=All;
             }
             action("Item Substitutions")
             {
@@ -1700,6 +1809,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item Substitutions";
+                ApplicationArea=All;
             }
             action("Invt. Valuation - Cost Spec.")
             {
@@ -1709,6 +1819,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Invt. Valuation - Cost Spec.";
+                ApplicationArea=All;
             }
             action("Inventory Valuation - WIP")
             {
@@ -1718,6 +1829,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory Valuation - WIP";
+                ApplicationArea=All;
             }
             action("Item Register - Value")
             {
@@ -1727,6 +1839,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item Register - Value";
+                ApplicationArea=All;
             }
             action("Item Charges - Specification")
             {
@@ -1736,6 +1849,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item Charges - Specification";
+                ApplicationArea=All;
             }
             action("Item Age Composition - Qty.")
             {
@@ -1745,6 +1859,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item Age Composition - Qty.";
+                ApplicationArea=All;
             }
             action("Item Age Composition - Value")
             {
@@ -1754,6 +1869,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item Age Composition - Value";
+                ApplicationArea=All;
             }
             action("Item Expiration - Quantity")
             {
@@ -1763,6 +1879,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Item Expiration - Quantity";
+                ApplicationArea=All;
             }
             action("Cost Shares Breakdown")
             {
@@ -1772,6 +1889,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Cost Shares Breakdown";
+                ApplicationArea=All;
             }
             action("Detailed Calculation")
             {
@@ -1781,6 +1899,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Detailed Calculation";
+                ApplicationArea=All;
             }
             action("Rolled-up Cost Shares")
             {
@@ -1790,6 +1909,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Rolled-up Cost Shares";
+                ApplicationArea=All;
             }
             action("Single-Level Cost Shares")
             {
@@ -1799,6 +1919,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Single-level Cost Shares";
+                ApplicationArea=All;
             }
             action("Where Used (Top Level)")
             {
@@ -1808,6 +1929,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Where-Used (Top Level)";
+                ApplicationArea=All;
             }
             action("Quantity Explosion of BOM")
             {
@@ -1817,6 +1939,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Quantity Explosion of BOM";
+                ApplicationArea=All;
             }
             action("Compare List")
             {
@@ -1826,6 +1949,7 @@ page 6014511 "NPR Retail Item List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Compare List";
+                ApplicationArea=All;
             }
         }
     }

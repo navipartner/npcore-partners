@@ -108,6 +108,7 @@ page 6151574 "NPR AF Notification Hub Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

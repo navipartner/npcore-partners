@@ -39,6 +39,7 @@ page 6059996 "NPR Scanner Service Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Codeunit "NPR Scanner Service WS";
+                ApplicationArea=All;
             }
         }
     }

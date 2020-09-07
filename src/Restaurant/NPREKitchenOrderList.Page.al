@@ -43,10 +43,12 @@ page 6150688 "NPR NPRE Kitchen Order List"
             systempart(Control6014408; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }
@@ -65,6 +67,7 @@ page 6150688 "NPR NPRE Kitchen Order List"
                 RunObject = Page "NPR NPRE Kitchen Req.";
                 RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
+                ApplicationArea=All;
             }
         }
     }

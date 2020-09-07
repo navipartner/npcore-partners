@@ -110,6 +110,7 @@ page 6151131 "NPR TM Seating Template"
                 Image = Delete;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -120,6 +121,7 @@ page 6151131 "NPR TM Seating Template"
             action("Add Root")
             {
                 Caption = 'Add Root';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -131,10 +133,12 @@ page 6151131 "NPR TM Seating Template"
             action("Add Parent")
             {
                 Caption = 'Add Parent';
+                ApplicationArea=All;
             }
             action("Add Child")
             {
                 Caption = 'Add Child';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -145,6 +149,7 @@ page 6151131 "NPR TM Seating Template"
             action("Add Sibling")
             {
                 Caption = 'Add Sibling';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -155,6 +160,7 @@ page 6151131 "NPR TM Seating Template"
             action("Structure Wizard")
             {
                 Caption = 'Structure Wizard';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -167,6 +173,7 @@ page 6151131 "NPR TM Seating Template"
             action("Numbering Wizard")
             {
                 Caption = 'Numbering Wizard';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -180,6 +187,7 @@ page 6151131 "NPR TM Seating Template"
             action("Split Wizard")
             {
                 Caption = 'Split Wizard';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -202,6 +210,7 @@ page 6151131 "NPR TM Seating Template"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Up';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -219,6 +228,7 @@ page 6151131 "NPR TM Seating Template"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Down';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -234,6 +244,7 @@ page 6151131 "NPR TM Seating Template"
                 action(DoUnindent)
                 {
                     Caption = 'Unindent';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -247,6 +258,7 @@ page 6151131 "NPR TM Seating Template"
                 action(Action6014422)
                 {
                     Caption = 'Indent';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

@@ -46,6 +46,7 @@ page 6059985 "NPR Retail Document Activities"
                         RunPageMode = Create;
                         RunPageView = SORTING("Document Type", "No.")
                                       WHERE("Document Type" = CONST("Selection Contract"));
+                        ApplicationArea=All;
                     }
                     action("New Customization")
                     {
@@ -54,6 +55,7 @@ page 6059985 "NPR Retail Document Activities"
                         RunPageMode = Create;
                         RunPageView = SORTING("Document Type", "No.")
                                       WHERE("Document Type" = CONST("Selection Contract"));
+                        ApplicationArea=All;
                     }
                     action("New Retail Order")
                     {
@@ -62,6 +64,7 @@ page 6059985 "NPR Retail Document Activities"
                         RunPageMode = Create;
                         RunPageView = SORTING("Document Type", "No.")
                                       WHERE("Document Type" = CONST("Selection Contract"));
+                        ApplicationArea=All;
                     }
                 }
             }

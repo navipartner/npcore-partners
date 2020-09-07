@@ -315,15 +315,18 @@ report 6014420 "NPR Item Group Top"
                     {
                         Caption = 'Show Type';
                         OptionCaption = 'Quantity,Sale(LCY),Contribution Margin,Contribution Ratio';
+                        ApplicationArea=All;
                     }
                     field(ShowQty; ShowQty)
                     {
                         Caption = 'Show Quantity';
+                        ApplicationArea=All;
                     }
                     field("Sorting"; Sorting)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
+                        ApplicationArea=All;
                     }
                 }
             }

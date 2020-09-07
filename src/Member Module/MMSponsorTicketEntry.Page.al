@@ -152,6 +152,7 @@ page 6151186 "NPR MM Sponsor. Ticket Entry"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -170,6 +171,7 @@ page 6151186 "NPR MM Sponsor. Ticket Entry"
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Request";
                 RunPageLink = "Session Token ID" = FIELD("Ticket Token");
+                ApplicationArea=All;
             }
         }
     }

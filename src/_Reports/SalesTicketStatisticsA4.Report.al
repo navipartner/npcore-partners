@@ -471,10 +471,12 @@ report 6014407 "NPR Sales Ticket Statistics A4"
                     field(CompareDay; CompareDay)
                     {
                         Caption = 'Compare to day';
+                        ApplicationArea=All;
                     }
                     field(compareNearestDate; CompareNearestDate)
                     {
                         Caption = 'Compare nearest date';
+                        ApplicationArea=All;
                     }
                 }
             }

@@ -42,6 +42,7 @@ page 6014686 "NPR Create Out. Endpoint Query"
             {
                 Caption = 'Create Request';
                 Image = Create;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

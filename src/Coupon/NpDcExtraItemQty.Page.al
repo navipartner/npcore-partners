@@ -106,6 +106,7 @@ page 6151606 "NPR NpDc Extra Item Qty."
             part(NpDcExtraItemQtySubform; "NPR NpDc ExtraItemQty. Subform")
             {
                 SubPageLink = "Coupon Type" = FIELD("Coupon Type");
+                ApplicationArea=All;
             }
         }
     }

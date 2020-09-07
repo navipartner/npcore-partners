@@ -55,12 +55,14 @@ page 6059812 "NPR Retail Activities"
                         Caption = 'New Sales Order';
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
+                        ApplicationArea=All;
                     }
                     action("New Sales Quote")
                     {
                         Caption = 'New Sales Quote';
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
+                        ApplicationArea=All;
                     }
                 }
             }
@@ -128,6 +130,7 @@ page 6059812 "NPR Retail Activities"
             }
             usercontrol(Bridge; "NPR Bridge")
             {
+                ApplicationArea=All;
 
                 trigger OnFrameworkReady()
                 begin
@@ -153,6 +156,7 @@ page 6059812 "NPR Retail Activities"
             action("Action Items")
             {
                 Caption = 'Action Items';
+                ApplicationArea=All;
             }
         }
     }

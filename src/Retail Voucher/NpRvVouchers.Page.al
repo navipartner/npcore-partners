@@ -114,6 +114,7 @@ page 6151015 "NPR NpRv Vouchers"
                 {
                     Caption = 'Archive Vouchers';
                     Image = Post;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -131,6 +132,7 @@ page 6151015 "NPR NpRv Vouchers"
                 {
                     Caption = 'Show Expired Vouchers';
                     Image = "Filter";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -148,6 +150,7 @@ page 6151015 "NPR NpRv Vouchers"
                 RunObject = Page "NPR NpRv Voucher Entries";
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
+                ApplicationArea=All;
             }
             action("Sending Log")
             {
@@ -156,12 +159,14 @@ page 6151015 "NPR NpRv Vouchers"
                 RunObject = Page "NPR NpRv Sending Log";
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
+                ApplicationArea=All;
             }
             action("Show Archived Vouchers")
             {
                 Caption = 'Show Archived Vouchers';
                 Image = PostedPutAway;
                 RunObject = Page "NPR NpRv Arch. Vouchers";
+                ApplicationArea=All;
             }
         }
     }

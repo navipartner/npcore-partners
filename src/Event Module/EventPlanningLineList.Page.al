@@ -94,6 +94,7 @@ page 6060161 "NPR Event Planning Line List"
                     RunObject = Page "NPR Event Card";
                     RunPageLink = "No." = FIELD("Job No.");
                     ShortCutKey = 'Shift+F7';
+                    ApplicationArea=All;
                 }
             }
         }

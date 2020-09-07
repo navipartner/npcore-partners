@@ -76,6 +76,7 @@ page 6150703 "NPR POS Actions"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -94,6 +95,7 @@ page 6150703 "NPR POS Actions"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Param.";
                 RunPageLink = "POS Action Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             action(Workflow)
             {
@@ -105,6 +107,7 @@ page 6150703 "NPR POS Actions"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Workflow";
                 RunPageLink = "POS Action Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

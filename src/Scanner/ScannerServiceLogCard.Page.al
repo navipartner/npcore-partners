@@ -91,6 +91,7 @@ page 6059998 "NPR Scanner Service Log Card"
                 {
                     Caption = 'Run Request';
                     Image = Return;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

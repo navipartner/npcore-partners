@@ -11,6 +11,7 @@ pageextension 6014419 "NPR Posted P.Credit Memos" extends "Posted Purchase Credi
                 Image = DocInBrowser;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

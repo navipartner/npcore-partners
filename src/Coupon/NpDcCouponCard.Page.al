@@ -182,6 +182,7 @@ page 6151592 "NPR NpDc Coupon Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -195,6 +196,7 @@ page 6151592 "NPR NpDc Coupon Card"
             {
                 Caption = 'Reset Coupons In-use';
                 Image = RefreshVoucher;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -214,6 +216,7 @@ page 6151592 "NPR NpDc Coupon Card"
                 {
                     Caption = 'Archive Coupon';
                     Image = Post;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -237,6 +240,7 @@ page 6151592 "NPR NpDc Coupon Card"
                 RunObject = Page "NPR NpDc Coupon Entries";
                 RunPageLink = "Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
+                ApplicationArea=All;
             }
         }
     }

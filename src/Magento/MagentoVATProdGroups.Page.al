@@ -45,6 +45,7 @@ page 6151410 "NPR Magento VAT Prod. Groups"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

@@ -114,6 +114,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
+                ApplicationArea=All;
             }
         }
         addafter(OrderTracking)
@@ -123,6 +124,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 AccessByPermission = TableData "Nonstock Item" = R;
                 Caption = 'Nonstoc&k Items';
                 Image = NonStockItem;
+                ApplicationArea=All;
             }
         }
     }

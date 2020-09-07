@@ -231,6 +231,7 @@ page 6014486 "NPR Pacsoft Shipment Document"
                 {
                     SubPageLink = "Shipment Document Entry No." = FIELD("Entry No.");
                     SubPageView = SORTING("Shipment Document Entry No.", "Entry No.");
+                    ApplicationArea=All;
                 }
             }
             group(Control6150659)
@@ -241,6 +242,7 @@ page 6014486 "NPR Pacsoft Shipment Document"
                     SubPageLink = "Entry No." = FIELD("Entry No."),
                                   "Shipping Agent Code" = FIELD("Shipping Agent Code");
                     SubPageView = SORTING("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
+                    ApplicationArea=All;
                 }
             }
         }
@@ -254,6 +256,7 @@ page 6014486 "NPR Pacsoft Shipment Document"
             {
                 Caption = '&OK';
                 Image = Approve;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

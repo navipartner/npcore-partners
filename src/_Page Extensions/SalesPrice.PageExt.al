@@ -19,6 +19,7 @@ pageextension 6014475 "NPR Sales Price" extends "Sales Prices"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
+                ApplicationArea=All;
             }
         }
     }

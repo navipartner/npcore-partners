@@ -52,6 +52,7 @@ page 6151531 "NPR Nc Collection List"
                 Image = XMLFile;
                 RunObject = Page "NPR Nc Collection Lines";
                 RunPageLink = "Collection No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -62,6 +63,7 @@ page 6151531 "NPR Nc Collection List"
                 {
                     Caption = 'Set to Collecting';
                     Image = Add;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -73,6 +75,7 @@ page 6151531 "NPR Nc Collection List"
                 {
                     Caption = 'Set to Ready to Send';
                     Image = Approve;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -84,6 +87,7 @@ page 6151531 "NPR Nc Collection List"
                 {
                     Caption = 'Set to Sent';
                     Image = SendApprovalRequest;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

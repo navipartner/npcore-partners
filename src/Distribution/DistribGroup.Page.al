@@ -36,6 +36,7 @@ page 6151056 "NPR Distrib. Group"
             part(Control10; "NPR Distrib. Grp Memb Listpart")
             {
                 SubPageLink = "Distribution Group" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }
@@ -51,6 +52,7 @@ page 6151056 "NPR Distrib. Group"
                 Promoted = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Distribution Group" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

@@ -67,6 +67,7 @@ page 6014525 "NPR Touch Screen - Items"
                 {
                     Caption = 'Items b&y Location';
                     Image = ItemAvailbyLoc;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -84,6 +85,7 @@ page 6014525 "NPR Touch Screen - Items"
                     {
                         Caption = 'Event';
                         Image = "Event";
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -101,6 +103,7 @@ page 6014525 "NPR Touch Screen - Items"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action("Variant")
                     {
@@ -113,6 +116,7 @@ page 6014525 "NPR Touch Screen - Items"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action(Location)
                     {
@@ -125,11 +129,13 @@ page 6014525 "NPR Touch Screen - Items"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action("BOM Level")
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -140,6 +146,7 @@ page 6014525 "NPR Touch Screen - Items"
                     {
                         Caption = 'Timeline';
                         Image = Timeline;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin

@@ -48,6 +48,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -73,6 +74,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

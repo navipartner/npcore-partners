@@ -49,6 +49,7 @@ page 6184496 "NPR Pepper Version List"
                 Caption = 'Configurations';
                 Image = Setup;
                 RunObject = Page "NPR Pepper Config. List";
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -59,6 +60,7 @@ page 6184496 "NPR Pepper Version List"
                 {
                     Caption = 'Zip';
                     Image = Import;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -73,6 +75,7 @@ page 6184496 "NPR Pepper Version List"
                 {
                     Caption = 'Zip';
                     Image = DeleteQtyToHandle;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -87,6 +90,7 @@ page 6184496 "NPR Pepper Version List"
                 {
                     Caption = 'Zip';
                     Image = Export;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

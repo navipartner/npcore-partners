@@ -84,6 +84,7 @@ page 6059772 "NPR Member Card Types Card"
             part(Control6150629; "NPR Member Card Types Subform")
             {
                 SubPageLink = "Card Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }
@@ -98,6 +99,7 @@ page 6059772 "NPR Member Card Types Card"
                 Image = List;
                 RunObject = Page "NPR Member Card Types";
                 ShortCutKey = 'F5';
+                ApplicationArea=All;
             }
         }
     }

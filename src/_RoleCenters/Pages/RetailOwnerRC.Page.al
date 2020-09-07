@@ -10,32 +10,40 @@ page 6151259 "NPR Retail Owner RC"
 
             part(Control6150616; "NPR Activities")
             {
+                  ApplicationArea=All;
             }
 
             part(Control16; "NPR Retail 10 Items by Qty.")
             {
+                  ApplicationArea=All;
             }
             part(NPRetailPOSEntryCue; "NPR POS Entry Cue")
             {
                 Caption = 'POS Activities';
+                ApplicationArea=All;
             }
             part(Control17; "NPR Retail Top 10 S.person")
             {
+                ApplicationArea=All;
             }
             part(Control72; "NPR Retail Top 10 Customers")
             {
+                ApplicationArea=All;
             }
             part(ControlPurchase; "NPR Acc. Payables Act")
             {
                 Caption = 'Purchase Activities';
+                ApplicationArea=All;
             }
 
             part(Top10vendors; "NPR Top 10 Vendors")
             {
+                  ApplicationArea=All;
 
             }
             part(Control73; "NPR My Reports")
             {
+                ApplicationArea=All;
             }
             part(Control69; "Finance Performance")
             {
@@ -96,6 +104,7 @@ page 6151259 "NPR Retail Owner RC"
 
             part(PowerBi; "Power BI Report Spinner Part")
             {
+                  ApplicationArea=All;
 
             }
 
@@ -313,12 +322,14 @@ page 6151259 "NPR Retail Owner RC"
                     Caption = 'Customer Ledger Entries';
                     Image = Customer;
                     RunObject = Page "Customer Ledger Entries";
+                    ApplicationArea=All;
                 }
                 action("Vendor Ledger Entries")
                 {
                     Caption = 'Vendor Ledger Entries';
                     Image = Vendor;
                     RunObject = Page "Vendor Ledger Entries";
+                    ApplicationArea=All;
                 }
             }
             group("Posted Documents")
@@ -390,12 +401,14 @@ page 6151259 "NPR Retail Owner RC"
                     Caption = 'Repair Document List';
                     Image = List;
                     RunObject = Page "NPR Customer Repair List";
+                    ApplicationArea=All;
                 }
                 action("Warranty Catalog List")
                 {
                     Caption = 'Warranty Catalog List';
                     Image = List;
                     RunObject = Page "NPR Warranty Catalog List";
+                    ApplicationArea=All;
                 }
             }
             group("Discount, Coupons & Vouchers")
@@ -405,31 +418,37 @@ page 6151259 "NPR Retail Owner RC"
                 {
                     Caption = 'Campaign Discount List';
                     RunObject = Page "NPR Campaign Discount List";
+                    ApplicationArea=All;
                 }
                 action("Mixed Discount List")
                 {
                     Caption = 'Mixed Discount List';
                     RunObject = Page "NPR Mixed Discount List";
+                    ApplicationArea=All;
                 }
                 action("Coupon Types")
                 {
                     Caption = 'Coupon Types';
                     RunObject = Page "NPR NpDc Coupon Types";
+                    ApplicationArea=All;
                 }
                 action("Coupon List")
                 {
                     Caption = 'Coupon List';
                     RunObject = Page "NPR NpDc Coupons";
+                    ApplicationArea=All;
                 }
                 action("Voucher Types")
                 {
                     Caption = 'Voucher Types';
                     RunObject = Page "NPR NpRv Voucher Types";
+                    ApplicationArea=All;
                 }
                 action("Voucher List")
                 {
                     Caption = 'Voucher List';
                     RunObject = Page "NPR NpRv Vouchers";
+                    ApplicationArea=All;
                 }
             }
         }
@@ -448,6 +467,7 @@ page 6151259 "NPR Retail Owner RC"
                     Caption = 'Customer';
                     Image = Customer;
                     RunObject = Page "Customer List";
+                      ApplicationArea=All;
                 }
                 action("Cash Receipt Journal")
                 {
@@ -595,12 +615,14 @@ page 6151259 "NPR Retail Owner RC"
                         Caption = 'Sales Statistics';
                         Image = Report2;
                         RunObject = Report "NPR Sales Ticket Stat.";
+                        ApplicationArea=All;
                     }
                     action("Sale Report")
                     {
                         Caption = 'Sale Report';
                         Image = Report2;
                         RunObject = Report "NPR Sale Time Report";
+                        ApplicationArea=All;
                     }
                     separator(Separator6014423)
                     {
@@ -610,12 +632,14 @@ page 6151259 "NPR Retail Owner RC"
                         Caption = 'Sales Person Top 20';
                         Image = Report2;
                         RunObject = Report "NPR Sales Person Top 20";
+                        ApplicationArea=All;
                     }
                     action("Salesperson/Item Group Top")
                     {
                         Caption = 'Salesperson/Item Group Top';
                         Image = Report2;
                         RunObject = Report "NPR Salesperson/Item Group Top";
+                        ApplicationArea=All;
                     }
                     separator(Separator6014432)
                     {
@@ -625,6 +649,7 @@ page 6151259 "NPR Retail Owner RC"
                         Caption = 'Item Wise Sales Figures';
                         Image = Report2;
                         RunObject = Report "NPR Item Wise Sales Figures";
+                        ApplicationArea=All;
                     }
                     separator(Separator6014462)
                     {
@@ -634,6 +659,7 @@ page 6151259 "NPR Retail Owner RC"
                         Caption = 'Discount Statistics';
                         Image = Report2;
                         RunObject = Report "NPR Discount Statistics";
+                        ApplicationArea=All;
                     }
                 }
 
@@ -646,24 +672,28 @@ page 6151259 "NPR Retail Owner RC"
                         Caption = 'Price List';
                         Image = Report2;
                         RunObject = Report "Price List";
+                          ApplicationArea=All;
                     }
                     action("Item Sales Statistics")
                     {
                         Caption = 'Item Sales Statistics';
                         Image = Report2;
                         RunObject = Report "NPR Item Sales Stats/Provider";
+                        ApplicationArea=All;
                     }
                     action("Top 10 List")
                     {
                         Caption = 'Top 10 List';
                         Image = Report2;
                         RunObject = Report "Inventory - Top 10 List";
+                        ApplicationArea=All;
                     }
                     action("Low Sales")
                     {
                         Caption = 'Low Sales';
                         Image = Report2;
                         RunObject = Report "NPR Items With Low Sales";
+                        ApplicationArea=All;
                     }
 
                 }

@@ -152,6 +152,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -165,6 +166,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -183,6 +185,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Left';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -198,6 +201,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Right';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -217,6 +221,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Up';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -232,6 +237,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Down';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -250,6 +256,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -272,6 +279,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -285,6 +293,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
