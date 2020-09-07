@@ -1,16 +1,5 @@
 codeunit 6059932 "NPR Doc. Exch. File Mgt."
 {
-    // NPR5.26/TJ/20160812 CASE 248831 Added export framework to be based on Electronic Document Format setup table
-    //                                 Added modify permission for table 112 Sales Invoice Header so we can update document status
-    // NPR5.27/TJ/20160928 CASE 248831 Recoded most of the export functions to only use RecordRef and to be resistant to export codeunit if it changes posted document
-    // NPR5.27/BR/20161014 CASE 252537 Show Error message if not export
-    // NPR5.29/BR/20170117 CASE 263705 Added support for FTP Import
-    // NPR5.33/BR/20170216 CASE 266527 Added functions for FTP and local file export
-    // NPR5.33/BR/20170420 CASE 266527 Added functions and subscribers to support more export buttons
-    // NPR5.54/THRO/20200212 CASE 389951 Close connection to ftp after last action
-    // NPR5.55/THRO/20200618 CASE 410350 Removed DisconnectFTP. Always setting KeepAlive to False, Removed the Keepalive parameter in InitFTPWebRequest
-    //                                   Added tryfunctions to get ftp filelist using NLST and LIST command. Retrive ftp-file in tryfunction
-
     Permissions = TableData "Sales Invoice Header" = m;
 
     trigger OnRun()
@@ -18,9 +7,7 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         ServerFilePath: Text;
     begin
         ImportUsingSetup;
-        //-NPR5.29 [263705]
         ImportFTPUsingSetup;
-        //+NPR5.29 [263705]
     end;
 
     var
@@ -107,13 +94,19 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
 
     local procedure ImportFile(FileName: Text; InboxPath: Text; ArchivePath: Text; IsLocalInbox: Boolean; IsLocalArchive: Boolean; CreateDocument: Boolean)
     var
+        IncomingDocumentAttachment: Record "Incoming Document Attachment";
         ServerFilePath: Text;
+        AttachmentInserted: Boolean;
     begin
         PrepareFile(ServerFilePath, IsLocalInbox, InboxPath + FileName);
-        ProcessFile(ServerFilePath, CreateDocument);
+        AttachmentInserted := InsertFile(IncomingDocumentAttachment, ServerFilePath);
+
         ArchiveFile(ServerFilePath, ArchivePath + FileName, IsLocalArchive);
         CleanupFile(ServerFilePath, IsLocalInbox, InboxPath + FileName);
         Commit;
+        if AttachmentInserted then
+            ProcessFile(IncomingDocumentAttachment, CreateDocument);
+
     end;
 
     procedure ImportFTPUsingSetup()
@@ -129,7 +122,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         DocExchangePath: Record "NPR Doc. Exchange Path";
         FTPFileMask: Text;
     begin
-        //-NPR5.29 [263705]
         DocExchSetup.Get;
         if not DocExchSetup."FTP Import Enabled" then
             exit;
@@ -144,69 +136,17 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
 
         if FTPServer <> '' then
             ImportFTPFolder(FTPServer, FTPUsername, FTPPassword, FTPFolder, FTPFileMask, FTPArchiveFolder, FTPUsePassive, CreateDocument);
-        //+NPR5.29 [263705]
     end;
 
     procedure ImportFTPFolder(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileMask: Text; FTPArchiveFolder: Text; FTPUsePassive: Boolean; CreateDocument: Boolean) Success: Boolean
     var
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        NetworkCredential: DotNet NPRNetNetworkCredential;
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        FileName: Text;
         FileNameList: array[20] of Text;
         FileCounter: Integer;
-        I: Integer;
     begin
-        //-NPR5.29 [263705]
-        //Get file list
-        //-NPR5.55 [410350]
-        //IF UPPERCASE(COPYSTR(FTPserver,1,4)) <> 'FTP://' THEN
         if UpperCase(CopyStr(FTPserver, 1, 6)) <> 'FTP://' then
-            //+NPR5.55 [410350]
             FTPserver := 'FTP://' + FTPserver;
         if FTPFileMask = '' then
             FTPFileMask := '*.*';
-        //-NPR5.55 [410350]
-        //-NPR5.54 [389951]
-        //InitFTPWebRequest(FtpWebRequest,'LIST',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFileMask,FTPUsePassive,TRUE);
-        //+NPR5.54 [389951]
-        // FtpWebResponse := FtpWebRequest.GetResponse;
-        // Stream := FtpWebResponse.GetResponseStream;
-        // StreamReader := StreamReader.StreamReader(Stream);
-        //
-        // FileCounter := 0;
-        // //Store list of files, Maximum of 20 per execution
-        // WHILE (NOT (StreamReader.EndOfStream)) AND (FileCounter < 20) DO BEGIN
-        //  FileName := StreamReader.ReadLine;
-        //  IF STRLEN(FileName) > 56 THEN BEGIN
-        //    FileName := COPYSTR(FileName,56);
-        //    IF COPYSTR(FileName,1,1) <> '.' THEN BEGIN
-        //      FileCounter := FileCounter + 1;
-        //      FileNameList[FileCounter] := FileName;
-        //    END;
-        //  END;
-        // END;
-        // FtpWebResponse.Close;
-        // StreamReader.Close;
-        // Stream.Close;
-        //
-        // IF FileCounter = 0 THEN
-        //  EXIT;
-        //
-        // SLEEP(2000); //Allow 2 secs between retrieving the file list so that anything writing to the FTP can finish writing file
-        // I:=0;
-        // REPEAT
-        //  I := I + 1;
-        //  ImportFTPFile(FTPserver,FTPUsername,FTPPassword,FTPFolder,FileNameList[I],FTPArchiveFolder,FTPUsePassive,CreateDocument);
-        // UNTIL I >= FileCounter;
-        // //-NPR5.29 [263705]
-        // //-NPR5.54 [389951]
-        // DisconnectFTP(FTPserver,FTPUsername,FTPPassword,FTPUsePassive);
-        // //+NPR5.54 [389951]
-
         if not GetFtpFileList(FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFileMask, FTPUsePassive, FileNameList) then
             exit;
         CompressArray(FileNameList);
@@ -215,7 +155,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
             ImportFTPFile(FTPserver, FTPUsername, FTPPassword, FTPFolder, FileNameList[FileCounter], FTPArchiveFolder, FTPUsePassive, CreateDocument);
             FileCounter += 1;
         end;
-        //+NPR5.55 [410350]
     end;
 
     local procedure ImportFTPFile(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFilename: Text; FTPArchiveFolder: Text; FTPUsePassive: Boolean; CreateDocument: Boolean)
@@ -236,16 +175,9 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         FileText: Text;
         RecRef: RecordRef;
     begin
-        //-NPR5.29 [263705]
-        //Download file and store in Blob
-        //-NPR5.55 [410350]
-        //-NPR5.54 [389951]
         InitFTPWebRequest(FtpWebRequest, 'RETR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
-        //+NPR5.54 [389951]
-        //FtpWebResponse := FtpWebRequest.GetResponse;
         if not GetFtpResponse(FtpWebRequest, FtpWebResponse) then
             exit;
-        //+NPR5.55 [410350]
         Stream := FtpWebResponse.GetResponseStream;
         MemoryStream := MemoryStream.MemoryStream();
         TempBlob.CreateOutStream(OStream);
@@ -259,18 +191,9 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         RecRef.SetTable(IncomingDocumentAttachment);
 
         if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment, FTPFilename) then begin
-            if CreateDocument then begin
-                IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
-                IncomingDocument.CreateDocumentWithDataExchange();
-            end;
-
             //If imported: Archive file
             if FTPArchiveFolder <> '' then begin
-                //-NPR5.54 [389951]
-                //-NPR5.55 [410350]
                 InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPArchiveFolder, FTPFilename, FTPUsePassive);
-                //+NPR5.55 [410350]
-                //+NPR5.54 [389951]
                 TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
                 IStream.Read(FileText);
                 Clear(IStream);
@@ -285,61 +208,49 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
             end;
 
             //If imported: Delete file
-            //-NPR5.54 [389951]
-            //-NPR5.55 [410350]
             InitFTPWebRequest(FtpWebRequest, 'DELE', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
-            //+NPR5.55 [410350]
-            //+NPR5.54 [389951]
             FtpWebResponse := FtpWebRequest.GetResponse;
             FtpWebResponse.Close;
+            if CreateDocument then begin
+                IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
+                IncomingDocument.CreateDocumentWithDataExchange();
+            end;
         end;
 
         Commit;
-        //+NPR5.29 [263705]
     end;
 
     local procedure InitFTPWebRequest(var FtpWebRequest: DotNet NPRNetFtpWebRequest; FTPMethod: Text; FTPServerName: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileNameOrMask: Text; FTPusePassive: Boolean)
     var
         NetworkCredential: DotNet NPRNetNetworkCredential;
     begin
-        //-NPR5.29 [263705]
         FtpWebRequest := FtpWebRequest.Create(GetFTPPath(FTPServerName, FTPFolder, FTPFileNameOrMask));
         FtpWebRequest.Credentials := NetworkCredential.NetworkCredential(FTPUsername, FTPPassword);
         FtpWebRequest.Method := FTPMethod;
-        //-NPR5.54 [389951]
-        //FtpWebRequest.KeepAlive := TRUE;
-        //-NPR5.55 [410350]
         FtpWebRequest.KeepAlive := false;
-        //+NPR5.55 [410350]
-        //+NPR5.54 [389951]
         FtpWebRequest.UseBinary := true;
         if FTPusePassive then
             FtpWebRequest.UsePassive := false;
-        //+NPR5.29 [263705]
     end;
 
     local procedure GetFTPPath(FTPServerName: Text; FTPFolder: Text; FTPFileNameOrMask: Text): Text
     var
         FTPStructureDelimiter: Text;
     begin
-        //-NPR5.29 [263705]
         FTPStructureDelimiter := '/';
         if FTPFolder <> '' then
             exit(FTPServerName + FTPStructureDelimiter + FTPFolder + FTPStructureDelimiter + FTPFileNameOrMask)
         else
             exit(FTPServerName + FTPStructureDelimiter + FTPFileNameOrMask);
-        //+NPR5.29 [263705]
     end;
 
     local procedure GetFtpFileList(FTPServerName: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileNameOrMask: Text; FTPusePassive: Boolean; var FileNameList: array[20] of Text): Boolean
     begin
-        //-NPR5.55 [410350]
         if FtpNLST(FTPServerName, FTPUsername, FTPPassword, FTPFolder, FTPFileNameOrMask, FTPusePassive, FileNameList) then
             exit(true);
         if FtpLIST(FTPServerName, FTPUsername, FTPPassword, FTPFolder, FTPFileNameOrMask, FTPusePassive, FileNameList) then
             exit(true);
         exit(false);
-        //+NPR5.55 [410350]
     end;
 
     [TryFunction]
@@ -351,7 +262,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         StreamReader: DotNet NPRNetStreamReader;
         FileCounter: Integer;
     begin
-        //-NPR5.55 [410350]
         InitFTPWebRequest(FtpWebRequest, 'NLST', FTPServerName, FTPUsername, FTPPassword, FTPFolder, FTPFileNameOrMask, FTPusePassive);
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
@@ -365,7 +275,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         FtpWebResponse.Close;
         StreamReader.Close;
         Stream.Close;
-        //+NPR5.55 [410350]
     end;
 
     [TryFunction]
@@ -378,7 +287,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         FileCounter: Integer;
         FileName: Text;
     begin
-        //-NPR5.55 [410350]
         InitFTPWebRequest(FtpWebRequest, 'LIST', FTPServerName, FTPUsername, FTPPassword, FTPFolder, FTPFileNameOrMask, FTPusePassive);
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
@@ -398,7 +306,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         FtpWebResponse.Close;
         StreamReader.Close;
         Stream.Close;
-        //-NPR5.55 [410350]
     end;
 
     [TryFunction]
@@ -418,30 +325,14 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
             SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order:
                 if SalesHeader.Invoice then begin
                     SalesInvHeader.Get(SalesInvHdrNo);
-
-                    //-NPR5.27 [248831]
-                    /*
-                          PostedSalesDoc := SalesInvHeader;
-                          SendSalesDocument(PostedSalesDoc,SalesInvHeader."Sell-to Customer No.",SalesInvHdrNo,0);
-                    */
                     RecordRef.GetTable(SalesInvHeader);
                     SendSalesDocument(RecordRef, SalesInvHeader."Sell-to Customer No.", SalesInvHdrNo, 0);
-                    //+NPR5.27 [248831]
-
                 end;
             SalesHeader."Document Type"::"Credit Memo":
                 begin
                     SalesCrMemoHeader.Get(SalesCrMemoHdrNo);
-
-                    //-NPR5.27 [248831]
-                    /*
-                          PostedSalesDoc := SalesCrMemoHeader;
-                          SendSalesDocument(PostedSalesDoc,SalesCrMemoHeader."Sell-to Customer No.",SalesCrMemoHdrNo,0);
-                    */
                     RecordRef.GetTable(SalesCrMemoHeader);
                     SendSalesDocument(RecordRef, SalesCrMemoHeader."Sell-to Customer No.", SalesCrMemoHdrNo, 0);
-                    //+NPR5.27 [248831]
-
                 end;
             else
                 exit;
@@ -451,194 +342,50 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
 
     [EventSubscriber(ObjectType::Page, 132, 'OnAfterActionEvent', 'NPR Export', false, false)]
     local procedure ExportSalesInvoiceOnPage132Action(var Rec: Record "Sales Invoice Header")
-    var
-        RecordRef: RecordRef;
-        Text001: Label 'One or more invoices that match your filter criteria have been created before.\\Do you want to continue?';
-        Text002: Label 'This will export an invoice in an electronic document format specified. Do you want to continue?';
-        Text003: Label 'The file was not created. Error message: %1 at %2.';
-        ActivityLog: Record "Activity Log";
-        Text004: Label 'The file was not created: Unknown error.';
     begin
-        //-NPR5.33 [266527]
         ExportSalesInvoice(Rec);
-
-        // IF NOT CONFIRM(Text002) THEN
-        //  EXIT;
-        // IF Rec."Doc. Exch. Exported" THEN
-        //  IF NOT CONFIRM(Text001) THEN
-        //    EXIT;
-        //
-        // //-NPR5.27 [248831]
-        // {
-        // PostedSalesDoc := Rec;
-        // SendSalesDocument(PostedSalesDoc,Rec."Sell-to Customer No.",Rec."No.",0);
-        // Rec := PostedSalesDoc;
-        // }
-        // RecordRef.GETTABLE(Rec);
-        // SendSalesDocument(RecordRef,Rec."Sell-to Customer No.",Rec."No.",0);
-        // RecordRef.SETTABLE(Rec);
-        // //+NPR5.27 [248831]
-        //
-        // //-NPR5.27 [252537]
-        // IF GUIALLOWED THEN BEGIN
-        //  IF NOT Rec."Doc. Exch. File Exists" THEN BEGIN
-        //    ActivityLog.SETRANGE("Record ID",RecordRef.RECORDID);
-        //    IF ActivityLog.FINDLAST THEN
-        //      MESSAGE(Text003,ActivityLog."Activity Message",ActivityLog."Activity Date")
-        //    ELSE
-        //      MESSAGE(Text004);
-        //  END;
-        // END;
-        //+NPR5.33 [266527]
     end;
 
     [EventSubscriber(ObjectType::Page, 143, 'OnAfterActionEvent', 'NPR Export', false, false)]
     local procedure ExportSalesInvoiceOnPage143Action(var Rec: Record "Sales Invoice Header")
-    var
-        RecordRef: RecordRef;
-        Text001: Label 'One or more invoices that match your filter criteria have been created before.\\Do you want to continue?';
-        Text002: Label 'This will export an invoice in an electronic document format specified. Do you want to continue?';
-        Text003: Label 'The file was not created. Error message: %1 at %2.';
-        ActivityLog: Record "Activity Log";
-        Text004: Label 'The file was not created: Unknown error.';
     begin
-        //-NPR5.33 [266527]
         ExportSalesInvoice(Rec);
-
-        // IF NOT CONFIRM(Text002) THEN
-        //  EXIT;
-        // IF Rec."Doc. Exch. Exported" THEN
-        //  IF NOT CONFIRM(Text001) THEN
-        //    EXIT;
-        //
-        // //-NPR5.27 [248831]
-        // {
-        // PostedSalesDoc := Rec;
-        // SendSalesDocument(PostedSalesDoc,Rec."Sell-to Customer No.",Rec."No.",0);
-        // Rec := PostedSalesDoc;
-        // }
-        // RecordRef.GETTABLE(Rec);
-        // SendSalesDocument(RecordRef,Rec."Sell-to Customer No.",Rec."No.",0);
-        // RecordRef.SETTABLE(Rec);
-        // //+NPR5.27 [248831]
-        //
-        // //-NPR5.27 [252537]
-        // IF GUIALLOWED THEN BEGIN
-        //  IF NOT Rec."Doc. Exch. File Exists" THEN BEGIN
-        //    ActivityLog.SETRANGE("Record ID",RecordRef.RECORDID);
-        //    IF ActivityLog.FINDLAST THEN
-        //      MESSAGE(Text003,ActivityLog."Activity Message",ActivityLog."Activity Date")
-        //    ELSE
-        //      MESSAGE(Text004);
-        //  END;
-        // END;
-        //+NPR5.33 [266527]
     end;
 
     [EventSubscriber(ObjectType::Page, 132, 'OnAfterActionEvent', 'NPR UpdateStatus', false, false)]
     local procedure UpdateSalesInvoiceOnPage132Action(var Rec: Record "Sales Invoice Header")
-    var
-        DocExchPath: Record "NPR Doc. Exchange Path";
-        RecordRef: RecordRef;
     begin
-        //-NPR5.33 [266527]
         UpdateSalesInvoice(Rec);
-
-        // IF NOT Rec."Doc. Exch. Exported" OR (Rec."Doc. Exch. Framework Status" = Rec."Doc. Exch. Framework Status"::"Delivered to Recepient") THEN
-        //  EXIT;
-        // RecordRef.GET(Rec."Doc. Exch. Setup Path Used");
-        //
-        // //-NPR5.27 [248831]
-        // {
-        // PostedSalesDoc := Rec;
-        // UpdateSalesDoc(PostedSalesDoc,RecordRef,FALSE,1);
-        // Rec := PostedSalesDoc;
-        // }
-        // RecordRef.SETTABLE(DocExchPath);
-        // RecordRef.GETTABLE(Rec);
-        // UpdateSalesDoc(RecordRef,DocExchPath,FALSE,1);
-        // RecordRef.SETTABLE(Rec);;
-        // //+NPR5.27 [248831]
-        //+NPR5.33 [266527]
     end;
 
     [EventSubscriber(ObjectType::Page, 143, 'OnAfterActionEvent', 'NPR UpdateStatus', false, false)]
     local procedure UpdateSalesInvoiceOnPage143Action(var Rec: Record "Sales Invoice Header")
-    var
-        DocExchPath: Record "NPR Doc. Exchange Path";
-        RecordRef: RecordRef;
     begin
-        //-NPR5.33 [266527]
         UpdateSalesInvoice(Rec);
-
-        // IF NOT Rec."Doc. Exch. Exported" OR (Rec."Doc. Exch. Framework Status" = Rec."Doc. Exch. Framework Status"::"Delivered to Recepient") THEN
-        //  EXIT;
-        // RecordRef.GET(Rec."Doc. Exch. Setup Path Used");
-        //
-        // //-NPR5.27 [248831]
-        // {
-        // PostedSalesDoc := Rec;
-        // UpdateSalesDoc(PostedSalesDoc,RecordRef,FALSE,1);
-        // Rec := PostedSalesDoc;
-        // }
-        // RecordRef.SETTABLE(DocExchPath);
-        // RecordRef.GETTABLE(Rec);
-        // UpdateSalesDoc(RecordRef,DocExchPath,FALSE,1);
-        // RecordRef.SETTABLE(Rec);;
-        // //+NPR5.27 [248831]
-        //+NPR5.33 [266527]
     end;
 
     [EventSubscriber(ObjectType::Page, 134, 'OnAfterActionEvent', 'NPR Export', false, false)]
     local procedure ExportSalesCrMemoOnPage134Action(var Rec: Record "Sales Cr.Memo Header")
-    var
-        RecordRef: RecordRef;
-        Text001: Label 'One or more invoices that match your filter criteria have been created before.\\Do you want to continue?';
-        Text002: Label 'This will export an invoice in an electronic document format specified. Do you want to continue?';
-        Text003: Label 'The file was not created. Error message: %1 at %2.';
-        ActivityLog: Record "Activity Log";
-        Text004: Label 'The file was not created: Unknown error.';
     begin
-        //-NPR5.33 [266527]
         ExportSalesCrMemo(Rec);
-        //+NPR5.33 [266527]
     end;
 
     [EventSubscriber(ObjectType::Page, 144, 'OnAfterActionEvent', 'NPR Export', false, false)]
     local procedure ExportSalesCrMemoOnPage144Action(var Rec: Record "Sales Cr.Memo Header")
-    var
-        RecordRef: RecordRef;
-        Text001: Label 'One or more invoices that match your filter criteria have been created before.\\Do you want to continue?';
-        Text002: Label 'This will export an invoice in an electronic document format specified. Do you want to continue?';
-        Text003: Label 'The file was not created. Error message: %1 at %2.';
-        ActivityLog: Record "Activity Log";
-        Text004: Label 'The file was not created: Unknown error.';
     begin
-        //-NPR5.33 [266527]
         ExportSalesCrMemo(Rec);
-        //+NPR5.33 [266527]
     end;
 
     [EventSubscriber(ObjectType::Page, 134, 'OnAfterActionEvent', 'NPR UpdateStatus', false, false)]
     local procedure UpdateSalesCrMemoOnPage134Action(var Rec: Record "Sales Cr.Memo Header")
-    var
-        DocExchPath: Record "NPR Doc. Exchange Path";
-        RecordRef: RecordRef;
     begin
-        //-NPR5.33 [266527]
         UpdateSalesCrMemo(Rec);
-        //+NPR5.33 [266527]
     end;
 
     [EventSubscriber(ObjectType::Page, 144, 'OnAfterActionEvent', 'NPR UpdateStatus', false, false)]
     local procedure UpdateSalesCrMemoOnPage144Action(var Rec: Record "Sales Cr.Memo Header")
-    var
-        DocExchPath: Record "NPR Doc. Exchange Path";
-        RecordRef: RecordRef;
     begin
-        //-NPR5.33 [266527]
         UpdateSalesCrMemo(Rec);
-        //+NPR5.33 [266527]
     end;
 
     local procedure ExportSalesInvoice(var SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -650,7 +397,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         ActivityLog: Record "Activity Log";
         Text004: Label 'The file was not created: Unknown error.';
     begin
-        //-NPR5.33 [266527]
         if not Confirm(Text002) then
             exit;
         if SalesInvoiceHeader."NPR Doc. Exch. Exported" then
@@ -670,7 +416,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
                     Message(Text004);
             end;
         end;
-        //+NPR5.33 [266527]
     end;
 
     procedure UpdateSalesInvoice(var SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -678,7 +423,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         DocExchPath: Record "NPR Doc. Exchange Path";
         RecordRef: RecordRef;
     begin
-        //-NPR5.33 [266527]
         if not SalesInvoiceHeader."NPR Doc. Exch. Exported" or (SalesInvoiceHeader."NPR Doc. Exch. Fr.work Status" = SalesInvoiceHeader."NPR Doc. Exch. Fr.work Status"::"Delivered to Recepient") then
             exit;
         RecordRef.Get(SalesInvoiceHeader."NPR Doc. Exch. Setup Path Used");
@@ -687,7 +431,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         RecordRef.GetTable(SalesInvoiceHeader);
         UpdateSalesDoc(RecordRef, DocExchPath, false, 1);
         RecordRef.SetTable(SalesInvoiceHeader);
-        //+NPR5.33 [266527]
     end;
 
     local procedure ExportSalesCrMemo(var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
@@ -699,7 +442,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         ActivityLog: Record "Activity Log";
         Text004: Label 'The file was not created: Unknown error.';
     begin
-        //-NPR5.33 [266527]
         if not Confirm(Text002) then
             exit;
         if SalesCrMemoHeader."NPR Doc. Exch. Exported" then
@@ -719,7 +461,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
                     Message(Text004);
             end;
         end;
-        //+NPR5.33 [266527]
     end;
 
     procedure UpdateSalesCrMemo(var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
@@ -727,7 +468,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         DocExchPath: Record "NPR Doc. Exchange Path";
         RecordRef: RecordRef;
     begin
-        //-NPR5.33 [266527]
         if not SalesCrMemoHeader."NPR Doc. Exch. Exported" or (SalesCrMemoHeader."NPR Doc.Exch. F.work Status" = SalesCrMemoHeader."NPR Doc.Exch. F.work Status"::"Delivered to Recepient") then
             exit;
         RecordRef.Get(SalesCrMemoHeader."NPR Doc.Exch.Setup Path Used");
@@ -736,7 +476,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         RecordRef.GetTable(SalesCrMemoHeader);
         UpdateSalesDoc(RecordRef, DocExchPath, false, 1);
         RecordRef.SetTable(SalesCrMemoHeader);
-        //+NPR5.33 [266527]
     end;
 
     procedure SendSalesDocument(var RecordRef: RecordRef; CustomerNo: Code[20]; DocumentNo: Code[20]; CalledFrom: Integer)
@@ -744,11 +483,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         DocExchPath: Record "NPR Doc. Exchange Path";
         SendSuccess: Boolean;
     begin
-        //-NPR5.27 [248831]
-        //Changed first parameter from Variant to RecordRef
-        //RecordRef.GETTABLE(PostedSalesDoc);
-        //+NPR5.27 [248831]
-
         if not GatherExportSetup(CustomerNo, DocExchPath) then
             exit;
         SendSuccess := ExportDocument(RecordRef, DocumentNo, DocExchPath);
@@ -756,11 +490,7 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
             LogActivitySucceeded(RecordRef.RecordId, SendDocTxt, DocSendSuccessMsg)
         else
             LogActivityFailed(RecordRef.RecordId, SendDocTxt, '');
-
-        //-NPR5.27 [248831]
-        //UpdateSalesDoc(PostedSalesDoc,DocExchPath,SendSuccess,CalledFrom);
         UpdateSalesDoc(RecordRef, DocExchPath, SendSuccess, CalledFrom);
-        //+NPR5.27 [248831]
     end;
 
     local procedure GatherExportSetup(CustomerNo: Code[20]; var DocExchPath: Record "NPR Doc. Exchange Path"): Boolean
@@ -768,14 +498,10 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         DocExchSetup: Record "NPR Doc. Exch. Setup";
     begin
         Clear(DocExchPath);
-        //-NPR5.33 [266527]
-        //IF NOT DocExchSetup.GET() OR NOT DocExchSetup."File Export Enabled" THEN
-        //  EXIT(FALSE);
         if not DocExchSetup.Get() then
             exit(false);
         if (not DocExchSetup."File Export Enabled") and (not DocExchSetup."FTP Export Enabled") then
             exit(false);
-        //+NPR5.33 [266527]
         if not DocExchPath.Get(DocExchPath.Direction::Export, DocExchPath.Type::Customer, CustomerNo) then
             if not DocExchPath.Get(DocExchPath.Direction::Export, DocExchPath.Type::All, '') then
                 exit(false);
@@ -784,9 +510,7 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
             exit(false);
 
         if (DocExchPath.Path = '') and (DocExchPath."Archive Path" = '') then
-            //-NPR5.33 [266527]
             if (not DocExchPath."Use Export FTP Settings") then
-                //+NPR5.33 [266527]
                 exit(false);
 
         exit(true);
@@ -799,31 +523,15 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         ClientFileName: Text;
         SpecificRecordRef: RecordRef;
     begin
-        //-NPR5.27 [248831]
-        //Parameter RecordRef is now called by reference
-        //+NPR5.27 [248831]
         if DocExchPath.Path <> '' then
             DocExchPath.Path := StrSubstNo('%1\%2.xml', DelChr(DocExchPath.Path, '>', '\'), DocumentNo);
         if DocExchPath."Archive Path" <> '' then
             DocExchPath."Archive Path" := StrSubstNo('%1\%2.xml', DelChr(DocExchPath."Archive Path", '>', '\'), DocumentNo);
 
-        //-NPR5.27 [248831]
-        /*
-        SpecificRecordRef.GET(RecordRef.RECORDID);
-        SpecificRecordRef.SETRECFILTER;
-        
-        ProcessDocumentElectronically(ServerFilePath,ClientFileName,SpecificRecordRef,DocExchPath);
-        */
         ProcessDocumentElectronically(ServerFilePath, ClientFileName, RecordRef, DocExchPath);
-        //+NPR5.27 [248831]
 
         if ServerFilePath <> '' then begin
             FolderStructureDelimiter := '\';
-            //-NPR5.33 [266527]
-            //IF DocExchPath.Path <> '' THEN
-            //  ExportFile(ServerFilePath,DocExchPath.Path);
-            //IF DocExchPath."Archive Path" <> '' THEN
-            //  ExportFile(ServerFilePath,DocExchPath."Archive Path");
             if DocExchPath."Use Export FTP Settings" then begin
                 ExportFTPUsingSetup(ServerFilePath, DocumentNo);
             end;
@@ -831,7 +539,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
                 ExportFile(ServerFilePath, DocExchPath.Path, DocExchPath."Export Locally");
             if DocExchPath."Archive Path" <> '' then
                 ExportFile(ServerFilePath, DocExchPath."Archive Path", DocExchPath."Export Locally");
-            //+NPR5.33 [266527]
         end;
 
     end;
@@ -847,19 +554,14 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         ElectronicDocumentFormat: Record "Electronic Document Format";
         SpecificRecordRef: RecordRef;
     begin
-        //-NPR5.27 [248831]
-        //IF NOT DocExchPath."Localization Format Code" THEN
         if not DocExchPath."Localization Format Code" then begin
             SpecificRecordRef.Get(RecordRef.RecordId);
             SpecificRecordRef.SetRecFilter;
-            //+NPR5.27 [248831]
 
             ElectronicDocumentFormat.SendElectronically(
               ServerFilePath, ClientFileName, SpecificRecordRef, DocExchPath."Electronic Format Code");
 
-            //-NPR5.27 [248831]
         end;
-        //+NPR5.27 [248831]
     end;
 
     local procedure ExportFile(SourceFile: Text; var DestinationFile: Text; LocalExport: Boolean)
@@ -869,28 +571,7 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         DirectoryPath: Text;
         ExportLocally: Integer;
     begin
-        //-NPR5.27 [248831]
-        //Parameter DestinationFile is now called by reference
-        //+NPR5.27 [248831]
-        //-NPR5.33 [266527]
         DirectoryPath := FileMgt.GetDirectoryName(DestinationFile);
-        // CASE TRUE OF
-        //  FileMgt.ServerDirectoryExists(DirectoryPath):
-        //    BEGIN
-        //      IF FileMgt.ServerFileExists(DestinationFile) THEN
-        //        DestinationFile := AddSuffixToFileName(DestinationFile);
-        //      FileMgt.CopyServerFile(SourceFile,DestinationFile,FALSE);
-        //    END;
-        //  FileMgt.ClientDirectoryExists(DirectoryPath):
-        //    BEGIN
-        //      IF FileMgt.ClientFileExists(DestinationFile) THEN
-        //        DestinationFile := AddSuffixToFileName(DestinationFile);
-        //      FileMgt.DownloadToFile(SourceFile,DestinationFile);
-        //    END;
-        //  ELSE
-        //    ERROR(DirectoryDoesntExist,DirectoryPath);
-        // END;
-
         if LocalExport then begin
             if FileMgt.ServerDirectoryExists(DirectoryPath) then begin
                 if FileMgt.ServerFileExists(DestinationFile) then
@@ -907,7 +588,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
             end;
         end;
         Error(DirectoryDoesntExist, DirectoryPath);
-        //+NPR5.33 [266527]
     end;
 
     procedure UpdateSalesDoc(var RecordRef: RecordRef; DocExchPath: Record "NPR Doc. Exchange Path"; SendSuccess: Boolean; UpdateFrom: Option SendDoc,DocList)
@@ -917,23 +597,10 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         FileMgt: Codeunit "File Management";
     begin
-        //-NPR5.27 [248831]
-
-        //Changed first parameter to RecordRef from Variant and second from Variant to Doc. Exch. Path
-        /*
-        DocExchPath := DocExchPathVar;
-        RecordRef.GETTABLE(PostedSalesDoc);
-        */
-        //+NPR5.27 [248831]
         case RecordRef.Number of
             DATABASE::"Sales Invoice Header":
                 begin
-
-                    //-NPR5.27 [248831]
-                    //      SalesInvHeader := PostedSalesDoc;
                     RecordRef.SetTable(SalesInvHeader);
-                    //+NPR5.27 [248831]
-
                     case UpdateFrom of
                         UpdateFrom::SendDoc:
                             begin
@@ -958,14 +625,9 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
                     end;
                     SalesInvHeader.Modify;
 
-                    //-NPR5.27 [248831]
-                    //      PostedSalesDoc := SalesInvHeader;
                     RecordRef.GetTable(SalesInvHeader);
-                    //+NPR5.27 [248831]
-
                 end;
 
-            //-NPR5.33 [266527]
             DATABASE::"Sales Cr.Memo Header":
                 begin
                     RecordRef.SetTable(SalesCrMemoHeader);
@@ -994,8 +656,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
                     SalesCrMemoHeader.Modify;
                     RecordRef.GetTable(SalesCrMemoHeader);
                 end;
-        //+NPR5.33 [266527]
-
         end;
 
     end;
@@ -1023,27 +683,29 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         exit(FolderExists);
     end;
 
-    local procedure ProcessFile(FilePath: Text; CreateDocument: Boolean)
+    local procedure InsertFile(var IncomingDocumentAttachment: Record "Incoming Document Attachment"; FilePath: Text): Boolean
     var
         TempBlob: Codeunit "Temp Blob";
-        IncomingDocumentAttachment: Record "Incoming Document Attachment";
         ImportAttachIncDoc: Codeunit "Import Attachment - Inc. Doc.";
-        IncomingDocument: Record "Incoming Document";
         RecRef: RecordRef;
     begin
         FileMgt.BLOBImportFromServerFile(TempBlob, FilePath);
-
         RecRef.GetTable(IncomingDocumentAttachment);
         TempBlob.ToRecordRef(RecRef, IncomingDocumentAttachment.FieldNo(Content));
         RecRef.SetTable(IncomingDocumentAttachment);
+        exit(ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment, FilePath));
+    end;
 
-        if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment, FilePath) then begin
-            if CreateDocument then begin
-                IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
-                IncomingDocument.CreateDocumentWithDataExchange();
-            end;
+    local procedure ProcessFile(var IncomingDocumentAttachment: Record "Incoming Document Attachment"; CreateDocument: Boolean)
+    var
+        IncomingDocument: Record "Incoming Document";
+    begin
+        if CreateDocument then begin
+            IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
+            IncomingDocument.CreateDocumentWithDataExchange();
         end;
     end;
+
 
     local procedure ThrowError(ErrorMsg: Text)
     begin
@@ -1160,11 +822,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
 
         ActivityLog.LogActivity(RelatedRecordID, ActivityLog.Status::Failed, LoggingConstTxt,
           CopyStr(ActivityDescription, 1, 250), CopyStr(ActivityMessage, 1, 250));
-
-        //COMMIT;
-
-        //IF DELCHR(ActivityMessage,'<>',' ') <> '' THEN
-        //  ERROR(ActivityMessage);
     end;
 
     procedure ExportFTPUsingSetup(ServerFilePath: Text; DocumentNo: Text)
@@ -1179,7 +836,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         DocExchangePath: Record "NPR Doc. Exchange Path";
         FTPFileName: Text;
     begin
-        //-NPR5.33 [266527]
         DocExchSetup.Get;
         if not DocExchSetup."FTP Export Enabled" then
             exit;
@@ -1187,20 +843,15 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         FTPUsername := DocExchSetup."Export FTP Username";
         FTPPassword := DocExchSetup."Export FTP Password";
         FTPFolder := DocExchSetup."Export FTP Folder";
-        //FTPFileName := FileMgt.GetFileName(ServerFilePath);
         FTPFileName := DocumentNo + '.xml';
         FTPUsePassive := DocExchSetup."Export FTP Using Passive";
 
         if FTPServer = '' then
             exit;
-        //-NPR5.55 [410350]
-        //IF UPPERCASE(COPYSTR(FTPServer,1,4)) <> 'FTP://' THEN
         if UpperCase(CopyStr(FTPServer, 1, 6)) <> 'FTP://' then
-            //+NPR5.55 [410350]
             FTPServer := 'FTP://' + FTPServer;
         Sleep(1000);
         ExportFTPFile(FTPServer, FTPUsername, FTPPassword, FTPFolder, FTPFileName, FTPUsePassive, ServerFilePath);
-        //+NPR5.33 [266527]
     end;
 
     local procedure ExportFTPFile(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFilename: Text; FTPUsePassive: Boolean; ServerFilePath: Text)
@@ -1220,14 +871,7 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         ImportAttachIncDoc: Codeunit "Import Attachment - Inc. Doc.";
         FileText: Text;
     begin
-        //-NPR5.33 [266527]
-
-        //Upload file
-        //-NPR5.54 [389951]
-        //-NPR5.55 [410350]
         InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
-        //+NPR5.55 [410350]
-        //+NPR5.54 [389951]
         FileMgt.BLOBImportFromServerFile(TempBlob, ServerFilePath);
         TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
         IStream.Read(FileText);
@@ -1240,7 +884,6 @@ codeunit 6059932 "NPR Doc. Exch. File Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
         FtpWebResponse.Close;
         Clear(IStream);
-        //+NPR5.33 [266527]
     end;
 }
 

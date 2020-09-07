@@ -1,9 +1,5 @@
 codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 {
-    // NPR5.29/BR /20161201  CASE 258697 Created CU based on Codeunit 1207 to keep 1207 standard (additions marked with //-NPR and //+NPR)
-    // NPR5.38/MHA /20180105  CASE 301053 Changed type of variable, DocumentType, from Option to Integer in GetDocumentType() to prepare for V2
-    // NPR5.55/THRO/20200609  CASE 390973 Added Publisher to allow external identification of Item on PurchaseLine
-
     TableNo = "Data Exch.";
 
     trigger OnRun()
@@ -705,16 +701,12 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
             // Lookup GTIN/Bar Code - else set as G/L Account
             if not FindItemCrossReferenceFromGTIN(EntryNo, HeaderRecordNo, RecordNo) then
                 if not FindItemCrossReferenceFromVendor(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                    //-NPR
                     if not FindItemCrossReferenceFromVendorItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                         if not FindItemCrossReferenceFromAltNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                             if not FindItemCrossReferenceFromItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                                 if not FindItemCrossReferenceFromItem(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                                    //-NPR5.55 [390973]
                                     if not FindItemCrossReferenceFromSubscriber(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                                        //+NPR5.55 [390973]
                                         if not CreateItemWorksheetLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                                            //+NPR
                                             if not FindGLAccountForLine(EntryNo, HeaderRecordNo, RecordNo) then
                                                 LogErrorIfItemNotFound(EntryNo, HeaderRecordNo, RecordNo, VendorNo);
             ResolveUnitOfMeasure(EntryNo, HeaderRecordNo, RecordNo);
@@ -807,13 +799,11 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
                       HeaderRecordNo, RecordNo, Format(ItemCrossReference."Item No.", 0, 9));
                     InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Type),
                       HeaderRecordNo, RecordNo, Format(PurchaseLine.Type::Item, 0, 9));
-                    //-NPR
                     if ItemCrossReference."Variant Code" <> '' then
                         if ItemVariant.Get(ItemCrossReference."Item No.", ItemCrossReference."Variant Code") then
                             if not ItemVariant."NPR Blocked" then
                                 InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Variant Code"),
                                   HeaderRecordNo, RecordNo, Format(ItemVariant.Code, 0, 9));
-                    //+NPR
                     exit(true);
                 end;
             end;
@@ -829,7 +819,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
         Vendor: Record Vendor;
         Item: Record Item;
     begin
-        //-NPR
         if not Vendor.Get(VendorNo) then
             exit(false);
         with IntermediateDataImport do begin
@@ -847,7 +836,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 
             exit(false);
         end;
-        //+NPR
     end;
 
     local procedure FindItemCrossReferenceFromAltNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
@@ -858,7 +846,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
         Vendor: Record Vendor;
         ItemVariant: Record "Item Variant";
     begin
-        //-NPR
         if not Vendor.Get(VendorNo) then
             exit(false);
 
@@ -883,7 +870,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 
             exit(false);
         end;
-        //+NPR
     end;
 
     local procedure FindItemCrossReferenceFromItemNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
@@ -893,7 +879,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
         Item: Record Item;
         Vendor: Record Vendor;
     begin
-        //-NPR
         if not Vendor.Get(VendorNo) then
             exit(false);
 
@@ -913,7 +898,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 
             exit(false);
         end;
-        //+NPR
     end;
 
     local procedure FindItemCrossReferenceFromItem(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
@@ -923,7 +907,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
         Item: Record Item;
         Vendor: Record Vendor;
     begin
-        //-NPR
         with IntermediateDataImport do begin
             if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
                 Item.SetRange("No.", Value);
@@ -938,7 +921,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 
             exit(false);
         end;
-        //+NPR
     end;
 
     local procedure CreateItemWorksheetLine(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
@@ -959,7 +941,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
         ItemWorksheetLineInsNotProcessed: Label 'The item could not be matched so an Item Worksheet Line was created, but could not be processed.';
         DummyBool: Boolean;
     begin
-        //-NPR
         if not Vendor.Get(VendorNo) then
             exit(false);
         if not ItemWkshtDocExchange.GetItemWorksheetDocExchange(VendorNo, ItemWorksheet, AutomaticRegistering, DummyBool) then
@@ -983,7 +964,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
 
             exit(false);
         end;
-        //-NPR
     end;
 
     local procedure IsDescriptionOnlyLine(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer): Boolean
@@ -1119,6 +1099,9 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
     var
         PurchaseLine: Record "Purchase Line";
         IntermediateDataImport: Record "Intermediate Data Import";
+        GLSetup: Record "General Ledger Setup";
+        PurchaseHeader: Record "Purchase Header";
+        Currency: Record Currency;
         LineDirectUnitCostTxt: Text;
         LineQuantityTxt: Text;
         LineAmountTxt: Text;
@@ -1126,6 +1109,9 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
         LineAmount: Decimal;
         LineQuantity: Decimal;
         LineDiscountAmount: Decimal;
+        DocumentCurrency: Text;
+        LineDiscountPct: Decimal;
+        UnitCostWithoutLineDiscount: Decimal;
     begin
         with IntermediateDataImport do begin
             if GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Line Discount Amount"), HeaderRecordNo, RecordNo) <> ''
@@ -1145,8 +1131,22 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
               GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Amount), HeaderRecordNo, RecordNo);
             if LineAmountTxt <> '' then
                 Evaluate(LineAmount, LineAmountTxt, 9);
-            LineDiscountAmount := (LineQuantity * LineDirectUnitCost) - LineAmount;
-
+            GLSetup.Get();
+            DocumentCurrency := GetEntryValue(EntryNo, Database::"Purchase Header", PurchaseHeader.FieldNo("Currency Code"), 0, HeaderRecordNo);
+            if (DocumentCurrency = '') or (DocumentCurrency = GLSetup."LCY Code") or not (Currency.Get(CopyStr(DocumentCurrency, 1, MaxStrLen(Currency.Code)))) then
+                Currency.InitRoundingPrecision()
+            else
+                Currency.TestField("Amount Rounding Precision");
+            LineDiscountAmount := Round(LineQuantity * LineDirectUnitCost, Currency."Amount Rounding Precision") - Round(LineAmount, Currency."Amount Rounding Precision");
+            if (LineDiscountAmount <> 0) and (LineQuantity <> 0) then begin
+                if Round(LineQuantity * LineDirectUnitCost, Currency."Amount Rounding Precision") <> 0 then
+                    LineDiscountPct := Round(LineDiscountAmount / Round(LineQuantity * LineDirectUnitCost, Currency."Amount Rounding Precision"), 0.00001);
+                UnitCostWithoutLineDiscount := Round(LineAmount / LineQuantity, Currency."Unit-Amount Rounding Precision");
+                if (LineDiscountPct < 0) or (LineDirectUnitCost = Round(UnitCostWithoutLineDiscount, UnitCostRoundingPrecision(LineDirectUnitCostTxt))) then begin
+                    LineDiscountAmount := 0;
+                    InsertOrUpdateEntry(EntryNo, Database::"Purchase Line", PurchaseLine.FieldNo("Direct Unit Cost"), HeaderRecordNo, RecordNo, Format(UnitCostWithoutLineDiscount, 0, 9));
+                end;
+            end;
             InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Line Discount Amount"),
               HeaderRecordNo, RecordNo, Format(LineDiscountAmount, 0, 9));
 
@@ -1387,6 +1387,18 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
         //-NPR5.55 [390973]
         OnMapCrossRecerenceToPurchaseLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo, Identified);
         //+NPR5.55 [390973]
+    end;
+
+    local procedure UnitCostRoundingPrecision(AmountTxt: Text): Decimal
+    var
+        NoOfDecimals: Integer;
+    begin
+        if AmountTxt = '' then
+            exit(0.00001);
+        if StrPos(AmountTxt, '.') = 0 then
+            exit(1);
+        NoOfDecimals := StrLen(AmountTxt) - StrPos(AmountTxt, '.');
+        exit(Power(10, -NoOfDecimals));
     end;
 
     [IntegrationEvent(false, false)]
