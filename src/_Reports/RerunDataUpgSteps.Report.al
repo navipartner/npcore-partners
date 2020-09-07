@@ -22,6 +22,7 @@ report 6150699 "NPR Re-run Data Upg. Steps"
                     Caption = 'From Build Step';
                     MinValue = 1;
                     ShowMandatory = true;
+                    ApplicationArea=All;
 
                     trigger OnValidate()
                     begin
@@ -35,6 +36,7 @@ report 6150699 "NPR Re-run Data Upg. Steps"
                     Caption = 'To Build Step';
                     MinValue = 1;
                     ShowMandatory = true;
+                    ApplicationArea=All;
 
                     trigger OnValidate()
                     begin

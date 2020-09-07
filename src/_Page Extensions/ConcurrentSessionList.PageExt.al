@@ -12,6 +12,7 @@ pageextension 6014490 "NPR Concurrent Session List" extends "Concurrent Session 
                 Image = Delete;
                 Promoted = true;
                 PromotedCategory = Category4;
+                ApplicationArea=All;
             }
         }
     }

@@ -204,10 +204,12 @@ report 6014419 "NPR Vendor Sales Stat"
                 field("Start Date"; StartDate)
                 {
                     Caption = 'Start Date';
+                    ApplicationArea=All;
                 }
                 field("End Date"; EndDate)
                 {
                     Caption = 'End Date';
+                    ApplicationArea=All;
                 }
             }
         }

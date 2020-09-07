@@ -391,11 +391,13 @@ page 6150629 "NPR POS Workshift Checkpoints"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Workshift Checkp. Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
             action(Archive)
             {
                 Caption = 'Archive';
                 Image = Archive;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

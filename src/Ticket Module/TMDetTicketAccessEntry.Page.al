@@ -94,6 +94,7 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Entry";
                 RunPageLink = "External Schedule Entry No." = FIELD("External Adm. Sch. Entry No.");
+                ApplicationArea=All;
             }
             action("Ticket Request")
             {
@@ -103,6 +104,7 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -118,6 +120,7 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
             {
                 Caption = 'Unconsume Item';
                 Image = ConsumptionJournal;
+                ApplicationArea=All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 

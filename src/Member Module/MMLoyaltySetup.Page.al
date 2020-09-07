@@ -181,6 +181,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Point Setup";
                 RunPageLink = Code = FIELD(Code);
+                ApplicationArea=All;
             }
             action("Item Points Setup")
             {
@@ -191,6 +192,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loy. Item Point Setup";
                 RunPageLink = Code = FIELD(Code);
+                ApplicationArea=All;
             }
             separator(Separator6014432)
             {
@@ -203,6 +205,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Alter Members.";
                 RunPageLink = "Loyalty Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             group("Cross Company Loyalty")
             {
@@ -212,18 +215,21 @@ page 6060105 "NPR MM Loyalty Setup"
                     Caption = '(Server) Loyalty Server - Store Setup';
                     Image = Server;
                     RunObject = Page "NPR MM Loy. Store Setup Server";
+                    ApplicationArea=All;
                 }
                 action("(Client) Loyalty Server Endpoints")
                 {
                     Caption = '(Client) Loyalty Server Endpoints';
                     Image = Server;
                     RunObject = Page "NPR MM NPR Endpoint Setup";
+                    ApplicationArea=All;
                 }
                 action("(Client) Loyalty Server - Store Setup")
                 {
                     Caption = '(Client) Loyalty Server - Store Setup';
                     Image = NumberSetup;
                     RunObject = Page "NPR MM Loy. Store Setup Client";
+                    ApplicationArea=All;
                 }
             }
         }
@@ -234,6 +240,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Caption = 'Expire Points';
                 Ellipsis = true;
                 Image = Excise;
+                ApplicationArea=All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'

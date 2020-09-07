@@ -66,6 +66,7 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
                 Caption = 'Start Production';
                 Image = Start;
                 Visible = NOT IsExpediteMode;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -78,6 +79,7 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
                 Caption = 'End Production';
                 Image = Stop;
                 Visible = NOT IsExpediteMode;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -90,6 +92,7 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
                 Caption = 'Accept Qty. Change';
                 Image = Approve;
                 Visible = NOT IsExpediteMode;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

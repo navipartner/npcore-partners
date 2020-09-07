@@ -182,6 +182,7 @@ page 6151570 "NPR AF Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR AF Test Services";
+                ApplicationArea=All;
             }
             action("Enable Webservice")
             {
@@ -191,6 +192,7 @@ page 6151570 "NPR AF Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Codeunit "NPR AF API WebService";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -206,6 +208,7 @@ page 6151570 "NPR AF Setup"
                 {
                     Caption = 'Clear Customer Tag';
                     Image = Delete;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -223,6 +226,7 @@ page 6151570 "NPR AF Setup"
                     Caption = 'Create Site';
                     Image = "Action";
                     RunObject = Codeunit "NPR AF API WebService";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -235,6 +239,7 @@ page 6151570 "NPR AF Setup"
                 {
                     Caption = 'Update Site';
                     Image = UpdateXML;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -247,6 +252,7 @@ page 6151570 "NPR AF Setup"
                 {
                     Caption = 'Delete Site';
                     Image = Delete;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

@@ -744,6 +744,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     {
                         Caption = 'Event';
                         Image = "Event";
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -754,6 +755,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     {
                         Caption = 'Period';
                         Image = Period;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -764,6 +766,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -775,6 +778,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         AccessByPermission = TableData Location = R;
                         Caption = 'Location';
                         Image = Warehouse;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -785,6 +789,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -797,6 +802,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData Item = R;
                     Caption = 'Reservation Entries';
                     Image = ReservationLedger;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -808,6 +814,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
                     ShortCutKey = 'Shift+Ctrl+I';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -819,6 +826,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData "Item Substitution" = R;
                     Caption = 'Select Item Substitution';
                     Image = SelectItemSubstitution;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -831,6 +839,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -841,6 +850,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     Caption = 'Co&mments';
                     Image = ViewComments;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -851,6 +861,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     AccessByPermission = TableData "Item Charge" = R;
                     Caption = 'Item Charge &Assignment';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -862,6 +873,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData "Order Promising Line" = R;
                     Caption = 'Order &Promising';
                     Image = OrderPromising;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -876,6 +888,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     {
                         AccessByPermission = TableData "BOM Component" = R;
                         Caption = 'Assemble-to-Order Lines';
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -887,6 +900,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         AccessByPermission = TableData "BOM Component" = R;
                         Caption = 'Roll Up &Price';
                         Ellipsis = true;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -898,6 +912,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         AccessByPermission = TableData "BOM Component" = R;
                         Caption = 'Roll Up &Cost';
                         Ellipsis = true;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -916,6 +931,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Get Price';
                     Ellipsis = true;
                     Image = Price;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -928,6 +944,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Get Li&ne Discount';
                     Ellipsis = true;
                     Image = LineDiscount;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -939,6 +956,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData "BOM Component" = R;
                     Caption = 'E&xplode BOM';
                     Image = ExplodeBOM;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -950,6 +968,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData "Extended Text Header" = R;
                     Caption = 'Insert &Ext. Texts';
                     Image = Text;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -961,6 +980,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = '&Reserve';
                     Ellipsis = true;
                     Image = Reserve;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -972,6 +992,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     Caption = 'Order &Tracking';
                     Image = OrderTracking;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -983,6 +1004,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData "Nonstock Item" = R;
                     Caption = 'Nonstoc&k Items';
                     Image = NonStockItem;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1003,6 +1025,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         AccessByPermission = TableData "Purch. Rcpt. Header" = R;
                         Caption = 'Purchase &Order';
                         Image = Document;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -1019,6 +1042,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         AccessByPermission = TableData "Purch. Rcpt. Header" = R;
                         Caption = 'Purchase &Order';
                         Image = Document;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin

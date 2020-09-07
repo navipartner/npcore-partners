@@ -55,6 +55,7 @@ page 6151402 "NPR Magento Inv. Companies"
                 Image = TestFile;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

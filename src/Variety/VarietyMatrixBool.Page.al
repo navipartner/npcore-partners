@@ -1454,6 +1454,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Promoted = true;
                 PromotedCategory = New;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -1471,6 +1472,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -1488,6 +1490,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -1504,6 +1507,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -1520,6 +1524,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

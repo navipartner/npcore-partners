@@ -49,6 +49,7 @@ page 6151575 "NPR Event Notes"
                 Caption = 'View Event';
                 Image = View;
                 RunPageMode = View;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

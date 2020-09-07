@@ -215,58 +215,72 @@ report 6014411 "NPR Sale Time Report"
                         field(TimeArray_1; TimeArray[1])
                         {
                             Caption = '1';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_2; TimeArray[2])
                         {
                             Caption = '2';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_3; TimeArray[3])
                         {
                             Caption = '3';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_4; TimeArray[4])
                         {
                             Caption = '4';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_5; TimeArray[5])
                         {
                             Caption = '5';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_6; TimeArray[6])
                         {
                             Caption = '6';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_7; TimeArray[7])
                         {
                             Caption = '7';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_8; TimeArray[8])
                         {
                             Caption = '8';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_9; TimeArray[9])
                         {
                             Caption = '9';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_10; TimeArray[10])
                         {
                             Caption = '10';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_11; TimeArray[11])
                         {
                             Caption = '11';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_12; TimeArray[12])
                         {
                             Caption = '12';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_13; TimeArray[13])
                         {
                             Caption = '13';
+                            ApplicationArea=All;
                         }
                         field(TimeArray_14; TimeArray[14])
                         {
                             Caption = '14';
+                            ApplicationArea=All;
                         }
                     }
                     group(Weekdays)
@@ -275,30 +289,37 @@ report 6014411 "NPR Sale Time Report"
                         field(DayArray_1; DayArray[1])
                         {
                             Caption = 'Monday';
+                            ApplicationArea=All;
                         }
                         field(DayArray_2; DayArray[2])
                         {
                             Caption = 'Tuesday';
+                            ApplicationArea=All;
                         }
                         field(DayArray_3; DayArray[3])
                         {
                             Caption = 'Wednesday';
+                            ApplicationArea=All;
                         }
                         field(DayArray_4; DayArray[4])
                         {
                             Caption = 'Thursday';
+                            ApplicationArea=All;
                         }
                         field(DayArray_5; DayArray[5])
                         {
                             Caption = 'Friday';
+                            ApplicationArea=All;
                         }
                         field(DayArray_6; DayArray[6])
                         {
                             Caption = 'Saturday';
+                            ApplicationArea=All;
                         }
                         field(DayArray_7; DayArray[7])
                         {
                             Caption = 'Sunday';
+                            ApplicationArea=All;
                         }
                     }
                 }

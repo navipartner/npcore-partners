@@ -24,6 +24,7 @@ report 6151597 "NPR NpDc Request Priority"
                     {
                         Caption = 'Priority';
                         MinValue = 0;
+                        ApplicationArea=All;
                     }
                 }
             }

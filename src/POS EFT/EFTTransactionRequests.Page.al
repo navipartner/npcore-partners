@@ -291,10 +291,12 @@ page 6184498 "NPR EFT Transaction Requests"
                 SubPageLink = "Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
             part(Control6014410; "NPR EFT Trx Log Factbox")
             {
                 SubPageLink = "Transaction Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -310,6 +312,7 @@ page 6184498 "NPR EFT Transaction Requests"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -329,6 +332,7 @@ page 6184498 "NPR EFT Transaction Requests"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -348,6 +352,7 @@ page 6184498 "NPR EFT Transaction Requests"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -360,6 +365,7 @@ page 6184498 "NPR EFT Transaction Requests"
             {
                 Caption = 'Download Logs';
                 Image = CreateXMLFile;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

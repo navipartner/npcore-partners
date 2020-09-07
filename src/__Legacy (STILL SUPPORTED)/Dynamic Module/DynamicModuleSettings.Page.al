@@ -48,6 +48,7 @@ page 6014500 "NPR Dynamic Module Settings"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -62,6 +63,7 @@ page 6014500 "NPR Dynamic Module Settings"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

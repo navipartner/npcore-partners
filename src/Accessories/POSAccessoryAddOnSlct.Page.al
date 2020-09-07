@@ -11,6 +11,7 @@ page 6014548 "NPR POS Accessory AddOn Slct."
         {
             usercontrol(Bridge; "NPR Bridge")
             {
+                ApplicationArea=All;
 
                 trigger OnFrameworkReady()
                 var

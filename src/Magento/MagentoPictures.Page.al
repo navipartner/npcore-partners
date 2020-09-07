@@ -78,6 +78,7 @@ page 6151411 "NPR Magento Pictures"
                 ShowFilter = false;
                 SubPageLink = Type = FIELD(Type),
                               Name = FIELD(Name);
+                ApplicationArea=All;
             }
         }
     }
@@ -93,6 +94,7 @@ page 6151411 "NPR Magento Pictures"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

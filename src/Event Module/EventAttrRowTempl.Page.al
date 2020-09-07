@@ -37,6 +37,7 @@ page 6060159 "NPR Event Attr. Row Templ."
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Row Values";
                 RunPageLink = "Template Name" = FIELD(Name);
+                ApplicationArea=All;
             }
         }
     }

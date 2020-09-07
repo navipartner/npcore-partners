@@ -23,6 +23,7 @@ pageextension 6014479 "NPR Inventory Put-away" extends "Inventory Put-away"
                 Image = BinContent;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -37,6 +38,7 @@ pageextension 6014479 "NPR Inventory Put-away" extends "Inventory Put-away"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

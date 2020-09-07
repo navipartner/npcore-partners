@@ -95,6 +95,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Day)
                 {
                     Caption = 'Day';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -105,6 +106,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Week)
                 {
                     Caption = 'Week';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -115,6 +117,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Month)
                 {
                     Caption = 'Month';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -125,6 +128,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Quarter)
                 {
                     Caption = 'Quarter';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -135,6 +139,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Year)
                 {
                     Caption = 'Year';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

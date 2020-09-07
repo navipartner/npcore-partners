@@ -125,24 +125,29 @@ page 6060152 "NPR Event List"
             {
                 SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
+                ApplicationArea=All;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
+                ApplicationArea=All;
             }
             part(Control1905650007; "Job WIP/Recognition FactBox")
             {
                 SubPageLink = "No." = FIELD("No.");
                 Visible = true;
+                ApplicationArea=All;
             }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = true;
+                ApplicationArea=All;
             }
         }
     }
@@ -165,6 +170,7 @@ page 6060152 "NPR Event List"
                     RunObject = Page "NPR Event Task Lines";
                     RunPageLink = "Job No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+T';
+                    ApplicationArea=All;
                 }
                 group("&Dimensions")
                 {
@@ -178,12 +184,14 @@ page 6060152 "NPR Event List"
                         RunPageLink = "Table ID" = CONST(167),
                                       "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
+                        ApplicationArea=All;
                     }
                     action("Dimensions-&Multiple")
                     {
                         AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -208,6 +216,7 @@ page 6060152 "NPR Event List"
                     RunObject = Page "NPR Event Statistics";
                     RunPageLink = "No." = FIELD("No.");
                     ShortCutKey = 'F7';
+                    ApplicationArea=All;
                 }
                 action(SalesDocuments)
                 {
@@ -215,6 +224,7 @@ page 6060152 "NPR Event List"
                     Image = GetSourceDoc;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -238,6 +248,7 @@ page 6060152 "NPR Event List"
                     RunObject = Page "Comment Sheet";
                     RunPageLink = "Table Name" = CONST(Job),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action(ActivityLog)
                 {
@@ -245,6 +256,7 @@ page 6060152 "NPR Event List"
                     Image = Log;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -261,6 +273,7 @@ page 6060152 "NPR Event List"
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Attributes";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -279,6 +292,7 @@ page 6060152 "NPR Event List"
                     Image = Quote;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -295,6 +309,7 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -312,6 +327,7 @@ page 6060152 "NPR Event List"
                     Image = ValidateEmailLoggingSetup;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -329,6 +345,7 @@ page 6060152 "NPR Event List"
                     Image = Resource;
                     RunObject = Page "Job Resource Prices";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("&Item")
                 {
@@ -336,6 +353,7 @@ page 6060152 "NPR Event List"
                     Image = Item;
                     RunObject = Page "Job Item Prices";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("&G/L Account")
                 {
@@ -343,6 +361,7 @@ page 6060152 "NPR Event List"
                     Image = JobPrice;
                     RunObject = Page "Job G/L Account Prices";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
             group("Plan&ning")
@@ -354,12 +373,14 @@ page 6060152 "NPR Event List"
                     Caption = 'Resource &Allocated per Job';
                     Image = ViewJob;
                     RunObject = Page "Resource Allocated per Job";
+                    ApplicationArea=All;
                 }
                 action("Res. Group All&ocated per Job")
                 {
                     Caption = 'Res. Group All&ocated per Job';
                     Image = ViewJob;
                     RunObject = Page "Res. Gr. Allocated per Job";
+                    ApplicationArea=All;
                 }
             }
             group(History)
@@ -376,6 +397,7 @@ page 6060152 "NPR Event List"
                     RunPageLink = "Job No." = FIELD("No.");
                     RunPageView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
+                    ApplicationArea=All;
                 }
             }
         }
@@ -388,6 +410,7 @@ page 6060152 "NPR Event List"
                 {
                     Caption = 'Collect Ticket Printouts';
                     Image = GetSourceDoc;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -407,6 +430,7 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -436,6 +460,7 @@ page 6060152 "NPR Event List"
                     Image = CreateJobSalesInvoice;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -457,6 +482,7 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -478,6 +504,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Send to Calendar';
                     Ellipsis = true;
                     Image = Calendar;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -490,6 +517,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Remove from Calendar';
                     Ellipsis = true;
                     Image = RemoveContacts;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -501,6 +529,7 @@ page 6060152 "NPR Event List"
                 {
                     Caption = 'Get Attendee Response';
                     Image = Answers;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -517,6 +546,7 @@ page 6060152 "NPR Event List"
                         Caption = 'Customer';
                         Ellipsis = true;
                         Image = Customer;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -532,6 +562,7 @@ page 6060152 "NPR Event List"
                         Caption = 'Team';
                         Ellipsis = true;
                         Image = TeamSales;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -554,6 +585,7 @@ page 6060152 "NPR Event List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Actual To Budget";
+                ApplicationArea=All;
             }
             action("Job Analysis")
             {
@@ -562,6 +594,7 @@ page 6060152 "NPR Event List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Analysis";
+                ApplicationArea=All;
             }
             action("Job - Planning Lines")
             {
@@ -570,6 +603,7 @@ page 6060152 "NPR Event List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job - Planning Lines";
+                ApplicationArea=All;
             }
             action("Job - Suggested Billing")
             {
@@ -578,6 +612,7 @@ page 6060152 "NPR Event List"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Suggested Billing";
+                ApplicationArea=All;
             }
             action("Jobs per Customer")
             {
@@ -587,6 +622,7 @@ page 6060152 "NPR Event List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Jobs per Customer";
+                ApplicationArea=All;
             }
             action("Items per Job")
             {
@@ -596,6 +632,7 @@ page 6060152 "NPR Event List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Items per Job";
+                ApplicationArea=All;
             }
             action("Jobs per Item")
             {
@@ -605,6 +642,7 @@ page 6060152 "NPR Event List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Jobs per Item";
+                ApplicationArea=All;
             }
             group("Financial Management")
             {
@@ -618,6 +656,7 @@ page 6060152 "NPR Event List"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
                     RunObject = Report "Job WIP To G/L";
+                    ApplicationArea=All;
                 }
             }
             group(ActionGroup23)
@@ -632,6 +671,7 @@ page 6060152 "NPR Event List"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
                     RunObject = Report "Job - Transaction Detail";
+                    ApplicationArea=All;
                 }
                 action("Job Register")
                 {
@@ -641,6 +681,7 @@ page 6060152 "NPR Event List"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
                     RunObject = Report "Job Register";
+                    ApplicationArea=All;
                 }
             }
         }

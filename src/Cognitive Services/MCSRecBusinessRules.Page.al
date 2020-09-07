@@ -61,6 +61,7 @@ page 6060083 "NPR MCS Rec. Business Rules"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

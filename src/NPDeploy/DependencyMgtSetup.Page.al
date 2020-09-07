@@ -91,6 +91,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -105,6 +106,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Image = Setup;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -121,6 +123,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Image = ImportCodes;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

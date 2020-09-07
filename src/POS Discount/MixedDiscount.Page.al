@@ -313,6 +313,7 @@ page 6014450 "NPR Mixed Discount"
                     part(Control6014425; "NPR Mixed Disc. Time Interv.")
                     {
                         SubPageLink = "Mix Code" = FIELD(Code);
+                        ApplicationArea=All;
                     }
                 }
             }
@@ -320,12 +321,14 @@ page 6014450 "NPR Mixed Discount"
             {
                 SubPageLink = "Mixed Discount Code" = FIELD(Code);
                 Visible = DiscountLevelsApplicable;
+                ApplicationArea=All;
             }
             part(SubForm; "NPR Mixed Discount Lines")
             {
                 ShowFilter = false;
                 SubPageLink = Code = FIELD(Code);
                 UpdatePropagation = Both;
+                ApplicationArea=All;
             }
         }
     }
@@ -342,6 +345,7 @@ page 6014450 "NPR Mixed Discount"
                 RunPageLink = "Table ID" = CONST(6014411),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -361,6 +365,7 @@ page 6014450 "NPR Mixed Discount"
                     Caption = 'Item Card';
                     Image = Item;
                     ShortCutKey = 'Shift+Ctrl+C';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -389,6 +394,7 @@ page 6014450 "NPR Mixed Discount"
                     {
                         Caption = 'Transfer Item';
                         Image = TransferToLines;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -408,6 +414,7 @@ page 6014450 "NPR Mixed Discount"
                     {
                         Caption = 'Transfer Item Group';
                         Image = TransferToLines;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -428,6 +435,7 @@ page 6014450 "NPR Mixed Discount"
                     {
                         Caption = 'Transfer Vendor';
                         Image = TransferToLines;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -448,6 +456,7 @@ page 6014450 "NPR Mixed Discount"
                     {
                         Caption = 'Transfer All Items';
                         Image = TransferToLines;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -462,6 +471,7 @@ page 6014450 "NPR Mixed Discount"
                     {
                         Caption = 'Compress to Item Disc. Group';
                         Image = "Action";
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -476,6 +486,7 @@ page 6014450 "NPR Mixed Discount"
                 {
                     Caption = '&Read from scanner';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -492,6 +503,7 @@ page 6014450 "NPR Mixed Discount"
                 {
                     Caption = 'Send to Retail Journal';
                     Image = SendTo;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -529,11 +541,13 @@ page 6014450 "NPR Mixed Discount"
                 {
                     Caption = 'Copy campaign to Department Code';
                     Image = "Action";
+                    ApplicationArea=All;
                 }
                 action("Copy Mixed Discount")
                 {
                     Caption = 'Copy Mixed Discount';
                     Image = CopyDocument;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

@@ -131,6 +131,7 @@ page 6014430 "NPR Credit Voucher List"
             {
                 Caption = 'Cash In';
                 Image = CashFlow;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -147,6 +148,7 @@ page 6014430 "NPR Credit Voucher List"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -169,6 +171,7 @@ page 6014430 "NPR Credit Voucher List"
             {
                 Caption = 'Credit Voucher A5';
                 Image = "Report";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -182,11 +185,13 @@ page 6014430 "NPR Credit Voucher List"
                 Caption = 'Magento Credit Voucher';
                 Image = "Report";
                 RunObject = Report "NPR Magento Credit Voucher";
+                ApplicationArea=All;
             }
             action("Gift Voucher/Credit Voucher")
             {
                 Caption = 'Gift Voucher/Credit Voucher';
                 Image = "Report";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

@@ -48,6 +48,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Copy';
                 Image = CopyDocument;
                 Promoted = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -63,6 +64,7 @@ page 6060157 "NPR Event Word Layouts"
                 Image = Import;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -75,6 +77,7 @@ page 6060157 "NPR Event Word Layouts"
                 Image = Export;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -88,6 +91,7 @@ page 6060157 "NPR Event Word Layouts"
                 Promoted = true;
                 PromotedCategory = Process;
                 Visible = CanEdit;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -98,6 +102,7 @@ page 6060157 "NPR Event Word Layouts"
             {
                 Caption = 'Update Layout';
                 Image = UpdateXML;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -116,6 +121,7 @@ page 6060157 "NPR Event Word Layouts"
                 Image = "Report";
                 Promoted = true;
                 PromotedCategory = "Report";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

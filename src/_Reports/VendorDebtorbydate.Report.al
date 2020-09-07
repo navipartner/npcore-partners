@@ -143,18 +143,22 @@ report 6014434 "NPR Vendor/Debtor by date"
                     field(Tildato; Tildato)
                     {
                         Caption = 'To Date';
+                        ApplicationArea=All;
                     }
                     field(Kunmedsaldo; Kunmedsaldo)
                     {
                         Caption = 'Only With Balance';
+                        ApplicationArea=All;
                     }
                     field(PrintKreditor; PrintKreditor)
                     {
                         Caption = 'Creditor';
+                        ApplicationArea=All;
                     }
                     field(PrintDebitor; PrintDebitor)
                     {
                         Caption = 'Customer';
+                        ApplicationArea=All;
                     }
                 }
             }

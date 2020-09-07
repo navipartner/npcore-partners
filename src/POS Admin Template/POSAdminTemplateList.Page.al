@@ -53,6 +53,7 @@ page 6150741 "NPR POS Admin. Template List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Admin. Template Scopes";
                 RunPageLink = "POS Admin. Template Id" = FIELD(Id);
+                ApplicationArea=All;
             }
         }
     }

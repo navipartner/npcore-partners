@@ -55,10 +55,12 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     part(Control6151411; "NPR Nc RapidConnect Subform")
                     {
                         SubPageLink = "Setup Code" = FIELD(Code);
+                        ApplicationArea=All;
                     }
                     part(Control6151416; "NPR Nc RapidConnect Endp. Sub.")
                     {
                         SubPageLink = "Setup Code" = FIELD(Code);
+                        ApplicationArea=All;
                     }
                 }
             }
@@ -138,6 +140,7 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                 {
                     Caption = 'Init Export Triggers';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -155,6 +158,7 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     Caption = 'Download Ftp';
                     Image = Delegate;
                     Visible = "Import Enabled";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

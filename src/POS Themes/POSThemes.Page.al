@@ -42,6 +42,7 @@ page 6150735 "NPR POS Themes"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Theme Dependencies";
                 RunPageLink = "POS Theme Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

@@ -14,6 +14,7 @@ page 6059905 "NPR Task Queue"
         {
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
+                ApplicationArea=All;
 
                 trigger AddInReady()
                 begin

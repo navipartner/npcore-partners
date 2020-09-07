@@ -59,6 +59,7 @@ page 6150729 "NPR POS Sales Workflows"
                 RunObject = Page "NPR POS Sales WF Steps";
                 RunPageLink = "Set Code" = CONST(''),
                               "Workflow Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             action("Initiate Workflow Steps")
             {
@@ -68,6 +69,7 @@ page 6150729 "NPR POS Sales Workflows"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

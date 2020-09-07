@@ -48,6 +48,7 @@ page 6151602 "NPR NpDc Coupon Setup"
             {
                 Caption = 'How-to Videos';
                 Image = UserInterface;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

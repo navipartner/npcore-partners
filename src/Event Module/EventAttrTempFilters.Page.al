@@ -34,6 +34,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Image = BulletList;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -51,6 +52,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

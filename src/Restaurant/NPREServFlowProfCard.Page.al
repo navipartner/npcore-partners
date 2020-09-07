@@ -39,10 +39,12 @@ page 6150695 "NPR NPRE Serv. Flow Prof. Card"
         {
             systempart(Control6014407; Notes)
             {
+                ApplicationArea=All;
             }
             systempart(Control6014408; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }

@@ -188,12 +188,14 @@ report 6014497 "NPR Campaign Vendor List"
                 {
                     Caption = 'LocationFilter';
                     TableRelation = Location.Code;
+                    ApplicationArea=All;
                 }
                 field(Dimension1Filter; Dimension1Filter)
                 {
                     CaptionClass = '1,3,1';
                     Caption = 'DimensionFilter';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+                    ApplicationArea=All;
                 }
             }
         }

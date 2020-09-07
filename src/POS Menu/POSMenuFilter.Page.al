@@ -120,6 +120,7 @@ page 6150718 "NPR POS Menu Filter"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -133,6 +134,7 @@ page 6150718 "NPR POS Menu Filter"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -147,6 +149,7 @@ page 6150718 "NPR POS Menu Filter"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -160,11 +163,13 @@ page 6150718 "NPR POS Menu Filter"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
             }
             action(DisplayFilter)
             {
                 Caption = 'Display Filter';
                 Image = "Filter";
+                ApplicationArea=All;
             }
         }
     }

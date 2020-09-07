@@ -58,6 +58,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -71,6 +72,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

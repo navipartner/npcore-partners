@@ -103,6 +103,7 @@ page 6060104 "NPR MM Members. Point Entry"
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

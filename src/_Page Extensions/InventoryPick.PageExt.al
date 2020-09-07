@@ -26,6 +26,7 @@ pageextension 6014480 "NPR Inventory Pick" extends "Inventory Pick"
                 RunObject = Page "NPR Inventory Pick Scan";
                 RunPageLink = Type = FIELD(Type),
                               "No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }

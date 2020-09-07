@@ -75,6 +75,7 @@ page 6014679 "NPR Endpoint Query List"
                 SubPageLink = "Endpoint Query No." = FIELD("No.");
                 SubPageView = SORTING("Endpoint Query No.", "Table No.", "Field No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
     }
@@ -88,11 +89,13 @@ page 6014679 "NPR Endpoint Query List"
                 Caption = 'Create New Outgoing Query';
                 Image = New;
                 RunObject = Page "NPR Create Out. Endpoint Query";
+                ApplicationArea=All;
             }
             action("Create Requests from Incoming Query")
             {
                 Caption = 'Create Requests from Incoming Query';
                 Image = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -108,6 +111,7 @@ page 6014679 "NPR Endpoint Query List"
                 Image = XMLFile;
                 RunObject = Page "NPR Endpoint Request List";
                 RunPageLink = "Query No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }

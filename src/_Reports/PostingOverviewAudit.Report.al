@@ -161,6 +161,7 @@ report 6014429 "NPR Posting Overview Audit"
                 field(IncludeDankort; IncludeDankort)
                 {
                     Caption = 'Include Dankort';
+                    ApplicationArea=All;
                 }
             }
         }

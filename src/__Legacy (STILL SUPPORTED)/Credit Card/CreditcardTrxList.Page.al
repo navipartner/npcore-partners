@@ -65,6 +65,7 @@ page 6014408 "NPR Credit card Trx List"
                 {
                     Caption = 'Print';
                     Image = Print;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

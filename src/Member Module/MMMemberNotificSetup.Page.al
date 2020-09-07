@@ -116,6 +116,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060139));
+                ApplicationArea=All;
             }
             action("SMS Template")
             {
@@ -125,6 +126,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060139));
+                ApplicationArea=All;
             }
             action("Edit Pass Template")
             {
@@ -132,6 +134,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Image = Template;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -147,6 +150,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Notification Trigger" = CONST(RENEWAL);
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -157,6 +161,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Image = Recalculate;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

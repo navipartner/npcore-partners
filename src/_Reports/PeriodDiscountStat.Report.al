@@ -174,6 +174,7 @@ report 6014443 "NPR Period Discount Stat."
                     field(OnlyItemWithSales; OnlyItemWithSales)
                     {
                         Caption = 'Only Items With Sale';
+                        ApplicationArea=All;
                     }
                 }
             }

@@ -78,6 +78,7 @@ page 6151426 "NPR Magento Custom Option List"
             {
                 Caption = 'Card';
                 Image = Card;
+                ApplicationArea=All;
             }
         }
     }

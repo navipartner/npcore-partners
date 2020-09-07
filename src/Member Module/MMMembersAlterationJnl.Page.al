@@ -106,6 +106,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -121,6 +122,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -133,6 +135,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Batch Renew';
                 Ellipsis = true;
                 Image = CalculatePlan;
+                ApplicationArea=All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -153,6 +156,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Import From File';
                 Ellipsis = true;
                 Image = Import;
+                ApplicationArea=All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -181,6 +185,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Setup";
                 RunPageLink = Code = FIELD("Membership Code");
+                ApplicationArea=All;
             }
             action("Membership Card")
             {
@@ -190,6 +195,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
+                ApplicationArea=All;
             }
         }
     }

@@ -71,10 +71,12 @@ page 6150684 "NPR NPRE Restaurant Card"
         {
             systempart(Control6014412; Notes)
             {
+                ApplicationArea=All;
             }
             systempart(Control6014413; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }
@@ -95,6 +97,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
+                    ApplicationArea=All;
                 }
                 action(KitchenStationSelection)
                 {
@@ -105,6 +108,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
+                    ApplicationArea=All;
                 }
                 action(ShowKitchenRequests)
                 {
@@ -114,6 +118,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Scope = Repeater;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -136,6 +141,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
+                    ApplicationArea=All;
                 }
                 action(Seatings)
                 {
@@ -145,6 +151,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

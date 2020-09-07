@@ -40,6 +40,7 @@ page 6014605 "NPR Attributes"
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
             action(Translations)
             {
@@ -48,6 +49,7 @@ page 6014605 "NPR Attributes"
                 RunObject = Page "NPR Attribute Translations";
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code", "Language ID");
+                ApplicationArea=All;
             }
             action(Values)
             {
@@ -56,6 +58,7 @@ page 6014605 "NPR Attributes"
                 RunObject = Page "NPR Attribute Value Lookup";
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code");
+                ApplicationArea=All;
             }
         }
     }

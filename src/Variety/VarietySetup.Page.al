@@ -136,6 +136,7 @@ page 6059970 "NPR Variety Setup"
                     Promoted = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -151,6 +152,7 @@ page 6059970 "NPR Variety Setup"
                     Promoted = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -167,6 +169,7 @@ page 6059970 "NPR Variety Setup"
                 {
                     Caption = 'Show Original Setup';
                     Image = History;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -181,6 +184,7 @@ page 6059970 "NPR Variety Setup"
                 {
                     Caption = 'Disable Original Setup';
                     Image = InactivityDescription;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -199,6 +203,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category4;
                     RunObject = Page "NPR Alternative Number";
                     RunPageView = SORTING("Alt. No.", Type);
+                    ApplicationArea=All;
                 }
                 action("Item Cross Reference")
                 {
@@ -208,6 +213,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category4;
                     RunObject = Page "Item Cross Reference Entries";
                     RunPageView = SORTING("Cross-Reference Type", "Cross-Reference No.");
+                    ApplicationArea=All;
                 }
             }
             group("Update")
@@ -220,6 +226,7 @@ page 6059970 "NPR Variety Setup"
                     Promoted = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -237,6 +244,7 @@ page 6059970 "NPR Variety Setup"
                     Promoted = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -255,6 +263,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Update Barcodes";
+                    ApplicationArea=All;
                 }
             }
             group(Convert)
@@ -268,6 +277,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Alt. No. to ICR barcodes";
+                    ApplicationArea=All;
                 }
                 action("Item Cross Reference to Alt. No.")
                 {
@@ -277,6 +287,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR ICR to Alt. No. barcodes";
+                    ApplicationArea=All;
                 }
             }
         }
@@ -293,6 +304,7 @@ page 6059970 "NPR Variety Setup"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety";
+                    ApplicationArea=All;
                 }
                 action("Field Setup")
                 {
@@ -301,6 +313,7 @@ page 6059970 "NPR Variety Setup"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Fields Setup";
+                    ApplicationArea=All;
                 }
                 action(Groups)
                 {
@@ -309,6 +322,7 @@ page 6059970 "NPR Variety Setup"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Group";
+                    ApplicationArea=All;
                 }
             }
             group(Wizard)
@@ -317,6 +331,7 @@ page 6059970 "NPR Variety Setup"
                 {
                     Caption = 'Setup Wizard';
                     Image = Setup;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

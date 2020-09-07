@@ -58,6 +58,7 @@ page 6059995 "NPR RSS Reader Activ."
                 Caption = 'Change';
                 Image = Change;
                 ShortCutKey = 'Return';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

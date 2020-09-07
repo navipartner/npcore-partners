@@ -88,6 +88,7 @@ page 6060130 "NPR MM Member Card List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
+                ApplicationArea=All;
             }
             action(Members)
             {
@@ -99,6 +100,7 @@ page 6060130 "NPR MM Member Card List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Card";
                 RunPageLink = "Entry No." = FIELD("Member Entry No.");
+                ApplicationArea=All;
             }
             separator(Separator6014401)
             {
@@ -113,6 +115,7 @@ page 6060130 "NPR MM Member Card List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Card No." = FIELD("External Card No.");
+                ApplicationArea=All;
             }
         }
     }

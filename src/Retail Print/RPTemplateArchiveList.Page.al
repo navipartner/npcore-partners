@@ -53,6 +53,7 @@ page 6014631 "NPR RP Template Archive List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -69,6 +70,7 @@ page 6014631 "NPR RP Template Archive List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

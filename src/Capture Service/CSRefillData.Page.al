@@ -72,6 +72,7 @@ page 6151389 "NPR CS Refill Data"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

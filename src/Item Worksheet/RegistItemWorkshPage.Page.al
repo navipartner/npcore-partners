@@ -292,6 +292,7 @@ page 6060047 "NPR Regist. Item Worksh. Page"
                 SubPageView = SORTING("Registered Worksheet No.", "Registered Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                               ORDER(Ascending);
                 UpdatePropagation = SubPart;
+                ApplicationArea=All;
             }
         }
     }
@@ -308,6 +309,7 @@ page 6060047 "NPR Regist. Item Worksh. Page"
                 RunPageLink = "No." = FIELD("Item No.");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -319,31 +321,37 @@ page 6060047 "NPR Regist. Item Worksh. Page"
                 {
                     Caption = 'Create';
                     Image = CreateForm;
+                    ApplicationArea=All;
                 }
                 action("Variant Code")
                 {
                     Caption = 'Variant code';
                     Image = ItemVariant;
+                    ApplicationArea=All;
                 }
                 action(Barcodes)
                 {
                     Caption = 'Barcode';
                     Image = BarCode;
+                    ApplicationArea=All;
                 }
                 action(SalesPrice)
                 {
                     Caption = 'Sales Prices';
                     Image = SalesPrices;
+                    ApplicationArea=All;
                 }
                 action("Purchase Price")
                 {
                     Caption = 'Purchase Price';
                     Image = Price;
+                    ApplicationArea=All;
                 }
                 action("Supplier barcode")
                 {
                     Caption = 'Supplier Barcode';
                     Image = "Action";
+                    ApplicationArea=All;
                 }
             }
             group(Functions)
@@ -353,16 +361,19 @@ page 6060047 "NPR Regist. Item Worksh. Page"
                 {
                     Caption = 'Create Items';
                     Image = Create;
+                    ApplicationArea=All;
                 }
                 action(Controller)
                 {
                     Caption = 'Controller';
                     Image = "Action";
+                    ApplicationArea=All;
                 }
                 action("Import from Buffer")
                 {
                     Caption = 'Import from Buffer';
                     Image = Import;
+                    ApplicationArea=All;
                 }
             }
         }

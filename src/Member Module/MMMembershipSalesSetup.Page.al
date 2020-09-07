@@ -127,6 +127,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Image = NewCustomer;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -141,11 +142,13 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Caption = 'Import Members From File';
                 Image = Import;
                 RunObject = Codeunit "NPR MM Import Members";
+                ApplicationArea=All;
             }
             action("Failed Import Worksheet")
             {
                 Caption = 'Failed Import Worksheet';
                 Image = ImportLog;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -167,12 +170,14 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Caption = 'Membership Setup';
                 Image = SetupList;
                 RunObject = Page "NPR MM Membership Setup";
+                ApplicationArea=All;
             }
             action("Item List")
             {
                 Caption = 'Item List';
                 Image = List;
                 RunObject = Page "NPR Retail Item List";
+                ApplicationArea=All;
             }
             action(Memberships)
             {
@@ -180,12 +185,14 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Image = List;
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Membership Code" = FIELD("Membership Code");
+                ApplicationArea=All;
             }
             action("Community Setup")
             {
                 Caption = 'Community Setup';
                 Image = Group;
                 RunObject = Page "NPR MM Member Community";
+                ApplicationArea=All;
             }
         }
     }

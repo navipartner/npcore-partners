@@ -69,6 +69,7 @@ page 6151428 "NPR Magento Item Cstm Options"
                 Caption = 'Values';
                 SubPageLink = "Item No." = FIELD("Item No."),
                               "Custom Option No." = FIELD("Custom Option No.");
+                ApplicationArea=All;
             }
         }
     }

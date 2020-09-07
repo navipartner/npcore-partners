@@ -25,6 +25,7 @@ report 6151590 "NPR NpDc Request Coupon Qty."
                     {
                         Caption = 'Issue Coupon Qty.';
                         MinValue = 0;
+                        ApplicationArea=All;
                     }
                 }
             }

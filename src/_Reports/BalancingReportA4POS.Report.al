@@ -698,22 +698,27 @@ report 6014459 "NPR Balancing Report A4 POS"
                     field(PrintSales; PrintSales)
                     {
                         Caption = 'Print Sales';
+                        ApplicationArea=All;
                     }
                     field(PrintReceipts; PrintReceipts)
                     {
                         Caption = 'Print Receipts';
+                        ApplicationArea=All;
                     }
                     field(PrintTerminals; PrintTerminals)
                     {
                         Caption = 'Print Terminals';
+                        ApplicationArea=All;
                     }
                     field(PrintVouchers; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
+                        ApplicationArea=All;
                     }
                     field(PrintTurnOver; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
+                        ApplicationArea=All;
                     }
                     group(PrintDiscount)
                     {
@@ -721,6 +726,7 @@ report 6014459 "NPR Balancing Report A4 POS"
                         field(PrintDiscountAmt; PrintDiscountAmt)
                         {
                             Caption = '        Print Discount Amount';
+                            ApplicationArea=All;
 
                             trigger OnValidate()
                             begin
@@ -731,6 +737,7 @@ report 6014459 "NPR Balancing Report A4 POS"
                         field(PrintDiscountPerc; PrintDiscountPerc)
                         {
                             Caption = '        Print Discount %';
+                            ApplicationArea=All;
 
                             trigger OnValidate()
                             begin
@@ -741,6 +748,7 @@ report 6014459 "NPR Balancing Report A4 POS"
                         field(PrintDiscountTotal; PrintDiscountTotal)
                         {
                             Caption = '        Print Discount Total';
+                            ApplicationArea=All;
 
                             trigger OnValidate()
                             begin
@@ -752,22 +760,27 @@ report 6014459 "NPR Balancing Report A4 POS"
                     field(PrintCounting; PrintCounting)
                     {
                         Caption = 'Print Counting';
+                        ApplicationArea=All;
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
+                        ApplicationArea=All;
                     }
                     field(PrintVAT; PrintVAT)
                     {
                         Caption = 'Print VAT';
+                        ApplicationArea=All;
                     }
                     field(PrintAttachedBins; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
+                        ApplicationArea=All;
                     }
                     field(PrintEmptyLines; PrintEmptyLines)
                     {
                         Caption = 'Print Lines where Value is Zero.';
+                        ApplicationArea=All;
                     }
                 }
             }

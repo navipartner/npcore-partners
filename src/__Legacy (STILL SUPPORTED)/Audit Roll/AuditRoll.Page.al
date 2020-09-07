@@ -395,6 +395,7 @@ page 6014432 "NPR Audit Roll"
             }
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
+                ApplicationArea=All;
 
                 trigger AddInReady()
                 begin
@@ -423,6 +424,7 @@ page 6014432 "NPR Audit Roll"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -467,6 +469,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Sales;
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -504,6 +507,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Invoice';
                     Image = Invoice;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -530,6 +534,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Receipt;
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -551,6 +556,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Insurranceoffer';
                     Image = Insurance;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -561,6 +567,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Retail order';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -583,6 +590,7 @@ page 6014432 "NPR Audit Roll"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -655,6 +663,7 @@ page 6014432 "NPR Audit Roll"
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
                     Visible = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -689,6 +698,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Credit Card Transaction List';
                     Image = "Action";
                     RunObject = Page "NPR Credit card Trx List";
+                    ApplicationArea=All;
                 }
                 action("EFT Receipt")
                 {
@@ -696,6 +706,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Print;
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -727,6 +738,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Show Credit Card Transaction';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -750,6 +762,7 @@ page 6014432 "NPR Audit Roll"
                     Image = CreditCardLog;
                     RunObject = Page "NPR EFT Transaction Requests";
                     RunPageLink = "Sales Ticket No." = FIELD("Sales Ticket No.");
+                    ApplicationArea=All;
                 }
             }
             group(Functions)
@@ -760,6 +773,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Post Payments';
                     Image = Post;
                     ShortCutKey = 'F5';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -771,6 +785,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Post';
                     Image = Post;
                     ShortCutKey = 'F11';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -788,6 +803,7 @@ page 6014432 "NPR Audit Roll"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Shift+F11';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -799,6 +815,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Posting of Range';
                     Image = Post;
                     ShortCutKey = 'Ctrl+F11';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -812,6 +829,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Move Sales Ticket to Warranty';
                     Image = MovementWorksheet;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -827,6 +845,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Show Documents';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -870,11 +889,13 @@ page 6014432 "NPR Audit Roll"
                     RunObject = Page "NPR Periods";
                     RunPageLink = "Sales Ticket No." = FIELD("Sales Ticket No."),
                                   "Register No." = FIELD("Register No.");
+                    ApplicationArea=All;
                 }
                 action("&Navigate")
                 {
                     Caption = 'Naviger';
                     Image = Navigate;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -889,6 +910,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -899,6 +921,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Change Dimensions';
                     Image = ChangeDimensions;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -911,6 +934,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Comments';
                     Image = Comment;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -932,11 +956,13 @@ page 6014432 "NPR Audit Roll"
                     RunObject = Page "NPR POS Info Audit Roll";
                     RunPageLink = "Register No." = FIELD("Register No."),
                                   "Sales Ticket No." = FIELD("Sales Ticket No.");
+                    ApplicationArea=All;
                 }
                 action("POS Entry")
                 {
                     Caption = 'POS Entry';
                     Image = Entries;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -959,6 +985,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Advanced Filter';
                     Image = "Filter";
+                    ApplicationArea=All;
                 }
                 separator(Separator6150674)
                 {
@@ -967,12 +994,14 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'Calculate';
                     Image = Calculate;
+                    ApplicationArea=All;
                 }
                 action(Sum)
                 {
                     Caption = 'Sum';
                     Image = Totals;
                     ShortCutKey = 'Ctrl+S';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -996,6 +1025,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Sales Ticket Statistics';
                     Image = Statistics;
                     ShortCutKey = 'F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1016,11 +1046,13 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Advanced Sales Statistics';
                     Image = Statistics;
                     RunObject = Page "NPR Advanced Sales Stats";
+                    ApplicationArea=All;
                 }
                 action("Day Report")
                 {
                     Caption = 'Day Report';
                     Image = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1044,12 +1076,14 @@ page 6014432 "NPR Audit Roll"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
+                    ApplicationArea=All;
                 }
                 action(SendAsPDF)
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     Promoted = true;
+                    ApplicationArea=All;
                 }
             }
         }

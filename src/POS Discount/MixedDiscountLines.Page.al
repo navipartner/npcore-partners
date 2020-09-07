@@ -129,6 +129,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 Promoted = true;
                 PromotedIsBig = true;
                 Visible = (MixType = 1);
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -158,6 +159,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 RunObject = Page "NPR Mixed Discount";
                 RunPageLink = Code = FIELD("No.");
                 Visible = (MixType = 1);
+                ApplicationArea=All;
             }
         }
     }

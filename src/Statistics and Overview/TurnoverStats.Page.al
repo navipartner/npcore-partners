@@ -188,6 +188,7 @@ page 6014483 "NPR Turnover Stats"
             part(sub1; "NPR Turnover Statistics")
             {
                 Caption = 'Turnover Statistics';
+                ApplicationArea=All;
             }
         }
     }
@@ -205,6 +206,7 @@ page 6014483 "NPR Turnover Stats"
                     Image = Register;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -225,6 +227,7 @@ page 6014483 "NPR Turnover Stats"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -248,6 +251,7 @@ page 6014483 "NPR Turnover Stats"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+F8';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

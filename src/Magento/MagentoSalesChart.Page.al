@@ -23,6 +23,7 @@ page 6151482 "NPR Magento Sales Chart"
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
+                ApplicationArea=All;
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
@@ -47,6 +48,7 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Day)
                 {
                     Caption = 'Day';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -58,6 +60,7 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Week)
                 {
                     Caption = 'Week';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -69,6 +72,7 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Month)
                 {
                     Caption = 'Month';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -80,6 +84,7 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -91,6 +96,7 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Year)
                 {
                     Caption = 'Year';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -104,6 +110,7 @@ page 6151482 "NPR Magento Sales Chart"
             {
                 Caption = 'Previous';
                 Image = PreviousRecord;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -115,6 +122,7 @@ page 6151482 "NPR Magento Sales Chart"
             {
                 Caption = 'Next';
                 Image = NextRecord;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

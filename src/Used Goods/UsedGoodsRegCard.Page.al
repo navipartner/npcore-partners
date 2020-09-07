@@ -197,6 +197,7 @@ page 6014506 "NPR Used Goods Reg. Card"
             {
                 Caption = 'Copy from Main Card';
                 Image = Copy;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -244,6 +245,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Caption = 'Associated Registration Card';
                     Image = List;
                     ShortCutKey = 'F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -283,6 +285,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                 {
                     Caption = 'Create Used Item';
                     Image = ElectronicNumber;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -303,6 +306,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                 {
                     Caption = 'Create Sales Credit Memo';
                     Image = CreateCreditMemo;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -319,6 +323,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                 {
                     Caption = '&Item Card';
                     Image = Card;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -335,6 +340,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                 {
                     Caption = 'Item &Entry';
                     Image = Entries;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -353,6 +359,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                 {
                     Caption = 'Print Registration Card';
                     Image = PrintDocument;
+                    ApplicationArea=All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
 
@@ -383,6 +390,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Caption = 'Create Used Item and Print Label';
                     Image = ElectronicNumber;
                     Visible = false;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

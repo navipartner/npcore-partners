@@ -49,6 +49,7 @@ page 6151024 "NPR NpRv Global Voucher Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

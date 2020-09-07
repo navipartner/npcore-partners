@@ -25,6 +25,7 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
             {
                 Caption = 'Opening Hours';
                 SubPageLink = "Set Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }
@@ -38,6 +39,7 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
                 Caption = 'Opening Hour Calendar';
                 Image = Calendar;
                 ShortCutKey = 'Ctrl+F7';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
