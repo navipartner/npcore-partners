@@ -307,6 +307,7 @@ page 6014585 "NPR Advanced Sales Stats"
                 {
                     Caption = 'Advanced Sales Statistics';
                     Image = Statistics;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -337,6 +338,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Salesperson Statisticts';
                     Image = SalesPerson;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -358,6 +360,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Item Group';
                     Image = ItemGroup;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -384,6 +387,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Item Statistics';
                     Image = Item;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -407,6 +411,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Customer Statistics';
                     Image = Customer;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -428,6 +433,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Vendor Statistics';
                     Image = Vendor;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -449,6 +455,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Item Category Code Statistics';
                     Image = ItemLines;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -470,6 +477,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Product Group Code Statistics';
                     Image = ProductionSetup;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

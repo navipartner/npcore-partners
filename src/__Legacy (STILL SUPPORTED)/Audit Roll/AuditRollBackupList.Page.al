@@ -109,6 +109,7 @@ page 6014495 "NPR Audit Roll Backup List"
             {
                 Caption = 'Move to Audit Roll';
                 Image = MoveUp;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

@@ -109,6 +109,7 @@ report 6014421 "NPR POS Menu Buttons/Actions"
                     field(ShowParameters; ShowParameters)
                     {
                         Caption = 'Show Parameters';
+                        ApplicationArea=All;
                     }
                 }
             }

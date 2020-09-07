@@ -139,10 +139,12 @@ page 6059902 "NPR Task Journal"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }
@@ -165,6 +167,7 @@ page 6059902 "NPR Task Journal"
                                   "Journal Batch Name" = FIELD("Journal Batch Name"),
                                   "Line No." = FIELD("Line No.");
                     ShortCutKey = 'Shift+F7';
+                    ApplicationArea=All;
                 }
                 action("Task Log")
                 {
@@ -179,6 +182,7 @@ page 6059902 "NPR Task Journal"
                                   "Line No." = FIELD("Line No.");
                     RunPageView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
                     ShortCutKey = 'Ctrl+F7';
+                    ApplicationArea=All;
                 }
             }
         }
@@ -194,6 +198,7 @@ page 6059902 "NPR Task Journal"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -209,6 +214,7 @@ page 6059902 "NPR Task Journal"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -228,6 +234,7 @@ page 6059902 "NPR Task Journal"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

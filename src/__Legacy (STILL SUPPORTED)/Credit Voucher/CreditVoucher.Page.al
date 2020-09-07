@@ -211,6 +211,7 @@ page 6014418 "NPR Credit Voucher"
                 {
                     Caption = 'Cashed';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -221,6 +222,7 @@ page 6014418 "NPR Credit Voucher"
                 {
                     Caption = 'Create Invoice';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -235,6 +237,7 @@ page 6014418 "NPR Credit Voucher"
                 {
                     Caption = 'Issued';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -245,6 +248,7 @@ page 6014418 "NPR Credit Voucher"
                 {
                     Caption = 'Cashed';
                     Image = Allocate;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -260,6 +264,7 @@ page 6014418 "NPR Credit Voucher"
                     Caption = 'Copy';
                     Image = PrintVoucher;
                     Promoted = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

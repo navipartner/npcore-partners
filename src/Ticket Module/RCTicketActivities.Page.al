@@ -84,6 +84,7 @@ page 6060108 "NPR RC Ticket Activities"
             {
                 Caption = 'Set Up Cues';
                 Image = Setup;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

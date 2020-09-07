@@ -116,6 +116,7 @@ page 6151383 "NPR CS Stock-Take Rfid Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

@@ -518,6 +518,7 @@ page 6060042 "NPR Item Worksheet Page"
                 SubPageView = SORTING("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                               ORDER(Ascending);
                 UpdatePropagation = SubPart;
+                ApplicationArea=All;
             }
         }
         area(factboxes)
@@ -528,6 +529,7 @@ page 6060042 "NPR Item Worksheet Page"
                               "Worksheet Name" = FIELD("Worksheet Name"),
                               "Line No." = FIELD("Line No.");
                 Visible = true;
+                ApplicationArea=All;
             }
             part(NPAttribFactBox; "NPR Item Worksh. Attr. FactBox")
             {
@@ -538,6 +540,7 @@ page 6060042 "NPR Item Worksheet Page"
                 SubPageView = SORTING("No. Series")
                               ORDER(Ascending);
                 Visible = true;
+                ApplicationArea=All;
             }
         }
     }
@@ -554,6 +557,7 @@ page 6060042 "NPR Item Worksheet Page"
                 RunPageLink = "No." = FIELD("Existing Item No.");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -565,31 +569,37 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Create';
                     Image = CreateForm;
+                    ApplicationArea=All;
                 }
                 action("Variant Code")
                 {
                     Caption = 'Variant code';
                     Image = ItemVariant;
+                    ApplicationArea=All;
                 }
                 action(Barcodes)
                 {
                     Caption = 'Barcode';
                     Image = BarCode;
+                    ApplicationArea=All;
                 }
                 action(SalesPrice)
                 {
                     Caption = 'Sales Prices';
                     Image = SalesPrices;
+                    ApplicationArea=All;
                 }
                 action("Purchase Price")
                 {
                     Caption = 'Purchase Price';
                     Image = Price;
+                    ApplicationArea=All;
                 }
                 action("Supplier barcode")
                 {
                     Caption = 'Supplier Barcode';
                     Image = "Action";
+                    ApplicationArea=All;
                 }
             }
             group(Functions)
@@ -599,6 +609,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Suggest Worksheet Lines';
                     Image = ItemWorksheet;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -615,16 +626,19 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Create Items';
                     Image = Create;
+                    ApplicationArea=All;
                 }
                 action(Controller)
                 {
                     Caption = 'Controller';
                     Image = "Action";
+                    ApplicationArea=All;
                 }
                 action("Import from Buffer")
                 {
                     Caption = 'Import from Buffer';
                     Image = Import;
+                    ApplicationArea=All;
                 }
             }
             group("Worksheet Line")
@@ -637,6 +651,7 @@ page 6060042 "NPR Item Worksheet Page"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -649,6 +664,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Combine Varieties';
                     Image = BankAccountRec;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -664,6 +680,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Refresh Headers';
                     Image = UpdateDescription;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -677,11 +694,13 @@ page 6060042 "NPR Item Worksheet Page"
                     Image = MapAccounts;
                     RunObject = Page "NPR Item Worksh. Vrty. Mapping";
                     RunPageLink = "Vendor No." = FIELD("Vendor No.");
+                    ApplicationArea=All;
                 }
                 action("Suggest Existing Variants")
                 {
                     Caption = 'Suggest Existing Variants';
                     Image = SKU;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -693,6 +712,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Suggest Varieties Without Variants';
                     Image = CreateSKU;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -704,6 +724,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Suggest all Varieties';
                     Image = ItemVariant;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -715,6 +736,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Set Sales Price to RRP';
                     Image = TransferFunds;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -729,6 +751,7 @@ page 6060042 "NPR Item Worksheet Page"
                     Image = BinContent;
                     Promoted = true;
                     PromotedCategory = "Report";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -749,6 +772,7 @@ page 6060042 "NPR Item Worksheet Page"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -770,6 +794,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Combine All Varieties';
                     Image = BankAccountRec;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -795,6 +820,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Refresh All Headers';
                     Image = UpdateDescription;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -812,6 +838,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Suggest All Existing Variants';
                     Image = SKU;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -831,6 +858,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Suggest All Varieties Without Variants';
                     Image = CreateSKU;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -850,6 +878,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Suggest All Varieties in Worksheet';
                     Image = ItemVariant;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -869,6 +898,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Set All Sales Prices to RRP';
                     Image = TransferFunds;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -886,6 +916,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Field Setup';
                     Image = MapAccounts;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -907,6 +938,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Check Lines';
                     Image = CheckList;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -925,6 +957,7 @@ page 6060042 "NPR Item Worksheet Page"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -943,11 +976,13 @@ page 6060042 "NPR Item Worksheet Page"
                     RunObject = Page "NPR Item Works. Excel Column";
                     RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                   "Worksheet Name" = FIELD("Worksheet Name");
+                    ApplicationArea=All;
                 }
                 action("Export Excel")
                 {
                     Caption = 'Export Excel';
                     Image = ExportToExcel;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -962,6 +997,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Import Excel';
                     Image = ImportExcel;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -973,6 +1009,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Import XML';
                     Image = Import;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -983,6 +1020,7 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     Caption = 'Export XML';
                     Image = Export;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

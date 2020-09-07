@@ -113,6 +113,7 @@ page 6151419 "NPR Magento Brand Card"
                 ShowFilter = false;
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD(Picture);
+                ApplicationArea=All;
             }
             part(LogoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
@@ -121,6 +122,7 @@ page 6151419 "NPR Magento Brand Card"
                 ShowFilter = false;
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD("Logo Picture");
+                ApplicationArea=All;
             }
         }
     }
@@ -135,12 +137,14 @@ page 6151419 "NPR Magento Brand Card"
                 Image = List;
                 RunObject = Page "NPR Magento Brands";
                 ShortCutKey = 'F5';
+                ApplicationArea=All;
             }
             action("Display Config")
             {
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

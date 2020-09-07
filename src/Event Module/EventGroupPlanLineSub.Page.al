@@ -468,6 +468,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'Shift+Ctrl+T';
+                    ApplicationArea=All;
                 }
                 separator(Separator6014408)
                 {
@@ -477,6 +478,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Linked Job Ledger E&ntries';
                     Image = JobLedger;
                     ShortCutKey = 'Ctrl+F7';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -502,6 +504,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     AccessByPermission = TableData Item = R;
                     Caption = '&Reservation Entries';
                     Image = ReservationLedger;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -515,6 +518,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     Caption = 'Order &Promising';
                     Image = OrderPromising;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -528,6 +532,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     {
                         Caption = 'Send';
                         Image = Calendar;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -539,6 +544,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     {
                         Caption = 'Remove';
                         Image = RemoveContacts;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -550,6 +556,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     {
                         Caption = 'Get Attendee Response';
                         Image = Answers;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -562,6 +569,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     Caption = 'Send E-Mail';
                     Image = SendMail;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -581,6 +589,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -614,6 +623,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     RunObject = Page "Job Journal";
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
+                    ApplicationArea=All;
                 }
                 separator(Separator16)
                 {
@@ -626,6 +636,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -639,6 +650,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Image = CreditMemo;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -652,6 +664,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Image = GetSourceDoc;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -669,6 +682,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = '&Reservation';
                     Ellipsis = true;
                     Image = Reserve;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -679,6 +693,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     Caption = 'Order &Tracking';
                     Image = OrderTracking;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -692,6 +707,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     Caption = '&Demand Overview';
                     Image = Forecast;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -708,6 +724,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     AccessByPermission = TableData "Extended Text Header" = R;
                     Caption = 'Insert &Ext. Texts';
                     Image = Text;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -729,6 +746,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
                     RunObject = Report "Job - Transaction Detail";
+                    ApplicationArea=All;
                 }
             }
             group(Navigate)
@@ -738,6 +756,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     Caption = 'Activity Log';
                     Image = Log;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

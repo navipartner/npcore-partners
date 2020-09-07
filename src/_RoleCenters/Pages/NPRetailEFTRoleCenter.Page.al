@@ -14,10 +14,12 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 ShowCaption = false;
                 part(Control1901138408; "Warehouse Worker Activities")
                 {
+                    ApplicationArea=All;
                 }
                 part(Control1905989608; "My Items")
                 {
                     Visible = false;
+                    ApplicationArea=All;
                 }
             }
             group(Control1900724708)
@@ -26,12 +28,15 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 part(Control1006; "My Job Queue")
                 {
                     Visible = false;
+                    ApplicationArea=All;
                 }
                 part(Control4; "Report Inbox Part")
                 {
+                    ApplicationArea=All;
                 }
                 systempart(Control1901377608; MyNotes)
                 {
+                    ApplicationArea=All;
                 }
             }
         }
@@ -46,12 +51,14 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Caption = 'Warehouse &Bin List';
                 Image = "Report";
                 RunObject = Report "Warehouse Bin List";
+                ApplicationArea=All;
             }
             action("Warehouse A&djustment Bin")
             {
                 Caption = 'Warehouse A&djustment Bin';
                 Image = "Report";
                 RunObject = Report "Whse. Adjustment Bin";
+                ApplicationArea=All;
             }
             separator(Separator51)
             {
@@ -61,6 +68,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Caption = 'Whse. P&hys. Inventory List';
                 Image = "Report";
                 RunObject = Report "Whse. Phys. Inventory List";
+                ApplicationArea=All;
             }
             separator(Separator19)
             {
@@ -70,6 +78,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Caption = 'Prod. &Order Picking List';
                 Image = "Report";
                 RunObject = Report "Prod. Order - Picking List";
+                ApplicationArea=All;
             }
             separator(Separator54)
             {
@@ -79,6 +88,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Caption = 'Customer &Labels';
                 Image = "Report";
                 RunObject = Report "Customer - Labels";
+                ApplicationArea=All;
             }
         }
         area(embedding)
@@ -87,21 +97,25 @@ page 6059835 "NPR NP Retail EFT Role Center"
             {
                 Caption = 'Picks';
                 RunObject = Page "Warehouse Picks";
+                ApplicationArea=All;
             }
             action(Action36)
             {
                 Caption = 'Put-aways';
                 RunObject = Page "Warehouse Put-aways";
+                ApplicationArea=All;
             }
             action(Action41)
             {
                 Caption = 'Movements';
                 RunObject = Page "Warehouse Movements";
+                ApplicationArea=All;
             }
             action(WhseShpt)
             {
                 Caption = 'Warehouse Shipments';
                 RunObject = Page "Warehouse Shipment List";
+                ApplicationArea=All;
             }
             action(WhseShptReleased)
             {
@@ -109,80 +123,94 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Warehouse Shipment List";
                 RunPageView = SORTING("No.")
                               WHERE(Status = FILTER(Released));
+                ApplicationArea=All;
             }
             action(WhseShptPartPicked)
             {
                 Caption = 'Partially Picked';
                 RunObject = Page "Warehouse Shipment List";
                 RunPageView = WHERE("Document Status" = FILTER("Partially Picked"));
+                ApplicationArea=All;
             }
             action(WhseShptComplPicked)
             {
                 Caption = 'Completely Picked';
                 RunObject = Page "Warehouse Shipment List";
                 RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
+                ApplicationArea=All;
             }
             action(WhseShptPartShipped)
             {
                 Caption = 'Partially Shipped';
                 RunObject = Page "Warehouse Shipment List";
                 RunPageView = WHERE("Document Status" = FILTER("Partially Shipped"));
+                ApplicationArea=All;
             }
             action(WhseReceipts)
             {
                 Caption = 'Warehouse Receipts';
                 RunObject = Page "Warehouse Receipts";
+                ApplicationArea=All;
             }
             action(WhseReceiptsPartReceived)
             {
                 Caption = 'Partially Received';
                 RunObject = Page "Warehouse Receipts";
                 RunPageView = WHERE("Document Status" = FILTER("Partially Received"));
+                ApplicationArea=All;
             }
             action(Action83)
             {
                 Caption = 'Transfer Orders';
                 Image = Document;
                 RunObject = Page "Transfer Orders";
+                ApplicationArea=All;
             }
             action(Action1)
             {
                 Caption = 'Assembly Orders';
                 RunObject = Page "Assembly Orders";
+                ApplicationArea=All;
             }
             action(Action46)
             {
                 Caption = 'Bin Contents';
                 Image = BinContent;
                 RunObject = Page "Bin Contents List";
+                ApplicationArea=All;
             }
             action(Action47)
             {
                 Caption = 'Items';
                 Image = Item;
                 RunObject = Page "Item List";
+                ApplicationArea=All;
             }
             action(Customers)
             {
                 Caption = 'Customers';
                 Image = Customer;
                 RunObject = Page "Customer List";
+                ApplicationArea=All;
             }
             action(Action52)
             {
                 Caption = 'Vendors';
                 Image = Vendor;
                 RunObject = Page "Vendor List";
+                ApplicationArea=All;
             }
             action(Action53)
             {
                 Caption = 'Shipping Agents';
                 RunObject = Page "Shipping Agents";
+                ApplicationArea=All;
             }
             action("Warehouse Employees")
             {
                 Caption = 'Warehouse Employees';
                 RunObject = Page "Warehouse Employee List";
+                ApplicationArea=All;
             }
         }
         area(sections)
@@ -196,24 +224,28 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Caption = 'Registered Picks';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Picks";
+                    ApplicationArea=All;
                 }
                 action(Action44)
                 {
                     Caption = 'Registered Put-aways';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Put-aways";
+                    ApplicationArea=All;
                 }
                 action(Action45)
                 {
                     Caption = 'Registered Movements';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Movements";
+                    ApplicationArea=All;
                 }
                 action(Action59)
                 {
                     Caption = 'Posted Whse. Receipts';
                     Image = PostedReceipts;
                     RunObject = Page "Posted Whse. Receipt List";
+                    ApplicationArea=All;
                 }
             }
         }
@@ -226,6 +258,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Whse. Phys. Invt. Journal";
                 ToolTip = 'Prepare to count inventories by preparing the documents that warehouse employees use when they perform a physical inventory of selected items or of all the inventory. When the physical count has been made, you enter the number of items that are in the bins in this window, and then you register the physical inventory.';
                 Visible = false;
+                ApplicationArea=All;
             }
             action("Whse. Item &Journal")
             {
@@ -234,6 +267,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Whse. Item Journal";
                 ToolTip = 'Adjust the quantity of an item in a particular bin or bins. For instance, you might find some items in a bin that are not registered in the system, or you might not be able to pick the quantity needed because there are fewer items in a bin than was calculated by the program. The bin is then updated to correspond to the actual quantity in the bin. In addition, it creates a balancing quantity in the adjustment bin, for synchronization with item ledger entries, which you can then post with an item journal.';
                 Visible = false;
+                ApplicationArea=All;
             }
             action("Pick &Worksheet")
             {
@@ -242,6 +276,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Pick Worksheet";
                 ToolTip = 'Plan and initialize picks of items. ';
                 Visible = false;
+                ApplicationArea=All;
             }
             action("Put-&away Worksheet")
             {
@@ -250,6 +285,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Put-away Worksheet";
                 ToolTip = 'Plan and initialize item put-aways.';
                 Visible = false;
+                ApplicationArea=All;
             }
             action("M&ovement Worksheet")
             {
@@ -258,6 +294,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Movement Worksheet";
                 ToolTip = 'Prepare to move items between bins within the warehouse.';
                 Visible = false;
+                ApplicationArea=All;
             }
             group(ActionGroup6014437)
             {
@@ -266,6 +303,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Caption = 'Warehouse Receipts';
                     Image = List;
                     RunObject = Page "Warehouse Receipts";
+                    ApplicationArea=All;
                 }
                 action("Partially Received")
                 {
@@ -273,12 +311,14 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Receipts";
                     RunPageView = WHERE("Document Status" = CONST("Partially Received"));
+                    ApplicationArea=All;
                 }
                 action("Warehouse Shipments")
                 {
                     Caption = 'Warehouse Shipments';
                     Image = List;
                     RunObject = Page "Warehouse Shipment List";
+                    ApplicationArea=All;
                 }
                 action(Release)
                 {
@@ -288,6 +328,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunPageView = SORTING("No.")
                                   ORDER(Ascending)
                                   WHERE(Status = FILTER(Released));
+                    ApplicationArea=All;
                 }
                 action("Partially Picked")
                 {
@@ -295,6 +336,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Shipment List";
                     RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
+                    ApplicationArea=All;
                 }
                 action("Completely Picked")
                 {
@@ -302,6 +344,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Shipment List";
                     RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
+                    ApplicationArea=All;
                 }
                 action("Partially Shipped")
                 {
@@ -309,48 +352,56 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Shipment List";
                     RunPageView = WHERE("Document Status" = FILTER("Partially Shipped"));
+                    ApplicationArea=All;
                 }
                 action("Inventory Put-aways")
                 {
                     Caption = 'Inventory Put-aways';
                     Image = List;
                     RunObject = Page "Inventory Put-aways";
+                    ApplicationArea=All;
                 }
                 action("Put-aways")
                 {
                     Caption = 'Put-aways';
                     Image = List;
                     RunObject = Page "Inventory Picks";
+                    ApplicationArea=All;
                 }
                 action(Picks)
                 {
                     Caption = 'Picks';
                     Image = List;
                     RunObject = Page "Warehouse Picks";
+                    ApplicationArea=All;
                 }
                 action(Movements)
                 {
                     Caption = 'Movements';
                     Image = List;
                     RunObject = Page "Warehouse Movements";
+                    ApplicationArea=All;
                 }
                 action("Transfer Orders")
                 {
                     Caption = 'Transfer Orders';
                     Image = List;
                     RunObject = Page "Transfer Orders";
+                    ApplicationArea=All;
                 }
                 action("Assembly Orders")
                 {
                     Caption = 'Assembly Orders';
                     Image = List;
                     RunObject = Page "Assembly Orders";
+                    ApplicationArea=All;
                 }
                 action("Bin Contents")
                 {
                     Caption = 'Bin Contents';
                     Image = List;
                     RunObject = Page "Bin Contents List";
+                    ApplicationArea=All;
                 }
             }
             group("Reference Data")
@@ -361,24 +412,28 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Caption = 'Items';
                     Image = List;
                     RunObject = Page "Item List";
+                    ApplicationArea=All;
                 }
                 action(Customer)
                 {
                     Caption = 'Customer';
                     Image = List;
                     RunObject = Page "Customer List";
+                    ApplicationArea=All;
                 }
                 action(Vendors)
                 {
                     Caption = 'Vendors';
                     Image = List;
                     RunObject = Page "Vendor List";
+                    ApplicationArea=All;
                 }
                 action("Shipping Agents")
                 {
                     Caption = 'Shipping Agents';
                     Image = List;
                     RunObject = Page "Shipping Agents";
+                    ApplicationArea=All;
                 }
             }
             group(Journal)
@@ -391,6 +446,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Whse. Journal Batches List";
                     RunPageView = WHERE("Template Type" = CONST("Physical Inventory"));
                     ToolTip = 'Prepare to count inventories by preparing the documents that warehouse employees use when they perform a physical inventory of selected items or of all the inventory. When the physical count has been made, you enter the number of items that are in the bins in this window, and then you register the physical inventory.';
+                    ApplicationArea=All;
                 }
                 action("WhseItem Journals")
                 {
@@ -399,6 +455,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Whse. Journal Batches List";
                     RunPageView = WHERE("Template Type" = CONST(Item));
                     ToolTip = 'Adjust the quantity of an item in a particular bin or bins. For instance, you might find some items in a bin that are not registered in the system, or you might not be able to pick the quantity needed because there are fewer items in a bin than was calculated by the program. The bin is then updated to correspond to the actual quantity in the bin. In addition, it creates a balancing quantity in the adjustment bin, for synchronization with item ledger entries, which you can then post with an item journal.';
+                    ApplicationArea=All;
                 }
             }
             group(Worksheet)
@@ -411,6 +468,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Worksheet Names List";
                     RunPageView = WHERE("Template Type" = CONST(Pick));
                     ToolTip = 'Plan and initialize picks of items. ';
+                    ApplicationArea=All;
                 }
                 action(PutawayWorksheets)
                 {
@@ -419,6 +477,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Worksheet Names List";
                     RunPageView = WHERE("Template Type" = CONST("Put-away"));
                     ToolTip = 'Plan and initialize item put-aways.';
+                    ApplicationArea=All;
                 }
                 action(MovementWorksheets)
                 {
@@ -427,6 +486,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Worksheet Names List";
                     RunPageView = WHERE("Template Type" = CONST(Movement));
                     ToolTip = 'Plan and initiate movements of items between bins according to an advanced warehouse configuration.';
+                    ApplicationArea=All;
                 }
             }
             group(ActionGroup6014410)
@@ -437,24 +497,28 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Caption = 'Registered Picks';
                     Image = List;
                     RunObject = Page "Registered Whse. Picks";
+                    ApplicationArea=All;
                 }
                 action("Registered Put-aways")
                 {
                     Caption = 'Registered Put-aways';
                     Image = List;
                     RunObject = Page "Registered Whse. Put-aways";
+                    ApplicationArea=All;
                 }
                 action("Registered Movements")
                 {
                     Caption = 'Registered Movements';
                     Image = List;
                     RunObject = Page "Registered Whse. Movements";
+                    ApplicationArea=All;
                 }
                 action("Posted Whse. Receipts")
                 {
                     Caption = 'Posted Whse. Receipts';
                     Image = List;
                     RunObject = Page "Posted Whse. Receipt List";
+                    ApplicationArea=All;
                 }
             }
         }

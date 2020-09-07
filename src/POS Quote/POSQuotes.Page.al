@@ -79,6 +79,7 @@ page 6151002 "NPR POS Quotes"
             part(Control6014417; "NPR POS Quote Subpage")
             {
                 SubPageLink = "Quote Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -91,6 +92,7 @@ page 6151002 "NPR POS Quotes"
             {
                 Caption = 'View POS Sales Data';
                 Image = XMLFile;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

@@ -233,7 +233,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
             until POSEntry.Next = 0;
             HigestTodaySales := Format(SalesAmt);
         end;
-
     end;
 
     procedure GetTopSalesPersonToday(var TopSalesPerson: Text[50])
@@ -242,7 +241,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
         SalesPerson: Record "Salesperson/Purchaser";
         SalesAmt: Decimal;
     begin
-
         SalesAmt := 0;
         SalesPerson.Reset;
         //SalesPerson.SETFILTER("Sales (Qty.)",'>%1',0);
@@ -257,7 +255,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
                     TopSalesPerson := SalesPerson.Name;
                 end;
             until SalesPerson.Next = 0;
-
         end;
     end;
 
@@ -279,7 +276,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
         AwayPickText := Format(WarehouseActivityHdr.Count)
     end;
 
-
     procedure GetHighestPOSSalesText(var highestPOSSales: Text)
     var
         User: Record User;
@@ -298,9 +294,7 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
             highestPOSSales := Format(SalesAmt);
         end else
             highestPOSSales := '0.00';
-
     end;
-
 
     procedure GetHighestSalesInvText(var highestSalesInv: Text)
     var
@@ -321,7 +315,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
             highestSalesInv := Format(SalesAmt);
         end else
             highestSalesInv := '0.00';
-
     end;
 
     procedure GetTopSalesPersonText(var TopSalesPersonText: Text)
@@ -350,9 +343,7 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
                         TopSalesPersonText := SalesPerson.Name;
                     end;
                 end;
-
             until SalesPerson.Next = 0;
-
         end;
     end;
 
@@ -363,8 +354,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
         TotalSum: Decimal;
         TotalRoundingAmt: Decimal;
         NoOfLines: Integer;
-
-
     begin
         PosEntry.Reset();
         PosEntry.SetRange("Entry Date", Today);
@@ -382,16 +371,12 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
             AvgBasket := (TotalSum + TotalRoundingAmt) / NoOfLines
         ELSE
             AvgBasket := 0;
-
     end;
-
 
     procedure GetissuedTicketToday(var AvgIssued: Text[250])
     var
         TMTicketType: Record "NPR TM Ticket";
-
     begin
-
         TMTicketType.Reset();
         TMTicketType.SetRange("Document Date", Today);
         AvgIssued := 'Ticket issued for today is ' + FORMAT(TMTicketType.Count);
@@ -408,7 +393,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
 
     end;
 
-
     procedure GetMembersCreatedToday(var AvgMember: Text[250])
     var
         MMMember: Record "NPR MM Membership";
@@ -418,7 +402,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
         MMMember.SetRange("Issued Date", Today);
         AvgMember := 'No of new member for today is ' + FORMAT(MMMember.Count);
     end;
-
 
     procedure DrillDownSalesThisMonthLastYear()
     var
@@ -447,7 +430,4 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
         ILE.SetRange("Posting Date", CalcDate('<-CY>', Today), Today)
 
     end;
-
-
 }
-

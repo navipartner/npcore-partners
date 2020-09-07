@@ -11,6 +11,8 @@ page 6150669 "NPR NPRE Restaurant Setup"
     PageType = Card;
     SourceTable = "NPR NPRE Restaurant Setup";
     UsageCategory = Administration;
+    InsertAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -96,6 +98,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
             part(PrintTemplates; "NPR NPRE Print Templ. Subpage")
             {
                 Caption = 'Print Templates';
+                ApplicationArea=All;
             }
         }
     }
@@ -109,6 +112,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 Caption = 'Print Categories';
                 Image = PrintForm;
                 RunObject = Page "NPR NPRE Slct Prnt Cat.";
+                ApplicationArea=All;
             }
             action(Restaurants)
             {
@@ -118,6 +122,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Restaurants";
+                ApplicationArea=All;
             }
             group(Kitchen)
             {
@@ -128,6 +133,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Image = Departments;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = CONST('');
+                    ApplicationArea=All;
                 }
                 action(KitchenStationSelection)
                 {
@@ -135,6 +141,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Image = Troubleshoot;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = CONST('');
+                    ApplicationArea=All;
                 }
             }
         }
@@ -144,6 +151,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
     var
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
     begin
+        if not Get() then
+            Insert();
+
         ShowKDS := KitchenOrderMgt.KDSAvailable();
     end;
 

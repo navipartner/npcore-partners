@@ -113,6 +113,7 @@ report 6060137 "NPR MM Membership Batch Renew"
                 {
                     Caption = 'Membership Code';
                     ShowMandatory = true;
+                    ApplicationArea=All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -140,16 +141,19 @@ report 6060137 "NPR MM Membership Batch Renew"
                 {
                     Caption = 'Active On Date';
                     ShowMandatory = true;
+                    ApplicationArea=All;
                 }
                 field(TypeOfActive; TypeOfActive)
                 {
                     Caption = 'Active Type';
                     OptionCaption = 'Active,Last Period';
+                    ApplicationArea=All;
                 }
                 field(RenewUsingItem; RenewUsingItem)
                 {
                     Caption = 'Renew Using Item';
                     ShowMandatory = true;
+                    ApplicationArea=All;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -180,6 +184,7 @@ report 6060137 "NPR MM Membership Batch Renew"
                 field(Verbose; Verbose)
                 {
                     Caption = 'Verbose';
+                    ApplicationArea=All;
                 }
             }
         }

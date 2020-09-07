@@ -250,6 +250,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
             {
                 Enabled = false;
                 Visible = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -260,6 +261,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
             {
                 Enabled = false;
                 Visible = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

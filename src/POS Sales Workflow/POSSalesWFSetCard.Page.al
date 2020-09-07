@@ -24,6 +24,7 @@ page 6150733 "NPR POS Sales WF Set Card"
             part(Control6014404; "NPR POS Sales WF Set Entries")
             {
                 SubPageLink = "Set Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

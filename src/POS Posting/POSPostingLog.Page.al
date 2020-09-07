@@ -53,6 +53,7 @@ page 6150658 "NPR POS Posting Log"
             part(Control6014412; "NPR POS Posting Log Parameters")
             {
                 SubPageLink = "Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -67,6 +68,7 @@ page 6150658 "NPR POS Posting Log"
                 Image = PostBatch;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -88,6 +90,7 @@ page 6150658 "NPR POS Posting Log"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";
                 RunPageLink = "POS Posting Log Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }

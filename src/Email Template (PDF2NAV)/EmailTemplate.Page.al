@@ -178,6 +178,7 @@ page 6059791 "NPR E-mail Template"
                 SubPageLink = "E-mail Template Code" = FIELD(Code);
                 SubPageView = SORTING("E-mail Template Code", "Line No.");
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                ApplicationArea=All;
             }
         }
         area(factboxes)
@@ -188,6 +189,7 @@ page 6059791 "NPR E-mail Template"
                 ShowFilter = false;
                 SubPageLink = TableNo = FIELD("Table No.");
                 SubPageView = SORTING(TableNo, "No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -201,6 +203,7 @@ page 6059791 "NPR E-mail Template"
                 Caption = 'Edit HTML Template';
                 Image = Edit;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -216,6 +219,7 @@ page 6059791 "NPR E-mail Template"
                 Caption = 'View HTML Template';
                 Image = View;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -231,6 +235,7 @@ page 6059791 "NPR E-mail Template"
                 Caption = 'Import HTML Template';
                 Image = Import;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -247,6 +252,7 @@ page 6059791 "NPR E-mail Template"
                 Caption = 'Export HTML Template';
                 Image = Export;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -262,6 +268,7 @@ page 6059791 "NPR E-mail Template"
                 Caption = 'Copy From E-Mail Template';
                 Image = Copy;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -277,6 +284,7 @@ page 6059791 "NPR E-mail Template"
                 Caption = 'Delete HTML Template';
                 Image = Delete;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -297,6 +305,7 @@ page 6059791 "NPR E-mail Template"
                 RunObject = Page "NPR E-mail Log";
                 RunPageLink = "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("Entry No.");
+                ApplicationArea=All;
             }
             action(EmailTemplateFilters)
             {
@@ -306,11 +315,13 @@ page 6059791 "NPR E-mail Template"
                 RunPageLink = "E-mail Template Code" = FIELD(Code),
                               "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("E-mail Template Code", "Table No.", "Line No.");
+                ApplicationArea=All;
             }
             action(AttachedFiles)
             {
                 Caption = 'Attached Files';
                 Image = MailAttachment;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -330,6 +341,7 @@ page 6059791 "NPR E-mail Template"
                 Image = "Report";
                 RunObject = Page "NPR E-mail Templ. Reports";
                 RunPageLink = "E-mail Template Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

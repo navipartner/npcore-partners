@@ -25,6 +25,7 @@ page 6151507 "NPR Nc Task Proces. Card"
             }
             part(Control6150618; "NPR Nc Task Proces. Lines")
             {
+                ApplicationArea=All;
             }
         }
     }

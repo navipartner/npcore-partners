@@ -10,6 +10,7 @@ pageextension 6014412 "NPR Posted P.Invoice Subform" extends "Posted Purch. Invo
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
+                ApplicationArea=All;
             }
         }
     }

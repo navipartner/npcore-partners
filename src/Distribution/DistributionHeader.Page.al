@@ -44,6 +44,7 @@ page 6151057 "NPR Distribution Header"
                 Promoted = true;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id");
+                ApplicationArea=All;
             }
         }
     }

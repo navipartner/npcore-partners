@@ -90,6 +90,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

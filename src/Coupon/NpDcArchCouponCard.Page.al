@@ -171,6 +171,7 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 RunObject = Page "NPR NpDc Arch.Coupon Entries";
                 RunPageLink = "Arch. Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
+                ApplicationArea=All;
             }
         }
     }

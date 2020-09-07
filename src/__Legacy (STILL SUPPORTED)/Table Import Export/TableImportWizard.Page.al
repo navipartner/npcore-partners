@@ -172,6 +172,7 @@ page 6014485 "NPR Table Import Wizard"
                 Image = Export;
                 Promoted = true;
                 PromotedCategory = Category4;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -184,6 +185,7 @@ page 6014485 "NPR Table Import Wizard"
                 Image = DeleteQtyToHandle;
                 Promoted = true;
                 PromotedCategory = Category5;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

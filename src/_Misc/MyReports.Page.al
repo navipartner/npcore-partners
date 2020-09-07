@@ -53,6 +53,7 @@ page 6014618 "NPR My Reports"
             {
                 Caption = 'Run Report';
                 Image = Report2;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

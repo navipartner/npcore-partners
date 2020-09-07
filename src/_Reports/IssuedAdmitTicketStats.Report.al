@@ -294,18 +294,22 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
                     field(StartDate; StartDate)
                     {
                         Caption = 'Start Date';
+                        ApplicationArea=All;
                     }
                     field(EndDate; EndDate)
                     {
                         Caption = 'End Date';
+                        ApplicationArea=All;
                     }
                     field(SkipLineWithZero; SkipLineWithZero)
                     {
                         Caption = 'Skip Zero Amt Lines';
+                        ApplicationArea=All;
                     }
                     field(CustomerFilter; CustomerFilter)
                     {
                         Caption = 'Customer No.';
+                        ApplicationArea=All;
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -320,11 +324,13 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
                     field(VariantVisibility; VariantVisibility)
                     {
                         Caption = 'Show Variant';
+                        ApplicationArea=All;
                     }
                     field(AdmissionCode; AdmissionCode)
                     {
                         Caption = 'Admission Code';
                         TableRelation = "NPR TM Ticket Access Fact"."Fact Code" WHERE("Fact Name" = FILTER(ADMISSION_CODE));
+                        ApplicationArea=All;
                     }
                 }
             }

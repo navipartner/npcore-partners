@@ -74,6 +74,7 @@ page 6060139 "NPR MM Create Membership"
                 Image = NewCustomer;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -88,12 +89,14 @@ page 6060139 "NPR MM Create Membership"
                 Caption = 'Membership Setup';
                 Image = SetupList;
                 RunObject = Page "NPR MM Membership Setup";
+                ApplicationArea=All;
             }
             action("Item List")
             {
                 Caption = 'Item List';
                 Image = List;
                 RunObject = Page "NPR Retail Item List";
+                ApplicationArea=All;
             }
             action(Memberships)
             {
@@ -101,12 +104,14 @@ page 6060139 "NPR MM Create Membership"
                 Image = List;
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Membership Code" = FIELD("Membership Code");
+                ApplicationArea=All;
             }
             action("Community Setup")
             {
                 Caption = 'Community Setup';
                 Image = Group;
                 RunObject = Page "NPR MM Member Community";
+                ApplicationArea=All;
             }
         }
     }

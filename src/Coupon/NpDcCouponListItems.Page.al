@@ -128,6 +128,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -143,6 +144,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

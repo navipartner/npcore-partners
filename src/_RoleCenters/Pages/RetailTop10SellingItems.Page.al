@@ -20,6 +20,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 field(StartDate; StartDate)
                 {
                     Caption = 'Start Date';
+                    ApplicationArea=All;
 
                     trigger OnValidate()
                     begin
@@ -31,6 +32,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 field(Enddate; Enddate)
                 {
                     Caption = 'End date';
+                    ApplicationArea=All;
 
                     trigger OnValidate()
                     begin
@@ -47,6 +49,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     field("No."; "No.")
                     {
+                        ApplicationArea=All;
 
                         trigger OnDrillDown()
                         begin
@@ -59,11 +62,13 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     }
                     field(Description; Description)
                     {
+                        ApplicationArea=All;
                     }
                     field("Sales (Qty.)"; "Sales (Qty.)")
                     {
                         BlankZero = true;
                         Caption = 'Sales (Qty.)';
+                        ApplicationArea=All;
                     }
                 }
             }
@@ -82,6 +87,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Day)
                 {
                     Caption = 'Day';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -92,6 +98,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Week)
                 {
                     Caption = 'Week';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -102,6 +109,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Month)
                 {
                     Caption = 'Month';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -112,6 +120,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -122,6 +131,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Year)
                 {
                     Caption = 'Year';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

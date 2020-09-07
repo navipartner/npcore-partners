@@ -39,15 +39,18 @@ report 6060080 "NPR MCS Add Rec. Bus. Rules"
                 field(RuleType; RuleType)
                 {
                     Caption = 'Rule Type';
+                    ApplicationArea=All;
                 }
                 field(MakeRulesActive; MakeRulesActive)
                 {
                     Caption = 'Make Rules Active';
+                    ApplicationArea=All;
                 }
                 field(BlockSeedItemNo; BlockSeedItemNo)
                 {
                     Caption = 'Block Seed Item No';
                     TableRelation = Item;
+                    ApplicationArea=All;
 
                     trigger OnValidate()
                     begin

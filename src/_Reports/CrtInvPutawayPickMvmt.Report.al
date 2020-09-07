@@ -149,12 +149,14 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                     field(CreateInventorytPutAway; CreatePutAway)
                     {
                         Caption = 'Create Invt. Put-Away';
+                        ApplicationArea=All;
                     }
                     field(CInvtPick; CreatePick)
                     {
                         Caption = 'Create Invt. Pick';
                         Editable = CreatePickEditable;
                         Enabled = CreatePickEditable;
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -168,6 +170,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                         Caption = 'Create Invt. Movement';
                         Editable = CreateMovementEditable;
                         Enabled = CreateMovementEditable;
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -179,10 +182,12 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                     field(PrintDocument; PrintDocument)
                     {
                         Caption = 'Print Document';
+                        ApplicationArea=All;
                     }
                     field(ShowError; ShowError)
                     {
                         Caption = 'Show Error';
+                        ApplicationArea=All;
                     }
                 }
             }

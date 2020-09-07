@@ -252,6 +252,7 @@ page 6060126 "NPR MM Members"
                 Image = NewCustomer;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -280,6 +281,7 @@ page 6060126 "NPR MM Members"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -299,6 +301,7 @@ page 6060126 "NPR MM Members"
             {
                 Caption = 'Synchronize Contact';
                 Image = CreateInteraction;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -316,6 +319,7 @@ page 6060126 "NPR MM Members"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -343,6 +347,7 @@ page 6060126 "NPR MM Members"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
                 RunPageLink = "Member Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
             action("Arrival Log")
             {
@@ -354,6 +359,7 @@ page 6060126 "NPR MM Members"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Member No." = FIELD("External Member No.");
+                ApplicationArea=All;
             }
             group("Raptor Integration")
             {
@@ -366,6 +372,7 @@ page 6060126 "NPR MM Members"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -388,6 +395,7 @@ page 6060126 "NPR MM Members"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

@@ -34,6 +34,7 @@ page 6151436 "NPR Magento Item Attr."
                 SubPageLink = "Attribute ID" = FIELD("Attribute ID"),
                               "Item No." = FIELD("Item No."),
                               "Variant Code" = FIELD("Variant Code");
+                ApplicationArea=All;
             }
         }
     }

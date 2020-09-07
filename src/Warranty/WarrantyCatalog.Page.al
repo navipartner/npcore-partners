@@ -283,6 +283,7 @@ page 6014514 "NPR Warranty Catalog"
             part(Control6150680; "NPR Warranty Cat. Lines")
             {
                 SubPageLink = "Warranty No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -300,11 +301,13 @@ page 6014514 "NPR Warranty Catalog"
                     Image = List;
                     RunObject = Page "NPR Warranty Catalog List";
                     ShortCutKey = 'F5';
+                    ApplicationArea=All;
                 }
                 action("Calculate Premium")
                 {
                     Caption = 'Calculate premium';
                     Image = Calculate;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -319,6 +322,7 @@ page 6014514 "NPR Warranty Catalog"
                 {
                     Caption = 'Warranty';
                     Image = WarrantyLedger;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -333,6 +337,7 @@ page 6014514 "NPR Warranty Catalog"
                 {
                     Caption = 'Policy';
                     Image = "Action";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -347,6 +352,7 @@ page 6014514 "NPR Warranty Catalog"
                 {
                     Caption = 'Insurance Offer';
                     Image = Insurance;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -361,6 +367,7 @@ page 6014514 "NPR Warranty Catalog"
             {
                 Caption = '&Navigate';
                 Image = Navigate;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

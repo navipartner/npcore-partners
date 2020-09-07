@@ -71,6 +71,7 @@ page 6014591 "NPR Sales Stats Time Period"
             part(SaleStatisticsSubform; "NPR Sales Stats Subform")
             {
                 Caption = 'Data';
+                ApplicationArea=All;
             }
         }
     }
@@ -86,6 +87,7 @@ page 6014591 "NPR Sales Stats Time Period"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

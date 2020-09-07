@@ -50,6 +50,7 @@ page 6014659 "NPR Web Client Dependencies"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -63,6 +64,7 @@ page 6014659 "NPR Web Client Dependencies"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -83,6 +85,7 @@ page 6014659 "NPR Web Client Dependencies"
             {
                 Caption = 'Export File';
                 Image = ExportFile;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

@@ -167,6 +167,7 @@ page 6059975 "NPR Variety Fields Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

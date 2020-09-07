@@ -38,6 +38,7 @@ page 6151085 "NPR RIS Retail Inv. Sets"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

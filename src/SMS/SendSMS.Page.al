@@ -73,6 +73,7 @@ page 6014636 "NPR Send SMS"
                 Image = "Action";
                 Promoted = true;
                 PromotedIsBig = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -90,6 +91,7 @@ page 6014636 "NPR Send SMS"
                 Image = "Action";
                 Promoted = true;
                 PromotedIsBig = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -102,6 +104,7 @@ page 6014636 "NPR Send SMS"
                 Image = SendTo;
                 Promoted = true;
                 PromotedIsBig = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

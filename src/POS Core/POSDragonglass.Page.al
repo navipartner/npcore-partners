@@ -11,6 +11,7 @@ page 6150750 "NPR POS (Dragonglass)"
         {
             usercontrol(Framework; "NPR Dragonglass")
             {
+                ApplicationArea=All;
 
                 trigger OnFrameworkReady()
                 begin

@@ -41,6 +41,7 @@ page 6184893 "NPR Storage Operation Types"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -63,6 +64,7 @@ page 6184893 "NPR Storage Operation Types"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -85,6 +87,7 @@ page 6184893 "NPR Storage Operation Types"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

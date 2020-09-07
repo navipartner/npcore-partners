@@ -49,6 +49,7 @@ page 6014674 "NPR Endpoint List"
                 Image = XMLFile;
                 RunObject = Page "NPR Endpoint Request List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             action("Request Batches")
             {
@@ -56,6 +57,7 @@ page 6014674 "NPR Endpoint List"
                 Image = XMLFileGroup;
                 RunObject = Page "NPR Endpoint Req. Batch List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

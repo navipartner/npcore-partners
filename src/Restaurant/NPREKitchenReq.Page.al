@@ -101,6 +101,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                               "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
                               "Kitchen Station" = FIELD("Kitchen Station Filter");
                 Visible = IsExpediteMode;
+                ApplicationArea=All;
             }
         }
     }
@@ -120,6 +121,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -138,6 +140,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -152,6 +155,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -170,6 +174,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -188,6 +193,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -209,6 +215,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

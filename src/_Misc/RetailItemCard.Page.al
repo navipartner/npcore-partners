@@ -2212,12 +2212,14 @@ page 6014425 "NPR Retail Item Card"
                     Caption = 'Category Links';
                     SubPageLink = "Item No." = FIELD("No.");
                     Visible = NOT MagentoEnabledMultiStore;
+                    ApplicationArea=All;
                 }
                 part("Product Relations"; "NPR Magento Product Relations")
                 {
                     Caption = 'Product Relations';
                     SubPageLink = "From Item No." = FIELD("No.");
                     Visible = MagentoEnabledProductRelations;
+                    ApplicationArea=All;
                 }
             }
         }
@@ -2226,10 +2228,12 @@ page 6014425 "NPR Retail Item Card"
             systempart(Control6150614; Links)
             {
                 Visible = true;
+                ApplicationArea=All;
             }
             systempart(Control6150613; Notes)
             {
                 Visible = true;
+                ApplicationArea=All;
             }
             part(ItemAttributesFactbox; "Item Attributes Factbox")
             {
@@ -2239,6 +2243,7 @@ page 6014425 "NPR Retail Item Card"
             {
                 Caption = 'Magento Picture';
                 Visible = MagentoEnabled;
+                ApplicationArea=All;
             }
             part(Picture; "NPR Magento Item Pict. Factbox")
             {
@@ -2246,15 +2251,18 @@ page 6014425 "NPR Retail Item Card"
                 ShowFilter = false;
                 SubPageLink = "No." = FIELD("No.");
                 Visible = MagentoEnabled;
+                ApplicationArea=All;
             }
             part("Discount FactBox"; "NPR Discount FactBox")
             {
                 Caption = 'Discounts';
                 SubPageLink = "No." = FIELD("No.");
+                ApplicationArea=All;
             }
             part(NPAttributes; "NPR NP Attributes FactBox")
             {
                 SubPageLink = "No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -2273,6 +2281,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("Va&riants")
                 {
@@ -2280,6 +2289,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action(Attributes)
                 {
@@ -2313,6 +2323,7 @@ page 6014425 "NPR Retail Item Card"
                     RunPageLink = "Table ID" = CONST(27),
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea=All;
                 }
                 action("Substituti&ons")
                 {
@@ -2321,6 +2332,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Item Substitution Entry";
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("Cross Re&ferences")
                 {
@@ -2328,6 +2340,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = Change;
                     RunObject = Page "Item Cross Reference Entries";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("E&xtended Texts")
                 {
@@ -2337,6 +2350,7 @@ page 6014425 "NPR Retail Item Card"
                     RunPageLink = "Table Name" = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    ApplicationArea=All;
                 }
                 action(Translations)
                 {
@@ -2344,6 +2358,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = Translations;
                     RunObject = Page "Item Translations";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("&Picture")
                 {
@@ -2357,6 +2372,7 @@ page 6014425 "NPR Retail Item Card"
                                   "Location Filter" = FIELD("Location Filter"),
                                   "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                   "Variant Filter" = FIELD("Variant Filter");
+                    ApplicationArea=All;
                 }
                 action(Identifiers)
                 {
@@ -2365,6 +2381,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Item Identifiers";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.", "Variant Code", "Unit of Measure Code");
+                    ApplicationArea=All;
                 }
             }
             group(Availability)
@@ -2375,6 +2392,7 @@ page 6014425 "NPR Retail Item Card"
                 {
                     Caption = 'Items b&y Location';
                     Image = ItemAvailbyLoc;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -2392,6 +2410,7 @@ page 6014425 "NPR Retail Item Card"
                     {
                         Caption = 'Event';
                         Image = "Event";
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -2409,6 +2428,7 @@ page 6014425 "NPR Retail Item Card"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action(Action6150798)
                     {
@@ -2421,6 +2441,7 @@ page 6014425 "NPR Retail Item Card"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action(Location)
                     {
@@ -2433,11 +2454,13 @@ page 6014425 "NPR Retail Item Card"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action("BOM Level")
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -2448,6 +2471,7 @@ page 6014425 "NPR Retail Item Card"
                     {
                         Caption = 'Timeline';
                         Image = Timeline;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -2475,6 +2499,7 @@ page 6014425 "NPR Retail Item Card"
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
                         ShortCutKey = 'Ctrl+F7';
+                        ApplicationArea=All;
                     }
                     action("&Reservation Entries")
                     {
@@ -2484,6 +2509,7 @@ page 6014425 "NPR Retail Item Card"
                         RunPageLink = "Reservation Status" = CONST(Reservation),
                                       "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.", "Variant Code", "Location Code", "Reservation Status");
+                        ApplicationArea=All;
                     }
                     action("&Phys. Inventory Ledger Entries")
                     {
@@ -2492,6 +2518,7 @@ page 6014425 "NPR Retail Item Card"
                         RunObject = Page "Phys. Inventory Ledger Entries";
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
+                        ApplicationArea=All;
                     }
                     action("&Value Entries")
                     {
@@ -2500,11 +2527,13 @@ page 6014425 "NPR Retail Item Card"
                         RunObject = Page "Value Entries";
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
+                        ApplicationArea=All;
                     }
                     action("Item &Tracking Entries")
                     {
                         Caption = 'Item &Tracking Entries';
                         Image = ItemTrackingLedger;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -2523,6 +2552,7 @@ page 6014425 "NPR Retail Item Card"
                         RunObject = Page "Warehouse Entries";
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated);
+                        ApplicationArea=All;
                     }
                     action("Application Worksheet")
                     {
@@ -2530,11 +2560,13 @@ page 6014425 "NPR Retail Item Card"
                         Image = ApplicationWorksheet;
                         RunObject = Page "Application Worksheet";
                         RunPageLink = "Item No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                     action(POSSalesEntries)
                     {
                         Caption = 'POS Sales Entries';
                         Image = Entries;
+                        ApplicationArea=All;
                     }
                 }
                 group(ActionGroup6150785)
@@ -2548,6 +2580,7 @@ page 6014425 "NPR Retail Item Card"
                         Promoted = true;
                         PromotedCategory = Process;
                         ShortCutKey = 'F7';
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -2569,6 +2602,7 @@ page 6014425 "NPR Retail Item Card"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                     action("T&urnover")
                     {
@@ -2581,6 +2615,7 @@ page 6014425 "NPR Retail Item Card"
                                       "Location Filter" = FIELD("Location Filter"),
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
+                        ApplicationArea=All;
                     }
                 }
                 action("Co&mments")
@@ -2590,6 +2625,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Comment Sheet";
                     RunPageLink = "Table Name" = CONST(Item),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
             group("&Purchases")
@@ -2603,6 +2639,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Item Vendor Catalog";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action(Prices)
                 {
@@ -2611,6 +2648,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Purchase Prices";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action("Line Discounts")
                 {
@@ -2618,6 +2656,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = LineDiscount;
                     RunObject = Page "Purchase Line Discounts";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("Prepa&yment Percentages")
                 {
@@ -2625,6 +2664,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 separator(Separator6150775)
                 {
@@ -2637,6 +2677,7 @@ page 6014425 "NPR Retail Item Card"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action("Return Orders")
                 {
@@ -2646,12 +2687,14 @@ page 6014425 "NPR Retail Item Card"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action("Nonstoc&k Items")
                 {
                     Caption = 'Nonstoc&k Items';
                     Image = NonStockItem;
                     RunObject = Page "Catalog Item List";
+                    ApplicationArea=All;
                 }
             }
             group("S&ales")
@@ -2665,6 +2708,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Sales Prices";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action(Action6150769)
                 {
@@ -2674,6 +2718,7 @@ page 6014425 "NPR Retail Item Card"
                     RunPageLink = Type = CONST(Item),
                                   Code = FIELD("No.");
                     RunPageView = SORTING(Type, Code);
+                    ApplicationArea=All;
                 }
                 action(Action6150768)
                 {
@@ -2681,6 +2726,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 separator(Separator6150767)
                 {
@@ -2693,6 +2739,7 @@ page 6014425 "NPR Retail Item Card"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action(Action6150765)
                 {
@@ -2702,6 +2749,7 @@ page 6014425 "NPR Retail Item Card"
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
                     RunPageView = SORTING("Document Type", Type, "No.");
+                    ApplicationArea=All;
                 }
                 action("Recommended Items")
                 {
@@ -2710,6 +2758,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "NPR MCS Recomm. Lines";
                     RunPageLink = "Seed Item No." = FIELD("No."),
                                   "Table No." = CONST(27);
+                    ApplicationArea=All;
                 }
             }
             group("Assembly/Production")
@@ -2720,6 +2769,7 @@ page 6014425 "NPR Retail Item Card"
                 {
                     Caption = 'Structure';
                     Image = Hierarchy;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -2733,6 +2783,7 @@ page 6014425 "NPR Retail Item Card"
                 {
                     Caption = 'Cost Shares';
                     Image = CostBudget;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -2752,6 +2803,7 @@ page 6014425 "NPR Retail Item Card"
                         Image = BOM;
                         RunObject = Page "Assembly BOM";
                         RunPageLink = "Parent Item No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                     action("Where-Used")
                     {
@@ -2761,11 +2813,13 @@ page 6014425 "NPR Retail Item Card"
                         RunPageLink = Type = CONST(Item),
                                       "No." = FIELD("No.");
                         RunPageView = SORTING(Type, "No.");
+                        ApplicationArea=All;
                     }
                     action("Calc. Stan&dard Cost")
                     {
                         Caption = 'Calc. Stan&dard Cost';
                         Image = CalculateCost;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -2777,6 +2831,7 @@ page 6014425 "NPR Retail Item Card"
                     {
                         Caption = 'Calc. Unit Price';
                         Image = SuggestItemPrice;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -2795,11 +2850,13 @@ page 6014425 "NPR Retail Item Card"
                         Image = BOM;
                         RunObject = Page "Production BOM";
                         RunPageLink = "No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                     action(Action6150754)
                     {
                         Caption = 'Where-Used';
                         Image = "Where-Used";
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -2813,6 +2870,7 @@ page 6014425 "NPR Retail Item Card"
                     {
                         Caption = 'Calc. Stan&dard Cost';
                         Image = CalculateCost;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -2833,6 +2891,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Item Bin Contents";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action("Stockkeepin&g Units")
                 {
@@ -2841,6 +2900,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Stockkeeping Unit List";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
             }
             group(Service)
@@ -2854,11 +2914,13 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Service Items";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageView = SORTING("Item No.");
+                    ApplicationArea=All;
                 }
                 action(Troubleshooting)
                 {
                     Caption = 'Troubleshooting';
                     Image = Troubleshoot;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -2874,6 +2936,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "Troubleshooting Setup";
                     RunPageLink = Type = CONST(Item),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
             group(Resources)
@@ -2891,11 +2954,13 @@ page 6014425 "NPR Retail Item Card"
                         RunObject = Page "Resource Skills";
                         RunPageLink = Type = CONST(Item),
                                       "No." = FIELD("No.");
+                        ApplicationArea=All;
                     }
                     action("Skilled Resources")
                     {
                         Caption = 'Skilled Resources';
                         Image = ResourceSkills;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -2918,6 +2983,7 @@ page 6014425 "NPR Retail Item Card"
                     Promoted = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -2942,6 +3008,7 @@ page 6014425 "NPR Retail Item Card"
                     PromotedCategory = Category6;
                     RunObject = Page "NPR Magento Video Links";
                     RunPageLink = "Item No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action(Webshops)
                 {
@@ -2950,6 +3017,7 @@ page 6014425 "NPR Retail Item Card"
                     Promoted = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledMultistore;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -2972,6 +3040,7 @@ page 6014425 "NPR Retail Item Card"
                     Promoted = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -2998,6 +3067,7 @@ page 6014425 "NPR Retail Item Card"
                 {
                     Caption = '&Create Stockkeeping Unit';
                     Image = CreateSKU;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3011,6 +3081,7 @@ page 6014425 "NPR Retail Item Card"
                 {
                     Caption = 'C&alculate Counting Period';
                     Image = CalculateCalendar;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3026,6 +3097,7 @@ page 6014425 "NPR Retail Item Card"
                     Image = ApplyTemplate;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3044,6 +3116,7 @@ page 6014425 "NPR Retail Item Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Req. Worksheet";
+                ApplicationArea=All;
             }
             action("Item Journal")
             {
@@ -3052,6 +3125,7 @@ page 6014425 "NPR Retail Item Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR Retail Item Journal";
+                ApplicationArea=All;
             }
             action("Item Reclassification Journal")
             {
@@ -3060,6 +3134,7 @@ page 6014425 "NPR Retail Item Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR Retail ItemReclass.Journal";
+                ApplicationArea=All;
             }
             separator(Separator6150718)
             {
@@ -3071,6 +3146,7 @@ page 6014425 "NPR Retail Item Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "Item Tracing";
+                ApplicationArea=All;
             }
             separator(Separator6150719)
             {
@@ -3079,6 +3155,7 @@ page 6014425 "NPR Retail Item Card"
             {
                 Caption = 'Replicate this Item';
                 Image = Copy;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -3093,6 +3170,7 @@ page 6014425 "NPR Retail Item Card"
                 {
                     Caption = 'Transfer to Retail Journal';
                     Image = TransferToGeneralJournal;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3142,6 +3220,7 @@ page 6014425 "NPR Retail Item Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ShortCutKey = 'Shift+F8';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3172,6 +3251,7 @@ page 6014425 "NPR Retail Item Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Alt+I';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3189,6 +3269,7 @@ page 6014425 "NPR Retail Item Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ShortCutKey = 'Ctrl+Alt+v';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3206,6 +3287,7 @@ page 6014425 "NPR Retail Item Card"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+B';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3224,6 +3306,7 @@ page 6014425 "NPR Retail Item Card"
                 {
                     Caption = 'Accessories';
                     Image = Allocations;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -3246,6 +3329,7 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "NPR POS Info Links";
                     RunPageLink = "Table ID" = CONST(27),
                                   "Primary Key" = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
             group("Price Management")
@@ -3258,12 +3342,14 @@ page 6014425 "NPR Retail Item Card"
                     RunObject = Page "NPR Quantity Discount Card";
                     RunPageLink = "Item No." = FIELD("No.");
                     RunPageMode = Edit;
+                    ApplicationArea=All;
                 }
                 action("Period Discount")
                 {
                     Caption = 'Period Discount';
                     Image = Period;
                     ShortCutKey = 'Ctrl+P';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -3286,6 +3372,7 @@ page 6014425 "NPR Retail Item Card"
                     Caption = 'Mix Discount';
                     Image = Discount;
                     ShortCutKey = 'Ctrl+F';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

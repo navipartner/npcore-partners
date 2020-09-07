@@ -229,6 +229,7 @@ report 6014441 "NPR POS Item Sales with Dim."
                     {
                         Caption = 'Show Dimensions';
                         Editable = false;
+                        ApplicationArea=All;
 
                         trigger OnAssistEdit()
                         begin

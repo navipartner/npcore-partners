@@ -244,6 +244,7 @@ page 6014518 "NPR Sales Order Pick"
             {
                 Editable = DynamicEditable;
                 SubPageLink = "Document No." = FIELD("No.");
+                ApplicationArea=All;
             }
             group(Invoicing)
             {
@@ -490,6 +491,7 @@ page 6014518 "NPR Sales Order Pick"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -504,6 +506,7 @@ page 6014518 "NPR Sales Order Pick"
                     Image = ReOpen;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -524,6 +527,7 @@ page 6014518 "NPR Sales Order Pick"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -540,6 +544,7 @@ page 6014518 "NPR Sales Order Pick"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -555,6 +560,7 @@ page 6014518 "NPR Sales Order Pick"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -566,6 +572,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Post and Email';
                     Ellipsis = true;
                     Image = PostMail;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -582,12 +589,14 @@ page 6014518 "NPR Sales Order Pick"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Post and handle as set up in ''Document Processing''';
+                    ApplicationArea=All;
                 }
                 action("Test Report")
                 {
                     Caption = 'Test Report';
                     Ellipsis = true;
                     Image = TestReport;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -599,6 +608,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Post &Batch';
                     Ellipsis = true;
                     Image = PostBatch;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

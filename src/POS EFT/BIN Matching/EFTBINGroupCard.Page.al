@@ -28,10 +28,12 @@ page 6184513 "NPR EFT BIN Group Card"
             part(Control6014405; "NPR EFT BIN Group Paym. Links")
             {
                 SubPageLink = "Group Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             part(Control6014406; "NPR EFT BIN Range SubPage")
             {
                 SubPageLink = "BIN Group Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }

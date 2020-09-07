@@ -46,6 +46,7 @@ page 6014584 "NPR TouchScreen: Valid. Ticket"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

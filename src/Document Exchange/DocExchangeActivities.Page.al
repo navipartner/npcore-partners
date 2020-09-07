@@ -24,6 +24,7 @@ page 6059932 "NPR Doc. Exchange Activities"
                     {
                         action("Import Files Now")
                         {
+                            ApplicationArea=All;
 
                             trigger OnAction()
                             var

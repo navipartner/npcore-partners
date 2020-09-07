@@ -60,6 +60,7 @@ page 6014524 "NPR Touch Screen: CRM Contacts"
                 Image = NewCustomer;
                 Promoted = true;
                 PromotedCategory = New;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

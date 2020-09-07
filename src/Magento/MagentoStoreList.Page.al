@@ -51,6 +51,7 @@ page 6151438 "NPR Magento Store List"
                 RunObject = Page "NPR Magento Store Item List";
                 RunPageLink = "Store Code" = FIELD(Code);
                 Visible = MultiStore;
+                ApplicationArea=All;
             }
         }
     }

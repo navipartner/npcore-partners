@@ -11,6 +11,7 @@ page 6059907 "NPR Task Worker"
         {
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
+                ApplicationArea=All;
 
                 trigger AddInReady()
                 begin

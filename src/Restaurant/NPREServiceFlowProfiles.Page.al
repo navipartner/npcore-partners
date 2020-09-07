@@ -30,10 +30,12 @@ page 6150694 "NPR NPRE Service Flow Profiles"
             systempart(Control6014405; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control6014406; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }

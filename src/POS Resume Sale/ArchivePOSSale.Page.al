@@ -78,6 +78,7 @@ page 6150744 "NPR Archive POS Sale"
                 Caption = 'POS Sale Lines';
                 SubPageLink = "Register No." = FIELD("Register No."),
                               "Sales Ticket No." = FIELD("Sales Ticket No.");
+                ApplicationArea=All;
             }
         }
         area(factboxes)
@@ -85,6 +86,7 @@ page 6150744 "NPR Archive POS Sale"
             systempart(Control6014414; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }

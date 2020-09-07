@@ -39,6 +39,7 @@ page 6059942 "NPR SMS Template Subform"
             {
                 Caption = 'Insert Report Link';
                 Enabled = ReportLinkEnabled;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

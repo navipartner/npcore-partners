@@ -181,12 +181,14 @@ page 6151553 "NPR NpXml Elements"
                 ShowFilter = false;
                 SubPageLink = "Xml Template Code" = FIELD("Xml Template Code"),
                               "Xml Element Line No." = FIELD("Line No.");
+                ApplicationArea=All;
             }
             part(PagePartAttributes; "NPR NpXml Attributes")
             {
                 ShowFilter = false;
                 SubPageLink = "Xml Template Code" = FIELD("Xml Template Code"),
                               "Xml Element Line No." = FIELD("Line No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -204,6 +206,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Insert';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -219,6 +222,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Insert';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -234,6 +238,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Alt+Insert';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -250,6 +255,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Delete';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -271,6 +277,7 @@ page 6151553 "NPR NpXml Elements"
                 {
                     Caption = 'Copy from Xml Template';
                     Image = CopyWorksheet;
+                    ApplicationArea=All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -290,6 +297,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -302,6 +310,7 @@ page 6151553 "NPR NpXml Elements"
                 {
                     Caption = 'Normalize';
                     Image = ExchProdBOMItem;
+                    ApplicationArea=All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -326,6 +335,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -341,6 +351,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -356,6 +367,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -369,6 +381,7 @@ page 6151553 "NPR NpXml Elements"
                     Promoted = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

@@ -155,6 +155,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -168,6 +169,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                 {
                     Caption = 'Show &Unknown Items';
                     Image = ShowSelected;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -178,6 +180,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                 {
                     Caption = 'Show &Blocked Items';
                     Image = ShowSelected;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -188,6 +191,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                 {
                     Caption = 'Show Missing &Variant Codes';
                     Image = ShowSelected;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -198,6 +202,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                 {
                     Caption = '&Show all Items';
                     Image = ShowSelected;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -210,6 +215,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                 action("Set Transfer Option to Ready")
                 {
                     Caption = 'Set Transfer Option to Ready';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -219,6 +225,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                 action("Set Transfer Option to Ignore")
                 {
                     Caption = 'Set Transfer Option to Ignore';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -233,6 +240,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                     Caption = 'Delete all lines';
                     Ellipsis = true;
                     Image = Delete;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -250,6 +258,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                 {
                     Caption = 'Delete lines with unknown item numbers';
                     Image = Delete;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -273,6 +282,7 @@ page 6014664 "NPR StockTake Worksh. Line"
                     Caption = 'Items';
                     Image = Item;
                     ShortCutKey = 'Shift+F5';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -284,12 +294,14 @@ page 6014664 "NPR StockTake Worksh. Line"
                     Caption = 'Items by Location';
                     Image = ItemAvailbyLoc;
                     RunObject = Page "Items by Location";
+                    ApplicationArea=All;
                 }
                 action("Item Ledger Entries")
                 {
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
                     ShortCutKey = 'Ctrl+F5';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -303,12 +315,14 @@ page 6014664 "NPR StockTake Worksh. Line"
                     RunObject = Page "Phys. Inventory Ledger Entries";
                     RunPageLink = "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD("Variant Code");
+                    ApplicationArea=All;
                 }
                 action("Retail Print")
                 {
                     Caption = 'Retail Print';
                     Ellipsis = true;
                     Image = BinContent;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin

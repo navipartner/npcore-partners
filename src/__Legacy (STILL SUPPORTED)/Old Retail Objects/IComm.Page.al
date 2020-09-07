@@ -216,6 +216,7 @@ page 6014516 "NPR I-Comm"
                     Caption = 'Phone no. groups';
                     Image = Calls;
                     RunObject = Page "NPR Tax Free Voucher";
+                    ApplicationArea=All;
                 }
             }
         }

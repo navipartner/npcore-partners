@@ -62,6 +62,7 @@ page 6059972 "NPR Variety Table"
                 RunPageLink = Type = FIELD(Type),
                               Table = FIELD(Code);
                 RunPageView = SORTING(Type, Table, Value);
+                ApplicationArea=All;
             }
         }
     }

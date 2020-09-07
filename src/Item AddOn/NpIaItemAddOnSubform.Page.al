@@ -117,6 +117,7 @@ page 6151127 "NPR NpIa Item AddOn Subform"
                               "AddOn Line No." = FIELD("Line No.");
                 ShortCutKey = 'Ctrl+F7';
                 Visible = (Type = 1);
+                ApplicationArea=All;
             }
             action("Before Insert Setup")
             {
@@ -125,6 +126,7 @@ page 6151127 "NPR NpIa Item AddOn Subform"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasBeforeInsertSetup;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

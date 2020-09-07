@@ -63,6 +63,7 @@ page 6014665 "NPR Stock-Take Configs"
                 RunPageLink = "Table ID" = CONST(6014665),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -79,6 +80,7 @@ page 6014665 "NPR Stock-Take Configs"
                 RunObject = Page "NPR Stock-Take Config. Card";
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F5';
+                ApplicationArea=All;
             }
             action("&Worksheets")
             {
@@ -86,6 +88,7 @@ page 6014665 "NPR Stock-Take Configs"
                 Image = Worksheet2;
                 RunObject = Page "NPR Stock-Take Worksheet";
                 RunPageLink = "Stock-Take Config Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             action(Integration)
             {
@@ -95,6 +98,7 @@ page 6014665 "NPR Stock-Take Configs"
                 PromotedCategory = Process;
                 RunObject = Page "NPR Scanner Service Setup";
                 RunPageMode = View;
+                ApplicationArea=All;
             }
         }
     }

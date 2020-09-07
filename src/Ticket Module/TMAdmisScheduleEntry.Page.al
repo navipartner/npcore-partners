@@ -176,6 +176,7 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -194,6 +195,7 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 RunPageLink = "Applies To Schedule Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Applies To Schedule Entry No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
             action("Waiting List")
             {
@@ -204,6 +206,7 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Waiting List";
                 RunPageLink = "External Schedule Entry No." = FIELD("External Schedule Entry No.");
+                ApplicationArea=All;
             }
         }
     }

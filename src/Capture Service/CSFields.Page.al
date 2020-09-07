@@ -52,10 +52,12 @@ page 6151374 "NPR CS Fields"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }

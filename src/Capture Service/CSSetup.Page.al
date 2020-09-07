@@ -195,6 +195,7 @@ page 6151371 "NPR CS Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR CS UIs";
+                ApplicationArea=All;
             }
             action(Users)
             {
@@ -204,6 +205,7 @@ page 6151371 "NPR CS Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR CS Users";
+                ApplicationArea=All;
             }
             action("Communication Log")
             {
@@ -213,6 +215,7 @@ page 6151371 "NPR CS Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR CS Comm. Log List";
+                ApplicationArea=All;
             }
             action(Devices)
             {
@@ -222,6 +225,7 @@ page 6151371 "NPR CS Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR CS Devices";
+                ApplicationArea=All;
             }
             action("Posting Buffer")
             {
@@ -231,12 +235,14 @@ page 6151371 "NPR CS Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR CS Posting Buffer";
+                ApplicationArea=All;
             }
             action("Whse. Activity Type Setup")
             {
                 Caption = 'Whse. Activity Type Setup';
                 Image = SetupLines;
                 RunObject = Page "NPR CS Wareh. Activity Setup";
+                ApplicationArea=All;
             }
             group(Stores)
             {
@@ -251,6 +257,7 @@ page 6151371 "NPR CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "NPR POS Store List";
+                    ApplicationArea=All;
                 }
                 action("Store Users")
                 {
@@ -262,6 +269,7 @@ page 6151371 "NPR CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "NPR CS Store Users";
+                    ApplicationArea=All;
                 }
                 action(Countings)
                 {
@@ -273,6 +281,7 @@ page 6151371 "NPR CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "NPR CS Stock-Takes List";
+                    ApplicationArea=All;
                 }
                 action(Schedule)
                 {
@@ -283,6 +292,7 @@ page 6151371 "NPR CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "NPR CS Counting Schedule";
+                    ApplicationArea=All;
                 }
                 action("Counting Supervisor")
                 {
@@ -294,6 +304,7 @@ page 6151371 "NPR CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "NPR CS Counting Supervisor";
+                    ApplicationArea=All;
                 }
             }
             group(RfidActionGroup)
@@ -308,6 +319,7 @@ page 6151371 "NPR CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "NPR CS Rfid Tag Models";
+                    ApplicationArea=All;
                 }
                 action("Counting Data")
                 {
@@ -318,11 +330,13 @@ page 6151371 "NPR CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "NPR CS Stock-Takes Data";
+                    ApplicationArea=All;
                 }
                 action("Update Item Cross. Ref.")
                 {
                     Caption = 'Update Item Cross. Ref.';
                     Image = UpdateDescription;
+                    ApplicationArea=All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 

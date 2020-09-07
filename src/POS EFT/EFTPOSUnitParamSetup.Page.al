@@ -21,6 +21,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 SubPageLink = "Integration Type" = FIELD("EFT Integration Type"),
                               "POS Unit No." = FIELD("POS Unit No.");
                 Visible = ShowPOSUnitGenParameter;
+                ApplicationArea=All;
             }
             part(BinaryParams; "NPR EFTType POSUnit BLOB Param")
             {
@@ -29,6 +30,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 SubPageLink = "Integration Type" = FIELD("EFT Integration Type"),
                               "POS Unit No." = FIELD("POS Unit No.");
                 Visible = ShowPOSUnitBLOBParameter;
+                ApplicationArea=All;
             }
         }
     }
@@ -45,6 +47,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 {
                     Caption = 'Register PoS';
                     Image = Add;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -57,6 +60,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 {
                     Caption = 'Update PoS Description';
                     Image = UpdateDescription;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -69,6 +73,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 {
                     Caption = 'Unregister PoS';
                     Image = UnApply;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -81,6 +86,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 {
                     Caption = 'Assign PoS Unit';
                     Image = AddAction;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -93,6 +99,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 {
                     Caption = 'Unassign PoS Unit';
                     Image = Cancel;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -105,6 +112,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                 {
                     Caption = 'Scan PoS Unit';
                     Image = MiniForm;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

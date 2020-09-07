@@ -51,6 +51,7 @@ page 6151069 "NPR Distrib. Group Member List"
                 Promoted = true;
                 RunObject = Page "NPR Retail Replenish. SKU List";
                 RunPageLink = "Location Code" = FIELD(Location);
+                ApplicationArea=All;
             }
             action("Distribution Lines")
             {
@@ -58,6 +59,7 @@ page 6151069 "NPR Distrib. Group Member List"
                 Image = ItemAvailbyLoc;
                 Promoted = true;
                 RunObject = Page "NPR Distribution Lines";
+                ApplicationArea=All;
                 //RunPageLink = "Distribution Group Member"=FIELD("Distribution Member Id"),
                 //              "Distribution Item"=FILTER(<>'');
             }
@@ -68,6 +70,7 @@ page 6151069 "NPR Distrib. Group Member List"
                 Promoted = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Location Code" = FIELD(Location);
+                ApplicationArea=All;
             }
         }
     }

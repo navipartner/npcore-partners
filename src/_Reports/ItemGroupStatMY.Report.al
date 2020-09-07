@@ -222,19 +222,23 @@ report 6014418 "NPR Item Group Stat M/Y"
                     field(ShowSubGroups; ShowSubGroups)
                     {
                         Caption = 'Show Sub Item Groups';
+                        ApplicationArea=All;
                     }
                     field(StartDate; StartDate)
                     {
                         Caption = 'Start Date';
+                        ApplicationArea=All;
                     }
                     field(EndDate; EndDate)
                     {
                         Caption = 'End Date';
+                        ApplicationArea=All;
                     }
                     field("Salesperson.Code"; Salesperson.Code)
                     {
                         Caption = 'Salesperson Code';
                         TableRelation = "Salesperson/Purchaser";
+                        ApplicationArea=All;
                     }
                 }
             }

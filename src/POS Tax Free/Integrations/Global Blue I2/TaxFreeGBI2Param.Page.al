@@ -139,6 +139,7 @@ page 6014647 "NPR Tax Free GB I2 Param."
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free GB I2 Serv. List";
                 RunPageLink = "Tax Free Unit" = FIELD("Tax Free Unit");
+                ApplicationArea=All;
             }
         }
     }

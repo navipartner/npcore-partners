@@ -57,7 +57,7 @@ profile "NPR REESTAURANT"
     Description = 'NP Retail Restaurant';
     Caption = 'Retail Restaurant';
     ProfileDescription = '';
-    RoleCenter = "NPR Retail Resturant RC";
+    RoleCenter = "NPR Restaurant RC";
     Enabled = true;
     Promoted = false;
 }

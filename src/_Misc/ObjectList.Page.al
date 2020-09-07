@@ -52,6 +52,7 @@ page 6014480 "NPR Object List"
                     Image = "Table";
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+b';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -64,6 +65,7 @@ page 6014480 "NPR Object List"
                     Image = ExplodeBOM;
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+c';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -76,6 +78,7 @@ page 6014480 "NPR Object List"
                     Image = "Report";
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+p';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -88,6 +91,7 @@ page 6014480 "NPR Object List"
                     Image = VendorLedger;
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+g';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -100,6 +104,7 @@ page 6014480 "NPR Object List"
                     Image = Export;
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+x';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -112,6 +117,7 @@ page 6014480 "NPR Object List"
                     Image = AllLines;
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+a';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -127,6 +133,7 @@ page 6014480 "NPR Object List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+r';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

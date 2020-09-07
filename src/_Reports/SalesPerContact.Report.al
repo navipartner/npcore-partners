@@ -170,10 +170,12 @@ report 6014597 "NPR Sales Per Contact"
                     field("Sorting"; Sorting)
                     {
                         Caption = 'Sort By';
+                        ApplicationArea=All;
                     }
                     field(ShowQuantity; ShowQuantity)
                     {
                         Caption = 'Quantity';
+                        ApplicationArea=All;
                     }
                 }
             }

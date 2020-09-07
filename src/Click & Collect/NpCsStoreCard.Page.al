@@ -149,12 +149,14 @@ page 6151196 "NPR NpCs Store Card"
             {
                 Caption = 'Workflows';
                 SubPageLink = "Store Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             part("POS Relations"; "NPR NpCs Store Card POSRelat.")
             {
                 Caption = 'POS Relations';
                 SubPageLink = "Store Code" = FIELD(Code);
                 Visible = "Local Store";
+                ApplicationArea=All;
             }
         }
     }
@@ -170,6 +172,7 @@ page 6151196 "NPR NpCs Store Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -188,6 +191,7 @@ page 6151196 "NPR NpCs Store Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -204,6 +208,7 @@ page 6151196 "NPR NpCs Store Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -219,6 +224,7 @@ page 6151196 "NPR NpCs Store Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -234,6 +240,7 @@ page 6151196 "NPR NpCs Store Card"
             {
                 Caption = 'Stores by Distance';
                 Image = List;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

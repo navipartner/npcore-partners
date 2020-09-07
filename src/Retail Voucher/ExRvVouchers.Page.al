@@ -93,6 +93,7 @@ page 6151081 "NPR ExRv Vouchers"
             {
                 Caption = 'Post Selected';
                 Image = Post;
+                ApplicationArea=All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 
@@ -120,6 +121,7 @@ page 6151081 "NPR ExRv Vouchers"
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -133,6 +135,7 @@ page 6151081 "NPR ExRv Vouchers"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 ShortCutKey = 'Shift+Ctrl+D';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

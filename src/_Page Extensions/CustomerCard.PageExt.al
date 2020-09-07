@@ -233,6 +233,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     RunPageLink = "Document Type" = CONST("Selection Contract"),
                                   "Customer No." = FIELD("No."),
                                   "Customer Type" = CONST(Alm);
+                    ApplicationArea=All;
                 }
             }
             group("NPR Retail")
@@ -244,22 +245,26 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = "Action";
                     RunObject = Page "NPR Used Goods Reg. Card";
                     RunPageLink = "Purchased By Customer No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("NPR ItemLedgerEntries")
                 {
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
+                    ApplicationArea=All;
                 }
                 action("NPR AuditRoll")
                 {
                     Caption = 'Audit Roll';
                     Image = ListPage;
+                    ApplicationArea=All;
                 }
                 action("NPR AlternativeNo")
                 {
                     Caption = 'Alternative No.';
                     Image = "Action";
                     Promoted = true;
+                    ApplicationArea=All;
                 }
                 action("NPR Reparation")
                 {
@@ -268,6 +273,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     RunObject = Page "NPR Customer Repair List";
                     RunPageLink = "Customer No." = FIELD("No."),
                                   "Customer Type" = CONST(Ordinary);
+                    ApplicationArea=All;
                 }
                 action("NPR Member Cards")
                 {
@@ -275,11 +281,13 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = Card;
                     RunObject = Page "NPR Member Card Issued Cards";
                     RunPageLink = "Customer No" = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("NPR PrintShippingLabel")
                 {
                     Caption = 'Shipping Label';
                     Image = PrintCheck;
+                    ApplicationArea=All;
                 }
             }
             group("NPR PDF2NAV")
@@ -289,11 +297,13 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
+                    ApplicationArea=All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send Statement as PDF';
                     Image = SendEmailPDF;
+                    ApplicationArea=All;
                 }
             }
         }
@@ -306,6 +316,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 RunObject = Page "NPR POS Info Links";
                 RunPageLink = "Table ID" = CONST(18),
                               "Primary Key" = FIELD("No.");
+                ApplicationArea=All;
             }
         }
         addafter("Item &Tracking Entries")
@@ -314,6 +325,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             {
                 Caption = 'POS Entries';
                 Image = Entries;
+                ApplicationArea=All;
             }
         }
         addafter(Documents)
@@ -325,6 +337,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
+                    ApplicationArea=All;
                 }
             }
         }
@@ -335,6 +348,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 Caption = 'Customer Anonymization';
                 Ellipsis = true;
                 Image = AbsenceCategory;
+                ApplicationArea=All;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
 

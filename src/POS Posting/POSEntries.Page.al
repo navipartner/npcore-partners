@@ -136,6 +136,7 @@ page 6150650 "NPR POS Entries"
                 Image = Sales;
                 RunObject = Page "NPR POS Sales Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
             action("Payment Lines")
             {
@@ -143,6 +144,7 @@ page 6150650 "NPR POS Entries"
                 Image = Payment;
                 RunObject = Page "NPR POS Payment Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
             action("Comment Lines")
             {
@@ -153,6 +155,7 @@ page 6150650 "NPR POS Entries"
                               "POS Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Table ID", "POS Entry No.", "POS Entry Line No.", Code, "Line No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -164,6 +167,7 @@ page 6150650 "NPR POS Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -180,6 +184,7 @@ page 6150650 "NPR POS Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -206,6 +211,7 @@ page 6150650 "NPR POS Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -277,6 +283,7 @@ page 6150650 "NPR POS Entries"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -303,6 +310,7 @@ page 6150650 "NPR POS Entries"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -325,6 +333,7 @@ page 6150650 "NPR POS Entries"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -352,6 +361,7 @@ page 6150650 "NPR POS Entries"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -388,6 +398,7 @@ page 6150650 "NPR POS Entries"
                     Image = Log;
                     RunObject = Page "NPR POS Entry Output Log";
                     RunPageLink = "POS Entry No." = FIELD("Entry No.");
+                    ApplicationArea=All;
                 }
             }
         }

@@ -30,10 +30,12 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
             systempart(Control6014406; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }

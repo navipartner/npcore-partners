@@ -91,6 +91,7 @@ page 6151394 "NPR CS Counting Schedule"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -106,6 +107,7 @@ page 6151394 "NPR CS Counting Schedule"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -128,6 +130,7 @@ page 6151394 "NPR CS Counting Schedule"
                 PromotedIsBig = true;
                 RunObject = Page "Job Queue Entry Card";
                 RunPageLink = ID = FIELD("Job Queue Entry ID");
+                ApplicationArea=All;
             }
         }
     }

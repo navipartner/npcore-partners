@@ -63,6 +63,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 PromotedCategory = "Report";
                 RunObject = Page "NPR Customer GDPR Log Entries";
                 RunPageLink = "Customer No" = FIELD("Customer No.");
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -73,6 +74,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 Image = Absence;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

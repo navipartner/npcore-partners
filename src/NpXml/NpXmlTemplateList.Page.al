@@ -84,6 +84,7 @@ page 6151552 "NPR NpXml Template List"
                     Editable = false;
                     ShowFilter = false;
                     SubPageLink = "Xml Template Code" = FIELD(Code);
+                    ApplicationArea=All;
                 }
             }
         }
@@ -103,6 +104,7 @@ page 6151552 "NPR NpXml Template List"
                 RunObject = Page "NPR NpXml Elements";
                 RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
+                ApplicationArea=All;
             }
             action("View Field Mapping")
             {
@@ -114,6 +116,7 @@ page 6151552 "NPR NpXml Template List"
                 RunObject = Page "NPR NpXml Elements";
                 RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -124,6 +127,7 @@ page 6151552 "NPR NpXml Template List"
                 Image = Start;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -139,6 +143,7 @@ page 6151552 "NPR NpXml Template List"
             {
                 Caption = 'Export Xml Template';
                 Image = Export;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -154,6 +159,7 @@ page 6151552 "NPR NpXml Template List"
             {
                 Caption = 'Import Template';
                 Image = Import;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -169,6 +175,7 @@ page 6151552 "NPR NpXml Template List"
             {
                 Caption = 'Delete Selected Templates';
                 Image = DeleteXML;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

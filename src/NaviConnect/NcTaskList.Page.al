@@ -173,6 +173,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F5';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -187,6 +188,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -202,6 +204,7 @@ page 6151502 "NPR Nc Task List"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 ShortCutKey = 'F9';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -217,6 +220,7 @@ page 6151502 "NPR Nc Task List"
                 Image = List;
                 RunObject = Page "NPR Nc Task Fields";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
             action("Show Output")
             {
@@ -225,6 +229,7 @@ page 6151502 "NPR Nc Task List"
                 Promoted = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -239,6 +244,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -257,6 +263,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Task Output List";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }

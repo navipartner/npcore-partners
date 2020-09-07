@@ -47,6 +47,7 @@ page 6151413 "NPR Magento Item Pict. List"
                 {
                     Caption = 'Pictures';
                     ShowFilter = false;
+                    ApplicationArea=All;
                 }
             }
             part(MagentoPictureLinkSubform2; "NPR Magento Pict. Link Subform")
@@ -54,6 +55,7 @@ page 6151413 "NPR Magento Item Pict. List"
                 Caption = 'Pictures';
                 ShowFilter = false;
                 Visible = (NOT HasVariants);
+                ApplicationArea=All;
             }
         }
         area(factboxes)
@@ -61,6 +63,7 @@ page 6151413 "NPR Magento Item Pict. List"
             part(MagentoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
                 Caption = 'Magento Picture';
+                ApplicationArea=All;
             }
         }
     }

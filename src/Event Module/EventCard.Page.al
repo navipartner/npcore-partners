@@ -1117,6 +1117,7 @@ page 6060150 "NPR Event Card"
                 Editable = GlobalEditable;
                 SubPageLink = "Job No." = FIELD("No."),
                               "NPR Group Source Line No." = CONST(0);
+                ApplicationArea=All;
             }
             part(Control6014530; "NPR Event Group.Plan. Line Sub")
             {
@@ -1124,6 +1125,7 @@ page 6060150 "NPR Event Card"
                 SubPageLink = "Job No." = FIELD("No."),
                               "NPR Group Line" = CONST(true);
                 Visible = GroupedLineGroupVisible;
+                ApplicationArea=All;
             }
             group("Foreign Trade")
             {
@@ -1158,11 +1160,13 @@ page 6060150 "NPR Event Card"
             {
                 SubPageLink = "Table Name" = CONST(Job),
                               "No." = FIELD("No.");
+                ApplicationArea=All;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
+                ApplicationArea=All;
             }
             part(Control1902136407; "Job No. of Prices FactBox")
             {
@@ -1172,6 +1176,7 @@ page 6060150 "NPR Event Card"
                               "Resource Gr. Filter" = FIELD("Resource Gr. Filter"),
                               "Planning Date Filter" = FIELD("Planning Date Filter");
                 Visible = true;
+                ApplicationArea=All;
             }
             part(Control1905650007; "Job WIP/Recognition FactBox")
             {
@@ -1181,18 +1186,22 @@ page 6060150 "NPR Event Card"
                               "Resource Gr. Filter" = FIELD("Resource Gr. Filter"),
                               "Planning Date Filter" = FIELD("Planning Date Filter");
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = true;
+                ApplicationArea=All;
             }
             part(Control6014421; "NPR Event Atributes Info")
             {
                 SubPageLink = "Job No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }
@@ -1215,6 +1224,7 @@ page 6060150 "NPR Event Card"
                     RunObject = Page "NPR Event Task Lines";
                     RunPageLink = "Job No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+T';
+                    ApplicationArea=All;
                 }
                 action("&Dimensions")
                 {
@@ -1224,6 +1234,7 @@ page 6060150 "NPR Event Card"
                     RunPageLink = "Table ID" = CONST(167),
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea=All;
                 }
                 action("&Statistics")
                 {
@@ -1234,6 +1245,7 @@ page 6060150 "NPR Event Card"
                     RunObject = Page "NPR Event Statistics";
                     RunPageLink = "No." = FIELD("No.");
                     ShortCutKey = 'F7';
+                    ApplicationArea=All;
                 }
                 action(SalesDocuments)
                 {
@@ -1241,6 +1253,7 @@ page 6060150 "NPR Event Card"
                     Image = GetSourceDoc;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1262,11 +1275,13 @@ page 6060150 "NPR Event Card"
                     RunObject = Page "Comment Sheet";
                     RunPageLink = "Table Name" = CONST(Job),
                                   "No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("&Online Map")
                 {
                     Caption = '&Online Map';
                     Image = Map;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1279,6 +1294,7 @@ page 6060150 "NPR Event Card"
                     Image = Log;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1295,6 +1311,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Attributes";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1313,6 +1330,7 @@ page 6060150 "NPR Event Card"
                     Image = Quote;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1329,6 +1347,7 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1346,6 +1365,7 @@ page 6060150 "NPR Event Card"
                     Image = ValidateEmailLoggingSetup;
                     Promoted = true;
                     PromotedCategory = Process;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1365,6 +1385,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category4;
                     RunObject = Page "Job Resource Prices";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("&Item")
                 {
@@ -1374,6 +1395,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category4;
                     RunObject = Page "Job Item Prices";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("&G/L Account")
                 {
@@ -1384,6 +1406,7 @@ page 6060150 "NPR Event Card"
                     PromotedIsBig = true;
                     RunObject = Page "Job G/L Account Prices";
                     RunPageLink = "Job No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
             group("Plan&ning")
@@ -1395,12 +1418,14 @@ page 6060150 "NPR Event Card"
                     Caption = 'Resource &Allocated per Job';
                     Image = ViewJob;
                     RunObject = Page "Resource Allocated per Job";
+                    ApplicationArea=All;
                 }
                 action("Res. Gr. All&ocated per Job")
                 {
                     Caption = 'Res. Gr. All&ocated per Job';
                     Image = ResourceGroup;
                     RunObject = Page "Res. Gr. Allocated per Job";
+                    ApplicationArea=All;
                 }
             }
             group(Tickets)
@@ -1414,6 +1439,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket Schedules";
+                    ApplicationArea=All;
                 }
                 action(TicketAdmissions)
                 {
@@ -1422,6 +1448,7 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1444,6 +1471,7 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1468,6 +1496,7 @@ page 6060150 "NPR Event Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Admis. Schedule Entry";
                     RunPageLink = "Admission Code" = FIELD("NPR Admission Code");
+                    ApplicationArea=All;
                 }
             }
             group(History)
@@ -1484,6 +1513,7 @@ page 6060150 "NPR Event Card"
                     RunPageLink = "Job No." = FIELD("No.");
                     RunPageView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
+                    ApplicationArea=All;
                 }
             }
         }
@@ -1496,6 +1526,7 @@ page 6060150 "NPR Event Card"
                 {
                     Caption = 'Collect Ticket Printouts';
                     Image = GetSourceDoc;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1515,6 +1546,7 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1532,6 +1564,7 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1549,6 +1582,7 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -1573,6 +1607,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Send to Calendar';
                     Ellipsis = true;
                     Image = Calendar;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1585,6 +1620,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Remove from Calendar';
                     Ellipsis = true;
                     Image = RemoveContacts;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1596,6 +1632,7 @@ page 6060150 "NPR Event Card"
                 {
                     Caption = 'Get Attendee Response';
                     Image = Answers;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -1612,6 +1649,7 @@ page 6060150 "NPR Event Card"
                         Caption = 'Customer';
                         Ellipsis = true;
                         Image = Customer;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -1627,6 +1665,7 @@ page 6060150 "NPR Event Card"
                         Caption = 'Team';
                         Ellipsis = true;
                         Image = TeamSales;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         begin
@@ -1649,6 +1688,7 @@ page 6060150 "NPR Event Card"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Actual To Budget";
+                ApplicationArea=All;
             }
             action("Job Analysis")
             {
@@ -1657,6 +1697,7 @@ page 6060150 "NPR Event Card"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Analysis";
+                ApplicationArea=All;
             }
             action("Job - Planning Lines")
             {
@@ -1665,6 +1706,7 @@ page 6060150 "NPR Event Card"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job - Planning Lines";
+                ApplicationArea=All;
             }
             action("Job - Suggested Billing")
             {
@@ -1673,6 +1715,7 @@ page 6060150 "NPR Event Card"
                 Promoted = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Suggested Billing";
+                ApplicationArea=All;
             }
         }
     }

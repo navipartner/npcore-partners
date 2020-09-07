@@ -47,6 +47,7 @@ page 6059788 "NPR Ticket Access Reserv. List"
                 Caption = 'Print Ticket';
                 Image = Print;
                 ShortCutKey = 'Ctrl+P';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -63,6 +64,7 @@ page 6059788 "NPR Ticket Access Reserv. List"
                 Caption = 'Print Selected Tickets';
                 Image = Print;
                 ShortCutKey = 'Shift+Ctrl+P';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

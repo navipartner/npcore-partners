@@ -104,6 +104,7 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

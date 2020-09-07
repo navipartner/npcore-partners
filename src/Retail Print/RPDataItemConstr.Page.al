@@ -30,6 +30,7 @@ page 6014642 "NPR RP Data Item Constr."
             {
                 SubPageLink = "Data Item Code" = FIELD("Data Item Code"),
                               "Constraint Line No." = FIELD("Line No.");
+                ApplicationArea=All;
             }
         }
     }

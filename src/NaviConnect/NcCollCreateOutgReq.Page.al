@@ -42,6 +42,7 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
             {
                 Caption = 'Create Request';
                 Image = "Se;ectEntries";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

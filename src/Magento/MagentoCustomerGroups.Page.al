@@ -38,6 +38,7 @@ page 6151440 "NPR Magento Customer Groups"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

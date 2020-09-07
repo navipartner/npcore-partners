@@ -143,11 +143,13 @@ report 6014550 "NPR Statement E-Mail"
                     field(ShowOverdueEntries; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
+                        ApplicationArea=All;
                     }
                     field(IncludeAllCustomerswithLE; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -159,6 +161,7 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -169,36 +172,44 @@ report 6014550 "NPR Statement E-Mail"
                     field(IncludeReversedEntries; PrintReversedEntries)
                     {
                         Caption = 'Include Reversed Entries';
+                        ApplicationArea=All;
                     }
                     field(IncludeUnappliedEntries; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
+                        ApplicationArea=All;
                     }
                     field(IncludeAgingBand; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
+                        ApplicationArea=All;
                     }
                     field(AgingBandPeriodLengt; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
+                        ApplicationArea=All;
                     }
                     field(AgingBandby; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
+                        ApplicationArea=All;
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
+                        ApplicationArea=All;
                     }
                     field(StartDate; StartDate)
                     {
                         Caption = 'Start Date';
+                        ApplicationArea=All;
                     }
                     field(EndDate; EndDate)
                     {
                         Caption = 'End Date';
+                        ApplicationArea=All;
                     }
                 }
                 group("Output Options")
@@ -208,6 +219,7 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Report Output';
                         OptionCaption = 'Send now,Send through NaviDocs';
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -230,6 +242,7 @@ report 6014550 "NPR Statement E-Mail"
                         Visible = ShowNaviDocsOption;
                         field("Delay sending until"; NaviDocsDelayUntil)
                         {
+                            ApplicationArea=All;
                         }
                     }
                 }

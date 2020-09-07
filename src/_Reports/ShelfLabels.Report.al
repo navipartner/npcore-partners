@@ -175,6 +175,7 @@ report 6014428 "NPR Shelf Labels"
                 {
                     Caption = 'Unit Price';
                     OptionCaption = 'Use Retail Journal Line Prices,Use Item Card Unit Prices,Use Campaign Unit Prices';
+                    ApplicationArea=All;
                 }
             }
         }

@@ -82,12 +82,14 @@ page 6150664 "NPR NPRE Seating List"
                         RunPageLink = "Table ID" = CONST(6150665),
                                       "No." = FIELD(Code);
                         ShortCutKey = 'Shift+Ctrl+D';
+                        ApplicationArea=All;
                     }
                     action("Dimensions-&Multiple")
                     {
                         AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var

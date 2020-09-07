@@ -128,6 +128,7 @@ page 6184502 "NPR CleanCash Audit Roll List"
             {
                 Caption = 'Send not sent CleanCash receipts';
                 Image = SendTo;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -140,6 +141,7 @@ page 6184502 "NPR CleanCash Audit Roll List"
             {
                 Caption = 'Send Receipt';
                 Image = Start;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

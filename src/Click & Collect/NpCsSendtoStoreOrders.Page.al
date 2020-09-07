@@ -152,6 +152,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Insert';
                 ToolTip = 'Create new Collect in Store Order';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -164,6 +165,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
             {
                 Caption = 'Run Next Workflow Step';
                 Image = Start;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -182,6 +184,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 {
                     Caption = 'Send Order to Store';
                     Image = Approve;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -194,6 +197,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 {
                     Caption = 'Send Notification to Store';
                     Image = SendTo;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -210,6 +214,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 {
                     Caption = 'Update Order Status';
                     Image = ChangeStatus;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -223,6 +228,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
                     Visible = NOT "Send Notification from Store";
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -239,6 +245,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 {
                     Caption = 'Perform Post Processing';
                     Image = Intercompany;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -251,6 +258,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 {
                     Caption = 'Archive';
                     Image = Archive;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -281,6 +289,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 Caption = 'Document';
                 Image = Document;
                 ShortCutKey = 'Shift+F7';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -294,6 +303,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 Caption = 'Log Entries';
                 Image = Log;
                 ShortCutKey = 'Ctrl+F7';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

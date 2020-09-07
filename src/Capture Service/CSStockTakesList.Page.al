@@ -116,6 +116,7 @@ page 6151385 "NPR CS Stock-Takes List"
             {
                 Caption = 'New Counting';
                 Image = LedgerEntries;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -133,6 +134,7 @@ page 6151385 "NPR CS Stock-Takes List"
             {
                 Caption = 'Force Close';
                 Image = Cancel;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -148,6 +150,7 @@ page 6151385 "NPR CS Stock-Takes List"
                 Image = DataEntry;
                 RunObject = Page "NPR CS Stock-Takes Data List";
                 RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
+                ApplicationArea=All;
             }
             group(Overview)
             {
@@ -158,6 +161,7 @@ page 6151385 "NPR CS Stock-Takes List"
                     Image = MiniForm;
                     RunObject = Page "NPR CS Devices";
                     RunPageLink = Location = FIELD(Location);
+                    ApplicationArea=All;
                 }
                 action("&Item Journal")
                 {
@@ -166,6 +170,7 @@ page 6151385 "NPR CS Stock-Takes List"
                     RunObject = Page "Phys. Inventory Journal";
                     RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
                                   "Journal Batch Name" = FIELD("Journal Batch Name");
+                    ApplicationArea=All;
                 }
                 action("&Item Journal Batch")
                 {
@@ -173,11 +178,13 @@ page 6151385 "NPR CS Stock-Takes List"
                     Image = InventoryJournal;
                     RunObject = Page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"));
+                    ApplicationArea=All;
                 }
                 action("Approved Data")
                 {
                     Caption = 'Approved Data';
                     Image = DataEntry;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -195,6 +202,7 @@ page 6151385 "NPR CS Stock-Takes List"
                     RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
                     RunPageView = SORTING(Created)
                                   ORDER(Ascending);
+                    ApplicationArea=All;
                 }
             }
             group(Process)
@@ -204,6 +212,7 @@ page 6151385 "NPR CS Stock-Takes List"
                 {
                     Caption = 'Re-Run Approvel';
                     Image = RefreshLines;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -234,6 +243,7 @@ page 6151385 "NPR CS Stock-Takes List"
                 {
                     Caption = 'Manual Posting';
                     Image = PostBatch;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -262,6 +272,7 @@ page 6151385 "NPR CS Stock-Takes List"
                 {
                     Caption = 'Schedule Posting';
                     Image = PostBatch;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -311,6 +322,7 @@ page 6151385 "NPR CS Stock-Takes List"
                 {
                     Caption = 'Force Close w/o Posting';
                     Image = CancelLine;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -326,6 +338,7 @@ page 6151385 "NPR CS Stock-Takes List"
                 {
                     Caption = 'Post Approve Counting';
                     Image = Post;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -347,6 +360,7 @@ page 6151385 "NPR CS Stock-Takes List"
                 {
                     Caption = 'Post Store Counting';
                     Image = Post;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

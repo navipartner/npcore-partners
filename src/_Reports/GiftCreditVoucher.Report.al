@@ -573,14 +573,17 @@ report 6014415 "NPR Gift/Credit Voucher"
                     field(ShowGiftOnly; ShowGiftOnly)
                     {
                         Caption = 'Gift Voucher';
+                        ApplicationArea=All;
                     }
                     field(ShowCreditOnly; ShowCreditOnly)
                     {
                         Caption = 'Credit Voucher';
+                        ApplicationArea=All;
                     }
                     field(ShowPosting; ShowPosting)
                     {
                         Caption = 'Show Ledger Entries';
+                        ApplicationArea=All;
                     }
                 }
             }

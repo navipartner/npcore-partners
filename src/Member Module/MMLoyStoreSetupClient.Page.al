@@ -63,6 +63,7 @@ page 6151162 "NPR MM Loy. Store Setup Client"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Server Trx Log";
                 RunPageLink = "POS Store Code" = FIELD("Store Code");
+                ApplicationArea=All;
             }
         }
     }

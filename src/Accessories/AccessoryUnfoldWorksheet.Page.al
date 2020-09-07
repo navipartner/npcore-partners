@@ -105,6 +105,7 @@ page 6014502 "NPR Accessory Unfold Worksheet"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -121,6 +122,7 @@ page 6014502 "NPR Accessory Unfold Worksheet"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'F9';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -147,6 +149,7 @@ page 6014502 "NPR Accessory Unfold Worksheet"
                 Image = Line;
                 RunObject = Page "NPR Accessory Unfold Entries";
                 RunPageLink = "Accessory Item No." = FIELD("Accessory Item No.");
+                ApplicationArea=All;
             }
         }
     }

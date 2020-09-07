@@ -114,14 +114,17 @@ report 6060112 "NPR Check Duplicate Contacts"
                 field(CheckName; CheckName)
                 {
                     Caption = 'Name';
+                    ApplicationArea=All;
                 }
                 field(CheckAddr; CheckAddr)
                 {
                     Caption = 'Address';
+                    ApplicationArea=All;
                 }
                 field(CheckPhone; CheckPhone)
                 {
                     Caption = 'Phone No.';
+                    ApplicationArea=All;
                 }
             }
         }

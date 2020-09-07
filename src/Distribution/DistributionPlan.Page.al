@@ -43,6 +43,7 @@ page 6151060 "NPR Distribution Plan"
             part(DistMatrix; "NPR Distrib. Matrix")
             {
                 SubPageLink = "Item Hierarchy Code" = FIELD("Item Hiearachy");
+                ApplicationArea=All;
             }
         }
     }
@@ -56,6 +57,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Create Distribution';
                 Image = CalculateInventory;
                 Promoted = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -73,6 +75,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Create Distribution Orders';
                 Image = CreateDocument;
                 Promoted = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -96,6 +99,7 @@ page 6151060 "NPR Distribution Plan"
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id"),
                               "Distribution Item" = CONST('<>'''),
                               "Distribution Quantity" = FILTER(> 0);
+                ApplicationArea=All;
             }
             action("Import Demands")
             {
@@ -103,6 +107,7 @@ page 6151060 "NPR Distribution Plan"
                 Image = ImportDatabase;
                 Promoted = true;
                 Visible = false;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -122,6 +127,7 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -145,6 +151,7 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -168,6 +175,7 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -193,6 +201,7 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

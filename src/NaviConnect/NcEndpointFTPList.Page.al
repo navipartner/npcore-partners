@@ -45,6 +45,7 @@ page 6151522 "NPR Nc Endpoint FTP List"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

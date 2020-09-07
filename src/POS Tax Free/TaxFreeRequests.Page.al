@@ -94,6 +94,7 @@ page 6014645 "NPR Tax Free Requests"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -117,6 +118,7 @@ page 6014645 "NPR Tax Free Requests"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

@@ -78,6 +78,7 @@ page 6151587 "NPR Event Invoices"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

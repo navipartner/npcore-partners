@@ -64,6 +64,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

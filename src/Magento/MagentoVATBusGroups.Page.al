@@ -45,6 +45,7 @@ page 6151409 "NPR Magento VAT Bus. Groups"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

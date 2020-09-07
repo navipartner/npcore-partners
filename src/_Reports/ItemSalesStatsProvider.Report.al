@@ -292,22 +292,27 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     field(ValueDate; ValueDate)
                     {
                         Caption = 'Value Date';
+                        ApplicationArea=All;
                     }
                     field(ShowItemWithSales; ShowItemWithSales)
                     {
                         Caption = 'Only Items With Sale';
+                        ApplicationArea=All;
                     }
                     field(ShowItem; ShowItem)
                     {
                         Caption = 'View Items';
+                        ApplicationArea=All;
                     }
                     field(ShowItemGroup; ShowItemGroup)
                     {
                         Caption = 'Show Item Groups';
+                        ApplicationArea=All;
                     }
                     field(InventoryValueIsBasedOn; ValueMethod)
                     {
                         Caption = 'Inventory Value Is Based On:';
+                        ApplicationArea=All;
                     }
                 }
             }

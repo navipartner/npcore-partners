@@ -90,6 +90,7 @@ page 6151133 "NPR TM Ticket Wizard"
             part(Schedules; "NPR TM Ticket Schedule Wizard")
             {
                 Caption = 'Schedules';
+                ApplicationArea=All;
             }
             group(Advanced)
             {
@@ -167,6 +168,7 @@ page 6151133 "NPR TM Ticket Wizard"
                 //PromotedIsBig = true;
                 RunObject = Page "Config. Template List";
                 RunPageView = WHERE("Table ID" = FILTER(6059784 .. 6060130));
+                ApplicationArea=All;
             }
         }
     }

@@ -72,6 +72,7 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
                 {
                     Caption = 'Set Status to Block Event Delete';
                     Image = Setup;
+                    ApplicationArea=All;
                 }
             }
         }

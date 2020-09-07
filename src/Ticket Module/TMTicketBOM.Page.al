@@ -162,6 +162,7 @@ page 6060121 "NPR TM Ticket BOM"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Admissions";
+                ApplicationArea=All;
             }
             action("Ticket Setup")
             {
@@ -171,6 +172,7 @@ page 6060121 "NPR TM Ticket BOM"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Setup";
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -179,6 +181,7 @@ page 6060121 "NPR TM Ticket BOM"
             {
                 Caption = 'Create Prepaid Tickets';
                 Image = PrepaymentInvoice;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -189,6 +192,7 @@ page 6060121 "NPR TM Ticket BOM"
             {
                 Caption = 'Create Postpaid Tickets';
                 Image = Invoice;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

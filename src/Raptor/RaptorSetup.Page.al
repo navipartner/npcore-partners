@@ -86,11 +86,13 @@ page 6151491 "NPR Raptor Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Raptor Actions";
+                ApplicationArea=All;
             }
             action(RaptorUrls)
             {
                 Caption = 'Reset Urls';
                 Image = LinkWeb;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -105,6 +107,7 @@ page 6151491 "NPR Raptor Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 ToolTip = 'View or edit the job that sends tracking data to Raptor. For example, you can see the status or change when and how often the data is sent.';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

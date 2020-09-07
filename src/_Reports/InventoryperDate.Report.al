@@ -197,39 +197,48 @@ report 6014417 "NPR Inventory per Date"
                 field(EndDate; EndDate)
                 {
                     Caption = 'Date';
+                    ApplicationArea=All;
                 }
                 field(IncludeItemStock; IncludeItemStock)
                 {
                     Caption = 'Show only products with inventory';
+                    ApplicationArea=All;
                 }
                 field(NotUnitPrice; NotUnitPrice)
                 {
                     Caption = 'Do not display prices';
+                    ApplicationArea=All;
                 }
                 field(ShowItemNegativeInventory; ShowItemNegativeInventory)
                 {
                     Caption = 'Do not display items with negative inventory';
+                    ApplicationArea=All;
                 }
                 field(NegativVolumeShow; NegativVolumeShow)
                 {
                     Caption = 'Show only items with negativ volume';
+                    ApplicationArea=All;
                 }
                 field(ShowNoInventory; ShowNoInventory)
                 {
                     Caption = 'Do not show inventory';
+                    ApplicationArea=All;
                 }
                 field(ShowZeroInventory; ShowZeroInventory)
                 {
                     Caption = 'Show only 0 quantity inventory';
+                    ApplicationArea=All;
                 }
                 field("Choose Calc. Method"; SelectCalcMethod)
                 {
                     Caption = 'Choose Calc. Method';
                     OptionCaption = 'Last Direct Cost Price,Cost Price';
+                    ApplicationArea=All;
                 }
                 field(GroupByItemGroup; GroupByItemGroup)
                 {
                     Caption = 'Sort items by item group';
+                    ApplicationArea=All;
                 }
             }
         }

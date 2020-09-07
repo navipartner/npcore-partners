@@ -43,6 +43,7 @@ page 6184473 "NPR EFT Trx Log Factbox"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

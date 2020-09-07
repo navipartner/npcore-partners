@@ -897,6 +897,7 @@ page 6059974 "NPR Variety Matrix"
                 Image = CopyFixedAssets;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -916,6 +917,7 @@ page 6059974 "NPR Variety Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -933,6 +935,7 @@ page 6059974 "NPR Variety Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

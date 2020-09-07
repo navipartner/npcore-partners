@@ -66,6 +66,7 @@ page 6151053 "NPR Item Hierarchy Lines"
             {
                 Caption = 'Create Hierachy Lines';
                 Image = Item;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -81,6 +82,7 @@ page 6151053 "NPR Item Hierarchy Lines"
                 Caption = 'Add Hierachy Item';
                 Image = NewItem;
                 Promoted = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

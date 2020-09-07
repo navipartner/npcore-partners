@@ -92,6 +92,7 @@ page 6060054 "NPR Item Worksh. Field Setup"
                               "Field Number" = FIELD("Field Number");
                 RunPageView = SORTING("Worksheet Template Name", "Worksheet Name", "Table No.", "Field Number", "Source Value")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
     }

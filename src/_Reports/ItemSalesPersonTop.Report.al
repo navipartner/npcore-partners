@@ -170,6 +170,7 @@ report 6014474 "NPR Item/Sales Person Top"
                     field("Sorting"; Sorting)
                     {
                         Caption = 'Sorting';
+                        ApplicationArea=All;
 
                         trigger OnValidate()
                         begin
@@ -184,17 +185,20 @@ report 6014474 "NPR Item/Sales Person Top"
                         Caption = 'Sort By';
                         Enabled = ShowSort;
                         OptionCaption = 'Qty.,Turnover';
+                        ApplicationArea=All;
                     }
                     field("Key"; Key)
                     {
                         Caption = 'Key';
                         Enabled = ShowSort;
                         OptionCaption = 'Biggest,Smallest';
+                        ApplicationArea=All;
                     }
                     field(ShowQty; ShowQty)
                     {
                         Caption = 'Show Qty.';
                         Enabled = ShowSort;
+                        ApplicationArea=All;
                     }
                 }
             }

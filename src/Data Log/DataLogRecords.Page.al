@@ -48,6 +48,7 @@ page 6059898 "NPR Data Log Records"
             part(Control6150622; "NPR Data Log Records Subform")
             {
                 SubPageLink = "Data Log Record Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }

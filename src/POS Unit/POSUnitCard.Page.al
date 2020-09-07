@@ -160,12 +160,14 @@ page 6150617 "NPR POS Unit Card"
                 RunPageLink = "Table ID" = CONST(6150615),
                               "No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+D';
+                ApplicationArea=All;
             }
             action("POS Unit Identity List")
             {
                 Caption = 'POS Unit Identity List';
                 Image = List;
                 RunObject = Page "NPR POS Unit Identity List";
+                ApplicationArea=All;
             }
             action("POS Period Registers")
             {
@@ -176,6 +178,7 @@ page 6150617 "NPR POS Unit Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Period Register List";
                 RunPageLink = "POS Unit No." = FIELD("No.");
+                ApplicationArea=All;
             }
             action("POS Entries")
             {
@@ -186,6 +189,7 @@ page 6150617 "NPR POS Unit Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";
                 RunPageLink = "POS Unit No." = FIELD("No.");
+                ApplicationArea=All;
             }
             action("POS Unit Bins")
             {
@@ -193,6 +197,7 @@ page 6150617 "NPR POS Unit Card"
                 Image = List;
                 RunObject = Page "NPR POS Unit to Bin Relation";
                 RunPageLink = "POS Unit No." = FIELD("No.");
+                ApplicationArea=All;
             }
         }
     }

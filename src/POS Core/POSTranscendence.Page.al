@@ -15,6 +15,7 @@ page 6150700 "NPR POS (Transcendence)"
         {
             usercontrol(Framework; "NPR Transcendence")
             {
+                ApplicationArea=All;
 
                 trigger OnFrameworkReady()
                 begin

@@ -121,6 +121,7 @@ page 6060091 "NPR MM Admis. Service Entries"
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Admission Service Log";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
+                ApplicationArea=All;
             }
         }
     }

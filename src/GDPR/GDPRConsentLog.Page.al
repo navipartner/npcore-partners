@@ -62,6 +62,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -83,6 +84,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -105,6 +107,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

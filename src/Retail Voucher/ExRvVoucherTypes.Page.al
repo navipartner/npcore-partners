@@ -76,6 +76,7 @@ page 6151080 "NPR ExRv Voucher Types"
             {
                 Caption = 'Update Voucher Status';
                 Image = RefreshVoucher;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -97,6 +98,7 @@ page 6151080 "NPR ExRv Voucher Types"
                 RunObject = Page "NPR ExRv Vouchers";
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
+                ApplicationArea=All;
             }
             action(Dimensions)
             {
@@ -104,6 +106,7 @@ page 6151080 "NPR ExRv Voucher Types"
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 ShortCutKey = 'Shift+Ctrl+D';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

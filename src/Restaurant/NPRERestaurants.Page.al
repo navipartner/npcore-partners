@@ -36,10 +36,12 @@ page 6150683 "NPR NPRE Restaurants"
             systempart(Control6014406; Notes)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
+                ApplicationArea=All;
             }
         }
     }
@@ -57,6 +59,7 @@ page 6150683 "NPR NPRE Restaurants"
                     Image = Departments;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
+                    ApplicationArea=All;
                 }
                 action(KitchenStationSelection)
                 {
@@ -64,6 +67,7 @@ page 6150683 "NPR NPRE Restaurants"
                     Image = Troubleshoot;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
+                    ApplicationArea=All;
                 }
                 action(ShowKitchenRequests)
                 {
@@ -74,6 +78,7 @@ page 6150683 "NPR NPRE Restaurants"
                     PromotedIsBig = true;
                     Scope = Repeater;
                     Visible = ShowRequests;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -93,11 +98,13 @@ page 6150683 "NPR NPRE Restaurants"
                     Image = Zones;
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
+                    ApplicationArea=All;
                 }
                 action(Seatings)
                 {
                     Caption = 'Seatings';
                     Image = Lot;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

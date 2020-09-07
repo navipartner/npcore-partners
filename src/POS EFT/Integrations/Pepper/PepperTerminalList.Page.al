@@ -60,6 +60,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'License';
                     Image = ImportCodes;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -70,6 +71,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'Import';
                     Image = Import;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -84,6 +86,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'Show';
                     Image = ElectronicNumber;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -94,6 +97,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'Additonal Parameters';
                     Image = ElectronicDoc;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -108,6 +112,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'Additional parameters';
                     Image = DeleteQtyToHandle;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -118,6 +123,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'Export';
                     Image = DeleteXML;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -132,6 +138,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'License';
                     Image = Export;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -142,6 +149,7 @@ page 6184494 "NPR Pepper Terminal List"
                 {
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -160,6 +168,7 @@ page 6184494 "NPR Pepper Terminal List"
                 RunPageLink = "Pepper Terminal Code" = FIELD(Code);
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
+                ApplicationArea=All;
             }
         }
     }

@@ -315,6 +315,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
             {
                 SubPageLink = "Entry No." = FIELD("Entry No.");
                 Visible = true;
+                ApplicationArea=All;
             }
         }
     }
@@ -334,6 +335,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     RunObject = Page "Reminder/Fin. Charge Entries";
                     RunPageLink = "Customer Entry No." = FIELD("Entry No.");
                     RunPageView = SORTING("Customer Entry No.");
+                    ApplicationArea=All;
                 }
                 action("Applied E&ntries")
                 {
@@ -341,6 +343,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Image = Approve;
                     RunObject = Page "Applied Customer Entries";
                     RunPageOnRec = true;
+                    ApplicationArea=All;
                 }
                 action(Dimensions)
                 {
@@ -348,6 +351,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -362,6 +366,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     RunPageLink = "Cust. Ledger Entry No." = FIELD("Entry No.");
                     RunPageView = SORTING("Cust. Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
+                    ApplicationArea=All;
                 }
             }
             group("&Application")
@@ -376,6 +381,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F11';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -393,6 +399,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'F9';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -403,6 +410,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 {
                     Caption = 'Preview Posting';
                     Image = ViewPostedOrder;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -417,6 +425,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 {
                     Caption = 'Show Only Selected Entries to Be Applied';
                     Image = ShowSelected;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -444,6 +453,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

@@ -60,6 +60,7 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
             {
                 Caption = 'On-Sale Items';
                 SubPageLink = "Coupon Type" = FIELD("Coupon Type");
+                ApplicationArea=All;
             }
         }
     }

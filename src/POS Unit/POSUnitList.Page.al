@@ -100,12 +100,14 @@ page 6150616 "NPR POS Unit List"
                         RunPageLink = "Table ID" = CONST(6150615),
                                       "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
+                        ApplicationArea=All;
                     }
                     action("Dimensions-&Multiple")
                     {
                         AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -125,6 +127,7 @@ page 6150616 "NPR POS Unit List"
                     Caption = 'POS Unit Identity List';
                     Image = List;
                     RunObject = Page "NPR POS Unit Identity List";
+                    ApplicationArea=All;
                 }
                 action("POS Period Registers")
                 {
@@ -135,6 +138,7 @@ page 6150616 "NPR POS Unit List"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
                     RunPageLink = "POS Unit No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("POS Entries")
                 {
@@ -145,6 +149,7 @@ page 6150616 "NPR POS Unit List"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry List";
                     RunPageLink = "POS Unit No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action("POS Unit Bins")
                 {
@@ -152,6 +157,7 @@ page 6150616 "NPR POS Unit List"
                     Image = List;
                     RunObject = Page "NPR POS Unit to Bin Relation";
                     RunPageLink = "POS Unit No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
                 action(Workshifts)
                 {
@@ -163,6 +169,7 @@ page 6150616 "NPR POS Unit List"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Workshift Checkpoints";
                     RunPageLink = "POS Unit No." = FIELD("No.");
+                    ApplicationArea=All;
                 }
             }
         }
@@ -175,6 +182,7 @@ page 6150616 "NPR POS Unit List"
                 Image = Sales;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

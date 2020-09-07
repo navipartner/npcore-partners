@@ -54,6 +54,7 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

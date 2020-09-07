@@ -13,6 +13,7 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
                 Image = BinContent;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
             }
             action("NPR PriceLabel")
             {
@@ -21,6 +22,7 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
             }
         }
     }

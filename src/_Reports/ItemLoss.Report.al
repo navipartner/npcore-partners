@@ -118,6 +118,7 @@ report 6014542 "NPR Item - Loss"
                     {
                         Caption = 'Source Code Filter';
                         TableRelation = "Source Code";
+                        ApplicationArea=All;
                     }
                 }
             }

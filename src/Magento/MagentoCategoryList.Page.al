@@ -51,6 +51,7 @@ page 6151415 "NPR Magento Category List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupCategories;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

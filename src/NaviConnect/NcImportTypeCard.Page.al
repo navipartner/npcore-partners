@@ -181,6 +181,7 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Ftp Enabled";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -199,6 +200,7 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Server File Enabled";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -217,6 +219,7 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Send E-mail on Error");
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

@@ -10,6 +10,7 @@ page 6151249 "NPR Entertainment RC"
 
             part(Control7; "NPR Retail Ent Headline")
             {
+                  ApplicationArea=All;
                 // ApplicationArea = Basic, Suite;
             }
 
@@ -18,39 +19,47 @@ page 6151249 "NPR Entertainment RC"
 
             part(Control2; "NPR Retail Enter. Act - Ticket")
             {
+                        ApplicationArea=All;
             }
             part(Control20; "NPR RC Ticket Activities")
             {
+                ApplicationArea=All;
             }
             part(RCMembershipBurndownChart; "NPR RC Members. Burndown Chart")
             {
+                ApplicationArea=All;
 
             }
 
             part(RetailActivities; "NPR Retail Activities")
             {
                 Caption = 'ACTIVITIES';
+                  ApplicationArea=All;
             }
 
 
 
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
+                      ApplicationArea=All;
 
             }
 
 
             part(MyJobQueue; "My Job Queue")
             {
+                    ApplicationArea=All;
 
             }
             part(MyReports; "NPR My Reports")
             {
+                ApplicationArea=All;
 
 
             }
             part(PowerBi; "Power BI Report Spinner Part")
             {
+                ApplicationArea=All;
 
             }
         }
@@ -86,15 +95,18 @@ page 6151249 "NPR Entertainment RC"
                 {
                     Caption = 'Membership Sales Setup';
                     RunObject = Page "NPR MM Membership Sales Setup";
+                    ApplicationArea=All;
                 }
                 action("Membership Alteration")
                 {
                     Caption = 'Membership Alteration';
                     RunObject = Page "NPR MM Membership Alter.";
+                    ApplicationArea=All;
                 }
                 action("Sponsorship Ticket Setup")
                 {
                     Caption = 'Sponsorship Ticket Setup';
+                    ApplicationArea=All;
                     //RunObject = Page "MM Sponsorship Ticket Setup";
                 }
                 action("Member Notification Setup")
@@ -246,11 +258,13 @@ page 6151249 "NPR Entertainment RC"
                 {
                     Caption = 'Ticket Setup';
                     RunObject = Page "NPR TM Ticket Setup";
+                    ApplicationArea=All;
                 }
                 action("Ticket Access Statistics Matrix")
                 {
                     Caption = 'Ticket Access Statistics Matrix';
                     RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
+                    ApplicationArea=All;
                 }
             }
             group(ActionGroup18)
@@ -276,12 +290,14 @@ page 6151249 "NPR Entertainment RC"
                 {
                     Caption = 'Restaurant Setup';
                     RunObject = Page "NPR NPRE Restaurant Setup";
+                    ApplicationArea=All;
                 }
             }
             action("Import List")
             {
                 Caption = 'Import List';
                 RunObject = Page "NPR Nc Import List";
+                ApplicationArea=All;
             }
         }
     }

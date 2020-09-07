@@ -479,23 +479,28 @@ report 6014535 "NPR Sales Statistics By Dept."
                     field(antalniveauer; antalniveauer)
                     {
                         Caption = 'Show no. of levels';
+                        ApplicationArea=All;
                     }
                     field(kunmedsalg; kunmedsalg)
                     {
                         Caption = 'Only with sales';
+                        ApplicationArea=All;
                     }
                     field(visvarer; visvarer)
                     {
                         Caption = 'Print items';
+                        ApplicationArea=All;
                     }
                     field(lastYear; lastYear)
                     {
                         Caption = 'Print last years numbers';
+                        ApplicationArea=All;
                     }
                     field(isGroupedByLocation; isGroupedByLocation)
                     {
                         CaptionClass = txtLabeldim1;
                         Caption = 'Group by';
+                        ApplicationArea=All;
                     }
                 }
             }

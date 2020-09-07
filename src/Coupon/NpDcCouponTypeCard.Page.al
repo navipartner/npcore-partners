@@ -198,6 +198,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -219,6 +220,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasIssueCouponSetup;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -235,6 +237,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasValidateCouponSetup;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -251,6 +254,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasApplyDiscountSetup;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -270,6 +274,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 RunObject = Page "NPR NpDc Coupons";
                 RunPageLink = "Coupon Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
+                ApplicationArea=All;
             }
             action(Comments)
             {
@@ -283,6 +288,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                               "Option 2" = CONST("0"),
                               Integer = CONST(0),
                               "Integer 2" = CONST(0);
+                ApplicationArea=All;
             }
         }
     }

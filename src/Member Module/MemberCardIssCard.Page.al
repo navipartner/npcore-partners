@@ -99,6 +99,7 @@ page 6059774 "NPR Member Card Iss. Card"
                 Caption = 'List';
                 Image = List;
                 RunObject = Page "NPR Member Card Issued Cards";
+                ApplicationArea=All;
             }
         }
     }

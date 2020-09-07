@@ -51,6 +51,7 @@ page 6014639 "NPR RP Template List"
             part(Control6014409; "NPR RP Template Media Factbox")
             {
                 SubPageLink = Template = FIELD(Code);
+                ApplicationArea=All;
             }
         }
     }
@@ -66,6 +67,7 @@ page 6014639 "NPR RP Template List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -83,6 +85,7 @@ page 6014639 "NPR RP Template List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -102,6 +105,7 @@ page 6014639 "NPR RP Template List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -121,6 +125,7 @@ page 6014639 "NPR RP Template List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -138,6 +143,7 @@ page 6014639 "NPR RP Template List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

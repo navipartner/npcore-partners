@@ -175,6 +175,7 @@ page 6151504 "NPR Nc Import List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -190,6 +191,7 @@ page 6151504 "NPR Nc Import List"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 ShortCutKey = 'F9';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -200,6 +202,7 @@ page 6151504 "NPR Nc Import List"
             {
                 Caption = 'Add File';
                 Image = Save;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -214,6 +217,7 @@ page 6151504 "NPR Nc Import List"
                 Image = XMLFile;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -229,6 +233,7 @@ page 6151504 "NPR Nc Import List"
                 Image = XMLFile;
                 Promoted = true;
                 PromotedCategory = Process;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -244,6 +249,7 @@ page 6151504 "NPR Nc Import List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 Visible = NOT WebClient;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin
@@ -259,6 +265,7 @@ page 6151504 "NPR Nc Import List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 Visible = WebClient;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -282,6 +289,7 @@ page 6151504 "NPR Nc Import List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 Visible = WebClient;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -322,6 +330,7 @@ page 6151504 "NPR Nc Import List"
                 Promoted = true;
                 PromotedCategory = Process;
                 ShortCutKey = 'Shift+F7';
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

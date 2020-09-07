@@ -91,6 +91,7 @@ page 6060132 "NPR MM Member Community"
                 Image = SetupList;
                 RunObject = Page "NPR MM Membership Setup";
                 RunPageLink = "Community Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             action("Loyalty Setup")
             {
@@ -98,6 +99,7 @@ page 6060132 "NPR MM Member Community"
                 Image = SalesLineDisc;
                 Promoted = true;
                 RunObject = Page "NPR MM Loyalty Setup";
+                ApplicationArea=All;
             }
             action("Notification Setup")
             {
@@ -105,6 +107,7 @@ page 6060132 "NPR MM Member Community"
                 Image = SetupList;
                 RunObject = Page "NPR MM Member Notific. Setup";
                 RunPageLink = "Community Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             separator(Separator6150626)
             {
@@ -120,6 +123,7 @@ page 6060132 "NPR MM Member Community"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR MM Members. AutoRenew List";
                 RunPageLink = "Community Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             separator(Separator6014406)
             {
@@ -130,6 +134,7 @@ page 6060132 "NPR MM Member Community"
                 Image = List;
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Community Code" = FIELD(Code);
+                ApplicationArea=All;
             }
             separator(Separator6014405)
             {
@@ -139,6 +144,7 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Notifications';
                 Image = InteractionLog;
                 RunObject = Page "NPR MM Membership Notific.";
+                ApplicationArea=All;
             }
             action("Foreign Membership Setup")
             {
@@ -151,6 +157,7 @@ page 6060132 "NPR MM Member Community"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR MM Foreign Members. Setup";
                 RunPageLink = "Community Code" = FIELD(Code);
+                ApplicationArea=All;
             }
         }
         area(processing)
@@ -162,6 +169,7 @@ page 6060132 "NPR MM Member Community"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Report "NPR MM Sync. Community Cust.";
+                ApplicationArea=All;
             }
         }
     }

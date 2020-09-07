@@ -67,6 +67,7 @@ page 6151188 "NPR MM Member Communication"
                 Image = Default;
                 Promoted = true;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

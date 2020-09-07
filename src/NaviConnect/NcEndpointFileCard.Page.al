@@ -64,6 +64,7 @@ page 6151527 "NPR Nc Endpoint File Card"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

@@ -63,6 +63,7 @@ page 6014474 "NPR Retail Price Log Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Price Log Activated";
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

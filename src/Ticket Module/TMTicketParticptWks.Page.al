@@ -161,6 +161,7 @@ page 6060109 "NPR TM Ticket Particpt. Wks."
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

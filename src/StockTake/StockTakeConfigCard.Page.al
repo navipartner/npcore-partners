@@ -150,6 +150,7 @@ page 6014668 "NPR Stock-Take Config. Card"
                     RunPageLink = "Table ID" = CONST(6014665),
                                   "No." = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

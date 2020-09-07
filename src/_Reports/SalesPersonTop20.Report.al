@@ -217,19 +217,23 @@ report 6014406 "NPR Sales Person Top 20"
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Turnover,Discount,Contribution Margin,Contribution Ratio';
+                        ApplicationArea=All;
                     }
                     field("Sorting"; Sorting)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
+                        ApplicationArea=All;
                     }
                     field(ShowQty; ShowQty)
                     {
                         Caption = 'Quantity';
+                        ApplicationArea=All;
                     }
                     field(OnlySales; OnlySales)
                     {
                         Caption = 'Only Salespersons With Sale';
+                        ApplicationArea=All;
                     }
                 }
             }

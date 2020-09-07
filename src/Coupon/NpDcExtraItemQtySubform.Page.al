@@ -60,6 +60,7 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 begin

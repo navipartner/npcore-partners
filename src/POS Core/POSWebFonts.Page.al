@@ -73,6 +73,7 @@ page 6014622 "NPR POS Web Fonts"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -87,6 +88,7 @@ page 6014622 "NPR POS Web Fonts"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -101,6 +103,7 @@ page 6014622 "NPR POS Web Fonts"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -118,6 +121,7 @@ page 6014622 "NPR POS Web Fonts"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -132,6 +136,7 @@ page 6014622 "NPR POS Web Fonts"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -146,6 +151,7 @@ page 6014622 "NPR POS Web Fonts"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -160,6 +166,7 @@ page 6014622 "NPR POS Web Fonts"
                 {
                     Caption = 'Export Font Configuration';
                     Image = Export;
+                    ApplicationArea=All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -174,6 +181,7 @@ page 6014622 "NPR POS Web Fonts"
                 {
                     Caption = 'Import Font Configuration';
                     Image = Import;
+                    ApplicationArea=All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -191,6 +199,7 @@ page 6014622 "NPR POS Web Fonts"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var

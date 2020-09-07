@@ -58,6 +58,7 @@ page 6151493 "NPR Raptor Actions"
         {
             systempart(Control6014407; Notes)
             {
+                ApplicationArea=All;
             }
         }
     }
@@ -73,6 +74,7 @@ page 6151493 "NPR Raptor Actions"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var

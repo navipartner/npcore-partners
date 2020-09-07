@@ -22,12 +22,14 @@ page 6060153 "NPR Event Activities"
                         Caption = 'New Event';
                         RunObject = Page "NPR Event Card";
                         RunPageMode = Create;
+                        ApplicationArea=All;
                     }
                     action("New Customer")
                     {
                         Caption = 'New Customer';
                         RunObject = Page "Customer Card";
                         RunPageMode = Create;
+                        ApplicationArea=All;
                     }
                 }
             }

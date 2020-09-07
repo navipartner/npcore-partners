@@ -42,6 +42,7 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                               Type = CONST(SalesPerson);
                 RunPageView = SORTING(Type, Code, "Alt. No.");
                 ShortCutKey = 'Ctrl+A';
+                ApplicationArea=All;
             }
         }
     }
