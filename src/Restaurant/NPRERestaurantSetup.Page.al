@@ -1,12 +1,5 @@
 page 6150669 "NPR NPRE Restaurant Setup"
 {
-    // NPR5.34/ANEN /2017012 CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.41/THRO/20180412 CASE 309873 Replaced 2 template fields by a listpart page for setup of multiple templates
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Restaurant Setup';
     PageType = Card;
     SourceTable = "NPR NPRE Restaurant Setup";
@@ -160,4 +153,3 @@ page 6150669 "NPR NPRE Restaurant Setup"
     var
         ShowKDS: Boolean;
 }
-
