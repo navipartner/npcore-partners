@@ -1,6 +1,5 @@
 pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 {
-
     layout
     {
         modify("Name 2")

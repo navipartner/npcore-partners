@@ -91,7 +91,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
             part(PrintTemplates; "NPR NPRE Print Templ. Subpage")
             {
                 Caption = 'Print Templates';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -105,7 +105,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 Caption = 'Print Categories';
                 Image = PrintForm;
                 RunObject = Page "NPR NPRE Slct Prnt Cat.";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Restaurants)
             {
@@ -115,7 +115,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Restaurants";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(Kitchen)
             {
@@ -126,7 +126,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Image = Departments;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = CONST('');
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(KitchenStationSelection)
                 {
@@ -134,7 +134,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Image = Troubleshoot;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = CONST('');
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
