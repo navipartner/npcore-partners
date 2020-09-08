@@ -158,7 +158,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
                 Caption = 'POS Sales Entries';
                 Image = Entries;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
