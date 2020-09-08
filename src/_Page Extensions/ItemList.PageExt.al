@@ -178,75 +178,34 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
-
-    var
         VendorItemNo: Text[100];
         TblItem: Record Item;
         TblVendor: Record Vendor;
 
 
-    //Unsupported feature: Code Modification on "OnAfterGetRecord".
+    trigger OnAfterGetRecord()
+    begin
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, "No.");
+        NPRAttrEditable := CurrPage.Editable();
 
-    //trigger OnAfterGetRecord()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    EnableControls;
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Item, "No.");
-    NPRAttrEditable := CurrPage.Editable ();
-    //+NPR4.11
-
-    EnableControls;
+        GetVendorName;
+    end;
 
 
-
-    //-NPR5.52 [367304]
-    GetVendorName;
-    //+NPR5.52 [367304]
-    */
-    //end;
-
-
-    //Unsupported feature: Code Modification on "OnOpenPage".
-
-    //trigger OnOpenPage()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
-    with SocialListeningSetup do
-      SocialListeningSetupVisible := Get and "Show on Customers" and "Accept License Agreement" and ("Solution ID" <> '');
-    IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled;
-    SetWorkflowManagementEnabledState;
-    IsOnPhone := ClientTypeManagement.GetCurrentClientType = CLIENTTYPE::Phone;
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetAttributeVisibility (DATABASE::Item, NPRAttrVisibleArray);
-    NPRAttrVisible01 := NPRAttrVisibleArray[1];
-    NPRAttrVisible02 := NPRAttrVisibleArray[2];
-    NPRAttrVisible03 := NPRAttrVisibleArray[3];
-    NPRAttrVisible04 := NPRAttrVisibleArray[4];
-    NPRAttrVisible05 := NPRAttrVisibleArray[5];
-    NPRAttrVisible06 := NPRAttrVisibleArray[6];
-    NPRAttrVisible07 := NPRAttrVisibleArray[7];
-    NPRAttrVisible08 := NPRAttrVisibleArray[8];
-    NPRAttrVisible09 := NPRAttrVisibleArray[9];
-    NPRAttrVisible10 := NPRAttrVisibleArray[10];
-    //+NPR4.11
-
-    #1..6
-    */
-    //end;
+    trigger OnOpenPage()
+    begin
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::Item, NPRAttrVisibleArray);
+        NPRAttrVisible01 := NPRAttrVisibleArray[1];
+        NPRAttrVisible02 := NPRAttrVisibleArray[2];
+        NPRAttrVisible03 := NPRAttrVisibleArray[3];
+        NPRAttrVisible04 := NPRAttrVisibleArray[4];
+        NPRAttrVisible05 := NPRAttrVisibleArray[5];
+        NPRAttrVisible06 := NPRAttrVisibleArray[6];
+        NPRAttrVisible07 := NPRAttrVisibleArray[7];
+        NPRAttrVisible08 := NPRAttrVisibleArray[8];
+        NPRAttrVisible09 := NPRAttrVisibleArray[9];
+        NPRAttrVisible10 := NPRAttrVisibleArray[10];
+    end;
 
     local procedure GetVendorName()
     begin

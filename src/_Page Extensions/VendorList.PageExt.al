@@ -1,11 +1,5 @@
 pageextension 6014428 "NPR Vendor List" extends "Vendor List"
 {
-    // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
-    // NPR9   /LS/20151022  CASE 225607  Merged to 2016
-    // NPR5.23/BHR/20160329 CASE 222711 Added PhoneLookup Action.
-    // NPR5.29/TJ /20170113 CASE 262797 Removed code from OnAfterGetRecord related to searching approvals as it's not part of standard code
-    // NPR5.29/TJ /20170125 CASE 263507 Moved code from PhoneLookup action to a subscriber and also renamed that action from default to PhoneLookup
-    // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
     layout
     {
         addafter("Base Calendar Code")
@@ -161,51 +155,24 @@ pageextension 6014428 "NPR Vendor List" extends "Vendor List"
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
 
+    trigger OnAfterGetRecord()
+    begin
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Vendor, "No.");
+        NPRAttrEditable := CurrPage.Editable();
+    end;
 
-    //Unsupported feature: Code Insertion on "OnAfterGetRecord".
-
-    //trigger OnAfterGetRecord()
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Vendor, "No.");
-    NPRAttrEditable := CurrPage.Editable();
-    //+NPR4.11
-    */
-    //end;
-
-
-    //Unsupported feature: Code Modification on "OnOpenPage".
-
-    //trigger OnOpenPage()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    SetFilter("Date Filter",'..%1',WorkDate);
-    with SocialListeningSetup do
-      SocialListeningSetupVisible := Get and "Show on Customers" and "Accept License Agreement" and ("Solution ID" <> '');
-    ResyncVisible := ReadSoftOCRMasterDataSync.IsSyncEnabled;
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetAttributeVisibility (DATABASE::Vendor, NPRAttrVisibleArray);
-    NPRAttrVisible01 := NPRAttrVisibleArray[1];
-    NPRAttrVisible02 := NPRAttrVisibleArray[2];
-    NPRAttrVisible03 := NPRAttrVisibleArray[3];
-    NPRAttrVisible04 := NPRAttrVisibleArray[4];
-    NPRAttrVisible05 := NPRAttrVisibleArray[5];
-    NPRAttrVisible06 := NPRAttrVisibleArray[6];
-    NPRAttrVisible07 := NPRAttrVisibleArray[7];
-    NPRAttrVisible08 := NPRAttrVisibleArray[8];
-    NPRAttrVisible09 := NPRAttrVisibleArray[9];
-    NPRAttrVisible10 := NPRAttrVisibleArray[10];
-    //+NPR4.11
-
-    #1..4
-    */
-    //end;
+    trigger OnOpenPage()
+    begin
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::Vendor, NPRAttrVisibleArray);
+        NPRAttrVisible01 := NPRAttrVisibleArray[1];
+        NPRAttrVisible02 := NPRAttrVisibleArray[2];
+        NPRAttrVisible03 := NPRAttrVisibleArray[3];
+        NPRAttrVisible04 := NPRAttrVisibleArray[4];
+        NPRAttrVisible05 := NPRAttrVisibleArray[5];
+        NPRAttrVisible06 := NPRAttrVisibleArray[6];
+        NPRAttrVisible07 := NPRAttrVisibleArray[7];
+        NPRAttrVisible08 := NPRAttrVisibleArray[8];
+        NPRAttrVisible09 := NPRAttrVisibleArray[9];
+        NPRAttrVisible10 := NPRAttrVisibleArray[10];
+    end;
 }
-
