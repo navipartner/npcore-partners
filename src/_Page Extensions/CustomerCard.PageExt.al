@@ -1,38 +1,6 @@
 pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 {
-    // PN1.00/MH/20140725  NAV-AddOn: PDF2NAV
-    //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting (Billing-page).
-    // NPR70.00.02.01/MH/20150216  CASE 204110 Removed Loyalty Module
-    // MAG1.08/MHA /20150311  CASE 206395 Added Webshop Group and function SetMagentoVisible()
-    // MAG1.17/MHA /20150622  CASE 215533 Magento related NaviConnect Setup moved to Magento Setup
-    // NPR4.11/TSA /20150623  CASE 209946 - Shortcut Attributes
-    // NPR9   /JDH /20151119  CASE 225607 Merge to NAV 2016
-    // PN1.08 /TTH /10122015  CASE 229069 Added Customer Statement Sending
-    // PN1.08 /MHA /20151214  CASE 228859 Pdf2Nav (New Version List)
-    // PN1.10 /MHA /20160314  CASE 236653 Updated Record Specific Pdf2Nav functions with general Variant functions
-    // NPR5.23/TS  /20160524  CASE 242388 Added Action Member Card
-    // NPR5.23/TS  /20160603  CASE 243212 Promoted Action Alternative nummer
-    // NPR5.23/TS  /20160608  CASE 243611 Removed Actions
-    // NPR5.25/MMV /20160621  CASE 233533 Added action "PrintShippingLabel"
-    // MAG2.00/MHA /20160525  CASE 240005 Magento Integration
-    // NPR5.26/OSFI/20160811  CASE 246167 Added Action "POS Info"
-    // MAG2.01/MHA /20160525  CASE 240005 Magento function removed to better support extensions: SetMagentoVisible()
-    // NPR5.29/TJ  /20170113  CASE 262797 Renamed actions Vareposter to ItemLedgerEntries, Alternativ Nummer to AlternativNo
-    //   - Moved code from actions ItemLedgerEntries, AlternativNo and PrintShippingLabel into subscriber functions
-    //   - Removed functions used as separators (--- NC)
-    // NPR5.30/THRO/20170203 CASE 263182 Added action SendSMS
-    // NPR5.30/BHR /20170217 CASE 262923 Change image for action'Reparation' Open list instead of card.
-    // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
-    // NPR5.33/BHR /20172526 CASE 277663 Added action Audit Roll
-    // NPR5.33/TR  /20170627 CASE 278820 Added Customer."Name 2" to General group.
-    // NPR5.38/BR  /20171117 CASE 295255 Added Action POS Entries
-    // NPR5.38/KENU/20170815 CASE 282631 Added field "Tax Area Code" and "Tax Liable" to "Invoicing"
-    // NPR5.42/THRO/20180516 CASE 308179 Removed code from Action SendAsPdf and EmailLog
-    // NPR5.48/TSA /20181218 CASE 320424 Added "Magento Shipping Group", "Magento Payment Group", "Magento Store Code"
-    // MAG2.20/MHA /20190426 CASE 320423 Added Magento Version visibility control
-    // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized,Anonymized Date,To Anonymize and Customer Anonymization functionality.
-    // NPR5.53/ZESO/20200115 CASE 358656 Use Field 'To Anonymize On' instead of 'To Anonymize'.
-    // NPR5.55/ZESO/20200512 CASE 358656 Remove Reference to 'To Anonymize'
+
     layout
     {
         modify("Name 2")
@@ -233,7 +201,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     RunPageLink = "Document Type" = CONST("Selection Contract"),
                                   "Customer No." = FIELD("No."),
                                   "Customer Type" = CONST(Alm);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("NPR Retail")
@@ -245,26 +213,26 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = "Action";
                     RunObject = Page "NPR Used Goods Reg. Card";
                     RunPageLink = "Purchased By Customer No." = FIELD("No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR ItemLedgerEntries")
                 {
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR AuditRoll")
                 {
                     Caption = 'Audit Roll';
                     Image = ListPage;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR AlternativeNo")
                 {
                     Caption = 'Alternative No.';
                     Image = "Action";
                     Promoted = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR Reparation")
                 {
@@ -273,7 +241,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     RunObject = Page "NPR Customer Repair List";
                     RunPageLink = "Customer No." = FIELD("No."),
                                   "Customer Type" = CONST(Ordinary);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR Member Cards")
                 {
@@ -281,13 +249,13 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = Card;
                     RunObject = Page "NPR Member Card Issued Cards";
                     RunPageLink = "Customer No" = FIELD("No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR PrintShippingLabel")
                 {
                     Caption = 'Shipping Label';
                     Image = PrintCheck;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("NPR PDF2NAV")
@@ -297,13 +265,13 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send Statement as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -316,7 +284,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 RunObject = Page "NPR POS Info Links";
                 RunPageLink = "Table ID" = CONST(18),
                               "Primary Key" = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Item &Tracking Entries")
@@ -325,7 +293,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             {
                 Caption = 'POS Entries';
                 Image = Entries;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter(Documents)
@@ -337,7 +305,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -348,33 +316,23 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 Caption = 'Customer Anonymization';
                 Ellipsis = true;
                 Image = AbsenceCategory;
-                ApplicationArea=All;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
                     GDPRManagement: Codeunit "NPR NP GDPR Management";
                 begin
-                    //-NPR5.52 [358656]
                     TestField("NPR Anonymized", false);
-                    //-NPR5.55 [388813]
-                    //TESTFIELD("To Anonymize",TRUE);
-                    //+NPR5.55 [388813]
                     if (GDPRManagement.DoAnonymization("No.", ReasonText)) then
                         if (not Confirm(Text000, false)) then
                             Error('');
 
 
                     Message(ReasonText);
-                    //+NPR5.52 [358656]
                 end;
             }
         }
     }
-
-    var
-        DynamicEditable: Boolean;
 
     var
         NPRAttrTextArray: array[40] of Text[100];
@@ -392,133 +350,57 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
         MagentoVersion: Decimal;
-
-    var
         ReasonText: Text;
         Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
         ToAnonymizeEditable: Boolean;
         UserSetup: Record "User Setup";
 
+    trigger OnAfterGetRecord()
+    begin
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Customer, "No.");
+        NPRAttrEditable := CurrPage.Editable();
 
-    //Unsupported feature: Code Modification on "OnAfterGetRecord".
-
-    //trigger OnAfterGetRecord()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    ActivateFields;
-    StyleTxt := SetStyle;
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    ActivateFields;
-    StyleTxt := SetStyle;
-
-    //-NPR4.11
-    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Customer, "No.");
-    NPRAttrEditable := CurrPage.Editable ();
-    //+NPR4.11
+        if UserSetup.Get(UserId) then
+            if UserSetup."NPR Anonymize Customers" then
+                ToAnonymizeEditable := true
+            else
+                ToAnonymizeEditable := false;
+    end;
 
 
-    //-NPR5.52 [358656]
-    if UserSetup.Get(UserId) then
-      if UserSetup."Anonymize Customers" then
-        ToAnonymizeEditable := true
-      else
+    trigger OnOpenPage()
+    begin
+        // ToAnonymizeEditable := false; was previously in C/AL set in "OnInit()" but
+        // this trigger isn't available in PageExtension object so I moved it here.
         ToAnonymizeEditable := false;
 
-    //-NPR5.52 [358656]
-    */
-    //end;
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::Customer, NPRAttrVisibleArray);
+        NPRAttrVisible01 := NPRAttrVisibleArray[1];
+        NPRAttrVisible02 := NPRAttrVisibleArray[2];
+        NPRAttrVisible03 := NPRAttrVisibleArray[3];
+        NPRAttrVisible04 := NPRAttrVisibleArray[4];
+        NPRAttrVisible05 := NPRAttrVisibleArray[5];
+        NPRAttrVisible06 := NPRAttrVisibleArray[6];
+        NPRAttrVisible07 := NPRAttrVisibleArray[7];
+        NPRAttrVisible08 := NPRAttrVisibleArray[8];
+        NPRAttrVisible09 := NPRAttrVisibleArray[9];
+        NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
+        NPRAttrEditable := CurrPage.Editable();
 
-    //Unsupported feature: Code Modification on "OnInit".
+        SetMagentoVersion();
 
-    //trigger OnInit()
-    //Parameters and return type have not been exported.
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    FoundationOnly := ApplicationAreaMgmtFacade.IsFoundationEnabled;
-
-    SetCustomerNoVisibilityOnFactBoxes;
-    #4..8
-    CaptionTxt := CurrPage.Caption;
-    SetCaption(CaptionTxt);
-    CurrPage.Caption(CaptionTxt);
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    #1..11
-
-    //-NPR5.52 [358656]
-    ToAnonymizeEditable := false;
-    //+NPR5.52 [358656]
-    */
-    //end;
-
-
-    //Unsupported feature: Code Modification on "OnOpenPage".
-
-    //trigger OnOpenPage()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    ActivateFields;
-
-    CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
-    #4..8
-    if FoundationOnly then
-      CurrPage.PriceAndLineDisc.PAGE.InitPage(false);
-
-    ShowCharts := "No." <> '';
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    #1..11
-    //-NPR4.11
-    NPRAttrManagement.GetAttributeVisibility (DATABASE::Customer, NPRAttrVisibleArray);
-    NPRAttrVisible01 := NPRAttrVisibleArray[1];
-    NPRAttrVisible02 := NPRAttrVisibleArray[2];
-    NPRAttrVisible03 := NPRAttrVisibleArray[3];
-    NPRAttrVisible04 := NPRAttrVisibleArray[4];
-    NPRAttrVisible05 := NPRAttrVisibleArray[5];
-    NPRAttrVisible06 := NPRAttrVisibleArray[6];
-    NPRAttrVisible07 := NPRAttrVisibleArray[7];
-    NPRAttrVisible08 := NPRAttrVisibleArray[8];
-    NPRAttrVisible09 := NPRAttrVisibleArray[9];
-    NPRAttrVisible10 := NPRAttrVisibleArray[10];
-
-    NPRAttrEditable := CurrPage.Editable ();
-    //+NPR4.11
-    //-MAG2.20 [320423]
-    SetMagentoVersion();
-    //+MAG2.20 [320423]
-
-    ShowCharts := "No." <> '';
-
-    //-NPR5.52 [358656]
-    if UserSetup.Get(UserId) then
-      if UserSetup."Anonymize Customers" then
-        ToAnonymizeEditable := true
-      else
-        ToAnonymizeEditable := false;
-
-    //-NPR5.52 [358656]
-    */
-    //end;
+        if UserSetup.Get(UserId) then
+            if UserSetup."NPR Anonymize Customers" then
+                ToAnonymizeEditable := true
+            else
+                ToAnonymizeEditable := false;
+    end;
 
     local procedure SetMagentoVersion()
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        //-MAG2.20 [320423]
         if not MagentoSetup.Get then
             exit;
 
@@ -528,7 +410,6 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             MagentoSetup."Magento Version"::"2":
                 MagentoVersion := 2;
         end;
-        //+MAG2.20 [320423]
     end;
 }
 
