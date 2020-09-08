@@ -1,8 +1,5 @@
 pageextension 6014445 "NPR Sales List" extends "Sales List"
 {
-    // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
-    //                                     Control "Assigned User ID": property 'Visible' set to false
-    //                                     Added controls: Amount, "Amount Including VAT", PrepmtAmtInclVAT, RemainingAmtInclVAT
     layout
     {
         modify("Assigned User ID")
@@ -52,41 +49,23 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
         RemainingAmtInclVAT: Decimal;
 
 
-    //Unsupported feature: Code Insertion on "OnAfterGetRecord".
-
-    //trigger OnAfterGetRecord()
-    //begin
-    /*
-    //-NPR5.53 [360297]
-    if "Document Type" = "Document Type"::Order then begin
-      PostedPrepmtDocumentBuffer.Generate(RecordId,true);
-      PrepmtAmtInclVAT := PostedPrepmtDocumentBuffer.TotalAmtInclVAT(RecordId);
-    end else
-      PrepmtAmtInclVAT := 0;
-    RemainingAmtInclVAT := "Amount Including VAT" - PrepmtAmtInclVAT;
-    //+NPR5.53 [360297]
-    */
-    //end;
+    trigger OnAfterGetRecord()
+    begin
+        if "Document Type" = "Document Type"::Order then begin
+            PostedPrepmtDocumentBuffer.Generate(RecordId, true);
+            PrepmtAmtInclVAT := PostedPrepmtDocumentBuffer.TotalAmtInclVAT(RecordId);
+        end else
+            PrepmtAmtInclVAT := 0;
+        RemainingAmtInclVAT := "Amount Including VAT" - PrepmtAmtInclVAT;
+    end;
 
 
-    //Unsupported feature: Code Modification on "OnOpenPage".
+    trigger OnOpenPage()
+    begin
+        CopySellToCustomerFilter;
 
-    //trigger OnOpenPage()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    CopySellToCustomerFilter;
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    CopySellToCustomerFilter;
-    //-NPR5.53 [360297]
-    PostedPrepmtDocumentBuffer.Reset;
-    PostedPrepmtDocumentBuffer.DeleteAll;
-    //+NPR5.53 [360297]
-    */
-    //end;
+        PostedPrepmtDocumentBuffer.Reset;
+        PostedPrepmtDocumentBuffer.DeleteAll;
+    end;
 }
 

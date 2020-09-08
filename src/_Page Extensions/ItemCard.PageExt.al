@@ -248,52 +248,27 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRAttrVisible10: Boolean;
 
 
-    //Unsupported feature: Code Insertion on "OnAfterGetRecord".
-
-    //trigger OnAfterGetRecord()
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Item, "No.");
-    NPRAttrEditable := CurrPage.Editable ();
-    //+NPR4.11
-    */
-    //end;
+    trigger OnAfterGetRecord()
+    begin
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, "No.");
+        NPRAttrEditable := CurrPage.Editable();
+    end;
 
 
-    //Unsupported feature: Code Modification on "OnOpenPage".
+    trigger OnOpenPage()
+    begin
+        NPRAttrManagement.GetAttributeVisibility(DATABASE::Item, NPRAttrVisibleArray);
+        NPRAttrVisible01 := NPRAttrVisibleArray[1];
+        NPRAttrVisible02 := NPRAttrVisibleArray[2];
+        NPRAttrVisible03 := NPRAttrVisibleArray[3];
+        NPRAttrVisible04 := NPRAttrVisibleArray[4];
+        NPRAttrVisible05 := NPRAttrVisibleArray[5];
+        NPRAttrVisible06 := NPRAttrVisibleArray[6];
+        NPRAttrVisible07 := NPRAttrVisibleArray[7];
+        NPRAttrVisible08 := NPRAttrVisibleArray[8];
+        NPRAttrVisible09 := NPRAttrVisibleArray[9];
+        NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
-    //trigger OnOpenPage()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled;
-    EnableControls;
-    SetNoFieldVisible;
-    IsSaaS := PermissionManager.SoftwareAsAService;
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetAttributeVisibility (DATABASE::Item, NPRAttrVisibleArray);
-    NPRAttrVisible01 := NPRAttrVisibleArray[1];
-    NPRAttrVisible02 := NPRAttrVisibleArray[2];
-    NPRAttrVisible03 := NPRAttrVisibleArray[3];
-    NPRAttrVisible04 := NPRAttrVisibleArray[4];
-    NPRAttrVisible05 := NPRAttrVisibleArray[5];
-    NPRAttrVisible06 := NPRAttrVisibleArray[6];
-    NPRAttrVisible07 := NPRAttrVisibleArray[7];
-    NPRAttrVisible08 := NPRAttrVisibleArray[8];
-    NPRAttrVisible09 := NPRAttrVisibleArray[9];
-    NPRAttrVisible10 := NPRAttrVisibleArray[10];
-
-    NPRAttrEditable := CurrPage.Editable ();
-    //+NPR4.11
-
-    #1..4
-    */
-    //end;
+        NPRAttrEditable := CurrPage.Editable();
+    end;
 }
-
