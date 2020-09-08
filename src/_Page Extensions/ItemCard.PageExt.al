@@ -211,13 +211,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 Caption = 'Variety Matrix';
                 Image = ItemAvailability;
                 ShortCutKey = 'Ctrl+Alt+v';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR AttributeValues")
             {
                 Caption = 'All Attributes Values';
                 Image = ShowList;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Application Worksheet")
@@ -226,7 +226,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             {
                 Caption = 'POS Sales Entries';
                 Image = Entries;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

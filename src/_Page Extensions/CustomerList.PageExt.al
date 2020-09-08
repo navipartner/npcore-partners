@@ -175,13 +175,13 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send Statement as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -191,20 +191,20 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
             {
                 Caption = 'Audit Roll';
                 Image = ListPage;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR POS Entries")
             {
                 Caption = 'POS Entries';
                 Image = Entries;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR ItemLedgerEntries")
             {
                 Caption = 'Item Ledger Entries';
                 Image = ItemLedger;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addfirst(Creation)
@@ -216,7 +216,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 Promoted = true;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Sales Journal")
@@ -225,13 +225,13 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
             {
                 Caption = 'PhoneLookup';
                 Image = ImportLog;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR Customer Anonymization")
             {
                 Caption = 'Customer Anonymization';
                 Image = AbsenceCategory;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

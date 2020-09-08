@@ -62,7 +62,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Provider = PurchLines;
                 SubPageLink = "No." = FIELD("No.");
                 Visible = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter(Control1905767507)
@@ -72,7 +72,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Caption = 'Item Availability FactBox';
                 Provider = PurchLines;
                 SubPageLink = "No." = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -85,14 +85,14 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Caption = 'Insert Line with Vendor Item';
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR ImportFromScanner")
             {
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -108,7 +108,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Caption = 'RFID Document';
                 Image = Delivery;
                 Visible = ShowCaptureService;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -127,7 +127,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Image = BinContent;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR PriceLabel")
             {
@@ -137,7 +137,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group("NPR PDF2NAV")
             {
@@ -146,13 +146,13 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

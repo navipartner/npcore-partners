@@ -134,7 +134,7 @@ pageextension 6014428 "NPR Vendor List" extends "Vendor List"
             {
                 Caption = 'PhoneLookup';
                 Image = ImportLog;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
