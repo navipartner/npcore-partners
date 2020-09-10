@@ -232,34 +232,34 @@ codeunit 6059955 "NPR MCS Face Service API"
         RecRefBlob: RecordRef;
     begin
         RecRef := MMMember.RecordId.GetRecord;
+        ServerFileName := FileManagement.UploadFile('Import Picture', '');
 
-        if MCSAPISetup.Get(MCSAPISetup.API::Face) then begin
-            MMMember.TestField("Entry No.");
-            MMMember.TestField("First Name");
+        if ServerFileName <> '' then begin
 
-            MCSAPISetup.TestField("Key 1");
-            MCSAPISetup.TestField("Key 2");
+            //3 streams because of NAV memory leak error if only one stream is used
+            StreamDotNet1 := FileDotNet.OpenRead(ServerFileName);
+            StreamDotNet2 := FileDotNet.OpenRead(ServerFileName);
+            StreamDotNet3 := FileDotNet.OpenRead(ServerFileName);
+            FileManagement.BLOBImportFromServerFile(TempBlob, ServerFileName);
 
-            MCSPersonGroupsSetup.Get(RecRef.Number);
-            PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
-            PersonGroups.TestField(PersonGroupId);
+            if MCSAPISetup.Get(MCSAPISetup.API::Face) and (MCSAPISetup."Use Cognitive Services" = true) then begin
+                MMMember.TestField("Entry No.");
+                MMMember.TestField("First Name");
 
-            MemberName := MMMember."First Name";
-            if MMMember."Middle Name" <> '' then
-                MemberName := MemberName + ' ' + MMMember."Middle Name";
-            if MMMember."Last Name" <> '' then
-                MemberName := MemberName + ' ' + MMMember."Last Name";
+                MCSAPISetup.TestField("Key 1");
+                MCSAPISetup.TestField("Key 2");
 
-            UserData := Format(CurrentDateTime);
+                MCSPersonGroupsSetup.Get(RecRef.Number);
+                PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
+                PersonGroups.TestField(PersonGroupId);
 
-            ServerFileName := FileManagement.UploadFile('Import Picture', '');
-            if ServerFileName <> '' then begin
+                MemberName := MMMember."First Name";
+                if MMMember."Middle Name" <> '' then
+                    MemberName := MemberName + ' ' + MMMember."Middle Name";
+                if MMMember."Last Name" <> '' then
+                    MemberName := MemberName + ' ' + MMMember."Last Name";
 
-                //3 streams because of NAV memory leak error if only one stream is used
-                StreamDotNet1 := FileDotNet.OpenRead(ServerFileName);
-                StreamDotNet2 := FileDotNet.OpenRead(ServerFileName);
-                StreamDotNet3 := FileDotNet.OpenRead(ServerFileName);
-                FileManagement.BLOBImportFromServerFile(TempBlob, ServerFileName);
+                UserData := Format(CurrentDateTime);
 
                 InitializeEntities();
                 InitializeClient();
@@ -342,14 +342,14 @@ codeunit 6059955 "NPR MCS Face Service API"
                         end;
                     end;
                 end;
-
-                RecRefBlob.GetTable(MMMember);
-                TempBlob.ToRecordRef(RecRefBlob, MMMember.FieldNo(Picture));
-                RecRefBlob.SetTable(MMMember);
-
-                MMMember.Modify;
-                if FILE.Erase(ServerFileName) then;
             end;
+
+            RecRefBlob.GetTable(MMMember);
+            TempBlob.ToRecordRef(RecRefBlob, MMMember.FieldNo(Picture));
+            RecRefBlob.SetTable(MMMember);
+
+            MMMember.Modify;
+            if FILE.Erase(ServerFileName) then;
         end;
     end;
 }
