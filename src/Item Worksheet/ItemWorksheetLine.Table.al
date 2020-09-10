@@ -2087,6 +2087,9 @@ table 6060042 "NPR Item Worksheet Line"
         key(Key1; "Worksheet Template Name", "Worksheet Name", "Line No.")
         {
         }
+        key(Key2; "No. Series")
+        {
+        }
     }
 
     fieldgroups
