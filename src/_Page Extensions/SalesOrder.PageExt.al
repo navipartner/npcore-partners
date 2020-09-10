@@ -78,7 +78,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Provider = SalesLines;
                 SubPageLink = "No." = FIELD("No.");
                 Visible = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter(WorkflowStatus)
@@ -94,7 +94,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                               WHERE("Table No." = CONST(37),
                                     "Document Type" = CONST(1));
                 UpdatePropagation = Both;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -106,14 +106,14 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'POS Entry';
                 Image = Entry;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR RFID Document")
             {
                 Caption = 'RFID Document';
                 Image = Delivery;
                 Visible = ShowCaptureService;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -132,7 +132,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Retail Vouchers';
                     Image = Certificate;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -152,7 +152,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Import From Scanner';
                 Image = Import;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Send IC Sales Order")
@@ -161,14 +161,14 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'Select Recommended Item';
                 Image = SuggestLines;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR InsertLineItem ")
             {
                 Caption = 'Insert Line with Item';
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Request Approval")
@@ -179,7 +179,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Issue Voucher';
                     Image = PostedPayableVoucher;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -202,7 +202,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Pick Instruction")
@@ -210,13 +210,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             action("NPR Consignor Label")
             {
                 Caption = 'Consignor Label';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR PrintShippingLabel")
             {
                 Caption = 'Shipping Label';
                 Image = PrintCheck;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group("NPR PDF2NAV")
             {
@@ -225,13 +225,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("NPR SMS")
@@ -241,7 +241,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("NPR Variants")
@@ -251,7 +251,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Variety';
                     ShortCutKey = 'Ctrl+Alt+V';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
