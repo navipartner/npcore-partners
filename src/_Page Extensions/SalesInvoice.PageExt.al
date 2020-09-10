@@ -30,7 +30,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
             {
                 Caption = 'POS Entry';
                 Image = Entry;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("&Invoice")
@@ -42,7 +42,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 {
                     Caption = 'Retail Vouchers';
                     Image = Certificate;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -62,7 +62,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -79,7 +79,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 {
                     Caption = 'Issue Voucher';
                     Image = PostedPayableVoucher;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -102,7 +102,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 PromotedCategory = Category6;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
