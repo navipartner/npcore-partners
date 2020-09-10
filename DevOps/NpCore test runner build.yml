@@ -14,15 +14,13 @@ resources:
     name:  'NpCore/NpDevOps'
 
 pool:
-  name: NP Deployment
+  name: NP Core Pipelines
   demands: 
   - docker
   # Now only 2019 is available but in the future it will be every newer version.
   # Then we will probably remove this requirement as it will alwyas TRUE.
-  - com.navipartner.docker.osversion -equals 2019
-
-variables:
-  varAdminPassword: $(adminPassword)
+  - Agent.OS -equals Windows_NT
+  - Agent.OSVersion -equals 10.0.17763
 
 jobs:
 - template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
@@ -33,7 +31,7 @@ jobs:
     containerName: Build-$(Build.BuildId)
     serverInstanceName: BC
     containerAdminUsername: admin
-    containerAdminPassword: $(varAdminPassword)
+    containerAdminPassword: P@ssword1
     licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
     dependancyPackages:
