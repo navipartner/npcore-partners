@@ -424,10 +424,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Page "NPR Tax Free Voucher";
                     ApplicationArea = All;
                 }
-                separator(Miscellaneous)
-                {
-                    Caption = 'Miscellaneous';
-                }
                 action("Retail Document List")
                 {
                     Caption = 'Retail Document List';
@@ -445,10 +441,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Warranty Catalog List';
                     RunObject = Page "NPR Warranty Catalog List";
                     ApplicationArea = All;
-                }
-                separator(Separator6014512)
-                {
-                    Caption = 'Miscellaneous';
                 }
                 action(Coupons)
                 {
@@ -576,19 +568,11 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Page "NPR Magento Attribute Sets";
                     ApplicationArea = All;
                 }
-                separator(Separator6014546)
-                {
-                    Caption = 'Sales';
-                }
                 action("Payment Lines")
                 {
                     Caption = 'Payment Lines';
                     RunObject = Page "NPR Magento Payment Line List";
                     ApplicationArea = All;
-                }
-                separator(Mapping)
-                {
-                    Caption = 'Mapping';
                 }
                 action("Shipment Method Mapping")
                 {
@@ -602,9 +586,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Page "NPR Magento Payment Mapping";
                     ApplicationArea = All;
                 }
-                separator(Separator6014556)
-                {
-                }
+
                 action("NaviDocs Document List")
                 {
                     Caption = 'NaviDocs Document List';

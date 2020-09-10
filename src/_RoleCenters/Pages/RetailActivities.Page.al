@@ -33,19 +33,19 @@ page 6059812 "NPR Retail Activities"
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
-                    Image = "None";
+                    Image = "Document";
                 }
                 field("Daily Sales Orders"; "Daily Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
-                    Image = "None";
+                    Image = "Document";
                 }
                 field("Import Pending"; "Import Pending")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Import List";
-                    Image = "None";
+                    Image = "Document";
                 }
 
                 actions
@@ -55,14 +55,14 @@ page 6059812 "NPR Retail Activities"
                         Caption = 'New Sales Order';
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     action("New Sales Quote")
                     {
                         Caption = 'New Sales Quote';
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -72,19 +72,19 @@ page 6059812 "NPR Retail Activities"
                 field("Pending Inc. Documents"; "Pending Inc. Documents")
                 {
                     ApplicationArea = All;
-                    Image = "None";
+                    Image = "Document";
                 }
                 field("Processed Error Tasks"; "Processed Error Tasks")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Task List";
-                    Image = "None";
+                    Image = "Document";
                 }
                 field("Failed Webshop Payments"; "Failed Webshop Payments")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Magento Payment Line List";
-                    Image = "None";
+                    Image = "Document";
                 }
             }
             cuegroup(Depreciated)
@@ -95,21 +95,21 @@ page 6059812 "NPR Retail Activities"
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Quotes";
-                    Image = "None";
+                    Image = "Document";
                     Visible = false;
                 }
                 field("Sales Return Orders"; "Sales Return Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Return Order List";
-                    Image = "None";
+                    Image = "Document";
                     Visible = false;
                 }
                 field("Magento Orders"; "Magento Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
-                    Image = "None";
+                    Image = "Document";
                     Visible = false;
                 }
                 field("Daily Sales Invoices"; "Daily Sales Invoices")
@@ -117,20 +117,20 @@ page 6059812 "NPR Retail Activities"
                     ApplicationArea = All;
                     Caption = 'Daily Sales Invoices';
                     DrillDownPageID = "Posted Sales Invoices";
-                    Image = "None";
+                    Image = "Document";
                     Visible = false;
                 }
                 field("Tasks Unprocessed"; "Tasks Unprocessed")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Task List";
-                    Image = "None";
+                    Image = "Document";
                     Visible = false;
                 }
             }
             usercontrol(Bridge; "NPR Bridge")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnFrameworkReady()
                 begin
@@ -156,7 +156,7 @@ page 6059812 "NPR Retail Activities"
             action("Action Items")
             {
                 Caption = 'Action Items';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
