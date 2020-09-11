@@ -21,8 +21,7 @@ page 6151455 "NPR Magento Video Links"
                     var
                         MagentoVideoLink: Record "NPR Magento Video Link";
                     begin
-                        if ((StrPos("Video Url", 'youtube.com') = 0) and (StrPos("Video Url", 'vimeo.com') = 0) and (StrPos("Video Url", 'youtu.be') = 0) and (StrPos("Video Url", 'youtube-nocookie.com') = 0)) THEN
-                            //+#420702 [420702]
+                        if ((StrPos("Video Url", 'youtube.com') = 0) and (StrPos("Video Url", 'vimeo.com') = 0) and (StrPos("Video Url", 'youtu.be') = 0)) then
                             Error(Text00001);
                         if (StrPos("Video Url", 'http://') <> 0) or (StrPos("Video Url", 'https://') <> 0) then
                             exit;

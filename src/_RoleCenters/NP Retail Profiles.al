@@ -1,7 +1,7 @@
 profile "NPR SALES PERSON"
 {
     Description = 'NP Retail Sales Person';
-    Caption = 'NP Retail Sales Person';
+    Caption = 'Retail Sales Person';
     ProfileDescription = '';
     RoleCenter = "NPR Retail POS- Sales Person R";
     Enabled = true;
@@ -10,7 +10,7 @@ profile "NPR SALES PERSON"
 profile "NPR ADMIN"
 {
     Description = 'NP Retail Admin';
-    Caption = 'NP Retail Admin';
+    Caption = 'Retail Admin';
     ProfileDescription = '';
     RoleCenter = "NPR NP Retail Admin Setup RC";
     Enabled = true;
@@ -19,7 +19,7 @@ profile "NPR ADMIN"
 profile "NPR MAGENTO MANAGER"
 {
     Description = 'NP Retail Magento Manager';
-    Caption = 'NP Retail Magento Manager';
+    Caption = 'Retail Magento Manager';
     ProfileDescription = '';
     RoleCenter = "NPR Retail Magento Manag. RC";
     Enabled = true;
@@ -28,7 +28,7 @@ profile "NPR MAGENTO MANAGER"
 profile "NPR MANAGER"
 {
     Description = 'NP Retail Manager';
-    Caption = 'NP Retail Manager';
+    Caption = 'Retail Manager';
     ProfileDescription = '';
     RoleCenter = "NPR Retail: Manager RoleCenter";
     Enabled = true;
@@ -37,7 +37,7 @@ profile "NPR MANAGER"
 profile "NPR STORE MANAGER"
 {
     Description = 'NP Retail Store Manager';
-    Caption = 'NP Retail Store Manager';
+    Caption = 'Retail Store Manager';
     ProfileDescription = '';
     RoleCenter = "NPR Retail Store Man. RC";
     Enabled = true;
@@ -46,7 +46,7 @@ profile "NPR STORE MANAGER"
 profile "NPR ENTERTAINMENT"
 {
     Description = 'NP Retail Entertainment';
-    Caption = 'NP Retail Entertainment';
+    Caption = 'Retail Entertainment';
     ProfileDescription = '';
     RoleCenter = "NPR Entertainment RC";
     Enabled = true;
@@ -55,7 +55,7 @@ profile "NPR ENTERTAINMENT"
 profile "NPR REESTAURANT"
 {
     Description = 'NP Retail Restaurant';
-    Caption = 'NP Retail Restaurant';
+    Caption = 'Retail Restaurant';
     ProfileDescription = '';
     RoleCenter = "NPR Restaurant RC";
     Enabled = true;
