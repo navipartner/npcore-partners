@@ -259,7 +259,6 @@ codeunit 6150702 "NPR POS UI Management"
     var
         "Action": DotNet NPRNetAction;
         DotNetHelper: Variant;
-        DotNetEnum: DotNet NPRNetEnum;
     begin
         with MenuButton do begin
             MenuButtonObj := MenuButtonObj.MenuButton();
@@ -273,10 +272,32 @@ codeunit 6150702 "NPR POS UI Management"
             MenuButtonObj.IconClass := "Icon Class";
             MenuButtonObj.Class := "Custom Class Attribute";
             MenuButtonObj.Bold := Bold;
-            MenuButtonObj.FontSize := DotNetEnum.Parse(MenuButtonObj.FontSize.GetType(), Format("Font Size"));
             MenuButtonObj.Row := "Position Y";
             MenuButtonObj.Column := "Position X";
-            MenuButtonObj.Enabled := DotNetEnum.Parse(MenuButtonObj.Enabled.GetType(), Format(Enabled));
+
+            case "Font Size" of
+                "Font Size"::Normal:
+                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Normal;
+                "Font Size"::Large:
+                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Large;
+                "Font Size"::Medium:
+                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Medium;
+                "Font Size"::Small:
+                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Small;
+                "Font Size"::XLarge:
+                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.XLarge;
+                "Font Size"::XSmall:
+                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.XSmall;
+            end;
+
+            case Enabled of
+                Enabled::No:
+                    MenuButtonObj.Enabled := MenuButtonObj.Enabled.No;
+                Enabled::Yes:
+                    MenuButtonObj.Enabled := MenuButtonObj.Enabled.Yes;
+                Enabled::Auto:
+                    MenuButtonObj.Enabled := MenuButtonObj.Enabled.Auto;
+            end;
 
             //-NPR5.38 [255773]
             MenuButtonObj.Content.Add('keyMenu', "Menu Code");
