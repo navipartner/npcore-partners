@@ -24,7 +24,6 @@ page 6014451 "NPR Mixed Discount Lines"
                 field("Disc. Grouping Type"; "Disc. Grouping Type")
                 {
                     ApplicationArea = All;
-                    OptionCaption = 'Item,Item Group,Item Disc. Group';
                 }
                 field("Cross-Reference No."; "Cross-Reference No.")
                 {
@@ -38,7 +37,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
-                    Enabled = ("Disc. Grouping Type" = 0);
+                    Enabled = ("Disc. Grouping Type" = "Disc. Grouping Type"::Item);
                 }
                 field(Description; Description)
                 {
@@ -77,7 +76,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 {
                     ApplicationArea = All;
                     Caption = 'Mix Discount Price';
-                    Visible = (DiscountType <> 4);
+                    Visible = (DiscountType <> DiscountType::"Multiple Discount Levels");
                 }
             }
             repeater(MixLines)
@@ -129,7 +128,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 Promoted = true;
                 PromotedIsBig = true;
                 Visible = (MixType = 1);
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -159,7 +158,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 RunObject = Page "NPR Mixed Discount";
                 RunPageLink = Code = FIELD("No.");
                 Visible = (MixType = 1);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -195,7 +194,7 @@ page 6014451 "NPR Mixed Discount Lines"
         Text10600002: Label 'Saving %1';
         Text10600003: Label 'Saving %1 %2 %3';
         Lot: Boolean;
-        DiscountType: Integer;
+        DiscountType: Enum "NPR Mixed Discount Type";
         MixType: Integer;
         TotalAmount: Decimal;
 

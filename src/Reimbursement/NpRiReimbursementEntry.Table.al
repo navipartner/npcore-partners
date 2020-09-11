@@ -110,24 +110,20 @@ table 6151103 "NPR NpRi Reimbursement Entry"
             Caption = 'Closed by Entry No.';
             DataClassification = CustomerContent;
         }
-        field(300; "Document Type"; Option)
+        field(300; "Document Type"; Enum "Gen. Journal Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund';
-            OptionMembers = " ",Payment,Invoice,"Credit Memo","Finance Charge Memo",Reminder,Refund;
         }
         field(305; "Document No."; Code[20])
         {
             Caption = 'Document No.';
             DataClassification = CustomerContent;
         }
-        field(310; "Account Type"; Option)
+        field(310; "Account Type"; Enum "NPR NpRi Account Type")
         {
             Caption = 'Account Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'G/L Account,Customer,Vendor,Bank Account,Fixed Asset,IC Partner,Membership';
-            OptionMembers = "G/L Account",Customer,Vendor,"Bank Account","Fixed Asset","IC Partner",Membership;
         }
         field(315; "Account No."; Code[20])
         {

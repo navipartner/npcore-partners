@@ -261,11 +261,9 @@ table 6014612 "NPR Retail Campaign Items"
         {
             Caption = 'Description 2';
         }
-        field(2321; "Disc. Grouping Type"; Option)
+        field(2321; "Disc. Grouping Type"; Enum "NPR Disc. Grouping Type")
         {
             Caption = 'Disc. Grouping Type';
-            OptionCaption = 'Item,Item Group,Item Disc. Group,Mix Discount';
-            OptionMembers = Item,"Item Group","Item Disc. Group","Mix Discount";
         }
         field(2330; Priority; Integer)
         {
@@ -294,8 +292,8 @@ table 6014612 "NPR Retail Campaign Items"
         field(7017; "Mix Discount Type"; Option)
         {
             Caption = 'Discount Type';
-            OptionCaption = ',Total Amount per Min. Qty.,Total Discount %,Total Discount Amt. per Min. Qty.,Priority Discount per Min. Qty';
-            OptionMembers = ,"Total Amount per Min. Qty.","Total Discount %","Total Discount Amt. per Min. Qty.","Priority Discount per Min. Qty";
+            OptionCaption = ',Total Amount per Min. Qty.,Total Discount %,Total Discount Amt. per Min. Qty.,Priority Discount per Min. Qty,Multiple Discount Levels';
+            OptionMembers = ,"Total Amount per Min. Qty.","Total Discount %","Total Discount Amt. per Min. Qty.","Priority Discount per Min. Qty","Multiple Discount Levels";
         }
         field(7018; "Total Discount %"; Decimal)
         {
@@ -528,7 +526,7 @@ table 6014612 "NPR Retail Campaign Items"
                                     "Priority 2" := '';
                                     //"Pagenumber in paper" := MixedDiscountLine."Pagenumber in paper";
                                     Photo := false;
-                                    "Mix Discount Type" := MixedDiscount."Discount Type" + 1;
+                                    "Mix Discount Type" := MixedDiscount."Discount Type".AsInteger() + 1;
                                     "Total Discount %" := MixedDiscount."Total Discount %";
                                     "Max. Quantity" := MixedDiscount."Max. Quantity";
                                     "Total Discount Amount" := MixedDiscount."Total Discount Amount";

@@ -616,7 +616,7 @@ codeunit 6059940 "NPR SMS Management"
             exit(SelectStr(OptionNo + 1, OptionString));
             //+NPR5.40
         end else
-            exit(Format(FldRef.Value, 0, AutoFormat.ResolveAutoFormat(1, '')));
+            exit(Format(FldRef.Value, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format".FromInteger(1), '')));
     end;
 
     local procedure IsRecRefEmpty(var RecRef: RecordRef): Boolean

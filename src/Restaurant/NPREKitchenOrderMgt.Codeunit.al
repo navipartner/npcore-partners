@@ -423,22 +423,24 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
     local procedure UpdateRequestProdStatus(var KitchenRequest: Record "NPR NPRE Kitchen Request")
     var
         KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
+        ProductionStatusUpdated: Boolean;
     begin
         with KitchenRequest do begin
             KitchenRequestStation.SetRange("Request No.", "Request No.");
             if not KitchenRequestStation.FindSet then
                 exit;
 
-            "Production Status" := -1;
+            ProductionStatusUpdated := false;
             repeat
                 if KitchenRequestStation."On Hold" then begin
                     "Production Status" := "Production Status"::"On Hold";
                     exit;
                 end;
 
-                if "Production Status" in [-1, "Production Status"::Cancelled] then
-                    "Production Status" := KitchenRequestStation."Production Status"
-                else
+                if not ProductionStatusUpdated or ("Production Status" = "Production Status"::Cancelled) then begin
+                    "Production Status" := KitchenRequestStation."Production Status";
+                    ProductionStatusUpdated := true;
+                end else
                     case true of
                         (KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::"Not Started") and
                           ("Production Status" = "Production Status"::Finished),

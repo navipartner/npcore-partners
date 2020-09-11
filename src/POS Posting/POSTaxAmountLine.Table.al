@@ -35,13 +35,11 @@ table 6150629 "NPR POS Tax Amount Line"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(9; "Tax Calculation Type"; Option)
+        field(9; "Tax Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             DataClassification = CustomerContent;
             Editable = false;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(10; "Tax Group Code"; Code[10])
         {

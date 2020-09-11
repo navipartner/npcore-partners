@@ -1214,7 +1214,7 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Retail Document No.';
             DataClassification = CustomerContent;
         }
-        field(140; "Sales Document Type"; Integer)
+        field(140; "Sales Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Sales Document Type';
             DataClassification = CustomerContent;
@@ -1486,13 +1486,10 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             Description = 'NPR4.002.005, for indication of opening on drawer.';
         }
-        field(600; "VAT Calculation Type"; Option)
+        field(600; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.33';
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(700; "NPRE Seating Code"; Code[10])
         {
@@ -1551,12 +1548,10 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Buffer Ref. No.';
             DataClassification = CustomerContent;
         }
-        field(6000; "Buffer Document Type"; Option)
+        field(6000; "Buffer Document Type"; Enum "Gen. Journal Document Type")
         {
             Caption = 'Buffer Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Payment,Invoice,Credit Note,Interest Note,Reminder';
-            OptionMembers = " ",Betaling,Faktura,Kreditnota,Rentenota,Rykker;
         }
         field(6001; "Buffer ID"; Code[20])
         {

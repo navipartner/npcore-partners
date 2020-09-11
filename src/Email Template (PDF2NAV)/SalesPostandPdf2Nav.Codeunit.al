@@ -178,7 +178,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         exit(PrintBothDocuments and (CurrentClientType <> CLIENTTYPE::Windows));
     end;
 
-    local procedure HandleReport(ReportUsage: Integer) Printed: Boolean
+    local procedure HandleReport(ReportUsage: Enum "Report Selection Usage") Printed: Boolean
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
         DoPrint: Boolean;
@@ -215,7 +215,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
             OIOReport(ReportUsage);
     end;
 
-    local procedure PrintReport(ReportUsage: Integer) Printed: Boolean
+    local procedure PrintReport(ReportUsage: Enum "Report Selection Usage") Printed: Boolean
     begin
         //-NPR5.39 [299380]
         if SkipPrintHandling then
@@ -247,7 +247,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         until ReportSelection.Next = 0;
     end;
 
-    local procedure EmailReport(ReportUsage: Integer)
+    local procedure EmailReport(ReportUsage: Enum "Report Selection Usage")
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
@@ -268,7 +268,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         end;
     end;
 
-    local procedure OIOReport(ReportUsage: Integer)
+    local procedure OIOReport(ReportUsage: Enum "Report Selection Usage")
     var
         NPRDocLocalizationProxy: Codeunit "NPR Doc. Localization Proxy";
     begin

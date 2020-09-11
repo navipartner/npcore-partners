@@ -174,12 +174,9 @@ table 6014412 "NPR Mixed Discount Line"
             Caption = 'Description 2';
             Description = 'NPR5.31';
         }
-        field(21; "Disc. Grouping Type"; Option)
+        field(21; "Disc. Grouping Type"; Enum "NPR Disc. Grouping Type")
         {
             Caption = 'Disc. Grouping Type';
-            Description = 'NPR5.31';
-            OptionCaption = 'Item,Item Group,Item Disc. Group,Mix Discount';
-            OptionMembers = Item,"Item Group","Item Disc. Group","Mix Discount";
         }
         field(30; Priority; Integer)
         {

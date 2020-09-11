@@ -76,7 +76,7 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                     end;
                 'option':
                     begin
-                        OptionString := Format(FieldRef.OptionString);
+                        OptionString := Format(FieldRef.OptionMembers);
                         if Evaluate(IntBuffer, Format(FieldRef.Value, 0, 9)) and (OptionString <> '') then begin
                             XmlValue := GetEnumOption(IntBuffer, OptionString);
                         end;

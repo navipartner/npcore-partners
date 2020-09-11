@@ -58,7 +58,7 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         LineDiscPerCent: Decimal;
         QtyPerUOM: Decimal;
         QtySalesPrice: Decimal;
-        VATCalcType: Option "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
+        VATCalcType: Enum "Tax Calculation Type";
         PricesInclVAT: Boolean;
         VATPostingSetup: Record "VAT Posting Setup";
         VATBusPostingGr: Code[10];

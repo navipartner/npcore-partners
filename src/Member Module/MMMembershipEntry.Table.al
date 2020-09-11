@@ -161,12 +161,10 @@ table 6060129 "NPR MM Membership Entry"
             OptionCaption = ' ,Sales Header';
             OptionMembers = NA,SALESHEADER;
         }
-        field(1011; "Document Type"; Option)
+        field(1011; "Document Type"; Enum "NPR MM Sales Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,1,2,3,4,5';
-            OptionMembers = "0","1","2","3","4","5";
         }
         field(1012; "Document No."; Code[20])
         {

@@ -497,12 +497,10 @@ table 6014405 "NPR Sale POS"
             Caption = 'Customer Price Group';
             DataClassification = CustomerContent;
         }
-        field(36; "Sales Document Type"; Option)
+        field(36; "Sales Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Sales Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         }
         field(37; "Sales Document No."; Code[20])
         {

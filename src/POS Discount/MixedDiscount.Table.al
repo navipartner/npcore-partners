@@ -1,23 +1,5 @@
 table 6014411 "NPR Mixed Discount"
 {
-    // Period Discount
-    // //NPR sag 84805
-    // NPR70.00.01.02/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
-    // NPR5.26/JC  /20160818  CASE 248285 Deleted fields 16Salesperson filter, 100Auto & applied code guidelines
-    // NPR5.29/JC  /20170113  CASE 261710 Deleted function ValidateShortcutDimCode()
-    // NPR5.31/MHA /20170109  CASE 262903 Option added to field 17 Discount Type: Discount Amount, added field 25 Discount Amount and Discount Calculation Functions
-    // NPR5.31/MHA /20170110  CASE 262904 Added field 100 "Mix Type" to enabled multi layered Mix
-    //                                    Deleted unused function CalcDiscPer()
-    //                                    Renamed variables to English and moved non-setup Globals to Locals
-    //                                    Added DecimalPlaces 0:5 to all Quantity fields
-    // NPR5.31/MHA /20170113  CASE 263093 Added field 310 "Customer Disc. Group Filter" to be used as filter and changed DataType for field 316 and 317 from Code to Text
-    // NPR5.31/MHA /20170120  CASE 262964 Option added to field 17 Discount Type: Lowest Unit Price Items per Min. Qty, added fields 30 Item Discount Qty. and 35 Item Discount %
-    // NPR5.38/MHA /20171106  CASE 295330 Renamed Option "Balanced" to "Closed" for field 8 "Status"
-    // NPR5.40/MMV /20180213  CASE 294655 Performance optimization.
-    // NPR5.40/MHA /20180320  CASE 306304 Added field 40 "Total Amount Excl. VAT"
-    // NPR5.45/MMV /20180904  CASE 327277 Update mix part parameters correctly.
-    // NPR5.55/ALPO/20200714  CASE 412946 Support for multiple discount amount levels (option added to field 17 Discount Type: Multiple Discount Levels)
-
     Caption = 'Mixed Discount';
     LookupPageID = "NPR Mixed Discount List";
 
@@ -150,12 +132,9 @@ table 6014411 "NPR Mixed Discount"
                 //+NPR5.55 [412946]
             end;
         }
-        field(17; "Discount Type"; Option)
+        field(17; "Discount Type"; Enum "NPR Mixed Discount Type")
         {
             Caption = 'Discount Type';
-            Description = 'NPR5.31,NPR5.55';
-            OptionCaption = 'Total Amount per Min. Qty.,Total Discount %,Total Discount Amt. per Min. Qty.,Priority Discount per Min. Qty,Multiple Discount Levels';
-            OptionMembers = "Total Amount per Min. Qty.","Total Discount %","Total Discount Amt. per Min. Qty.","Priority Discount per Min. Qty","Multiple Discount Levels";
 
             trigger OnValidate()
             begin

@@ -508,7 +508,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
     local procedure InsertReservationEntry(XmlElement: DotNet NPRNetXmlElement; SalesLine: Record "Sales Line")
     var
         TempReservationEntry: Record "Reservation Entry" temporary;
-        CurrentEntryStatus: Option Reservation,Tracking,Surplus,Prospect;
+        CurrentEntryStatus: Enum "Reservation Status";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ReservationEntry: Record "Reservation Entry";
         ReservationMgt: Codeunit "Reservation Management";
@@ -551,7 +551,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         Evaluate(TempReservationEntry."New Expiration Date", NpXmlDomMgt.GetXmlText(XmlElement, 'newexpirationdate', 0, false), 9);
         TempReservationEntry.UpdateItemTracking();
 
-        if ItemTrackingMgt.IsOrderNetworkEntity(TempReservationEntry."Source Type", SalesLine."Document Type") and not SalesLine."Drop Shipment" then
+        if ItemTrackingMgt.IsOrderNetworkEntity(TempReservationEntry."Source Type", SalesLine."Document Type".AsInteger()) and not SalesLine."Drop Shipment" then
             CurrentEntryStatus := CurrentEntryStatus::Surplus
         else
             CurrentEntryStatus := CurrentEntryStatus::Prospect;
@@ -577,7 +577,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
 
     end;
 
-    local procedure CreateReservationEntry(var ReservationEntry: Record "Reservation Entry"; CurrentEntryStatus: Option Reservation,Tracking,Surplus,Prospect)
+    local procedure CreateReservationEntry(var ReservationEntry: Record "Reservation Entry"; CurrentEntryStatus: Enum "Reservation Status")
     var
         CreateReservEntry: Codeunit "Create Reserv. Entry";
     begin

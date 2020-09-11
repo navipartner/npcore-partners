@@ -153,14 +153,11 @@ table 6150623 "NPR POS Payment Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
         }
-        field(77; "VAT Calculation Type"; Option)
+        field(77; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.36';
             Editable = false;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(84; "Gen. Posting Type"; Option)
         {
@@ -191,13 +188,10 @@ table 6150623 "NPR POS Payment Line"
             Caption = 'Use Tax';
             DataClassification = CustomerContent;
         }
-        field(90; "Applies-to Doc. Type"; Option)
+        field(90; "Applies-to Doc. Type"; Enum "Gen. Journal Document Type")
         {
             Caption = 'Applies-to Doc. Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.38';
-            OptionCaption = ' ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund';
-            OptionMembers = " ",Payment,Invoice,"Credit Memo","Finance Charge Memo",Reminder,Refund;
         }
         field(91; "Applies-to Doc. No."; Code[20])
         {

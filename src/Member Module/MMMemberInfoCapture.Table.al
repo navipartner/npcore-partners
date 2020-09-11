@@ -377,12 +377,10 @@ table 6060134 "NPR MM Member Info Capture"
             OptionCaption = ' ,Sales Header,Alteration Journal,File Import,Print Journal,AutoRenew Journal';
             OptionMembers = NA,SALESHEADER,ALTERATION_JNL,FILE_IMPORT,PRINT_JNL,AUTORENEW_JNL;
         }
-        field(1011; "Document Type"; Option)
+        field(1011; "Document Type"; Enum "NPR MM Sales Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,1,2,3,4,5';
-            OptionMembers = "0","1","2","3","4","5";
         }
         field(1012; "Document No."; Code[20])
         {

@@ -6,12 +6,12 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
     end;
 
     var
-        TrailingSalesOrdersSetup: Record "NPR Trail. Purch. Orders Setup";
-        SalesHeader: Record "Purchase Header";
+        TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup";
+        PurchHeader: Record "Purchase Header";
 
-    procedure OnOpenPage(var TrailingSalesOrdersSetup: Record "NPR Trail. Purch. Orders Setup")
+    procedure OnOpenPage(var TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup")
     begin
-        with TrailingSalesOrdersSetup do
+        with TrailingPurchOrdersSetup do
             if not Get(UserId) then begin
                 LockTable;
                 "User ID" := UserId;
@@ -25,60 +25,59 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
 
     procedure DrillDown(var BusChartBuf: Record "Business Chart Buffer")
     var
-        SalesHeader: Record "Purchase Header";
+        PurchHeader: Record "Purchase Header";
         ToDate: Date;
         Measure: Integer;
     begin
         Measure := BusChartBuf."Drill-Down Measure Index";
         if (Measure < 0) or (Measure > 3) then
             exit;
-        TrailingSalesOrdersSetup.Get(UserId);
-        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
-        if TrailingSalesOrdersSetup."Show Orders" = TrailingSalesOrdersSetup."Show Orders"::"Delayed Orders" then
-            //SalesHeader.SETFILTER("Shipment Date",'<%1',TrailingSalesOrdersSetup.GetStartDate);
-            SalesHeader.SetFilter("Posting Date", '<%1', TrailingSalesOrdersSetup.GetStartDate);
-        if Evaluate(SalesHeader.Status, BusChartBuf.GetMeasureValueString(Measure), 9) then
-            SalesHeader.SetRange(Status, SalesHeader.Status);
+        TrailingPurchOrdersSetup.Get(UserId);
+        PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
+        if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
+            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate);
+        if Evaluate(PurchHeader.Status, BusChartBuf.GetMeasureValueString(Measure), 9) then
+            PurchHeader.SetRange(Status, PurchHeader.Status);
 
         ToDate := BusChartBuf.GetXValueAsDate(BusChartBuf."Drill-Down X Index");
-        SalesHeader.SetRange("Document Date", 0D, ToDate);
-        PAGE.Run(PAGE::"Sales Order List", SalesHeader);
+        PurchHeader.SetRange("Document Date", 0D, ToDate);
+        PAGE.Run(PAGE::"Purchase Order List", PurchHeader);
     end;
 
     procedure UpdateData(var BusChartBuf: Record "Business Chart Buffer")
     var
-        ChartToStatusMap: array[4] of Integer;
+        ChartToStatusMap: array[4] of Enum "Purchase Document Status";
         ToDate: array[5] of Date;
         FromDate: array[5] of Date;
         Value: Decimal;
         TotalValue: Decimal;
         ColumnNo: Integer;
-        SalesHeaderStatus: Integer;
+        PurchHeaderStatus: Integer;
     begin
-        TrailingSalesOrdersSetup.Get(UserId);
+        TrailingPurchOrdersSetup.Get(UserId);
         with BusChartBuf do begin
             Initialize;
-            "Period Length" := TrailingSalesOrdersSetup."Period Length";
+            "Period Length" := TrailingPurchOrdersSetup."Period Length";
             SetPeriodXAxis;
 
             CreateMap(ChartToStatusMap);
-            for SalesHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
-                SalesHeader.Status := ChartToStatusMap[SalesHeaderStatus];
-                AddMeasure(Format(SalesHeader.Status), SalesHeader.Status, "Data Type"::Decimal, TrailingSalesOrdersSetup.GetChartType);
+            for PurchHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
+                PurchHeader.Status := ChartToStatusMap[PurchHeaderStatus];
+                AddMeasure(Format(PurchHeader.Status), PurchHeader.Status, "Data Type"::Decimal, TrailingPurchOrdersSetup.GetChartType);
             end;
 
             if CalcPeriods(FromDate, ToDate, BusChartBuf) then begin
                 AddPeriods(ToDate[1], ToDate[ArrayLen(ToDate)]);
 
-                for SalesHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
+                for PurchHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
                     TotalValue := 0;
                     for ColumnNo := 1 to ArrayLen(ToDate) do begin
-                        Value := GetSalesOrderValue(ChartToStatusMap[SalesHeaderStatus], FromDate[ColumnNo], ToDate[ColumnNo]);
+                        Value := GetPurchOrderValue(ChartToStatusMap[PurchHeaderStatus], FromDate[ColumnNo], ToDate[ColumnNo]);
                         if ColumnNo = 1 then
                             TotalValue := Value
                         else
                             TotalValue += Value;
-                        SetValueByIndex(SalesHeaderStatus - 1, ColumnNo - 1, TotalValue);
+                        SetValueByIndex(PurchHeaderStatus - 1, ColumnNo - 1, TotalValue);
                     end;
                 end;
             end;
@@ -91,7 +90,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         i: Integer;
     begin
         MaxPeriodNo := ArrayLen(ToDate);
-        ToDate[MaxPeriodNo] := TrailingSalesOrdersSetup.GetStartDate;
+        ToDate[MaxPeriodNo] := TrailingPurchOrdersSetup.GetStartDate;
         if ToDate[MaxPeriodNo] = 0D then
             exit(false);
         for i := MaxPeriodNo downto 1 do begin
@@ -104,22 +103,22 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         exit(true);
     end;
 
-    local procedure GetSalesOrderValue(Status: Option; FromDate: Date; ToDate: Date): Decimal
+    local procedure GetPurchOrderValue(Status: Enum "Purchase Document Status"; FromDate: Date; ToDate: Date): Decimal
     begin
-        if TrailingSalesOrdersSetup."Value to Calculate" = TrailingSalesOrdersSetup."Value to Calculate"::"No. of Orders" then
-            exit(GetSalesOrderCount(Status, FromDate, ToDate));
-        exit(GetSalesOrderAmount(Status, FromDate, ToDate));
+        if TrailingPurchOrdersSetup."Value to Calculate" = TrailingPurchOrdersSetup."Value to Calculate"::"No. of Orders" then
+            exit(GetPurchOrderCount(Status, FromDate, ToDate));
+        exit(GetPurchOrderAmount(Status, FromDate, ToDate));
     end;
 
-    local procedure GetSalesOrderAmount(Status: Option; FromDate: Date; ToDate: Date): Decimal
+    local procedure GetPurchOrderAmount(Status: Enum "Purchase Document Status"; FromDate: Date; ToDate: Date): Decimal
     var
         CurrExchRate: Record "Currency Exchange Rate";
         TrailingSalesOrderQry: Query "NPR Trailing Purch Order";
         Amount: Decimal;
         TotalAmount: Decimal;
     begin
-        if TrailingSalesOrdersSetup."Show Orders" = TrailingSalesOrdersSetup."Show Orders"::"Delayed Orders" then
-            TrailingSalesOrderQry.SetFilter(ShipmentDate, '<%1', TrailingSalesOrdersSetup.GetStartDate);
+        if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
+            TrailingSalesOrderQry.SetFilter(ShipmentDate, '<%1', TrailingPurchOrdersSetup.GetStartDate);
 
         TrailingSalesOrderQry.SetRange(Status, Status);
         TrailingSalesOrderQry.SetRange(DocumentDate, FromDate, ToDate);
@@ -134,28 +133,25 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         exit(TotalAmount);
     end;
 
-    local procedure GetSalesOrderCount(Status: Option; FromDate: Date; ToDate: Date): Decimal
+    local procedure GetPurchOrderCount(Status: Enum "Purchase Document Status"; FromDate: Date; ToDate: Date): Decimal
     begin
-        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
-        if TrailingSalesOrdersSetup."Show Orders" = TrailingSalesOrdersSetup."Show Orders"::"Delayed Orders" then
-            //SalesHeader.SETFILTER("Shipment Date",'<%1',TrailingSalesOrdersSetup.GetStartDate)
-            SalesHeader.SetFilter("Posting Date", '<%1', TrailingSalesOrdersSetup.GetStartDate)
+        PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
+        if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
+            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate)
         else
-            //SalesHeader.SETRANGE("Shipment Date");
-            SalesHeader.SetRange("Posting Date");
-        SalesHeader.SetRange(Status, Status);
-        SalesHeader.SetRange("Document Date", FromDate, ToDate);
-        exit(SalesHeader.Count);
+            PurchHeader.SetRange("Posting Date");
+        PurchHeader.SetRange(Status, Status);
+        PurchHeader.SetRange("Document Date", FromDate, ToDate);
+        exit(PurchHeader.Count);
     end;
 
-    procedure CreateMap(var Map: array[4] of Integer)
+    procedure CreateMap(var Map: array[4] of Enum "Purchase Document Status")
     var
-        SalesHeader: Record "Purchase Header";
+        PurchHeader: Record "Purchase Header";
     begin
-        Map[1] := SalesHeader.Status::Released;
-        Map[2] := SalesHeader.Status::"Pending Prepayment";
-        Map[3] := SalesHeader.Status::"Pending Approval";
-        Map[4] := SalesHeader.Status::Open;
+        Map[1] := PurchHeader.Status::Released;
+        Map[2] := PurchHeader.Status::"Pending Prepayment";
+        Map[3] := PurchHeader.Status::"Pending Approval";
+        Map[4] := PurchHeader.Status::Open;
     end;
 }
-

@@ -482,7 +482,7 @@ codeunit 6060071 "NPR Map Incom. Item Lines"
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";
         FldNo: Integer;
-        Type: Option;
+        Type: Enum "Purchase Line Type";
     begin
         with IntermediateDataImport do begin
             SetRange("Data Exch. No.", DataExchNo);

@@ -118,7 +118,7 @@ codeunit 6151492 "NPR Raptor Helper Functions"
 
         RecRef.GetTable(RecordVariant);
         FldRef := RecRef.Field(FieldNoInt);
-        OptionString := FldRef.OptionString;
+        OptionString := FldRef.OptionMembers;
 
         Separator := ',';
         Options := OptionString.Split(Separator.ToCharArray());

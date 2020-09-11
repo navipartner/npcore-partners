@@ -455,11 +455,11 @@ codeunit 6014437 "NPR Phone Lookup"
             CreateCustomer(TDCNamesNumbersBuffer);
 
         if TDCNamesNumbersBuffer."Create Contact" and TDCNamesNumbersBuffer."Create Customer" then
-            CreateContactBusinessRel(TDCNamesNumbersBuffer, 1);
+            CreateContactBusinessRel(TDCNamesNumbersBuffer, "Contact Business Relation Link To Table"::Customer);
 
 
         if TDCNamesNumbersBuffer."Create Contact" and TDCNamesNumbersBuffer."Create Vendor" then
-            CreateContactBusinessRel(TDCNamesNumbersBuffer, 2);
+            CreateContactBusinessRel(TDCNamesNumbersBuffer, "Contact Business Relation Link To Table"::Vendor);
 
         //+NPR5.23
     end;
@@ -528,7 +528,7 @@ codeunit 6014437 "NPR Phone Lookup"
         //+NPR5.23
     end;
 
-    local procedure CreateContactBusinessRel(TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary; LinkToTable: Option " ",Customer,Vendor,"Bank Account")
+    local procedure CreateContactBusinessRel(TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary; LinkToTable: Enum "Contact Business Relation Link To Table")
     var
         ContactBusinessRelation: Record "Contact Business Relation";
         Contact: Record Contact;

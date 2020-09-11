@@ -121,7 +121,7 @@ codeunit 6151416 "NPR Magento Pmt. Mgt."
             exit;
         if not SalesCrMemoHeader.Get(SalesCrMemoHdrNo) then
             exit;
-        if not HasMagentoPayment(DATABASE::"Sales Cr.Memo Header", 0, SalesCrMemoHeader."No.") then
+        if not HasMagentoPayment(DATABASE::"Sales Cr.Memo Header", Enum::"Sales Document Type".FromInteger(0), SalesCrMemoHeader."No.") then
             exit;
 
         RefundSalesCreditMemo(SalesCrMemoHeader);
@@ -320,7 +320,7 @@ codeunit 6151416 "NPR Magento Pmt. Mgt."
         //+MAG2.05 [283588]
     end;
 
-    local procedure HasMagentoPayment(DocTableNo: Integer; DocType: Option; DocNo: Code[20]): Boolean
+    local procedure HasMagentoPayment(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]): Boolean
     var
         PaymentLine: Record "NPR Magento Payment Line";
     begin
@@ -615,7 +615,7 @@ codeunit 6151416 "NPR Magento Pmt. Mgt."
                     PaymentLine2.Init;
                     PaymentLine2 := PaymentLine;
                     PaymentLine2."Document Table No." := DATABASE::"Sales Invoice Header";
-                    PaymentLine2."Document Type" := 0;
+                    PaymentLine2."Document Type" := Enum::"Sales Document Type".FromInteger(0);
                     PaymentLine2."Document No." := DocNo;
                     PaymentLine2."Posting Date" := "Posting Date";
                     PaymentLine2.Insert;
@@ -646,7 +646,7 @@ codeunit 6151416 "NPR Magento Pmt. Mgt."
     var
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        if not HasMagentoPayment(DATABASE::"Sales Invoice Header", 0, SalesInvHdrNo) then
+        if not HasMagentoPayment(DATABASE::"Sales Invoice Header", Enum::"Sales Document Type".FromInteger(0), SalesInvHdrNo) then
             exit;
 
         SalesInvHeader.Get(SalesInvHdrNo);
@@ -862,7 +862,7 @@ codeunit 6151416 "NPR Magento Pmt. Mgt."
                     PaymentLine2.Init;
                     PaymentLine2 := PaymentLine;
                     PaymentLine2."Document Table No." := DATABASE::"Sales Cr.Memo Header";
-                    PaymentLine2."Document Type" := 0;
+                    PaymentLine2."Document Type" := Enum::"Sales Document Type".FromInteger(0);
                     PaymentLine2."Document No." := DocNo;
                     PaymentLine2."Posting Date" := "Posting Date";
                     PaymentLine2.Insert;
@@ -890,7 +890,7 @@ codeunit 6151416 "NPR Magento Pmt. Mgt."
 
     local procedure RefundSalesCreditMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
-        if not HasMagentoPayment(DATABASE::"Sales Cr.Memo Header", 0, SalesCrMemoHeader."No.") then
+        if not HasMagentoPayment(DATABASE::"Sales Cr.Memo Header", Enum::"Sales Document Type".FromInteger(0), SalesCrMemoHeader."No.") then
             exit;
 
         RefundPaymentLines(SalesCrMemoHeader);

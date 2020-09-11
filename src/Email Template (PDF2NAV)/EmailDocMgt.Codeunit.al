@@ -568,7 +568,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         ServHeader: Record "Service Header";
         EmailRetailMgt: Codeunit "NPR E-mail Retail Mgt.";
         NewTemplateCode: Code[20];
-        i: Integer;
+    //i: Integer;
     begin
         //-PN1.08
         EmailSetup.Get;
@@ -798,8 +798,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter."Table No." := DATABASE::"Sales Header";
                     EmailTemplateFilter."Line No." := 10000;
                     EmailTemplateFilter."Field No." := SalesHeader.FieldNo("Document Type");
-                    i := SalesHeader."Document Type"::Quote;
-                    EmailTemplateFilter.Value := Format(i);
+                    EmailTemplateFilter.Value := Format(SalesHeader."Document Type"::Quote.AsInteger());
                     EmailTemplateFilter.Insert;
                 end;
             "TemplateType.SalesOrder":
@@ -809,8 +808,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter."Table No." := DATABASE::"Sales Header";
                     EmailTemplateFilter."Line No." := 10000;
                     EmailTemplateFilter."Field No." := SalesHeader.FieldNo("Document Type");
-                    i := SalesHeader."Document Type"::Order;
-                    EmailTemplateFilter.Value := Format(i);
+                    EmailTemplateFilter.Value := Format(SalesHeader."Document Type"::Order.AsInteger());
                     EmailTemplateFilter.Insert;
                 end;
             "TemplateType.PurchQuote":
@@ -820,8 +818,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter."Table No." := DATABASE::"Purchase Header";
                     EmailTemplateFilter."Line No." := 10000;
                     EmailTemplateFilter."Field No." := PurchHeader.FieldNo("Document Type");
-                    i := PurchHeader."Document Type"::Quote;
-                    EmailTemplateFilter.Value := Format(i);
+                    EmailTemplateFilter.Value := Format(PurchHeader."Document Type"::Quote.AsInteger());
                     EmailTemplateFilter.Insert;
                 end;
             "TemplateType.PurchOrder":
@@ -831,8 +828,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter."Table No." := DATABASE::"Purchase Header";
                     EmailTemplateFilter."Line No." := 10000;
                     EmailTemplateFilter."Field No." := PurchHeader.FieldNo("Document Type");
-                    i := PurchHeader."Document Type"::Order;
-                    EmailTemplateFilter.Value := Format(i);
+                    EmailTemplateFilter.Value := Format(PurchHeader."Document Type"::Order.AsInteger());
                     EmailTemplateFilter.Insert;
                 end;
             "TemplateType.ServQuote":
@@ -842,8 +838,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter."Table No." := DATABASE::"Service Header";
                     EmailTemplateFilter."Line No." := 10000;
                     EmailTemplateFilter."Field No." := ServHeader.FieldNo("Document Type");
-                    i := ServHeader."Document Type"::Quote;
-                    EmailTemplateFilter.Value := Format(i);
+                    EmailTemplateFilter.Value := Format(ServHeader."Document Type"::Quote.AsInteger());
                     EmailTemplateFilter.Insert;
                 end;
             "TemplateType.ServOrder":
@@ -853,8 +848,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter."Table No." := DATABASE::"Service Header";
                     EmailTemplateFilter."Line No." := 10000;
                     EmailTemplateFilter."Field No." := ServHeader.FieldNo("Document Type");
-                    i := ServHeader."Document Type"::Order;
-                    EmailTemplateFilter.Value := Format(i);
+                    EmailTemplateFilter.Value := Format(ServHeader."Document Type"::Order.AsInteger());
                     EmailTemplateFilter.Insert;
                 end;
         end;

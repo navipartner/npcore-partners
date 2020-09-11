@@ -71,7 +71,7 @@ codeunit 6151153 "NPR M2 Service Lib."
         exit(true);
     end;
 
-    local procedure GetNextWorkDay(ReferenceDate: Date; SourceType: Option Company,Customer,Vendor,Location,"Shipping Agent",Service; SourceNo: Code[20]): Date
+    local procedure GetNextWorkDay(ReferenceDate: Date; SourceType: Enum "Calendar Source Type"; SourceNo: Code[20]): Date
     var
         CalendarManagement: Codeunit "Calendar Management";
         NonWorkingDescription: Text;
@@ -105,7 +105,7 @@ codeunit 6151153 "NPR M2 Service Lib."
         exit(ReferenceDate);
     end;
 
-    local procedure GetCalendarCode(SourceType: Option Company,Customer,Vendor,Location,"Shipping Agent",Service; SourceCode: Code[20]; AdditionalSourceCode: Code[20]): Code[10]
+    local procedure GetCalendarCode(SourceType: Enum "Calendar Source Type"; SourceCode: Code[20]; AdditionalSourceCode: Code[20]): Code[10]
     var
         Customer: Record Customer;
         Vendor: Record Vendor;

@@ -244,7 +244,7 @@ codeunit 6059767 "NPR NaviDocs Management"
                 DATABASE::"Sales Header":
                     begin
                         RecRef.SetTable(SalesHeader);
-                        "Document Type" := SalesHeader."Document Type";
+                        "Document Type" := SalesHeader."Document Type".AsInteger();
                         "Type (Recipient)" := "Type (Recipient)"::Customer;
                         "No. (Recipient)" := SalesHeader."Sell-to Customer No.";
                         "Name (Recipient)" := SalesHeader."Sell-to Customer Name";
@@ -255,7 +255,7 @@ codeunit 6059767 "NPR NaviDocs Management"
                 DATABASE::"Purchase Header":
                     begin
                         RecRef.SetTable(PurchHeader);
-                        "Document Type" := PurchHeader."Document Type";
+                        "Document Type" := PurchHeader."Document Type".AsInteger();
                         "Type (Recipient)" := "Type (Recipient)"::Vendor;
                         "No. (Recipient)" := PurchHeader."Buy-from Vendor No.";
                         "Posting Date" := PurchHeader."Posting Date";
@@ -323,7 +323,7 @@ codeunit 6059767 "NPR NaviDocs Management"
                 DATABASE::"Service Header":
                     begin
                         RecRef.SetTable(ServiceHeader);
-                        "Document Type" := ServiceHeader."Document Type";
+                        "Document Type" := ServiceHeader."Document Type".AsInteger();
                         "Type (Recipient)" := "Type (Recipient)"::Customer;
                         "No. (Recipient)" := ServiceHeader."Customer No.";
                         "Name (Recipient)" := ServiceHeader.Name;

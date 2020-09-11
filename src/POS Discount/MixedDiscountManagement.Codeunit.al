@@ -118,7 +118,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         //+NPR5.40 [294655]
     end;
 
-    local procedure FindMixGroupingImpact(GroupingType: Option Item,"Item Group","Item Disc. Group","Mix Discount"; No: Code[20]; VariantCode: Code[10]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
+    local procedure FindMixGroupingImpact(GroupingType: Enum "NPR Disc. Grouping Type"; No: Code[20]; VariantCode: Code[10]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         MixedDiscountHeader: Record "NPR Mixed Discount";

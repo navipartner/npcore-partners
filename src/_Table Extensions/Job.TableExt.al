@@ -32,13 +32,10 @@ tableextension 6014422 "NPR Job" extends Job
             DataClassification = CustomerContent;
             Description = 'NPR5.29';
         }
-        field(6060153; "NPR Event Status"; Option)
+        field(6060153; "NPR Event Status"; Enum "NPR Event Status")
         {
             Caption = 'Event Status';
             DataClassification = CustomerContent;
-            Description = 'NPR5.29';
-            OptionCaption = 'Planning,Quote,Order,Completed,,,,,,Postponed,Cancelled,Ready to be Invoiced';
-            OptionMembers = Planning,Quote,"Order",Completed,,,,,,Postponed,Cancelled,"Ready to be Invoiced";
         }
         field(6060154; "NPR Calendar Item ID"; Text[250])
         {

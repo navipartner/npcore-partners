@@ -134,7 +134,7 @@ codeunit 6060150 "NPR Event Management"
             exit;
 
         //-NPR5.31 [269162]
-        if (Rec."NPR Event Status" = xRec."NPR Event Status") and (Rec."NPR Event Status" < Rec."NPR Event Status"::Postponed) and (Rec."NPR Event Status" <> Rec.Status) then begin
+        if (Rec."NPR Event Status" = xRec."NPR Event Status") and (Rec."NPR Event Status".AsInteger() < Rec."NPR Event Status"::Postponed.AsInteger()) and (Rec."NPR Event Status" <> Rec.Status) then begin
             Rec.Validate("NPR Event Status");
             //-NPR5.36 [275966]
             Rec.Modify;
@@ -217,7 +217,7 @@ codeunit 6060150 "NPR Event Management"
         JobPlanningLine.SetCurrentKey("Job No.");
         JobPlanningLine.SetRange("Job No.", Rec."No.");
 
-        if Rec."NPR Event Status" < Rec."NPR Event Status"::Postponed then begin
+        if Rec."NPR Event Status".AsInteger() < Rec."NPR Event Status"::Postponed.AsInteger() then begin
             if Rec."NPR Event Status" = Rec."NPR Event Status"::Completed then begin
                 Rec.Status := Rec.Status::Completed;
                 if Rec."Ending Date" = 0D then
@@ -529,7 +529,7 @@ codeunit 6060150 "NPR Event Management"
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         JobPlanningLine: Record "Job Planning Line";
-        PostedDocType: Integer;
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
         JobPostLine: Codeunit "Job Post-Line";
     begin
         //-NPR5.54 [395153]
@@ -552,7 +552,7 @@ codeunit 6060150 "NPR Event Management"
     local procedure SalesLineOnBeforeDelete(var Rec: Record "Sales Line"; RunTrigger: Boolean)
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        DocType: Integer;
+        DocType: Enum "Job Planning Line Invoice Document Type";
         JobPlanningLine: Record "Job Planning Line";
     begin
         //-NPR5.48 [287903]
@@ -565,7 +565,7 @@ codeunit 6060150 "NPR Event Management"
             Rec."Document Type"::"Credit Memo":
                 DocType := JobPlanningLineInvoice."Document Type"::"Credit Memo";
         end;
-        if DocType = 0 then
+        if DocType = DocType::" " then
             exit;
         JobPlanningLineInvoice.SetRange("Document Type", DocType);
         JobPlanningLineInvoice.SetRange("Document No.", Rec."Document No.");
@@ -606,7 +606,7 @@ codeunit 6060150 "NPR Event Management"
     local procedure SalesPostOnAfterPostSale(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
         PostedDocNo: Code[20];
-        PostedDocType: Integer;
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
     begin
         //-NPR5.48 [287903]
@@ -663,7 +663,7 @@ codeunit 6060150 "NPR Event Management"
         POSEntry2: Record "NPR POS Entry";
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         POSSalesLine: Record "NPR POS Sales Line";
-        PostedDocType: Integer;
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
         SkipThisEntry: Boolean;
     begin
         //-NPR5.49 [331208]
@@ -680,7 +680,7 @@ codeunit 6060150 "NPR Event Management"
                 if not SkipThisEntry then begin
                     JobPlanningLineInvoice.SetRange("NPR POS Unit No.", POSEntry2."POS Unit No.");
                     JobPlanningLineInvoice.SetRange("NPR POS Store Code", POSEntry2."POS Store Code");
-                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", 0, POSEntry2."Document No.", JobPlanningLineInvoice, PostedDocType);
+                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", Enum::"Sales Document Type".FromInteger(0), POSEntry2."Document No.", JobPlanningLineInvoice, PostedDocType);
                 end;
                 POSEntryNo := POSEntry2."Entry No.";
                 POSDocPostType := POSDocPostType::"POS Entry";
@@ -694,7 +694,7 @@ codeunit 6060150 "NPR Event Management"
     local procedure PostTempAuditRollOnAfterRunPostItemLedger(var Rec: Record "NPR Audit Roll Posting")
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        PostedDocType: Integer;
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
         SkipThisEntry: Boolean;
     begin
         //-NPR5.49 [331208]
@@ -704,7 +704,7 @@ codeunit 6060150 "NPR Event Management"
                 SkipThisEntry := not AuditRollPosting."Item Entry Posted";
                 if not SkipThisEntry then begin
                     JobPlanningLineInvoice.SetRange("NPR POS Unit No.", AuditRollPosting."Register No.");
-                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", 0, AuditRollPosting."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType);
+                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", Enum::"Sales Document Type".FromInteger(0), AuditRollPosting."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType);
                 end;
                 POSDocPostType := POSDocPostType::"Audit Roll";
                 if not SkipThisEntry then
@@ -717,14 +717,14 @@ codeunit 6060150 "NPR Event Management"
     local procedure POSActionLoadFromQuoteOnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Quote Entry"; var SalePOS: Record "NPR Sale POS")
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        PostedDocType: Integer;
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
         JobPlanningLineInvoice2: Record "Job Planning Line Invoice";
     begin
         //-NPR5.49 [331208]
         with JobPlanningLineInvoice do begin
             SetRange("NPR POS Unit No.", POSQuoteEntry."Register No.");
             SetRange("NPR POS Store Code", SalePOS."POS Store Code");
-            if not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", 0, POSQuoteEntry."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
+            if not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", Enum::"Sales Document Type".FromInteger(0), POSQuoteEntry."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
                 exit;
             if FindSet then
                 repeat
@@ -1067,9 +1067,9 @@ codeunit 6060150 "NPR Event Management"
         ActivityLog.DeleteAll;
     end;
 
-    local procedure InProperStatus(Status: Option): Boolean
+    local procedure InProperStatus(Status: Enum "NPR Event Status"): Boolean
     begin
-        exit(Status < 3);
+        exit(Status.AsInteger() < 3);
     end;
 
     procedure EditTemplate(EventWordLayout: Record "NPR Event Word Layout")
@@ -1080,6 +1080,7 @@ codeunit 6060150 "NPR Event Management"
         [RunOnClient]
         WordApplication: DotNet NPRNetApplicationClass;
         [RunOnClient]
+
         WordDocument: DotNet NPRNetDocument;
         [RunOnClient]
         WdWindowState: DotNet NPRNetWdWindowState;
@@ -1483,7 +1484,8 @@ codeunit 6060150 "NPR Event Management"
         //+NPR5.48 [287903]
     end;
 
-    procedure PostEventSalesDoc(var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocType: Integer; PostedDocNo: Code[20]; PostingDate: Date)
+    procedure PostEventSalesDoc(var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; PostedDocNo: Code[20];
+                                                                                                                   PostingDate: Date)
     var
         JobPlanningLineInvoice2: Record "Job Planning Line Invoice";
     begin
@@ -1516,7 +1518,7 @@ codeunit 6060150 "NPR Event Management"
         SalesLine: Record "Sales Line";
         JobPlanningLine: Record "Job Planning Line";
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        PostedDocType: Integer;
+        PostedDocType: Enum "Job Planning Line Invoice Document Type";
         Job: Record Job;
         JobTask: Record "Job Task";
     begin
@@ -1556,13 +1558,13 @@ codeunit 6060150 "NPR Event Management"
         //+NPR5.48 [287903]
     end;
 
-    local procedure JobPlanningLineInvoiceExists(DocTableID: Integer; DocType: Integer; DocNo: Code[20]; var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var PostedDocType: Integer): Boolean
+    local procedure JobPlanningLineInvoiceExists(DocTableID: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]; var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var PostedDocType: Enum "Job Planning Line Invoice Document Type"): Boolean
     var
         SalesHeader: Record "Sales Header";
-        JobPlanInvLineDocType: Integer;
+        JobPlanInvLineDocType: Enum "Job Planning Line Invoice Document Type";
     begin
         //-NPR5.48 [287903]
-        PostedDocType := 0;
+        PostedDocType := PostedDocType::" ";
         case DocTableID of
             DATABASE::"Sales Header":
                 case DocType of
@@ -1589,7 +1591,8 @@ codeunit 6060150 "NPR Event Management"
         //+NPR5.48 [287903]
     end;
 
-    local procedure ChangeJobPlanInvoiceFromNonpostedToPosted(var NonPostedJobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocType: Integer; PostedDocNo: Code[20]; PostingDate: Date; var PostedJobPlanningLineInvoice: Record "Job Planning Line Invoice")
+    local procedure ChangeJobPlanInvoiceFromNonpostedToPosted(var NonPostedJobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; PostedDocNo: Code[20];
+                                                                                                                                                          PostingDate: Date; var PostedJobPlanningLineInvoice: Record "Job Planning Line Invoice")
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         JobPlanningLine: Record "Job Planning Line";
@@ -2222,7 +2225,7 @@ codeunit 6060150 "NPR Event Management"
         //-NPR5.48 [287903]
         with ResJnlLine do begin
             Init;
-            "Entry Type" := JobJnlLine."Entry Type";
+            "Entry Type" := Enum::"Res. Journal Line Entry Type".FromInteger(JobJnlLine."Entry Type");
             "Document No." := JobJnlLine."Document No.";
             "External Document No." := JobJnlLine."External Document No.";
             "Posting Date" := JobJnlLine."Posting Date";

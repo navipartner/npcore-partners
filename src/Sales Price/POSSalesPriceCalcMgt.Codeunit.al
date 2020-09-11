@@ -30,7 +30,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         AllowInvDisc: Boolean;
         VATPerCent: Decimal;
         PricesInclVAT: Boolean;
-        VATCalcType: Option "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
+        VATCalcType: Enum "Tax Calculation Type";
         VATBusPostingGr: Code[10];
         QtyPerUOM: Decimal;
         PricesInCurrency: Boolean;
@@ -358,7 +358,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
             GLSetup.Get;
     end;
 
-    local procedure SetVAT(PriceInclVAT2: Boolean; VATPerCent2: Decimal; VATCalcType2: Option; VATBusPostingGr2: Code[10])
+    local procedure SetVAT(PriceInclVAT2: Boolean; VATPerCent2: Decimal; VATCalcType2: Enum "Tax Calculation Type"; VATBusPostingGr2: Code[10])
     begin
         PricesInclVAT := PriceInclVAT2;
         VATPerCent := VATPerCent2;

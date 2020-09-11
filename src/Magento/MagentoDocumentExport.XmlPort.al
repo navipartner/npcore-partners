@@ -80,7 +80,7 @@ xmlport 6151402 "NPR Magento Document Export"
                                 LineTypeFound: Boolean;
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeFound := LineTypeDict.Get(SalesInvLine.Type, SalesInvLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesInvLine.Type.AsInteger(), SalesInvLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
@@ -253,7 +253,7 @@ xmlport 6151402 "NPR Magento Document Export"
                                 LineTypeFound: Boolean;
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeFound := LineTypeDict.Get(SalesCrMemoLine.Type, SalesCrMemoLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesCrMemoLine.Type.AsInteger(), SalesCrMemoLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
@@ -450,7 +450,7 @@ xmlport 6151402 "NPR Magento Document Export"
                                 LineTypeFound: Boolean;
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeFound := LineTypeDict.Get(SalesLine.Type, SalesLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesLine.Type.AsInteger(), SalesLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
@@ -690,7 +690,7 @@ xmlport 6151402 "NPR Magento Document Export"
                                 LineTypeFound: Boolean;
                             begin
                                 //-MAG2.20 [345376]
-                                LineTypeFound := LineTypeDict.Get(SalesShipmentLine.Type, ShipmentLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesShipmentLine.Type.AsInteger(), ShipmentLineType);
                                 //+MAG2.20 [345376]
                             end;
                         }
@@ -862,7 +862,7 @@ xmlport 6151402 "NPR Magento Document Export"
                             var
                                 LineTypeFound: Boolean;
                             begin
-                                LineTypeFound := LineTypeDict.Get(SalesLine.Type, QuoteLineType);
+                                LineTypeFound := LineTypeDict.Get(SalesLine.Type.AsInteger(), QuoteLineType);
                             end;
                         }
                         fieldelement(no; QuoteLine."No.")
@@ -1045,28 +1045,13 @@ xmlport 6151402 "NPR Magento Document Export"
 
     local procedure InitLineTypeDict()
     var
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
-        OptionString: Text;
         LineType: Text;
-        Position: Integer;
-        i: Integer;
+        Ordinal: Integer;
     begin
-        //-MAG2.12 [309647]
-        RecRef.GetTable(SalesInvLine);
-        FieldRef := RecRef.Field(SalesInvLine.FieldNo(Type));
-        OptionString := FieldRef.OptionString;
-        while OptionString <> '' do begin
-            Position := StrPos(OptionString, ',');
-            if Position = 0 then
-                Position := StrLen(OptionString) + 1;
-            LineType := DelStr(OptionString, Position);
-            LineTypeDict.Add(i, LineType);
-
-            i += 1;
-            OptionString := DelStr(OptionString, 1, Position);
+        foreach Ordinal in Enum::"Sales Line Type".Ordinals() do begin
+            Enum::"Sales Line Type".Names().Get(Ordinal, LineType);
+            LineTypeDict.Add(Ordinal, LineType);
         end;
-        //+MAG2.12 [309647]
     end;
 
     local procedure GetRelatedDocs(DocumentNumber: Code[20]; LinkedFromDocNo: Code[20]; var TmpDocumentSearchResult: Record "Document Search Result" temporary)

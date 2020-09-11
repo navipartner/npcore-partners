@@ -777,18 +777,18 @@ report 6014510 "NPR Purch Return Order"
                     field(NoOfCopies; NoOfCopies)
                     {
                         Caption = 'No. of Copies';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(ShowInternalInfo; ShowInternalInfo)
                     {
                         Caption = 'Show Internal Information';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -872,7 +872,7 @@ report 6014510 "NPR Purch Return Order"
         Text008: Label 'Local Currency';
         Text009: Label 'Exchange rate: %1/%2';
         OutputNo: Integer;
-        TypeInt: Integer;
+        TypeInt: Enum "Purchase Document Type";
         [InDataSet]
         LogInteractionEnable: Boolean;
         DirectUnitCostCaptionLbl: Label 'Direct Unit Cost';

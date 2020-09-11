@@ -314,7 +314,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 
         SalesHeader.SetHideValidationDialog(true);
         SalesHeader.Init;
-        SalesHeader."Document Type" := NpXmlDomMgt.GetElementInt(XmlElement, 'to_document_type', true);
+        SalesHeader."Document Type" := Enum::"Sales Document Type".FromInteger(NpXmlDomMgt.GetElementInt(XmlElement, 'to_document_type', true));
         SalesHeader."No." := '';
         //-NPR5.53 [377915]
         //SalesHeader."External Order No." := COPYSTR(DocNo,1,MAXSTRLEN(SalesHeader."External Order No."));
