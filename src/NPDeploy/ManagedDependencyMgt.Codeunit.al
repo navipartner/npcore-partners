@@ -25,7 +25,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
 
     Permissions = TableData "NPR POS Web Font" = rimd,
-                  TableData "NPR .NET Assembly"=rimd,
                   TableData "NPR Web Client Dependency" = rimd,
                   TableData "Add-in" = rimd;
 
@@ -322,6 +321,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
         //Below types are deprecated starting with AL:
         Filter += ' and Type ne ''Control Add-in''';
+        Filter += ' and Type ne ''.NET Assembly''';
     end;
 
     local procedure GetExportFileName(DefaultFileName: Text) FileName: Text
@@ -340,7 +340,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     local procedure GetTypeNameVersionFromRecordRef(RecRef: RecordRef; var Type: Text; var Name: Text; var Version: Text)
     var
         AddIn: Record "Add-in";
-        DotNetAssembly: Record "NPR .NET Assembly";
         WebClientDependency: Record "NPR Web Client Dependency";
         WebFont: Record "NPR POS Web Font";
         StargatePackage: Record "NPR POS Stargate Package";
@@ -353,12 +352,8 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
                     Name := AddIn."Add-in Name";
                     Version := AddIn.Version;
                 end;
-            DATABASE::"NPR .NET Assembly":
+            6014623: //.NET Assembly
                 begin
-                    RecRef.SetTable(DotNetAssembly);
-                    Type := '.NET Assembly';
-                    Name := DotNetAssembly."Assembly Name";
-                    Version := '1.0';
                 end;
             DATABASE::"NPR Web Client Dependency":
                 begin
