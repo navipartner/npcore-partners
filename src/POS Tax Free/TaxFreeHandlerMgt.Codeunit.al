@@ -9,12 +9,40 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     // 
     // Commit is used vigorously in this codeunit as it is assumed that handlers are acting on external systems.
     // 
-    // NPR5.39/MHA /20180202  CASE 302779 Added OnFinishSale POS Workflow
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
 
     trigger OnRun()
     begin
+
+        ClearLastError();
+
+        case OnRunFunction of
+            OnRunFunction::UnitAutoConfigure:
+                OnUnitAutoConfigure(OnRunTaxFreeRequest, OnRunSilent, OnRunHandled);
+            OnRunFunction::UnitTestConnection:
+                OnUnitTestConnection(OnRunTaxFreeRequest, OnRunHandled);
+            OnRunFunction::VoucherIssueFromPOSSale:
+                OnVoucherIssueFromPOSSale(OnRunTaxFreeRequest, OnRunSalesReceiptNo, OnRunHandled, OnRunSkipRecordHandling);
+            OnRunFunction::VoucherVoid:
+                OnVoucherVoid(OnRunTaxFreeRequest, OnRunTaxFreeVoucher, OnRunHandled);
+            OnRunFunction::VoucherReissue:
+                OnVoucherReissue(OnRunTaxFreeRequest, OnRunTaxFreeVoucher, OnRunHandled);
+            OnRunFunction::VoucherLookup:
+                OnVoucherLookup(OnRunTaxFreeRequest, OnRunVoucherNo, OnRunHandled);
+            OnRunFunction::VoucherPrint:
+                OnVoucherPrint(OnRunTaxFreeRequest, OnRunTaxFreeVoucher, OnRunIsRecentVoucher, OnRunHandled);
+            OnRunFunction::VoucherConsolidate:
+                OnVoucherConsolidate(OnRunTaxFreeRequest, OnRunTmpTaxFreeConsolidation, OnRunHandled);
+            OnRunFunction::IsValidTerminalIIN:
+                OnIsValidTerminalIIN(OnRunTaxFreeRequest, OnRunMaskedCardNo, OnRunIsForeignIIN, OnRunHandled);
+            OnRunFunction::IsStoredSaleEligible:
+                OnIsStoredSaleEligible(OnRunTaxFreeRequest, OnRunSalesReceiptNo, OnRunEligible, OnRunHandled);
+            OnRunFunction::IsActiveSaleEligible:
+                OnIsActiveSaleEligible(OnRunTaxFreeRequest, OnRunSalesReceiptNo, OnRunEligible, OnRunHandled);
+
+        end;
+
+        Commit();
+
     end;
 
     var
@@ -33,6 +61,21 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         Caption_VoidSucces: Label 'Voucher %1 was voided successfully';
         Caption_EnvironmentWarning: Label 'WARNING:\The current environment is not set to production, but this tax free operation will impact an external service running in production!\Continue?';
         Caption_Workflow: Label 'Issue Tax Free Voucher';
+
+        // Replacing assert error
+        OnRunTaxFreeRequest: Record "NPR Tax Free Request";
+        OnRunTaxFreeVoucher: Record "NPR Tax Free Voucher";
+        OnRunTmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
+        OnRunSalesReceiptNo: Code[20];
+        OnRunEligible: Boolean;
+        OnRunHandled: Boolean;
+        OnRunSilent: Boolean;
+        OnRunSkipRecordHandling: Boolean;
+        OnRunVoucherNo: Text;
+        OnRunIsRecentVoucher: Boolean;
+        OnRunMaskedCardNo: Text;
+        OnRunIsForeignIIN: Boolean;
+        OnRunFunction: option FunctionNotSet,UnitAutoConfigure,UnitTestConnection,VoucherIssueFromPOSSale,VoucherVoid,VoucherReissue,VoucherLookup,VoucherPrint,VoucherConsolidate,IsStoredSaleEligible,IsValidTerminalIIN,IsActiveSaleEligible;
 
     procedure TryLookupHandler(var HandlerID: Text): Boolean
     var
@@ -109,14 +152,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     begin
         CreateRequest('UNIT_AUTO_CONFIGURE', TaxFreeUnit, TaxFreeRequest);
 
-        ClearLastError();
-        asserterror
-        begin
-            OnUnitAutoConfigure(TaxFreeRequest, Silent, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunUnitAutoConfigureEvent(TaxFreeRequest, Silent, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
@@ -131,14 +167,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     begin
         CreateRequest('UNIT_TEST_CONN', TaxFreeUnit, TaxFreeRequest);
 
-        ClearLastError();
-        asserterror
-        begin
-            OnUnitTestConnection(TaxFreeRequest, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunUnitTestConnectionEvent(TaxFreeRequest, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
@@ -186,14 +215,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
             exit;
         end;
 
-        ClearLastError();
-        asserterror
-        begin
-            OnVoucherIssueFromPOSSale(TaxFreeRequest, ReceiptNo, Handled, SkipRecordHandling);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunVoucherIssueFromPOSSaleEvent(TaxFreeRequest, ReceiptNo, Handled, SkipRecordHandling);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
@@ -228,14 +250,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
             exit;
         end;
 
-        ClearLastError();
-        asserterror
-        begin
-            OnVoucherVoid(TaxFreeRequest, TaxFreeVoucher, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunVoucherVoidEvent(TaxFreeRequest, TaxFreeVoucher, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
@@ -275,14 +290,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
             exit;
         end;
 
-        ClearLastError();
-        asserterror
-        begin
-            OnVoucherReissue(TaxFreeRequest, TaxFreeVoucher, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunVoucherReissueEvent(TaxFreeRequest, TaxFreeVoucher, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
@@ -299,14 +307,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     begin
         CreateRequest('VOUCHER_LOOKUP', TaxFreeUnit, TaxFreeRequest);
 
-        ClearLastError();
-        asserterror
-        begin
-            OnVoucherLookup(TaxFreeRequest, VoucherNo, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunVoucherLookupEvent(TaxFreeRequest, VoucherNo, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
     end;
@@ -331,14 +332,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         TaxFreeRequest.Print := TaxFreeVoucher.Print;
         TaxFreeRequest."Print Type" := TaxFreeVoucher."Print Type";
 
-        ClearLastError();
-        asserterror
-        begin
-            OnVoucherPrint(TaxFreeRequest, TaxFreeVoucher, false, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunVoucherPrintEvent(TaxFreeRequest, TaxFreeVoucher, false, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
     end;
@@ -380,14 +374,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
 
         TaxFreeRequest."Print Type" := PrintType;
 
-        ClearLastError();
-        asserterror
-        begin
-            OnVoucherPrint(TaxFreeRequest, TaxFreeVoucher, true, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunVoucherPrintEvent(TaxFreeRequest, TaxFreeVoucher, true, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
     end;
@@ -412,13 +399,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
             exit;
         end;
 
-        asserterror
-        begin
-            OnVoucherConsolidate(TaxFreeRequest, tmpTaxFreeConsolidation, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunVoucherConsolidateEvent(TaxFreeRequest, tmpTaxFreeConsolidation, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
@@ -448,14 +429,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
 
         CreateRequest('TERMINAL_IIN_CHECK', TaxFreeUnit, TaxFreeRequest);
 
-        ClearLastError;
-        asserterror
-        begin
-            OnIsValidTerminalIIN(TaxFreeRequest, MaskedCardNo, Valid, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunIsValidTerminalIINEvent(TaxFreeRequest, MaskedCardNo, Valid, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, true);
 
@@ -471,14 +445,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     begin
         CreateRequest('ELIGIBLE_CHECK_CURRENT', TaxFreeUnit, TaxFreeRequest);
 
-        ClearLastError();
-        asserterror
-        begin
-            OnIsActiveSaleEligible(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunIsActiveSaleEligibleEvent(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, true);
 
@@ -494,14 +461,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     begin
         CreateRequest('ELIGIBLE_CHECK_STORED', TaxFreeUnit, TaxFreeRequest);
 
-        ClearLastError();
-        asserterror
-        begin
-            OnIsStoredSaleEligible(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
-            TaxFreeRequest.Success := true;
-            Commit;
-            Error('');
-        end;
+        RunIsStoredSaleEligibleEvent(TaxFreeRequest, SalesTicketNo, Eligible, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, true);
 
@@ -817,5 +777,266 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         VoucherIssueFromPOSSale(SalePOS."Sales Ticket No.");
         //+NPR5.39 [302779]
     end;
+
+    //
+    // assert erro replacement functions
+    [IntegrationEvent(true, false)]
+    local procedure GetCodeunitReferenceToSelf(var ReferenceToSender: Codeunit "NPR Tax Free Handler Mgt.")
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Tax Free Handler Mgt.", 'GetCodeunitReferenceToSelf', '', true, true)]
+    local procedure ProvideCodeunitReferenceToSelf(var Sender: Codeunit "NPR Tax Free Handler Mgt."; var ReferenceToSender: Codeunit "NPR Tax Free Handler Mgt.")
+    begin
+        ReferenceToSender := Sender;
+    end;
+
+    local procedure RunUnitAutoConfigureEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunHandled := Handled;
+        OnRunSilent := Silent;
+        OnRunFunction := OnRunFunction::UnitAutoConfigure;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunUnitTestConnectionEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::UnitTestConnection;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunVoucherIssueFromPOSSaleEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var Handled: Boolean; var SkipRecordHandling: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunTaxFreeRequest.TransferFields(TaxFreeRequest);
+        OnRunSalesReceiptNo := SalesReceiptNo;
+        OnRunHandled := Handled;
+        OnRunSkipRecordHandling := SkipRecordHandling;
+        OnRunFunction := OnRunFunction::VoucherIssueFromPOSSale;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Handled := OnRunHandled;
+        SkipRecordHandling := OnRunSkipRecordHandling;
+
+    end;
+
+    local procedure RunVoucherVoidEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunTaxFreeVoucher.copy(TaxFreeVoucher);
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::VoucherVoid;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunVoucherReissueEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunTaxFreeVoucher.copy(TaxFreeVoucher);
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::VoucherReissue;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunVoucherLookupEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunTaxFreeRequest.TransferFields(TaxFreeRequest);
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::VoucherLookup;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Handled := OnRunHandled;
+
+    end;
+
+
+    local procedure RunVoucherPrintEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; IsRecentVoucher: Boolean; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunTaxFreeVoucher.copy(TaxFreeVoucher);
+        OnRunIsrecentVoucher := IsRecentVoucher;
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::VoucherPrint;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunVoucherConsolidateEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+
+        OnRunTmpTaxFreeConsolidation.reset();
+        If (OnRunTmpTaxFreeConsolidation.IsTemporary()) then
+            OnRunTmpTaxFreeConsolidation.DeleteAll();
+
+        tmpTaxFreeConsolidation.reset;
+        if (tmpTaxFreeConsolidation.FindSet()) then begin
+            repeat
+                OnRunTmpTaxFreeConsolidation.TransferFields(tmpTaxFreeConsolidation, true);
+                if (not OnRunTmpTaxFreeConsolidation.Insert()) then;
+            until (tmpTaxFreeConsolidation.next() = 0);
+        end;
+
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::VoucherConsolidate;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+
+        TmpTaxFreeConsolidation.reset();
+        If (TmpTaxFreeConsolidation.IsTemporary()) then
+            TmpTaxFreeConsolidation.DeleteAll();
+
+        OnRunTmpTaxFreeConsolidation.reset;
+        if (OnRunTmpTaxFreeConsolidation.FindSet()) then begin
+            repeat
+                TmpTaxFreeConsolidation.TransferFields(OnRunTmpTaxFreeConsolidation, true);
+                if (not TmpTaxFreeConsolidation.Insert()) then;
+            until (OnRunTmpTaxFreeConsolidation.next() = 0);
+        end;
+
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunIsValidTerminalIINEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunMaskedCardNo := MaskedCardNo;
+        OnRunIsForeignIIN := IsForeignIIN;
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::IsValidTerminalIIN;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        IsForeignIIN := OnRunIsForeignIIN;
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunIsStoredSaleEligibleEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunSalesReceiptNo := SalesTicketNo;
+        OnRunEligible := Eligible;
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::IsStoredSaleEligible;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        Eligible := OnRunEligible;
+        Handled := OnRunHandled;
+
+    end;
+
+    local procedure RunIsActiveSaleEligibleEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
+    var
+        Self: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        Commit();
+        GetCodeunitReferenceToSelf(Self);
+
+        OnRunTaxFreeRequest.copy(TaxFreeRequest);
+        OnRunTaxFreeRequest.TransferFields(TaxFreeRequest);
+        OnRunSalesReceiptNo := SalesTicketNo;
+        OnRunEligible := Eligible;
+        OnRunHandled := Handled;
+        OnRunFunction := OnRunFunction::IsActiveSaleEligible;
+
+        OnRunTaxFreeRequest.Success := Self.Run();
+
+        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        TaxFreeRequest.TransferFields(OnRunTaxFreeRequest, true);
+        Eligible := OnRunEligible;
+        Handled := OnRunHandled;
+
+    end;
+
+
 }
 
