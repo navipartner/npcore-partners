@@ -1,18 +1,16 @@
 codeunit 6014699 "NPR Doc. Localization Proxy"
 {
     // 
-    // NPRX.xx/TSA/2015073/CASE 216800 - Initial version of the proxy to separate DK and W1 NPR version
     // 
     // NOTE *** NOTE *** NOTE *** NOTE
     // This codeunit SHOULD NOT go into the any localized database.
     // This is a template proxy for accessning the localization on document tables
-    // NPR5.38/MHA /20180105  CASE 301053 Removed unused Global Text Constant, -- Test Toolset
+
 
 
     trigger OnRun()
     begin
 
-        TestFunctions();
     end;
 
     var
@@ -158,28 +156,6 @@ codeunit 6014699 "NPR Doc. Localization Proxy"
 
         Error(NOT_LOCALIZED);
 
-        //WITH SalesHeader DO BEGIN
-        //  IF "EAN No." <> '' THEN BEGIN
-        //    CASE "Document Type" OF
-        //      "Document Type"::Order : SaveXMLDocument(0,"Last Posting No.");
-        //      "Document Type"::Invoice:
-        //        BEGIN
-        //          IF "Last Posting No." = '' THEN
-        //            SaveXMLDocument(1,"No.")
-        //          ELSE
-        //            SaveXMLDocument(1,"Last Posting No.");
-        //        END;
-        //      "Document Type"::"Return Order": SaveXMLDocument(2,"Last Posting No.");
-        //      "Document Type"::"Credit Memo":
-        //        BEGIN
-        //          IF "Last Posting No." = '' THEN
-        //            SaveXMLDocument(3,"No.")
-        //          ELSE
-        //            SaveXMLDocument(3,"Last Posting No.");
-        //        END;
-        //    END;
-        //  END;
-        //END;
     end;
 
     procedure SaveXMLDocument(Type: Option "Sales Order","Sales Invoice","Sales Return Order","Sales Credit Memo"; DocumentNo: Code[20])
@@ -189,20 +165,6 @@ codeunit 6014699 "NPR Doc. Localization Proxy"
     begin
         Error(NOT_LOCALIZED);
 
-        //-PN1.03
-        //CASE Type OF
-        //  Type::"Sales Order",Type::"Sales Invoice":
-        //    BEGIN
-        //      IF SalesInvHeader.GET(DocumentNo) THEN
-        //        OIOUBLExportSalesInvoice.RUN(SalesInvHeader);
-        //    END;
-        //  Type::"Sales Return Order", Type::"Sales Credit Memo":
-        //    BEGIN
-        //      IF SalesCrMemoHeader.GET(DocumentNo) THEN
-        //        OIOUBLExportSalesCrMemo.RUN(SalesCrMemoHeader);
-        //    END;
-        //END;
-        //+PN1.03
     end;
 
     procedure ValidateXMLDocumentCountryCode(NaviDocsEntry: Record "NPR NaviDocs Entry"; Country: Record "Country/Region"): Boolean
@@ -213,200 +175,16 @@ codeunit 6014699 "NPR Doc. Localization Proxy"
 
         Error(NOT_LOCALIZED);
 
-        //IF STRLEN(Country."OIOUBL Country/Region Code") <> 2 THEN BEGIN
-        //  NaviDocsManagement.InsertComment (NaviDocsEntry,STRSUBSTNO(Error010,Country."OIOUBL Country/Region Code",Country.Code),TRUE);
-        //  EXIT(FALSE);
-        //END;
-
-        //EXIT (TRUE);
     end;
 
     procedure ExportSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
 
-        // OIOUBLExportSalesInvoice.RUN (SalesInvoiceHeader);
     end;
 
     procedure ExportCreditMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
 
-        // OIOUBLExportCrMemo.RUN(SalesCrMemoHeader);
-    end;
-
-    local procedure "--"()
-    begin
-    end;
-
-    local procedure TestFunctions()
-    begin
-
-        // A test function to verify PROXY Implementation
-
-        TestCustomerProxy();
-        TestSalesInvoiceHeaderProxy();
-        TestSalesCrMemoHeaderProxy();
-        TestIssuedReminderHeaderProxy();
-        TestIssuedFinChargeMemoHeaderProxy();
-
-        Message('All PROXY tests passed OK');
-    end;
-
-    local procedure TestCustomerProxy()
-    var
-        testCode: Code[20];
-        testBool: Boolean;
-        Customer: Record Customer;
-        ActualValue: Variant;
-    begin
-
-        Customer.Init;
-
-        asserterror T18_GetFieldValue(Customer, testCode, ActualValue);
-    end;
-
-    local procedure TestSalesInvoiceHeaderProxy()
-    var
-        testCode: Code[20];
-        testBool: Boolean;
-        ActualValue: Variant;
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-    begin
-
-        SalesInvoiceHeader.Init();
-
-        asserterror T112_GetFieldValue(SalesInvoiceHeader, testCode, ActualValue);
-    end;
-
-    local procedure TestSalesCrMemoHeaderProxy()
-    var
-        testCode: Code[20];
-        testBool: Boolean;
-        ActualValue: Variant;
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-    begin
-
-        SalesCrMemoHeader.Init();
-
-        asserterror T114_GetFieldValue(SalesCrMemoHeader, testCode, ActualValue);
-    end;
-
-    local procedure TestIssuedReminderHeaderProxy()
-    var
-        testCode: Code[20];
-        testBool: Boolean;
-        ActualValue: Variant;
-        IssuedReminderHeader: Record "Issued Reminder Header";
-    begin
-
-        IssuedReminderHeader.Init();
-
-        asserterror T297_GetFieldValue(IssuedReminderHeader, testCode, ActualValue);
-    end;
-
-    local procedure TestIssuedFinChargeMemoHeaderProxy()
-    var
-        testCode: Code[20];
-        testBool: Boolean;
-        ActualValue: Variant;
-        IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
-    begin
-
-        IssuedFinChargeMemoHeader.Init();
-
-        asserterror T304_GetFieldValue(IssuedFinChargeMemoHeader, testCode, ActualValue);
-    end;
-
-    local procedure "-- Test Toolset Asserts"()
-    begin
-    end;
-
-    procedure IsTrue(Condition: Boolean; Msg: Text[1024])
-    begin
-        if not Condition then
-            Error(IsTrueFailedMsg, Msg)
-    end;
-
-    procedure IsFalse(Condition: Boolean; Msg: Text[1024])
-    begin
-        if Condition then
-            Error(IsFalseFailedMsg, Msg)
-    end;
-
-    procedure AreEqual(Expected: Variant; Actual: Variant; Msg: Text[1024])
-    begin
-        if not Equal(Expected, Actual) then
-            Error(AreEqualFailedMsg, Expected, Actual, Msg)
-    end;
-
-    procedure AreNotEqual(Expected: Variant; Actual: Variant; Msg: Text[1024])
-    begin
-        if Equal(Expected, Actual) then
-            Error(AreNotEqualFailedMsg, Expected, Actual, Msg)
-    end;
-
-    procedure AreNearlyEqual(Expected: Decimal; Actual: Decimal; Delta: Decimal; Msg: Text[1024])
-    begin
-        if Abs(Expected - Actual) > Abs(Delta) then
-            Error(AreNearlyEqualFailedMsg, Delta, Expected, Actual, Msg)
-    end;
-
-    procedure AreNotNearlyEqual(Expected: Decimal; Actual: Decimal; Delta: Decimal; Msg: Text[1024])
-    begin
-        if Abs(Expected - Actual) <= Abs(Delta) then
-            Error(AreNotNearlyEqualFailedMsg, Delta, Expected, Actual, Msg)
-    end;
-
-    procedure Fail(Msg: Text[1024])
-    begin
-        Error(FailFailedMsg, Msg)
-    end;
-
-    procedure KnownFailure(Expected: Text[1024]; Msg: Text[1024])
-    begin
-        if StrPos(GetLastErrorText, Expected) = 0 then
-            Error(KnowFailureFailedMsg, GetLastErrorText);
-
-        Error(KnownFailureMsg, Msg)
-    end;
-
-    local procedure TypeOf(Value: Variant): Integer
-    var
-        "Field": Record "Field";
-    begin
-        case true of
-            Value.IsBoolean:
-                exit(Field.Type::Boolean);
-            Value.IsOption or Value.IsInteger:
-                exit(Field.Type::Integer);
-            Value.IsDecimal:
-                exit(Field.Type::Decimal);
-            Value.IsText or Value.IsCode:
-                exit(Field.Type::Text);
-            Value.IsDate:
-                exit(Field.Type::Date);
-            Value.IsTime:
-                exit(Field.Type::Time);
-            else
-                Error(UnsupportedTypeMsg)
-        end
-    end;
-
-    local procedure Equal(Left: Variant; Right: Variant): Boolean
-    begin
-        if IsNumber(Left) and IsNumber(Right) then
-            exit(EqualNumbers(Left, Right));
-
-        exit((TypeOf(Left) = TypeOf(Right)) and (Format(Left, 0, 2) = Format(Right, 0, 2)))
-    end;
-
-    local procedure EqualNumbers(Left: Decimal; Right: Decimal): Boolean
-    begin
-        exit(Left = Right)
-    end;
-
-    local procedure IsNumber(Value: Variant): Boolean
-    begin
-        exit(Value.IsDecimal or Value.IsInteger or Value.IsChar)
     end;
 }
 
