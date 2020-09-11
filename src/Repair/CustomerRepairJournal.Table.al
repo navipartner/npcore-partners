@@ -175,13 +175,11 @@ table 6014505 "NPR Customer Repair Journal"
 
             end;
         }
-        field(40; "VAT Calculation Type"; Option)
+        field(40; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             DataClassification = CustomerContent;
             Editable = false;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(41; "VAT Bus. Posting Group"; Code[10])
         {

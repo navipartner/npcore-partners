@@ -1169,7 +1169,7 @@ table 6014504 "NPR Customer Repair"
             NprDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
     end;
 
-    procedure CreateSalesDocument("Document Type": Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order")
+    procedure CreateSalesDocument("Document Type": Enum "Sales Document Type")
     var
         TxtInvCreated: Label 'The invoice has been created on number %1';
         TxtOrderCreated: Label 'Salesorder is created with number %1';

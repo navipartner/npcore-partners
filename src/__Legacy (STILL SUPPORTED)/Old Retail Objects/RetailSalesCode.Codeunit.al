@@ -15,7 +15,7 @@ codeunit 6014418 "NPR Retail Sales Code"
         SalesShipmentHeader: Record "Sales Shipment Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
-        ReportType: Integer;
+        ReportType: Enum "Report Selection Usage";
         PrintStd: Boolean;
         PrintRetail: Boolean;
         TxtMenu: Label 'No print,Navision invoice/Cr. Memo,Debit ticket,Both prints';

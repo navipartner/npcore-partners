@@ -406,9 +406,9 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
             SalesPriceText := ''
         else
             if "Sales Price" = 0 then
-                SalesPriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Sales Price", 0, AutoFormatManagement.ResolveAutoFormat(2, '')))
+                SalesPriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Sales Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')))
             else
-                SalesPriceText := StrSubstNo('%1', Format("Sales Price", 0, AutoFormatManagement.ResolveAutoFormat(2, '')));
+                SalesPriceText := StrSubstNo('%1', Format("Sales Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
         SalesPriceBold := "Sales Price" > 0;
     end;
 
@@ -419,9 +419,9 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
             PurchasePriceText := ''
         else
             if "Direct Unit Cost" = 0 then
-                PurchasePriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Direct Unit Cost", 0, AutoFormatManagement.ResolveAutoFormat(2, '')))
+                PurchasePriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Direct Unit Cost", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')))
             else
-                PurchasePriceText := StrSubstNo('%1', Format("Direct Unit Cost", 0, AutoFormatManagement.ResolveAutoFormat(2, '')));
+                PurchasePriceText := StrSubstNo('%1', Format("Direct Unit Cost", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
         PurchasePriceBold := "Direct Unit Cost" > 0;
     end;
 
@@ -433,9 +433,9 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
             RecommendedRetailPriceText := ''
         else
             if "Recommended Retail Price" = 0 then
-                RecommendedRetailPriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Recommended Retail Price", 0, AutoFormatManagement.ResolveAutoFormat(2, '')))
+                RecommendedRetailPriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Recommended Retail Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')))
             else
-                RecommendedRetailPriceText := StrSubstNo('%1', Format("Recommended Retail Price", 0, AutoFormatManagement.ResolveAutoFormat(2, '')));
+                RecommendedRetailPriceText := StrSubstNo('%1', Format("Recommended Retail Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
         RecommendedRetailPriceBold := "Recommended Retail Price" > 0;
         //+NPR5.22
     end;

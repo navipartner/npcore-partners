@@ -29,13 +29,10 @@ table 6151198 "NPR NpCs Document"
             OptionCaption = 'Send to Store,Collect in Store';
             OptionMembers = "Send to Store","Collect in Store";
         }
-        field(5; "Document Type"; Option)
+        field(5; "Document Type"; Enum "NPR NpCs Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.51';
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order,Posted Invoice,Posted Credit Memo';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order","Posted Invoice","Posted Credit Memo";
 
             trigger OnValidate()
             begin

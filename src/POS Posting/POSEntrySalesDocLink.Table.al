@@ -26,12 +26,10 @@ table 6150680 "NPR POS Entry Sales Doc. Link"
             Caption = 'POS Entry Reference Line No.';
             DataClassification = CustomerContent;
         }
-        field(4; "Sales Document Type"; Option)
+        field(4; "Sales Document Type"; Enum "NPR POS Sales Document Type")
         {
             Caption = 'Sales Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order,Posted Invoice,Posted Credit Memo,Shipment,Return Receipt,Service Item,Assembly Order,Posted Assembly Order';
-            OptionMembers = QUOTE,"ORDER",INVOICE,CREDIT_MEMO,BLANKET_ORDER,RETURN_ORDER,POSTED_INVOICE,POSTED_CREDIT_MEMO,SHIPMENT,RETURN_RECEIPT,SERVICE_ITEM,ASSEMBLY_ORDER,POSTED_ASSEMBLY_ORDER;
         }
         field(5; "Sales Document No"; Code[20])
         {

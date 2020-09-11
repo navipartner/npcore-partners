@@ -137,9 +137,9 @@ codeunit 6060151 "NPR Event EWS Management"
         exit(StatusOK);
     end;
 
-    local procedure InProperStatus(Status: Option): Boolean
+    local procedure InProperStatus(Status: Enum "NPR Event Status"): Boolean
     begin
-        exit(Status > 0);
+        exit(Status.AsInteger() > 0);
     end;
 
     [TryFunction]

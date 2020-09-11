@@ -218,7 +218,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
             if ConfirmDeleteDocumentOnImportToPOS then begin
                 if Confirm(TextConfDocDelete, true, SalesHeader."Document Type", SalesHeader."No.") then begin
                     SalesHeader.Delete(true);
-                    SalePOS."Sales Document Type" := 0;
+                    SalePOS."Sales Document Type" := SalePOS."Sales Document Type"::Quote;
                     SalePOS."Sales Document No." := '';
                     SalePOS.Modify;
                 end;
@@ -227,7 +227,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
                 Message(StrSubstNo(TextMsgDocDelete, SalesHeader."Document Type", SalesHeader."No."));
                 //+NPR5.34
                 SalesHeader.Delete(true);
-                SalePOS."Sales Document Type" := 0;
+                SalePOS."Sales Document Type" := SalePOS."Sales Document Type"::Quote;
                 SalePOS."Sales Document No." := '';
                 SalePOS.Modify;
             end;

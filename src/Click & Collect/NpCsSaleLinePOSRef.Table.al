@@ -54,7 +54,7 @@ table 6151204 "NPR NpCs Sale Line POS Ref."
             Caption = 'Document No.';
             DataClassification = CustomerContent;
         }
-        field(105; "Document Type"; Integer)
+        field(105; "Document Type"; Enum "NPR NpCs Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;

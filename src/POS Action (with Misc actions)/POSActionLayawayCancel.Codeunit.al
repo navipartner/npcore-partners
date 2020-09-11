@@ -361,7 +361,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         SaleLinePOS.Validate("No.", CreditMemoCustLedgerEntry."Customer No.");
         SaleLinePOS.Validate("Unit Price", CreditMemoCustLedgerEntry."Remaining Amt. (LCY)");
         SaleLinePOS.Validate(Quantity, 1);
-        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::Kreditnota;
+        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::"Credit Memo";
         SaleLinePOS."Buffer Document No." := SalesCrMemoHeader."No.";
         SaleLinePOS.Description := LAYAWAY_REFUND;
         SaleLinePOS.UpdateAmounts(SaleLinePOS);

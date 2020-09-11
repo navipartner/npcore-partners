@@ -94,7 +94,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
     var
         Text000002: Label '%1 %2 %3 couldn''t be printed.';
-        DocumentType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+        DocumentType: Enum "Sales Document Type";
         Ask: Boolean;
         SkipDefaultValues: Boolean;
         Invoice: Boolean;
@@ -813,7 +813,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                     ReservationEntry."Quantity (Base)" := -SalesLine."Quantity (Base)";
                     ReservationEntry."Reservation Status" := ReservationEntry."Reservation Status"::Surplus;
                     ReservationEntry."Source Type" := 37;
-                    ReservationEntry."Source Subtype" := SalesLine."Document Type";
+                    ReservationEntry."Source Subtype" := SalesLine."Document Type".AsInteger();
                     ReservationEntry."Source ID" := SalesLine."Document No.";
                     ReservationEntry."Source Batch Name" := '';
                     ReservationEntry."Source Ref. No." := SalesLine."Line No.";
@@ -1088,7 +1088,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         //Set record to get desc.
         ReservationEntry."Source Type" := DATABASE::"Sales Line";
-        ReservationEntry."Source Subtype" := SalesLine."Document Type";
+        ReservationEntry."Source Subtype" := SalesLine."Document Type".AsInteger();
         ReservationEntry."Source ID" := SalesLine."Document No.";
         ReservationEntry."Source Ref. No." := SalesLine."Line No.";
 
@@ -1284,7 +1284,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             Modify(true);
 
             SalesPostPrepayments.Invoice(SalesHeader);
-            "Buffer Document Type" := "Buffer Document Type"::Faktura;
+            "Buffer Document Type" := "Buffer Document Type"::Invoice;
             "Posted Sales Document Type" := "Posted Sales Document Type"::INVOICE;
             "Posted Sales Document No." := SalesHeader."Last Prepayment No.";
             Validate("Buffer Document No.", SalesHeader."Last Prepayment No.");
@@ -1341,7 +1341,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             SalesPostPrepayments.CreditMemo(SalesHeader);
             "Posted Sales Document Type" := "Posted Sales Document Type"::CREDIT_MEMO;
             "Posted Sales Document No." := SalesHeader."Last Prepmt. Cr. Memo No.";
-            "Buffer Document Type" := "Buffer Document Type"::Kreditnota;
+            "Buffer Document Type" := "Buffer Document Type"::"Credit Memo";
             Validate("Buffer Document No.", SalesHeader."Last Prepmt. Cr. Memo No.");
             Modify(true);
 
@@ -1411,7 +1411,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                 case SalesHeader."Document Type" of
                     SalesHeader."Document Type"::Invoice:
                         begin
-                            "Buffer Document Type" := "Buffer Document Type"::Faktura;
+                            "Buffer Document Type" := "Buffer Document Type"::Invoice;
                             if SalesHeader."Last Posting No." <> '' then
                                 Validate("Buffer Document No.", SalesHeader."Last Posting No.")
                             else
@@ -1421,14 +1421,14 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                         end;
                     SalesHeader."Document Type"::Order:
                         begin
-                            "Buffer Document Type" := "Buffer Document Type"::Faktura;
+                            "Buffer Document Type" := "Buffer Document Type"::Invoice;
                             Validate("Buffer Document No.", SalesHeader."Last Posting No.");
                             "Posted Sales Document Type" := "Posted Sales Document Type"::INVOICE;
                             "Posted Sales Document No." := "Buffer Document No.";
                         end;
                     SalesHeader."Document Type"::"Credit Memo":
                         begin
-                            "Buffer Document Type" := "Buffer Document Type"::Kreditnota;
+                            "Buffer Document Type" := "Buffer Document Type"::"Credit Memo";
                             if SalesHeader."Last Posting No." <> '' then
                                 Validate("Buffer Document No.", SalesHeader."Last Posting No.")
                             else
@@ -1438,7 +1438,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                         end;
                     SalesHeader."Document Type"::"Return Order":
                         begin
-                            "Buffer Document Type" := "Buffer Document Type"::Kreditnota;
+                            "Buffer Document Type" := "Buffer Document Type"::"Credit Memo";
                             Validate("Buffer Document No.", SalesHeader."Last Posting No.");
                             "Posted Sales Document Type" := "Posted Sales Document Type"::CREDIT_MEMO;
                             "Posted Sales Document No." := "Buffer Document No.";

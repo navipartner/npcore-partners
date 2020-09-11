@@ -300,7 +300,7 @@ codeunit 6014410 "NPR POS Apply Customer Entries"
 
     end;
 
-    procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Integer; DocumentNo: Code[20]; Silent: Boolean)
+    procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Silent: Boolean)
     var
         Customer: Record Customer;
         CustLedgerEntry: Record "Cust. Ledger Entry";

@@ -811,7 +811,7 @@ codeunit 6150615 "NPR POS Post Entries"
             //NPRetailSetup.TESTFIELD("POS Posting Diff. Account");  //NPR5.52 [365326]-revoked
             POSPostingProfile.TestField("POS Posting Diff. Account");  //NPR5.52 [365326]
             MakeGenJournalLine(
-              0,
+              Enum::"Gen. Journal Account Type"::"G/L Account",
               //NPRetailSetup."POS Posting Diff. Account",  //NPR5.52 [365326]-revoked
               POSPostingProfile."POS Posting Diff. Account",  //NPR5.52 [365326]
               0,
@@ -1475,7 +1475,7 @@ codeunit 6150615 "NPR POS Post Entries"
         end;
     end;
 
-    local procedure GetGLAccountType(POSPostingSetup: Record "NPR POS Posting Setup"): Integer
+    local procedure GetGLAccountType(POSPostingSetup: Record "NPR POS Posting Setup"): Enum "Gen. Journal Account Type"
     var
         GenJournalLine: Record "Gen. Journal Line";
     begin
@@ -1491,7 +1491,7 @@ codeunit 6150615 "NPR POS Post Entries"
         Error(TextAccountTypeNotSupported, POSPostingSetup.FieldCaption("Account Type"), POSPostingSetup.TableCaption);
     end;
 
-    local procedure GetDifferenceAccountType(POSPostingSetup: Record "NPR POS Posting Setup"): Integer
+    local procedure GetDifferenceAccountType(POSPostingSetup: Record "NPR POS Posting Setup"): Enum "Gen. Journal Account Type"
     var
         GenJournalLine: Record "Gen. Journal Line";
     begin
@@ -1534,7 +1534,7 @@ codeunit 6150615 "NPR POS Post Entries"
             until POSEntry.Next = 0;
     end;
 
-    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Integer; AccountType: Integer; AccountNo: Code[20]; BalancingAccountType: Integer; BalancingAccountNo: Code[20]; VATAmountIn: Decimal; VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Integer; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Integer; BalancingAccountNo: Code[20]; VATAmountIn: Decimal; VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
     var
         POSStore: Record "NPR POS Store";
     begin
@@ -1591,7 +1591,7 @@ codeunit 6150615 "NPR POS Post Entries"
         //+NPR5.53 [376362]
     end;
 
-    local procedure MakeGenJournalFromPOSBalancingLine(POSBalancingLine: Record "NPR POS Balancing Line"; Amount: Decimal; AccountType: Integer; AccountNo: Code[20]; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalFromPOSBalancingLine(POSBalancingLine: Record "NPR POS Balancing Line"; Amount: Decimal; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
     var
         POSEntry: Record "NPR POS Entry";
     begin
@@ -1638,7 +1638,7 @@ codeunit 6150615 "NPR POS Post Entries"
         //+NPR5.53 [376362]
     end;
 
-    local procedure MakeGenJournalLine(AccountType: Integer; AccountNo: Code[20]; BalancingAccountType: Integer; BalancingAccountNo: Code[20]; GenPostingType: Integer; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[10]; GenBusPostingGroup: Code[10]; GenProdPostingGroup: Code[10]; VATBusPostingGroup: Code[10]; VATProdPostingGroup: Code[10]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[10]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Integer; BalancingAccountNo: Code[20]; GenPostingType: Integer; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[10]; GenBusPostingGroup: Code[10]; GenProdPostingGroup: Code[10]; VATBusPostingGroup: Code[10]; VATProdPostingGroup: Code[10]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[10]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; var GenJournalLine: Record "Gen. Journal Line")
     var
         NPRetailSetup: Record "NPR NP Retail Setup";
     begin

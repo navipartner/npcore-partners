@@ -52,14 +52,12 @@ table 6014508 "NPR Accessory Unfold Entry"
             ELSE
             IF ("Source Type" = CONST(Item)) Item;
         }
-        field(25; "Document Type"; Option)
+        field(25; "Document Type"; Enum "Item Ledger Document Type")
         {
             CalcFormula = Lookup ("Item Ledger Entry"."Document Type" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Document Type';
             Editable = false;
             FieldClass = FlowField;
-            OptionCaption = ' ,Sales Shipment,Sales Invoice,Sales Return Receipt,Sales Credit Memo,Purchase Receipt,Purchase Invoice,Purchase Return Shipment,Purchase Credit Memo,Transfer Shipment,Transfer Receipt,Service Shipment,Service Invoice,Service Credit Memo,Posted Assembly';
-            OptionMembers = " ","Sales Shipment","Sales Invoice","Sales Return Receipt","Sales Credit Memo","Purchase Receipt","Purchase Invoice","Purchase Return Shipment","Purchase Credit Memo","Transfer Shipment","Transfer Receipt","Service Shipment","Service Invoice","Service Credit Memo","Posted Assembly";
         }
         field(30; "Document No."; Code[20])
         {
