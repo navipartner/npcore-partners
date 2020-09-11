@@ -30,18 +30,19 @@ codeunit 6059969 "NPR Description Control"
             InitDescriptionControl();
             //+NPR5.47 [332824]
 
-            RetailSetup.Get;
-            if RetailSetup."POS Line Description Code" = '' then begin
-                //Do this the old way
-                GetDescriptionPOS_OLD(Rec, XRec, Item);
-            end else begin
-                //this is the new way
-                //-NPR5.51 [351999]
-                Language.SetRange("Windows Language ID", GlobalLanguage);
-                if Language.FindFirst then;
-                GetDescription(Description, "Description 2", "No.", "Variant Code", Language.Code, RetailSetup."POS Line Description Code");
-                // GetDescription(Description, "Description 2", "No.", "Variant Code", '', RetailSetup."POS Line Description Code");
-                //+NPR5.51 [351999]
+            if RetailSetup.Get then begin
+                if RetailSetup."POS Line Description Code" = '' then begin
+                    //Do this the old way
+                    GetDescriptionPOS_OLD(Rec, XRec, Item);
+                end else begin
+                    //this is the new way
+                    //-NPR5.51 [351999]
+                    Language.SetRange("Windows Language ID", GlobalLanguage);
+                    if Language.FindFirst then;
+                    GetDescription(Description, "Description 2", "No.", "Variant Code", Language.Code, RetailSetup."POS Line Description Code");
+                    // GetDescription(Description, "Description 2", "No.", "Variant Code", '', RetailSetup."POS Line Description Code");
+                    //+NPR5.51 [351999]
+                end;
             end;
         end;
     end;
@@ -58,13 +59,14 @@ codeunit 6059969 "NPR Description Control"
             InitDescriptionControl();
             //+NPR5.47 [332824]
 
-            RetailSetup.Get;
-            if (RetailSetup."Purchase Line Description Code" = '') then begin
-                //Do this the old way
-                GetDescriptionPL_OLD(PurchaseLine, PurchHeader);
-            end else begin
-                //this is the new way
-                GetDescription(Description, "Description 2", "No.", "Variant Code", PurchHeader."Language Code", RetailSetup."Purchase Line Description Code");
+            if RetailSetup.Get then begin
+                if (RetailSetup."Purchase Line Description Code" = '') then begin
+                    //Do this the old way
+                    GetDescriptionPL_OLD(PurchaseLine, PurchHeader);
+                end else begin
+                    //this is the new way
+                    GetDescription(Description, "Description 2", "No.", "Variant Code", PurchHeader."Language Code", RetailSetup."Purchase Line Description Code");
+                end;
             end;
         end;
     end;
@@ -81,13 +83,14 @@ codeunit 6059969 "NPR Description Control"
             InitDescriptionControl();
             //+NPR5.47 [332824]
 
-            RetailSetup.Get;
-            if (RetailSetup."Sales Line Description Code" = '') then begin
-                //Do this the old way
-                GetDescriptionSL_OLD(SalesLine, SalesHeader);
-            end else begin
-                //this is the new way
-                GetDescription(Description, "Description 2", "No.", "Variant Code", SalesHeader."Language Code", RetailSetup."Sales Line Description Code");
+            if RetailSetup.Get then begin
+                if (RetailSetup."Sales Line Description Code" = '') then begin
+                    //Do this the old way
+                    GetDescriptionSL_OLD(SalesLine, SalesHeader);
+                end else begin
+                    //this is the new way
+                    GetDescription(Description, "Description 2", "No.", "Variant Code", SalesHeader."Language Code", RetailSetup."Sales Line Description Code");
+                end;
             end;
         end;
     end;
@@ -102,13 +105,14 @@ codeunit 6059969 "NPR Description Control"
             InitDescriptionControl();
             //+NPR5.47 [332824]
 
-            RetailSetup.Get;
-            if (RetailSetup."Transfer Line Description Code" = '') then begin
-                //Do this the old way
-                GetDescriptionTL_OLD(TransferLine, TransferHeader);
-            end else begin
-                //this is the new way
-                GetDescription(Description, "Description 2", "Item No.", "Variant Code", '', RetailSetup."Transfer Line Description Code");
+            if RetailSetup.Get then begin
+                if (RetailSetup."Transfer Line Description Code" = '') then begin
+                    //Do this the old way
+                    GetDescriptionTL_OLD(TransferLine, TransferHeader);
+                end else begin
+                    //this is the new way
+                    GetDescription(Description, "Description 2", "Item No.", "Variant Code", '', RetailSetup."Transfer Line Description Code");
+                end;
             end;
         end;
     end;
@@ -327,49 +331,50 @@ codeunit 6059969 "NPR Description Control"
             if "Custom Descr" then
                 exit;
 
-            RetailSetup.Get;
-            if ((XRec."No." <> "No.") or (Description = '')) and not "Custom Descr" then begin
-                case RetailSetup."Description control" of
-                    RetailSetup."Description control"::"<Description>":
-                        Description := CopyStr(Item.Description, 1, 50);
-                    RetailSetup."Description control"::"<Description 2>":
-                        Description := CopyStr(Item."Description 2", 1, 50);
-                    RetailSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
-                        begin
-                            if ItemGroup.Get(Item."NPR Item Group") then begin
-                                if Vendor.Get(Item."Vendor No.") then
-                                    Pos := StrPos(Vendor.Name, ' ');
-                                if Pos > 0 then
-                                    VendorName := CopyStr(Vendor.Name, 1, Pos - 1)
-                                else
-                                    VendorName := Vendor.Name;
+            if RetailSetup.Get then begin
+                if ((XRec."No." <> "No.") or (Description = '')) and not "Custom Descr" then begin
+                    case RetailSetup."Description control" of
+                        RetailSetup."Description control"::"<Description>":
+                            Description := CopyStr(Item.Description, 1, 50);
+                        RetailSetup."Description control"::"<Description 2>":
+                            Description := CopyStr(Item."Description 2", 1, 50);
+                        RetailSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
+                            begin
+                                if ItemGroup.Get(Item."NPR Item Group") then begin
+                                    if Vendor.Get(Item."Vendor No.") then
+                                        Pos := StrPos(Vendor.Name, ' ');
+                                    if Pos > 0 then
+                                        VendorName := CopyStr(Vendor.Name, 1, Pos - 1)
+                                    else
+                                        VendorName := Vendor.Name;
 
-                                Pos := StrPos(ItemGroup.Description, ' ');
-                                if Pos > 0 then
-                                    ItemGroupName := CopyStr(ItemGroup.Description, 1, Pos - 1)
-                                else
-                                    ItemGroupName := ItemGroup.Description;
+                                    Pos := StrPos(ItemGroup.Description, ' ');
+                                    if Pos > 0 then
+                                        ItemGroupName := CopyStr(ItemGroup.Description, 1, Pos - 1)
+                                    else
+                                        ItemGroupName := ItemGroup.Description;
 
-                                if (VendorName <> '') and (ItemGroupName <> '') then
-                                    Description := CopyStr(VendorName + ' ' + ItemGroupName + ' ' + Item."Vendor Item No.", 1, 30);
+                                    if (VendorName <> '') and (ItemGroupName <> '') then
+                                        Description := CopyStr(VendorName + ' ' + ItemGroupName + ' ' + Item."Vendor Item No.", 1, 30);
+                                end;
                             end;
-                        end;
-                    RetailSetup."Description control"::"<Description 2><Item group name>":
-                        begin
-                            if ItemGroup.Get(Item."NPR Item Group") and (Item."Description 2" <> '') then
-                                Description := CopyStr(Item."Description 2" + ' ' + ItemGroup.Description, 1, 30);
-                        end;
-                    RetailSetup."Description control"::"<Description><Variant Info>":
-                        begin
-                            if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
-                                Description := Item.Description + ' ' + ItemVariant.Description;
-                        end;
-                    RetailSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
-                        begin
-                            Description := Item.Description;
-                            if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
-                                "Description 2" := ItemVariant.Description;
-                        end;
+                        RetailSetup."Description control"::"<Description 2><Item group name>":
+                            begin
+                                if ItemGroup.Get(Item."NPR Item Group") and (Item."Description 2" <> '') then
+                                    Description := CopyStr(Item."Description 2" + ' ' + ItemGroup.Description, 1, 30);
+                            end;
+                        RetailSetup."Description control"::"<Description><Variant Info>":
+                            begin
+                                if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
+                                    Description := Item.Description + ' ' + ItemVariant.Description;
+                            end;
+                        RetailSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
+                            begin
+                                Description := Item.Description;
+                                if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
+                                    "Description 2" := ItemVariant.Description;
+                            end;
+                    end;
                 end;
             end;
 
@@ -399,7 +404,8 @@ codeunit 6059969 "NPR Description Control"
             if not Item.Get("No.") then
                 exit;
 
-            RetailSetup.Get;
+            if not RetailSetup.Get then
+                exit;
             case RetailSetup."Description control" of
                 RetailSetup."Description control"::"<Description>":
                     begin
@@ -475,7 +481,8 @@ codeunit 6059969 "NPR Description Control"
             if not Item.Get("No.") then
                 exit;
 
-            RetailSetup.Get;
+            if not RetailSetup.Get then
+                exit;
             case RetailSetup."Description control" of
                 RetailSetup."Description control"::"<Description>":
                     begin
@@ -548,7 +555,8 @@ codeunit 6059969 "NPR Description Control"
             if not Item.Get("Item No.") then
                 exit;
 
-            RetailSetup.Get;
+            if not RetailSetup.Get then
+                exit;
             case RetailSetup."Description control" of
                 RetailSetup."Description control"::"<Description>":
                     begin
