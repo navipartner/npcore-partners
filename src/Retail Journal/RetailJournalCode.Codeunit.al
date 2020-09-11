@@ -522,7 +522,7 @@ codeunit 6014467 "NPR Retail Journal Code"
         //+NPR5.46 [294354]
     end;
 
-    procedure PurchaseOrder2RetailJnl(DocumentType: Integer; PurchaseOrderNo: Code[20]; RetailJnlCode: Code[40])
+    procedure PurchaseOrder2RetailJnl(DocumentType: Enum "Purchase Document Type"; PurchaseOrderNo: Code[20]; RetailJnlCode: Code[40])
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";

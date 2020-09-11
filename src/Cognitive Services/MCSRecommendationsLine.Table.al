@@ -37,7 +37,7 @@ table 6060084 "NPR MCS Recommendations Line"
             Caption = 'Table No.';
             DataClassification = CustomerContent;
         }
-        field(110; "Document Type"; Integer)
+        field(110; "Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;

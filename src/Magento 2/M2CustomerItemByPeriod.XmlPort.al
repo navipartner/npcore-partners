@@ -249,7 +249,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
                                         trigger OnBeforePassVariable()
                                         begin
 
-                                            AmtShipped := Format(Abs(AmountShippedArray[TmpItemLedgerEntry."Document Type"]), 0, 9);
+                                            AmtShipped := Format(Abs(AmountShippedArray[TmpItemLedgerEntry."Document Type".AsInteger()]), 0, 9);
                                         end;
                                     }
                                 }
@@ -566,9 +566,9 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
                 // Partial shipments
                 // All decimal amount fields are flowfields on item ledger
                 if (ItemLedgerEntry."Sales Amount (Actual)" = 0) then
-                    AmountShippedArray[ItemLedgerEntry."Document Type"] += ItemLedgerEntry."Sales Amount (Expected)"
+                    AmountShippedArray[ItemLedgerEntry."Document Type".AsInteger()] += ItemLedgerEntry."Sales Amount (Expected)"
                 else
-                    AmountShippedArray[ItemLedgerEntry."Document Type"] += ItemLedgerEntry."Sales Amount (Actual)";
+                    AmountShippedArray[ItemLedgerEntry."Document Type".AsInteger()] += ItemLedgerEntry."Sales Amount (Actual)";
 
                 TmpItemLedgerEntry.Modify();
 

@@ -364,12 +364,10 @@ table 6150621 "NPR POS Entry"
                 //+NPR5.38 [294717]
             end;
         }
-        field(500; "Sales Document Type"; Option)
+        field(500; "Sales Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Sales Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         }
         field(501; "Sales Document No."; Code[20])
         {

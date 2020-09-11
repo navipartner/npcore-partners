@@ -66,7 +66,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014428)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type" <> 4);
+                            Visible = ("Discount Type" <> "Discount Type"::"Multiple Discount Levels");
                             field(Lot; Lot)
                             {
                                 ApplicationArea = All;
@@ -131,7 +131,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014403)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type" = 0);
+                            Visible = ("Discount Type" = "Discount Type"::"Total Amount per Min. Qty.");
                             field("Total Amount"; "Total Amount")
                             {
                                 ApplicationArea = All;
@@ -149,7 +149,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014426)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type" = 4);
+                            Visible = ("Discount Type" = "Discount Type"::"Multiple Discount Levels");
                             field(DiscAmountExclVAT; "Total Amount Excl. VAT")
                             {
                                 ApplicationArea = All;
@@ -164,7 +164,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014404)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type" = 1;
+                            Visible = "Discount Type" = "Discount Type"::"Total Discount %";
                             field("Total Discount %"; "Total Discount %")
                             {
                                 ApplicationArea = All;
@@ -178,7 +178,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014405)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type" = 2;
+                            Visible = "Discount Type" = "Discount Type"::"Total Discount Amt. per Min. Qty.";
                             field("Total Discount Amount"; "Total Discount Amount")
                             {
                                 ApplicationArea = All;
@@ -192,7 +192,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014416)
                         {
                             ShowCaption = false;
-                            Visible = "Discount Type" = 3;
+                            Visible = "Discount Type" = "Discount Type"::"Priority Discount per Min. Qty";
                             field("Item Discount Qty."; "Item Discount Qty.")
                             {
                                 ApplicationArea = All;
@@ -215,7 +215,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014407)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type" <> 2) AND ("Discount Type" <> 4) AND (NOT "Lot");
+                            Visible = ("Discount Type" <> "Discount Type"::"Total Discount Amt. per Min. Qty.") AND ("Discount Type" <> "Discount Type"::"Multiple Discount Levels") AND (NOT "Lot");
                             field(MinimumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, false))
                             {
                                 ApplicationArea = All;
@@ -231,7 +231,7 @@ page 6014450 "NPR Mixed Discount"
                         group(Control6014417)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type" <> 2) AND ("Lot");
+                            Visible = ("Discount Type" <> "Discount Type"::"Total Discount Amt. per Min. Qty.") AND ("Lot");
                             field(Discount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                             {
                                 ApplicationArea = All;

@@ -61,14 +61,14 @@ page 6014460 "NPR Inventory Pick Scan"
                 field("Destination No."; "Destination No.")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 0));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 0));
                     Editable = false;
                     QuickEntry = false;
                 }
-                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationName("Destination Type", "Destination No."))
+                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationName("Destination Type".AsInteger(), "Destination No."))
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 1));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 1));
                     Caption = 'Name';
                     Editable = false;
                 }
@@ -86,13 +86,13 @@ page 6014460 "NPR Inventory Pick Scan"
                 field("External Document No."; "External Document No.")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 2));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 2));
                     QuickEntry = false;
                 }
                 field("External Document No.2"; "External Document No.2")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type", "Source Document", 3));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 3));
                     QuickEntry = false;
                 }
             }
@@ -181,7 +181,7 @@ page 6014460 "NPR Inventory Pick Scan"
                               "No." = FIELD("No.");
                 SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
                               WHERE(Breakbulk = CONST(false));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(WhseActivityLines; "NPR Invt. Pick Subform Scan")
             {
@@ -189,7 +189,7 @@ page 6014460 "NPR Inventory Pick Scan"
                               "No." = FIELD("No.");
                 SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
                               WHERE(Breakbulk = CONST(false));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -201,17 +201,17 @@ page 6014460 "NPR Inventory Pick Scan"
                               "Variant Code" = FIELD("Variant Code"),
                               "Location Code" = FIELD("Location Code");
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -229,7 +229,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Caption = 'List';
                     Image = OpportunitiesList;
                     ShortCutKey = 'Shift+Ctrl+L';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -244,7 +244,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     RunPageLink = "Table Name" = CONST("Whse. Activity Header"),
                                   Type = FIELD(Type),
                                   "No." = FIELD("No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Posted Picks")
                 {
@@ -253,13 +253,13 @@ page 6014460 "NPR Inventory Pick Scan"
                     RunObject = Page "Posted Invt. Pick List";
                     RunPageLink = "Invt Pick No." = FIELD("No.");
                     RunPageView = SORTING("Invt Pick No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Source Documents")
                 {
                     Caption = 'Source Documents';
                     Image = "Order";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -284,7 +284,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -298,7 +298,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 {
                     Caption = 'Autofill Qty. to Handle';
                     Image = AutofillQtyToHandle;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -309,7 +309,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 {
                     Caption = 'Delete Qty. to Handle';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -330,7 +330,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -346,7 +346,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -361,7 +361,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 Image = Print;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -379,7 +379,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Picking List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

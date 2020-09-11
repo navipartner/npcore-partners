@@ -30,7 +30,6 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     ApplicationArea = All;
                     Caption = 'Document Type';
                     Editable = false;
-                    OptionCaption = ' ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund';
                 }
                 field("ApplyingCustLedgEntry.""Document No."""; ApplyingCustLedgEntry."Document No.")
                 {
@@ -315,7 +314,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
             {
                 SubPageLink = "Entry No." = FIELD("Entry No.");
                 Visible = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -335,7 +334,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     RunObject = Page "Reminder/Fin. Charge Entries";
                     RunPageLink = "Customer Entry No." = FIELD("Entry No.");
                     RunPageView = SORTING("Customer Entry No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Applied E&ntries")
                 {
@@ -343,7 +342,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Image = Approve;
                     RunObject = Page "Applied Customer Entries";
                     RunPageOnRec = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Dimensions)
                 {
@@ -351,7 +350,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -366,7 +365,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     RunPageLink = "Cust. Ledger Entry No." = FIELD("Entry No.");
                     RunPageView = SORTING("Cust. Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("&Application")
@@ -381,7 +380,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F11';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -399,7 +398,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -410,7 +409,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 {
                     Caption = 'Preview Posting';
                     Image = ViewPostedOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -425,7 +424,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 {
                     Caption = 'Show Only Selected Entries to Be Applied';
                     Image = ShowSelected;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -453,7 +452,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -777,7 +776,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
         if ApplyingCustLedgEntry."Entry No." <> 0 then
             GenJnlApply.CheckAgainstApplnCurrency(
-              ApplnCurrencyCode, "Currency Code", GenJnlLine."Account Type"::Customer, true);
+              ApplnCurrencyCode, "Currency Code", GenJnlLine."Account Type"::Customer.AsInteger(), true);
 
         CustLedgEntry.Copy(Rec);
         CurrPage.SetSelectionFilter(CustLedgEntry);

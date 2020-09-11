@@ -92,10 +92,10 @@ page 6014649 "NPR Generic Filter Page"
                                         FilterText := RelationFieldRef.Value;
                                     end;
                                 end;
-                            FldRef.OptionString <> '':
+                            FldRef.OptionMembers <> '':
                                 begin
                                     GenericMultipleCheckList.LookupMode := true;
-                                    GenericMultipleCheckList.SetOptions(FldRef.OptionString, FilterText);
+                                    GenericMultipleCheckList.SetOptions(FldRef.OptionMembers, FilterText);
                                     if GenericMultipleCheckList.RunModal = ACTION::LookupOK then
                                         FilterText := GenericMultipleCheckList.GetSelectedOption();
                                 end;
@@ -186,7 +186,7 @@ page 6014649 "NPR Generic Filter Page"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -200,7 +200,7 @@ page 6014649 "NPR Generic Filter Page"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -214,7 +214,7 @@ page 6014649 "NPR Generic Filter Page"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

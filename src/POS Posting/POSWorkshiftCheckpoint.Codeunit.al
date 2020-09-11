@@ -1173,7 +1173,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         //+NPR5.55 [397342]
     end;
 
-    local procedure CheckIsPosted(DocumentType: Option; DocmentNo: Code[20]; var DocDeleted: Boolean): Boolean
+    local procedure CheckIsPosted(DocumentType: Enum "Sales Document Type"; DocmentNo: Code[20]; var DocDeleted: Boolean): Boolean
     var
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";

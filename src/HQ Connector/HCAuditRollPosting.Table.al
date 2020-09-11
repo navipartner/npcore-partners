@@ -271,7 +271,7 @@ table 6150903 "NPR HC Audit Roll Posting"
             Caption = 'No.';
             DataClassification = CustomerContent;
         }
-        field(140; "Sales Document Type"; Integer)
+        field(140; "Sales Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Sales Document Type';
             DataClassification = CustomerContent;
@@ -431,13 +431,10 @@ table 6150903 "NPR HC Audit Roll Posting"
             Caption = 'N3 Debit Sale Conversion';
             DataClassification = CustomerContent;
         }
-        field(6001; "Buffer Document Type"; Option)
+        field(6001; "Buffer Document Type"; Enum "Gen. Journal Document Type")
         {
             Caption = 'Buffer Document Type';
             DataClassification = CustomerContent;
-            Description = 'NP-retail 1.8';
-            OptionCaption = ' ,Payment,Invoice,Credit Note,Interest Note,Reminder';
-            OptionMembers = " ",Betaling,Faktura,Kreditnota,Rentenota,Rykker;
         }
         field(6002; "Buffer ID"; Code[20])
         {

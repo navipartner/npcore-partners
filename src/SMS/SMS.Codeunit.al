@@ -154,7 +154,7 @@ codeunit 6014502 "NPR SMS"
         end;
     end;
 
-    procedure CreateInteractionLog(CustomerNo: Code[20]; SegmentNo: Code[20]; Description: Text[50]; Subject: Text[50]; DocumentType: Integer; DocumentNo: Code[20])
+    procedure CreateInteractionLog(CustomerNo: Code[20]; SegmentNo: Code[20]; Description: Text[50]; Subject: Text[50]; DocumentType: Enum "Interaction Log Entry Document Type"; DocumentNo: Code[20])
     var
         InteractionLogEntry: Record "Interaction Log Entry";
         Contact: Record Contact;

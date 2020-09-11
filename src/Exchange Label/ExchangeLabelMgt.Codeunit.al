@@ -418,7 +418,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
             DATABASE::"Sales Line":
                 begin
                     AssignIntegerFieldValue(Type, RecRef, 'Type');
-                    exit(Type = SalesLine.Type::Item)
+                    exit(Type = SalesLine.Type::Item.AsInteger())
                 end;
             DATABASE::"NPR Sale Line POS":
                 begin

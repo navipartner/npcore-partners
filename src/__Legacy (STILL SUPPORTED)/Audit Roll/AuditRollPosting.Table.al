@@ -20,6 +20,7 @@ table 6014424 "NPR Audit Roll Posting"
     // NPR5.36/TJ  /20170920 CASE 286283 Renamed all the danish OptionString properties to english
     // NPR5.38/TJ  /20171218 CASE 225415 Renumbered fields from range 50xxx to range below 50000
     // NPR5.43/JDH /20180620 CASE 317453 Removed non existing table relation from Field 40 (ref to old Department table 11)
+    // NPR5.55/ALPO/20200907 CASE 420356 Fixed Enum/Option conversion issues
 
     Caption = 'Audit Roll Posting';
 
@@ -394,7 +395,7 @@ table 6014424 "NPR Audit Roll Posting"
         {
             Caption = 'No.';
         }
-        field(140; "Sales Document Type"; Integer)
+        field(140; "Sales Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Sales Document Type';
         }
@@ -580,12 +581,10 @@ table 6014424 "NPR Audit Roll Posting"
         {
             Caption = 'N3 Debit Sale Conversion';
         }
-        field(6001; "Buffer Document Type"; Option)
+        field(6001; "Buffer Document Type"; Enum "Gen. Journal Document Type")
         {
             Caption = 'Buffer Document Type';
             Description = 'NP-retail 1.8';
-            OptionCaption = ' ,Payment,Invoice,Credit Note,Interest Note,Reminder';
-            OptionMembers = " ",Payment,Invoice,"Credit Note","Interest Note",Reminder;
         }
         field(6002; "Buffer ID"; Code[20])
         {

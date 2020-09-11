@@ -145,7 +145,7 @@ codeunit 6151571 "NPR AF Helper Functions"
 
         RecRef.GetTable(RecordVariant);
         FldRef := RecRef.Field(FieldNoInt);
-        OptionString := FldRef.OptionString;
+        OptionString := FldRef.OptionMembers;
 
         Separator := ',';
         Options := OptionString.Split(Separator.ToCharArray());

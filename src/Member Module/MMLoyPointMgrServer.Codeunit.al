@@ -859,7 +859,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         PostingEarnCurrencyCode: Code[10];
         PostingEarnAmount: Decimal;
         InvoiceNo: Code[20];
-        DocType: Option;
+        DocType: Enum "Gen. Journal Document Type";
     begin
 
         case LoyaltyStoreSetup."Reconciliation Period" of
@@ -953,7 +953,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         //  GenJournalLine.INSERT (TRUE);
     end;
 
-    local procedure MakeJournalLine(var GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20]; DocType: Option; AccNo: Code[20]; Description: Text[50]; CurrencyCode: Code[10]; AmountToPost: Decimal; BalanceGLAccont: Code[20]; InvoiceNo: Code[20])
+    local procedure MakeJournalLine(var GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20]; DocType: Enum "Gen. Journal Document Type"; AccNo: Code[20]; Description: Text[50]; CurrencyCode: Code[10]; AmountToPost: Decimal; BalanceGLAccont: Code[20]; InvoiceNo: Code[20])
     begin
 
         GenJournalLine."Line No." += 10000;

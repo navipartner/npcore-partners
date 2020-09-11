@@ -2466,7 +2466,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
                 NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
 
                 if (UpperCase(Format(Format(FieldRef.Type)))) = 'OPTION' then begin
-                    OptionCaption := Format(FieldRef.OptionString);
+                    OptionCaption := Format(FieldRef.OptionMembers);
                     Evaluate(OptionInt, Format(FieldRef.Value));
                     for i := 1 to OptionInt do
                         OptionCaption := DelStr(OptionCaption, 1, StrPos(OptionCaption, ','));

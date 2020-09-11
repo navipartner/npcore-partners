@@ -99,30 +99,30 @@ report 6060042 "NPR Import Excel Item Worksh."
                 {
                     Caption = 'Option';
                     OptionCaption = 'Replace lines,Add lines';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(SetItemsToSkip; SetItemsToSkip)
                 {
                     Caption = 'Set all items to SKIP';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ActionIfVariantUnknown; ActionIfVariantUnknown)
                 {
                     Caption = 'If the Variant does not exist, but the Variety does';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ActionIfVarietyUnknown; ActionIfVarietyUnknown)
                 {
                     Caption = 'If the Variant and Variety do not exist';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(CombineVarieties; CombineVarieties)
                 {
                     Caption = 'Combine Varieties';
                     ToolTip = 'Automatically try to combine all imported lines to item/variety combinations after import.';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -641,8 +641,8 @@ report 6060042 "NPR Import Excel Item Worksh."
                                         if StrPos(UpperCase(FldRef.OptionCaption), UpperCase(ExcelBuf2."Cell Value as Text")) > 0 then
                                             TxtOption := UpperCase(FldRef.OptionCaption)
                                         else
-                                            if StrPos(UpperCase(FldRef.OptionString), UpperCase(ExcelBuf2."Cell Value as Text")) > 0 then
-                                                TxtOption := UpperCase(FldRef.OptionString);
+                                            if StrPos(UpperCase(FldRef.OptionMembers), UpperCase(ExcelBuf2."Cell Value as Text")) > 0 then
+                                                TxtOption := UpperCase(FldRef.OptionMembers);
                                         if TxtOption <> '' then begin
                                             //Option as Text
                                             if TxtOption[1] = ',' then

@@ -286,13 +286,11 @@ table 6151015 "NPR NpRv Sales Line"
             OptionCaption = 'POS,Sales Document,Payment Line';
             OptionMembers = POS,"Sales Document","Payment Line";
         }
-        field(410; "Document Type"; Option)
+        field(410; "Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         }
         field(420; "Document No."; Code[20])
         {

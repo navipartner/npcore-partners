@@ -22,12 +22,10 @@ table 6151409 "NPR Magento Payment Line"
             Caption = 'Document Table No.';
             DataClassification = CustomerContent;
         }
-        field(5; "Document Type"; Option)
+        field(5; "Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         }
         field(10; "Document No."; Code[20])
         {
@@ -53,12 +51,10 @@ table 6151409 "NPR Magento Payment Line"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(24; "Account Type"; Option)
+        field(24; "Account Type"; Enum "Payment Balance Account Type")
         {
             Caption = 'Account Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'G/L Account,Bank Account';
-            OptionMembers = "G/L Account","Bank Account";
         }
         field(25; "Account No."; Code[20])
         {

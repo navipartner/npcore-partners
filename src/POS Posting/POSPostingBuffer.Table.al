@@ -188,12 +188,10 @@ table 6150634 "NPR POS Posting Buffer"
             Caption = 'VAT Amount';
             DataClassification = CustomerContent;
         }
-        field(71; "VAT Calculation Type"; Option)
+        field(71; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(72; "VAT Base Amount"; Decimal)
         {
@@ -256,13 +254,10 @@ table 6150634 "NPR POS Posting Buffer"
             Caption = 'VAT Amount Discount (LCY)';
             DataClassification = CustomerContent;
         }
-        field(90; "Applies-to Doc. Type"; Option)
+        field(90; "Applies-to Doc. Type"; Enum "Gen. Journal Document Type")
         {
             Caption = 'Applies-to Doc. Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.38';
-            OptionCaption = ' ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund';
-            OptionMembers = " ",Payment,Invoice,"Credit Memo","Finance Charge Memo",Reminder,Refund;
         }
         field(91; "Applies-to Doc. No."; Code[20])
         {

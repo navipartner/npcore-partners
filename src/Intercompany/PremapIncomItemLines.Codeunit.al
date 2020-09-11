@@ -725,7 +725,7 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             // Find a posted purchase invoice that has the specified Vendor Invoice No.
             PurchInvHeader.SetRange("Vendor Invoice No.", VendorInvoiceNo);
             if PurchInvHeader.FindFirst then begin
-                AppliesToDocTypeAsInteger := PurchaseHeader."Applies-to Doc. Type"::Invoice;
+                AppliesToDocTypeAsInteger := PurchaseHeader."Applies-to Doc. Type"::Invoice.AsInteger();
                 InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Header",
                   PurchaseHeader.FieldNo("Applies-to Doc. Type"), 0, RecordNo, Format(AppliesToDocTypeAsInteger));
                 InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Header",
@@ -1469,41 +1469,34 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
           DocumentType);
     end;
 
-    local procedure GetDocumentType(EntryNo: Integer; CurrRecNo: Integer): Integer
+    local procedure GetDocumentType(EntryNo: Integer; CurrRecNo: Integer): Enum "Purchase Document Type"
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseHeader: Record "Purchase Header";
         DocumentTypeTxt: Text[250];
-        DocumentType: Integer;
+        DocumentTypeOrdinal: Integer;
     begin
-        DocumentType := -1;
+        DocumentTypeOrdinal := -1;
         with IntermediateDataImport do begin
             DocumentTypeTxt := GetEntryValue(EntryNo, DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Document Type"), 0, CurrRecNo);
-            if Evaluate(DocumentType, DocumentTypeTxt) then;
+            if Evaluate(DocumentTypeOrdinal, DocumentTypeTxt) then;
         end;
-        exit(DocumentType)
+        exit(Enum::"Purchase Document Type".FromInteger(DocumentTypeOrdinal))
     end;
 
-    procedure GetDocumentTypeOptionString(OptionIndex: Integer): Text[250]
+    procedure GetDocumentTypeOptionString(PurchDocType: Enum "Purchase Document Type"): Text[250]
     var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseHeaderRecRef: RecordRef;
-        DocumentTypeFieldRef: FieldRef;
+        EnumIndex: Integer;
+        EnumValueName: Text;
     begin
-        PurchaseHeaderRecRef.Open(DATABASE::"Purchase Header");
-        DocumentTypeFieldRef := PurchaseHeaderRecRef.Field(PurchaseHeader.FieldNo("Document Type"));
-        exit(UpperCase(SelectStr(OptionIndex + 1, DocumentTypeFieldRef.OptionString)));
+        EnumIndex := PurchDocType.Ordinals().IndexOf(PurchDocType.AsInteger());
+        PurchDocType.Names().Get(EnumIndex, EnumValueName);
+        exit(UpperCase(EnumValueName));
     end;
 
-    procedure GetDocumentTypeOptionCaption(OptionIndex: Integer): Text[250]
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseHeaderRecRef: RecordRef;
-        DocumentTypeFieldRef: FieldRef;
+    procedure GetDocumentTypeOptionCaption(PurchDocType: Enum "Purchase Document Type"): Text[250]
     begin
-        PurchaseHeaderRecRef.Open(DATABASE::"Purchase Header");
-        DocumentTypeFieldRef := PurchaseHeaderRecRef.Field(PurchaseHeader.FieldNo("Document Type"));
-        exit(UpperCase(SelectStr(OptionIndex + 1, DocumentTypeFieldRef.OptionCaption)));
+        exit(UpperCase(Format(PurchDocType)));
     end;
 
     procedure ConstructDocumenttypeUnknownErr(): Text
@@ -1528,7 +1521,7 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
         TextToAccountMapping: Record "Text-to-Account Mapping";
         PurchaseHeader: Record "Purchase Header";
-        DocumentType: Option;
+        DocumentType: Enum "Purchase Document Type";
         DefaultGLAccount: Code[20];
     begin
         DocumentType := GetDocumentType(EntryNo, HeaderRecordNo);
