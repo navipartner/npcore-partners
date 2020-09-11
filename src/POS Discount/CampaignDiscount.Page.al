@@ -79,9 +79,8 @@ page 6014453 "NPR Campaign Discount"
                 {
                     ApplicationArea = All;
                 }
-                field("CommentBoolean"; Comment)
+                field(Control6014404; Comment)
                 {
-                    Caption = 'Comment';
                     ApplicationArea = All;
                     ShowCaption = false;
                 }
@@ -166,7 +165,7 @@ page 6014453 "NPR Campaign Discount"
             {
                 SubPageLink = Code = FIELD(Code);
                 Visible = SubFormVisible;
-                ApplicationArea = All;
+                ApplicationArea=All;
             }
         }
     }
@@ -183,7 +182,7 @@ page 6014453 "NPR Campaign Discount"
                 RunPageLink = "Table ID" = CONST(6014413),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea = All;
+                ApplicationArea=All;
 
                 trigger OnAction()
                 var
@@ -207,14 +206,14 @@ page 6014453 "NPR Campaign Discount"
                     RunObject = Page "NPR Retail Comments";
                     RunPageLink = "Table ID" = CONST(6014413),
                                   "No." = FIELD(Code);
-                    ApplicationArea = All;
+                    ApplicationArea=All;
                 }
                 action("Item Card")
                 {
                     Caption = 'Item Card';
                     Image = Item;
                     ShortCutKey = 'Shift+Ctrl+C';
-                    ApplicationArea = All;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -239,7 +238,7 @@ page 6014453 "NPR Campaign Discount"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+                    ApplicationArea=All;
                 }
                 action(PriceLabel)
                 {
@@ -248,7 +247,7 @@ page 6014453 "NPR Campaign Discount"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+                    ApplicationArea=All;
                 }
             }
             group("&Functions")
@@ -262,7 +261,7 @@ page 6014453 "NPR Campaign Discount"
                     {
                         Caption = 'Transfer Item';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -285,7 +284,7 @@ page 6014453 "NPR Campaign Discount"
                     {
                         Caption = 'Transfer from Item Group';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -307,7 +306,7 @@ page 6014453 "NPR Campaign Discount"
                     {
                         Caption = 'Transfer from Vendor';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -329,13 +328,13 @@ page 6014453 "NPR Campaign Discount"
                     {
                         Caption = 'Transfer from Period Discount';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+                        ApplicationArea=All;
                     }
                     action("Transfer all Items")
                     {
                         Caption = 'Transfer all Items';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+                        ApplicationArea=All;
 
                         trigger OnAction()
                         var
@@ -355,7 +354,7 @@ page 6014453 "NPR Campaign Discount"
                 {
                     Caption = '&Read from scanner';
                     Image = "Action";
-                    ApplicationArea = All;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -368,7 +367,7 @@ page 6014453 "NPR Campaign Discount"
                 {
                     Caption = 'Copy to all companies';
                     Image = Copy;
-                    ApplicationArea = All;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     begin
@@ -384,7 +383,7 @@ page 6014453 "NPR Campaign Discount"
                 {
                     Caption = 'Send to Retail Journal';
                     Image = SendTo;
-                    ApplicationArea = All;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -424,7 +423,7 @@ page 6014453 "NPR Campaign Discount"
                 {
                     Caption = 'Copy Campaign Discount';
                     Image = CopyDocument;
-                    ApplicationArea = All;
+                    ApplicationArea=All;
 
                     trigger OnAction()
                     var
@@ -461,7 +460,7 @@ page 6014453 "NPR Campaign Discount"
                 Caption = 'Inventory Campaign Stat.';
                 Image = "Report";
                 RunObject = Report "NPR Inventory Campaign Stat.";
-                ApplicationArea = All;
+                ApplicationArea=All;
             }
         }
     }
