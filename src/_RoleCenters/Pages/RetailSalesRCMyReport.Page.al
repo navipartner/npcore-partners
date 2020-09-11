@@ -18,14 +18,14 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 part(Control6150638; "NPR Discount Activities")
                 {
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 group(Control6151401)
                 {
                     ShowCaption = false;
                     part(Control6150616; "NPR Retail Activities")
                     {
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -34,15 +34,15 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 ShowCaption = false;
                 part(Control6150615; "NPR Retail Top 10 Customers")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6150614; "NPR Retail 10 Items by Qty.")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6150613; "NPR Retail Top 10 S.person")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Control6150632)
@@ -50,20 +50,20 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 ShowCaption = false;
                 part(Control6150617; "NPR Retail Sales Chart")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6014405; "NPR RSS Reader Activ.")
                 {
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6014403; "NPR Retail Sales Chart by Shop")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6014406; "NPR My Reports")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -78,138 +78,138 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Attributes';
                 RunObject = Page "NPR Magento Attributes";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Attribute Sets")
             {
                 Caption = 'Attribute Sets';
                 RunObject = Page "NPR Magento Attribute Sets";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Audit Roll")
             {
                 Caption = 'Audit Roll';
                 RunObject = Page "NPR Audit Roll";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Brands)
             {
                 Caption = 'Brands';
                 RunObject = Page "NPR Magento Brands";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Customers ")
             {
                 Caption = 'Customers';
                 RunObject = Page "Customer List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Customer Repair")
             {
                 Caption = 'Customer Repair';
                 RunObject = Page "NPR Customer Repair List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Contact List ")
             {
                 Caption = 'Contact List';
                 RunObject = Page "Contact List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Credit Vouchers")
             {
                 Caption = 'Credit Vouchers';
                 RunObject = Page "NPR Credit Voucher List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Gift Vouchers")
             {
                 Caption = 'Gift Vouchers';
                 RunObject = Page "NPR Gift Voucher List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Item List")
             {
                 Caption = 'Item List';
                 RunObject = Page "NPR Retail Item List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Magento Item List")
             {
                 Caption = '  Magento Items';
                 RunObject = Page "NPR Retail Item List";
                 RunPageLink = "NPR Magento Item" = CONST(true);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Item Groups")
             {
                 Caption = 'Item Groups';
                 RunObject = Page "NPR Item Group Tree";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Magento Item Groups")
             {
                 Caption = 'Magento Item Groups';
                 RunObject = Page "NPR Magento Categories";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(MixedDiscounts)
             {
                 Caption = 'Mixed Discounts';
                 RunObject = Page "NPR Mixed Discount List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(PeriodDiscounts)
             {
                 Caption = 'Period Discounts';
                 RunObject = Page "NPR Campaign Discount List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Pictures)
             {
                 Caption = 'Pictures';
                 RunObject = Page "NPR Magento Pictures";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Purchase Orders")
             {
                 Caption = 'Purchase Orders';
                 RunObject = Page "Purchase Order List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Retail Documents")
             {
                 Caption = 'Retail Documents';
                 RunObject = Page "NPR Retail Document List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Retail Journal")
             {
                 Caption = 'Retail Journal';
                 RunObject = Page "NPR Retail Journal List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales Orders")
             {
                 Caption = 'Sales Orders';
                 RunObject = Page "Sales Order List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales Ticket Statistics")
             {
                 Caption = 'Sales Ticket Statistics';
                 RunObject = Page "NPR Sales Ticket Statistics";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Transfer Orders")
             {
                 Caption = 'Transfer Orders';
                 RunObject = Page "Transfer Orders";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(reporting)
@@ -219,7 +219,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'S&tatement';
                 Image = "Report";
                 RunObject = Report Statement;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150667)
             {
@@ -229,21 +229,21 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Customer - Order Su&mmary';
                 Image = "Report";
                 RunObject = Report "Customer - Order Summary";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Customer - T&op 10 List")
             {
                 Caption = 'Customer - T&op 10 List';
                 Image = "Report";
                 RunObject = Report "Customer - Top 10 List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Customer/&Item Sales")
             {
                 Caption = 'Customer/&Item Sales';
                 Image = "Report";
                 RunObject = Report "Customer/Item Sales";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150663)
             {
@@ -253,14 +253,14 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Salesperson - Sales &Statistics';
                 Image = "Report";
                 RunObject = Report "Salesperson - Sales Statistics";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Price &List")
             {
                 Caption = 'Price &List';
                 Image = "Report";
                 RunObject = Report "Price List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150660)
             {
@@ -270,7 +270,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Inventory - Sales &Back Orders';
                 Image = "Report";
                 RunObject = Report "Inventory - Sales Back Orders";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150658)
             {
@@ -280,21 +280,21 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&G/L Trial Balance';
                 Image = "Report";
                 RunObject = Report "Trial Balance";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Trial Balance by &Period")
             {
                 Caption = 'Trial Balance by &Period';
                 Image = "Report";
                 RunObject = Report "Trial Balance by Period";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Closing T&rial Balance")
             {
                 Caption = 'Closing T&rial Balance';
                 Image = "Report";
                 RunObject = Report "Closing Trial Balance";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150654)
             {
@@ -304,21 +304,21 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Aged Ac&counts Receivable';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Receivable";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Aged Accounts Pa&yable")
             {
                 Caption = 'Aged Accounts Pa&yable';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Payable";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Reconcile Cust. and &Vend. Accs")
             {
                 Caption = 'Reconcile Cust. and &Vend. Accs';
                 Image = "Report";
                 RunObject = Report "Reconcile Cust. and Vend. Accs";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150650)
             {
@@ -328,42 +328,42 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'VAT Registration No. Chec&k';
                 Image = "Report";
                 RunObject = Report "VAT Registration No. Check";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("VAT E&xceptions")
             {
                 Caption = 'VAT E&xceptions';
                 Image = "Report";
                 RunObject = Report "VAT Exceptions";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("V&AT Statement")
             {
                 Caption = 'V&AT Statement';
                 Image = "Report";
                 RunObject = Report "VAT Statement";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("VAT-VIES Declaration Tax A&uth")
             {
                 Caption = 'VAT-VIES Declaration Tax A&uth';
                 Image = "Report";
                 RunObject = Report "VAT- VIES Declaration Tax Auth";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("VAT - VIES Declaration &Disk")
             {
                 Caption = 'VAT - VIES Declaration &Disk';
                 Image = "Report";
                 RunObject = Report "VAT- VIES Declaration Disk";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("EC Sal&es List")
             {
                 Caption = 'EC Sal&es List';
                 Image = "Report";
                 RunObject = Report "EC Sales List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(sections)
@@ -378,7 +378,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(Item),
                                         Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Physical Inventory Journals")
                 {
@@ -386,7 +386,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
                                         Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Revaluation Journals")
                 {
@@ -394,21 +394,21 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(Revaluation),
                                         Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Resource Journals")
                 {
                     Caption = 'Resource Journals';
                     RunObject = Page "Resource Jnl. Batches";
                     RunPageView = WHERE(Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("FA Journals")
                 {
                     Caption = 'FA Journals';
                     RunObject = Page "FA Journal Batches";
                     RunPageView = WHERE(Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Cash Receipt Journals")
                 {
@@ -417,7 +417,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "General Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
                                         Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Payment Journals")
                 {
@@ -426,7 +426,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "General Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(Payments),
                                         Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("General Journals")
                 {
@@ -435,7 +435,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "General Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(General),
                                         Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Recurring Journals")
                 {
@@ -443,7 +443,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "General Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(General),
                                         Recurring = CONST(true));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Worksheets)
@@ -456,7 +456,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     RunObject = Page "Req. Wksh. Names";
                     RunPageView = WHERE("Template Type" = CONST("Req."),
                                         Recurring = CONST(false));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("Posted Documents")
@@ -468,53 +468,53 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     Caption = 'Posted Sales Shipments';
                     Image = PostedShipment;
                     RunObject = Page "Posted Sales Shipments";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Posted Sales Invoices")
                 {
                     Caption = 'Posted Sales Invoices';
                     Image = PostedOrder;
                     RunObject = Page "Posted Sales Invoices";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Posted Sales Credit Memos")
                 {
                     Caption = 'Posted Sales Credit Memos';
                     Image = PostedOrder;
                     RunObject = Page "Posted Sales Credit Memos";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Posted Purchase Receipts")
                 {
                     Caption = 'Posted Purchase Receipts';
                     RunObject = Page "Posted Purchase Receipts";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Posted Purchase Invoices")
                 {
                     Caption = 'Posted Purchase Invoices';
                     RunObject = Page "Posted Purchase Invoices";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Posted Purchase Credit Memos")
                 {
                     Caption = 'Posted Purchase Credit Memos';
                     RunObject = Page "Posted Purchase Credit Memos";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Issued Reminders")
                 {
                     Caption = 'Issued Reminders';
                     Image = OrderReminder;
                     RunObject = Page "Issued Reminder List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Issued Fin. Charge Memos")
                 {
                     Caption = 'Issued Fin. Charge Memos';
                     Image = PostedMemo;
                     RunObject = Page "Issued Fin. Charge Memo List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Finance)
@@ -525,47 +525,47 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 {
                     Caption = 'VAT Statements';
                     RunObject = Page "VAT Statement Names";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Chart of Accounts")
                 {
                     Caption = 'Chart of Accounts';
                     RunObject = Page "Chart of Accounts";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Bank Accounts")
                 {
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
                     RunObject = Page "Bank Account List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Currencies)
                 {
                     Caption = 'Currencies';
                     Image = Currency;
                     RunObject = Page Currencies;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Accounting Periods")
                 {
                     Caption = 'Accounting Periods';
                     Image = AccountingPeriods;
                     RunObject = Page "Accounting Periods";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Dimensions)
                 {
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page Dimensions;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Bank Account Posting Groups")
                 {
                     Caption = 'Bank Account Posting Groups';
                     RunObject = Page "Bank Account Posting Groups";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Marketing)
@@ -577,14 +577,14 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     Caption = 'Contacts';
                     Image = CustomerContact;
                     RunObject = Page "Contact List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("To-dos")
                 {
                     Caption = 'To-dos';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Sales)
@@ -596,54 +596,54 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     Caption = 'Assembly BOM';
                     Image = AssemblyBOM;
                     RunObject = Page "Assembly BOM";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Sales Credit Memos")
                 {
                     Caption = 'Sales Credit Memos';
                     RunObject = Page "Sales Credit Memos";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Standard Sales Codes")
                 {
                     Caption = 'Standard Sales Codes';
                     RunObject = Page "Standard Sales Codes";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Salespeople/Purchasers")
                 {
                     Caption = 'Salespeople/Purchasers';
                     RunObject = Page "Salespersons/Purchasers";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Customer Invoice Discount")
                 {
                     Caption = 'Customer Invoice Discount';
                     RunObject = Page "Cust. Invoice Discounts";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Purchase)
             {
                 Caption = 'Purchase';
-                Image = purchasing;
+                Image = Purchasing;
                 action("Standard Purchase Codes")
                 {
                     Caption = 'Standard Purchase Codes';
                     RunObject = Page "Standard Purchase Codes";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Vendor Invoice Discounts")
                 {
                     Caption = 'Vendor Invoice Discounts';
                     RunObject = Page "Vend. Invoice Discounts";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Item Discount Groups")
                 {
                     Caption = 'Item Discount Groups';
                     RunObject = Page "Item Disc. Groups";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Resources)
@@ -654,27 +654,27 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 {
                     Caption = 'Resources';
                     RunObject = Page "Resource List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Resource Groups")
                 {
                     Caption = 'Resource Groups';
                     RunObject = Page "Resource Groups";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Resource Price Changes")
                 {
                     Caption = 'Resource Price Changes';
                     Image = ResourcePrice;
                     RunObject = Page "Resource Price Changes";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Resource Registers")
                 {
                     Caption = 'Resource Registers';
                     Image = ResourceRegisters;
                     RunObject = Page "Resource Registers";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("Human Resources")
@@ -686,7 +686,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     Caption = 'Employees';
                     Image = Employee;
                     RunObject = Page "Employee List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("Fixed Assets")
@@ -697,7 +697,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 {
                     Caption = 'Fixed Assets';
                     RunObject = Page "Fixed Asset List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Administration)
@@ -709,38 +709,38 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                     Caption = 'User Setup';
                     Image = UserSetup;
                     RunObject = Page "User Setup";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Data Templates List")
                 {
                     Caption = 'Data Templates List';
                     RunObject = Page "Config. Template List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Base Calendar List")
                 {
                     Caption = 'Base Calendar List';
                     RunObject = Page "Base Calendar List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Post Codes")
                 {
                     Caption = 'Post Codes';
                     RunObject = Page "Post Codes";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Reason Codes")
                 {
                     Caption = 'Reason Codes';
                     RunObject = Page "Reason Codes";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Extended Texts")
                 {
                     Caption = 'Extended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -755,7 +755,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 //PromotedCategory = Process;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales &Order")
             {
@@ -766,7 +766,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 //PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales Credit &Memo")
             {
@@ -777,7 +777,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 //PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("&Sales Reminder")
             {
@@ -788,7 +788,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 //PromotedCategory = Process;
                 RunObject = Page Reminder;
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150698)
             {
@@ -802,7 +802,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 //PromotedCategory = Process;
                 RunObject = Page "Vendor Card";
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("&Purchase Order")
             {
@@ -813,7 +813,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 //PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -828,69 +828,69 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Cash Receipt &Journal';
                 Image = CashReceiptJournal;
                 RunObject = Page "Cash Receipt Journal";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Vendor Pa&yment Journal")
             {
                 Caption = 'Vendor Pa&yment Journal';
                 Image = VendorPaymentJournal;
                 RunObject = Page "Payment Journal";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales Price &Worksheet")
             {
                 Caption = 'Sales Price &Worksheet';
                 Image = PriceWorksheet;
                 RunObject = Page "Sales Price Worksheet";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales P&rices")
             {
                 Caption = 'Sales P&rices';
                 Image = SalesPrices;
                 RunObject = Page "Sales Prices";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales &Line Discounts")
             {
                 Caption = 'Sales &Line Discounts';
                 Image = SalesLineDisc;
                 RunObject = Page "Sales Line Discounts";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Create Electronic Credit Memos")
             {
                 Caption = 'Create Electronic Credit Memos';
                 Image = ElectronicDoc;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunObject = Report Report13601;
             }
             action("Create Electronic Reminders")
             {
                 Caption = 'Create Electronic Reminders';
                 Image = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunObject = Report Report13602;
             }
             action("Create Electronic Fin. Chrg. Memos")
             {
                 Caption = 'Create Electronic Fin. Chrg. Memos';
                 Image = ElectronicDoc;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunObject = Report Report13603;
             }
             action("Create Electronic Service Invoices")
             {
                 Caption = 'Create Electronic Service Invoices';
                 Image = ElectronicDoc;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunObject = Report Report13604;
             }
             action("Create Electronic Service Credit Memos")
             {
                 Caption = 'Create Electronic Service Credit Memos';
                 Image = ElectronicDoc;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunObject = Report Report13605;
             }
             separator(Separator6150682)
@@ -901,14 +901,14 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&Bank Account Reconciliation';
                 Image = BankAccountRec;
                 RunObject = Page "Bank Acc. Reconciliation";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Payment Registration")
             {
                 Caption = 'Payment Registration';
                 Image = Payment;
                 RunObject = Codeunit "Payment Registration Mgt.";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Adjust E&xchange Rates")
             {
@@ -916,21 +916,21 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Ellipsis = true;
                 Image = AdjustExchangeRates;
                 RunObject = Report "Adjust Exchange Rates";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Adjust &Item Costs/Prices")
             {
                 Caption = 'Adjust &Item Costs/Prices';
                 Image = AdjustItemCost;
                 RunObject = Report "Adjust Item Costs/Prices";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Adjust &Cost - Item Entries")
             {
                 Caption = 'Adjust &Cost - Item Entries';
                 Image = AdjustEntries;
                 RunObject = Report "Adjust Cost - Item Entries";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Post Inve&ntory Cost to G/L")
             {
@@ -938,7 +938,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Ellipsis = true;
                 Image = PostInventoryToGL;
                 RunObject = Report "Post Inventory Cost to G/L";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Calc. and Post VAT Settlem&ent")
             {
@@ -946,7 +946,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Ellipsis = true;
                 Image = SettleOpenTransactions;
                 RunObject = Report "Calc. and Post VAT Settlement";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150674)
             {
@@ -958,14 +958,14 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'General Le&dger Setup';
                 Image = Setup;
                 RunObject = Page "General Ledger Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("S&ales && Receivables Setup")
             {
                 Caption = 'S&ales && Receivables Setup';
                 Image = Setup;
                 RunObject = Page "Sales & Receivables Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(History)
             {
@@ -977,7 +977,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Navi&gate';
                 Image = Navigate;
                 RunObject = Page Navigate;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
