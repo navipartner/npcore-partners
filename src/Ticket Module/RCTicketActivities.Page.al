@@ -21,17 +21,17 @@ page 6060108 "NPR RC Ticket Activities"
                 field("Event Capacity 1"; "Event Capacity 1")
                 {
                     ApplicationArea = All;
-                    Image = people;
+                    Image = People;
                 }
                 field("Event Open Reservations 1"; "Event Open Reservations 1")
                 {
                     ApplicationArea = All;
-                    Image = person;
+                    Image = Person;
                 }
                 field("Event Admitted 1"; "Event Admitted 1")
                 {
                     ApplicationArea = All;
-                    Image = person;
+                    Image = Person;
                 }
                 field("Event Utilization Avg. 1"; "Event Utilization Avg. 1")
                 {
@@ -55,17 +55,17 @@ page 6060108 "NPR RC Ticket Activities"
                 field("Event Capacity 2"; "Event Capacity 2")
                 {
                     ApplicationArea = All;
-                    Image = people;
+                    Image = People;
                 }
                 field("Event Open Reservations 2"; "Event Open Reservations 2")
                 {
                     ApplicationArea = All;
-                    Image = person;
+                    Image = Person;
                 }
                 field("Event Admitted 2"; "Event Admitted 2")
                 {
                     ApplicationArea = All;
-                    Image = person;
+                    Image = Person;
                 }
                 field("Event Utilization Avg. 2"; "Event Utilization Avg. 2")
                 {
@@ -84,7 +84,7 @@ page 6060108 "NPR RC Ticket Activities"
             {
                 Caption = 'Set Up Cues';
                 Image = Setup;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

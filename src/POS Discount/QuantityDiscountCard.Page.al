@@ -82,7 +82,7 @@ page 6014466 "NPR Quantity Discount Card"
                 SubPageLink = "Item No." = FIELD("Item No."),
                               "Main no." = FIELD("Main No.");
                 Visible = ActionVisible;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -90,7 +90,7 @@ page 6014466 "NPR Quantity Discount Card"
             part(Control6150634; "Item Invoicing FactBox")
             {
                 SubPageLink = "No." = FIELD("Item No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -107,7 +107,7 @@ page 6014466 "NPR Quantity Discount Card"
                 RunPageLink = "Table ID" = CONST(6014439),
                               "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -121,7 +121,7 @@ page 6014466 "NPR Quantity Discount Card"
                 Caption = 'List';
                 Image = List;
                 RunObject = Page "NPR Quantity Discount List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6150623)
             {
@@ -129,8 +129,8 @@ page 6014466 "NPR Quantity Discount Card"
             action("Send to Retail Journal")
             {
                 Caption = 'Send to Retail Journal';
-                Image = sendTo;
-                ApplicationArea=All;
+                Image = SendTo;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -168,7 +168,7 @@ page 6014466 "NPR Quantity Discount Card"
             {
                 Caption = 'Copy Multiple Price Discount';
                 Image = CopyDocument;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
