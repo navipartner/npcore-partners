@@ -416,10 +416,6 @@ dotnet
         {
         }
 
-        type("System.Enum"; "NPRNetEnum")
-        {
-        }
-
         type("System.Globalization.NumberFormatInfo"; "NPRNetNumberFormatInfo")
         {
         }
