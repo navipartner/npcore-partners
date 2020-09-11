@@ -66,9 +66,31 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         //+NPR5.53 [349793]
     end;
 
-    local procedure "// Aux"()
-    begin
+    procedure MoveFileRequest(SourcePath: Text; DestinationPath: Text);
+    var
+        Content: JsonObject;
+        Caption: Label 'Moving file...';
+        
+            begin
+        Content.Add('operation', 'move');
+        Content.Add('source', SourcePath);
+        Content.Add('destination', DestinationPath);
+
+        SendGenericRequest('File', Content, Caption);
     end;
+
+    procedure SendGenericRequest(RequestType: Text; RequestContent: JsonObject; WindowCaption: Text)
+    var
+        Content: Text;
+    begin
+        RequestContent.WriteTo(Content);
+        Commit;
+
+        if not TrySendGenericRequest(RequestType, Content, WindowCaption) then
+            Message(GetLastErrorText);
+    end;
+
+    // Auxilliary functions
 
     [TryFunction]
     local procedure TrySendGenericRequest(Handler: Text; Content: Text; Caption: Text)
