@@ -54,7 +54,7 @@ page 6059972 "NPR Variety Table"
             action(Values)
             {
                 Caption = 'Values';
-                Image = "table";
+                Image = "Table";
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
@@ -62,7 +62,7 @@ page 6059972 "NPR Variety Table"
                 RunPageLink = Type = FIELD(Type),
                               Table = FIELD(Code);
                 RunPageView = SORTING(Type, Table, Value);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

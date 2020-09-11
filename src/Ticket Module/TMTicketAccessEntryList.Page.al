@@ -73,7 +73,7 @@ page 6059786 "NPR TM Ticket AccessEntry List"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Det. Ticket AccessEntry";
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunPageLink = "Ticket Access Entry No."=FIELD("Entry No.");
             }
         }
@@ -83,7 +83,7 @@ page 6059786 "NPR TM Ticket AccessEntry List"
             {
                 Caption = 'Register Arrival';
                 Image = Approve;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -104,7 +104,7 @@ page 6059786 "NPR TM Ticket AccessEntry List"
             {
                 Caption = 'Register Departure';
                 Image = DefaultFault;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -119,8 +119,8 @@ page 6059786 "NPR TM Ticket AccessEntry List"
             action("Block/Unblock")
             {
                 Caption = 'Block/Unblock';
-                Image = change;
-                ApplicationArea=All;
+                Image = Change;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

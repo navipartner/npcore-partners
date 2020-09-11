@@ -2274,7 +2274,7 @@ page 6014425 "NPR Retail Item Card"
             group("Master Data")
             {
                 Caption = 'Master Data';
-                Image = "<DataEntry>";
+                Image = "DataEntry";
                 action("&Units of Measure")
                 {
                     Caption = '&Units of Measure';

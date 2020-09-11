@@ -11,7 +11,7 @@ page 6060145 "NPR MM Member Info Cap. Camera"
         {
             usercontrol(Camera; "NPRNaviPartner.POS.Camera")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
                 trigger SaveCompleted(HTML: Text)
                 var
                     OutS: OutStream;
@@ -56,7 +56,7 @@ page 6060145 "NPR MM Member Info Cap. Camera"
                 Image = Save;
                 InFooterBar = true;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -66,10 +66,10 @@ page 6060145 "NPR MM Member Info Cap. Camera"
             action("Snap Photo")
             {
                 Caption = 'Snap Photo';
-                Image = camera;
+                Image = Camera;
                 InFooterBar = true;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

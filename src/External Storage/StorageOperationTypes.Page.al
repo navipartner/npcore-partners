@@ -41,7 +41,7 @@ page 6184893 "NPR Storage Operation Types"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -64,7 +64,7 @@ page 6184893 "NPR Storage Operation Types"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -83,11 +83,11 @@ page 6184893 "NPR Storage Operation Types"
             action(CopyParamToClipboard)
             {
                 Caption = 'Create & Copy Job Parameter';
-                Image = Selectentries;
+                Image = SelectEntries;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
