@@ -1,26 +1,19 @@
 codeunit 6151493 "NPR Raptor API"
 {
-    // NPR5.51/CLVA/20190710  CASE 355871 Object created
-    // NPR5.53/ALPO/20191119 CASE 377727 Raptor integration enhancements
-
-
     trigger OnRun()
     begin
     end;
 
     procedure SendRaptorRequest(BaseUrl: Text; Path: Text; var ErrorMsg: Text) Result: Text
     var
-        Parameters: DotNet NPRNetDictionary_Of_T_U;
-        HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
+        Parameters: Dictionary of [Text, Text];
         RequestStatus: Boolean;
     begin
-        Parameters := Parameters.Dictionary();
         Parameters.Add('baseurl', BaseUrl);
         Parameters.Add('restmethod', 'GET');
         Parameters.Add('path', Path);
 
-        RequestStatus := CallRaptorAPI(Parameters, HttpResponseMessage);
-        Result := HttpResponseMessage.Content.ReadAsStringAsync.Result;
+        RequestStatus := CallRaptorAPI(Parameters, Result);
 
         if not RequestStatus then begin
             ErrorMsg := Result;
@@ -28,47 +21,55 @@ codeunit 6151493 "NPR Raptor API"
         end;
     end;
 
-    procedure CallRaptorAPI(var Parameters: DotNet NPRNetDictionary_Of_T_U; var HttpResponseMessage: DotNet NPRNetHttpResponseMessage): Boolean
+    procedure CallRaptorAPI(var Parameters: Dictionary of [Text, Text]; var ResponseMsgTxt: Text): Boolean
     var
-        HttpContent: DotNet NPRNetHttpContent;
-        HttpClient: DotNet NPRNetHttpClient;
-        AuthHeaderValue: DotNet NPRNetAuthenticationHeaderValue;
-        EntityTagHeaderValue: DotNet NPRNetEntityTagHeaderValue;
-        Uri: DotNet NPRNetUri;
-        Bytes: DotNet NPRNetArray;
-        Encoding: DotNet NPRNetEncoding;
-        Convert: DotNet NPRNetConvert;
-        HttpRequestMessage: DotNet NPRNetHttpRequestMessage;
-        HttpMethod: DotNet NPRNetHttpMethod;
+        Base64Convert: Codeunit "Base64 Convert";
+        Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        RequestMsg: HttpRequestMessage;
+        ResponseMsg: HttpResponseMessage;
+        AuthText: Text;
     begin
-        HttpClient := HttpClient.HttpClient();
-        HttpClient.BaseAddress := Uri.Uri(Format(Parameters.Item('baseurl')));
+        RequestMsg.Method := Format(Parameters.get('restmethod'));
+        if Parameters.ContainsKey('path') then
+            RequestMsg.SetRequestUri(strsubstno('%1%2', Parameters.get('baseurl'), Parameters.Get('path')))
+        else
+            RequestMsg.SetRequestUri(Parameters.get('baseurl'));
 
-        HttpRequestMessage :=
-          HttpRequestMessage.HttpRequestMessage(HttpMethod.HttpMethod(UpperCase(Format(Parameters.Item('restmethod')))),
-                                                Format(Parameters.Item('path')));
-        ;
+        RequestMsg.GetHeaders(Headers);
+        Headers.Add('User-Agent', 'Dynamics 365');
 
         if Parameters.ContainsKey('accept') then
-            HttpRequestMessage.Headers.Add('Accept', Format(Parameters.Item('accept')));
+            Headers.Add('Accept', Parameters.Get('accept'));
 
         if Parameters.ContainsKey('username') then begin
             if Parameters.ContainsKey('password') then
-                Bytes := Encoding.ASCII.GetBytes(StrSubstNo('%1:%2', Format(Parameters.Item('username')), Format(Parameters.Item('password'))))
+                AuthText := StrSubstNo('%1:%2', Parameters.Get('username'), Parameters.Get('password'))
             else
-                Bytes := Encoding.ASCII.GetBytes(StrSubstNo('%1:%2', Format(Parameters.Item('username')), ''));
-            AuthHeaderValue := AuthHeaderValue.AuthenticationHeaderValue('Basic', Convert.ToBase64String(Bytes));
-            HttpRequestMessage.Headers.Authorization := AuthHeaderValue;
+                AuthText := StrSubstNo('%1:%2', Parameters.Get('username'), '');
+            Headers.Add('Authorization', StrSubstNo('Basic %1', Base64Convert.ToBase64(AuthText)));
         end;
 
         if Parameters.ContainsKey('etag') then
-            HttpRequestMessage.Headers.IfMatch.Add(Parameters.Item('etag'));
+            Headers.Add('If-Match', Parameters.Get('etag'));
 
-        if Parameters.ContainsKey('httpcontent') then
-            HttpRequestMessage.Content := Parameters.Item('httpcontent');
+        if Parameters.ContainsKey('httpcontent') then begin
+            Content.WriteFrom(Parameters.Get('httpcontent'));
+            if Parameters.ContainsKey('contenttype') then begin
+                Content.GetHeaders(Headers);
+                if Headers.Contains('Content-Type') then
+                    Headers.Remove('Content-Type');
+                Headers.Add('Content-Type', Parameters.Get('contenttype'));
+            end;
+            RequestMsg.Content := Content;
+        end;
 
-        HttpResponseMessage := HttpClient.SendAsync(HttpRequestMessage).Result;
-        exit(HttpResponseMessage.IsSuccessStatusCode);
+        Client.Send(RequestMsg, ResponseMsg);
+
+        Content := ResponseMsg.Content;
+        Content.ReadAs(ResponseMsgTxt);
+
+        EXIT(ResponseMsg.IsSuccessStatusCode);
     end;
 }
-
