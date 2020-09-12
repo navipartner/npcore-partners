@@ -46,11 +46,6 @@ page 6151248 "NPR Retail Admin Act - POS"
                 {
                     ApplicationArea = All;
                 }
-                field("POS Posting Setups"; "POS Posting Setups")
-                {
-                    ApplicationArea = All;
-                    DrillDownPageID = "NPR POS Posting Setup";
-                }
             }
         }
     }
