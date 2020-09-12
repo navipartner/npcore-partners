@@ -419,6 +419,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     ToolTip = 'View Sales Credit Memos that have been done.';
                     ApplicationArea = All;
                 }
+
                 action("Repair Document List")
                 {
                     //ApplicationArea = Warehouse;
@@ -430,41 +431,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     ToolTip = 'View the list of Repair List.';
                     ApplicationArea = All;
                 }
-                action("Warranty Catalog List")
-                {
-
-                    Caption = 'Warranty Catalog List';
-                    Image = PostedReceipts;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    RunObject = Page "NPR Warranty Catalog List";
-                    ToolTip = 'View the Warranty Catalog List.';
-                    ApplicationArea = All;
-                }
-                /*
-                action("Posted Purchase Invoices List")
-                {
-                    //ApplicationArea = Warehouse;
-                    Caption = 'Posted Purchase Invoices List';
-                    Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    RunObject = Page "Posted Purchase Invoices";
-                    ToolTip = 'View the Posted Purchase Invoices.';
-                }
-
-                action("Posted Purchase Credit Memos List")
-                {
-                    //ApplicationArea = Warehouse;
-                    Caption = 'Posted Purchase Credit Memos List';
-                    Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    RunObject = Page "Posted Purchase Credit Memos";
-                    ToolTip = 'View the Posted Purchase Credit Memos.';
-                }
-                */
-
             }
 
             group("Discount, Coupons & Vouchers")
