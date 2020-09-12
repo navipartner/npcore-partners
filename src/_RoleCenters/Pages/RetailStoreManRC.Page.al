@@ -15,40 +15,40 @@ page 6151246 "NPR Retail Store Man. RC"
 
             part(headline; "Headline RC Order Processor")
             {
-                  ApplicationArea=All;
+                  ApplicationArea = All;
 
             }
             part(NPRetailVoucherCue; "NPR Voucher Cue")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
             }
             part(Retail10ItemsbyQty; "NPR Retail 10 Items by Qty.")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(RetailTop10Salesperson; "NPR Retail Top 10 S.person")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
             }
             part(RetailTop10Customers; "NPR Retail Top 10 Customers")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
             }
             part(RetailTop10Vendors; "NPR Top 10 Vendors")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
             }
             part(Control6014400; "NPR My Reports")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control6150613; MyNotes)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             //    }
         }
@@ -67,13 +67,13 @@ page 6151246 "NPR Retail Store Man. RC"
                 {
                     Caption = 'Item List';
                     RunObject = Page "NPR Retail Item List";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                 }
                 action("Item Groups")
                 {
                     Caption = 'Item Groups';
                     RunObject = Page "NPR Item Group Tree";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Retail)
@@ -82,13 +82,13 @@ page 6151246 "NPR Retail Store Man. RC"
                 {
                     Caption = 'Retail Journal';
                     RunObject = Page "NPR Retail Journal List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Retail Documents")
                 {
                     Caption = 'Retail Documents';
                     RunObject = Page "NPR Retail Document List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
 
@@ -105,7 +105,7 @@ page 6151246 "NPR Retail Store Man. RC"
                 {
                     Caption = 'POS Entry List';
                     RunObject = Page "NPR POS Entry List";
-                                                                                                                                                                                                                               ApplicationArea=All;
+                                                                                                                                                                                                                               ApplicationArea = All;
                 }
 
 
@@ -113,43 +113,43 @@ page 6151246 "NPR Retail Store Man. RC"
                 {
                     Caption = 'Gift Vouchers';
                     RunObject = Page "NPR Gift Voucher List";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                 }
                 action("Credit Vouchers")
                 {
                     Caption = 'Credit Vouchers';
                     RunObject = Page "NPR Credit Voucher List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Sales Ticket Statistics")
                 {
                     Caption = 'Sales Ticket Statistics';
                     RunObject = Page "NPR Sales Ticket Statistics";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Contacts ")
                 {
                     Caption = 'Contact List';
                     RunObject = Page "Contact List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Customers)
                 {
                     Caption = 'Customer List';
                     RunObject = Page "Customer List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(MixedDiscounts)
                 {
                     Caption = 'Mixed Discounts';
                     RunObject = Page "NPR Mixed Discount List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(PeriodDiscounts)
                 {
                     Caption = 'Period Discounts';
                     RunObject = Page "NPR Campaign Discount List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
 
@@ -161,49 +161,49 @@ page 6151246 "NPR Retail Store Man. RC"
                 Caption = 'Sale Statistics';
                 Image = "Report";
                 RunObject = Report "NPR Sales Ticket Stat.";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Discount Statistics")
             {
                 Caption = 'Discount Statistics';
                 Image = "Report";
                 RunObject = Report "NPR Discount Statistics";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Customer Analysis")
             {
                 Caption = 'Customer Analysis';
                 Image = "Report";
                 RunObject = Report "NPR Customer Analysis";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Gift Voucher/Credit Voucher")
             {
                 Caption = 'Gift Voucher/Credit Voucher';
                 Image = "Report";
                 RunObject = Report "NPR Gift/Credit Voucher";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales Person Top 20")
             {
                 Caption = 'Sales Person Top 20';
                 Image = "Report";
                 RunObject = Report "NPR Sales Person Top 20";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sale Statistics per Vendor")
             {
                 Caption = 'Sale Statistics per Vendor';
                 Image = "Report";
                 RunObject = Report "NPR Sale Statistics per Vendor";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Vendor/Salesperson")
             {
                 Caption = 'Vendor/Salesperson';
                 Image = "Report";
                 RunObject = Report "NPR Vendor/Salesperson";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
 
             action("Item Group Overview")
@@ -211,7 +211,7 @@ page 6151246 "NPR Retail Store Man. RC"
                 Caption = 'Item Group Overview';
                 Image = "Report";
                 RunObject = Report "NPR Item Group Overview";
-                  ApplicationArea=All;
+                  ApplicationArea = All;
             }
         }
     }

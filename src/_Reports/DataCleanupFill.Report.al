@@ -342,22 +342,22 @@ report 6060100 "NPR Data Cleanup Fill"
                 field(FillTable; FillTable)
                 {
                     Caption = 'Insert Data In Table';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(CleanupAction; CleanupAction)
                 {
                     Caption = 'Cleanup Action';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(TableOption; TableOption)
                 {
                     Caption = 'Table Option';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ItemRenameOption; ItemRenameOption)
                 {
                     Caption = 'Rename Option for Item';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

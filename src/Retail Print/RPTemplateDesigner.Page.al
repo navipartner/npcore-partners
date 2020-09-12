@@ -23,7 +23,7 @@ page 6014560 "NPR RP Template Designer"
                 ShowFilter = false;
                 SubPageLink = "Template Code" = FIELD(Code);
                 Visible = "Printer Type" = "Printer Type"::Matrix;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(LineDesigner; "NPR RP Templ. Line Designer")
             {
@@ -31,7 +31,7 @@ page 6014560 "NPR RP Template Designer"
                 ShowFilter = false;
                 SubPageLink = "Template Code" = FIELD(Code);
                 Visible = "Printer Type" = "Printer Type"::Line;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -48,7 +48,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Printer Type" = "Printer Type"::Line;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -63,7 +63,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Printer Type" = "Printer Type"::Line;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -78,7 +78,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F8';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -112,7 +112,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

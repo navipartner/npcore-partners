@@ -170,7 +170,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = ImportCodes;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -182,7 +182,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -197,7 +197,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = ElectronicNumber;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -209,7 +209,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -223,7 +223,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -235,7 +235,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -250,7 +250,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = Export;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -261,7 +261,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -280,7 +280,7 @@ page 6184493 "NPR Pepper Terminal Card"
                 RunPageLink = "Pepper Terminal Code" = FIELD(Code);
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

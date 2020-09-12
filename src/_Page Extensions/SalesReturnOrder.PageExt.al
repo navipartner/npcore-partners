@@ -65,7 +65,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Request Approval")
@@ -77,13 +77,13 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

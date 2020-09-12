@@ -94,7 +94,7 @@ page 6150676 "NPR POS Tax Line List"
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

@@ -12,7 +12,7 @@ page 6014697 "NPR Embedded Videos"
         {
             usercontrol(Bridge; "NPR Bridge")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnFrameworkReady()
                 begin

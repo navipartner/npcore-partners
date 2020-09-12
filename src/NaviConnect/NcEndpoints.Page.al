@@ -53,7 +53,7 @@ page 6151539 "NPR Nc Endpoints"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -71,7 +71,7 @@ page 6151539 "NPR Nc Endpoints"
                 RunPageLink = "Endpoint Code" = FIELD(Code);
                 RunPageView = SORTING("Endpoint Code", "Trigger Code")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Init Endpoint")
             {
@@ -81,7 +81,7 @@ page 6151539 "NPR Nc Endpoints"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = EndpointHasInit;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -198,21 +198,21 @@ page 6150615 "NPR POS Store Card"
                 RunPageLink = "Table ID" = CONST(6150614),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Unit List")
             {
                 Caption = 'POS Unit List';
                 Image = List;
                 RunObject = Page "NPR POS Unit List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NP Retail Setup")
             {
                 Caption = 'NP Retail Setup';
                 Image = Setup;
                 RunObject = Page "NPR NP Retail Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Posting Setup")
             {
@@ -223,7 +223,7 @@ page 6150615 "NPR POS Store Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Store Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Period Registers")
             {
@@ -234,7 +234,7 @@ page 6150615 "NPR POS Store Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Period Register List";
                 RunPageLink = "POS Store Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Entries")
             {
@@ -245,7 +245,7 @@ page 6150615 "NPR POS Store Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";
                 RunPageLink = "POS Store Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -39,7 +39,7 @@ page 6060049 "NPR Item Worksh. Missing Setup"
                               "Field No." = FIELD("Field No.");
                 SubPageView = SORTING("Table ID", "Field No.", Value)
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -52,7 +52,7 @@ page 6060049 "NPR Item Worksh. Missing Setup"
             {
                 Caption = 'Create Records';
                 Image = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

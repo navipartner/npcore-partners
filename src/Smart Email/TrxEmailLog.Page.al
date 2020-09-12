@@ -75,7 +75,7 @@ page 6059825 "NPR Trx Email Log"
                 Caption = 'Update Details';
                 Image = Process;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

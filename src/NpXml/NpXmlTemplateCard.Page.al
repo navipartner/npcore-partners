@@ -121,7 +121,7 @@ page 6151551 "NPR NpXml Template Card"
                     {
                         SubPageLink = "Xml Template Code" = FIELD(Code);
                         Visible = "Namespaces Enabled";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -147,7 +147,7 @@ page 6151551 "NPR NpXml Template Card"
                     ShowFilter = false;
                     SubPageLink = "Xml Template Code" = FIELD(Code);
                     Visible = NpXmlTemplateTriggersVisible;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Batch)
@@ -183,7 +183,7 @@ page 6151551 "NPR NpXml Template Card"
                     SubPageLink = "Xml Template Code" = FIELD(Code),
                                   "Xml Element Line No." = CONST(-1);
                     Visible = NpXmlBatchFiltersVisible;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Transfer)
@@ -341,7 +341,7 @@ page 6151551 "NPR NpXml Template Card"
                         Caption = 'Api Headers';
                         ShowFilter = false;
                         SubPageLink = "Xml Template Code" = FIELD(Code);
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     group(Control6151410)
                     {
@@ -396,7 +396,7 @@ page 6151551 "NPR NpXml Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Elements";
                 RunPageLink = "Xml Template Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Preview Xml")
             {
@@ -405,7 +405,7 @@ page 6151551 "NPR NpXml Template Card"
                 Promoted = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -425,7 +425,7 @@ page 6151551 "NPR NpXml Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Templ. Chng. History";
                 RunPageLink = "Template Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Archived Versions")
             {
@@ -436,7 +436,7 @@ page 6151551 "NPR NpXml Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Templ. Arch. List";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -448,7 +448,7 @@ page 6151551 "NPR NpXml Template Card"
                 Promoted = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -461,7 +461,7 @@ page 6151551 "NPR NpXml Template Card"
             {
                 Caption = 'Export Xml Template';
                 Image = Export;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -477,7 +477,7 @@ page 6151551 "NPR NpXml Template Card"
             {
                 Caption = 'Import Template';
                 Image = Import;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -495,7 +495,7 @@ page 6151551 "NPR NpXml Template Card"
                 Image = Start;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -511,7 +511,7 @@ page 6151551 "NPR NpXml Template Card"
             {
                 Caption = 'Schedule Batch Task';
                 Image = NewToDo;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -535,7 +535,7 @@ page 6151551 "NPR NpXml Template Card"
                 Promoted = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

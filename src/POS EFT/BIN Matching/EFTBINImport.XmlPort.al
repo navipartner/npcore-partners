@@ -51,12 +51,12 @@ xmlport 6184500 "NPR EFT BIN Import"
                 field(DeleteRanges; DeleteRanges)
                 {
                     Caption = 'Delete existing BIN ranges';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(DeleteGroups; DeleteGroups)
                 {
                     Caption = 'Delete existing BIN groups';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

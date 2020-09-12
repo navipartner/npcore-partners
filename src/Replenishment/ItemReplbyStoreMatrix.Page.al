@@ -286,7 +286,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

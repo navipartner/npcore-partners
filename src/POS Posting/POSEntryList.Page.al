@@ -282,7 +282,7 @@ page 6150652 "NPR POS Entry List"
                 Editable = false;
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Payments; "NPR POS Paym. Line Subpage")
             {
@@ -290,7 +290,7 @@ page 6150652 "NPR POS Entry List"
                 Editable = false;
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Taxes; "NPR POS Tax Line Subpage")
             {
@@ -300,7 +300,7 @@ page 6150652 "NPR POS Entry List"
                 SubPageView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive)
                               ORDER(Ascending);
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -308,7 +308,7 @@ page 6150652 "NPR POS Entry List"
             part(Control6014466; "NPR POS Entry Factbox")
             {
                 SubPageLink = "Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -326,7 +326,7 @@ page 6150652 "NPR POS Entry List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Log";
                 RunPageLink = "Entry No." = FIELD("POS Posting Log Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sales Lines")
             {
@@ -334,7 +334,7 @@ page 6150652 "NPR POS Entry List"
                 Image = Sales;
                 RunObject = Page "NPR POS Sales Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Payment Lines")
             {
@@ -342,7 +342,7 @@ page 6150652 "NPR POS Entry List"
                 Image = Payment;
                 RunObject = Page "NPR POS Payment Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Tax Lines")
             {
@@ -350,7 +350,7 @@ page 6150652 "NPR POS Entry List"
                 Image = TaxDetail;
                 RunObject = Page "NPR POS Tax Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Balancing Lines")
             {
@@ -358,7 +358,7 @@ page 6150652 "NPR POS Entry List"
                 Image = Balance;
                 RunObject = Page "NPR POS Balancing Line";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Comment Lines")
             {
@@ -370,13 +370,13 @@ page 6150652 "NPR POS Entry List"
                 RunPageView = SORTING("Table ID", "POS Entry No.", "POS Entry Line No.", Code, "Line No.")
                               ORDER(Ascending);
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(ShowDimensions)
             {
                 Caption = 'Dimensions';
                 Image = Dimensions;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -390,7 +390,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'Sales Document';
                 Image = CoupledOrder;
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -409,7 +409,7 @@ page 6150652 "NPR POS Entry List"
                 RunObject = Page "NPR POS Info POS Entry";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("POS Info Code", "POS Entry No.", "Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Info Audit Roll")
             {
@@ -418,13 +418,13 @@ page 6150652 "NPR POS Entry List"
                 RunObject = Page "NPR POS Info Audit Roll";
                 RunPageLink = "Sales Ticket No." = FIELD("Document No.");
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Audit Log")
             {
                 Caption = 'POS Audit Log';
                 Image = InteractionLog;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -439,7 +439,7 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Related Sales Documents';
                 Image = CoupledOrder;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -459,7 +459,7 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Workshift Statistics';
                 Image = Sales;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -475,14 +475,14 @@ page 6150652 "NPR POS Entry List"
                 Image = CreditCardLog;
                 RunObject = Page "NPR EFT Transaction Requests";
                 RunPageLink = "Sales Ticket No." = FIELD("Document No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Period Register")
             {
                 Image = PeriodEntries;
                 RunObject = Page "NPR POS Period Register List";
                 RunPageLink = "No." = FIELD("POS Period Register No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(Vouchers)
             {
@@ -498,7 +498,7 @@ page 6150652 "NPR POS Entry List"
                         Image = PostedPayableVoucher;
                         RunObject = Page "NPR Gift Voucher List";
                         RunPageLink = "Issuing POS Entry No" = FIELD("Entry No.");
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     action(RedeemedGiftVouchers)
                     {
@@ -506,7 +506,7 @@ page 6150652 "NPR POS Entry List"
                         Image = PostedReceivableVoucher;
                         RunObject = Page "NPR Gift Voucher List";
                         RunPageLink = "Cashed POS Entry No." = FIELD("Entry No.");
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
                 group("Credit Vouchers")
@@ -519,7 +519,7 @@ page 6150652 "NPR POS Entry List"
                         Image = PostedPayableVoucher;
                         RunObject = Page "NPR Credit Voucher List";
                         RunPageLink = "Issuing POS Entry No" = FIELD("Entry No.");
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     action(RedeemdedCreditVouchers)
                     {
@@ -527,7 +527,7 @@ page 6150652 "NPR POS Entry List"
                         Image = PostedReceivableVoucher;
                         RunObject = Page "NPR Credit Voucher List";
                         RunPageLink = "Cashed POS Entry No." = FIELD("Entry No.");
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
                 group("Tax Free Vouchers")
@@ -539,7 +539,7 @@ page 6150652 "NPR POS Entry List"
                     {
                         Caption = 'New';
                         Image = RefreshVoucher;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -557,7 +557,7 @@ page 6150652 "NPR POS Entry List"
                         Image = PostedPayableVoucher;
                         RunObject = Page "NPR Tax Free Voucher";
                         RunPageLink = "Sales Receipt No." = FIELD("Document No.");
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -570,7 +570,7 @@ page 6150652 "NPR POS Entry List"
                     Image = RefreshVoucher;
                     RunObject = Page "NPR NpRv Vouchers";
                     RunPageLink = "Issue Document No." = FIELD("Document No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -583,7 +583,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Voucher List';
                     Image = VoucherDescription;
                     RunObject = Page "NPR NpRv Vouchers";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -596,7 +596,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Voucher Types';
                     Image = VoucherGroup;
                     RunObject = Page "NPR NpRv Voucher Types";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("POS Entry Lists")
@@ -610,7 +610,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Sales Line List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Payment Line List")
                 {
@@ -620,7 +620,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Payment Line List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Tax Line List")
                 {
@@ -630,7 +630,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Tax Line List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Balancing Line List")
                 {
@@ -640,7 +640,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Balancing Line";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("POS Period Register List")
                 {
@@ -650,7 +650,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("Failed POS Lists")
@@ -666,7 +666,7 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Item Entry Status" = FILTER("Error while Posting"));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Failed G/L Posting List")
                 {
@@ -678,7 +678,7 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Entry Status" = FILTER("Error while Posting"));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Unposted Item List")
                 {
@@ -690,7 +690,7 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Item Entry Status" = FILTER(Unposted));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Unposted G/L List")
                 {
@@ -702,7 +702,7 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Entry Status" = FILTER(Unposted));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("Posting Entries")
@@ -714,7 +714,7 @@ page 6150652 "NPR POS Entry List"
                     Image = Navigate;
                     Promoted = true;
                     PromotedCategory = Category6;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -746,7 +746,7 @@ page 6150652 "NPR POS Entry List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -771,7 +771,7 @@ page 6150652 "NPR POS Entry List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -849,7 +849,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'Preview Post Entry';
                 Image = ViewPostedOrder;
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -872,7 +872,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'Preview Post Range';
                 Image = ViewWorksheet;
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -897,7 +897,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'Compare Preview Post Entry to Audit Roll Posting';
                 Image = CompareCOA;
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -925,7 +925,7 @@ page 6150652 "NPR POS Entry List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -957,7 +957,7 @@ page 6150652 "NPR POS Entry List"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -991,7 +991,7 @@ page 6150652 "NPR POS Entry List"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -1027,7 +1027,7 @@ page 6150652 "NPR POS Entry List"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -1064,13 +1064,13 @@ page 6150652 "NPR POS Entry List"
                     Image = Log;
                     RunObject = Page "NPR POS Entry Output Log";
                     RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Entry Overview")
                 {
                     Caption = 'Entry Overview';
                     Image = PrintCheck;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
 
@@ -1093,7 +1093,7 @@ page 6150652 "NPR POS Entry List"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(PDF2NAV)
@@ -1104,13 +1104,13 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'E-mail Log';
                     Image = Email;
                     Promoted = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(SendAsPDF)
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

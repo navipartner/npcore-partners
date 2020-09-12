@@ -66,7 +66,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -77,7 +77,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -88,7 +88,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -99,7 +99,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -110,7 +110,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

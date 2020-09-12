@@ -66,7 +66,7 @@ page 6014561 "NPR RP Data Items"
                               "Child Line No." = FIELD("Line No."),
                               "Parent Table ID" = FIELD("Parent Table ID"),
                               "Table ID" = FIELD("Table ID");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -82,7 +82,7 @@ page 6014561 "NPR RP Data Items"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -96,7 +96,7 @@ page 6014561 "NPR RP Data Items"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -113,7 +113,7 @@ page 6014561 "NPR RP Data Items"
                 RunObject = Page "NPR RP Data Item Constr.";
                 RunPageLink = "Data Item Code" = FIELD(Code),
                               "Data Item Line No." = FIELD("Line No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

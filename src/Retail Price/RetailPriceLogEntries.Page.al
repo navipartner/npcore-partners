@@ -93,7 +93,7 @@ page 6014475 "NPR Retail Price Log Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

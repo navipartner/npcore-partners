@@ -97,7 +97,7 @@ page 6060143 "NPR MM Membership Notific."
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Notific. Entry";
                 RunPageLink = "Notification Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -107,7 +107,7 @@ page 6060143 "NPR MM Membership Notific."
                 Caption = 'Send Notifications';
                 Image = SendTo;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

@@ -86,7 +86,7 @@ page 6184850 "NPR FR Audit Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -102,7 +102,7 @@ page 6184850 "NPR FR Audit Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -124,7 +124,7 @@ page 6184850 "NPR FR Audit Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -163,7 +163,7 @@ page 6184850 "NPR FR Audit Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR FR Audit No. Series";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(POSEntryRelatedInfo)
             {
@@ -173,7 +173,7 @@ page 6184850 "NPR FR Audit Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR FR POS Audit Log Aux. Info";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

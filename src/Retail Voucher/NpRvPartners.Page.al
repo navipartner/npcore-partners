@@ -49,7 +49,7 @@ page 6151026 "NPR NpRv Partners"
                 Image = UserCertificate;
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Partner Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

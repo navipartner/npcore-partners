@@ -108,7 +108,7 @@ page 6151022 "NPR NpRv Arch. Vouchers"
                 RunObject = Page "NPR NpRv Arch. Voucher Entries";
                 RunPageLink = "Arch. Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Arch. Sending Log")
             {
@@ -117,7 +117,7 @@ page 6151022 "NPR NpRv Arch. Vouchers"
                 RunObject = Page "NPR NpRv Arch. Sending Log";
                 RunPageLink = "Arch. Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

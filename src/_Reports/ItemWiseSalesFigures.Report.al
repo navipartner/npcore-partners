@@ -96,12 +96,12 @@ report 6060052 "NPR Item Wise Sales Figures"
                 field(FromDate; FromDate)
                 {
                     Caption = 'From Date';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ToDate; ToDate)
                 {
                     Caption = 'To Date';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

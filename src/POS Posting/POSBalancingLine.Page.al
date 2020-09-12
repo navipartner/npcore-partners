@@ -175,7 +175,7 @@ page 6150670 "NPR POS Balancing Line"
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

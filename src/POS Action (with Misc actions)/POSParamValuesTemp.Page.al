@@ -49,7 +49,7 @@ page 6150727 "NPR POS Param. Values Temp."
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

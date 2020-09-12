@@ -19,7 +19,7 @@ page 6014627 "NPR Hardware Connector"
             }
             usercontrol(Bridge; "NPR Bridge")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnFrameworkReady()
                 begin

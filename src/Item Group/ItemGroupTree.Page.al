@@ -103,14 +103,14 @@ page 6014427 "NPR Item Group Tree"
                     RunPageLink = "Table ID" = CONST(6014410),
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Dimensions-Mulitple")
                 {
                     Caption = 'Dimensions-Mulitple';
                     Image = DimensionSets;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -138,7 +138,7 @@ page 6014427 "NPR Item Group Tree"
                 {
                     Caption = 'Load Image';
                     Image = Picture;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -167,7 +167,7 @@ page 6014427 "NPR Item Group Tree"
                 {
                     Caption = 'Create Item(s) From Item Group';
                     Image = ItemGroup;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -192,7 +192,7 @@ page 6014427 "NPR Item Group Tree"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

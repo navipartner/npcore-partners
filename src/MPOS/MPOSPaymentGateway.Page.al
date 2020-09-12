@@ -52,7 +52,7 @@ page 6059994 "NPR MPOS Payment Gateway"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

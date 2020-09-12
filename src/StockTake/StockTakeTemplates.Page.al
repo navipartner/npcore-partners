@@ -142,7 +142,7 @@ page 6014666 "NPR Stock-Take Templates"
                 RunObject = Page "NPR Stock-Take Template Card";
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F5';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(CreateDefaultTemplates)
             {
@@ -151,7 +151,7 @@ page 6014666 "NPR Stock-Take Templates"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunPageMode = View;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -169,7 +169,7 @@ page 6014666 "NPR Stock-Take Templates"
                 Image = Components;
                 RunObject = Page "NPR Stock-Take Configs";
                 RunPageLink = "Stock-Take Template Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -78,7 +78,7 @@ page 6151523 "NPR Nc Endpoint FTP Card"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

@@ -45,7 +45,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
                 Promoted = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

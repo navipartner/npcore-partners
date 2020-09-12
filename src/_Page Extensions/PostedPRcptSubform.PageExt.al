@@ -10,7 +10,7 @@ pageextension 6014410 "NPR Posted P.Rcpt. Subform" extends "Posted Purchase Rcpt
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

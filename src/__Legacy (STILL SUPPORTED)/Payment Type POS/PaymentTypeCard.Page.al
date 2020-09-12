@@ -290,7 +290,7 @@ page 6014433 "NPR Payment Type - Card"
                     Caption = 'Prefix Table';
                     Image = "Table";
                     ShortCutKey = 'F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -313,7 +313,7 @@ page 6014433 "NPR Payment Type - Card"
                     Caption = 'Coin Types';
                     Image = Currency;
                     ShortCutKey = 'Ctrl+F5';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -334,7 +334,7 @@ page 6014433 "NPR Payment Type - Card"
                     Caption = 'G/L Account';
                     Image = GL;
                     ShortCutKey = 'Shift+F5';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

@@ -28,7 +28,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
             {
                 Caption = 'Save To Disk';
                 ShortCutKey = 'Return';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

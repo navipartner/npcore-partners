@@ -153,14 +153,14 @@ page 6151169 "NPR NpGp POS Sales Lines"
                 RunPageLink = "POS Entry No." = FIELD("POS Entry No."),
                               "POS Sales Line No." = FIELD("Line No.");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Info")
             {
                 Caption = 'POS Info';
                 Image = List;
                 RunObject = Page "NPR NpGp POS Info POS Entry";
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunPageLink = "POS Entry No."=FIELD("POS Entry No."),
                 //              "Sales Line No."=FIELD("Line No.");
             }

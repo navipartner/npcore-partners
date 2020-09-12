@@ -37,7 +37,7 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
             {
                 Caption = 'Show Terminal Settings';
                 Image = Setup;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -182,7 +182,7 @@ page 6151386 "NPR CS Stock-Takes Card"
             {
                 Caption = 'Force Close';
                 Image = Cancel;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -200,7 +200,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                 Image = DataEntry;
                 RunObject = Page "NPR CS Stock-Takes Data List";
                 RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(Overview)
             {
@@ -211,7 +211,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                     Image = MiniForm;
                     RunObject = Page "NPR CS Devices";
                     RunPageLink = Location = FIELD(Location);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("&Item Journal")
                 {
@@ -220,7 +220,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                     RunObject = Page "Phys. Inventory Journal";
                     RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
                                   "Journal Batch Name" = FIELD("Journal Batch Name");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Process)
@@ -229,7 +229,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                 action("Update Predicted Qty.")
                 {
                     Caption = 'Update Predicted Qty.';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -260,7 +260,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                 {
                     Caption = 'Set Manuel Posting';
                     Image = Add;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -275,7 +275,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                 {
                     Caption = 'Remove Posting Flag';
                     Image = ReOpen;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -289,7 +289,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                 {
                     Caption = 'Set Posting Flag';
                     Image = Close;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -308,7 +308,7 @@ page 6151386 "NPR CS Stock-Takes Card"
                     RunObject = Page "NPR CS Upd. Unknown Entries";
                     RunPageLink = "Stock-Take Id" = FIELD("Stock-Take Id");
                     RunPageView = WHERE("Item No." = CONST(''));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

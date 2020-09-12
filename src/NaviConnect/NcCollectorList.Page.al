@@ -49,7 +49,7 @@ page 6151528 "NPR Nc Collector List"
                 Image = XMLFile;
                 RunObject = Page "NPR Nc Collection Lines";
                 RunPageLink = "Collector Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Collections)
             {
@@ -57,7 +57,7 @@ page 6151528 "NPR Nc Collector List"
                 Image = XMLFileGroup;
                 RunObject = Page "NPR Nc Collection List";
                 RunPageLink = "Collector Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

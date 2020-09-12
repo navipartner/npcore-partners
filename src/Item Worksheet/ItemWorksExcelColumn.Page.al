@@ -60,7 +60,7 @@ page 6060053 "NPR Item Works. Excel Column"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -72,7 +72,7 @@ page 6060053 "NPR Item Works. Excel Column"
             {
                 Caption = 'Insert all Mapped fields in Excel Mapping';
                 Image = Add;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

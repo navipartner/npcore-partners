@@ -280,7 +280,7 @@ page 6014476 "NPR Retail Document List"
                     SubPageLink = "Document Type" = FIELD("Document Type"),
                                   "Document No." = FIELD("No.");
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -294,7 +294,7 @@ page 6014476 "NPR Retail Document List"
             {
                 Caption = 'Change Outstanding / Redeemed';
                 Image = ChangePaymentTolerance;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -310,7 +310,7 @@ page 6014476 "NPR Retail Document List"
             {
                 Caption = 'View All';
                 Image = View;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

@@ -11,7 +11,7 @@ pageextension 6014438 "NPR Item Journal" extends "Item Journal"
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Page")
@@ -20,7 +20,7 @@ pageextension 6014438 "NPR Item Journal" extends "Item Journal"
             {
                 Caption = 'Price Label';
                 Image = BinContent;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 

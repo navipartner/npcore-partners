@@ -58,7 +58,7 @@ page 6151448 "NPR Magento Payment Mapping"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

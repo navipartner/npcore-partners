@@ -46,14 +46,14 @@ page 6184511 "NPR EFT BIN Group List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = XMLport "NPR EFT BIN Import";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(ShowAllRanges)
             {
                 Caption = 'Show All Ranges';
                 Image = List;
                 RunObject = Page "NPR EFT BIN Ranges";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

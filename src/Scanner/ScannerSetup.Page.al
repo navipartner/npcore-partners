@@ -226,7 +226,7 @@ page 6014535 "NPR Scanner - Setup"
                     SubPageLink = ID = FIELD(ID),
                                   "Where To" = CONST(Input);
                     SubPageView = SORTING(Order);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("Output Format")
@@ -237,7 +237,7 @@ page 6014535 "NPR Scanner - Setup"
                     SubPageLink = ID = FIELD(ID),
                                   "Where To" = CONST(Output);
                     SubPageView = SORTING(Order);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -255,13 +255,13 @@ page 6014535 "NPR Scanner - Setup"
                     Caption = 'List';
                     Image = List;
                     RunObject = Page "NPR Scanner - List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Upload Program to Scanner")
                 {
                     Caption = 'Upload Program to Scanner';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

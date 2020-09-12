@@ -30,21 +30,21 @@ page 6151481 "NPR Magento Retail Activities"
                         Caption = 'New Sales Order';
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     action("New Sales Quote")
                     {
                         Caption = 'New Sales Quote';
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     action("New Sales Return Order")
                     {
                         Caption = 'New Sales Return Order';
                         RunObject = Page "Sales Return Order";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -138,7 +138,7 @@ page 6151481 "NPR Magento Retail Activities"
         {
             action("Action Items")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -71,7 +71,7 @@ page 6059900 "NPR Task Template"
                     Image = Description;
                     RunObject = Page "NPR Task Batch";
                     RunPageLink = "Journal Template Name" = FIELD(Name);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

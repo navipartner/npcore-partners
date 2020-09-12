@@ -20,14 +20,14 @@ page 6151480 "NPR Magento Manag. Role Center"
                 part(Control6151408; "NPR Discount Activities")
                 {
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 group(Control6151407)
                 {
                     ShowCaption = false;
                     part(Control6151406; "NPR Magento Retail Activities")
                     {
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -36,15 +36,15 @@ page 6151480 "NPR Magento Manag. Role Center"
                 ShowCaption = false;
                 part(Control6151404; "NPR Magento Top 10 Customers")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6151403; "NPR Magento Top10 Items by Qty")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6151402; "NPR Magento Top 10 S.Person")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Control6151401)
@@ -52,11 +52,11 @@ page 6151480 "NPR Magento Manag. Role Center"
                 ShowCaption = false;
                 part(Control6151400; "NPR Magento Sales Chart")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part(Control6151409; "NPR RSS Reader Activ.")
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -70,49 +70,49 @@ page 6151480 "NPR Magento Manag. Role Center"
             {
                 Caption = 'Item List';
                 RunObject = Page "NPR Retail Item List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Internet Item List")
             {
                 Caption = 'Internet Items';
                 RunObject = Page "NPR Retail Item List";
                 RunPageLink = "NPR Magento Item" = CONST(true);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Magento Item Groups")
             {
                 Caption = 'Magento Item Groups';
                 RunObject = Page "NPR Magento Categories";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Brands)
             {
                 Caption = 'Brands';
                 RunObject = Page "NPR Magento Brands";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Attributes)
             {
                 Caption = 'Attributes';
                 RunObject = Page "NPR Magento Attributes";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Attribute Sets")
             {
                 Caption = 'Attribute Sets';
                 RunObject = Page "NPR Magento Attribute Sets";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Pictures)
             {
                 Caption = 'Pictures';
                 RunObject = Page "NPR Magento Pictures";
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

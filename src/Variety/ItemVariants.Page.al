@@ -52,12 +52,12 @@ page 6014602 "NPR Item Variants"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -77,7 +77,7 @@ page 6014602 "NPR Item Variants"
                     RunObject = Page "Item Translations";
                     RunPageLink = "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD(Code);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

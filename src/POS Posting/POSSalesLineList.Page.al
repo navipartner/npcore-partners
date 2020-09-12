@@ -125,7 +125,7 @@ page 6150655 "NPR POS Sales Line List"
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

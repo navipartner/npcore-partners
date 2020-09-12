@@ -10,7 +10,7 @@ pageextension 6014406 "NPR Posted S.Invoice Subform" extends "Posted Sales Invoi
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

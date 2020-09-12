@@ -57,7 +57,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -74,7 +74,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -90,7 +90,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -108,7 +108,7 @@ page 6014644 "NPR Tax Free POS Units"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free Requests";
                 RunPageLink = "POS Unit No." = FIELD("POS Unit No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -84,11 +84,11 @@ page 6150639 "NPR POS Post. Profile Card"
         {
             systempart(Control6014413; Notes)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control6014414; Links)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -312,7 +312,7 @@ page 6150900 "NPR HC Audit Roll"
             }
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger AddInReady()
                 begin
@@ -341,7 +341,7 @@ page 6150900 "NPR HC Audit Roll"
                     Image = Post;
                     ShortCutKey = 'F5';
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -354,7 +354,7 @@ page 6150900 "NPR HC Audit Roll"
                     Caption = 'Post';
                     Image = Post;
                     ShortCutKey = 'F11';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -373,7 +373,7 @@ page 6150900 "NPR HC Audit Roll"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Shift+F11';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -385,7 +385,7 @@ page 6150900 "NPR HC Audit Roll"
                     Caption = 'Posting of Range';
                     Image = Post;
                     ShortCutKey = 'Ctrl+F11';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -403,7 +403,7 @@ page 6150900 "NPR HC Audit Roll"
                     Caption = 'Show Documents';
                     Image = "Action";
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -446,7 +446,7 @@ page 6150900 "NPR HC Audit Roll"
                     Caption = 'Naviger';
                     Image = Navigate;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -460,7 +460,7 @@ page 6150900 "NPR HC Audit Roll"
                 {
                     Caption = 'Show Documents Custom';
                     Image = ShowList;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 separator(Separator6150674)
                 {
@@ -469,14 +469,14 @@ page 6150900 "NPR HC Audit Roll"
                 {
                     Caption = 'Calculate';
                     Image = Calculate;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Sum)
                 {
                     Caption = 'Sum';
                     Image = Totals;
                     ShortCutKey = 'Ctrl+S';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -501,7 +501,7 @@ page 6150900 "NPR HC Audit Roll"
                     Caption = 'Sales Ticket Statistics';
                     Image = Statistics;
                     ShortCutKey = 'F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -524,7 +524,7 @@ page 6150900 "NPR HC Audit Roll"
                     Image = Statistics;
                     RunObject = Page "NPR Advanced Sales Stats";
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Day Report")
                 {
@@ -532,7 +532,7 @@ page 6150900 "NPR HC Audit Roll"
                     Enabled = false;
                     Image = "Report";
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

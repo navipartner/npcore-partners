@@ -388,22 +388,22 @@ report 6014416 "NPR Sale Statistics per Vendor"
                     field(InventoryDate; InventoryDate)
                     {
                         Caption = 'Inventory Per Date';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintOnePerPage; PrintOnePerPage)
                     {
                         Caption = 'New Page Per Creditor';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(OnlyTotal; OnlyTotal)
                     {
                         Caption = 'Totals Only';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(Avoid0Sales; Avoid0Sales)
                     {
                         Caption = 'Avoid 0 Sales';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

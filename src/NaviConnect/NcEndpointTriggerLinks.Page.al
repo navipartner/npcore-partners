@@ -32,7 +32,7 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
             {
                 Caption = 'Endpoint Setup';
                 Image = InteractionTemplateSetup;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'

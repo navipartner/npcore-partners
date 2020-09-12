@@ -37,7 +37,7 @@ page 6014555 "NPR Touch Screen - Cust Loc."
                 {
                     SubPageLink = "Customer Location No." = FIELD("No.");
                     SubPageView = SORTING("Register No.", "Sales Ticket No.", "Line No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

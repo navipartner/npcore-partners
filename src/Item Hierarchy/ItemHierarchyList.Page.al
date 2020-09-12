@@ -48,7 +48,7 @@ page 6151050 "NPR Item Hierarchy List"
                 RunObject = Page "NPR Item Hierarchy Lines";
                 RunPageLink = "Item Hierarchy Code" = FIELD("Hierarchy Code");
                 RunPageView = SORTING("Item Hierarchy Code", "Item Hierarchy Line No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Demand Lines")
             {
@@ -57,7 +57,7 @@ page 6151050 "NPR Item Hierarchy List"
                 Promoted = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD("Hierarchy Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Distribution lines")
             {
@@ -66,7 +66,7 @@ page 6151050 "NPR Item Hierarchy List"
                 Promoted = true;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Item Hiearachy" = FIELD("Hierarchy Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

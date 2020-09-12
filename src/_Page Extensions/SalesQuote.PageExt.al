@@ -37,13 +37,13 @@ pageextension 6014439 "NPR Sales Quote" extends "Sales Quote"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("NPR SMS")
@@ -53,7 +53,7 @@ pageextension 6014439 "NPR Sales Quote" extends "Sales Quote"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

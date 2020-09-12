@@ -80,7 +80,7 @@ page 6060131 "NPR MM Member Cards ListPart"
                 Caption = 'Print Card';
                 Image = PrintVoucher;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -97,7 +97,7 @@ page 6060131 "NPR MM Member Cards ListPart"
                 RunObject = Page "NPR MM Member Card Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

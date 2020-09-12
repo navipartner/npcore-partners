@@ -912,7 +912,7 @@ page 6014424 "NPR Retail Setup"
                     Caption = '&E-Mail';
                     Image = Email;
                     RunObject = Page "NPR E-mail Templates";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("&Setup")
@@ -923,42 +923,42 @@ page 6014424 "NPR Retail Setup"
                     Caption = 'I-Comm Settings';
                     Image = Form;
                     RunObject = Page "NPR I-Comm";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Scanner / weight setup")
                 {
                     Caption = 'Scanner / weight setup';
                     Image = Form;
                     RunObject = Page "NPR Scanner - Setup";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Insurance)
                 {
                     Caption = 'Insurance';
                     Image = Form;
                     RunObject = Page "NPR Insurrance Combination";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Retail Contract Setup")
                 {
                     Caption = 'Retail Contract Setup';
                     Image = Form;
                     RunObject = Page "NPR Retail Contr. Setup";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("User setup")
                 {
                     Caption = 'User setup';
                     Image = Form;
                     RunObject = Page "User Setup";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Package Module configuration")
                 {
                     Caption = 'Package Module configuration';
                     Image = Form;
                     RunObject = Page "NPR Package Module Admin";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Routines)
@@ -978,7 +978,7 @@ page 6014424 "NPR Retail Setup"
                     {
                         Caption = 'Create NPR No. Series';
                         Image = "Action";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -1044,7 +1044,7 @@ page 6014424 "NPR Retail Setup"
                         Caption = 'Show License Range';
                         Image = View;
                         RunObject = Page "NPR Permission Range";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

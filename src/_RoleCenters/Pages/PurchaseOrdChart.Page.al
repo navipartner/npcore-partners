@@ -18,7 +18,7 @@ page 6151261 "NPR Purchase Ord Chart"
             }
             usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
                 /*
                   ApplicationArea = Basic,Suite;
 

@@ -112,7 +112,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -131,7 +131,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -155,7 +155,7 @@ page 6151102 "NPR NpRi Reimbursements"
                               "Party No." = FIELD("Party No."),
                               "Template Code" = FIELD("Template Code");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

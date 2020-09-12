@@ -97,7 +97,7 @@ page 6014675 "NPR Endpoint Card"
             part(Control6150625; "NPR Endpoint Filters")
             {
                 SubPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -112,7 +112,7 @@ page 6014675 "NPR Endpoint Card"
                 Image = XMLFile;
                 RunObject = Page "NPR Endpoint Request List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Request Batches")
             {
@@ -120,7 +120,7 @@ page 6014675 "NPR Endpoint Card"
                 Image = XMLFileGroup;
                 RunObject = Page "NPR Endpoint Req. Batch List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Query")
             {
@@ -130,7 +130,7 @@ page 6014675 "NPR Endpoint Card"
                 RunPageLink = "Endpoint Code" = FIELD(Code);
                 RunPageView = SORTING("Endpoint Code", "No.")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -139,7 +139,7 @@ page 6014675 "NPR Endpoint Card"
             {
                 Caption = 'Send All Records As Modify';
                 Image = BulletList;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

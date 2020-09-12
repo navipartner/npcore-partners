@@ -683,13 +683,13 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     field(PrintEntriesDue; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintAllHavingEntry; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -701,7 +701,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -712,34 +712,34 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     field(PrintReversedEntries; PrintReversedEntries)
                     {
                         Caption = 'Include Reversed Entries';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintUnappliedEntries; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(IncludeAgingBand; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PeriodLength; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(DateChoice; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
                 group("Output Options")
@@ -749,7 +749,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Report Output';
                         OptionCaption = 'Print,Preview,PDF,Email,Excel,XML';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         var
@@ -777,7 +777,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Chosen Output';
                         Visible = false;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     group(EmailOptions)
                     {
@@ -786,7 +786,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         field(PrintMissingAddresses; PrintRemaining)
                         {
                             Caption = 'Print remaining statements';
-                            ApplicationArea=All;
+                            ApplicationArea = All;
                         }
                     }
                 }

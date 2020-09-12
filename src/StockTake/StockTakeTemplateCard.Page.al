@@ -133,7 +133,7 @@ page 6014667 "NPR Stock-Take Template Card"
                     Caption = 'Create Default Templates';
                     Ellipsis = true;
                     Image = CreateInteraction;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

@@ -100,7 +100,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 RunPageLink = "Company Name" = FIELD("Client Company Name"),
                               "POS Store Code" = FIELD("Store Code"),
                               "POS Unit Code" = FIELD("Unit Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -112,7 +112,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -129,7 +129,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -36,7 +36,7 @@ page 6151215 "NPR NpCs Open. Hour Sets"
                 Caption = 'Opening Hour Calendar';
                 Image = Calendar;
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

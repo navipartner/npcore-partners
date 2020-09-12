@@ -64,7 +64,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -81,7 +81,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

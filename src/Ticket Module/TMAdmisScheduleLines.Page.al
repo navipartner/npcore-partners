@@ -170,7 +170,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 Caption = 'Calculate Schedule Entries';
                 Image = CalcWorkCenterCalendar;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -184,7 +184,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
             {
                 Caption = 'Calculate Schedule Entries (Force)';
                 Image = CalcWorkCenterCalendar;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -207,7 +207,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Admissions";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Schedules)
             {
@@ -218,7 +218,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Schedules";
                 RunPageLink = "Schedule Code" = FIELD("Schedule Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Schedule Entries")
             {
@@ -230,7 +230,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 RunObject = Page "NPR TM Admis. Schedule Entry";
                 RunPageLink = "Admission Code" = FIELD("Admission Code"),
                               "Schedule Code" = FIELD("Schedule Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -257,22 +257,22 @@ report 6060136 "NPR MM Membership Not Renewed"
                     field(ReferenceDate; ReferenceDate)
                     {
                         Caption = 'Reference Date 1';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(MembershipStatus; MembershipStatus)
                     {
                         Caption = 'Membership Status (Reference Date 1)';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(ReferenceDate2; ReferenceDate2)
                     {
                         Caption = 'Reference Date 2';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(MembershipStatus2; MembershipStatus2)
                     {
                         Caption = 'Membership Status (Reference Date 2)';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

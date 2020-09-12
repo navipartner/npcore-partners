@@ -163,7 +163,7 @@ page 6151211 "NPR NpCs Arch. Doc. List"
                 RunPageView = SORTING("Entry No.")
                               ORDER(Descending);
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -13,7 +13,7 @@ page 6151201 "NPR NpCs Document Log Entries"
         {
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger AddInReady()
                 begin
@@ -81,7 +81,7 @@ page 6151201 "NPR NpCs Document Log Entries"
             {
                 Caption = 'View Error Message';
                 Image = Log;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -117,34 +117,34 @@ report 6014452 "NPR Sales Ticket Stats/Date"
                 field(PeriodType; PeriodType)
                 {
                     Caption = 'Period Type';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(FromDate; FromDate)
                 {
                     Caption = 'From Date';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ToDate; ToDate)
                 {
                     Caption = 'To Date';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(AmountType; AmountType)
                 {
                     Caption = 'Amount Type';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(Dim1Filter; Dim1Filter)
                 {
                     CaptionClass = '1,2,1';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(Dim2Filter; Dim2Filter)
                 {
                     CaptionClass = '1,2,2';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

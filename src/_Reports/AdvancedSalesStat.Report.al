@@ -227,17 +227,17 @@ report 6014490 "NPR Advanced Sales Stat."
                 field(Periodestart; Periodestart)
                 {
                     Caption = 'Period Start';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(SortBy; SortBy)
                 {
                     Caption = 'Sort by';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(Lines; Lines)
                 {
                     Caption = 'Lines';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

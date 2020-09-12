@@ -40,14 +40,14 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendSelectedAsPDF")
                 {
                     Caption = 'Send Selected as PDF';
                     Image = SendEmailPDF;
                     ToolTip = 'Send Selected as PDF';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -75,13 +75,13 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                 {
                     Caption = 'Export';
                     Image = ExportFile;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
