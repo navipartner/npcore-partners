@@ -134,7 +134,7 @@ page 6014452 "NPR Mixed Discount List"
                 RunPageLink = "Table ID" = CONST(6014411),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

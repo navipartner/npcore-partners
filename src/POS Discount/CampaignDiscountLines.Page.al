@@ -152,7 +152,7 @@ page 6014454 "NPR Campaign Discount Lines"
                 RunPageLink = "Table ID" = CONST(6014414),
                               "No." = FIELD(Code),
                               "No. 2" = FIELD("Item No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

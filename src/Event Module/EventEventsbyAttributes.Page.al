@@ -65,13 +65,13 @@ page 6151582 "NPR Event Events by Attributes"
                 RunObject = Page "NPR Event Card";
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(SelectAttributeFilter)
             {
                 Caption = 'Select Attribute Filter';
                 Image = "Filter";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -99,7 +99,7 @@ page 6151582 "NPR Event Events by Attributes"
             {
                 Caption = 'Clear Filter';
                 Image = ClearFilter;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

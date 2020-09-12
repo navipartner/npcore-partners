@@ -239,7 +239,7 @@ page 6014404 "NPR Periods"
                 {
                     Caption = 'Register report';
                     Image = "Report";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

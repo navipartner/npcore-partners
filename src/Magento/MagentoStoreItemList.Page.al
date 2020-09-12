@@ -71,7 +71,7 @@ page 6151439 "NPR Magento Store Item List"
                         {
                             Caption = 'Magento Category Links';
                             SubPageLink = "Item No." = FIELD("Item No.");
-                            ApplicationArea=All;
+                            ApplicationArea = All;
                         }
                     }
                     group(Control6150693)

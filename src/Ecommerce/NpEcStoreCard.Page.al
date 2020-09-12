@@ -69,7 +69,7 @@ page 6151301 "NPR NpEc Store Card"
                 Image = List;
                 RunObject = Page "NPR NpEc Customer Mapping";
                 RunPageLink = "Store Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

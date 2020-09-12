@@ -53,7 +53,7 @@ report 6014610 "NPR Create Item From ItemGr."
                 field(ProfitPct; ProfitPct)
                 {
                     Caption = 'Standard Profit % On The Item Groups';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

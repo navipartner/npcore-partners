@@ -216,7 +216,7 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Data Items";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Edit Layout")
             {
@@ -227,7 +227,7 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Template Designer";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Edit Device Settings")
             {
@@ -238,7 +238,7 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Device Settings";
                 RunPageLink = Template = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("New Version")
             {
@@ -247,7 +247,7 @@ page 6014638 "NPR RP Template Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -265,7 +265,7 @@ page 6014638 "NPR RP Template Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -284,7 +284,7 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Template Archive List";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

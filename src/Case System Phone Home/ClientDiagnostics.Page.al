@@ -174,7 +174,7 @@ page 6059999 "NPR Client Diagnostics"
                 Caption = 'Test NpCase Login Integration';
                 Image = CoupledUser;
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

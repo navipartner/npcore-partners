@@ -172,7 +172,7 @@ page 6014574 "NPR Pacsoft Setup"
             {
                 Caption = 'Test Connection';
                 Image = Server;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -183,7 +183,7 @@ page 6014574 "NPR Pacsoft Setup"
             {
                 Caption = 'Check Balance';
                 Image = Balance;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

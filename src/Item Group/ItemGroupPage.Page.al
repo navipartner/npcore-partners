@@ -261,7 +261,7 @@ page 6014421 "NPR Item Group Page"
                 Caption = 'Child Groups';
                 SubPageLink = "Parent Item Group No." = FIELD(FILTER("No."));
                 SubPageView = SORTING("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -278,7 +278,7 @@ page 6014421 "NPR Item Group Page"
                 {
                     Caption = 'Insert picture';
                     Image = Picture;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -321,7 +321,7 @@ page 6014421 "NPR Item Group Page"
                 {
                     Caption = 'Delete Picture';
                     Image = Delete;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -347,7 +347,7 @@ page 6014421 "NPR Item Group Page"
                     RunPageLink = "Table ID" = CONST(6014410),
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("&Function")
@@ -357,7 +357,7 @@ page 6014421 "NPR Item Group Page"
                 {
                     Caption = 'Create Number Series';
                     Image = CreateSerialNo;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -368,7 +368,7 @@ page 6014421 "NPR Item Group Page"
                 {
                     Caption = 'Create Number Series to All Item Groups';
                     Image = CreateSerialNo;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -391,7 +391,7 @@ page 6014421 "NPR Item Group Page"
                 {
                     Caption = 'Create Item(s) From Item Group';
                     Image = ItemGroup;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -432,13 +432,13 @@ page 6014421 "NPR Item Group Page"
                     RunObject = Page "Item Ledger Entries";
                     RunPageLink = "NPR Item Group No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+N';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("&VAT Posting Grups")
                 {
                     Caption = '&VAT Posting Grups';
                     Image = Form;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -456,7 +456,7 @@ page 6014421 "NPR Item Group Page"
                     Image = ItemWorksheet;
                     RunObject = Page "Item List";
                     RunPageLink = "NPR Item Group" = FIELD("No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

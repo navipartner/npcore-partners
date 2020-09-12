@@ -59,7 +59,7 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

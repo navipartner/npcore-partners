@@ -327,7 +327,7 @@ page 6151401 "NPR Magento Setup"
                 Editable = ("NpCs Workflow Code" <> '');
                 SubPageLink = "Workflow Code" = FIELD("NpCs Workflow Code");
                 Visible = "Collect in Store Enabled";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(GiftVoucher)
             {
@@ -484,7 +484,7 @@ page 6151401 "NPR Magento Setup"
                     Caption = 'Inventory Companies';
                     ShowFilter = false;
                     Visible = "Intercompany Inventory Enabled";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Customer)
@@ -580,7 +580,7 @@ page 6151401 "NPR Magento Setup"
             }
             part(Control6151459; "NPR Magento Setup PostOnImport")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -600,7 +600,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup NpXml Templates';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -621,7 +621,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup Magento Api Credentials';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -642,7 +642,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup Magento Websites';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -663,7 +663,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup Magento Customer Groups';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -688,7 +688,7 @@ page 6151401 "NPR Magento Setup"
                         PromotedCategory = Process;
                         PromotedIsBig = true;
                         Visible = HasSetupCategories;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -708,7 +708,7 @@ page 6151401 "NPR Magento Setup"
                         PromotedCategory = Process;
                         PromotedIsBig = true;
                         Visible = HasSetupBrands;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -729,7 +729,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup Magento Tax Classes';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -750,7 +750,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup VAT Business Posting Groups';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -772,7 +772,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup VAT Product Posting Groups';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -799,7 +799,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup Payment Method Mapping';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -821,7 +821,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         Caption = 'Setup Shipment Method Mapping';
                         Image = Setup;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Process;
                         //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -850,7 +850,7 @@ page 6151401 "NPR Magento Setup"
                 {
                     Caption = 'Update Version No.';
                     Image = UpdateXML;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -872,7 +872,7 @@ page 6151401 "NPR Magento Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -890,7 +890,7 @@ page 6151401 "NPR Magento Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -910,7 +910,7 @@ page 6151401 "NPR Magento Setup"
                     Caption = 'Resync Internet Items';
                     Image = AddAction;
                     Visible = "Magento Enabled";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -929,7 +929,7 @@ page 6151401 "NPR Magento Setup"
                     Caption = 'Replicate Special Prices to Sales Prices';
                     Image = SuggestSalesPrice;
                     Visible = "Replicate to Sales Prices" AND (("Replicate to Sales Type" = 2) OR ("Replicate to Sales Code" <> ''));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -949,7 +949,7 @@ page 6151401 "NPR Magento Setup"
                 Caption = 'Event Subscriptions';
                 Image = "Where-Used";
                 RunObject = Page "NPR Magento Setup Event Subs.";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

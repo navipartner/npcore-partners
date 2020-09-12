@@ -10,7 +10,7 @@ pageextension 6014404 "NPR Posted Sales Shpt. Subform" extends "Posted Sales Shp
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

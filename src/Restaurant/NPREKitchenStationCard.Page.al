@@ -35,12 +35,12 @@ page 6150686 "NPR NPRE Kitchen Station Card"
         {
             systempart(Control6014407; Notes)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control6014408; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -59,7 +59,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 RunObject = Page "NPR NPRE Kitchen Station Slct.";
                 RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
                               "Kitchen Station" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(ShowKitchenRequests)
             {
@@ -69,7 +69,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

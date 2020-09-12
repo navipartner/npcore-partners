@@ -14,13 +14,13 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
                 {
                     Caption = 'Export';
                     Image = ExportFile;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -33,13 +33,13 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

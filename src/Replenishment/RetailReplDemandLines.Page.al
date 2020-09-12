@@ -132,34 +132,34 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 SubPageLink = "No." = FIELD("Item No."),
                               "Location Filter" = FIELD("Location Code");
                 Visible = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Control6014415; "Item Replenishment FactBox")
             {
                 SubPageLink = "No." = FIELD("Item No."),
                               "Location Filter" = FIELD("Location Code");
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Control6014414; "Item Planning FactBox")
             {
                 SubPageLink = "No." = FIELD("Item No."),
                               "Location Filter" = FIELD("Location Code");
                 Visible = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Control6014413; "Item Warehouse FactBox")
             {
                 SubPageLink = "No." = FIELD("Item No."),
                               "Location Filter" = FIELD("Location Code");
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Control6014412; "NPR Purchase Price Factbox")
             {
                 SubPageLink = "Item No." = FIELD("Item No."),
                               "Vendor No." = FIELD("Vendor No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -173,13 +173,13 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'Retail Replenishment Setup';
                 Image = Setup;
                 RunObject = Page "NPR Retail Replenishment Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Distribution Setup")
             {
                 Caption = 'Distribution Setup';
                 Image = Setup;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -196,14 +196,14 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Image = CalculatePlan;
                 Promoted = true;
                 RunObject = Page "Req. Worksheet";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Confirm All")
             {
                 Caption = 'Confirm All';
                 Image = Confirm;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -214,7 +214,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
             action("DeConfirm All")
             {
                 Caption = 'DeConfirm All';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -225,7 +225,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
             action("Create Retail Campaign Orders")
             {
                 Caption = 'Create Retail Campaign Orders';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

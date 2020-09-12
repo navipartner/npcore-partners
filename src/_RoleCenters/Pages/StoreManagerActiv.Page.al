@@ -31,14 +31,14 @@ page 6059983 "NPR Store Manager Activ."
                         Caption = 'New Salesorder';
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     action("New Purchase Order")
                     {
                         Caption = 'New Purchase Order';
                         RunObject = Page "Purchase Order";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

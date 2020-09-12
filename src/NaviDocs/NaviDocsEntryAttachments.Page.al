@@ -41,7 +41,7 @@ page 6059949 "NPR NaviDocs Entry Attachments"
             {
                 Caption = 'Open Attachment';
                 Image = XMLFile;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

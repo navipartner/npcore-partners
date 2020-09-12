@@ -164,7 +164,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket BOM";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Schedules)
             {
@@ -174,7 +174,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Schedules";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Admission Schedules")
             {
@@ -184,14 +184,14 @@ page 6060120 "NPR TM Ticket Admissions"
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Event List")
             {
                 Caption = 'Event List';
                 Image = CustomerList;
                 RunObject = Report "NPR TM Admission List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Seating Setup")
             {
@@ -201,7 +201,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR TM Seating Setup";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Waiting List Setup")
             {
@@ -213,7 +213,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "NPR TM Waiting List Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -222,7 +222,7 @@ page 6060120 "NPR TM Ticket Admissions"
             {
                 Caption = 'Send Waitinglist Notifications';
                 Image = Interaction;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -248,7 +248,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 Promoted = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

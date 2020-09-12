@@ -596,16 +596,16 @@ report 6014409 "NPR Sales Ticket Stat."
                     field(CompareDay; CompareDay)
                     {
                         Caption = 'Compare To Day';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(compareNearestDate; CompareNearestDate)
                     {
                         Caption = 'Compare Nearest Date';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field("Show Adjusted Cost"; ShowAdj)
                     {
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

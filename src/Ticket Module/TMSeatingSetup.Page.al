@@ -42,7 +42,7 @@ page 6151130 "NPR TM Seating Setup"
                 Image = Template;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

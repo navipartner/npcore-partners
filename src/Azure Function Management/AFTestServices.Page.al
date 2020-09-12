@@ -93,7 +93,7 @@ page 6151572 "NPR AF Test Services"
                     Image = Task;
                     Promoted = true;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -111,7 +111,7 @@ page 6151572 "NPR AF Test Services"
                     Promoted = true;
                     PromotedIsBig = true;
                     RunObject = Page "NPR AF Notification Hub List";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(ActionGroup6014415)
@@ -123,7 +123,7 @@ page 6151572 "NPR AF Test Services"
                     Image = SendConfirmation;
                     Promoted = true;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

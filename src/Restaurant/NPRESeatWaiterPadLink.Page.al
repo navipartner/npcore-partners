@@ -44,13 +44,13 @@ page 6150662 "NPR NPRE Seat.: WaiterPadLink"
             {
                 Caption = 'Change Seating';
                 Image = "Action";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Change Waiter Pad")
             {
                 Caption = 'Change Waiter Pad';
                 Image = View;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -57,7 +57,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
             }
             part(MATRIX; "NPR TM Admis. Forecast Lines")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -74,7 +74,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -91,7 +91,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -108,7 +108,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -125,7 +125,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -145,7 +145,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

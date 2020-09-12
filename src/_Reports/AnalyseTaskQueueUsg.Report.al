@@ -328,17 +328,17 @@ report 6059900 "NPR Analyse Task Queue Usg."
                 field(GroupBy; GroupBy)
                 {
                     Caption = 'Group By:';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ShowLines; ShowLines)
                 {
                     Caption = 'Show Lines';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(WarningLevel; WarningLevel)
                 {
                     Caption = 'Show Warning';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

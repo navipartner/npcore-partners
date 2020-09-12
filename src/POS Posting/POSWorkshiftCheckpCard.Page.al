@@ -165,7 +165,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 ShowFilter = false;
                 SubPageLink = "Workshift Checkpoint Entry No." = FIELD("Entry No.");
                 Visible = NOT IsBlindCount;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(Turnover)
             {
@@ -326,7 +326,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Caption = 'Attached Payment Bins';
                 Editable = false;
                 ShowFilter = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -343,7 +343,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -355,7 +355,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
             {
                 Caption = 'Create X-Report';
                 Image = StatisticsDocument;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -379,7 +379,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Image = VATLedger;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -400,7 +400,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Image = PrintVAT;
                 Promoted = true;
                 PromotedCategory = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

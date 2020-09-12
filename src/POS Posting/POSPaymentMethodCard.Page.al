@@ -91,7 +91,7 @@ page 6150619 "NPR POS Payment Method Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Payment Method Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(History)
             {
@@ -105,7 +105,7 @@ page 6150619 "NPR POS Payment Method Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Payment Line List";
                     RunPageLink = "POS Payment Method Code" = FIELD(Code);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

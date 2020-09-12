@@ -495,18 +495,18 @@ report 6014432 "NPR Customer Analysis"
                     {
                         Caption = 'Show Type';
                         OptionCaption = 'Sales,Balance,Margin';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field("Sorting"; Sorting)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(ShowQty; ShowQty)
                     {
                         Caption = 'Quantity';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

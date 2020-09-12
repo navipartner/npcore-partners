@@ -50,7 +50,7 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
             {
                 Caption = 'Lines';
                 SubPageLink = "Template Code" = FIELD("Template Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

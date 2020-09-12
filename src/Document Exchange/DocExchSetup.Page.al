@@ -177,7 +177,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 Caption = 'Doc. Exchange Paths';
                 Image = CopyBOMVersion;
                 RunObject = Page "NPR Doc. Exchange Paths";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Run Document Exchange")
             {
@@ -186,7 +186,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

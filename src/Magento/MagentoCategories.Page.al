@@ -69,7 +69,7 @@ page 6151416 "NPR Magento Categories"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupCategories;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -89,7 +89,7 @@ page 6151416 "NPR Magento Categories"
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -107,7 +107,7 @@ page 6151416 "NPR Magento Categories"
             {
                 Caption = 'Items';
                 Image = Item;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

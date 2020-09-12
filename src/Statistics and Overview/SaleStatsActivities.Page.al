@@ -16,7 +16,7 @@ page 6059988 "NPR Sale Stats Activities"
         {
             usercontrol(SalesChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger AddInReady()
                 begin
@@ -47,7 +47,7 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 1")
             {
                 Caption = '1';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -58,7 +58,7 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 7")
             {
                 Caption = '7';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -69,7 +69,7 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 31")
             {
                 Caption = '31';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -80,7 +80,7 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 3")
             {
                 Caption = '3';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -91,7 +91,7 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 12")
             {
                 Caption = '12';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -103,7 +103,7 @@ page 6059988 "NPR Sale Stats Activities"
             {
                 Caption = 'Prev';
                 Image = PreviousSet;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -114,7 +114,7 @@ page 6059988 "NPR Sale Stats Activities"
             {
                 Caption = 'Next';
                 Image = NextSet;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -128,7 +128,7 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Sale (Qty.)';
                     Image = Sales;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -139,7 +139,7 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Sale (LCY)';
                     Image = SalesPrices;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -150,7 +150,7 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Profit (LCY)';
                     Image = Turnover;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -161,7 +161,7 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Profit (Pct.)';
                     Image = Percentage;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -175,7 +175,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Point)
                 {
                     Caption = 'Point';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -185,7 +185,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Bubble)
                 {
                     Caption = 'Bubble';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -195,7 +195,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Line)
                 {
                     Caption = 'Line';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -205,7 +205,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StepLine)
                 {
                     Caption = 'StepLine';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -215,7 +215,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Column)
                 {
                     Caption = 'Column';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -225,7 +225,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedColumn)
                 {
                     Caption = 'StackedColumn';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -235,7 +235,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedColumn100)
                 {
                     Caption = 'StackedColumn100';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -245,7 +245,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action("Area")
                 {
                     Caption = 'Area';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -255,7 +255,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedArea)
                 {
                     Caption = 'StackedArea';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -265,7 +265,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedArea100)
                 {
                     Caption = 'StackedArea100';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -275,7 +275,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Pie)
                 {
                     Caption = 'Pie';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -285,7 +285,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Doughnut)
                 {
                     Caption = 'Doughnut';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -295,7 +295,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Range)
                 {
                     Caption = 'Range';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -305,7 +305,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Radar)
                 {
                     Caption = 'Radar';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -315,7 +315,7 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Funnel)
                 {
                     Caption = 'Funnel';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

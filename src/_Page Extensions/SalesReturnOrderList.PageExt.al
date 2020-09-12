@@ -13,7 +13,7 @@ pageextension 6014486 "NPR Sales Return Order List" extends "Sales Return Order 
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

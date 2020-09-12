@@ -13,7 +13,7 @@ pageextension 6014484 "NPR Sales Invoice List" extends "Sales Invoice List"
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

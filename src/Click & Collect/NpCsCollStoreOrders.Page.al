@@ -201,7 +201,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Processing Print Template" <> '';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -221,7 +221,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Document Type" = "Document Type"::Order;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -244,7 +244,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ("Delivery Status" = "Delivery Status"::Delivered) AND ((("Bill via" = "Bill via"::POS) AND ("Delivery Print Template (POS)" <> '')) OR (("Bill via" = "Bill via"::"Sales Document") AND ("Delivery Print Template (S.)" <> '')));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -265,7 +265,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -285,7 +285,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0) AND ("Store Stock");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -305,7 +305,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Send Notification from Store";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -318,7 +318,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                 {
                     Caption = 'Archive';
                     Image = Archive;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -349,7 +349,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Invoke Callback';
                     Image = UpdateShipment;
                     Visible = HasCallback;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -367,7 +367,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                 Caption = 'Document';
                 Image = Document;
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -381,7 +381,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                 Caption = 'Log Entries';
                 Image = Log;
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

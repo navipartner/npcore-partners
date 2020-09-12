@@ -35,7 +35,7 @@ page 6151051 "NPR Item Hierarchy Card"
             {
                 SubPageLink = "Hierarchy Code" = FIELD("Hierarchy Code");
                 SubPageView = SORTING("Hierarchy Code", "Line No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -52,7 +52,7 @@ page 6151051 "NPR Item Hierarchy Card"
                 RunObject = Page "NPR Item Hierarchy Lines";
                 RunPageLink = "Item Hierarchy Code" = FIELD("Hierarchy Code");
                 RunPageView = SORTING("Item Hierarchy Code", "Item Hierarchy Line No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Demand Lines")
             {
@@ -61,7 +61,7 @@ page 6151051 "NPR Item Hierarchy Card"
                 Promoted = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD("Hierarchy Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Distribution lines")
             {
@@ -70,7 +70,7 @@ page 6151051 "NPR Item Hierarchy Card"
                 Promoted = true;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Item Hiearachy" = FIELD("Hierarchy Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

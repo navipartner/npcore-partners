@@ -54,7 +54,7 @@ page 6151420 "NPR Magento Brands"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupBrands;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -75,14 +75,14 @@ page 6151420 "NPR Magento Brands"
                 Image = Card;
                 RunObject = Page "NPR Magento Brand Card";
                 ShortCutKey = 'Shift+F5';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Display Config")
             {
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

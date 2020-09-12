@@ -89,7 +89,7 @@ page 6014455 "NPR Campaign Discount List"
                 RunPageLink = "Table ID" = CONST(6014413),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

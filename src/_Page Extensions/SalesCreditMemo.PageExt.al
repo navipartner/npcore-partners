@@ -43,7 +43,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
             {
                 Caption = 'POS Entry';
                 Image = Entry;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Move Negative Lines")
@@ -53,7 +53,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -72,7 +72,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 PromotedCategory = Category6;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

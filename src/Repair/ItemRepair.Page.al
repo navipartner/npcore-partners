@@ -254,7 +254,7 @@ page 6059991 "NPR Item Repair"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -268,7 +268,7 @@ page 6059991 "NPR Item Repair"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -282,7 +282,7 @@ page 6059991 "NPR Item Repair"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -293,7 +293,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Test Data (Selection)';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -310,7 +310,7 @@ page 6059991 "NPR Item Repair"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -321,7 +321,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Suggest Actions (Selected)';
                     Image = Suggest;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -339,7 +339,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Show Variety 3';
                     Image = ShowSelected;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -351,7 +351,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Show Variety 4';
                     Image = ShowSelected;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -363,7 +363,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Item Card';
                     Image = Card;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -377,7 +377,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Varient List';
                     Image = ItemVariant;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -399,7 +399,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Block Variant';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -410,7 +410,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Delete Variant';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -422,7 +422,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Force New Variety Value (Var)';
                     Image = Forecast;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -433,7 +433,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Block Selected Variant(s)';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -447,7 +447,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Delete Selected Variant(s)';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -461,7 +461,7 @@ page 6059991 "NPR Item Repair"
                 {
                     Caption = 'Force New Variety Value(s) (Var)';
                     Image = Forecast;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

@@ -408,12 +408,12 @@ page 6014403 "NPR Retail ItemReclass.Journal"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -432,7 +432,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -445,7 +445,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
                     ShortCutKey = 'Shift+Ctrl+I';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -461,7 +461,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                   "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD("Variant Code");
                     RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("&Item")
@@ -475,7 +475,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     RunObject = Page "Item Card";
                     RunPageLink = "No." = FIELD("Item No.");
                     ShortCutKey = 'Shift+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Ledger E&ntries")
                 {
@@ -488,7 +488,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     RunPageLink = "Item No." = FIELD("Item No.");
                     RunPageView = SORTING("Item No.");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 group("Item Availability by")
                 {
@@ -498,7 +498,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'Event';
                         Image = "Event";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -509,7 +509,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'Period';
                         Image = Period;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -520,7 +520,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -532,7 +532,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         AccessByPermission = TableData Location = R;
                         Caption = 'Location';
                         Image = Warehouse;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -543,7 +543,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -564,7 +564,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'E&xplode BOM';
                     Image = ExplodeBOM;
                     RunObject = Codeunit "Item Jnl.-Explode BOM";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 separator(Separator52)
                 {
@@ -575,7 +575,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Get Bin Content';
                     Ellipsis = true;
                     Image = GetBinContent;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -599,7 +599,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Test Report';
                     Ellipsis = true;
                     Image = TestReport;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -614,7 +614,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -631,7 +631,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -648,7 +648,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 Image = Print;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

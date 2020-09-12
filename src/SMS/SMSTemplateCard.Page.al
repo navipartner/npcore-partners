@@ -78,7 +78,7 @@ page 6059941 "NPR SMS Template Card"
                 SubPageLink = "Template Code" = FIELD(Code);
                 SubPageView = SORTING("Template Code", "Line No.");
                 UpdatePropagation = Both;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -89,7 +89,7 @@ page 6059941 "NPR SMS Template Card"
                 SubPageLink = TableNo = FIELD("Table No.");
                 SubPageView = SORTING(TableNo, "No.");
                 UpdatePropagation = Both;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -107,7 +107,7 @@ page 6059941 "NPR SMS Template Card"
                     Image = SendTo;
                     Promoted = true;
                     PromotedCategory = Category4;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -120,7 +120,7 @@ page 6059941 "NPR SMS Template Card"
                 {
                     Caption = 'Send batch SMS';
                     Image = SendToMultiple;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -142,7 +142,7 @@ page 6059941 "NPR SMS Template Card"
                     Image = UseFilters;
                     Promoted = true;
                     PromotedCategory = Category4;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

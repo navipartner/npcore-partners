@@ -45,7 +45,7 @@ page 6151588 "NPR Event Atributes Info"
             {
                 Caption = 'Matrix';
                 Image = ShowMatrix;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

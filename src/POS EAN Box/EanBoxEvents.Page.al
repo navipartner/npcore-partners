@@ -59,7 +59,7 @@ page 6060097 "NPR Ean Box Events"
             {
                 Caption = 'Parameters';
                 Image = List;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

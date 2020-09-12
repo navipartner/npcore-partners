@@ -57,7 +57,7 @@ page 6150699 "NPR Retail Data Model Upg.Log"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunPageMode = View;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -72,7 +72,7 @@ page 6150699 "NPR Retail Data Model Upg.Log"
                     Ellipsis = true;
                     Image = "Action";
                     RunObject = Report "NPR Re-run Data Upg. Steps";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

@@ -41,7 +41,7 @@ pageextension 6014411 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
                 Image = BinContent;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR PriceLabel")
             {
@@ -51,7 +51,7 @@ pageextension 6014411 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("NPR Show Imported File")
             {
@@ -59,7 +59,7 @@ pageextension 6014411 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
                 Image = DocInBrowser;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -77,13 +77,13 @@ pageextension 6014411 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

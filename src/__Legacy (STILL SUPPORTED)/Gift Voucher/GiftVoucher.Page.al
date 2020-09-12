@@ -235,7 +235,7 @@ page 6014419 "NPR Gift Voucher"
                 {
                     Caption = 'Cashed';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -246,7 +246,7 @@ page 6014419 "NPR Gift Voucher"
                 {
                     Caption = 'Create Invoice';
                     Image = AddAction;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -261,7 +261,7 @@ page 6014419 "NPR Gift Voucher"
                 {
                     Caption = 'Issued';
                     Image = Addresses;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -272,7 +272,7 @@ page 6014419 "NPR Gift Voucher"
                 {
                     Caption = 'Cashed';
                     Image = Bank;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -288,7 +288,7 @@ page 6014419 "NPR Gift Voucher"
                     Caption = 'Copy';
                     Image = PrintVoucher;
                     Promoted = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -305,7 +305,7 @@ page 6014419 "NPR Gift Voucher"
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

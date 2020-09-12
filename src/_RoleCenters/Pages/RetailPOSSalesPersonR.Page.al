@@ -24,7 +24,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
             part("NP Retail SO Processor Act"; "NPR SO Processor Act")
             {
                 ApplicationArea = All;
-
             }
 
             part(Control6150616; "NPR Activities")
@@ -57,7 +56,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
             part(Control6150615; "NPR Retail Top 10 Customers")
             {
                 ApplicationArea = All;
-
             }
             part(RetailTop10Vendors; "NPR Top 10 Vendors")
             {
@@ -68,7 +66,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
             part(PowerBi; "Power BI Report Spinner Part")
             {
                 ApplicationArea = All;
-
             }
 
             part("MyReports"; "NPR My Reports")
@@ -86,11 +83,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
             {
                 ApplicationArea = All;
             }
-
-
-
-
-
         }
     }
 

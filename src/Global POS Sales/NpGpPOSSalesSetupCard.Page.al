@@ -70,7 +70,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

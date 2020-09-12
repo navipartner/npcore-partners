@@ -92,7 +92,7 @@ page 6151454 "NPR Magento Payment Line List"
         {
             systempart(Control50000; Notes)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -109,7 +109,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = CaptureEnabled;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -146,7 +146,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = RefundEnabled;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -178,7 +178,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) AND ("Account No." <> '') AND (NOT Posted);
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -202,7 +202,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) OR ("Document Table No." = 114);
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -219,7 +219,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

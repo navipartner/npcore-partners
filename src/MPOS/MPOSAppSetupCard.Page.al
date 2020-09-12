@@ -69,7 +69,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Codeunit "NPR MPOS Webservice";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -86,7 +86,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "NPR MPOS QR Code List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Transactions)
             {
@@ -95,7 +95,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -121,7 +121,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "NPR MPOS EOD Receipts";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

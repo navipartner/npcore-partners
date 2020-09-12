@@ -71,7 +71,7 @@ page 6014671 "NPR Lookup Templates"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Lookup Template Lines";
                 RunPageLink = "Lookup Template Table No." = FIELD("Table No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Export Managed Dependency Manifest")
             {
@@ -80,7 +80,7 @@ page 6014671 "NPR Lookup Templates"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

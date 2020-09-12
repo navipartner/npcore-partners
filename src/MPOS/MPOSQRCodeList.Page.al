@@ -61,7 +61,7 @@ page 6059964 "NPR MPOS QR Code List"
                 SubPageLink = "User ID" = FIELD("User ID"),
                               Company = FIELD(Company),
                               "Cash Register Id" = FIELD("Cash Register Id");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -77,7 +77,7 @@ page 6059964 "NPR MPOS QR Code List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -91,7 +91,7 @@ page 6059964 "NPR MPOS QR Code List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

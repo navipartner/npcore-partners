@@ -31,7 +31,7 @@ page 6059952 "NPR Display Content Lines"
             {
                 SubPageLink = "Content Code" = FIELD("Content Code"),
                               "Line No." = FIELD("Line No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

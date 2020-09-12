@@ -82,7 +82,7 @@ page 6014473 "NPR Retail Journal Print"
                     Image = Change;
                     Promoted = true;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -95,7 +95,7 @@ page 6014473 "NPR Retail Journal Print"
                     Image = BinLedger;
                     Promoted = true;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -110,7 +110,7 @@ page 6014473 "NPR Retail Journal Print"
                     Image = BinContent;
                     Promoted = true;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -125,7 +125,7 @@ page 6014473 "NPR Retail Journal Print"
                     Image = Bin;
                     Promoted = true;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

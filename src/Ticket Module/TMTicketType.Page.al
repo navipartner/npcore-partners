@@ -121,7 +121,7 @@ page 6059784 "NPR TM Ticket Type"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Items)
             {
@@ -131,7 +131,7 @@ page 6059784 "NPR TM Ticket Type"
                 PromotedCategory = Process;
                 RunObject = Page "NPR Retail Item List";
                 RunPageLink = "NPR Ticket Type" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Admissions)
             {
@@ -140,7 +140,7 @@ page 6059784 "NPR TM Ticket Type"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Admissions";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Ticket BOM")
             {
@@ -149,7 +149,7 @@ page 6059784 "NPR TM Ticket Type"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket BOM";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6014412)
             {
@@ -162,7 +162,7 @@ page 6059784 "NPR TM Ticket Type"
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060110));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("SMS Template")
             {
@@ -172,7 +172,7 @@ page 6059784 "NPR TM Ticket Type"
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060110));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Edit Pass Template")
             {
@@ -180,7 +180,7 @@ page 6059784 "NPR TM Ticket Type"
                 Image = Template;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

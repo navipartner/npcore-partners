@@ -55,7 +55,7 @@ page 6059773 "NPR Member Card Trx Logs"
                 Caption = 'Edit';
                 Image = Edit;
                 ShortCutKey = 'F2';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

@@ -145,7 +145,7 @@ page 6150653 "NPR POS Sale Line Subpage"
             {
                 Caption = 'Dimensions';
                 Image = Dimensions;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -158,7 +158,7 @@ page 6150653 "NPR POS Sale Line Subpage"
             {
                 Caption = 'Related Sales Documents';
                 Image = CoupledOrder;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -105,7 +105,7 @@ page 6150660 "NPR NPRE Waiter Pad"
             {
                 SubPageLink = "Waiter Pad No." = FIELD("No.");
                 UpdatePropagation = Both;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(ClosingStatus)
             {
@@ -148,7 +148,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Notify kitchen of all ordered items regardless of serving step and print categories';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -164,7 +164,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare next set of items based on current serving step and print categories';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -179,7 +179,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare set of items belonging to a specific serving step';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -194,7 +194,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare selected waiter pad lines regardless of serving step and print categories';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -222,7 +222,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -243,7 +243,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -257,7 +257,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

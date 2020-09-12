@@ -93,7 +93,7 @@ page 6151138 "NPR TM Ticket Waiting List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Notif. Entry";
                 RunPageLink = "Ticket Token" = FIELD(Token);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Notify Now")
             {
@@ -102,7 +102,7 @@ page 6151138 "NPR TM Ticket Waiting List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

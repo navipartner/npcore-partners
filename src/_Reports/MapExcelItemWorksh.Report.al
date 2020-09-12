@@ -43,11 +43,11 @@ report 6060044 "NPR Map Excel Item Worksh."
             {
                 field("Header Row"; HeaderRow)
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field("Try to match fields automatically"; BoolTryMatch)
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

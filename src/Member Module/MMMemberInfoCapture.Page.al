@@ -867,7 +867,7 @@ page 6060134 "NPR MM Member Info Capture"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ShowImportMemberAction;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -881,7 +881,7 @@ page 6060134 "NPR MM Member Info Capture"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

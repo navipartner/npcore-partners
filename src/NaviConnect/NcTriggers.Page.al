@@ -63,7 +63,7 @@ page 6151520 "NPR Nc Triggers"
             {
                 Caption = 'Task Queue Entry';
                 Image = JobTimeSheet;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -78,7 +78,7 @@ page 6151520 "NPR Nc Triggers"
                 RunPageLink = "Trigger Code" = FIELD(Code);
                 RunPageView = SORTING("Trigger Code")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Task List")
             {
@@ -91,7 +91,7 @@ page 6151520 "NPR Nc Triggers"
                 RunPageLink = "Record Value" = FIELD(Code);
                 RunPageView = WHERE(Type = CONST(Insert),
                                     "Table No." = CONST(6151520));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

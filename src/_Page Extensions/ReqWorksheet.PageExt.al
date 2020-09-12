@@ -12,7 +12,7 @@ pageextension 6014429 "NPR Req. Worksheet" extends "Req. Worksheet"
                 Caption = 'Read from scanner';
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

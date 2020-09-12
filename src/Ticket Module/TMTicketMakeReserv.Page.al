@@ -313,7 +313,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 Image = ChangeDate;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -326,7 +326,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
             {
                 Caption = 'Update Schedule';
                 Image = "Action";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

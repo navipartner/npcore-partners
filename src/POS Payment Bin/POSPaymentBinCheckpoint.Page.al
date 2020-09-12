@@ -292,7 +292,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

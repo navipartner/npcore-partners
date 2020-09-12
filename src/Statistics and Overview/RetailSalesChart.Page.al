@@ -24,7 +24,7 @@ page 6059813 "NPR Retail Sales Chart"
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
@@ -45,7 +45,7 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -57,7 +57,7 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -69,7 +69,7 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -81,7 +81,7 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -93,7 +93,7 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -107,7 +107,7 @@ page 6059813 "NPR Retail Sales Chart"
             {
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -119,7 +119,7 @@ page 6059813 "NPR Retail Sales Chart"
             {
                 Caption = 'Next';
                 Image = NextRecord;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

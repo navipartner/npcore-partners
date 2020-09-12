@@ -193,7 +193,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -213,7 +213,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Image = SendElectronicDocument;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -238,7 +238,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
             {
                 Caption = 'Show eTicket Template Data';
                 Image = ElectronicDoc;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 
@@ -259,7 +259,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Image = SendElectronicDocument;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

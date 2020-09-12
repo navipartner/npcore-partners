@@ -40,7 +40,7 @@ page 6151068 "NPR Distrib. Group Member Card"
             part(Control9; "NPR Distribution Setup")
             {
                 SubPageLink = "Distribution Group" = FIELD("Distribution Group");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -23,7 +23,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             {
                 Provider = PurchLines;
                 SubPageLink = "No." = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -34,7 +34,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             action("NPR Show Imported File")
             {
                 Caption = 'Show Imported File';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -59,7 +59,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Image = BinContent;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR PriceLabel")
                 {
@@ -68,7 +68,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

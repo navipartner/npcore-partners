@@ -80,7 +80,7 @@ page 6151375 "NPR CS UI"
             part(Control9; "NPR CS UI Subform")
             {
                 SubPageLink = "UI Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -88,12 +88,12 @@ page 6151375 "NPR CS UI"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -112,13 +112,13 @@ page 6151375 "NPR CS UI"
                     Image = "Action";
                     RunObject = Page "NPR CS UI Functions";
                     RunPageLink = "UI Code" = FIELD(Code);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Reset Field Defaults")
                 {
                     Caption = 'Reset Field Defaults';
                     Image = ClearFilter;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

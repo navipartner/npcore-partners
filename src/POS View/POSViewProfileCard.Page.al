@@ -72,7 +72,7 @@ page 6150636 "NPR POS View Profile Card"
                 {
                     Caption = 'Detect Decimal and Thousands Separators';
                     Image = SuggestNumber;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -94,7 +94,7 @@ page 6150636 "NPR POS View Profile Card"
                 {
                     Caption = 'Import';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -128,7 +128,7 @@ page 6150636 "NPR POS View Profile Card"
                 {
                     Caption = 'Export';
                     Image = Export;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -146,7 +146,7 @@ page 6150636 "NPR POS View Profile Card"
                 {
                     Caption = 'Delete';
                     Image = Delete;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

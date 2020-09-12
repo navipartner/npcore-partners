@@ -52,7 +52,7 @@ page 6151092 "NPR Nc RapidConnect Subform"
                 RunPageLink = "Setup Code" = FIELD("Setup Code"),
                               "Table ID" = FIELD("Table ID");
                 Visible = ("Modify Trigger" = 2);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

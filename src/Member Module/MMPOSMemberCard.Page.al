@@ -151,14 +151,14 @@ page 6060140 "NPR MM POS Member Card"
                 SubPageLink = "Member Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Descending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
         {
             systempart(Control6014400; Notes)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -176,7 +176,7 @@ page 6060140 "NPR MM POS Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Register Arrival")
             {
@@ -185,7 +185,7 @@ page 6060140 "NPR MM POS Member Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -208,7 +208,7 @@ page 6060140 "NPR MM POS Member Card"
                 Image = Start;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -226,7 +226,7 @@ page 6060140 "NPR MM POS Member Card"
                 Image = ChangeCustomer;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -239,7 +239,7 @@ page 6060140 "NPR MM POS Member Card"
                 Caption = 'Profiles';
                 Image = Answers;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -254,7 +254,7 @@ page 6060140 "NPR MM POS Member Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -283,7 +283,7 @@ page 6060140 "NPR MM POS Member Card"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -311,7 +311,7 @@ page 6060140 "NPR MM POS Member Card"
                     Image = ItemLedger;
                     Promoted = true;
                     PromotedCategory = Category4;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -339,7 +339,7 @@ page 6060140 "NPR MM POS Member Card"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -370,7 +370,7 @@ page 6060140 "NPR MM POS Member Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -393,7 +393,7 @@ page 6060140 "NPR MM POS Member Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

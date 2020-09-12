@@ -261,23 +261,23 @@ report 6014475 "NPR Item Replenish. by Store"
                     {
                         Caption = 'Excl. Empty Replenish Setup';
                         Visible = false;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(ShowItems; ShowItems)
                     {
                         Caption = 'Show Items';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrepareReqWksh; PrepareReqWksh)
                     {
                         Caption = 'Prepare Order Planning';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(OrderDate; OrderDate)
                     {
                         Caption = 'Order Date';
                         Visible = false;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

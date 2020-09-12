@@ -101,7 +101,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Image = PrintCheck;
                 Promoted = true;
                 PromotedCategory = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -124,7 +124,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Promoted = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -146,7 +146,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Promoted = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -174,7 +174,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(MembershipSetup)
             {
@@ -183,7 +183,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Shipment)
             {
@@ -192,7 +192,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
