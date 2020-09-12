@@ -16,11 +16,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
             {
                 ApplicationArea = Basic, Suite;
             }
-            /* part("O365 Activities Ext"; "O365 Activities Ext")
-            {
 
-            }
-             */
             part("NP Retail SO Processor Act"; "NPR SO Processor Act")
             {
                 ApplicationArea = All;
@@ -40,8 +36,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 Caption = 'POS Activities';
                 ApplicationArea = All;
             }
-
-
             part(ControlPurchase; "NPR Acc. Payables Act")
             {
                 Caption = 'Purchase Activities';
@@ -62,12 +56,10 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 ApplicationArea = All;
 
             }
-
             part(PowerBi; "Power BI Report Spinner Part")
             {
                 ApplicationArea = All;
             }
-
             part("MyReports"; "NPR My Reports")
             {
                 ApplicationArea = All;
@@ -425,20 +417,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Credit Memos";
                     ToolTip = 'View Sales Credit Memos that have been done.';
-                    ApplicationArea = All;
-                }
-
-
-
-                action("Retail Document")
-                {
-                    //ApplicationArea = Warehouse;
-                    Caption = 'Retail Document';
-                    Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    RunObject = Page "NPR Retail Document List";
-                    ToolTip = 'View the list of Retail Document.';
                     ApplicationArea = All;
                 }
                 action("Repair Document List")
