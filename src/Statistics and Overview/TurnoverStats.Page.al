@@ -340,7 +340,8 @@ page 6014483 "NPR Turnover Stats"
             EndDateFilter := Today;
         //+NPR5.55 [414769]
 
-
+        IF StartDateFilter = 0D THEN
+            StartDateFilter := TODAY;
 
 
 
@@ -470,6 +471,8 @@ page 6014483 "NPR Turnover Stats"
         //CalculateSaleLineNoAmount(RegisterFilter,SaleDate);
         CalculateSaleLineNoAmount(RegisterFilter, StartDateFilter, EndDateFilter);
         //+NPR5.55 [414769]
+        StartDate := StartDateFilter;
+        EndDate := EndDateFilter;
     end;
 
     procedure CalculateSaleLineNoAmount(RegisterFilter: Text[250]; StartDate: Date; EndDate: Date)
