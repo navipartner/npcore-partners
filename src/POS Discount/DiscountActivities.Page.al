@@ -29,14 +29,14 @@ page 6059987 "NPR Discount Activities"
                         Caption = 'New Mixed Discount';
                         RunObject = Page "NPR Mixed Discount";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     action("New Period Discount")
                     {
                         Caption = 'New Perioddiscount';
                         RunObject = Page "NPR Campaign Discount";
                         RunPageMode = Create;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

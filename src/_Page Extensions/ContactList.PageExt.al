@@ -11,7 +11,7 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
             {
                 Caption = 'POS Entries';
                 Image = Entries;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter(NewSalesQuote)
@@ -20,7 +20,7 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
             {
                 Caption = 'PhoneLookup';
                 Image = ImportLog;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

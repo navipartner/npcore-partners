@@ -98,7 +98,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                     field(ShowDetails; ShowDetails)
                     {
                         Caption = 'ShowDetails';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
                 group("Created In Company")
@@ -115,43 +115,43 @@ report 6014403 "NPR Cashed Gift Vouchers"
                             {
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList[2]"; CompanyList[2])
                             {
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList[3]"; CompanyList[3])
                             {
                                 Visible = CompanyVisible3;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList[4]"; CompanyList[4])
                             {
                                 Visible = CompanyVisible4;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList[5]"; CompanyList[5])
                             {
                                 Visible = CompanyVisible5;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList[6]"; CompanyList[6])
                             {
                                 Visible = CompanyVisible6;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList[7]"; CompanyList[7])
                             {
                                 Visible = CompanyVisible7;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList[8]"; CompanyList[8])
                             {
                                 Visible = CompanyVisible8;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                         }
                         group(Control6150625)
@@ -162,50 +162,50 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyListName[2]"; CompanyListName[2])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyListName[3]"; CompanyListName[3])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible3;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyListName[4]"; CompanyListName[4])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible4;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyListName[5]"; CompanyListName[5])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible5;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyListName[6]"; CompanyListName[6])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible6;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyListName[7]"; CompanyListName[7])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible7;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyListName[8]"; CompanyListName[8])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible8;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                         }
                     }
@@ -224,43 +224,43 @@ report 6014403 "NPR Cashed Gift Vouchers"
                             {
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList2[2]"; CompanyList2[2])
                             {
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList2[3]"; CompanyList2[3])
                             {
                                 Visible = CompanyVisible3;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList2[4]"; CompanyList2[4])
                             {
                                 Visible = CompanyVisible4;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList2[5]"; CompanyList2[5])
                             {
                                 Visible = CompanyVisible5;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList2[6]"; CompanyList2[6])
                             {
                                 Visible = CompanyVisible6;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList2[7]"; CompanyList2[7])
                             {
                                 Visible = CompanyVisible7;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field("CompanyList2[8]"; CompanyList2[8])
                             {
                                 Visible = CompanyVisible8;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                         }
                         group(Control6150645)
@@ -271,56 +271,56 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field(Control6150643; CompanyListName[2])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field(Control6150642; CompanyListName[3])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible3;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field(Control6150641; CompanyListName[4])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible4;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field(Control6150640; CompanyListName[5])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible5;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field(Control6150621; CompanyListName[6])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible6;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field(Control6150620; CompanyListName[7])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible7;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                             field(Control6150619; CompanyListName[8])
                             {
                                 Editable = false;
                                 ShowCaption = false;
                                 Visible = CompanyVisible8;
-                                ApplicationArea=All;
+                                ApplicationArea = All;
                             }
                         }
                     }

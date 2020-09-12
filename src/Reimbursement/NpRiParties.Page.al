@@ -49,7 +49,7 @@ page 6151105 "NPR NpRi Parties"
                 RunObject = Page "NPR NpRi Reimbursements";
                 RunPageLink = "Party Type" = FIELD("Party Type"),
                               "Party No." = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

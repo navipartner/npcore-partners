@@ -341,7 +341,7 @@ page 6014469 "NPR Retail Document Header"
                 SubPageLink = "Document Type" = FIELD("Document Type"),
                               "Document No." = FIELD("No.");
                 SubPageView = SORTING("Document Type", "Document No.", "Line No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -354,7 +354,7 @@ page 6014469 "NPR Retail Document Header"
             {
                 Caption = 'OK';
                 Image = Confirm;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -368,7 +368,7 @@ page 6014469 "NPR Retail Document Header"
             {
                 Caption = ' Cancel';
                 Image = Cancel;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -382,7 +382,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Print Order Note';
                     Image = PrintDocument;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -410,7 +410,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Label';
                     Image = DepositSlip;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -424,7 +424,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Customer Letter';
                     Image = CustomerLedger;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -439,7 +439,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Purchase Contract';
                     Image = Documents;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -456,7 +456,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Lease';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -476,7 +476,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Detail Trial Bal.';
                     Image = BankAccountLedger;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -518,13 +518,13 @@ page 6014469 "NPR Retail Document Header"
                     RunObject = Page "NPR Retail Document List";
                     ShortCutKey = 'F5';
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Create Invoice")
                 {
                     Caption = 'Create Invoice';
                     Image = Invoice;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -537,7 +537,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Create purchaseorder';
                     Image = "Order";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -548,7 +548,7 @@ page 6014469 "NPR Retail Document Header"
                 {
                     Caption = 'Send Status SMS';
                     Image = SendMail;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

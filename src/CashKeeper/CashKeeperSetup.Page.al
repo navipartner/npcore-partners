@@ -44,7 +44,7 @@ page 6059945 "NPR CashKeeper Setup"
                 Image = View;
                 RunObject = Page "NPR CashKeeper Transaction";
                 RunPageLink = "Register No." = FIELD("Register No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("CashKeeper Overview")
             {
@@ -52,7 +52,7 @@ page 6059945 "NPR CashKeeper Setup"
                 Image = View;
                 RunObject = Page "NPR CashKeeper Overview";
                 RunPageLink = "Register No." = FIELD("Register No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

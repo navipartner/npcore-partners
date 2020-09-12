@@ -320,17 +320,17 @@ page 6014402 "NPR Retail Item Journal"
             {
                 SubPageLink = "No." = FIELD("Item No.");
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -351,7 +351,7 @@ page 6014402 "NPR Retail Item Journal"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -366,7 +366,7 @@ page 6014402 "NPR Retail Item Journal"
                     Promoted = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+Ctrl+I';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -382,7 +382,7 @@ page 6014402 "NPR Retail Item Journal"
                                   "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD("Variant Code");
                     RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 separator("-")
                 {
@@ -392,7 +392,7 @@ page 6014402 "NPR Retail Item Journal"
                 {
                     Caption = '&Recalculate Unit Amount';
                     Image = UpdateUnitCost;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -412,7 +412,7 @@ page 6014402 "NPR Retail Item Journal"
                     RunObject = Page "Item Card";
                     RunPageLink = "No." = FIELD("Item No.");
                     ShortCutKey = 'Shift+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Ledger E&ntries")
                 {
@@ -425,7 +425,7 @@ page 6014402 "NPR Retail Item Journal"
                     RunPageLink = "Item No." = FIELD("Item No.");
                     RunPageView = SORTING("Item No.");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 group("Item Availability by")
                 {
@@ -435,7 +435,7 @@ page 6014402 "NPR Retail Item Journal"
                     {
                         Caption = 'Event';
                         Image = "Event";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -446,7 +446,7 @@ page 6014402 "NPR Retail Item Journal"
                     {
                         Caption = 'Period';
                         Image = Period;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -457,7 +457,7 @@ page 6014402 "NPR Retail Item Journal"
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -469,7 +469,7 @@ page 6014402 "NPR Retail Item Journal"
                         AccessByPermission = TableData Location = R;
                         Caption = 'Location';
                         Image = Warehouse;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -480,7 +480,7 @@ page 6014402 "NPR Retail Item Journal"
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -503,14 +503,14 @@ page 6014402 "NPR Retail Item Journal"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Codeunit "Item Jnl.-Explode BOM";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("&Calculate Whse. Adjustment")
                 {
                     Caption = '&Calculate Whse. Adjustment';
                     Ellipsis = true;
                     Image = CalculateWarehouseAdjustment;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -530,7 +530,7 @@ page 6014402 "NPR Retail Item Journal"
                     Image = GetStandardJournal;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -550,7 +550,7 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = '&Save as Standard Journal';
                     Ellipsis = true;
                     Image = SaveasStandardJournal;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -577,7 +577,7 @@ page 6014402 "NPR Retail Item Journal"
                 {
                     Caption = 'Import from Scanner';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -596,7 +596,7 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = 'Test Report';
                     Ellipsis = true;
                     Image = TestReport;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -611,7 +611,7 @@ page 6014402 "NPR Retail Item Journal"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -628,7 +628,7 @@ page 6014402 "NPR Retail Item Journal"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -645,7 +645,7 @@ page 6014402 "NPR Retail Item Journal"
                 Image = Print;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -661,7 +661,7 @@ page 6014402 "NPR Retail Item Journal"
             {
                 Caption = 'Price Label';
                 Image = BinContent;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 

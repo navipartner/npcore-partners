@@ -135,7 +135,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 Image = Post;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -150,7 +150,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 Image = PostBatch;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -170,7 +170,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "External Ticket No." = FIELD("Ticket Reference No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

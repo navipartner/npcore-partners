@@ -70,7 +70,7 @@ page 6014532 "NPR TouchScreen: Saved sales"
                     SubPageView = SORTING("Register No.", "Sales Ticket No.", "Sale Type", "Line No.")
                                   ORDER(Ascending)
                                   WHERE(Type = FILTER(<> Payment));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 part("Payment Lines"; "NPR Sale POS: Saved Sale Line")
                 {
@@ -79,7 +79,7 @@ page 6014532 "NPR TouchScreen: Saved sales"
                     SubPageView = SORTING("Register No.", "Sales Ticket No.", "Sale Type", "Line No.")
                                   ORDER(Ascending)
                                   WHERE(Type = CONST(Payment));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

@@ -66,7 +66,7 @@ page 6014467 "NPR Quantity Discount List"
                 RunPageLink = "Table ID" = CONST(6014439),
                               "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

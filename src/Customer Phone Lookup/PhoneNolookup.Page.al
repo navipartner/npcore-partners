@@ -116,7 +116,7 @@ page 6014412 "NPR Phone No lookup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F6';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -131,7 +131,7 @@ page 6014412 "NPR Phone No lookup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F3';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

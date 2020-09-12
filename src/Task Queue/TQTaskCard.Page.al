@@ -248,7 +248,7 @@ page 6059903 "NPR TQ Task Card"
                     RunPageView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.")
                                   ORDER(Descending);
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }
@@ -265,7 +265,7 @@ page 6059903 "NPR TQ Task Card"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -287,7 +287,7 @@ page 6059903 "NPR TQ Task Card"
                     Image = "Report";
                     Promoted = true;
                     PromotedCategory = "Report";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

@@ -147,7 +147,7 @@ page 6014423 "NPR Report Selection: Retail"
                     PromotedIsBig = true;
                     RunObject = Page "NPR Retail Report Select. List";
                     ShortCutKey = 'F5';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

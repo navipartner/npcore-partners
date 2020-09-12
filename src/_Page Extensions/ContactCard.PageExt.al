@@ -66,7 +66,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
             {
                 Caption = 'POS Entries';
                 Image = Entries;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         addafter("Create &Interaction")
@@ -78,7 +78,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("NPR ResetPassword")
@@ -88,7 +88,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                 {
                     Caption = 'Reset Magento Password';
                     Image = UserCertificate;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

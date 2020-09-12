@@ -271,7 +271,7 @@ page 6060076 "NPR MM Members.Setup Card"
                 Caption = 'Recurring Payment Setup';
                 Image = PaymentHistory;
                 RunObject = Page "NPR MM Recur. Payment Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

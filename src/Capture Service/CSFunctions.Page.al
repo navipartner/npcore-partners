@@ -34,12 +34,12 @@ page 6151379 "NPR CS Functions"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

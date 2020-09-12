@@ -445,7 +445,7 @@ page 6014406 "NPR Register Card"
                     Image = Interaction;
                     Promoted = true;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -456,7 +456,7 @@ page 6014406 "NPR Register Card"
                 {
                     Caption = 'Create New Register';
                     Image = Register;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -473,7 +473,7 @@ page 6014406 "NPR Register Card"
                     Image = UserSetup;
                     RunObject = Page "User Setup";
                     RunPageLink = "NPR Backoffice Register No." = FIELD("Register No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Skuffer)
                 {
@@ -483,7 +483,7 @@ page 6014406 "NPR Register Card"
                     RunPageLink = Code = FIELD("Register No."),
                                   Type = CONST(Register);
                     RunPageView = SORTING(Type, Code, "Alt. No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Show Registers Periods")
                 {
@@ -491,13 +491,13 @@ page 6014406 "NPR Register Card"
                     Image = Register;
                     RunObject = Page "NPR Register Period List";
                     RunPageLink = "Register No." = FIELD("Register No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Set Saldo Inicial ")
                 {
                     Caption = 'Set Saldo Inicial';
                     Image = AmountByPeriod;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -529,7 +529,7 @@ page 6014406 "NPR Register Card"
                     Caption = 'Dimensions';
                     Image = DefaultDimension;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

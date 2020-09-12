@@ -100,7 +100,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -111,7 +111,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -122,7 +122,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -133,7 +133,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -144,7 +144,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

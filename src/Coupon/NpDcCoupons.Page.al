@@ -72,7 +72,7 @@ page 6151593 "NPR NpDc Coupons"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -97,7 +97,7 @@ page 6151593 "NPR NpDc Coupons"
                 {
                     Caption = 'Archive Coupons';
                     Image = Post;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -115,7 +115,7 @@ page 6151593 "NPR NpDc Coupons"
                 {
                     Caption = 'Show Expired Coupons';
                     Image = "Filter";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -135,7 +135,7 @@ page 6151593 "NPR NpDc Coupons"
                 RunObject = Page "NPR NpDc Coupon Entries";
                 RunPageLink = "Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -71,7 +71,7 @@ page 6151373 "NPR CS Comm. Log Card"
                     Image = Evaluate;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

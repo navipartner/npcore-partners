@@ -38,7 +38,7 @@ page 6151221 "NPR PrintNode Printer List"
                 Image = PrintInstallment;
                 Promoted = true;
                 PromotedCategory = New;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

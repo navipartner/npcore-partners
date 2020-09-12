@@ -488,12 +488,12 @@ report 6014435 "NPR Vendor/Item Group"
                     field(viskunhovedtal; Viskunhovedtal)
                     {
                         Caption = 'Show Only Main Figures';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(sortervaregruppe; Sortervaregruppe)
                     {
                         Caption = 'Sort Item Groups';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -508,14 +508,14 @@ report 6014435 "NPR Vendor/Item Group"
                         Caption = 'Show';
                         Enabled = ShowBool;
                         OptionCaption = 'Amount,Turnover,DR';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(sorter; Sorter)
                     {
                         Caption = 'Show Largest/Smallest';
                         Enabled = ShowBool;
                         OptionCaption = 'Most,Least';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

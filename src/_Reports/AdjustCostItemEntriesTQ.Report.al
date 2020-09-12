@@ -43,20 +43,20 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
                         Caption = 'Item No. Filter';
                         Editable = FilterItemNoEditable;
                         TableRelation = Item;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(FilterItemCategory; ItemCategoryFilter)
                     {
                         Caption = 'Item Category Filter';
                         Editable = FilterItemCategoryEditable;
                         TableRelation = "Item Category";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(Post; PostToGL)
                     {
                         Caption = 'Post to G/L';
                         Enabled = PostEnable;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         var
@@ -71,7 +71,7 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
                     field(SkipVariousItems; SkipVariousItems)
                     {
                         Caption = 'Skip Various Items';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

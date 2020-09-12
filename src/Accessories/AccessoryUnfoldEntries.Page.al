@@ -104,7 +104,7 @@ page 6014505 "NPR Accessory Unfold Entries"
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

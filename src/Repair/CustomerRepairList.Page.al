@@ -86,7 +86,7 @@ page 6014443 "NPR Customer Repair List"
         {
             systempart(Control6014405; Notes)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

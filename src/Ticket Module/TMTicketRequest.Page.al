@@ -150,7 +150,7 @@ page 6060103 "NPR TM Ticket Request"
             {
                 Caption = 'Attributes';
                 SubPageLink = "Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -168,7 +168,7 @@ page 6060103 "NPR TM Ticket Request"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("View Online Ticket")
             {
@@ -176,7 +176,7 @@ page 6060103 "NPR TM Ticket Request"
                 Image = Web;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -193,7 +193,7 @@ page 6060103 "NPR TM Ticket Request"
             {
                 Caption = 'Handle Postpaid Tickets';
                 Image = Invoice;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -210,7 +210,7 @@ page 6060103 "NPR TM Ticket Request"
                 Image = PostApplication;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -233,7 +233,7 @@ page 6060103 "NPR TM Ticket Request"
                 Caption = 'Revoke Ticket Request';
                 Ellipsis = true;
                 Image = RemoveLine;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -247,7 +247,7 @@ page 6060103 "NPR TM Ticket Request"
             {
                 Caption = 'Export Ticket Batch List';
                 Image = ExportToExcel;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

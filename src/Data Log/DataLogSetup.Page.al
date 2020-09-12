@@ -71,7 +71,7 @@ page 6059897 "NPR Data Log Setup"
                 Image = ClearLog;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -85,7 +85,7 @@ page 6059897 "NPR Data Log Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -106,7 +106,7 @@ page 6059897 "NPR Data Log Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Data Log Subscribers";
                 RunPageLink = "Table ID" = FIELD("Table ID");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(DataLog)
             {
@@ -118,7 +118,7 @@ page 6059897 "NPR Data Log Setup"
                 RunObject = Page "NPR Data Log Records";
                 RunPageLink = "Table ID" = FIELD("Table ID");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

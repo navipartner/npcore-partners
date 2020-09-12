@@ -123,7 +123,7 @@ page 6014663 "NPR Stock-Take Worksheet"
             {
                 SubPageLink = "Stock-Take Config Code" = FIELD("Stock-Take Config Code"),
                               "Worksheet Name" = FIELD(Name);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             field(LineTypeCountText; LineTypeCountText)
             {
@@ -147,7 +147,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 {
                     Caption = 'Import from &File';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -174,7 +174,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 {
                     Caption = '&Import from Scanner';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -187,7 +187,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 {
                     Caption = 'Import Worksheets & Lines';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -220,7 +220,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 {
                     Caption = '&Aggregate';
                     Image = Compress;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -236,7 +236,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                     Caption = 'Calc. Inventory and Transfer';
                     Image = Calculate;
                     ShortCutKey = 'F11';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -259,7 +259,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 {
                     Caption = 'Top-Up Area';
                     Image = CalculatePlan;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -279,7 +279,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 Image = Setup;
                 RunObject = Page "NPR Stock-Take Config. Card";
                 RunPageLink = Code = FIELD("Stock-Take Config Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

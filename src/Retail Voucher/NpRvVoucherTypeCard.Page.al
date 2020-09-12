@@ -188,7 +188,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasIssueVoucherSetup;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -205,7 +205,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasValidateVoucherSetup;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -222,7 +222,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasApplyPaymentSetup;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -242,7 +242,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 RunObject = Page "NPR NpRv Vouchers";
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Partner Card")
             {
@@ -251,7 +251,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 RunObject = Page "NPR NpRv Partner Card";
                 RunPageLink = Code = FIELD("Partner Code");
                 Visible = "Partner Code" <> '';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Partner Relations")
             {
@@ -259,7 +259,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 Image = UserCertificate;
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Voucher Type" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

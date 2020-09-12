@@ -45,7 +45,7 @@ page 6151524 "NPR Nc Endpoint E-mail List"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

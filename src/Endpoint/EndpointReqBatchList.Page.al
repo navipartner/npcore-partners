@@ -52,7 +52,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 Image = XMLFile;
                 RunObject = Page "NPR Endpoint Request List";
                 RunPageLink = "Request Batch No." = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -64,7 +64,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 {
                     Caption = 'Set to Collecting';
                     Image = Add;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -76,7 +76,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 {
                     Caption = 'Set to Ready to Send';
                     Image = Approve;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -88,7 +88,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 {
                     Caption = 'Set to Sent';
                     Image = SendApprovalRequest;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

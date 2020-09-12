@@ -80,7 +80,7 @@ page 6014541 "NPR Report Selection: Contract"
                 Caption = 'List';
                 Image = List;
                 RunObject = Page "NPR Retail Report Select. List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

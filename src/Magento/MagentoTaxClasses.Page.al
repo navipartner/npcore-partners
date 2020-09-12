@@ -45,7 +45,7 @@ page 6151407 "NPR Magento Tax Classes"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

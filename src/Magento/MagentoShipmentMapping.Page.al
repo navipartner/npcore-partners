@@ -56,7 +56,7 @@ page 6151449 "NPR Magento Shipment Mapping"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

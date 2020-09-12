@@ -79,7 +79,7 @@ page 6151576 "NPR Event Resource Overview"
                 RunObject = Page "Resource Card";
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group("Period Length")
             {
@@ -88,7 +88,7 @@ page 6151576 "NPR Event Resource Overview"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -99,7 +99,7 @@ page 6151576 "NPR Event Resource Overview"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -110,7 +110,7 @@ page 6151576 "NPR Event Resource Overview"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -121,7 +121,7 @@ page 6151576 "NPR Event Resource Overview"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -132,7 +132,7 @@ page 6151576 "NPR Event Resource Overview"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -145,7 +145,7 @@ page 6151576 "NPR Event Resource Overview"
             {
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -156,7 +156,7 @@ page 6151576 "NPR Event Resource Overview"
             {
                 Caption = 'Next';
                 Image = NextRecord;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

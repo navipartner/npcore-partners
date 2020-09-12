@@ -141,7 +141,7 @@ page 6014431 "NPR Gift Voucher List"
             {
                 Caption = 'Cash In';
                 Image = CashFlow;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -158,7 +158,7 @@ page 6014431 "NPR Gift Voucher List"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -178,7 +178,7 @@ page 6014431 "NPR Gift Voucher List"
             {
                 Caption = 'Send as PDF';
                 Image = SendEmailPDF;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -200,7 +200,7 @@ page 6014431 "NPR Gift Voucher List"
             {
                 Caption = 'Gift Voucher A5';
                 Image = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -213,7 +213,7 @@ page 6014431 "NPR Gift Voucher List"
             {
                 Caption = 'Gift Voucher A5 Right';
                 Image = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -226,7 +226,7 @@ page 6014431 "NPR Gift Voucher List"
             {
                 Caption = 'Gift Voucher/Credit Voucher';
                 Image = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -239,7 +239,7 @@ page 6014431 "NPR Gift Voucher List"
             {
                 Caption = 'Cashed Gift Vouchers';
                 Image = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -252,7 +252,7 @@ page 6014431 "NPR Gift Voucher List"
             {
                 Caption = 'Magento Gift Voucher';
                 Image = "Report";
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

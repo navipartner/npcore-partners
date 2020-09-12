@@ -145,7 +145,7 @@ page 6059785 "NPR TM Ticket List"
                 Image = ElectronicNumber;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -159,7 +159,7 @@ page 6059785 "NPR TM Ticket List"
             {
                 Caption = 'Block/Unblock Tickets';
                 Image = Change;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -171,7 +171,7 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'Revoke Ticket';
                 Ellipsis = true;
                 Image = RemoveLine;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -191,7 +191,7 @@ page 6059785 "NPR TM Ticket List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket AccessEntry List";
                 RunPageLink = "Ticket No." = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Ticketholder)
             {
@@ -200,7 +200,7 @@ page 6059785 "NPR TM Ticket List"
                 Image = WIPEntries;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -216,7 +216,7 @@ page 6059785 "NPR TM Ticket List"
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Request";
                 RunPageLink = "Entry No." = FIELD("Ticket Reservation Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6014406)
             {
@@ -227,7 +227,7 @@ page 6059785 "NPR TM Ticket List"
                 Image = Web;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -244,7 +244,7 @@ page 6059785 "NPR TM Ticket List"
                 Image = ElectronicNumber;
                 RunObject = Page "NPR TM Ticket Notif. Entry";
                 RunPageLink = "Ticket No." = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6014407)
             {
@@ -255,7 +255,7 @@ page 6059785 "NPR TM Ticket List"
                 Image = Print;
                 Promoted = true;
                 ShortCutKey = 'Shift+Ctrl+P';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -277,7 +277,7 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'Issued Tickets';
                 Image = Print;
                 RunObject = Report "NPR Issued Tickets";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

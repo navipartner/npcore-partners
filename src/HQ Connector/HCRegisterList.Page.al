@@ -114,7 +114,7 @@ page 6150903 "NPR HC Register List"
                 RunPageLink = "BC Register No." = FIELD("Register No.");
                 RunPageView = SORTING("BC Payment Type POS No.", "BC Register No.")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Default Dimension")
             {
@@ -124,7 +124,7 @@ page 6150903 "NPR HC Register List"
                 RunObject = Page "Default Dimensions";
                 RunPageLink = "Table ID" = CONST(6150902),
                               "No." = FIELD("Register No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

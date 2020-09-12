@@ -119,7 +119,7 @@ page 6059990 "NPR Item Repair Action"
                 {
                     Caption = 'Execute Action (Single)';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -132,7 +132,7 @@ page 6059990 "NPR Item Repair Action"
                 {
                     Caption = 'Execute Action (Selected)';
                     Image = "Action";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

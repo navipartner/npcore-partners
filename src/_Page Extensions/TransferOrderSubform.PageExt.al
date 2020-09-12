@@ -46,7 +46,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

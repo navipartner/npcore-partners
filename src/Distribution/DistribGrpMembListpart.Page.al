@@ -48,7 +48,7 @@ page 6151058 "NPR Distrib. Grp Memb Listpart"
                 Promoted = true;
                 RunObject = Page "NPR Retail Replenish. SKU List";
                 RunPageLink = "Location Code" = FIELD(Location);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Distribution Lines")
             {
@@ -56,7 +56,7 @@ page 6151058 "NPR Distrib. Grp Memb Listpart"
                 Image = ItemAvailbyLoc;
                 Promoted = true;
                 RunObject = Page "NPR Distribution Lines";
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunPageLink = "Distribution Group Member"=FIELD("Distribution Member Id"),
                 //              "Distribution Item"=FILTER(<>'');
             }
@@ -66,7 +66,7 @@ page 6151058 "NPR Distrib. Grp Memb Listpart"
                 Promoted = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Location Code" = FIELD(Location);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

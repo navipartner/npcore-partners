@@ -46,12 +46,12 @@ page 6150687 "NPR NPRE Kitchen Station Slct."
             systempart(Control6014409; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control6014410; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

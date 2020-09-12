@@ -43,7 +43,7 @@ page 6150734 "NPR POS Sales WF Set Entries"
                 RunObject = Page "NPR POS Sales WF Steps";
                 RunPageLink = "Set Code" = FIELD("Set Code"),
                               "Workflow Code" = FIELD("Workflow Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

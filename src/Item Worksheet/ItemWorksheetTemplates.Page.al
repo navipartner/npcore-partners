@@ -122,13 +122,13 @@ page 6060040 "NPR Item Worksheet Templates"
                 RunPageLink = "Item Template Name" = FIELD(Name);
                 RunPageView = SORTING("Item Template Name", Name)
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Field Setup")
             {
                 Caption = 'Field Setup';
                 Image = MapAccounts;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

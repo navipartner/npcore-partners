@@ -30,7 +30,7 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

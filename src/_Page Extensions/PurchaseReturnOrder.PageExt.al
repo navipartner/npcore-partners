@@ -24,13 +24,13 @@ pageextension 6014473 "NPR Purchase Return Order" extends "Purchase Return Order
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

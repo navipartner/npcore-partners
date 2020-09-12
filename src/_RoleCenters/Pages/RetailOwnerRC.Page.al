@@ -39,7 +39,6 @@ page 6151259 "NPR Retail Owner RC"
             part(Top10vendors; "NPR Top 10 Vendors")
             {
                 ApplicationArea = All;
-
             }
             part(Control73; "NPR My Reports")
             {
@@ -105,7 +104,6 @@ page 6151259 "NPR Retail Owner RC"
             part(PowerBi; "Power BI Report Spinner Part")
             {
                 ApplicationArea = All;
-
             }
 
         }

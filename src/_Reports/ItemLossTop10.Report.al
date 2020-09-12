@@ -195,17 +195,17 @@ report 6014543 "NPR Item - Loss - Top 10"
                     field(SourceCodeFilter; SourceCodeFilter)
                     {
                         Caption = 'Source Code Filter';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field("Sorting"; Sorting)
                     {
                         Caption = 'Quantity';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(NoOfRecordsToPrint; NoOfRecordsToPrint)
                     {
                         Caption = 'Print Lines';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

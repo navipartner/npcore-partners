@@ -1122,17 +1122,17 @@ report 6014617 "NPR Purchase Order"
                     field(NoofCopies; NoOfCopies)
                     {
                         Caption = 'No. of Copies';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(ShowInternalInformation; ShowInternalInfo)
                     {
                         Caption = 'Show Internal Information';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(ArchiveDocument; ArchiveDocument)
                     {
                         Caption = 'Archive Document';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -1144,7 +1144,7 @@ report 6014617 "NPR Purchase Order"
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin

@@ -45,7 +45,7 @@ page 6151370 "NPR CS Users"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MPOS QR Code List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Warehouse Employees")
             {
@@ -55,7 +55,7 @@ page 6151370 "NPR CS Users"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Warehouse Employees";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -92,7 +92,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                 Caption = 'POS Sale Lines';
                 SubPageLink = "Register No." = FIELD("Register No."),
                               "Sales Ticket No." = FIELD("Sales Ticket No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -100,7 +100,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
             systempart(Control6014414; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -120,7 +120,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -138,7 +138,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -159,7 +159,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'Show all unfinished sale transactions for current cash register';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

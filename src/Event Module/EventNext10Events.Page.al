@@ -64,7 +64,7 @@ page 6060166 "NPR Event Next 10 Events"
                 RunObject = Page "NPR Event Card";
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group("Select Filter")
             {
@@ -74,7 +74,7 @@ page 6060166 "NPR Event Next 10 Events"
                 {
                     Caption = 'Select Responsible Person';
                     Image = JobResponsibility;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -95,7 +95,7 @@ page 6060166 "NPR Event Next 10 Events"
             {
                 Caption = 'Clear Filter';
                 Image = ClearFilter;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

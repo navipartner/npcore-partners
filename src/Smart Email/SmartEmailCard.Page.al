@@ -98,7 +98,7 @@ page 6059822 "NPR Smart Email Card"
             {
                 SubPageLink = "Transactional Email Code" = FIELD(Code);
                 Visible = ShowVariablesSubPage;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group("Preview")
             {

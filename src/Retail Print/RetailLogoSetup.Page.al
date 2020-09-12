@@ -49,7 +49,7 @@ page 6014566 "NPR Retail Logo Setup"
             part(Control6150624; "NPR Retail Logo Factbox")
             {
                 SubPageLink = Sequence = FIELD(Sequence);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -65,7 +65,7 @@ page 6014566 "NPR Retail Logo Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -82,7 +82,7 @@ page 6014566 "NPR Retail Logo Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

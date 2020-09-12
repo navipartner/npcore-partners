@@ -138,7 +138,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Caption = 'Previous Set';
                     Enabled = PreviousColumnSetExists;
                     Image = PreviousSet;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -150,7 +150,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Caption = 'Next Set';
                     Enabled = NextColumnSetExists;
                     Image = NextSet;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -163,7 +163,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Image = ShowList;
                     Promoted = true;
                     Visible = FilterMode;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

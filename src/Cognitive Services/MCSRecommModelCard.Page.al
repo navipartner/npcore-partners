@@ -105,7 +105,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Image = PreviewChecks;
                     Promoted = true;
                     PromotedCategory = "Report";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -121,7 +121,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -138,7 +138,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 {
                     Caption = 'Create Azure Model';
                     Image = CreateXMLFile;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -155,7 +155,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 {
                     Caption = 'Upload Sales History';
                     Image = Server;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -170,7 +170,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 {
                     Caption = 'Test Get Recommendations';
                     Image = Task;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -187,7 +187,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 {
                     Caption = 'Refresh All Recommendations';
                     Image = RefreshLines;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -200,7 +200,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 {
                     Caption = 'Delete Azure Model';
                     Image = Delete;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -227,7 +227,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 RunPageLink = "Model No." = FIELD(Code);
                 RunPageView = SORTING("Model No.", "Rule No.")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(RecommendationsLines)
             {
@@ -235,7 +235,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 Image = SuggestLines;
                 RunObject = Page "NPR MCS Recomm. Lines";
                 RunPageLink = "Model No." = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(Log)
             {
@@ -243,7 +243,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 Image = InteractionLog;
                 RunObject = Page "NPR MCS Recommendations Log";
                 RunPageLink = "Model No." = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

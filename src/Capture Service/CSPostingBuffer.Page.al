@@ -75,7 +75,7 @@ page 6151392 "NPR CS Posting Buffer"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -91,7 +91,7 @@ page 6151392 "NPR CS Posting Buffer"
             {
                 Caption = 'Delete';
                 Image = Delete;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -106,7 +106,7 @@ page 6151392 "NPR CS Posting Buffer"
             {
                 Caption = 'Re-Schedule Posting';
                 Image = RefreshPlanningLine;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -143,7 +143,7 @@ page 6151392 "NPR CS Posting Buffer"
             {
                 Caption = 'Job Queue Entry';
                 Image = Job;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -90,11 +90,11 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
             {
                 field(Variants; OptVariants)
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(Defaults; OptDefaultAction)
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

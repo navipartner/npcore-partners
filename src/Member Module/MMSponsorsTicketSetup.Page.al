@@ -81,7 +81,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6151186));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("SMS Template")
             {
@@ -93,7 +93,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6151186));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -106,7 +106,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

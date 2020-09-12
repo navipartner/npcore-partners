@@ -59,7 +59,7 @@ page 6151027 "NPR NpRv Partner Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

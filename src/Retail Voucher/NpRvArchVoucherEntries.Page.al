@@ -94,7 +94,7 @@ page 6151023 "NPR NpRv Arch. Voucher Entries"
                 Image = Navigate;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

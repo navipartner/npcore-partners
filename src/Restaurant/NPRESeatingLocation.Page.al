@@ -69,7 +69,7 @@ page 6150667 "NPR NPRE Seating Location"
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating List";
                     RunPageLink = "Seating Location" = FIELD(Code);
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

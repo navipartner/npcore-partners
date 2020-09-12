@@ -42,7 +42,7 @@ pageextension 6014459 "NPR Purch. Invoice Subform" extends "Purch. Invoice Subfo
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

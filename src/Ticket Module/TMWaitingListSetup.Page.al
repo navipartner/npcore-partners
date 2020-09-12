@@ -80,7 +80,7 @@ page 6151137 "NPR TM Waiting List Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060110));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("SMS Template")
             {
@@ -90,7 +90,7 @@ page 6151137 "NPR TM Waiting List Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060110));
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

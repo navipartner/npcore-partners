@@ -217,7 +217,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     Caption = '&Split Line';
                     Image = Split;
                     ShortCutKey = 'Ctrl+F11';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -238,7 +238,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 {
                     Caption = 'Source &Document Line';
                     Image = SourceDocLine;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -249,7 +249,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 {
                     Caption = 'Bin Contents List';
                     Image = BinContent;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -264,7 +264,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     {
                         Caption = 'Event';
                         Image = "Event";
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -275,7 +275,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     {
                         Caption = 'Period';
                         Image = Period;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -286,7 +286,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -298,7 +298,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                         AccessByPermission = TableData Location = R;
                         Caption = 'Location';
                         Image = Warehouse;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin

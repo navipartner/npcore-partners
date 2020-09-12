@@ -101,7 +101,7 @@ page 6060092 "NPR MM Admission Service Log"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

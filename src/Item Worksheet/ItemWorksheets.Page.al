@@ -60,7 +60,7 @@ page 6060041 "NPR Item Worksheets"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -76,7 +76,7 @@ page 6060041 "NPR Item Worksheets"
                               "Item Worksheet Template" = FIELD("Item Template Name");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -85,7 +85,7 @@ page 6060041 "NPR Item Worksheets"
             {
                 Caption = 'Field Setup';
                 Image = MapAccounts;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

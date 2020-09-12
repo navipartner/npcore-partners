@@ -10,7 +10,7 @@ pageextension 6014408 "NPR Posted S.Cr.Memo Subform" extends "Posted Sales Cr. M
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

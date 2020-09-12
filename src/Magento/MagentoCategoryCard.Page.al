@@ -142,7 +142,7 @@ page 6151414 "NPR Magento Category Card"
                 ShowFilter = false;
                 SubPageLink = "Parent Category Id" = FIELD(FILTER(Id));
                 Visible = MagentoItemGroupSubformVisible;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -152,7 +152,7 @@ page 6151414 "NPR Magento Category Card"
                 SubPageLink = Type = CONST("Item Group"),
                               Name = FIELD(Picture);
                 Visible = (NOT HasSetupCategories);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(IconPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
@@ -162,7 +162,7 @@ page 6151414 "NPR Magento Category Card"
                 SubPageLink = Type = CONST("Item Group"),
                               Name = FIELD(Icon);
                 Visible = (NOT HasSetupCategories);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -176,7 +176,7 @@ page 6151414 "NPR Magento Category Card"
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

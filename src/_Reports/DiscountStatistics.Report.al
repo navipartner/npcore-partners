@@ -239,7 +239,7 @@ report 6014402 "NPR Discount Statistics"
                     field(ShowItemLedger; ShowItemLedger)
                     {
                         Caption = 'Show Value Entries';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

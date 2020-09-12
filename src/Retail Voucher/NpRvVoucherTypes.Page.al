@@ -55,7 +55,7 @@ page 6151013 "NPR NpRv Voucher Types"
                 RunObject = Page "NPR NpRv Vouchers";
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Partner Relations")
             {
@@ -63,7 +63,7 @@ page 6151013 "NPR NpRv Voucher Types"
                 Image = UserCertificate;
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Voucher Type" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

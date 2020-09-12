@@ -61,7 +61,7 @@ page 6150620 "NPR POS Payment Bins"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Payment Bin Code" = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(EjectMethodParameters)
             {
@@ -70,7 +70,7 @@ page 6150620 "NPR POS Payment Bins"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -92,7 +92,7 @@ page 6150620 "NPR POS Payment Bins"
                 Promoted = true;
                 PromotedCategory = Process;
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -106,7 +106,7 @@ page 6150620 "NPR POS Payment Bins"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

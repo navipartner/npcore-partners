@@ -43,12 +43,12 @@ page 6151377 "NPR CS UIs"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

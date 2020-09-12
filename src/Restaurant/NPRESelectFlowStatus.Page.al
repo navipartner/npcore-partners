@@ -95,7 +95,7 @@ page 6150633 "NPR NPRE Select Flow Status"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

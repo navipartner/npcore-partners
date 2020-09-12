@@ -67,13 +67,13 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("NPR DocExchFramework")
@@ -83,13 +83,13 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 {
                     Caption = 'Export';
                     Image = ExportFile;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

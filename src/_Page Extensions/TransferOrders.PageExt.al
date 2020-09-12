@@ -18,7 +18,7 @@ pageextension 6014464 "NPR Transfer Orders" extends "Transfer Orders"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F9';
                 Visible = PostingVisibilityPOS;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

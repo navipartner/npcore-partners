@@ -85,7 +85,7 @@ page 6014405 "NPR Register List"
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -97,7 +97,7 @@ page 6014405 "NPR Register List"
                     Caption = 'Dimensions-Mulitple';
                     Image = DimensionSets;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -121,7 +121,7 @@ page 6014405 "NPR Register List"
                     Image = Add;
                     RunObject = Page "NPR CashKeeper Setup";
                     RunPageLink = "Register No." = FIELD("Register No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("2nd Display Setup")
                 {
@@ -129,7 +129,7 @@ page 6014405 "NPR Register List"
                     Image = Add;
                     RunObject = Page "NPR Display Setup";
                     RunPageLink = "Register No." = FIELD("Register No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("mPos Setup")
                 {
@@ -137,7 +137,7 @@ page 6014405 "NPR Register List"
                     Image = Add;
                     RunObject = Page "NPR MPOS App Setup Card";
                     RunPageLink = "Register No." = FIELD("Register No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

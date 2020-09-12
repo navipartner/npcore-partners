@@ -59,7 +59,7 @@ page 6151492 "NPR Raptor Data Buffer Entries"
                 PromotedCategory = Process;
                 RunObject = Page "NPR Retail Item Card";
                 RunPageLink = "No." = FIELD("Item No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

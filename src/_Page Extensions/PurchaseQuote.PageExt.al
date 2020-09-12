@@ -32,7 +32,7 @@ pageextension 6014450 "NPR Purchase Quote" extends "Purchase Quote"
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -50,13 +50,13 @@ pageextension 6014450 "NPR Purchase Quote" extends "Purchase Quote"
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

@@ -167,7 +167,7 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
             {
                 field("Only Inventory"; OnlyInventory)
                 {
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

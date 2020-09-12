@@ -622,12 +622,12 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                 field(AntalKopier; AntalKopier)
                 {
                     Caption = 'Copy Qty.';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(Sprog; Sprog)
                 {
                     Caption = 'Language';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

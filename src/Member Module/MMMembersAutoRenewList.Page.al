@@ -104,7 +104,7 @@ page 6060070 "NPR MM Members. AutoRenew List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -123,7 +123,7 @@ page 6060070 "NPR MM Members. AutoRenew List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Members. Auto-Renew Log";
                 RunPageLink = "Auto-Renew Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

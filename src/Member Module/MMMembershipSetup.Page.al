@@ -253,7 +253,7 @@ page 6060124 "NPR MM Membership Setup"
                 Caption = 'Community';
                 Image = Group;
                 RunObject = Page "NPR MM Member Community";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Membership Sales Setup")
             {
@@ -262,7 +262,7 @@ page 6060124 "NPR MM Membership Setup"
                 Promoted = true;
                 RunObject = Page "NPR MM Membership Sales Setup";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Membership Alteration")
             {
@@ -271,7 +271,7 @@ page 6060124 "NPR MM Membership Setup"
                 Promoted = true;
                 RunObject = Page "NPR MM Membership Alter.";
                 RunPageLink = "From Membership Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Member Communication Setup")
             {
@@ -282,7 +282,7 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Comm. Setup";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6014404)
             {
@@ -293,7 +293,7 @@ page 6060124 "NPR MM Membership Setup"
                 Image = SetupLines;
                 RunObject = Page "NPR MM Members. Admis. Setup";
                 RunPageLink = "Membership  Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Membership Limitation Setup")
             {
@@ -305,7 +305,7 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Lim. Setup";
                 RunPageLink = "Membership  Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sponsorship Ticket Setup")
             {
@@ -316,7 +316,7 @@ page 6060124 "NPR MM Membership Setup"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR MM Sponsors. Ticket Setup";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6014405)
             {
@@ -327,14 +327,14 @@ page 6060124 "NPR MM Membership Setup"
                 Image = List;
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Item List")
             {
                 Caption = 'Item List';
                 Image = List;
                 RunObject = Page "NPR Retail Item List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             separator(Separator6014416)
             {
@@ -348,7 +348,7 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Admission Service Setup";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

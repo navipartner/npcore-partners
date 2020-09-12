@@ -19,7 +19,7 @@ page 6184475 "NPR EFT Payment Param. Setup"
                 SubPageLink = "Integration Type" = FIELD("EFT Integration Type"),
                               "Payment Type POS" = FIELD("Payment Type POS");
                 Visible = ShowPaymentGenParameter;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(BinaryParams; "NPR EFT Type Paym. BLOB Param.")
             {
@@ -27,7 +27,7 @@ page 6184475 "NPR EFT Payment Param. Setup"
                 SubPageLink = "Integration Type" = FIELD("EFT Integration Type"),
                               "Payment Type POS" = FIELD("Payment Type POS");
                 Visible = ShowPaymentBLOBParameter;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

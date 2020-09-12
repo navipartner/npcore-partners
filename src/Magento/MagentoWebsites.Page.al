@@ -62,7 +62,7 @@ page 6151403 "NPR Magento Websites"
                     {
                         Caption = 'Stores';
                         SubPageLink = "Website Code" = FIELD(Code);
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }
@@ -80,7 +80,7 @@ page 6151403 "NPR Magento Websites"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

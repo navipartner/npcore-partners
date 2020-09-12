@@ -800,52 +800,52 @@ report 6014460 "NPR Balancing Report A4"
                     field(PrintTurnOver; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintDiscount; PrintDiscount)
                     {
                         Caption = 'Print Discount';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintVAT; PrintVAT)
                     {
                         Caption = 'Print VAT';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintEFT; PrintEFT)
                     {
                         Caption = 'Print EFT';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintVouchers; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintCounting; PrintCounting)
                     {
                         Caption = 'Print Counting';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintCountedAmtInclFloat; PrintCountedAmtInclFloat)
                     {
                         Caption = 'Print Counted Amt Incl Float';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintAttachedBins; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                     field(PrintEmptyLines; PrintEmptyLines)
                     {
                         Caption = 'Print Lines where Value is Zero.';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

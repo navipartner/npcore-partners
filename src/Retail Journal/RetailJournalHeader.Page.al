@@ -214,7 +214,7 @@ page 6014490 "NPR Retail Journal Header"
                 SubPageLink = "No." = FIELD("No."),
                               "Location Filter" = FIELD("Location Code");
                 SubPageView = SORTING("No.", "Line No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(factboxes)
@@ -223,13 +223,13 @@ page 6014490 "NPR Retail Journal Header"
             {
                 Provider = SubLine;
                 SubPageLink = "No." = FIELD("Item No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Control6150645; "NPR NP Attributes FactBox")
             {
                 Provider = SubLine;
                 SubPageLink = "No." = FIELD("Item No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -247,7 +247,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = BinContent;
                     Promoted = true;
                     PromotedCategory = "Report";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -263,7 +263,7 @@ page 6014490 "NPR Retail Journal Header"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -278,7 +278,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = Bin;
                     Promoted = true;
                     PromotedCategory = "Report";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -293,7 +293,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = Change;
                     Promoted = true;
                     PromotedCategory = "Report";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -304,7 +304,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Set Print Qty to Inventory';
                     Image = AddAction;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -322,7 +322,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = "Report";
                     Promoted = true;
                     PromotedCategory = "Report";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -340,7 +340,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Get from Item Card';
                     Image = Card;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -368,7 +368,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Items';
                     Image = ItemLines;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -382,7 +382,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Scanner';
                     Image = MiniForm;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -399,7 +399,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Period Discounts';
                     Image = PeriodEntries;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -422,7 +422,7 @@ page 6014490 "NPR Retail Journal Header"
                     Enabled = false;
                     Image = Discount;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -441,7 +441,7 @@ page 6014490 "NPR Retail Journal Header"
                     Enabled = true;
                     Image = ReturnReceipt;
                     Visible = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -461,7 +461,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Transfer Order';
                     Image = PeriodEntries;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -477,7 +477,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Transfer Shipment';
                     Image = PeriodEntries;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -493,7 +493,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Transfer Receipt';
                     Image = PeriodEntries;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -509,7 +509,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Retail Price Log';
                     Image = ImportLog;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -531,7 +531,7 @@ page 6014490 "NPR Retail Journal Header"
                     Enabled = false;
                     Image = Card;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -545,7 +545,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Scanner';
                     Image = MiniForm;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -560,7 +560,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Other Retail Journal';
                     Image = Journal;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -574,7 +574,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Period Discount';
                     Image = Campaign;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -588,7 +588,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Item Journal';
                     Image = ItemLines;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -602,7 +602,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Requisition Worksheet';
                     Image = Worksheet;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -616,7 +616,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'File';
                     Image = MakeDiskette;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -635,7 +635,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Find Item';
                     Image = Find;
                     ShortCutKey = 'Ctrl+F';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -652,7 +652,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Item Card';
                     Image = Card;
                     ShortCutKey = 'Shift+F5';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -675,7 +675,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Validate Lines';
                     Image = CheckList;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -711,7 +711,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Change Price on Selected Items';
                     Image = PriceAdjustment;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Create)
@@ -724,7 +724,7 @@ page 6014490 "NPR Retail Journal Header"
                 {
                     Caption = 'Update Count Code/Type';
                     Image = Discount;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -740,7 +740,7 @@ page 6014490 "NPR Retail Journal Header"
                 Caption = 'Retail Price Log Entries';
                 Image = Log;
                 RunObject = Page "NPR Retail Price Log Entries";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

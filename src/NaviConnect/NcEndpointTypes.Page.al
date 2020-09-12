@@ -40,7 +40,7 @@ page 6151537 "NPR Nc Endpoint Types"
                 RunPageLink = "Endpoint Type" = FIELD(Code);
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

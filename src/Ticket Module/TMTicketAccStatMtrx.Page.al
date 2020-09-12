@@ -171,7 +171,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
             part(MATRIX; "NPR TM Ticket Acs. Stat.Lines")
             {
                 ShowFilter = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group("Matrix Filters")
             {
@@ -349,7 +349,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 Image = Refresh;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -369,7 +369,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Image = NextRecord;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -387,7 +387,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Image = PreviousRecord;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -407,7 +407,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -423,7 +423,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -439,7 +439,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -455,7 +455,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -476,7 +476,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Forecast Matrix";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

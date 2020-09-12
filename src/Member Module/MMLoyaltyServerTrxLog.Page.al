@@ -87,7 +87,7 @@ page 6151161 "NPR MM Loyalty Server Trx Log"
                 Promoted = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

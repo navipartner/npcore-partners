@@ -90,7 +90,7 @@ page 6151533 "NPR Nc Collector Req. Lines"
                 SubPageLink = "Nc Collector Request No." = FIELD("No.");
                 SubPageView = SORTING("Nc Collector Request No.")
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

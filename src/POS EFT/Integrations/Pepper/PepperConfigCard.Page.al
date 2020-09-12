@@ -212,7 +212,7 @@ page 6184490 "NPR Pepper Config. Card"
                 RunPageLink = "Configuration Code" = FIELD(Code);
                 RunPageView = SORTING(ID)
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -224,7 +224,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = ImportCodes;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -236,7 +236,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -252,7 +252,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = ElectronicNumber;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -264,7 +264,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Configuration XML';
                     Image = CreateXMLFile;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -276,7 +276,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -291,7 +291,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -303,7 +303,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -319,7 +319,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = Export;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -330,7 +330,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Configuration XML';
                     Image = ExportElectronicDocument;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -341,7 +341,7 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

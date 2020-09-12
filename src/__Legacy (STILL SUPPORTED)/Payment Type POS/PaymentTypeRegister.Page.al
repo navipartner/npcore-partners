@@ -53,14 +53,14 @@ page 6014435 "NPR Payment Type - Register"
                     RunPageLink = "Table ID" = CONST(6014402),
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action("Dimensions-Mulitple")
                 {
                     Caption = 'Dimensions-Mulitple';
                     Image = DimensionSets;
                     Visible = false;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

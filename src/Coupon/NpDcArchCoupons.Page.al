@@ -68,7 +68,7 @@ page 6151599 "NPR NpDc Arch. Coupons"
                 RunObject = Page "NPR NpDc Arch.Coupon Entries";
                 RunPageLink = "Arch. Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

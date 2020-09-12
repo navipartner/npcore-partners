@@ -63,14 +63,14 @@ page 6151054 "NPR POS Paym. View Event Setup"
                 Caption = 'POS Payment View Log Entries';
                 Image = History;
                 RunObject = Page "NPR POS Paym. View Log Entries";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("POS Sales Workflows")
             {
                 Caption = 'POS Sales Workflows';
                 Image = Setup;
                 RunObject = Page "NPR POS Sales Workflows";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

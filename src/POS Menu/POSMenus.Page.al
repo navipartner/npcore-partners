@@ -63,13 +63,13 @@ page 6150701 "NPR POS Menus"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Menu Buttons";
                 RunPageLink = "Menu Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(ExportPackageSelected)
             {
                 Caption = 'Export Package (Selected)';
                 Image = Export;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -84,7 +84,7 @@ page 6150701 "NPR POS Menus"
             {
                 Caption = 'Export Package (All)';
                 Image = Export;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -98,7 +98,7 @@ page 6150701 "NPR POS Menus"
             {
                 Caption = 'Import Package From File';
                 Image = Import;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -111,7 +111,7 @@ page 6150701 "NPR POS Menus"
             {
                 Caption = 'Deploy Package From Ground Control';
                 Image = ImportDatabase;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

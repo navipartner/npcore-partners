@@ -89,7 +89,7 @@ page 6151003 "NPR POS Quote Card"
             {
                 Caption = 'Lines';
                 SubPageLink = "Quote Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -102,7 +102,7 @@ page 6151003 "NPR POS Quote Card"
             {
                 Caption = 'View POS Sales Data';
                 Image = XMLFile;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

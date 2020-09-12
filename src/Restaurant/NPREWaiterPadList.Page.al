@@ -82,7 +82,7 @@ page 6150663 "NPR NPRE Waiter Pad List"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

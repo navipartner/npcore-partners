@@ -141,7 +141,7 @@ page 6150673 "NPR POS Audit Log"
             {
                 Caption = 'Validate Log';
                 Image = Approval;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -24,7 +24,7 @@ page 6151086 "NPR RIS Retail Inv. Set Card"
             part(Control6014404; "NPR RIS Retail Inv. Set Sub.")
             {
                 SubPageLink = "Set Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -40,7 +40,7 @@ page 6151086 "NPR RIS Retail Inv. Set Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

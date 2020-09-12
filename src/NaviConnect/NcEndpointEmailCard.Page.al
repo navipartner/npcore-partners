@@ -73,7 +73,7 @@ page 6151525 "NPR Nc Endpoint E-mail Card"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

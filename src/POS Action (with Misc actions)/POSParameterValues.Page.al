@@ -78,7 +78,7 @@ page 6150705 "NPR POS Parameter Values"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

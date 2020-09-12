@@ -95,7 +95,7 @@ page 6151167 "NPR NpGp POS Sales Entries"
             {
                 Caption = 'POS Sales Lines';
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -109,7 +109,7 @@ page 6151167 "NPR NpGp POS Sales Entries"
                 Caption = 'POS Info';
                 Image = List;
                 RunObject = Page "NPR NpGp POS Info POS Entry";
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //RunPageLink = "POS Entry No."=FIELD("Entry No.");
             }
         }

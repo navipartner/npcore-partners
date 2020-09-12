@@ -11,7 +11,7 @@ pageextension 6014478 "NPR Bins" extends Bins
             {
                 Caption = 'Print Label';
                 Image = BarCode;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -72,7 +72,7 @@ page 6151445 "NPR Magento Store Items"
                         part(MagentoItemGroupLinks; "NPR Magento Category Links")
                         {
                             SubPageLink = "Item No." = FIELD("Item No.");
-                            ApplicationArea=All;
+                            ApplicationArea = All;
                         }
                     }
                     group(Control6150682)

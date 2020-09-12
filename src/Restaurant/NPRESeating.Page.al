@@ -95,7 +95,7 @@ page 6150665 "NPR NPRE Seating"
                     RunPageLink = "Table ID" = CONST(6150665),
                                   "No." = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

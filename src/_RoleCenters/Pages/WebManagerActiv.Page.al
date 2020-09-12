@@ -60,13 +60,13 @@ page 6059984 "NPR Web Manager Activ."
                 Caption = 'New Credit Memo';
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("New Purchase Order")
             {
                 Caption = 'New Purchase Order';
                 RunObject = Page "Purchase Order";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

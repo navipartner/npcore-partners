@@ -99,7 +99,7 @@ page 6150656 "NPR POS Payment Line List"
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

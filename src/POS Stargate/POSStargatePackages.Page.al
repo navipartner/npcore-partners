@@ -43,7 +43,7 @@ page 6150713 "NPR POS Stargate Packages"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -57,7 +57,7 @@ page 6150713 "NPR POS Stargate Packages"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -92,7 +92,7 @@ page 6150713 "NPR POS Stargate Packages"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Stargate Pckg Method";
                 RunPageLink = "Package Name" = FIELD(Name);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

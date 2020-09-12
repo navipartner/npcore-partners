@@ -41,7 +41,7 @@ page 6151055 "NPR Distrib. Group List"
                 Promoted = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Distribution Group" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Distribution Group Members")
             {
@@ -50,7 +50,7 @@ page 6151055 "NPR Distrib. Group List"
                 Promoted = true;
                 RunObject = Page "NPR Distrib. Group Member List";
                 RunPageLink = "Distribution Group" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

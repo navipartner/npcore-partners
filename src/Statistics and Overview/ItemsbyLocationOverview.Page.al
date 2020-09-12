@@ -43,7 +43,7 @@ page 6060066 "NPR Items by Location Overview"
             }
             part(MATRIX; "NPR Items by Loc.Overv. Matrix")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(Filters)
             {
@@ -145,7 +145,7 @@ page 6060066 "NPR Items by Location Overview"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -162,7 +162,7 @@ page 6060066 "NPR Items by Location Overview"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -177,7 +177,7 @@ page 6060066 "NPR Items by Location Overview"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -192,7 +192,7 @@ page 6060066 "NPR Items by Location Overview"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

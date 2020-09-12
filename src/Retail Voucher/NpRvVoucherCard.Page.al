@@ -257,7 +257,7 @@ page 6151014 "NPR NpRv Voucher Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -271,7 +271,7 @@ page 6151014 "NPR NpRv Voucher Card"
             {
                 Caption = 'Reset Vouchers In-use';
                 Image = RefreshVoucher;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -291,7 +291,7 @@ page 6151014 "NPR NpRv Voucher Card"
                 {
                     Caption = 'Archive Coupon';
                     Image = Post;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -317,7 +317,7 @@ page 6151014 "NPR NpRv Voucher Card"
                 RunObject = Page "NPR NpRv Voucher Entries";
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Sending Log")
             {
@@ -326,7 +326,7 @@ page 6151014 "NPR NpRv Voucher Card"
                 RunObject = Page "NPR NpRv Sending Log";
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

@@ -28,7 +28,7 @@ page 6151220 "NPR PrintNode Setup"
             {
                 Caption = 'Test Connection';
                 Image = Confirm;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -160,7 +160,7 @@ page 6184497 "NPR Pepper Version Card"
                 Caption = 'Configurations';
                 Image = Setup;
                 RunObject = Page "NPR Pepper Config. List";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(processing)
@@ -172,7 +172,7 @@ page 6184497 "NPR Pepper Version Card"
                 {
                     Caption = 'Zip';
                     Image = Import;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -188,7 +188,7 @@ page 6184497 "NPR Pepper Version Card"
                 {
                     Caption = 'Zip';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -204,7 +204,7 @@ page 6184497 "NPR Pepper Version Card"
                 {
                     Caption = 'Zip';
                     Image = Export;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

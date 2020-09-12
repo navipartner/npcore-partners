@@ -483,7 +483,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'Shift+Ctrl+T';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 separator(Separator6014408)
                 {
@@ -493,7 +493,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     Caption = 'Linked Job Ledger E&ntries';
                     Image = JobLedger;
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -519,7 +519,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     AccessByPermission = TableData Item = R;
                     Caption = '&Reservation Entries';
                     Image = ReservationLedger;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -533,7 +533,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                 {
                     Caption = 'Order &Promising';
                     Image = OrderPromising;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -547,7 +547,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     {
                         Caption = 'Send';
                         Image = Calendar;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -559,7 +559,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     {
                         Caption = 'Remove';
                         Image = RemoveContacts;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -571,7 +571,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     {
                         Caption = 'Get Attendee Response';
                         Image = Answers;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -584,7 +584,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                 {
                     Caption = 'Send E-Mail';
                     Image = SendMail;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -600,7 +600,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                         Caption = 'Edit Reservation and Issue';
                         Ellipsis = true;
                         Image = Edit;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -616,7 +616,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                         Caption = 'Edit Holder';
                         Ellipsis = true;
                         Image = EditCustomer;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -632,7 +632,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                         Caption = 'Register';
                         Ellipsis = true;
                         Image = CreateDocument;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -650,7 +650,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                         Ellipsis = true;
                         Image = CancelLine;
                         Visible = false;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -667,7 +667,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                         Caption = 'Issue';
                         Ellipsis = true;
                         Image = PostDocument;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -684,7 +684,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                         Caption = 'Confirm';
                         Ellipsis = true;
                         Image = ContractPayment;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         var
@@ -703,7 +703,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     {
                         Caption = 'Collect Ticket';
                         Image = GetSourceDoc;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -715,7 +715,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     {
                         Caption = 'Show Ticket Printout';
                         Image = PreviewChecks;
-                        ApplicationArea=All;
+                        ApplicationArea = All;
 
                         trigger OnAction()
                         begin
@@ -735,7 +735,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -769,7 +769,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     RunObject = Page "Job Journal";
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 separator(Separator16)
                 {
@@ -782,7 +782,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -796,7 +796,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     Image = CreditMemo;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -810,7 +810,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     Image = GetSourceDoc;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -828,7 +828,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     Caption = '&Reservation';
                     Ellipsis = true;
                     Image = Reserve;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -839,7 +839,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                 {
                     Caption = 'Order &Tracking';
                     Image = OrderTracking;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -853,7 +853,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                 {
                     Caption = '&Demand Overview';
                     Image = Forecast;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -870,7 +870,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     AccessByPermission = TableData "Extended Text Header" = R;
                     Caption = 'Insert &Ext. Texts';
                     Image = Text;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -883,7 +883,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                 {
                     Caption = 'Distribute Across Period';
                     Image = Period;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -905,7 +905,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
                     RunObject = Report "Job - Transaction Detail";
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group(Navigate)
@@ -915,7 +915,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                 {
                     Caption = 'Issued Tickets';
                     Image = ViewPostedOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -928,7 +928,7 @@ page 6060151 "NPR Event Plan. Lines Sub."
                 {
                     Caption = 'Activity Log';
                     Image = Log;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

@@ -34,7 +34,7 @@ page 6059957 "NPR MCS Person Groups"
             {
                 Caption = 'Get Person Groups';
                 Image = Refresh;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 

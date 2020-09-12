@@ -73,7 +73,7 @@ page 6059789 "NPR E-mail Setup"
             {
                 Caption = 'Create E-mail Templates';
                 Image = New;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -95,7 +95,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Sales Quote';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -113,7 +113,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Sales Order';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -131,7 +131,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Sales Shipment';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -149,7 +149,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Sales Invoice';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -167,7 +167,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Sales Credit Memo';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -185,7 +185,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Purchase Quote';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -203,7 +203,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Purchase Order';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -221,7 +221,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Purchase Receipt';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -239,7 +239,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Purchase Invoice';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -257,7 +257,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Purchase Credit Memo';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -275,7 +275,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Reminder';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -293,7 +293,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Charge Memo';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -311,7 +311,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Statement';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -329,7 +329,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Service Quote';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -347,7 +347,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Service Order';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -365,7 +365,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Service Shipment';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -383,7 +383,7 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Service Invoice';
                     Image = NewOrder;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -402,7 +402,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Sales Ticket';
                     Image = NewOrder;
                     Visible = AuditRollExists;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -421,7 +421,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Credit Voucher';
                     Image = NewOrder;
                     Visible = CreditVoucherExists;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -439,7 +439,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Gift Voucher';
                     Image = NewOrder;
                     Visible = GiftVoucherExists;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

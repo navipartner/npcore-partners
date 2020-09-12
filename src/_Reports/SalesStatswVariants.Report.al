@@ -205,7 +205,7 @@ report 6014611 "NPR Sales Stats w/ Variants"
                     field(PrintPrintAlsoWithoutSale; PrintAlsoWithoutSale)
                     {
                         Caption = 'Print Also Without Sale';
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

@@ -195,7 +195,7 @@ page 6060118 "NPR TM Ticket Schedules"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Admission Schedules")
             {
@@ -206,7 +206,7 @@ page 6060118 "NPR TM Ticket Schedules"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Schedule Code" = FIELD("Schedule Code");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

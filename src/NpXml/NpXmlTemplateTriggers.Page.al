@@ -76,7 +76,7 @@ page 6151558 "NPR NpXml Template Triggers"
             {
                 Caption = 'Trigger Links';
                 Image = Links;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -91,7 +91,7 @@ page 6151558 "NPR NpXml Template Triggers"
             {
                 Caption = 'Move Up';
                 Image = MoveUp;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -104,7 +104,7 @@ page 6151558 "NPR NpXml Template Triggers"
             {
                 Caption = 'Move Down';
                 Image = MoveDown;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -120,7 +120,7 @@ page 6151558 "NPR NpXml Template Triggers"
                 {
                     Caption = 'Decrement Level';
                     Image = PreviousRecord;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -131,7 +131,7 @@ page 6151558 "NPR NpXml Template Triggers"
                 {
                     Caption = 'Increment Level';
                     Image = NextRecord;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin

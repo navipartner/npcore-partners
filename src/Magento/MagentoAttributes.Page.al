@@ -91,7 +91,7 @@ page 6151431 "NPR Magento Attributes"
                         Caption = 'Labels';
                         ShowFilter = false;
                         SubPageLink = "Attribute ID" = FIELD("Attribute ID");
-                        ApplicationArea=All;
+                        ApplicationArea = All;
                     }
                 }
             }

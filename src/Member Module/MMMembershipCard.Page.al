@@ -130,13 +130,13 @@ page 6060137 "NPR MM Membership Card"
             {
                 SubPageLink = "Membership Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Membership Entry No.", "Member Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(Control6150624; "NPR MM Members. Ledger Entries")
             {
                 SubPageLink = "Membership Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Membership Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(Points)
             {
@@ -178,7 +178,7 @@ page 6060137 "NPR MM Membership Card"
                 SubPageView = SORTING("Membership Entry No.", "Relative Period")
                               ORDER(Descending);
                 UpdatePropagation = Both;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(Attributes)
             {
@@ -399,7 +399,7 @@ page 6060137 "NPR MM Membership Card"
         {
             systempart(Control6150629; Notes)
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -415,7 +415,7 @@ page 6060137 "NPR MM Membership Card"
                 Image = Start;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -433,7 +433,7 @@ page 6060137 "NPR MM Membership Card"
                 Image = NewCustomer;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -448,7 +448,7 @@ page 6060137 "NPR MM Membership Card"
                 Image = ChangeCustomer;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -460,7 +460,7 @@ page 6060137 "NPR MM Membership Card"
             {
                 Caption = 'Update Customer Information';
                 Image = CreateInteraction;
-                ApplicationArea=All;
+                ApplicationArea = All;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
 
@@ -478,7 +478,7 @@ page 6060137 "NPR MM Membership Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -493,7 +493,7 @@ page 6060137 "NPR MM Membership Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -504,7 +504,7 @@ page 6060137 "NPR MM Membership Card"
             {
                 Caption = 'Create Welcome Notification';
                 Image = Interaction;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -522,7 +522,7 @@ page 6060137 "NPR MM Membership Card"
             {
                 Caption = 'Create Wallet Notification';
                 Image = Interaction;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -541,7 +541,7 @@ page 6060137 "NPR MM Membership Card"
             {
                 Caption = 'Issue Sponsorship Tickets';
                 Image = TeamSales;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -561,7 +561,7 @@ page 6060137 "NPR MM Membership Card"
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Membership Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Membership Entry No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Show Sponsorship Tickets")
             {
@@ -571,7 +571,7 @@ page 6060137 "NPR MM Membership Card"
                 RunObject = Page "NPR MM Sponsor. Ticket Entry";
                 RunPageLink = "Membership Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Membership Entry No.", "Event Type");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Arrival Log")
             {
@@ -583,7 +583,7 @@ page 6060137 "NPR MM Membership Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Membership No." = FIELD("External Membership No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             group(History)
             {
@@ -599,7 +599,7 @@ page 6060137 "NPR MM Membership Card"
                     RunPageLink = "Customer No." = FIELD("Customer No.");
                     RunPageView = SORTING("Customer No.");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(ItemLedgerEntries)
                 {
@@ -612,7 +612,7 @@ page 6060137 "NPR MM Membership Card"
                     RunPageView = SORTING("Source Type", "Source No.", "Posting Date")
                                   ORDER(Descending)
                                   WHERE("Source Type" = CONST(Customer));
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 action(Statistics)
                 {
@@ -623,7 +623,7 @@ page 6060137 "NPR MM Membership Card"
                     RunObject = Page "Customer Statistics";
                     RunPageLink = "No." = FIELD("Customer No.");
                     ShortCutKey = 'F7';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
             group("Raptor Integration")
@@ -637,7 +637,7 @@ page 6060137 "NPR MM Membership Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var
@@ -659,7 +659,7 @@ page 6060137 "NPR MM Membership Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     var

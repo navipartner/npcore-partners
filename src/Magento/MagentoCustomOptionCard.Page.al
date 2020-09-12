@@ -84,7 +84,7 @@ page 6151425 "NPR Magento Custom Option Card"
                 ShowFilter = false;
                 SubPageLink = "Custom Option No." = FIELD("No.");
                 Visible = CustomOptionValuesVisible;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

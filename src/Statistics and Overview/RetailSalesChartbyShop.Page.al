@@ -21,7 +21,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea=All;
+                ApplicationArea = All;
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
@@ -42,7 +42,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -54,7 +54,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -66,7 +66,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -78,7 +78,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -90,7 +90,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
 
                     trigger OnAction()
                     begin
@@ -104,7 +104,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
             {
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin
@@ -116,7 +116,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
             {
                 Caption = 'Next';
                 Image = NextRecord;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 begin

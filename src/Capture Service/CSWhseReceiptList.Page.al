@@ -59,7 +59,7 @@ page 6151390 "NPR CS Whse. Receipt List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR CS Whse. Receipt Data";
                 RunPageLink = "Doc. No." = FIELD("No.");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Transfer Data")
             {
@@ -68,7 +68,7 @@ page 6151390 "NPR CS Whse. Receipt List"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

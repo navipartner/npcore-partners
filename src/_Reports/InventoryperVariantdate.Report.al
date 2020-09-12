@@ -399,37 +399,37 @@ report 6014612 "NPR Inventory per Variant/date"
                 field(Varermedbeholdning; Varermedbeholdning)
                 {
                     Caption = 'Show Only Items With Inventory';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ViewSalesPrice; ViewSalesPrice)
                 {
                     Caption = 'View Sales Prices';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(Negativbeh; Negativbeh)
                 {
                     Caption = 'Hide Items With Negative Inventory';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(NegativVolumeShow; NegativVolumeShow)
                 {
                     Caption = 'Show Only Items With Negative Inventory';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ShowNoInventory; ShowNoInventory)
                 {
                     Caption = 'Do Not Show Inventory';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ShowLocation; ShowLocation)
                 {
                     Caption = 'Show Location';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
                 field(ShowBlankLocation; ShowBlankLocation)
                 {
                     Caption = 'Show Blank Location';
-                    ApplicationArea=All;
+                    ApplicationArea = All;
                 }
             }
         }

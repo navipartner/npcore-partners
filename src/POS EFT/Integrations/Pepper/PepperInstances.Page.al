@@ -41,7 +41,7 @@ page 6184492 "NPR Pepper Instances"
                 RunPageLink = "Instance ID" = FIELD(ID);
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

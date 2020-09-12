@@ -40,12 +40,12 @@ page 6150685 "NPR NPRE Kitchen Stations"
             systempart(Control6014407; Notes)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             systempart(Control6014408; Links)
             {
                 Visible = false;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -61,7 +61,7 @@ page 6150685 "NPR NPRE Kitchen Stations"
                 RunObject = Page "NPR NPRE Kitchen Station Slct.";
                 RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
                               "Kitchen Station" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action(ShowKitchenRequests)
             {
@@ -71,7 +71,7 @@ page 6150685 "NPR NPRE Kitchen Stations"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

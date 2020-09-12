@@ -212,7 +212,7 @@ page 6151018 "NPR NpRv Sales Line Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var

@@ -65,7 +65,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -185,7 +185,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR GDPR Anonymization Req.";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

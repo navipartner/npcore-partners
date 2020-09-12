@@ -81,12 +81,12 @@ page 6014611 "NPR Retail Campaign"
             {
                 SubPageLink = "Campaign Code" = FIELD(Code);
                 UpdatePropagation = Both;
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             part(RetailItems; "NPR Retail Campgn.Item Subform")
             {
                 SubPageLink = "Retail Campaign Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }
@@ -100,7 +100,7 @@ page 6014611 "NPR Retail Campaign"
                 Caption = 'Planning Items';
                 Image = ItemLines;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
@@ -120,7 +120,7 @@ page 6014611 "NPR Retail Campaign"
                 Image = ItemLines;
                 RunObject = Page "NPR Item Hierarchy Card";
                 RunPageLink = "Hierarchy Code" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("View Demand Lines")
             {
@@ -130,7 +130,7 @@ page 6014611 "NPR Retail Campaign"
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD(Code),
                               "Distribution Group" = FIELD("Distribution Group");
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("View Distribution Lines")
             {
@@ -139,7 +139,7 @@ page 6014611 "NPR Retail Campaign"
                 Promoted = false;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Item Hiearachy" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
             action("Distribution Setup")
             {
@@ -148,7 +148,7 @@ page 6014611 "NPR Retail Campaign"
                 Promoted = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Item Hiearachy" = FIELD(Code);
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
         area(reporting)
@@ -158,7 +158,7 @@ page 6014611 "NPR Retail Campaign"
                 Caption = 'Campaign Items';
                 Image = Campaign;
                 RunObject = Report "NPR Retail Campaign Items";
-                ApplicationArea=All;
+                ApplicationArea = All;
             }
         }
     }

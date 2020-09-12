@@ -50,7 +50,7 @@ page 6059820 "NPR Trx Email Setup"
                 Image = Link;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
 
                 trigger OnAction()
                 var
