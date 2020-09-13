@@ -10,20 +10,16 @@ page 6151245 "NPR NP Retail Admin Setup RC"
         area(rolecenter)
         {
 
-
-
             part(Control1904484608; "NPR Retail Admin Act - POS")
             {
-                      ApplicationArea = All;
+                ApplicationArea = All;
 
             }
-
 
             part(Control14; "NPR Retail Admin Act - WFs")
             {
-                    ApplicationArea = All;
+                ApplicationArea = All;
             }
-
 
         }
     }
@@ -398,7 +394,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 action("Report Selection - Retail")
                 {
                     Caption = 'Report Selection - Retail';
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                     //RunObject = page "Report Selection - Retail";
                 }
 
@@ -406,7 +402,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'SMS Template List';
                     RunObject = page "NPR SMS Template List";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
 
                 }
                 action("Report Selection - Contract")
@@ -487,7 +483,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 }
                 action("CleanCash Setup List")
                 {
-                    Caption = 'CleanCast Setup List';
+                    Caption = 'CleanCash Setup List';
                     RunObject = page "NPR CleanCash Setup List";
                     ApplicationArea = All;
                 }
@@ -559,34 +555,34 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'Mix Discounts List';
                     RunObject = page "NPR Mixed Discount List";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("Period Discounts")
                 {
                     Caption = 'Period Discounts List';
                     RunObject = page "NPR Campaign Discount List";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("Retail Campaigns")
                 {
                     Caption = 'Retail Campaigns List';
                     RunObject = page "NPR Retail Campaigns";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("Discount Priority List")
                 {
                     Caption = 'Discount Priority List';
                     RunObject = page "NPR Discount Priority List";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("Retail Price Log Setup")
                 {
                     Caption = 'Retail Price Log Setup';
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                     //RunObject = page "Retail Price Log Setup";
                 }
 
@@ -626,7 +622,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'Import Wizard';
                     RunObject = page "NPR Table Import Wizard";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
                 action(Users)
                 {
@@ -639,7 +635,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'User Group';
                     RunObject = page "User Groups";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
                 action("Permission Sets")
                 {
@@ -658,14 +654,14 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'Extension';
                     RunObject = page "Extension Management";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("Setup & Extensions")
                 {
                     Caption = 'Setup & Extensions';
                     RunObject = page "Assisted Setup";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
             }
             group("Posting Setup")
@@ -676,7 +672,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'Gen. Posting Setup';
                     RunObject = page "General Posting Setup";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
                 action("VAT Posting Setup")
                 {
@@ -694,7 +690,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 action("Default Dimension Prorities")
                 {
                     Caption = 'Default Dimension Prorities';
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                     //RunObject = page "Default Dimension Priorities";
                 }
 
@@ -702,7 +698,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'Dimensions List';
                     RunObject = page "Dimension List";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
             }
@@ -736,7 +732,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
             {
                 Caption = 'Company Information';
                 RunObject = Page "Company Information";
-                  ApplicationArea = All;
+                ApplicationArea = All;
             }
             action("Table Export")
             {
@@ -758,7 +754,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'CS Setup';
                     RunObject = page "NPR CS Setup";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
                 action("AF Setup")
                 {
