@@ -2,6 +2,7 @@ table 6014559 "NPR RP Template Archive"
 {
     Caption = 'Template Archive';
     LookupPageID = "NPR RP Template Archive List";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -9,26 +10,32 @@ table 6014559 "NPR RP Template Archive"
         {
             Caption = 'Code';
             TableRelation = "NPR RP Template Header".Code;
+            DataClassification = CustomerContent;
         }
         field(2; Version; Code[50])
         {
             Caption = 'Version';
+            DataClassification = CustomerContent;
         }
         field(3; "Archived at"; DateTime)
         {
             Caption = 'Archived at';
+            DataClassification = CustomerContent;
         }
         field(4; "Archived by"; Code[50])
         {
             Caption = 'Archived by';
+            DataClassification = CustomerContent;
         }
         field(5; "Version Comments"; Text[128])
         {
             Caption = 'Version Comments';
+            DataClassification = CustomerContent;
         }
         field(6; Template; BLOB)
         {
             Caption = 'Template';
+            DataClassification = CustomerContent;
         }
     }
 

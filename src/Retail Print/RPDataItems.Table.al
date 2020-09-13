@@ -7,6 +7,7 @@ table 6014561 "NPR RP Data Items"
     // NPR5.51/MMV /20190712 CASE 354694 Added type in field 13
 
     Caption = 'Data Items';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -14,18 +15,22 @@ table 6014561 "NPR RP Data Items"
         {
             Caption = 'Code';
             TableRelation = "NPR RP Template Header".Code;
+            DataClassification = CustomerContent;
         }
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(5; "Parent Line No."; Integer)
         {
             Caption = 'Parent Item Line No.';
+            DataClassification = CustomerContent;
         }
         field(6; "Parent Table ID"; Integer)
         {
             Caption = 'Parent Table ID';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -36,10 +41,12 @@ table 6014561 "NPR RP Data Items"
         field(10; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
         }
         field(11; "Data Source"; Text[50])
         {
             Caption = 'Data Source';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -81,6 +88,7 @@ table 6014561 "NPR RP Data Items"
         field(12; Name; Text[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -103,6 +111,7 @@ table 6014561 "NPR RP Data Items"
             Caption = 'Iteration Type';
             OptionCaption = ' ,First,Last,Total,Distinct Values,Field Value';
             OptionMembers = " ",First,Last,Total,"Distinct Values","Field Value";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -120,6 +129,7 @@ table 6014561 "NPR RP Data Items"
             BlankZero = true;
             Caption = 'Key ID';
             TableRelation = Key."No." WHERE(TableNo = FIELD("Table ID"));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -160,10 +170,12 @@ table 6014561 "NPR RP Data Items"
             Caption = 'Sort Order';
             OptionCaption = ' ,Ascending,Descending';
             OptionMembers = " ","Ascending","Descending";
+            DataClassification = CustomerContent;
         }
         field(16; "Total Fields"; Text[250])
         {
             Caption = 'Total Fields';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -209,6 +221,7 @@ table 6014561 "NPR RP Data Items"
         {
             BlankZero = true;
             Caption = 'Field ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -240,6 +253,7 @@ table 6014561 "NPR RP Data Items"
         field(20; Level; Integer)
         {
             Caption = 'Level';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -250,10 +264,12 @@ table 6014561 "NPR RP Data Items"
         field(30; "Skip Template If Empty"; Boolean)
         {
             Caption = 'Skip Template If Empty';
+            DataClassification = CustomerContent;
         }
         field(31; "Skip Template If Not Empty"; Boolean)
         {
             Caption = 'Skip Template If Not Empty';
+            DataClassification = CustomerContent;
         }
     }
 

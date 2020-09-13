@@ -3,6 +3,7 @@ table 6014566 "NPR RP Template Media Info"
     // Keep media information seperate from templates so they are not backed up in archived versions and to prevent the BLOB from impacting print SQL performance.
 
     Caption = 'Template Media Info';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,19 +11,23 @@ table 6014566 "NPR RP Template Media Info"
         {
             Caption = 'Template';
             TableRelation = "NPR RP Template Header".Code;
+            DataClassification = CustomerContent;
         }
         field(10; Picture; BLOB)
         {
             Caption = 'Picture';
             SubType = Bitmap;
+            DataClassification = CustomerContent;
         }
         field(11; URL; Text[250])
         {
             Caption = 'URL';
+            DataClassification = CustomerContent;
         }
         field(12; Description; Text[250])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 

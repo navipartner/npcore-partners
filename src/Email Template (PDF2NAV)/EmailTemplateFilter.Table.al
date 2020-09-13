@@ -7,6 +7,7 @@ table 6014464 "NPR E-mail Template Filter"
     // PN1.08/MHA/20151214  CASE 228859 Changed Field 10 "Field Name" to Flowfield and removed retail reference
 
     Caption = 'E-mail Template Filter';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -14,19 +15,23 @@ table 6014464 "NPR E-mail Template Filter"
         {
             Caption = 'E-mail Template Code';
             TableRelation = "NPR E-mail Template Header";
+            DataClassification = CustomerContent;
         }
         field(3; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
         }
         field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(8; "Field No."; Integer)
         {
             Caption = 'Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -48,6 +53,7 @@ table 6014464 "NPR E-mail Template Filter"
         field(9; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
         }
         field(10; "Field Name"; Text[30])
         {

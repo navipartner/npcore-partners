@@ -3,6 +3,7 @@ table 6014415 "NPR Quantity Discount Line"
     // NPR5.31/MHA /20170110  CASE 262904 Renamed Variables and functions to English and deleted unused in OnInsert()
 
     Caption = 'Multiple Unit Price';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,6 +11,7 @@ table 6014415 "NPR Quantity Discount Line"
         {
             Caption = 'Item No.';
             TableRelation = Item."No.";
+            DataClassification = CustomerContent;
         }
         field(2; Quantity; Decimal)
         {
@@ -18,6 +20,7 @@ table 6014415 "NPR Quantity Discount Line"
             MaxValue = 9.999;
             MinValue = 2;
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(3; "Unit Price"; Decimal)
         {
@@ -25,6 +28,7 @@ table 6014415 "NPR Quantity Discount Line"
             DecimalPlaces = 2 : 2;
             MaxValue = 9999999;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -38,6 +42,7 @@ table 6014415 "NPR Quantity Discount Line"
             DecimalPlaces = 2 : 2;
             MaxValue = 9999999;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -49,11 +54,13 @@ table 6014415 "NPR Quantity Discount Line"
         {
             Caption = 'Created Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(6; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(7; "Price Includes VAT"; Boolean)
         {
@@ -65,10 +72,12 @@ table 6014415 "NPR Quantity Discount Line"
         field(8; "Start Date"; Decimal)
         {
             Caption = 'Start Date';
+            DataClassification = CustomerContent;
         }
         field(9; "Main no."; Code[20])
         {
             Caption = 'Main no.';
+            DataClassification = CustomerContent;
         }
     }
 

@@ -5,27 +5,32 @@ table 6059937 "NPR RSS Feed Channel Sub."
     Caption = 'RSS Feed Channel Subscription';
     DrillDownPageID = "NPR RSS Feed Channel Sub.";
     LookupPageID = "NPR RSS Feed Channel Sub.";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Feed Code"; Code[10])
         {
             Caption = 'Feed Code';
+            DataClassification = CustomerContent;
         }
         field(10; Url; Text[250])
         {
             Caption = 'Url';
             Description = 'NPR5.22';
+            DataClassification = CustomerContent;
         }
         field(20; "Show as New Within"; DateFormula)
         {
             Caption = 'Show as New Within';
             Description = 'NPR5.22';
+            DataClassification = CustomerContent;
         }
         field(30; Default; Boolean)
         {
             Caption = 'Default';
             Description = 'NPR5.22';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin

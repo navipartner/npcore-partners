@@ -1,10 +1,12 @@
 table 6151247 "NPR POS Entry Cue."
 {
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
+            DataClassification = CustomerContent;
         }
         field(2; "Failed G/L Posting Trans."; Integer)
         {
@@ -38,7 +40,6 @@ table 6151247 "NPR POS Entry Cue."
         {
             CalcFormula = count ("NPR POS Entry");
             FieldClass = FlowField;
-
         }
         field(7; "Campaign Discount List"; Integer)
         {

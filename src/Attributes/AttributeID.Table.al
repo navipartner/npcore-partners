@@ -7,6 +7,7 @@ table 6014554 "NPR Attribute ID"
     Caption = 'Attribute ID';
     DrillDownPageID = "NPR Attribute IDs";
     LookupPageID = "NPR Attribute IDs";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -14,17 +15,20 @@ table 6014554 "NPR Attribute ID"
         {
             Caption = 'Table ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
         }
         field(2; "Attribute Code"; Code[20])
         {
             Caption = 'Attribute Code';
             TableRelation = "NPR Attribute".Code;
+            DataClassification = CustomerContent;
         }
         field(10; "Shortcut Attribute ID"; Option)
         {
             Caption = 'Shortcut Attribute ID';
             OptionCaption = 'Not Assigned,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40';
             OptionMembers = NOT_ASSIGNED,"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -36,6 +40,7 @@ table 6014554 "NPR Attribute ID"
             Caption = 'Entity Attribute ID';
             OptionCaption = 'Not Assigned,1,2';
             OptionMembers = NOT_ASSIGNED,"1","2";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -48,6 +53,7 @@ table 6014554 "NPR Attribute ID"
             Description = 'NPR5.22.01';
             OptionCaption = 'Not Set,Master Data,Document,Document Line,Worksheet Line, Worksheet Subline';
             OptionMembers = NOT_SET,MASTERDATA,DOCUMENT,DOCUMENTLINE,WORKSHEETLINE,WORKSHEETSUBLINE;
+            DataClassification = CustomerContent;
         }
     }
 

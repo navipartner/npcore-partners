@@ -6,6 +6,7 @@ table 6014463 "NPR E-mail Templ. Line"
     // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
 
     Caption = 'E-mail Template Line';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,14 +14,17 @@ table 6014463 "NPR E-mail Templ. Line"
         {
             Caption = 'E-mail Template Code';
             TableRelation = "NPR E-mail Template Header";
+            DataClassification = CustomerContent;
         }
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(3; "Mail Body Line"; Text[250])
         {
             Caption = 'Mail Body Line';
+            DataClassification = CustomerContent;
         }
     }
 

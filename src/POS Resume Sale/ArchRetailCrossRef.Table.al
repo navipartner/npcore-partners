@@ -10,24 +10,29 @@ table 6014495 "NPR Arch. Retail Cross Ref."
     Caption = 'Retail Cross Reference';
     DrillDownPageID = "NPR Retail Cross References";
     LookupPageID = "NPR Retail Cross References";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
+            DataClassification = CustomerContent;
         }
         field(5; "Reference No."; Code[50])
         {
             Caption = 'Reference No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
         }
         field(15; "Record Value"; Text[100])
         {
             Caption = 'Record Value';
+            DataClassification = CustomerContent;
         }
     }
 

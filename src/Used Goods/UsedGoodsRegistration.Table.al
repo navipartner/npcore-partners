@@ -11,12 +11,14 @@ table 6014500 "NPR Used Goods Registration"
 
     Caption = 'Used Goods Registration';
     LookupPageID = "NPR Used Goods Reg. List";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "No."; Code[10])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -31,10 +33,12 @@ table 6014500 "NPR Used Goods Registration"
         field(2; "Purchase Date"; Date)
         {
             Caption = 'Purchase Date';
+            DataClassification = CustomerContent;
         }
         field(3; Subject; Text[30])
         {
             Caption = 'Subject';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -46,6 +50,7 @@ table 6014500 "NPR Used Goods Registration"
         field(4; Description; Text[30])
         {
             Caption = 'Subject Description';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -55,22 +60,26 @@ table 6014500 "NPR Used Goods Registration"
         field(5; "Unit Cost"; Decimal)
         {
             Caption = 'Unit Cost';
+            DataClassification = CustomerContent;
         }
         field(6; Paid; Option)
         {
             Caption = 'Paid';
             OptionCaption = ' ,Check,Cash,Exchange';
             OptionMembers = " ",Check,Kontant,Bytte;
+            DataClassification = CustomerContent;
         }
         field(7; "Check Number"; Code[20])
         {
             Caption = 'Check Number';
+            DataClassification = CustomerContent;
         }
         field(20; "Purchased By Customer No."; Code[20])
         {
             Caption = 'Purchase Customer No.';
             TableRelation = Customer;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -182,19 +191,23 @@ table 6014500 "NPR Used Goods Registration"
         field(21; Name; Text[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
         field(22; Address; Text[50])
         {
             Caption = 'Address';
+            DataClassification = CustomerContent;
         }
         field(23; "Address 2"; Text[50])
         {
             Caption = 'Address 2';
+            DataClassification = CustomerContent;
         }
         field(24; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
             TableRelation = "Post Code";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -209,44 +222,53 @@ table 6014500 "NPR Used Goods Registration"
             Caption = 'ID Card';
             OptionCaption = ' ,Driver''s Licence,Passport,Credit Card,Other';
             OptionMembers = " ","Driver's Licence",Passport,"Credit Card",Other;
+            DataClassification = CustomerContent;
         }
         field(26; "CPR No."; Code[11])
         {
             Caption = 'Social Security No.';
+            DataClassification = CustomerContent;
         }
         field(27; "Identification Number"; Code[20])
         {
             Caption = 'Legitimation No.';
+            DataClassification = CustomerContent;
         }
         field(28; "Fax til Kostercentralen"; Boolean)
         {
             Caption = 'Fax to Kostercentralen';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(29; "Subject Sold Date"; Date)
         {
             Caption = 'Subject Sold Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(30; "Sales Ticket No./Invoice No."; Code[10])
         {
             Caption = 'On Sales Ticket No./Invoice';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(31; "Item No. Created"; Code[20])
         {
             Caption = 'Generated Item No.';
             Editable = false;
             TableRelation = Item;
+            DataClassification = CustomerContent;
         }
         field(32; "Kostercentralen Registered"; Date)
         {
             Caption = 'Kostercentralen Registered Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(33; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -263,31 +285,38 @@ table 6014500 "NPR Used Goods Registration"
         {
             Caption = 'Pool  VAT System';
             InitValue = true;
+            DataClassification = CustomerContent;
         }
         field(35; "Relation til faktura"; Code[10])
         {
             Caption = 'Relation to Invoice';
+            DataClassification = CustomerContent;
         }
         field(36; "Salgspris inkl. Moms"; Decimal)
         {
             Caption = 'Unit Price Including VAT';
+            DataClassification = CustomerContent;
         }
         field(37; Nummerserie; Code[20])
         {
             Caption = 'No. Series';
+            DataClassification = CustomerContent;
         }
         field(38; By; Code[30])
         {
             Caption = 'City';
+            DataClassification = CustomerContent;
         }
         field(39; Serienummer; Code[50])
         {
             Caption = 'Serial No.';
+            DataClassification = CustomerContent;
         }
         field(40; "Salesperson Code"; Code[10])
         {
             Caption = 'Salesperson Code';
             TableRelation = "Salesperson/Purchaser";
+            DataClassification = CustomerContent;
         }
         field(41; Beholdning; Decimal)
         {
@@ -299,32 +328,38 @@ table 6014500 "NPR Used Goods Registration"
         field(42; Link; Code[10])
         {
             Caption = 'Link';
+            DataClassification = CustomerContent;
         }
         field(43; "Brugtvare lagermetode"; Option)
         {
             Caption = 'Used Goods Inventory Method';
             OptionCaption = 'FIFO,LIFO,Serial No.,Avarage,Standard';
             OptionMembers = FIFO,LIFO,Serienummer,Gennemsnit,Standard;
+            DataClassification = CustomerContent;
         }
         field(44; "Item Group No."; Code[10])
         {
             Caption = 'Belongs in Item Group No.';
             TableRelation = "NPR Item Group" WHERE("Used Goods Group" = CONST(true),
                                                 "Main Item Group" = CONST(false));
+            DataClassification = CustomerContent;
         }
         field(45; Stand; Option)
         {
             Caption = 'Condition';
             OptionCaption = 'New,Mint,Mint boxed,A,B,C,D,E,F,B+';
             OptionMembers = New,Mint,"Mint boxed",A,B,C,D,E,F,"B+";
+            DataClassification = CustomerContent;
         }
         field(46; "Search Name"; Text[30])
         {
             Caption = 'Search Name';
+            DataClassification = CustomerContent;
         }
         field(47; "Rettet den"; Date)
         {
             Caption = 'Edited Date';
+            DataClassification = CustomerContent;
         }
         field(50; "Location Code"; Code[10])
         {
@@ -332,6 +367,7 @@ table 6014500 "NPR Used Goods Registration"
             Description = 'NPR5.26';
             InitValue = '1';
             TableRelation = Location;
+            DataClassification = CustomerContent;
         }
         field(55; Status; Option)
         {
@@ -339,6 +375,7 @@ table 6014500 "NPR Used Goods Registration"
             Description = 'NPR5.26';
             OptionCaption = 'MainPost,SinglePost,SubPost';
             OptionMembers = MainPost,SinglePost,SubPost;
+            DataClassification = CustomerContent;
         }
     }
 

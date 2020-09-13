@@ -7,6 +7,7 @@ table 6014458 "NPR E-mail Attachment"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 1
 
     Caption = 'E-mail Attachment';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -14,18 +15,22 @@ table 6014458 "NPR E-mail Attachment"
         {
             Caption = 'Table No.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
         }
         field(10; "Primary Key"; Text[200])
         {
             Caption = 'Primary Key';
+            DataClassification = CustomerContent;
         }
         field(20; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(30; "Attached File"; BLOB)
         {
             Caption = 'Attached data';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -53,6 +58,7 @@ table 6014458 "NPR E-mail Attachment"
         field(40; Description; Text[250])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 

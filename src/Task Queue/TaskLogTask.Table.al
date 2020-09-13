@@ -10,6 +10,7 @@ table 6059904 "NPR Task Log (Task)"
     Caption = 'Task Log';
     DrillDownPageID = "NPR Task Log (Task)";
     LookupPageID = "NPR Task Log (Task)";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -17,42 +18,51 @@ table 6059904 "NPR Task Log (Task)"
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
         field(2; "Journal Template Name"; Code[10])
         {
             Caption = 'Journal Template Name';
             TableRelation = "NPR Task Template";
+            DataClassification = CustomerContent;
         }
         field(3; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             TableRelation = "NPR Task Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            DataClassification = CustomerContent;
         }
         field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(9; "Entry Type"; Option)
         {
             Caption = 'Entry Type';
             OptionCaption = 'Task,Login,Logout,Change Company,Login Tread,Logout Tread';
             OptionMembers = Task,Login,Logout,ChangeComp,LoginTread,LogoutTread;
+            DataClassification = CustomerContent;
         }
         field(10; "Starting Time"; DateTime)
         {
             Caption = 'Starting Time';
+            DataClassification = CustomerContent;
         }
         field(11; "Ending Time"; DateTime)
         {
             Caption = 'Ending Time';
+            DataClassification = CustomerContent;
         }
         field(12; "Expected Ending Time"; DateTime)
         {
             Caption = 'Expected Ending Time';
+            DataClassification = CustomerContent;
         }
         field(13; "Task Duration"; Duration)
         {
             Caption = 'Task Duration';
+            DataClassification = CustomerContent;
         }
         field(15; Status; Option)
         {
@@ -60,10 +70,12 @@ table 6059904 "NPR Task Log (Task)"
             Description = 'TQ1.27';
             OptionCaption = ',Started,Error,Succes,Message';
             OptionMembers = " ",Started,Error,Succes,Message;
+            DataClassification = CustomerContent;
         }
         field(16; "Last Error Message"; Text[250])
         {
             Caption = 'Last Error Message';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -83,29 +95,35 @@ table 6059904 "NPR Task Log (Task)"
         field(17; "Last Error Message BLOB"; BLOB)
         {
             Caption = 'Last Error Message BLOB';
+            DataClassification = CustomerContent;
         }
         field(20; "User ID"; Code[50])
         {
             Caption = 'User ID';
+            DataClassification = CustomerContent;
         }
         field(21; "Task Worker Group"; Code[10])
         {
             Caption = 'Task Worker Group';
             TableRelation = "NPR Task Worker Group";
+            DataClassification = CustomerContent;
         }
         field(22; "Server Instance ID"; Integer)
         {
             Caption = 'Server Instance ID';
+            DataClassification = CustomerContent;
         }
         field(23; "Session ID"; Integer)
         {
             Caption = 'Session ID';
+            DataClassification = CustomerContent;
         }
         field(40; "Object Type"; Option)
         {
             Caption = 'Object Type';
             OptionCaption = ' ,Report,Codeunit';
             OptionMembers = " ","Report","Codeunit";
+            DataClassification = CustomerContent;
         }
         field(41; "Object No."; Integer)
         {
@@ -113,6 +131,7 @@ table 6059904 "NPR Task Log (Task)"
             TableRelation = IF ("Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = CONST(Report))
             ELSE
             IF ("Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var

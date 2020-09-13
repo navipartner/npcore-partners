@@ -4,6 +4,7 @@ table 6059777 "NPR Company Sync Profiles"
 
     Caption = 'Company Sync Profiles';
     DataPerCompany = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -11,10 +12,12 @@ table 6059777 "NPR Company Sync Profiles"
         {
             Caption = 'Synchronisation Profile';
             Editable = true;
+            DataClassification = CustomerContent;
         }
         field(2; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 

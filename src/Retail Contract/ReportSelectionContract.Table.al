@@ -8,6 +8,7 @@ table 6014520 "NPR Report Selection: Contract"
     // NPR5.48/JDH /20181108 CASE 334560 Changed Data port fields to XML Port fields, and fixed reference to Object table. Fixed option Caption for "Report Type"
 
     Caption = 'Report Selection - Contract';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -18,16 +19,19 @@ table 6014520 "NPR Report Selection: Contract"
             InitValue = "Insurance Offer";
             OptionCaption = ',Insurance Offer,Insurance Voucher,Guarantee Certificate,,,Repair reminder,Delivery note,Customer receipt,Repair guarantee,Repair finished,Repair offer,Rental contract,Purchase contract,Customer letter,Contract financing,Signs,Quote,Repair Label';
             OptionMembers = ,"Insurance Offer",Police,"Guarantee Certificate",,,"Reparation Reminder","Shipment note","Customer receipt","Repair warranty","Repair finished","Repair offer","Rental contract","Purchase contract",CustLetter,"Contract financing",Signs,Quote,"Repair Label";
+            DataClassification = CustomerContent;
         }
         field(2; Sequence; Code[10])
         {
             Caption = 'Sequence';
             Numeric = true;
+            DataClassification = CustomerContent;
         }
         field(3; "Report ID"; Integer)
         {
             Caption = 'Report ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -46,6 +50,7 @@ table 6014520 "NPR Report Selection: Contract"
         {
             Caption = 'XML Port ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -64,11 +69,13 @@ table 6014520 "NPR Report Selection: Contract"
         {
             Caption = 'Cash Register No.';
             TableRelation = "NPR Register";
+            DataClassification = CustomerContent;
         }
         field(8; "Codeunit ID"; Integer)
         {
             Caption = 'Codeunit ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            DataClassification = CustomerContent;
         }
         field(9; "Codeunit Name"; Text[30])
         {
@@ -82,6 +89,7 @@ table 6014520 "NPR Report Selection: Contract"
         {
             Caption = 'Print Template';
             TableRelation = "NPR RP Template Header".Code;
+            DataClassification = CustomerContent;
         }
     }
 

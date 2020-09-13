@@ -3,20 +3,24 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
     // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free GB I2 Info Capture';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Entry No."; Integer)
         {
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
         field(2; "Shop Country Code"; Integer)
         {
             Caption = 'Shop Country Code';
+            DataClassification = CustomerContent;
         }
         field(3; "Passport Number"; Text[20])
         {
             Caption = 'Passport Number';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -27,26 +31,32 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(4; "First Name"; Text[30])
         {
             Caption = 'First Name';
+            DataClassification = CustomerContent;
         }
         field(5; "Last Name"; Text[30])
         {
             Caption = 'Last Name';
+            DataClassification = CustomerContent;
         }
         field(6; Street; Text[100])
         {
             Caption = 'Street';
+            DataClassification = CustomerContent;
         }
         field(7; "Postal Code"; Text[20])
         {
             Caption = 'Postal Code';
+            DataClassification = CustomerContent;
         }
         field(8; Town; Text[50])
         {
             Caption = 'Town';
+            DataClassification = CustomerContent;
         }
         field(9; "Country Of Residence"; Text[60])
         {
             Caption = 'Country Of Residence';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -81,10 +91,12 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(10; "Country Of Residence Code"; Integer)
         {
             Caption = 'Country Of Residence Code';
+            DataClassification = CustomerContent;
         }
         field(11; "E-mail"; Text[100])
         {
             Caption = 'E-mail';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -94,6 +106,7 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(12; "Mobile No."; Text[20])
         {
             Caption = 'Mobile No.';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -103,6 +116,7 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(13; "Mobile No. Prefix"; Integer)
         {
             Caption = 'Mobile No. Prefix';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -115,10 +129,12 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(14; "Mobile No. Prefix Formatted"; Text[10])
         {
             Caption = 'Mobile No. Prefix Formatted';
+            DataClassification = CustomerContent;
         }
         field(15; "Mobile No. Country"; Text[60])
         {
             Caption = 'Mobile No. Country';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -146,6 +162,7 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(16; "Passport Country"; Text[60])
         {
             Caption = 'Passport Country';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -174,10 +191,12 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(17; "Passport Country Code"; Integer)
         {
             Caption = 'Passport Country Code';
+            DataClassification = CustomerContent;
         }
         field(18; "Date Of Birth"; Date)
         {
             Caption = 'Date Of Birth';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -187,14 +206,17 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(19; "Departure Date"; Date)
         {
             Caption = 'Departure Date';
+            DataClassification = CustomerContent;
         }
         field(20; "Arrival Date"; Date)
         {
             Caption = 'Arrival Date';
+            DataClassification = CustomerContent;
         }
         field(21; "Final Destination Country"; Text[60])
         {
             Caption = 'Final Destination Country';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -222,14 +244,17 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         field(22; "Final Destination Country Code"; Integer)
         {
             Caption = 'Final Destination Country Code';
+            DataClassification = CustomerContent;
         }
         field(23; "Global Blue Identifier"; Text[250])
         {
             Caption = 'Global Blue Identifier';
+            DataClassification = CustomerContent;
         }
         field(24; "Is Identity Checked"; Boolean)
         {
             Caption = 'Is Identity Checked';
+            DataClassification = CustomerContent;
         }
     }
 

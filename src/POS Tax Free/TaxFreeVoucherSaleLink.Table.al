@@ -4,6 +4,7 @@ table 6014644 "NPR Tax Free Voucher Sale Link"
 
     Caption = 'Tax Free Voucher Sale Link';
     LookupPageID = "NPR Tax Free Vouch. Sale Links";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -11,6 +12,7 @@ table 6014644 "NPR Tax Free Voucher Sale Link"
         {
             Caption = 'Voucher Entry No.';
             TableRelation = "NPR Tax Free Voucher"."Entry No.";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -23,20 +25,24 @@ table 6014644 "NPR Tax Free Voucher Sale Link"
         field(2; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
+            DataClassification = CustomerContent;
         }
         field(3; "Sales Header Type"; Option)
         {
             Caption = 'Sales Header Type';
             OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
             OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+            DataClassification = CustomerContent;
         }
         field(4; "Sales Header No."; Code[20])
         {
             Caption = 'Sales Header No.';
+            DataClassification = CustomerContent;
         }
         field(20; "Voucher External No."; Text[50])
         {
             Caption = 'Voucher External No.';
+            DataClassification = CustomerContent;
         }
     }
 

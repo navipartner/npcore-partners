@@ -4,6 +4,7 @@ table 6014430 "NPR Line Dimension"
     // NPR5.39/TJ  /20180206 CASE 302634 Changed OptionString property of field Sale Type to english version
 
     Caption = 'NPR Line Dimension';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,41 +13,49 @@ table 6014430 "NPR Line Dimension"
             Caption = 'Table ID';
             NotBlank = true;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
         }
         field(2; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
             NotBlank = true;
             TableRelation = "NPR Register";
+            DataClassification = CustomerContent;
         }
         field(3; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(4; "Sale Type"; Option)
         {
             Caption = 'Sale Type';
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Payment1,Disbursement,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Payment1,Disbursement,Comment,Cancelled,"Open/Close";
+            DataClassification = CustomerContent;
         }
         field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(6; "Date"; Date)
         {
             Caption = 'Date';
+            DataClassification = CustomerContent;
         }
         field(7; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Dimension Code"; Code[20])
         {
             Caption = 'Dimension Code';
             NotBlank = true;
             TableRelation = Dimension;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -59,6 +68,7 @@ table 6014430 "NPR Line Dimension"
             Caption = 'Dimension Value Code';
             NotBlank = true;
             TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin

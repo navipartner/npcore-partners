@@ -4,12 +4,14 @@ table 6059932 "NPR Doc. Exch. Cue"
     // NPR5.48/JDH /20181109 CASE 334163 Added Captions
 
     Caption = 'Doc. Exch. Cue';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
+            DataClassification = CustomerContent;
         }
         field(2; "Requests to Approve"; Integer)
         {

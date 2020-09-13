@@ -3,6 +3,7 @@ table 6014437 "NPR Payment Type - Detailed"
     // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
 
     Caption = 'Payment Type - Detailed';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,19 +11,23 @@ table 6014437 "NPR Payment Type - Detailed"
         {
             Caption = 'Payment Type';
             TableRelation = "NPR Payment Type POS"."No.";
+            DataClassification = CustomerContent;
         }
         field(2; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
             TableRelation = IF ("Payment No." = CONST('<>''')) "NPR Register"."Register No.";
+            DataClassification = CustomerContent;
         }
         field(3; Weight; Decimal)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
         }
         field(4; Amount; Decimal)
         {
             Caption = 'Amount';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -32,6 +37,7 @@ table 6014437 "NPR Payment Type - Detailed"
         field(5; Quantity; Integer)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
