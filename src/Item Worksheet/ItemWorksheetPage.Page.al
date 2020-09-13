@@ -25,7 +25,8 @@ page 6060042 "NPR Item Worksheet Page"
     AutoSplitKey = true;
     Caption = 'Item Worksheet Page';
     DelayedInsert = false;
-    PageType = Worksheet;
+    //PageType = Worksheet;
+    PageType = Document;
     PopulateAllFields = true;
     RefreshOnActivate = true;
     SaveValues = true;
