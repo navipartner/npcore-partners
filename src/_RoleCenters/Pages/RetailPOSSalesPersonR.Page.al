@@ -419,7 +419,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     ToolTip = 'View Sales Credit Memos that have been done.';
                     ApplicationArea = All;
                 }
-
                 action("Repair Document List")
                 {
                     //ApplicationArea = Warehouse;
@@ -1078,15 +1077,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     ApplicationArea = All;
                     //RunObject = Report "pos item with dimension";
                 }
-
-
             }
-
-
-
         }
     }
-
 }
-
-
